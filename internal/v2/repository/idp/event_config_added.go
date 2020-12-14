@@ -34,10 +34,6 @@ func NewConfigAddedEvent(
 	}
 }
 
-func (e *ConfigAddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ConfigAddedEvent) Data() interface{} {
 	return e
 }

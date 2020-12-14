@@ -20,10 +20,6 @@ type AddedEvent struct {
 	ShowLockOutFailures bool   `json:"showLockOutFailures"`
 }
 
-func (e *AddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *AddedEvent) Data() interface{} {
 	return e
 }
@@ -59,10 +55,6 @@ type ChangedEvent struct {
 
 	MaxAttempts         uint64 `json:"maxAttempts,omitempty"`
 	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
-}
-
-func (e *ChangedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *ChangedEvent) Data() interface{} {
@@ -105,10 +97,6 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 
 type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *RemovedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *RemovedEvent) Data() interface{} {

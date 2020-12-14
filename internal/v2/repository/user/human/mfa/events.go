@@ -15,10 +15,6 @@ type InitSkippedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *InitSkippedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *InitSkippedEvent) Data() interface{} {
 	return e
 }

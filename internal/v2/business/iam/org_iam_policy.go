@@ -19,7 +19,7 @@ func (r *Repository) AddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgI
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.OrgIAMPolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.Policy.WriteModel).
 		PushOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -36,7 +36,7 @@ func (r *Repository) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.O
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.Policy.WriteModel).
 		PushOrgIAMPolicyChangedFromExisting(ctx, existingPolicy, policy.UserLoginMustBeDomain)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

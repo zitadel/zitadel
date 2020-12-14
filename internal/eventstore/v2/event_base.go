@@ -65,16 +65,15 @@ func (e *BaseEvent) CreationDate() time.Time {
 
 func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 	return &BaseEvent{
-		aggregateID:       event.AggregateID,
-		aggregateType:     AggregateType(event.AggregateType),
-		aggregateVersion:  Version(event.Version),
-		EventType:         EventType(event.Type),
-		creationDate:      event.CreationDate,
-		sequence:          event.Sequence,
-		previouseSequence: event.PreviousSequence,
-		resourceOwner:     event.ResourceOwner,
-		Service:           event.EditorService,
-		User:              event.EditorUser,
+		aggregateID:      event.AggregateID,
+		aggregateType:    AggregateType(event.AggregateType),
+		aggregateVersion: Version(event.Version),
+		EventType:        EventType(event.Type),
+		creationDate:     event.CreationDate,
+		sequence:         event.Sequence,
+		resourceOwner:    event.ResourceOwner,
+		Service:          event.EditorService,
+		User:             event.EditorUser,
 	}
 }
 

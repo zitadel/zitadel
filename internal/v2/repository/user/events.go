@@ -26,10 +26,6 @@ type LockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LockedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *LockedEvent) Data() interface{} {
 	return nil
 }
@@ -51,10 +47,6 @@ func LockedEventMapper(event *repository.Event) (eventstore.EventReader, error) 
 
 type UnlockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *UnlockedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *UnlockedEvent) Data() interface{} {
@@ -80,10 +72,6 @@ type DeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DeactivatedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *DeactivatedEvent) Data() interface{} {
 	return nil
 }
@@ -107,10 +95,6 @@ type ReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ReactivatedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ReactivatedEvent) Data() interface{} {
 	return nil
 }
@@ -132,10 +116,6 @@ func ReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, er
 
 type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *RemovedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *RemovedEvent) Data() interface{} {
@@ -167,10 +147,6 @@ type TokenAddedEvent struct {
 	Scopes            []string  `json:"scopes""`
 	Expiration        time.Time `json:"expiration"`
 	PreferredLanguage string    `json:"preferredLanguage"`
-}
-
-func (e *TokenAddedEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *TokenAddedEvent) Data() interface{} {
@@ -219,10 +195,6 @@ type DomainClaimedEvent struct {
 	UserName string `json:"userName"`
 }
 
-func (e *DomainClaimedEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *DomainClaimedEvent) Data() interface{} {
 	return e
 }
@@ -256,10 +228,6 @@ type DomainClaimedSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DomainClaimedSentEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *DomainClaimedSentEvent) Data() interface{} {
 	return nil
 }
@@ -285,10 +253,6 @@ type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
-}
-
-func (e *UsernameChangedEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *UsernameChangedEvent) Data() interface{} {

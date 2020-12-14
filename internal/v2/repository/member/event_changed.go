@@ -21,10 +21,6 @@ type ChangedEvent struct {
 	UserID string   `json:"userId,omitempty"`
 }
 
-func (e *ChangedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ChangedEvent) Data() interface{} {
 	return e
 }

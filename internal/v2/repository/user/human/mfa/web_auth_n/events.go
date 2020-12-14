@@ -37,10 +37,6 @@ type AddedEvent struct {
 	State           mfa.State `json:"-"`
 }
 
-func (e *AddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *AddedEvent) Data() interface{} {
 	return e
 }
@@ -98,10 +94,6 @@ type VerifiedEvent struct {
 	SignCount         uint32    `json:"signCount"`
 	WebAuthNTokenName string    `json:"webAuthNTokenName"`
 	State             mfa.State `json:"-"`
-}
-
-func (e *VerifiedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *VerifiedEvent) Data() interface{} {
@@ -178,10 +170,6 @@ type SignCountChangedEvent struct {
 	State           mfa.State `json:"-"`
 }
 
-func (e *SignCountChangedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *SignCountChangedEvent) Data() interface{} {
 	return e
 }
@@ -234,10 +222,6 @@ type RemovedEvent struct {
 	State           mfa.State `json:"-"`
 }
 
-func (e *RemovedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *RemovedEvent) Data() interface{} {
 	return e
 }
@@ -286,10 +270,6 @@ type BeginLoginEvent struct {
 	Challenge       string `json:"challenge"`
 	//TODO: Handle Auth Req??
 	//*AuthRequest
-}
-
-func (e *BeginLoginEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *BeginLoginEvent) Data() interface{} {
@@ -344,10 +324,6 @@ type CheckSucceededEvent struct {
 	//*AuthRequest
 }
 
-func (e *CheckSucceededEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *CheckSucceededEvent) Data() interface{} {
 	return e
 }
@@ -386,10 +362,6 @@ type CheckFailedEvent struct {
 
 	//TODO: Handle Auth Req??
 	//*AuthRequest
-}
-
-func (e *CheckFailedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *CheckFailedEvent) Data() interface{} {

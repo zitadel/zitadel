@@ -10,71 +10,65 @@ const (
 )
 
 type SecondFactorWriteModel struct {
-	eventstore.WriteModel
-	SecondFactor factors.SecondFactoryWriteModel
-
-	iamID string
+	factors.SecondFactorWriteModel
 }
 
 func NewSecondFactorWriteModel(iamID string) *SecondFactorWriteModel {
 	return &SecondFactorWriteModel{
-		iamID: iamID,
+		factors.SecondFactorWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID: iamID,
+			},
+		},
 	}
 }
 
 func (wm *SecondFactorWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
 		case *LoginPolicySecondFactorAddedEvent:
-			wm.SecondFactor.AppendEvents(&e.SecondFactorAddedEvent)
+			wm.WriteModel.AppendEvents(&e.SecondFactorAddedEvent)
 		}
 	}
 }
 
 func (wm *SecondFactorWriteModel) Reduce() error {
-	if err := wm.SecondFactor.Reduce(); err != nil {
-		return err
-	}
 	return wm.WriteModel.Reduce()
 }
 
 func (wm *SecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
-		AggregateIDs(wm.iamID)
+		AggregateIDs(wm.WriteModel.AggregateID)
 }
 
 type MultiFactorWriteModel struct {
-	eventstore.WriteModel
-	MultiFactor factors.MultiFactoryWriteModel
-
-	iamID string
+	factors.MultiFactoryWriteModel
 }
 
 func NewMultiFactorWriteModel(iamID string) *MultiFactorWriteModel {
 	return &MultiFactorWriteModel{
-		iamID: iamID,
+		factors.MultiFactoryWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID: iamID,
+			},
+		},
 	}
 }
 
 func (wm *MultiFactorWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
 		case *LoginPolicyMultiFactorAddedEvent:
-			wm.MultiFactor.AppendEvents(&e.MultiFactorAddedEvent)
+			wm.WriteModel.AppendEvents(&e.MultiFactorAddedEvent)
 		}
 	}
 }
 
 func (wm *MultiFactorWriteModel) Reduce() error {
-	if err := wm.MultiFactor.Reduce(); err != nil {
-		return err
-	}
 	return wm.WriteModel.Reduce()
 }
 
 func (wm *MultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
-		AggregateIDs(wm.iamID)
+		AggregateIDs(wm.WriteModel.AggregateID)
 }

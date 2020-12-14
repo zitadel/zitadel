@@ -19,7 +19,7 @@ func (r *Repository) AddPasswordAgePolicy(ctx context.Context, policy *iam_model
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-6L0pd", "Errors.IAM.PasswordAgePolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.Policy.WriteModel).
 		PushPasswordAgePolicyAddedEvent(ctx, policy.ExpireWarnDays, policy.MaxAgeDays)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -36,7 +36,7 @@ func (r *Repository) ChangePasswordAgePolicy(ctx context.Context, policy *iam_mo
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.Policy.WriteModel).
 		PushPasswordAgePolicyChangedFromExisting(ctx, existingPolicy, policy.ExpireWarnDays, policy.MaxAgeDays)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

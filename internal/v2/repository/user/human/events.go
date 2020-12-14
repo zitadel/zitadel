@@ -45,10 +45,6 @@ type AddedEvent struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (e *AddedEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *AddedEvent) Data() interface{} {
 	return e
 }
@@ -127,10 +123,6 @@ type RegisteredEvent struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (e *RegisteredEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *RegisteredEvent) Data() interface{} {
 	return e
 }
@@ -192,10 +184,6 @@ type InitialCodeAddedEvent struct {
 	Expiry               time.Duration       `json:"expiry,omitempty"`
 }
 
-func (e *InitialCodeAddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *InitialCodeAddedEvent) Data() interface{} {
 	return e
 }
@@ -231,10 +219,6 @@ type InitialCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *InitialCodeSentEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *InitialCodeSentEvent) Data() interface{} {
 	return nil
 }
@@ -256,10 +240,6 @@ func InitialCodeSentEventMapper(event *repository.Event) (eventstore.EventReader
 
 type InitializedCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *InitializedCheckSucceededEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *InitializedCheckSucceededEvent) Data() interface{} {
@@ -285,10 +265,6 @@ type InitializedCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *InitializedCheckFailedEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *InitializedCheckFailedEvent) Data() interface{} {
 	return nil
 }
@@ -310,10 +286,6 @@ func InitializedCheckFailedEventMapper(event *repository.Event) (eventstore.Even
 
 type SignedOutEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *SignedOutEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *SignedOutEvent) Data() interface{} {

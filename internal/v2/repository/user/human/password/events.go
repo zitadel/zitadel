@@ -27,10 +27,6 @@ type ChangedEvent struct {
 	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
-func (e *ChangedEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *ChangedEvent) Data() interface{} {
 	return e
 }
@@ -70,10 +66,6 @@ type CodeAddedEvent struct {
 	NotificationType human.NotificationType `json:"notificationType,omitempty"`
 }
 
-func (e *CodeAddedEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *CodeAddedEvent) Data() interface{} {
 	return e
 }
@@ -111,10 +103,6 @@ type CodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CodeSentEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *CodeSentEvent) Data() interface{} {
 	return nil
 }
@@ -138,10 +126,6 @@ type CheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CheckSucceededEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *CheckSucceededEvent) Data() interface{} {
 	return nil
 }
@@ -163,10 +147,6 @@ func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader,
 
 type CheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *CheckFailedEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *CheckFailedEvent) Data() interface{} {

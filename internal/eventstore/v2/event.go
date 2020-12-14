@@ -18,9 +18,6 @@ type EventPusher interface {
 	// * struct which can be marshalled to json
 	// * pointer to struct which can be marshalled to json
 	Data() interface{}
-	//CheckPrevious ensures the event order if true
-	// if false the previous sequence is not checked on push
-	CheckPrevious() bool
 }
 
 type EventReader interface {

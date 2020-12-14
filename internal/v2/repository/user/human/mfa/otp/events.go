@@ -26,10 +26,6 @@ type AddedEvent struct {
 	State  mfa.State           `json:"-"`
 }
 
-func (e *AddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *AddedEvent) Data() interface{} {
 	return e
 }
@@ -62,10 +58,6 @@ type VerifiedEvent struct {
 	State                mfa.State `json:"-"`
 }
 
-func (e *VerifiedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *VerifiedEvent) Data() interface{} {
 	return nil
 }
@@ -88,10 +80,6 @@ func VerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error
 
 type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *RemovedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *RemovedEvent) Data() interface{} {
@@ -117,10 +105,6 @@ type CheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CheckSucceededEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *CheckSucceededEvent) Data() interface{} {
 	return nil
 }
@@ -142,10 +126,6 @@ func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader,
 
 type CheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *CheckFailedEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *CheckFailedEvent) Data() interface{} {

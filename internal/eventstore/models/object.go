@@ -21,7 +21,7 @@ func (o *ObjectRoot) AppendEvent(event *Event) {
 	}
 
 	o.ChangeDate = event.CreationDate
-	if event.PreviousSequence == 0 {
+	if o.CreationDate.IsZero() {
 		o.CreationDate = o.ChangeDate
 	}
 

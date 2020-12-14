@@ -18,10 +18,6 @@ type RemovedEvent struct {
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *RemovedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *RemovedEvent) Data() interface{} {
 	return e
 }

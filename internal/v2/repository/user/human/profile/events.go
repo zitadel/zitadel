@@ -26,10 +26,6 @@ type ChangedEvent struct {
 	Gender            human.Gender `json:"gender,omitempty"`
 }
 
-func (e *ChangedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ChangedEvent) Data() interface{} {
 	return e
 }

@@ -18,10 +18,6 @@ type AddedEvent struct {
 	UserLoginMustBeDomain bool `json:"userLoginMustBeDomain"`
 }
 
-func (e *AddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *AddedEvent) Data() interface{} {
 	return e
 }
@@ -54,10 +50,6 @@ type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserLoginMustBeDomain bool `json:"userLoginMustBeDomain"`
-}
-
-func (e *ChangedEvent) CheckPrevious() bool {
-	return true
 }
 
 func (e *ChangedEvent) Data() interface{} {

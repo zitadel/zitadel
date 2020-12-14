@@ -23,10 +23,6 @@ type ChangedEvent struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (e *ChangedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *ChangedEvent) Data() interface{} {
 	return e
 }

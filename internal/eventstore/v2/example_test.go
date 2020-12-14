@@ -80,10 +80,6 @@ func UserAddedEventMapper() (eventstore.EventType, func(*repository.Event) (even
 	}
 }
 
-func (e *UserAddedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *UserAddedEvent) Data() interface{} {
 	return e
 }
@@ -122,10 +118,6 @@ func UserFirstNameChangedMapper() (eventstore.EventType, func(*repository.Event)
 	}
 }
 
-func (e *UserFirstNameChangedEvent) CheckPrevious() bool {
-	return true
-}
-
 func (e *UserFirstNameChangedEvent) Data() interface{} {
 	return e
 }
@@ -156,10 +148,6 @@ func UserPasswordCheckedMapper() (eventstore.EventType, func(*repository.Event) 
 	}
 }
 
-func (e *UserPasswordCheckedEvent) CheckPrevious() bool {
-	return false
-}
-
 func (e *UserPasswordCheckedEvent) Data() interface{} {
 	return nil
 }
@@ -188,10 +176,6 @@ func UserDeletedMapper() (eventstore.EventType, func(*repository.Event) (eventst
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
 	}
-}
-
-func (e *UserDeletedEvent) CheckPrevious() bool {
-	return false
 }
 
 func (e *UserDeletedEvent) Data() interface{} {
