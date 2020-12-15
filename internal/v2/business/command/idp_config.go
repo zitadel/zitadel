@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
-func (r *CommandSide) AddIDPConfig(ctx context.Context, config *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
 	if config.OIDCConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "IAM-eUpQU", "Errors.idp.config.notset")
 	}
@@ -28,7 +28,7 @@ func (r *CommandSide) AddIDPConfig(ctx context.Context, config *iam_model.IDPCon
 		return nil, err
 	}
 
-	writeModel, err := r.pushIDPWriteModel(ctx, config.AggregateID, idpConfigID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
+	writeModel, err := r.pushDefaultIDPWriteModel(ctx, config.AggregateID, idpConfigID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
 		return a.
 			PushIDPConfigAdded(
 				ctx,
@@ -53,8 +53,8 @@ func (r *CommandSide) AddIDPConfig(ctx context.Context, config *iam_model.IDPCon
 	return writeModelToIDPConfig(writeModel), nil
 }
 
-func (r *CommandSide) ChangeIDPConfig(ctx context.Context, config *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
-	writeModel, err := r.pushIDPWriteModel(ctx, config.AggregateID, config.IDPConfigID, func(a *iam.Aggregate, writeModel *iam.IDPConfigWriteModel) *iam.Aggregate {
+func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+	writeModel, err := r.pushDefaultIDPWriteModel(ctx, config.AggregateID, config.IDPConfigID, func(a *iam.Aggregate, writeModel *iam.IDPConfigWriteModel) *iam.Aggregate {
 		return a.PushIDPConfigChanged(
 			ctx,
 			writeModel,
@@ -70,8 +70,8 @@ func (r *CommandSide) ChangeIDPConfig(ctx context.Context, config *iam_model.IDP
 	return writeModelToIDPConfig(writeModel), nil
 }
 
-func (r *CommandSide) DeactivateIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
-	writeModel, err := r.pushIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
+func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+	writeModel, err := r.pushDefaultIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
 		return a.PushIDPConfigDeactivated(ctx, idpID)
 	})
 	if err != nil {
@@ -81,8 +81,8 @@ func (r *CommandSide) DeactivateIDPConfig(ctx context.Context, iamID, idpID stri
 	return writeModelToIDPConfig(writeModel), nil
 }
 
-func (r *CommandSide) ReactivateIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
-	writeModel, err := r.pushIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
+func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+	writeModel, err := r.pushDefaultIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
 		return a.PushIDPConfigReactivated(ctx, idpID)
 	})
 	if err != nil {
@@ -92,8 +92,8 @@ func (r *CommandSide) ReactivateIDPConfig(ctx context.Context, iamID, idpID stri
 	return writeModelToIDPConfig(writeModel), nil
 }
 
-func (r *CommandSide) RemoveIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
-	writeModel, err := r.pushIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
+func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+	writeModel, err := r.pushDefaultIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *iam.IDPConfigWriteModel) *iam.Aggregate {
 		return a.PushIDPConfigRemoved(ctx, idpID)
 	})
 	if err != nil {
@@ -103,7 +103,7 @@ func (r *CommandSide) RemoveIDPConfig(ctx context.Context, iamID, idpID string) 
 	return writeModelToIDPConfig(writeModel), nil
 }
 
-func (r *CommandSide) pushIDPWriteModel(ctx context.Context, iamID, idpID string, eventSetter func(*iam.Aggregate, *iam.IDPConfigWriteModel) *iam.Aggregate) (*iam.IDPConfigWriteModel, error) {
+func (r *CommandSide) pushDefaultIDPWriteModel(ctx context.Context, iamID, idpID string, eventSetter func(*iam.Aggregate, *iam.IDPConfigWriteModel) *iam.Aggregate) (*iam.IDPConfigWriteModel, error) {
 	writeModel := iam.NewIDPConfigWriteModel(iamID, idpID)
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {

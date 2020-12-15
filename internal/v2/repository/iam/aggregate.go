@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/business/command"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	factors2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
@@ -68,12 +69,13 @@ func AggregateFromReadModel(rm *ReadModel) *Aggregate {
 	}
 }
 
-func (a *Aggregate) PushMemberAdded(ctx context.Context, userID string, roles ...string) *Aggregate {
-	a.Aggregate = *a.PushEvents(NewMemberAddedEvent(ctx, userID, roles...))
-	return a
-}
+//
+//func (a *Aggregate) PushMemberAdded(ctx context.Context, userID string, roles ...string) *Aggregate {
+//	a.Aggregate = *a.PushEvents(NewMemberAddedEvent(ctx, userID, roles...))
+//	return a
+//}
 
-func (a *Aggregate) PushMemberChangedFromExisting(ctx context.Context, current *MemberWriteModel, roles ...string) *Aggregate {
+func (a *Aggregate) PushMemberChangedFromExisting(ctx context.Context, current *command.IAMMemberWriteModel, roles ...string) *Aggregate {
 	e, err := MemberChangedEventFromExisting(ctx, current, roles...)
 	if err != nil {
 		return a

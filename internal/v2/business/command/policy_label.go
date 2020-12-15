@@ -10,7 +10,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
-func (r *CommandSide) AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mv0s", "Errors.IAM.LabelPolicyInvalid")
 	}
@@ -35,12 +35,12 @@ func (r *CommandSide) AddLabelPolicy(ctx context.Context, policy *iam_model.Labe
 	return writeModelToLabelPolicy(addedPolicy), nil
 }
 
-func (r *CommandSide) ChangeLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-6M0od", "Errors.IAM.LabelPolicyInvalid")
 	}
 
-	existingPolicy, err := r.labelPolicyWriteModelByID(ctx, policy.AggregateID)
+	existingPolicy, err := r.defaultLabelPolicyWriteModelByID(ctx, policy.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (r *CommandSide) ChangeLabelPolicy(ctx context.Context, policy *iam_model.L
 	return writeModelToLabelPolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) labelPolicyWriteModelByID(ctx context.Context, iamID string) (policy *label.WriteModel, err error) {
+func (r *CommandSide) defaultLabelPolicyWriteModelByID(ctx context.Context, iamID string) (policy *label.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

@@ -37,10 +37,10 @@ type LabelPolicyChangedEvent struct {
 // 	ctx context.Context,
 // 	primaryColor,
 // 	secondaryColor string,
-// ) *AddedEvent {
+// ) *MemberAddedEvent {
 
-// 	return &AddedEvent{
-// 		AddedEvent: *policy.NewAddedEvent(
+// 	return &MemberAddedEvent{
+// 		MemberAddedEvent: *policy.NewAddedEvent(
 // 			ctx,
 // 			primaryColor,
 // 			secondaryColor,

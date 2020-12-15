@@ -48,5 +48,6 @@ func (r *CommandSide) setup(ctx context.Context, iamID string, step iam_repo.Ste
 		return nil, err
 	}
 	return nil, nil
+	//TODO: return write model
 	//return readModelToIAM(iam), nil
 }

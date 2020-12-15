@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
-func (r *CommandSide) ChangeIDPOIDCConfig(ctx context.Context, config *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
+func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
 	writeModel := iam.NewIDPOIDCConfigWriteModel(config.AggregateID, config.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {

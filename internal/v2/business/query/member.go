@@ -6,7 +6,7 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *QuerySide) MemberByID(ctx context.Context, iamID, userID string) (member *iam_repo.MemberReadModel, err error) {
+func (r *QuerySide) IAMMemberByID(ctx context.Context, iamID, userID string) (member *iam_repo.MemberReadModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

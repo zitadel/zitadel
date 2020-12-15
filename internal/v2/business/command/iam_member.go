@@ -10,14 +10,14 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) AddMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+func (r *CommandSide) AddIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-W8m4l", "Errors.IAM.MemberInvalid")
 	}
 
-	addedMember := iam_repo.NewMemberWriteModel(member.AggregateID, member.UserID)
+	addedMember := NewIAMMemberWriteModel(member.AggregateID, member.UserID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
@@ -26,8 +26,8 @@ func (r *CommandSide) AddMember(ctx context.Context, member *iam_model.IAMMember
 		return nil, errors.ThrowAlreadyExists(nil, "IAM-PtXi1", "Errors.IAM.Member.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedMember.WriteModel.WriteModel).
-		PushMemberAdded(ctx, member.UserID, member.Roles...)
+	iamAgg := iam_repo.AggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
 
 	err = r.eventstore.PushAggregate(ctx, addedMember, iamAgg)
 	if err != nil {
@@ -37,21 +37,28 @@ func (r *CommandSide) AddMember(ctx context.Context, member *iam_model.IAMMember
 	return writeModelToMember(addedMember), nil
 }
 
-//ChangeMember updates an existing member
-func (r *CommandSide) ChangeMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+//ChangeIAMMember updates an existing member
+func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.MemberInvalid")
 	}
 
-	existingMember, err := r.memberWriteModelByID(ctx, member.AggregateID, member.UserID)
+	existingMember, err := r.iamMemberWriteModelByID(ctx, member.AggregateID, member.UserID)
 	if err != nil {
 		return nil, err
 	}
 
-	iam := iam_repo.AggregateFromWriteModel(&existingMember.WriteModel.WriteModel).
+	iam := iam_repo.AggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel).
 		PushMemberChangedFromExisting(ctx, existingMember, member.Roles...)
+
+	//e, err := MemberChangedEventFromExisting(ctx, current, roles...)
+	//if err != nil {
+	//	return a
+	//}
+	//a.Aggregate = *a.PushEvents(e)
+	//return a
 
 	events, err := r.eventstore.PushAggregates(ctx, iam)
 	if err != nil {
@@ -66,8 +73,8 @@ func (r *CommandSide) ChangeMember(ctx context.Context, member *iam_model.IAMMem
 	return writeModelToMember(existingMember), nil
 }
 
-func (r *CommandSide) RemoveMember(ctx context.Context, member *iam_model.IAMMember) error {
-	m, err := r.memberWriteModelByID(ctx, member.AggregateID, member.UserID)
+func (r *CommandSide) RemoveIAMMember(ctx context.Context, member *iam_model.IAMMember) error {
+	m, err := r.iamMemberWriteModelByID(ctx, member.AggregateID, member.UserID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
@@ -75,17 +82,17 @@ func (r *CommandSide) RemoveMember(ctx context.Context, member *iam_model.IAMMem
 		return nil
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&m.WriteModel.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&m.MemberWriteModel.WriteModel).
 		PushEvents(iam_repo.NewMemberRemovedEvent(ctx, member.UserID))
 
 	return r.eventstore.PushAggregate(ctx, m, iamAgg)
 }
 
-func (r *CommandSide) memberWriteModelByID(ctx context.Context, iamID, userID string) (member *iam_repo.MemberWriteModel, err error) {
+func (r *CommandSide) iamMemberWriteModelByID(ctx context.Context, iamID, userID string) (member *IAMMemberWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := iam_repo.NewMemberWriteModel(iamID, userID)
+	writeModel := NewIAMMemberWriteModel(iamID, userID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

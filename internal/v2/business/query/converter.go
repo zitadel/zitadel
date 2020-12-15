@@ -13,7 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
-	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
 func readModelToIAM(readModel *iam_repo.ReadModel) *model.IAM {
@@ -55,7 +54,7 @@ func readModelToIDPConfigView(rm *iam.IDPConfigReadModel) *model.IDPConfigView {
 	}
 }
 
-func readModelToMember(readModel *member.ReadModel) *model.IAMMember {
+func readModelToMember(readModel *MemberReadModel) *model.IAMMember {
 	return &model.IAMMember{
 		ObjectRoot: readModelToObjectRoot(readModel.ReadModel),
 		Roles:      readModel.Roles,

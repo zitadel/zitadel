@@ -2,16 +2,17 @@ package members
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/business/query"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
 type ReadModel struct {
 	eventstore.ReadModel
 
-	Members []*member.ReadModel
+	Members []*query.MemberReadModel
 }
 
-func (rm *ReadModel) MemberByUserID(id string) (idx int, member *member.ReadModel) {
+func (rm *ReadModel) MemberByUserID(id string) (idx int, member *query.MemberReadModel) {
 	for idx, member = range rm.Members {
 		if member.UserID == id {
 			return idx, member
@@ -23,8 +24,8 @@ func (rm *ReadModel) MemberByUserID(id string) (idx int, member *member.ReadMode
 func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *member.AddedEvent:
-			m := member.NewReadModel(e.UserID)
+		case *member.MemberAddedEvent:
+			m := query.NewMemberReadModel(e.UserID)
 			rm.Members = append(rm.Members, m)
 			m.AppendEvents(e)
 		case *member.ChangedEvent:

@@ -2,6 +2,8 @@ package org
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/business/command"
+	"github.com/caos/zitadel/internal/v2/business/query"
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/member"
@@ -19,7 +21,7 @@ var (
 )
 
 type MemberWriteModel struct {
-	member.WriteModel
+	command.MemberWriteModel
 }
 
 // func NewMemberAggregate(userID string) *MemberAggregate {
@@ -39,7 +41,7 @@ func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *MemberAddedEvent:
-			rm.ReadModel.AppendEvents(&e.AddedEvent)
+			rm.ReadModel.AppendEvents(&e.MemberAddedEvent)
 		case *MemberChangedEvent:
 			rm.ReadModel.AppendEvents(&e.ChangedEvent)
 		case *MemberRemovedEvent:
@@ -48,13 +50,13 @@ func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 	}
 }
 
-type MemberReadModel member.ReadModel
+type MemberReadModel query.MemberReadModel
 
 func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *MemberAddedEvent:
-			rm.ReadModel.AppendEvents(&e.AddedEvent)
+			rm.ReadModel.AppendEvents(&e.MemberAddedEvent)
 		case *MemberChangedEvent:
 			rm.ReadModel.AppendEvents(&e.ChangedEvent)
 		}
@@ -62,7 +64,7 @@ func (rm *MemberReadModel) AppendEvents(events ...eventstore.EventReader) {
 }
 
 type MemberAddedEvent struct {
-	member.AddedEvent
+	member.MemberAddedEvent
 }
 
 type MemberChangedEvent struct {
@@ -79,7 +81,7 @@ func NewMemberAddedEvent(
 ) *MemberAddedEvent {
 
 	return &MemberAddedEvent{
-		AddedEvent: *member.NewAddedEvent(
+		MemberAddedEvent: *member.NewMemberAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				MemberAddedEventType,
@@ -101,7 +103,7 @@ func MemberChangedEventFromExisting(
 			ctx,
 			MemberChangedEventType,
 		),
-		&current.WriteModel,
+		&current.MemberWriteModel,
 		roles...,
 	)
 	if err != nil {

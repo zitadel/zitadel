@@ -21,7 +21,7 @@ func (rm *IAM) AppendEvents(events ...eventstore.EventReader) {
 	rm.ReadModel.AppendEvents(events...)
 }
 
-//Reduce implements eventstore.ReadModel
+//Reduce implements eventstore.MemberReadModel
 //
 func (rm *IAM) Reduce() (err error) {
 	for _, event := range rm.Events {

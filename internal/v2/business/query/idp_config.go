@@ -6,7 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *QuerySide) IDPConfigByID(ctx context.Context, iamID, idpConfigID string) (*model.IDPConfigView, error) {
+func (r *QuerySide) DefaultIDPConfigByID(ctx context.Context, iamID, idpConfigID string) (*model.IDPConfigView, error) {
 	idpConfig := iam.NewIDPConfigReadModel(iamID, idpConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpConfig)
 	if err != nil {
