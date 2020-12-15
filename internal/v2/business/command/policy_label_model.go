@@ -1,23 +1,26 @@
-package label
+package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
-type WriteModel struct {
+type LabelPolicyWriteModel struct {
 	eventstore.WriteModel
 
 	PrimaryColor   string
 	SecondaryColor string
+	IsActive       bool
 }
 
-func (wm *WriteModel) Reduce() error {
+func (wm *LabelPolicyWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *AddedEvent:
+		case *policy.LabelPolicyAddedEvent:
 			wm.PrimaryColor = e.PrimaryColor
 			wm.SecondaryColor = e.SecondaryColor
-		case *ChangedEvent:
+			wm.IsActive = true
+		case *policy.LabelPolicyChangedEvent:
 			wm.PrimaryColor = e.PrimaryColor
 			wm.SecondaryColor = e.SecondaryColor
 		}

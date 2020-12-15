@@ -2,7 +2,6 @@ package iam
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
@@ -15,8 +14,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(SetupDoneEventType, SetupStepMapper).
 		RegisterFilterEventMapper(GlobalOrgSetEventType, GlobalOrgSetMapper).
 		RegisterFilterEventMapper(ProjectSetEventType, ProjectSetMapper).
-		RegisterFilterEventMapper(label.LabelPolicyAddedEventType, label.AddedEventMapper).
-		RegisterFilterEventMapper(label.LabelPolicyChangedEventType, label.ChangedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyAddedEventType, LabelPolicyAddedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyChangedEventType, LabelPolicyChangedEventMapper).
 		RegisterFilterEventMapper(login.LoginPolicyAddedEventType, login.AddedEventMapper).
 		RegisterFilterEventMapper(login.LoginPolicyChangedEventType, login.ChangedEventMapper).
 		RegisterFilterEventMapper(org_iam.OrgIAMPolicyAddedEventType, org_iam.AddedEventMapper).

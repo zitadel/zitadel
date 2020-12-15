@@ -191,6 +191,7 @@ Errors:
         Unspecified: Multifactor invalid
     LabelPolicy:
       NotFound: Default Private Label Policy not found
+      NotChanged: Default Private Label Policy has not been changed
     PasswordComplexityPolicy:
       NotFound: Default Private Label Policy not found
       NotExisting: Default Password Complexity Policy not existing

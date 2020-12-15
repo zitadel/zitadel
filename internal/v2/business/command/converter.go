@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
@@ -43,9 +42,9 @@ func writeModelToLoginPolicy(wm *login.WriteModel) *model.LoginPolicy {
 	}
 }
 
-func writeModelToLabelPolicy(wm *label.WriteModel) *model.LabelPolicy {
+func writeModelToLabelPolicy(wm *IAMLabelPolicyWriteModel) *model.LabelPolicy {
 	return &model.LabelPolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		ObjectRoot:     writeModelToObjectRoot(wm.LabelPolicyWriteModel.WriteModel),
 		PrimaryColor:   wm.PrimaryColor,
 		SecondaryColor: wm.SecondaryColor,
 	}

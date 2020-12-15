@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	factors2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
 	iam_factors "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
@@ -136,19 +135,20 @@ func (a *Aggregate) PushPasswordLockoutPolicyChangedFromExisting(ctx context.Con
 	return a
 }
 
-func (a *Aggregate) PushLabelPolicyAddedEvent(ctx context.Context, primaryColor, secondaryColor string) *Aggregate {
-	a.Aggregate = *a.PushEvents(label.NewAddedEvent(ctx, primaryColor, secondaryColor))
-	return a
-}
-
-func (a *Aggregate) PushLabelPolicyChangedFromExisting(ctx context.Context, current *label.WriteModel, primaryColor, secondaryColor string) *Aggregate {
-	e, err := label.ChangedEventFromExisting(ctx, current, primaryColor, secondaryColor)
-	if err != nil {
-		return a
-	}
-	a.Aggregate = *a.PushEvents(e)
-	return a
-}
+//
+//func (a *Aggregate) PushLabelPolicyAddedEvent(ctx context.Context, primaryColor, secondaryColor string) *Aggregate {
+//	a.Aggregate = *a.PushEvents(NewLabelPolicyAddedEvent(ctx, primaryColor, secondaryColor))
+//	return a
+//}
+//
+//func (a *Aggregate) PushLabelPolicyChangedFromExisting(ctx context.Context, current *command.IAMLabelPolicyWriteModel, primaryColor, secondaryColor string) *Aggregate {
+//	e, err := NewLabelPolicyChangedEvent(ctx, current, primaryColor, secondaryColor)
+//	if err != nil {
+//		return a
+//	}
+//	a.Aggregate = *a.PushEvents(e)
+//	return a
+//}
 
 func (a *Aggregate) PushLoginPolicyAddedEvent(ctx context.Context, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType login.PasswordlessType) *Aggregate {
 	a.Aggregate = *a.PushEvents(iam_login.NewAddedEvent(ctx, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType))

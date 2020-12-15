@@ -3,10 +3,9 @@ package command
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
-
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
+	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
@@ -14,17 +13,17 @@ func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *iam_mod
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mv0s", "Errors.IAM.LabelPolicyInvalid")
 	}
 
-	addedPolicy := label.NewWriteModel(policy.AggregateID)
+	addedPolicy := NewIAMLabelPolicyWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
-	if addedPolicy != nil {
+	if addedPolicy.IsActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.AlreadyExists")
 	}
 
-	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
-		PushLabelPolicyAddedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor)
+	iamAgg := AggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewLabelPolicyAddedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
 	if err != nil {
@@ -44,8 +43,12 @@ func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_
 		return nil, err
 	}
 
-	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
-		PushLabelPolicyChangedFromExisting(ctx, existingPolicy, policy.PrimaryColor, policy.SecondaryColor)
+	if !existingPolicy.HasChanged(policy.PrimaryColor, policy.SecondaryColor) {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.NotChanged")
+	}
+
+	iamAgg := AggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewLabelPolicyChangedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor))
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)
 	if err != nil {
@@ -55,11 +58,11 @@ func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_
 	return writeModelToLabelPolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) defaultLabelPolicyWriteModelByID(ctx context.Context, iamID string) (policy *label.WriteModel, err error) {
+func (r *CommandSide) defaultLabelPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMLabelPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := label.NewWriteModel(iamID)
+	writeModel := NewIAMLabelPolicyWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

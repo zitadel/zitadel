@@ -1,21 +1,24 @@
-package label
+package query
 
-import "github.com/caos/zitadel/internal/eventstore/v2"
+import (
+	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
+)
 
-type ReadModel struct {
+type LabelPolicyReadModel struct {
 	eventstore.ReadModel
 
 	PrimaryColor   string
 	SecondaryColor string
 }
 
-func (rm *ReadModel) Reduce() error {
+func (rm *LabelPolicyReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *AddedEvent:
+		case *policy.LabelPolicyAddedEvent:
 			rm.PrimaryColor = e.PrimaryColor
 			rm.SecondaryColor = e.SecondaryColor
-		case *ChangedEvent:
+		case *policy.LabelPolicyChangedEvent:
 			rm.PrimaryColor = e.PrimaryColor
 			rm.SecondaryColor = e.SecondaryColor
 		}
