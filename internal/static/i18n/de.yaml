@@ -446,9 +446,16 @@ EventTypes:
       login:
         added: Login Richtlinie hinzugefügt
         changed: Login Richtlinie geändert
+        removed: Login Richtline gelöscht
         idpprovider:
           added: Idp Provider zu Login Richtlinie hinzugefügt
           removed: Idp Provider aus Login Richtlinie gelöscht
+        secondfactor:
+          added: Zweitfaktor zu Login Richtlinie hinzugefügt
+          removed: Zweitfaktor aus Login Richtlinie gelöscht
+        multifactor:
+          added: Multifaktor zu Login Richtlinie hinzugefügt
+          removed: Multifaktor aus Login Richtlinie gelöscht
       password:
         complexity:
           added: Passwort Komplexitäts Richtlinie hinzugefügt

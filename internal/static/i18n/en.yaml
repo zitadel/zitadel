@@ -446,9 +446,16 @@ EventTypes:
       login:
         added: Login Policy added
         changed: Login Policy changed
+        removed: Login Policy removed
         idpprovider:
           added: Idp Provider added to Login Policy
           removed: Idp Provider removed from Login Policy
+        secondfactor:
+          added: Second factor added to Login Policy
+          removed: Second factor removed from Login Policy
+        multifactor:
+          added: Multi factor added to Login Policy
+          removed: Multi factor removed from Login Policy
       password:
         complexity:
           added: Password complexity policy added
