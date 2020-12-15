@@ -63,7 +63,7 @@ func ChangedEventFromExisting(
 			ctx,
 			PasswordComplexityPolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		minLength,
 		hasLowerCase,
 		hasUpperCase,

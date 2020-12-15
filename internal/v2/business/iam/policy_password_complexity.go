@@ -23,7 +23,7 @@ func (r *Repository) AddPasswordComplexityPolicy(ctx context.Context, policy *ia
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.PasswordComplexityPolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.Policy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushPasswordComplexityPolicyAddedEvent(ctx, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -44,7 +44,7 @@ func (r *Repository) ChangePasswordComplexityPolicy(ctx context.Context, policy 
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.Policy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushPasswordComplexityPolicyChangedFromExisting(ctx, existingPolicy, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

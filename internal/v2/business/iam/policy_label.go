@@ -24,7 +24,7 @@ func (r *Repository) AddLabelPolicy(ctx context.Context, policy *iam_model.Label
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.Policy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushLabelPolicyAddedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -45,7 +45,7 @@ func (r *Repository) ChangeLabelPolicy(ctx context.Context, policy *iam_model.La
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.Policy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushLabelPolicyChangedFromExisting(ctx, existingPolicy, policy.PrimaryColor, policy.SecondaryColor)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

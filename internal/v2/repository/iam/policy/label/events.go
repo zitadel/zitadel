@@ -54,7 +54,7 @@ func ChangedEventFromExisting(
 			ctx,
 			LabelPolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		primaryColor,
 		secondaryColor,
 	)

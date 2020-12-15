@@ -54,7 +54,7 @@ func ChangedEventFromExisting(
 			ctx,
 			PasswordAgePolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		expireWarnDays,
 		maxAgeDays,
 	)

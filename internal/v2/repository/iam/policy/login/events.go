@@ -67,7 +67,7 @@ func ChangedEventFromExisting(
 			ctx,
 			LoginPolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		allowUsernamePassword,
 		allowRegister,
 		allowExternalIDP,

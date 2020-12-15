@@ -52,7 +52,7 @@ func ChangedEventFromExisting(
 			ctx,
 			OrgIAMPolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		userLoginMustBeDomain,
 	)
 	return &ChangedEvent{

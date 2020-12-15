@@ -54,7 +54,7 @@ func ChangedEventFromExisting(
 			ctx,
 			PasswordLockoutPolicyChangedEventType,
 		),
-		&current.Policy,
+		&current.WriteModel,
 		maxAttempts,
 		showLockoutFailure,
 	)

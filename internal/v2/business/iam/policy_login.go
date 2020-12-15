@@ -28,7 +28,7 @@ func (r *Repository) AddLoginPolicy(ctx context.Context, policy *iam_model.Login
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LoginPolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.Policy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, login.PasswordlessType(policy.PasswordlessType))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -49,7 +49,7 @@ func (r *Repository) ChangeLoginPolicy(ctx context.Context, policy *iam_model.Lo
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.Policy.WriteModel).
+	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushLoginPolicyChangedFromExisting(ctx, existingPolicy, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, login.PasswordlessType(policy.PasswordlessType))
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)
@@ -96,14 +96,14 @@ func (r *Repository) AddSecondFactorToLoginPolicy(ctx context.Context, iamID str
 		return iam_model.SecondFactorTypeUnspecified, err
 	}
 
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.SecondFactor.WriteModel).
+	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.SecondFactorWriteModel.WriteModel).
 		PushLoginPolicySecondFactorAdded(ctx, factors.SecondFactorType(secondFactor))
 
 	if err = r.eventstore.PushAggregate(ctx, writeModel, aggregate); err != nil {
 		return iam_model.SecondFactorTypeUnspecified, err
 	}
 
-	return iam_model.SecondFactorType(writeModel.SecondFactor.MFAType), nil
+	return iam_model.SecondFactorType(writeModel.MFAType), nil
 }
 
 func (r *Repository) RemoveSecondFactorFromLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.SecondFactorType) error {
@@ -112,7 +112,7 @@ func (r *Repository) RemoveSecondFactorFromLoginPolicy(ctx context.Context, iamI
 	if err != nil {
 		return err
 	}
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.SecondFactor.WriteModel).
+	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.SecondFactorWriteModel.WriteModel).
 		PushLoginPolicySecondFactorRemoved(ctx, factors.SecondFactorType(secondFactor))
 
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)
@@ -125,14 +125,14 @@ func (r *Repository) AddMultiFactorToLoginPolicy(ctx context.Context, iamID stri
 		return iam_model.MultiFactorTypeUnspecified, err
 	}
 
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.MultiFactor.WriteModel).
+	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.MultiFactoryWriteModel.WriteModel).
 		PushLoginPolicyMultiFactorAdded(ctx, factors.MultiFactorType(secondFactor))
 
 	if err = r.eventstore.PushAggregate(ctx, writeModel, aggregate); err != nil {
 		return iam_model.MultiFactorTypeUnspecified, err
 	}
 
-	return iam_model.MultiFactorType(writeModel.MultiFactor.MFAType), nil
+	return iam_model.MultiFactorType(writeModel.MultiFactoryWriteModel.MFAType), nil
 }
 
 func (r *Repository) RemoveMultiFactorFromLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.MultiFactorType) error {
@@ -141,7 +141,7 @@ func (r *Repository) RemoveMultiFactorFromLoginPolicy(ctx context.Context, iamID
 	if err != nil {
 		return err
 	}
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.MultiFactor.WriteModel).
+	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.MultiFactoryWriteModel.WriteModel).
 		PushLoginPolicyMultiFactorRemoved(ctx, factors.MultiFactorType(secondFactor))
 
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)
