@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
@@ -34,13 +35,20 @@ func (u *User) ViewModel() string {
 	return userTable
 }
 
+func (u *User) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
+}
+
+func (u *User) SetSubscription(s eventstore.Subscription) {
+}
+
 func (u *User) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := u.view.GetLatestUserSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(es_model.UserAggregate, org_es_model.OrgAggregate).
+		AggregateTypeFilter(u.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

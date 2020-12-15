@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -23,13 +24,20 @@ func (p *PasswordLockoutPolicy) ViewModel() string {
 	return passwordLockoutPolicyTable
 }
 
+func (p *PasswordLockoutPolicy) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (p *PasswordLockoutPolicy) SetSubscription(s eventstore.Subscription) {
+}
+
 func (p *PasswordLockoutPolicy) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

@@ -2,9 +2,11 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -34,13 +36,20 @@ func (i *ExternalIDP) ViewModel() string {
 	return externalIDPTable
 }
 
+func (i *ExternalIDP) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
+}
+
+func (i *ExternalIDP) SetSubscription(s eventstore.Subscription) {
+}
+
 func (i *ExternalIDP) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := i.view.GetLatestExternalIDPSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate).
+		AggregateTypeFilter(i.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

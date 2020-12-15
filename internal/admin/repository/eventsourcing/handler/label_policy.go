@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -22,14 +23,21 @@ func (p *LabelPolicy) ViewModel() string {
 	return labelPolicyTable
 }
 
+func (p *LabelPolicy) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.IAMAggregate}
+}
+
 func (p *LabelPolicy) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestLabelPolicySequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IAMAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
+}
+
+func (p *LabelPolicy) SetSubscription(s eventstore.Subscription) {
 }
 
 func (p *LabelPolicy) Reduce(event *models.Event) (err error) {

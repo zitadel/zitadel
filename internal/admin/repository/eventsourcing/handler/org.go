@@ -3,6 +3,8 @@ package handler
 import (
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -22,12 +24,19 @@ func (o *Org) ViewModel() string {
 	return orgTable
 }
 
+func (o *Org) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.OrgAggregate}
+}
+
 func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := o.view.GetLatestOrgSequence()
 	if err != nil {
 		return nil, err
 	}
 	return eventsourcing.OrgQuery(sequence.CurrentSequence), nil
+}
+
+func (o *Org) SetSubscription(s eventstore.Subscription) {
 }
 
 func (o *Org) Reduce(event *es_models.Event) error {

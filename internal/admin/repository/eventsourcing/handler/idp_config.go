@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -23,13 +24,20 @@ func (i *IDPConfig) ViewModel() string {
 	return idpConfigTable
 }
 
+func (i *IDPConfig) AggregateTypes() []models.AggregateType {
+	return []es_models.AggregateType{model.IAMAggregate}
+}
+
+func (i *IDPConfig) SetSubscription(s eventstore.Subscription) {
+}
+
 func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := i.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IAMAggregate).
+		AggregateTypeFilter(i.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -28,17 +29,34 @@ func (m *IamMember) ViewModel() string {
 	return iamMemberTable
 }
 
+func (m *IamMember) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.IAMAggregate, usr_es_model.UserAggregate}
+}
+
+func (m *IamMember) SetSubscription(s eventstore.Subscription) {
+}
+
 func (m *IamMember) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestIAMMemberSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IAMAggregate, usr_es_model.UserAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
+func (m *IamMember) HandleSubscription(events <-chan *models.Event) {
+	for event := range events {
+		_ = event
+		//TODO: check current sequence with event.previoussEquence
+		//if false => load events between currentsequenece and event.previoussequence
+		//handle event
+	}
+}
+
 func (m *IamMember) Reduce(event *models.Event) (err error) {
+
 	switch event.AggregateType {
 	case model.IAMAggregate:
 		err = m.processIamMember(event)
