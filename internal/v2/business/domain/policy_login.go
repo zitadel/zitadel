@@ -1,4 +1,4 @@
-package login
+package domain
 
 type PasswordlessType int32
 

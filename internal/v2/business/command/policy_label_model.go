@@ -23,6 +23,8 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 		case *policy.LabelPolicyChangedEvent:
 			wm.PrimaryColor = e.PrimaryColor
 			wm.SecondaryColor = e.SecondaryColor
+		case *policy.LabelPolicyRemovedEvent:
+			wm.IsActive = false
 		}
 	}
 	return wm.WriteModel.Reduce()

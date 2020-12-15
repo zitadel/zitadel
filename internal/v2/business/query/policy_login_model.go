@@ -1,34 +1,40 @@
-package login
+package query
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
-type ReadModel struct {
+type LoginPolicyReadModel struct {
 	eventstore.ReadModel
 
 	AllowUserNamePassword bool
 	AllowRegister         bool
 	AllowExternalIDP      bool
 	ForceMFA              bool
-	PasswordlessType      PasswordlessType
+	PasswordlessType      domain.PasswordlessType
+	IsActive              bool
 }
 
-func (rm *ReadModel) Reduce() error {
+func (rm *LoginPolicyReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *AddedEvent:
+		case *policy.LoginPolicyAddedEvent:
 			rm.AllowUserNamePassword = e.AllowUserNamePassword
 			rm.AllowExternalIDP = e.AllowExternalIDP
 			rm.AllowRegister = e.AllowRegister
 			rm.ForceMFA = e.ForceMFA
 			rm.PasswordlessType = e.PasswordlessType
-		case *ChangedEvent:
+			rm.IsActive = true
+		case *policy.LoginPolicyChangedEvent:
 			rm.AllowUserNamePassword = e.AllowUserNamePassword
 			rm.AllowExternalIDP = e.AllowExternalIDP
 			rm.AllowRegister = e.AllowRegister
 			rm.ForceMFA = e.ForceMFA
 			rm.PasswordlessType = e.PasswordlessType
+		case *policy.LoginPolicyRemovedEvent:
+			rm.IsActive = false
 		}
 	}
 	return rm.ReadModel.Reduce()

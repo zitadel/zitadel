@@ -5,10 +5,10 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
+	"github.com/caos/zitadel/internal/v2/business/domain"
+	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
-	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login/factors"
 	idpprovider2 "github.com/caos/zitadel/internal/v2/repository/policy/login/idpprovider"
 )
@@ -18,17 +18,17 @@ func (r *CommandSide) AddDefaultLoginPolicy(ctx context.Context, policy *iam_mod
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mv0s", "Errors.IAM.LoginPolicyInvalid")
 	}
 
-	addedPolicy := iam_login.NewWriteModel(policy.AggregateID)
+	addedPolicy := NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
-	if addedPolicy != nil {
+	if addedPolicy.IsActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LoginPolicy.AlreadyExists")
 	}
 
-	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
-		PushLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, login.PasswordlessType(policy.PasswordlessType))
+	iamAgg := AggregateFromWriteModel(&addedPolicy.LoginPolicyWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType)))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
 	if err != nil {
@@ -47,9 +47,14 @@ func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *iam_
 	if err != nil {
 		return nil, err
 	}
-
-	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
-		PushLoginPolicyChangedFromExisting(ctx, existingPolicy, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, login.PasswordlessType(policy.PasswordlessType))
+	if !existingPolicy.IsActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-M0sif", "Errors.IAM.LoginPolicy.NotFound")
+	}
+	if !existingPolicy.HasChanged(policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType)) {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")
+	}
+	iamAgg := AggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewLoginPolicyChangedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType)))
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)
 	if err != nil {
@@ -146,11 +151,11 @@ func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Contex
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)
 }
 
-func (r *CommandSide) defaultLoginPolicyWriteModelByID(ctx context.Context, iamID string) (policy *iam_login.WriteModel, err error) {
+func (r *CommandSide) defaultLoginPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMLoginPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := iam_login.NewWriteModel(iamID)
+	writeModel := NewWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
@@ -84,9 +83,9 @@ func readModelToLabelPolicy(readModel *IAMLabelPolicyReadModel) *model.LabelPoli
 	}
 }
 
-func readModelToLoginPolicy(readModel *login.ReadModel) *model.LoginPolicy {
+func readModelToLoginPolicy(readModel *IAMLoginPolicyReadModel) *model.LoginPolicy {
 	return &model.LoginPolicy{
-		ObjectRoot:            readModelToObjectRoot(readModel.ReadModel.ReadModel),
+		ObjectRoot:            readModelToObjectRoot(readModel.LoginPolicyReadModel.ReadModel),
 		AllowExternalIdp:      readModel.AllowExternalIDP,
 		AllowRegister:         readModel.AllowRegister,
 		AllowUsernamePassword: readModel.AllowUserNamePassword,

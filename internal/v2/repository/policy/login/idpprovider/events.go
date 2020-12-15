@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	AddedEventType   = "idpprovider.added"
-	RemovedEventType = "idpprovider.removed"
+	loginPolicyIDPProviderPrevix      = "policy.login.idpprovider."
+	LoginPolicyIDPProviderAddedType   = loginPolicyIDPProviderPrevix + "added"
+	LoginPolicyIDPProviderRemovedType = loginPolicyIDPProviderPrevix + "removed"
 )
 
 type AddedEvent struct {

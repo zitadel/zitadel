@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	factors2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
 	iam_factors "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
@@ -14,13 +13,12 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
-	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login/factors"
 	idpprovider2 "github.com/caos/zitadel/internal/v2/repository/policy/login/idpprovider"
 )
 
 const (
-	IamEventTypePrefix = eventstore.EventType("iam.")
+	IAMEventTypePrefix = eventstore.EventType("iam.")
 )
 
 const (
@@ -149,20 +147,20 @@ func (a *Aggregate) PushPasswordLockoutPolicyChangedFromExisting(ctx context.Con
 //	a.Aggregate = *a.PushEvents(e)
 //	return a
 //}
-
-func (a *Aggregate) PushLoginPolicyAddedEvent(ctx context.Context, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType login.PasswordlessType) *Aggregate {
-	a.Aggregate = *a.PushEvents(iam_login.NewAddedEvent(ctx, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType))
-	return a
-}
-
-func (a *Aggregate) PushLoginPolicyChangedFromExisting(ctx context.Context, current *iam_login.WriteModel, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType login.PasswordlessType) *Aggregate {
-	e, err := iam_login.ChangedEventFromExisting(ctx, current, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType)
-	if err != nil {
-		return a
-	}
-	a.Aggregate = *a.PushEvents(e)
-	return a
-}
+//
+//func (a *Aggregate) PushLoginPolicyAddedEvent(ctx context.Context, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType domain.PasswordlessType) *Aggregate {
+//	a.Aggregate = *a.PushEvents(NewLoginPolicyAddedEvent(ctx, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType))
+//	return a
+//}
+//
+//func (a *Aggregate) PushLoginPolicyChangedFromExisting(ctx context.Context, current *command.IAMLoginPolicyWriteModel, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType domain.PasswordlessType) *Aggregate {
+//	e, err := NewLoginPolicyChangedEvent(ctx, current, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType)
+//	if err != nil {
+//		return a
+//	}
+//	a.Aggregate = *a.PushEvents(e)
+//	return a
+//}
 
 func (a *Aggregate) PushLoginPolicySecondFactorAdded(ctx context.Context, mfaType factors.SecondFactorType) *Aggregate {
 	a.Aggregate = *a.PushEvents(iam_factors.NewLoginPolicySecondFactorAddedEvent(ctx, mfaType))

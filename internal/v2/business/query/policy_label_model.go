@@ -10,6 +10,7 @@ type LabelPolicyReadModel struct {
 
 	PrimaryColor   string
 	SecondaryColor string
+	IsActive       bool
 }
 
 func (rm *LabelPolicyReadModel) Reduce() error {
@@ -18,9 +19,12 @@ func (rm *LabelPolicyReadModel) Reduce() error {
 		case *policy.LabelPolicyAddedEvent:
 			rm.PrimaryColor = e.PrimaryColor
 			rm.SecondaryColor = e.SecondaryColor
+			rm.IsActive = true
 		case *policy.LabelPolicyChangedEvent:
 			rm.PrimaryColor = e.PrimaryColor
 			rm.SecondaryColor = e.SecondaryColor
+		case *policy.LabelPolicyRemovedEvent:
+			rm.IsActive = false
 		}
 	}
 	return rm.ReadModel.Reduce()

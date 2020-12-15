@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
@@ -31,9 +30,9 @@ func writeModelToMember(writeModel *IAMMemberWriteModel) *model.IAMMember {
 	}
 }
 
-func writeModelToLoginPolicy(wm *login.WriteModel) *model.LoginPolicy {
+func writeModelToLoginPolicy(wm *IAMLoginPolicyWriteModel) *model.LoginPolicy {
 	return &model.LoginPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		ObjectRoot:            writeModelToObjectRoot(wm.LoginPolicyWriteModel.WriteModel),
 		AllowUsernamePassword: wm.AllowUserNamePassword,
 		AllowRegister:         wm.AllowRegister,
 		AllowExternalIdp:      wm.AllowExternalIDP,

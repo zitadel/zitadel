@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	LabelPolicyAddedEventType   = IamEventTypePrefix + policy.LabelPolicyAddedEventType
-	LabelPolicyChangedEventType = IamEventTypePrefix + policy.LabelPolicyChangedEventType
+	LabelPolicyAddedEventType   = IAMEventTypePrefix + policy.LabelPolicyAddedEventType
+	LabelPolicyChangedEventType = IAMEventTypePrefix + policy.LabelPolicyChangedEventType
 )
 
 type LabelPolicyAddedEvent struct {

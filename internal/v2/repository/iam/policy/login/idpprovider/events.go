@@ -2,11 +2,17 @@ package idpprovider
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login/idpprovider"
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+)
+
+var (
+	iamEventPrefix = eventstore.EventType("iam.")
+
+	LoginPolicyIDPProviderAddedEventType   = iamEventPrefix + idpprovider.LoginPolicyIDPProviderAddedType
+	LoginPolicyIDPProviderRemovedEventType = iamEventPrefix + idpprovider.LoginPolicyIDPProviderRemovedType
 )
 
 type AddedEvent struct {
@@ -21,7 +27,7 @@ func NewAddedEvent(
 
 	return &AddedEvent{
 		AddedEvent: *idpprovider.NewAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, login.LoginPolicyIDPProviderAddedEventType),
+			eventstore.NewBaseEventForPush(ctx, LoginPolicyIDPProviderAddedEventType),
 			idpConfigID,
 			idpProviderType),
 	}
@@ -48,7 +54,7 @@ func NewRemovedEvent(
 ) *RemovedEvent {
 	return &RemovedEvent{
 		RemovedEvent: *idpprovider.NewRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, login.LoginPolicyIDPProviderRemovedEventType),
+			eventstore.NewBaseEventForPush(ctx, LoginPolicyIDPProviderRemovedEventType),
 			idpConfigID),
 	}
 }
