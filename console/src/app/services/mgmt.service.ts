@@ -1345,21 +1345,7 @@ export class ManagementService {
         return this.grpcService.mgmt.updateApplication(req);
     }
 
-    public UpdateOIDCAppConfig(projectId: string,
-        appId: string, oidcConfig: OIDCConfig.AsObject): Promise<OIDCConfig> {
-        const req = new OIDCConfigUpdate();
-        req.setProjectId(projectId);
-        req.setApplicationId(appId);
-        req.setRedirectUrisList(oidcConfig.redirectUrisList);
-        req.setResponseTypesList(oidcConfig.responseTypesList);
-        req.setAuthMethodType(oidcConfig.authMethodType);
-        req.setPostLogoutRedirectUrisList(oidcConfig.postLogoutRedirectUrisList);
-        req.setGrantTypesList(oidcConfig.grantTypesList);
-        req.setApplicationType(oidcConfig.applicationType);
-        req.setDevMode(oidcConfig.devMode);
-        req.setAccessTokenType(oidcConfig.accessTokenType);
-        req.setAccessTokenRoleAssertion(oidcConfig.accessTokenRoleAssertion);
-        req.setIdTokenRoleAssertion(oidcConfig.idTokenRoleAssertion);
+    public UpdateOIDCAppConfig(req: OIDCConfigUpdate): Promise<OIDCConfig> {
         return this.grpcService.mgmt.updateApplicationOIDCConfig(req);
     }
 }

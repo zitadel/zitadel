@@ -4,12 +4,11 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { MfaOtpResponse, MFAState, MfaType, MultiFactor, WebAuthNResponse } from 'src/app/proto/generated/auth_pb';
+import { MFAState, MfaType, MultiFactor, WebAuthNResponse } from 'src/app/proto/generated/auth_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { _base64ToArrayBuffer } from '../../u2f-util';
-import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
 import { DialogU2FComponent } from '../dialog-u2f/dialog-u2f.component';
 
 export interface WebAuthNOptions {
@@ -23,11 +22,11 @@ export interface WebAuthNOptions {
 }
 
 @Component({
-    selector: 'app-auth-user-mfa',
-    templateUrl: './auth-user-mfa.component.html',
-    styleUrls: ['./auth-user-mfa.component.scss'],
+    selector: 'app-auth-passwordless',
+    templateUrl: './auth-passwordless.component.html',
+    styleUrls: ['./auth-passwordless.component.scss'],
 })
-export class AuthUserMfaComponent implements OnInit, OnDestroy {
+export class AuthPasswordlessComponent implements OnInit, OnDestroy {
     public displayedColumns: string[] = ['type', 'attr', 'state', 'actions'];
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -52,26 +51,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy(): void {
         this.loadingSubject.complete();
-    }
-
-    public addOTP(): void {
-        this.service.AddMfaOTP().then((otpresp) => {
-            const otp: MfaOtpResponse.AsObject = otpresp.toObject();
-            const dialogRef = this.dialog.open(DialogOtpComponent, {
-                data: otp.url,
-                width: '400px',
-            });
-
-            dialogRef.afterClosed().subscribe((code) => {
-                if (code) {
-                    this.service.VerifyMfaOTP(code).then(() => {
-                        this.getMFAs();
-                    });
-                }
-            });
-        }, error => {
-            this.toast.showError(error);
-        });
     }
 
     public addU2F(): void {

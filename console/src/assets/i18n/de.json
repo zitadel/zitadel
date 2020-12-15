@@ -956,8 +956,11 @@
             "OVERVIEWTITLE":"Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen.",
             "ACCESSTOKENROLEASSERTION":"Benutzerrollen dem Access Token hinzufügen",
             "ACCESSTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Access Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
-            "IDTOKENROLEASSERTION":"Benutzerrollen dem Id Token hinzufügen",
-            "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt."
+            "IDTOKENROLEASSERTION":"Benutzerrollen im ID Token",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
+            "IDTOKENUSERINFOASSERTION":"User Info im ID Token",
+            "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
+            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen."
         },
         "TOAST": {
             "REACTIVATED":"Anwendung reaktiviert.",

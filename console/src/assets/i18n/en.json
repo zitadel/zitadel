@@ -956,8 +956,11 @@
             "OVERVIEWTITLE":"You are now done. Review your configuration.",
             "ACCESSTOKENROLEASSERTION":"Add user roles to the access token",
             "ACCESSTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the access token.",
-            "IDTOKENROLEASSERTION":"Add user roles to the id token",
-            "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the id token."
+            "IDTOKENROLEASSERTION":"User roles inside ID Token",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the ID token.",
+            "IDTOKENUSERINFOASSERTION":"User Info inside ID Token",
+            "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Enables clients to retrieve profile, email, phone and address claims from ID token.",
+            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf."
         },
         "TOAST": {
             "REACTIVATED":"Application reactivated.",

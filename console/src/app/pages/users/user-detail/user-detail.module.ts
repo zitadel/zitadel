@@ -29,6 +29,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
@@ -57,6 +58,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         DialogOtpComponent,
         EditDialogComponent,
         AuthUserMfaComponent,
+        AuthPasswordlessComponent,
         UserMfaComponent,
         ThemeSettingComponent,
         PasswordComponent,
