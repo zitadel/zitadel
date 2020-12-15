@@ -43,8 +43,11 @@ func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_
 		return nil, err
 	}
 
+	if !existingPolicy.IsActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0K9dq", "Errors.IAM.LabelPolicy.NotFound")
+	}
 	if !existingPolicy.HasChanged(policy.PrimaryColor, policy.SecondaryColor) {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 
 	iamAgg := AggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
