@@ -7,7 +7,6 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/member"
-	"github.com/caos/zitadel/internal/v2/repository/members"
 )
 
 const (
@@ -34,18 +33,18 @@ type MemberWriteModel struct {
 // }
 
 type MembersReadModel struct {
-	members.ReadModel
+	query.MembersReadModel
 }
 
 func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *MemberAddedEvent:
-			rm.ReadModel.AppendEvents(&e.MemberAddedEvent)
+			rm.MembersReadModel.AppendEvents(&e.MemberAddedEvent)
 		case *MemberChangedEvent:
-			rm.ReadModel.AppendEvents(&e.ChangedEvent)
+			rm.MembersReadModel.AppendEvents(&e.ChangedEvent)
 		case *MemberRemovedEvent:
-			rm.ReadModel.AppendEvents(&e.RemovedEvent)
+			rm.MembersReadModel.AppendEvents(&e.RemovedEvent)
 		}
 	}
 }

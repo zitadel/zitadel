@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -26,7 +27,7 @@ func (r *CommandSide) AddIAMMember(ctx context.Context, member *iam_model.IAMMem
 		return nil, errors.ThrowAlreadyExists(nil, "IAM-PtXi1", "Errors.IAM.Member.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
+	iamAgg := AggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
 
 	err = r.eventstore.PushAggregate(ctx, addedMember, iamAgg)
@@ -50,17 +51,13 @@ func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *iam_model.IAM
 		return nil, err
 	}
 
-	iam := iam_repo.AggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel).
-		PushMemberChangedFromExisting(ctx, existingMember, member.Roles...)
+	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.Member.RolesNotChanged")
+	}
+	iamAgg := AggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewMemberChangedEvent(ctx, member.UserID, member.Roles...))
 
-	//e, err := MemberChangedEventFromExisting(ctx, current, roles...)
-	//if err != nil {
-	//	return a
-	//}
-	//a.Aggregate = *a.PushEvents(e)
-	//return a
-
-	events, err := r.eventstore.PushAggregates(ctx, iam)
+	events, err := r.eventstore.PushAggregates(ctx, iamAgg)
 	if err != nil {
 		return nil, err
 	}
@@ -82,8 +79,8 @@ func (r *CommandSide) RemoveIAMMember(ctx context.Context, member *iam_model.IAM
 		return nil
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&m.MemberWriteModel.WriteModel).
-		PushEvents(iam_repo.NewMemberRemovedEvent(ctx, member.UserID))
+	iamAgg := AggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewMemberRemovedEvent(ctx, member.UserID))
 
 	return r.eventstore.PushAggregate(ctx, m, iamAgg)
 }

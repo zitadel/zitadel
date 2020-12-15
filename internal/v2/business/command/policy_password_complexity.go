@@ -5,7 +5,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 )
 
@@ -23,7 +22,7 @@ func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, po
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.PasswordComplexityPolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushPasswordComplexityPolicyAddedEvent(ctx, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -44,7 +43,7 @@ func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context,
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushPasswordComplexityPolicyChangedFromExisting(ctx, existingPolicy, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

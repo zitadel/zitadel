@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/business/query"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -36,7 +37,7 @@ func (r *CommandSide) setup(ctx context.Context, iamID string, step iam_repo.Ste
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "setup error")
 	}
 
-	aggregate := iam_repo.AggregateFromReadModel(iam).
+	aggregate := query.AggregateFromReadModel(iam).
 		PushEvents(event)
 
 	events, err := r.eventstore.PushAggregates(ctx, aggregate)

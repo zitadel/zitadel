@@ -5,7 +5,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	iam_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
@@ -28,7 +27,7 @@ func (r *CommandSide) AddDefaultLoginPolicy(ctx context.Context, policy *iam_mod
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LoginPolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, login.PasswordlessType(policy.PasswordlessType))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -49,7 +48,7 @@ func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *iam_
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushLoginPolicyChangedFromExisting(ctx, existingPolicy, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, login.PasswordlessType(policy.PasswordlessType))
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)
@@ -67,7 +66,7 @@ func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, id
 		return nil, err
 	}
 
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel.WriteModel).
+	aggregate := AggregateFromWriteModel(&writeModel.WriteModel.WriteModel).
 		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IDPConfigID, idpprovider2.Type(idpProvider.Type))
 
 	if err = r.eventstore.PushAggregate(ctx, writeModel, aggregate); err != nil {
@@ -83,7 +82,7 @@ func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Contex
 	if err != nil {
 		return err
 	}
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel.WriteModel).
+	aggregate := AggregateFromWriteModel(&writeModel.WriteModel.WriteModel).
 		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IDPConfigID, idpprovider2.Type(idpProvider.Type))
 
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)
@@ -96,7 +95,7 @@ func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, i
 		return iam_model.SecondFactorTypeUnspecified, err
 	}
 
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.SecondFactorWriteModel.WriteModel).
+	aggregate := AggregateFromWriteModel(&writeModel.SecondFactorWriteModel.WriteModel).
 		PushLoginPolicySecondFactorAdded(ctx, factors.SecondFactorType(secondFactor))
 
 	if err = r.eventstore.PushAggregate(ctx, writeModel, aggregate); err != nil {
@@ -112,7 +111,7 @@ func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Conte
 	if err != nil {
 		return err
 	}
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.SecondFactorWriteModel.WriteModel).
+	aggregate := AggregateFromWriteModel(&writeModel.SecondFactorWriteModel.WriteModel).
 		PushLoginPolicySecondFactorRemoved(ctx, factors.SecondFactorType(secondFactor))
 
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)
@@ -125,7 +124,7 @@ func (r *CommandSide) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, ia
 		return iam_model.MultiFactorTypeUnspecified, err
 	}
 
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.MultiFactoryWriteModel.WriteModel).
+	aggregate := AggregateFromWriteModel(&writeModel.MultiFactoryWriteModel.WriteModel).
 		PushLoginPolicyMultiFactorAdded(ctx, factors.MultiFactorType(secondFactor))
 
 	if err = r.eventstore.PushAggregate(ctx, writeModel, aggregate); err != nil {
@@ -141,7 +140,7 @@ func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Contex
 	if err != nil {
 		return err
 	}
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.MultiFactoryWriteModel.WriteModel).
+	aggregate := AggregateFromWriteModel(&writeModel.MultiFactoryWriteModel.WriteModel).
 		PushLoginPolicyMultiFactorRemoved(ctx, factors.MultiFactorType(secondFactor))
 
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)

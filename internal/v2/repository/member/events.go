@@ -2,10 +2,6 @@ package member
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/v2/business/command"
-	"reflect"
-	"sort"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -65,39 +61,15 @@ func (e *ChangedEvent) Data() interface{} {
 	return e
 }
 
-func ChangeEventFromExisting(
-	base *eventstore.BaseEvent,
-	current *command.MemberWriteModel,
-	roles ...string,
-) (*ChangedEvent, error) {
-
-	change := NewChangedEvent(base, current.UserID)
-	hasChanged := false
-
-	sort.Strings(current.Roles)
-	sort.Strings(roles)
-	if !reflect.DeepEqual(current.Roles, roles) {
-		change.Roles = roles
-		hasChanged = true
-	}
-
-	if !hasChanged {
-		return nil, errors.ThrowPreconditionFailed(nil, "MEMBE-SeKlD", "Errors.NoChanges")
-	}
-
-	return change, nil
-}
-
-func NewChangedEvent(
+func NewMemberChangedEvent(
 	base *eventstore.BaseEvent,
 	userID string,
 	roles ...string,
-) *ChangedEvent {
-
-	return &ChangedEvent{
+) *MemberAddedEvent {
+	return &MemberAddedEvent{
 		BaseEvent: *base,
-		UserID:    userID,
 		Roles:     roles,
+		UserID:    userID,
 	}
 }
 

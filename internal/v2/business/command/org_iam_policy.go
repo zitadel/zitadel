@@ -5,7 +5,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 )
 
@@ -19,7 +18,7 @@ func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_mo
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.OrgIAMPolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -36,7 +35,7 @@ func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushOrgIAMPolicyChangedFromExisting(ctx, existingPolicy, policy.UserLoginMustBeDomain)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

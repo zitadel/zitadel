@@ -5,7 +5,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 )
 
@@ -19,7 +18,7 @@ func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, polic
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0olDf", "Errors.IAM.PasswordLockoutPolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushPasswordLockoutPolicyAddedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -36,7 +35,7 @@ func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, po
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushPasswordLockoutPolicyChangedFromExisting(ctx, existingPolicy, policy.MaxAttempts, policy.ShowLockOutFailures)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

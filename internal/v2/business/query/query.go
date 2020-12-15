@@ -46,11 +46,11 @@ func (r *QuerySide) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, e
 	return readModelToIAM(readModel), nil
 }
 
-func (r *QuerySide) iamByID(ctx context.Context, id string) (_ *iam_repo.ReadModel, err error) {
+func (r *QuerySide) iamByID(ctx context.Context, id string) (_ *ReadModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	readModel := iam_repo.NewReadModel(id)
+	readModel := NewReadModel(id)
 	err = r.eventstore.FilterToQueryReducer(ctx, readModel)
 	if err != nil {
 		return nil, err

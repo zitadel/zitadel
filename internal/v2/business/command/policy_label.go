@@ -4,7 +4,6 @@ import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -24,7 +23,7 @@ func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *iam_mod
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushLabelPolicyAddedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -45,7 +44,7 @@ func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushLabelPolicyChangedFromExisting(ctx, existingPolicy, policy.PrimaryColor, policy.SecondaryColor)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

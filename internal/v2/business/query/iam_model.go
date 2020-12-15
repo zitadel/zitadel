@@ -1,7 +1,8 @@
-package iam
+package query
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_label "github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	iam_org_iam "github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
@@ -20,11 +21,11 @@ import (
 type ReadModel struct {
 	eventstore.ReadModel
 
-	SetUpStarted Step
-	SetUpDone    Step
+	SetUpStarted iam.Step
+	SetUpDone    iam.Step
 
-	Members MembersReadModel
-	IDPs    IDPConfigsReadModel
+	Members IAMMembersReadModel
+	IDPs    iam.IDPConfigsReadModel
 
 	GlobalOrgID string
 	ProjectID   string
@@ -45,12 +46,12 @@ func NewReadModel(id string) *ReadModel {
 	}
 }
 
-func (rm *ReadModel) IDPByID(idpID string) *IDPConfigReadModel {
+func (rm *ReadModel) IDPByID(idpID string) *iam.IDPConfigReadModel {
 	_, config := rm.IDPs.ConfigByID(idpID)
 	if config == nil {
 		return nil
 	}
-	return &IDPConfigReadModel{ConfigReadModel: *config}
+	return &iam.IDPConfigReadModel{ConfigReadModel: *config}
 }
 
 func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
@@ -62,13 +63,13 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 			*member.RemovedEvent:
 
 			rm.Members.AppendEvents(event)
-		case *IDPConfigAddedEvent,
-			*IDPConfigChangedEvent,
-			*IDPConfigDeactivatedEvent,
-			*IDPConfigReactivatedEvent,
-			*IDPConfigRemovedEvent,
-			*IDPOIDCConfigAddedEvent,
-			*IDPOIDCConfigChangedEvent:
+		case *iam.IDPConfigAddedEvent,
+			*iam.IDPConfigChangedEvent,
+			*iam.IDPConfigDeactivatedEvent,
+			*iam.IDPConfigReactivatedEvent,
+			*iam.IDPConfigRemovedEvent,
+			*iam.IDPOIDCConfigAddedEvent,
+			*iam.IDPOIDCConfigChangedEvent:
 
 			rm.IDPs.AppendEvents(event)
 		case *label.AddedEvent,
@@ -100,11 +101,11 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 func (rm *ReadModel) Reduce() (err error) {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *ProjectSetEvent:
+		case *iam.ProjectSetEvent:
 			rm.ProjectID = e.ProjectID
-		case *GlobalOrgSetEvent:
+		case *iam.GlobalOrgSetEvent:
 			rm.GlobalOrgID = e.OrgID
-		case *SetupStepEvent:
+		case *iam.SetupStepEvent:
 			if e.Done {
 				rm.SetUpDone = e.Step
 			} else {
@@ -137,5 +138,17 @@ func (rm *ReadModel) AppendAndReduce(events ...eventstore.EventReader) error {
 }
 
 func (rm *ReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).AggregateIDs(rm.AggregateID)
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).AggregateIDs(rm.AggregateID)
+}
+
+func AggregateFromReadModel(rm *ReadModel) *iam.Aggregate {
+	return &iam.Aggregate{
+		Aggregate: *eventstore.NewAggregate(
+			rm.AggregateID,
+			iam.AggregateType,
+			rm.ResourceOwner,
+			iam.AggregateVersion,
+			rm.ProcessedSequence,
+		),
+	}
 }

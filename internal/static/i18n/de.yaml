@@ -164,6 +164,8 @@ Errors:
     GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
     UserIDMisisng: User ID fehlt
   IAM:
+    Member:
+      RolesNotChanged: Rollen wurden nicht verändert
     MemberInvalid: Member ist ungültig
     MemberAlreadyExisting: Member existiert bereits
     MemberNotExisting: Member existiert nicht

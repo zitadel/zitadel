@@ -1,18 +1,17 @@
-package members
+package query
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/business/query"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
-type ReadModel struct {
+type MembersReadModel struct {
 	eventstore.ReadModel
 
-	Members []*query.MemberReadModel
+	Members []*MemberReadModel
 }
 
-func (rm *ReadModel) MemberByUserID(id string) (idx int, member *query.MemberReadModel) {
+func (rm *MembersReadModel) MemberByUserID(id string) (idx int, member *MemberReadModel) {
 	for idx, member = range rm.Members {
 		if member.UserID == id {
 			return idx, member
@@ -21,11 +20,11 @@ func (rm *ReadModel) MemberByUserID(id string) (idx int, member *query.MemberRea
 	return -1, nil
 }
 
-func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *member.MemberAddedEvent:
-			m := query.NewMemberReadModel(e.UserID)
+			m := NewMemberReadModel(e.UserID)
 			rm.Members = append(rm.Members, m)
 			m.AppendEvents(e)
 		case *member.ChangedEvent:
@@ -43,7 +42,7 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	}
 }
 
-func (rm *ReadModel) Reduce() (err error) {
+func (rm *MembersReadModel) Reduce() (err error) {
 	for _, m := range rm.Members {
 		err = m.Reduce()
 		if err != nil {

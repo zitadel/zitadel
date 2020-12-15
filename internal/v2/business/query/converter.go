@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
@@ -15,7 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
-func readModelToIAM(readModel *iam_repo.ReadModel) *model.IAM {
+func readModelToIAM(readModel *ReadModel) *model.IAM {
 	return &model.IAM{
 		ObjectRoot:                      readModelToObjectRoot(readModel.ReadModel),
 		GlobalOrgID:                     readModel.GlobalOrgID,
@@ -62,7 +61,7 @@ func readModelToMember(readModel *MemberReadModel) *model.IAMMember {
 	}
 }
 
-func readModelToMembers(readModel *iam_repo.MembersReadModel) []*model.IAMMember {
+func readModelToMembers(readModel *IAMMembersReadModel) []*model.IAMMember {
 	members := make([]*model.IAMMember, len(readModel.Members))
 
 	for i, member := range readModel.Members {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/business/command"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	factors2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
@@ -51,43 +50,25 @@ func NewAggregate(
 	}
 }
 
-func AggregateFromWriteModel(wm *eventstore.WriteModel) *Aggregate {
-	return &Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, AggregateType, AggregateVersion),
-	}
-}
-
-func AggregateFromReadModel(rm *ReadModel) *Aggregate {
-	return &Aggregate{
-		Aggregate: *eventstore.NewAggregate(
-			rm.AggregateID,
-			AggregateType,
-			rm.ResourceOwner,
-			AggregateVersion,
-			rm.ProcessedSequence,
-		),
-	}
-}
-
 //
 //func (a *Aggregate) PushMemberAdded(ctx context.Context, userID string, roles ...string) *Aggregate {
 //	a.Aggregate = *a.PushEvents(NewMemberAddedEvent(ctx, userID, roles...))
 //	return a
 //}
-
-func (a *Aggregate) PushMemberChangedFromExisting(ctx context.Context, current *command.IAMMemberWriteModel, roles ...string) *Aggregate {
-	e, err := MemberChangedEventFromExisting(ctx, current, roles...)
-	if err != nil {
-		return a
-	}
-	a.Aggregate = *a.PushEvents(e)
-	return a
-}
-
-func (a *Aggregate) PushMemberRemoved(ctx context.Context, userID string) *Aggregate {
-	a.Aggregate = *a.PushEvents(NewMemberRemovedEvent(ctx, userID))
-	return a
-}
+//
+//func (a *Aggregate) PushMemberChangedFromExisting(ctx context.Context, current *command.IAMMemberWriteModel, roles ...string) *Aggregate {
+//	e, err := MemberChangedEventFromExisting(ctx, current, roles...)
+//	if err != nil {
+//		return a
+//	}
+//	a.Aggregate = *a.PushEvents(e)
+//	return a
+//}
+//
+//func (a *Aggregate) PushMemberRemoved(ctx context.Context, userID string) *Aggregate {
+//	a.Aggregate = *a.PushEvents(NewMemberRemovedEvent(ctx, userID))
+//	return a
+//}
 
 func (a *Aggregate) PushStepStarted(ctx context.Context, step Step) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewSetupStepStartedEvent(ctx, step))

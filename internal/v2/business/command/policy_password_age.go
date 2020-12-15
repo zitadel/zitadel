@@ -5,7 +5,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 )
 
@@ -19,7 +18,7 @@ func (r *CommandSide) AddDefaultPasswordAgePolicy(ctx context.Context, policy *i
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-6L0pd", "Errors.IAM.PasswordAgePolicy.AlreadyExists")
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushPasswordAgePolicyAddedEvent(ctx, policy.ExpireWarnDays, policy.MaxAgeDays)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -36,7 +35,7 @@ func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy
 		return nil, err
 	}
 
-	iamAgg := iam_repo.AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
+	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushPasswordAgePolicyChangedFromExisting(ctx, existingPolicy, policy.ExpireWarnDays, policy.MaxAgeDays)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

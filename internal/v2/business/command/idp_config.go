@@ -110,7 +110,7 @@ func (r *CommandSide) pushDefaultIDPWriteModel(ctx context.Context, iamID, idpID
 		return nil, err
 	}
 
-	aggregate := eventSetter(iam.AggregateFromWriteModel(&writeModel.WriteModel), writeModel)
+	aggregate := eventSetter(AggregateFromWriteModel(&writeModel.WriteModel), writeModel)
 	err = r.eventstore.PushAggregate(ctx, writeModel, aggregate)
 	if err != nil {
 		return nil, err
