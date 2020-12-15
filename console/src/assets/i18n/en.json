@@ -152,6 +152,39 @@
             },
             "EMPTY":"No entries"
         },
+        "PASSWORDLESS": {
+            "TABLETYPE":"Type",
+            "TABLESTATE":"Status",
+            "ATTRIBUTE":"Attribut",
+            "TABLEACTIONS":"Actions",
+            "TITLE": "Multifactor Authentication",
+            "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
+            "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
+            "OTP": "Configure OTP",
+            "OTP_DIALOG_TITLE": "Add OTP",
+            "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
+            "U2F":"Add U2F",
+            "U2F_DIALOG_TITLE": "Verify U2F",
+            "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
+            "U2F_SUCCESS":"U2F created successfully!",
+            "U2F_ERROR":"An error during U2F setup occurred!",
+            "U2F_NAME":"U2F Name",
+            "TYPE": {
+                "0": "No MFA defined",
+                "1": "OTP",
+                "2": "U2F"
+            },
+            "STATE": {
+                "0": "No State",
+                "1": "Not Ready",
+                "2": "Ready",
+                "3": "Deleted"
+            },
+            "DIALOG": {
+                "DELETE_TITLE":"Remove Passwordless Authentication Method",
+                "DELETE_DESCRIPTION":"You are about to delete a passwordless Authentication method. Are you sure?"
+            }
+        },
         "MFA": {
             "TABLETYPE":"Type",
             "TABLESTATE":"Status",

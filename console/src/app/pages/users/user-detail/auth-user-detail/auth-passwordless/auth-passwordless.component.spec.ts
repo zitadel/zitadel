@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { AuthUserMfaComponent } from './auth-user-mfa.component';
+import { AuthPasswordlessComponent } from './auth-passwordless.component';
 
-describe('AuthUserMfaComponent', () => {
-    let component: AuthUserMfaComponent;
-    let fixture: ComponentFixture<AuthUserMfaComponent>;
+describe('AuthPasswordlessComponent', () => {
+    let component: AuthPasswordlessComponent;
+    let fixture: ComponentFixture<AuthPasswordlessComponent>;
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [AuthUserMfaComponent],
+            declarations: [AuthPasswordlessComponent],
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(AuthUserMfaComponent);
+        fixture = TestBed.createComponent(AuthPasswordlessComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

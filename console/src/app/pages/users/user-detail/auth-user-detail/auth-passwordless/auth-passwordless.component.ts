@@ -39,14 +39,13 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
     public MFAState: any = MFAState;
 
     public error: string = '';
-    public otpAvailable: boolean = false;
 
     constructor(private service: GrpcAuthService,
         private toast: ToastService,
         private dialog: MatDialog) { }
 
     public ngOnInit(): void {
-        this.getMFAs();
+        this.getPasswordless();
     }
 
     public ngOnDestroy(): void {
@@ -70,9 +69,9 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
 
                 dialogRef.afterClosed().subscribe(done => {
                     if (done) {
-                        this.getMFAs();
+                        this.getPasswordless();
                     } else {
-                        this.getMFAs();
+                        this.getPasswordless();
                     }
                 });
             }
@@ -82,58 +81,34 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
         });
     }
 
-    public getMFAs(): void {
+    public getPasswordless(): void {
         this.service.GetMyMfas().then(mfas => {
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
-
-            const index = mfas.toObject().mfasList.findIndex(mfa => mfa.type === MfaType.MFATYPE_OTP);
-            if (index === -1) {
-                this.otpAvailable = true;
-            }
         }).catch(error => {
             this.error = error.message;
         });
     }
 
-    public deleteMFA(type: MfaType, id?: string): void {
+    public deletePasswordless(id?: string): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
                 cancelKey: 'ACTIONS.CANCEL',
-                titleKey: 'USER.MFA.DIALOG.MFA_DELETE_TITLE',
-                descriptionKey: 'USER.MFA.DIALOG.MFA_DELETE_DESCRIPTION',
+                titleKey: 'USER.PASSWORDLESS.DIALOG.DELETE_TITLE',
+                descriptionKey: 'USER.PASSWORDLESS.DIALOG.DELETE_DESCRIPTION',
             },
             width: '400px',
         });
 
         dialogRef.afterClosed().subscribe(resp => {
-            if (resp) {
-                if (type === MfaType.MFATYPE_OTP) {
-                    this.service.RemoveMfaOTP().then(() => {
-                        this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
-
-                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
-                        if (index > -1) {
-                            this.dataSource.data.splice(index, 1);
-                        }
-                        this.getMFAs();
-                    }).catch(error => {
-                        this.toast.showError(error);
-                    });
-                } else if (type === MfaType.MFATYPE_U2F && id) {
-                    this.service.RemoveMyMfaU2F(id).then(() => {
-                        this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
-
-                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
-                        if (index > -1) {
-                            this.dataSource.data.splice(index, 1);
-                        }
-                        this.getMFAs();
-                    }).catch(error => {
-                        this.toast.showError(error);
-                    });
-                }
+            if (resp && id) {
+                this.service.RemoveMyMfaU2F(id).then(() => {
+                    this.toast.showInfo('USER.TOAST.PASSWORDLESSREMOVED', true);
+                    this.getPasswordless();
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
             }
         });
     }
