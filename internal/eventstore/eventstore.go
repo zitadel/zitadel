@@ -21,6 +21,7 @@ var _ Eventstore = (*eventstore)(nil)
 type eventstore struct {
 	repo             repository.Repository
 	aggregateCreator *models.AggregateCreator
+	subscriptions    map[models.AggregateType][]*Subscription
 }
 
 func (es *eventstore) AggregateCreator() *models.AggregateCreator {
@@ -42,6 +43,7 @@ func (es *eventstore) PushAggregates(ctx context.Context, aggregates ...*models.
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
