@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
-import { MultiFactorsResult } from '../proto/generated/admin_pb';
 
+import { MultiFactorsResult } from '../proto/generated/admin_pb';
 import {
     AddMachineKeyRequest,
     AddMachineKeyResponse,
@@ -714,9 +714,10 @@ export class ManagementService {
         return this.grpcService.mgmt.removeMfaOTP(req);
     }
 
-    public RemoveMfaU2F(id: string): Promise<Empty> {
+    public RemoveMfaU2F(userid: string, id: string): Promise<Empty> {
         const req = new WebAuthNTokenID();
         req.setId(id);
+        req.setUserId(userid);
         return this.grpcService.mgmt.removeMfaU2F(req);
     }
 

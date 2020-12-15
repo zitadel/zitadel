@@ -877,6 +877,10 @@
             "TITLE":"Identity Provider hinzufügen",
             "DESCRIPTION":"Sie können vordefinierte oder selbsterstellten Provider auswählen",
             "SELECTIDPS":"Identity Provider"
+        },
+        "PASSWORDLESSTYPE": {
+            "0":"Nicht erlaubt",
+            "1":"Erlaubt"
         }
     },
     "APP": {

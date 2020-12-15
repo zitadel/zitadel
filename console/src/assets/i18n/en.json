@@ -877,6 +877,10 @@
             "TITLE":"Add Identity Provider",
             "DESCRIPTION":"You can select predefined or selfcreated providers for authentication.",
             "SELECTIDPS":"Identity providers"
+        },
+        "PASSWORDLESSTYPE": {
+            "0":"Not allowed",
+            "1":"Allowed"
         }
     },
     "APP": {

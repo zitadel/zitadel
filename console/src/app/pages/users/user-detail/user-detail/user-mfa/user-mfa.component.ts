@@ -81,7 +81,8 @@ export class UserMfaComponent implements OnInit, OnDestroy {
                         this.toast.showError(error);
                     });
                 } else if (type === MfaType.MFATYPE_U2F && id) {
-                    this.mgmtUserService.RemoveMfaU2F(id).then(() => {
+                    console.log(id);
+                    this.mgmtUserService.RemoveMfaU2F(this.user.id, id).then(() => {
                         this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
                         const index = this.dataSource.data.findIndex(mfa => mfa.type === type);

@@ -8,8 +8,8 @@
 
             <ng-container matColumnDef="attr">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.ATTRIBUTE' | translate }} </th>
-                <td mat-cell *matCellDef="let mfa"><span *ngIf="mfa?.attr" class="centered">
-                        {{ mfa.attr }}
+                <td mat-cell *matCellDef="let mfa"><span *ngIf="mfa?.attribute" class="centered">
+                        {{ mfa?.attribute }}
                     </span>
                 </td>
             </ng-container>
