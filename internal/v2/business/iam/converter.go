@@ -273,8 +273,8 @@ func writeModelToIDPOIDCConfig(wm *oidc.ConfigWriteModel) *model.OIDCIDPConfig {
 
 func writeModelToIDPProvider(wm *idpprovider.WriteModel) *model.IDPProvider {
 	return &model.IDPProvider{
-		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
-		IDPConfigID: wm.Provider.IDPConfigID,
-		Type:        model.IDPProviderType(wm.Provider.IDPProviderType),
+		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		IDPConfigID: wm.IDPConfigID,
+		Type:        model.IDPProviderType(wm.IDPProviderType),
 	}
 }

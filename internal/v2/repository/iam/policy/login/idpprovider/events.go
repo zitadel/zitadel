@@ -7,7 +7,6 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 )
 
 type AddedEvent struct {
@@ -17,7 +16,7 @@ type AddedEvent struct {
 func NewAddedEvent(
 	ctx context.Context,
 	idpConfigID string,
-	idpProviderType provider.Type,
+	idpProviderType idpprovider.Type,
 ) *AddedEvent {
 
 	return &AddedEvent{

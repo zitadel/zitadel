@@ -1,4 +1,4 @@
-package provider
+package idpprovider
 
 type Type int8
 

@@ -15,9 +15,9 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
-	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login/factors"
+	idpprovider2 "github.com/caos/zitadel/internal/v2/repository/policy/login/idpprovider"
 )
 
 const (
@@ -283,7 +283,7 @@ func (a *Aggregate) PushIDPOIDCConfigChanged(
 func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
 	ctx context.Context,
 	idpConfigID string,
-	providerType provider.Type,
+	providerType idpprovider2.Type,
 ) *Aggregate {
 
 	a.Aggregate = *a.PushEvents(idpprovider.NewAddedEvent(ctx, idpConfigID, providerType))
@@ -293,7 +293,7 @@ func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
 func (a *Aggregate) PushLoginPolicyIDPProviderRemovedEvent(
 	ctx context.Context,
 	idpConfigID string,
-	providerType provider.Type,
+	providerType idpprovider2.Type,
 ) *Aggregate {
 
 	a.Aggregate = *a.PushEvents(idpprovider.NewRemovedEvent(ctx, idpConfigID))

@@ -9,9 +9,9 @@ import (
 	iam_login "github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
 	iam_factor "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
-	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login"
 	"github.com/caos/zitadel/internal/v2/repository/policy/login/factors"
+	idpprovider2 "github.com/caos/zitadel/internal/v2/repository/policy/login/idpprovider"
 )
 
 func (r *Repository) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
@@ -67,8 +67,8 @@ func (r *Repository) AddIDPProviderToLoginPolicy(ctx context.Context, idpProvide
 		return nil, err
 	}
 
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel).
-		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IDPConfigID, provider.Type(idpProvider.Type))
+	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel.WriteModel).
+		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IDPConfigID, idpprovider2.Type(idpProvider.Type))
 
 	if err = r.eventstore.PushAggregate(ctx, writeModel, aggregate); err != nil {
 		return nil, err
@@ -83,8 +83,8 @@ func (r *Repository) RemoveIDPProviderFromLoginPolicy(ctx context.Context, idpPr
 	if err != nil {
 		return err
 	}
-	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel).
-		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IDPConfigID, provider.Type(idpProvider.Type))
+	aggregate := iam_repo.AggregateFromWriteModel(&writeModel.WriteModel.WriteModel).
+		PushLoginPolicyIDPProviderAddedEvent(ctx, idpProvider.IDPConfigID, idpprovider2.Type(idpProvider.Type))
 
 	return r.eventstore.PushAggregate(ctx, writeModel, aggregate)
 }

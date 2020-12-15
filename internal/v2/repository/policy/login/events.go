@@ -5,7 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
+	"github.com/caos/zitadel/internal/v2/repository/policy/login/idpprovider"
 )
 
 const (
@@ -13,8 +13,8 @@ const (
 	LoginPolicyAddedEventType              = loginPolicyPrefix + "added"
 	LoginPolicyChangedEventType            = loginPolicyPrefix + "changed"
 	LoginPolicyRemovedEventType            = loginPolicyPrefix + "removed"
-	LoginPolicyIDPProviderAddedEventType   = loginPolicyPrefix + provider.AddedEventType
-	LoginPolicyIDPProviderRemovedEventType = loginPolicyPrefix + provider.RemovedEventType
+	LoginPolicyIDPProviderAddedEventType   = loginPolicyPrefix + idpprovider.AddedEventType
+	LoginPolicyIDPProviderRemovedEventType = loginPolicyPrefix + idpprovider.RemovedEventType
 )
 
 type AddedEvent struct {

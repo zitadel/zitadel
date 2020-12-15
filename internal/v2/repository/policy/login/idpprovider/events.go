@@ -1,42 +1,62 @@
 package idpprovider
 
 import (
+	"encoding/json"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
+)
+
+const (
+	AddedEventType   = "idpprovider.added"
+	RemovedEventType = "idpprovider.removed"
 )
 
 type AddedEvent struct {
-	provider.AddedEvent
+	eventstore.BaseEvent
+
+	IDPConfigID     string `json:"idpConfigId"`
+	IDPProviderType Type   `json:"idpProviderType"`
+}
+
+func (e *AddedEvent) Data() interface{} {
+	return e
 }
 
 func NewAddedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID string,
-	idpProviderType provider.Type,
+	idpProviderType Type,
 ) *AddedEvent {
 
 	return &AddedEvent{
-		AddedEvent: *provider.NewAddedEvent(
-			base,
-			idpConfigID,
-			idpProviderType),
+		*base,
+		idpConfigID,
+		idpProviderType,
 	}
 }
 
 func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := provider.AddedEventEventMapper(event)
-	if err != nil {
-		return nil, err
+	e := &AddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	return &AddedEvent{
-		AddedEvent: *e.(*provider.AddedEvent),
-	}, nil
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "PROVI-bfNnp", "Errors.Internal")
+	}
+
+	return e, nil
 }
 
 type RemovedEvent struct {
-	provider.RemovedEvent
+	eventstore.BaseEvent
+
+	IDPConfigID string `json:"idpConfigId"`
+}
+
+func (e *RemovedEvent) Data() interface{} {
+	return e
 }
 
 func NewRemovedEvent(
@@ -44,17 +64,20 @@ func NewRemovedEvent(
 	idpConfigID string,
 ) *RemovedEvent {
 	return &RemovedEvent{
-		RemovedEvent: *provider.NewRemovedEvent(base, idpConfigID),
+		BaseEvent:   *base,
+		IDPConfigID: idpConfigID,
 	}
 }
 
 func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := provider.RemovedEventEventMapper(event)
-	if err != nil {
-		return nil, err
+	e := &RemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	return &RemovedEvent{
-		RemovedEvent: *e.(*provider.RemovedEvent),
-	}, nil
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "PROVI-6H0KQ", "Errors.Internal")
+	}
+
+	return e, nil
 }

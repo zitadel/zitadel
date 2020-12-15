@@ -2,18 +2,22 @@ package idpprovider
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/idp/provider"
 )
 
 type WriteModel struct {
-	provider.WriteModel
+	eventstore.WriteModel
+
+	IDPConfigID     string
+	IDPProviderType Type
 }
 
-func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
+func (wm *WriteModel) Reduce() error {
+	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *AddedEvent:
-			wm.WriteModel.AppendEvents(&e.AddedEvent)
+			wm.IDPConfigID = e.IDPConfigID
+			wm.IDPProviderType = e.IDPProviderType
 		}
 	}
+	return wm.WriteModel.Reduce()
 }

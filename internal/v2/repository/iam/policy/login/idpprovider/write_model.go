@@ -10,57 +10,39 @@ const (
 )
 
 type WriteModel struct {
-	eventstore.WriteModel
-	Provider idpprovider.WriteModel
-
-	idpConfigID string
-	iamID       string
-
+	idpprovider.WriteModel
 	IsRemoved bool
 }
 
 func NewWriteModel(iamID, idpConfigID string) *WriteModel {
 	return &WriteModel{
-		iamID:       iamID,
-		idpConfigID: idpConfigID,
+		WriteModel: idpprovider.WriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID: iamID,
+			},
+			IDPConfigID: idpConfigID,
+		},
+		IsRemoved: false,
 	}
 }
 
 func (wm *WriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
 		case *AddedEvent:
-			if e.IDPConfigID != wm.idpConfigID {
+			if e.IDPConfigID != wm.IDPConfigID {
 				continue
 			}
-			wm.Provider.AppendEvents(&e.AddedEvent)
+			wm.WriteModel.AppendEvents(&e.AddedEvent)
 		}
 	}
 }
 
 func (wm *WriteModel) Reduce() error {
-	for _, event := range wm.Events {
-		switch e := event.(type) {
-		case *AddedEvent:
-			if e.IDPConfigID != wm.idpConfigID {
-				continue
-			}
-			wm.IsRemoved = false
-		case *RemovedEvent:
-			if e.IDPConfigID != wm.idpConfigID {
-				continue
-			}
-			wm.IsRemoved = true
-		}
-	}
-	if err := wm.Provider.Reduce(); err != nil {
-		return err
-	}
 	return wm.WriteModel.Reduce()
 }
 
 func (wm *WriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
-		AggregateIDs(wm.iamID)
+		AggregateIDs(wm.AggregateID)
 }
