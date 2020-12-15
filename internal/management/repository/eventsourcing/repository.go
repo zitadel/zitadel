@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/business/query"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -17,7 +18,6 @@ import (
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
-	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
 )
 
 type Config struct {
@@ -75,7 +75,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
-	iamV2, err := iam_business.StartRepository(&iam_business.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
+	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, user, org, usergrant, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 		IAMRepository: eventstore.IAMRepository{
-			IAMV2: iamV2,
+			IAMV2Query: iamV2Query,
 		},
 	}, nil
 }

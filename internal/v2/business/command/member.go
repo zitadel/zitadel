@@ -1,4 +1,4 @@
-package iam
+package command
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *Repository) AddMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+func (r *CommandSide) AddMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
@@ -38,7 +38,7 @@ func (r *Repository) AddMember(ctx context.Context, member *iam_model.IAMMember)
 }
 
 //ChangeMember updates an existing member
-func (r *Repository) ChangeMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+func (r *CommandSide) ChangeMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
@@ -66,7 +66,7 @@ func (r *Repository) ChangeMember(ctx context.Context, member *iam_model.IAMMemb
 	return writeModelToMember(existingMember), nil
 }
 
-func (r *Repository) RemoveMember(ctx context.Context, member *iam_model.IAMMember) error {
+func (r *CommandSide) RemoveMember(ctx context.Context, member *iam_model.IAMMember) error {
 	m, err := r.memberWriteModelByID(ctx, member.AggregateID, member.UserID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
@@ -81,20 +81,7 @@ func (r *Repository) RemoveMember(ctx context.Context, member *iam_model.IAMMemb
 	return r.eventstore.PushAggregate(ctx, m, iamAgg)
 }
 
-func (r *Repository) MemberByID(ctx context.Context, iamID, userID string) (member *iam_repo.MemberReadModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	member = iam_repo.NewMemberReadModel(iamID, userID)
-	err = r.eventstore.FilterToQueryReducer(ctx, member)
-	if err != nil {
-		return nil, err
-	}
-
-	return member, nil
-}
-
-func (r *Repository) memberWriteModelByID(ctx context.Context, iamID, userID string) (member *iam_repo.MemberWriteModel, err error) {
+func (r *CommandSide) memberWriteModelByID(ctx context.Context, iamID, userID string) (member *iam_repo.MemberWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

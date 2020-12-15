@@ -1,4 +1,4 @@
-package iam
+package command
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 )
 
-func (r *Repository) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+func (r *CommandSide) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (r *Repository) AddPasswordComplexityPolicy(ctx context.Context, policy *ia
 	return writeModelToPasswordComplexityPolicy(addedPolicy), nil
 }
 
-func (r *Repository) ChangePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+func (r *CommandSide) ChangePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (r *Repository) ChangePasswordComplexityPolicy(ctx context.Context, policy 
 	return writeModelToPasswordComplexityPolicy(existingPolicy), nil
 }
 
-func (r *Repository) passwordComplexityPolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_complexity.WriteModel, err error) {
+func (r *CommandSide) passwordComplexityPolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_complexity.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

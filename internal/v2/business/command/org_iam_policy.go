@@ -1,4 +1,4 @@
-package iam
+package command
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 )
 
-func (r *Repository) AddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+func (r *CommandSide) AddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	addedPolicy := org_iam.NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -30,7 +30,7 @@ func (r *Repository) AddOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgI
 	return writeModelToOrgIAMPolicy(addedPolicy), nil
 }
 
-func (r *Repository) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	existingPolicy, err := r.orgIAMPolicyWriteModelByID(ctx, policy.AggregateID)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (r *Repository) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.O
 	return writeModelToOrgIAMPolicy(existingPolicy), nil
 }
 
-func (r *Repository) orgIAMPolicyWriteModelByID(ctx context.Context, iamID string) (policy *org_iam.WriteModel, err error) {
+func (r *CommandSide) orgIAMPolicyWriteModelByID(ctx context.Context, iamID string) (policy *org_iam.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

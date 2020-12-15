@@ -1,4 +1,4 @@
-package iam
+package query
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -8,7 +8,6 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/label"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
@@ -32,6 +31,35 @@ func readModelToIAM(readModel *iam_repo.ReadModel) *model.IAM {
 		DefaultPasswordComplexityPolicy: readModelToPasswordComplexityPolicy(&readModel.DefaultPasswordComplexityPolicy),
 		DefaultPasswordLockoutPolicy:    readModelToPasswordLockoutPolicy(&readModel.DefaultPasswordLockoutPolicy),
 		IDPs:                            readModelToIDPConfigs(&readModel.IDPs),
+	}
+}
+
+func readModelToIDPConfigView(rm *iam.IDPConfigReadModel) *model.IDPConfigView {
+	return &model.IDPConfigView{
+		AggregateID:               rm.AggregateID,
+		ChangeDate:                rm.ChangeDate,
+		CreationDate:              rm.CreationDate,
+		IDPConfigID:               rm.ConfigID,
+		IDPProviderType:           model.IDPProviderType(rm.ProviderType),
+		IsOIDC:                    rm.OIDCConfig != nil,
+		Name:                      rm.Name,
+		OIDCClientID:              rm.OIDCConfig.ClientID,
+		OIDCClientSecret:          rm.OIDCConfig.ClientSecret,
+		OIDCIDPDisplayNameMapping: model.OIDCMappingField(rm.OIDCConfig.IDPDisplayNameMapping),
+		OIDCIssuer:                rm.OIDCConfig.Issuer,
+		OIDCScopes:                rm.OIDCConfig.Scopes,
+		OIDCUsernameMapping:       model.OIDCMappingField(rm.OIDCConfig.UserNameMapping),
+		Sequence:                  rm.ProcessedSequence,
+		State:                     model.IDPConfigState(rm.State),
+		StylingType:               model.IDPStylingType(rm.StylingType),
+	}
+}
+
+func readModelToMember(readModel *member.ReadModel) *model.IAMMember {
+	return &model.IAMMember{
+		ObjectRoot: readModelToObjectRoot(readModel.ReadModel),
+		Roles:      readModel.Roles,
+		UserID:     readModel.UserID,
 	}
 }
 
@@ -106,115 +134,6 @@ func readModelToPasswordLockoutPolicy(readModel *password_lockout.ReadModel) *mo
 	}
 }
 
-func readModelToObjectRoot(readModel eventstore.ReadModel) models.ObjectRoot {
-	return models.ObjectRoot{
-		AggregateID:   readModel.AggregateID,
-		ChangeDate:    readModel.ChangeDate,
-		CreationDate:  readModel.CreationDate,
-		ResourceOwner: readModel.ResourceOwner,
-		Sequence:      readModel.ProcessedSequence,
-	}
-}
-
-func writeModelToObjectRoot(writeModel eventstore.WriteModel) models.ObjectRoot {
-	return models.ObjectRoot{
-		AggregateID:   writeModel.AggregateID,
-		ChangeDate:    writeModel.ChangeDate,
-		ResourceOwner: writeModel.ResourceOwner,
-		Sequence:      writeModel.ProcessedSequence,
-	}
-}
-
-func readModelToMember(readModel *member.ReadModel) *model.IAMMember {
-	return &model.IAMMember{
-		ObjectRoot: readModelToObjectRoot(readModel.ReadModel),
-		Roles:      readModel.Roles,
-		UserID:     readModel.UserID,
-	}
-}
-
-func writeModelToMember(writeModel *iam.MemberWriteModel) *model.IAMMember {
-	return &model.IAMMember{
-		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel.WriteModel),
-		Roles:      writeModel.Roles,
-		UserID:     writeModel.UserID,
-	}
-}
-
-func writeModelToLoginPolicy(wm *login.WriteModel) *model.LoginPolicy {
-	return &model.LoginPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel.WriteModel),
-		AllowUsernamePassword: wm.AllowUserNamePassword,
-		AllowRegister:         wm.AllowRegister,
-		AllowExternalIdp:      wm.AllowExternalIDP,
-		ForceMFA:              wm.ForceMFA,
-		PasswordlessType:      model.PasswordlessType(wm.PasswordlessType),
-	}
-}
-
-func writeModelToLabelPolicy(wm *label.WriteModel) *model.LabelPolicy {
-	return &model.LabelPolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel.WriteModel),
-		PrimaryColor:   wm.PrimaryColor,
-		SecondaryColor: wm.SecondaryColor,
-	}
-}
-
-func writeModelToOrgIAMPolicy(wm *org_iam.WriteModel) *model.OrgIAMPolicy {
-	return &model.OrgIAMPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel.WriteModel),
-		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
-	}
-}
-
-func writeModelToPasswordAgePolicy(wm *password_age.WriteModel) *model.PasswordAgePolicy {
-	return &model.PasswordAgePolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel.WriteModel),
-		MaxAgeDays:     wm.MaxAgeDays,
-		ExpireWarnDays: wm.ExpireWarnDays,
-	}
-}
-
-func writeModelToPasswordComplexityPolicy(wm *password_complexity.WriteModel) *model.PasswordComplexityPolicy {
-	return &model.PasswordComplexityPolicy{
-		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel.WriteModel),
-		MinLength:    wm.MinLength,
-		HasLowercase: wm.HasLowercase,
-		HasUppercase: wm.HasUpperCase,
-		HasNumber:    wm.HasNumber,
-		HasSymbol:    wm.HasSymbol,
-	}
-}
-
-func writeModelToPasswordLockoutPolicy(wm *password_lockout.WriteModel) *model.PasswordLockoutPolicy {
-	return &model.PasswordLockoutPolicy{
-		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel.WriteModel),
-		MaxAttempts:         wm.MaxAttempts,
-		ShowLockOutFailures: wm.ShowLockOutFailures,
-	}
-}
-
-func readModelToIDPConfigView(rm *iam.IDPConfigReadModel) *model.IDPConfigView {
-	return &model.IDPConfigView{
-		AggregateID:               rm.AggregateID,
-		ChangeDate:                rm.ChangeDate,
-		CreationDate:              rm.CreationDate,
-		IDPConfigID:               rm.ConfigID,
-		IDPProviderType:           model.IDPProviderType(rm.ProviderType),
-		IsOIDC:                    rm.OIDCConfig != nil,
-		Name:                      rm.Name,
-		OIDCClientID:              rm.OIDCConfig.ClientID,
-		OIDCClientSecret:          rm.OIDCConfig.ClientSecret,
-		OIDCIDPDisplayNameMapping: model.OIDCMappingField(rm.OIDCConfig.IDPDisplayNameMapping),
-		OIDCIssuer:                rm.OIDCConfig.Issuer,
-		OIDCScopes:                rm.OIDCConfig.Scopes,
-		OIDCUsernameMapping:       model.OIDCMappingField(rm.OIDCConfig.UserNameMapping),
-		Sequence:                  rm.ProcessedSequence,
-		State:                     model.IDPConfigState(rm.State),
-		StylingType:               model.IDPStylingType(rm.StylingType),
-	}
-}
-
 func readModelToIDPConfigs(rm *iam.IDPConfigsReadModel) []*model.IDPConfig {
 	configs := make([]*model.IDPConfig, len(rm.Configs))
 	for i, config := range rm.Configs {
@@ -248,33 +167,12 @@ func readModelToIDPOIDCConfig(rm *oidc.ConfigReadModel) *model.OIDCIDPConfig {
 	}
 }
 
-func writeModelToIDPConfig(wm *iam.IDPConfigWriteModel) *model.IDPConfig {
-	return &model.IDPConfig{
-		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
-		OIDCConfig:  writeModelToIDPOIDCConfig(wm.OIDCConfig),
-		IDPConfigID: wm.ConfigID,
-		Name:        wm.Name,
-		State:       model.IDPConfigState(wm.State),
-		StylingType: model.IDPStylingType(wm.StylingType),
-	}
-}
-
-func writeModelToIDPOIDCConfig(wm *oidc.ConfigWriteModel) *model.OIDCIDPConfig {
-	return &model.OIDCIDPConfig{
-		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
-		ClientID:              wm.ClientID,
-		IDPConfigID:           wm.IDPConfigID,
-		IDPDisplayNameMapping: model.OIDCMappingField(wm.IDPDisplayNameMapping),
-		Issuer:                wm.Issuer,
-		Scopes:                wm.Scopes,
-		UsernameMapping:       model.OIDCMappingField(wm.UserNameMapping),
-	}
-}
-
-func writeModelToIDPProvider(wm *idpprovider.WriteModel) *model.IDPProvider {
-	return &model.IDPProvider{
-		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel.WriteModel),
-		IDPConfigID: wm.IDPConfigID,
-		Type:        model.IDPProviderType(wm.IDPProviderType),
+func readModelToObjectRoot(readModel eventstore.ReadModel) models.ObjectRoot {
+	return models.ObjectRoot{
+		AggregateID:   readModel.AggregateID,
+		ChangeDate:    readModel.ChangeDate,
+		CreationDate:  readModel.CreationDate,
+		ResourceOwner: readModel.ResourceOwner,
+		Sequence:      readModel.ProcessedSequence,
 	}
 }

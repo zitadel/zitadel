@@ -1,4 +1,4 @@
-package iam
+package query
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-type Repository struct {
+type QuerySide struct {
 	eventstore   *eventstore.Eventstore
 	idGenerator  id.Generator
 	secretCrypto crypto.Crypto
@@ -23,8 +23,8 @@ type Config struct {
 	SystemDefaults sd.SystemDefaults
 }
 
-func StartRepository(config *Config) (repo *Repository, err error) {
-	repo = &Repository{
+func StartQuerySide(config *Config) (repo *QuerySide, err error) {
+	repo = &QuerySide{
 		eventstore:  config.Eventstore,
 		idGenerator: id.SonyFlakeGenerator,
 	}
@@ -37,7 +37,7 @@ func StartRepository(config *Config) (repo *Repository, err error) {
 	return repo, nil
 }
 
-func (r *Repository) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, err error) {
+func (r *QuerySide) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, err error) {
 	readModel, err := r.iamByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (r *Repository) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, 
 	return readModelToIAM(readModel), nil
 }
 
-func (r *Repository) iamByID(ctx context.Context, id string) (_ *iam_repo.ReadModel, err error) {
+func (r *QuerySide) iamByID(ctx context.Context, id string) (_ *iam_repo.ReadModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

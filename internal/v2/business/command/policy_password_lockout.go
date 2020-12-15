@@ -1,4 +1,4 @@
-package iam
+package command
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 )
 
-func (r *Repository) AddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+func (r *CommandSide) AddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
 	addedPolicy := password_lockout.NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -30,7 +30,7 @@ func (r *Repository) AddPasswordLockoutPolicy(ctx context.Context, policy *iam_m
 	return writeModelToPasswordLockoutPolicy(addedPolicy), nil
 }
 
-func (r *Repository) ChangePasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+func (r *CommandSide) ChangePasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
 	existingPolicy, err := r.passwordLockoutPolicyWriteModelByID(ctx, policy.AggregateID)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (r *Repository) ChangePasswordLockoutPolicy(ctx context.Context, policy *ia
 	return writeModelToPasswordLockoutPolicy(existingPolicy), nil
 }
 
-func (r *Repository) passwordLockoutPolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_lockout.WriteModel, err error) {
+func (r *CommandSide) passwordLockoutPolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_lockout.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

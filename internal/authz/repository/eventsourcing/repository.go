@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/business/query"
 
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 
@@ -19,7 +20,6 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
 )
 
 type Config struct {
@@ -79,7 +79,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 	if err != nil {
 		return nil, err
 	}
-	iamV2, err := iam_business.StartRepository(&iam_business.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
+	iamV2, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
@@ -96,9 +96,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 			IamEvents: iam,
 		},
 		eventstore.IamRepo{
-			IAMID:     systemDefaults.IamID,
-			IAMEvents: iam,
-			IAMV2:     iamV2,
+			IAMID:      systemDefaults.IamID,
+			IAMEvents:  iam,
+			IAMV2Query: iamV2,
 		},
 		eventstore.TokenVerifierRepo{
 			//TODO: Add Token Verification Key

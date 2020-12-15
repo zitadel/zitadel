@@ -1,4 +1,4 @@
-package iam
+package command
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *Repository) StartSetup(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
+func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
 	iam, err := r.setup(ctx, iamID, iam_repo.Step(step), iam_repo.NewSetupStepStartedEvent(ctx, iam_repo.Step(step)))
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-zx03n", "Setup start failed")
@@ -17,7 +17,7 @@ func (r *Repository) StartSetup(ctx context.Context, iamID string, step iam_mode
 	return iam, nil
 }
 
-func (r *Repository) SetupDone(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
+func (r *CommandSide) SetupDone(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
 	iam, err := r.setup(ctx, iamID, iam_repo.Step(step), iam_repo.NewSetupStepDoneEvent(ctx, iam_repo.Step(step)))
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-zx03n", "Setup start failed")
@@ -25,7 +25,8 @@ func (r *Repository) SetupDone(ctx context.Context, iamID string, step iam_model
 	return iam, nil
 }
 
-func (r *Repository) setup(ctx context.Context, iamID string, step iam_repo.Step, event eventstore.EventPusher) (*iam_model.IAM, error) {
+//TODO: should not use readmodel
+func (r *CommandSide) setup(ctx context.Context, iamID string, step iam_repo.Step, event eventstore.EventPusher) (*iam_model.IAM, error) {
 	iam, err := r.iamByID(ctx, iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
@@ -46,5 +47,6 @@ func (r *Repository) setup(ctx context.Context, iamID string, step iam_repo.Step
 	if err = iam.AppendAndReduce(events...); err != nil {
 		return nil, err
 	}
-	return readModelToIAM(iam), nil
+	return nil, nil
+	//return readModelToIAM(iam), nil
 }

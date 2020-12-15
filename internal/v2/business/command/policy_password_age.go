@@ -1,4 +1,4 @@
-package iam
+package command
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 )
 
-func (r *Repository) AddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+func (r *CommandSide) AddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
 	addedPolicy := password_age.NewWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -30,7 +30,7 @@ func (r *Repository) AddPasswordAgePolicy(ctx context.Context, policy *iam_model
 	return writeModelToPasswordAgePolicy(addedPolicy), nil
 }
 
-func (r *Repository) ChangePasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+func (r *CommandSide) ChangePasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
 	existingPolicy, err := r.passwordAgePolicyWriteModelByID(ctx, policy.AggregateID)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (r *Repository) ChangePasswordAgePolicy(ctx context.Context, policy *iam_mo
 	return writeModelToPasswordAgePolicy(existingPolicy), nil
 }
 
-func (r *Repository) passwordAgePolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_age.WriteModel, err error) {
+func (r *CommandSide) passwordAgePolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_age.WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
