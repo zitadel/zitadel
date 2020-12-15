@@ -353,6 +353,7 @@
             "EMAILVERIFICATIONSENT":"E-mail verification code sent.",
             "OTPREMOVED":"OTP removed.",
             "U2FREMOVED":"U2F removed.",
+            "PASSWORDLESSREMOVED":"Passwordless removed.",
             "INITIALPASSWORDSET":"Initial password set.",
             "PASSWORDNOTIFICATIONSENT":"Password change notification sent.",
             "PASSWORDCHANGED":"Password changed successfully.",

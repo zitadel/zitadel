@@ -50,7 +50,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public error: string = '';
     public otpAvailable: boolean = false;
-    public u2fAvailable: boolean = false;
 
     constructor(private service: GrpcAuthService,
         private toast: ToastService,
@@ -125,11 +124,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             const index = mfas.toObject().mfasList.findIndex(mfa => mfa.type === MfaType.MFATYPE_OTP);
             if (index === -1) {
                 this.otpAvailable = true;
-            }
-
-            const index2 = mfas.toObject().mfasList.findIndex(mfa => mfa.type === MfaType.MFATYPE_U2F);
-            if (index2 === -1) {
-                this.u2fAvailable = true;
             }
         }).catch(error => {
             this.error = error.message;
