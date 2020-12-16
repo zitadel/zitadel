@@ -16,8 +16,6 @@ type Email struct {
 
 	EmailAddress    string `json:"email,omitempty"`
 	IsEmailVerified bool   `json:"-"`
-
-	isEmailUnique bool `json:"-"`
 }
 
 type EmailCode struct {

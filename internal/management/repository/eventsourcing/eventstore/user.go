@@ -187,7 +187,7 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierID)
 		if user != nil {
 			if user.Human != nil {
-				change.ModifierName = user.DisplayName
+				change.ModifierName = user.Human.DisplayName
 			}
 			if user.Machine != nil {
 				change.ModifierName = user.Machine.Name
