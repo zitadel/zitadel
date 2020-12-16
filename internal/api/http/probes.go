@@ -1,9 +1,9 @@
 package http
 
 const (
-	Healthz    = "/Healthz"
-	Readiness  = "/Ready"
-	Validation = "/Validate"
+	Healthz    = "/healthz"
+	Readiness  = "/ready"
+	Validation = "/validate"
 )
 
 var (

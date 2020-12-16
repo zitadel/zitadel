@@ -3,9 +3,13 @@ name: "Code scanning - action"
 on:
   push:
     branches: [master, ]
+    paths-ignore:
+    - 'site/**'
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [master]
+    paths-ignore:
+    - 'site/**'
   schedule:
     - cron: '0 12 * * 2'
 

@@ -30,7 +30,12 @@ type UserRepository interface {
 	ProfileByID(ctx context.Context, userID string) (*model.Profile, error)
 	ChangeProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 
-	UserMfas(ctx context.Context, userID string) ([]*model.MultiFactor, error)
+	UserMFAs(ctx context.Context, userID string) ([]*model.MultiFactor, error)
+	RemoveOTP(ctx context.Context, userID string) error
+	RemoveU2F(ctx context.Context, userID, webAuthNTokenID string) error
+
+	GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error)
+	RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error
 
 	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
 	RemoveExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
@@ -54,4 +59,6 @@ type UserRepository interface {
 	ChangeAddress(ctx context.Context, address *model.Address) (*model.Address, error)
 
 	SearchUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
+
+	ResendInitialMail(ctx context.Context, userID, email string) error
 }

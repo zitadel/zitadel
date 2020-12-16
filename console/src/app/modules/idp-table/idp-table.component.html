@@ -1,19 +1,16 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    emitRefreshOnPreviousRoute="/iam/idp/create" [timestamp]="idpResult?.viewTimestamp" [selection]="selection">
+    [emitRefreshOnPreviousRoutes]="['/iam/idp/create']" [timestamp]="idpResult?.viewTimestamp" [selection]="selection">
     <ng-template appHasRole [appHasRole]="['iam.write']" actions>
         <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT"
-            [disabled]="disabled">
+            mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon>block</mat-icon>
         </button>
         <button (click)="reactivateSelectedIdps()" matTooltip="{{'IDP.ACTIVATE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT"
-            [disabled]="disabled">
+            mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon>play_circle_outline</mat-icon>
         </button>
         <button color="warn" (click)="removeSelectedIdps()" matTooltip="{{'IDP.DELETE' | translate}}"
-            class="icon-button" mat-icon-button
-            *ngIf="selection.hasValue() && serviceType!=PolicyComponentServiceType.MGMT" [disabled]="disabled">
+            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <i class="las la-trash"></i>
         </button>
         <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled">
@@ -27,14 +24,14 @@
                 <th mat-header-cell *matHeaderCellDef>
                     <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
                         [checked]="selection.hasValue() && isAllSelected()"
-                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [disabled]="serviceType==PolicyComponentServiceType.MGMT">
                     </mat-checkbox>
                 </th>
                 <td mat-cell *matCellDef="let idp">
                     <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                        [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM"
                         (change)="$event ? selection.toggle(idp) : null" [checked]="selection.isSelected(idp)">
-                        <img *ngIf="idp?.logoSrc?.startsWith('https://'); else genAvatar" [src]="idp.logoSrc"
-                            alt="ipp logo {{idp?.name}}" />
                         <ng-template #genAvatar>
                             <div class="avatar">
                                 <span>{{idp.name.charAt(0)}}</span>
@@ -46,12 +43,12 @@
 
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.NAME' | translate }} </th>
-                <td mat-cell *matCellDef="let idp"> {{idp?.name}} </td>
+                <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp"> {{idp?.name}} </td>
             </ng-container>
 
             <ng-container matColumnDef="config">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.CONFIG' | translate }} </th>
-                <td mat-cell *matCellDef="let idp">
+                <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
                     <div *ngFor="let elem of idp?.oidcConfig | keyvalue" class="flex-row">
                         <span class="key">{{elem.key}}:</span>
                         <span class="value">{{elem.value}}</span>
@@ -61,35 +58,45 @@
 
             <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.STATE' | translate }} </th>
-                <td mat-cell *matCellDef="let idp"> {{ 'IDP.STATES.'+idp.state | translate }} </td>
+                <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+                    {{ 'IDP.STATES.'+idp.state | translate }} </td>
             </ng-container>
 
             <ng-container matColumnDef="creationDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.CREATIONDATE' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let idp">
+                <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
                     {{idp.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
             </ng-container>
 
             <ng-container matColumnDef="changeDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.CHANGEDATE' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let idp">
+                <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
                     {{idp.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
             </ng-container>
 
             <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.TYPE' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let idp">
+                <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
                     {{'IDP.TYPES.'+idp.providerType | translate }} </td>
             </ng-container>
 
+            <ng-container matColumnDef="actions" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let idp">
+                    <button
+                        [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM"
+                        mat-icon-button color="warn" matTooltip="{{'IAM.VIEWS.CLEAR' | translate}}"
+                        (click)="removeIdp(idp)">
+                        <i class="las la-trash"></i>
+                    </button>
+                </td>
+            </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr class="highlight"
                 [ngClass]="{'disabled': serviceType==PolicyComponentServiceType.MGMT && row?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM}"
-                mat-row *matRowDef="let row; columns: displayedColumns;"
-                [routerLink]="serviceType==PolicyComponentServiceType.ADMIN ? routerLinkForRow(row): null">
+                mat-row *matRowDef="let row; columns: displayedColumns;">
             </tr>
-
         </table>
     </div>
     <mat-paginator #paginator class="paginator" [length]="idpResult?.totalResult || 0" [pageSize]="10"

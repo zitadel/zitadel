@@ -61,7 +61,8 @@ export class AddIdpDialogComponent {
             query.setKey(IdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
             query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
             query.setValue(this.idpType.toString());
-            this.mgmtService.SearchIdps().then(idps => {
+
+            this.mgmtService.SearchIdps(undefined, undefined, [query]).then(idps => {
                 this.availableIdps = idps.toObject().resultList;
             });
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {

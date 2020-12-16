@@ -10,7 +10,7 @@ type IDPConfig struct {
 	IDPConfigID string
 	Type        IdpConfigType
 	Name        string
-	LogoSrc     []byte
+	StylingType IDPStylingType
 	State       IDPConfigState
 	OIDCConfig  *OIDCIDPConfig
 }
@@ -40,6 +40,13 @@ const (
 	IDPConfigStateActive IDPConfigState = iota
 	IDPConfigStateInactive
 	IDPConfigStateRemoved
+)
+
+type IDPStylingType int32
+
+const (
+	IDPStylingTypeUnspecified IDPStylingType = iota
+	IDPStylingTypeGoogle
 )
 
 type OIDCMappingField int32
@@ -81,4 +88,13 @@ func (oi *OIDCIDPConfig) CryptSecret(crypt crypto.Crypto) error {
 	}
 	oi.ClientSecret = cryptedSecret
 	return nil
+}
+
+func (st IDPStylingType) GetCSSClass() string {
+	switch st {
+	case IDPStylingTypeGoogle:
+		return "google"
+	default:
+		return ""
+	}
 }

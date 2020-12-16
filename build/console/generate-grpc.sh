@@ -4,38 +4,24 @@ set -eux
 
 GEN_PATH=src/app/proto/generated
 
-echo "Remove old files"
-rm -rf $GEN_PATH
-
 echo "Create folders"
 mkdir -p $GEN_PATH
-
-targetcurl () {
-   mkdir -p $1 && cd $1 && { curl -O $2; cd -; }
-}
-
-echo "Download additional protofiles"
-targetcurl tmp/validate https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.0/validate/validate.proto
-targetcurl tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto
-targetcurl tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto
 
 echo "Generate grpc"
 
 protoc \
-  -I=/usr/local/include \
-  -I=../pkg/grpc/message \
-  -I=../pkg/grpc/management/proto \
-  -I=../pkg/grpc/auth/proto \
-  -I=../pkg/grpc/admin/proto \
-  -I=../internal/protoc/protoc-gen-authoption \
+  -I=.tmp/protos/message \
+  -I=.tmp/protos/admin/proto \
+  -I=.tmp/protos/management/proto \
+  -I=.tmp/protos/auth/proto \
   -I=node_modules/google-proto-files \
-  -I=tmp \
+  -I=.tmp/protos \
   --js_out=import_style=commonjs,binary:$GEN_PATH \
   --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:$GEN_PATH \
-  ../pkg/grpc/message/proto/*.proto \
-  ../pkg/grpc/management/proto/*.proto \
-  ../pkg/grpc/admin/proto/*.proto \
-  ../pkg/grpc/auth/proto/*.proto
+  .tmp/protos/message/proto/*.proto \
+  .tmp/protos/admin/proto/*.proto \
+  .tmp/protos/auth/proto/*.proto \
+  .tmp/protos/management/proto/*.proto
 
 echo "Generate annotations js file (compatibility)"
 

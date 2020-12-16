@@ -3,7 +3,7 @@ code[class*="language-"] {
 	color: #d4d4d4;
 	font-size: 13px;
 	text-shadow: none;
-	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace !important;
 	direction: ltr;
 	text-align: left;
 	white-space: pre;
@@ -36,7 +36,8 @@ pre[class*="language-"] {
 	padding: 1em;
 	margin: .5em 0;
 	overflow: auto;
-	background: #2d2e30;
+    background: #2A2F45;
+    border-radius: 8px;
 }
 
 :not(pre) > code[class*="language-"] {

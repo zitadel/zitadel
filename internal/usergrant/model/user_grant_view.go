@@ -49,6 +49,14 @@ const (
 	UserGrantSearchKeyOrgName
 	UserGrantSearchKeyRoleKey
 	UserGrantSearchKeyID
+	UserGrantSearchKeyUserName
+	UserGrantSearchKeyFirstName
+	UserGrantSearchKeyLastName
+	UserGrantSearchKeyEmail
+	UserGrantSearchKeyOrgDomain
+	UserGrantSearchKeyProjectName
+	UserGrantSearchKeyDisplayName
+	UserGrantSearchKeyWithGranted
 )
 
 type UserGrantSearchQuery struct {

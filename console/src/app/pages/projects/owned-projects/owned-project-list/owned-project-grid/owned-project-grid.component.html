@@ -1,5 +1,5 @@
 <div class="view-toggle">
-    <button (click)="closeGridView()" mat-icon-button>
+    <button (click)="closeGridView()" mat-icon-button matTooltip="{{'PROJECT.TABLE.SHOWTABLE' | translate}}">
         <i class="show list view las la-th-list"></i>
     </button>
 </div>
@@ -25,11 +25,9 @@
             }}</span>
             <span class="fill-space"></span>
         </div>
-        <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
-            mat-icon-button>
-            <mat-icon *ngIf="selection.isSelected(item)" svgIcon="mdi_pin"></mat-icon>
-            <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(item)"></mat-icon>
-        </button>
+
+        <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{key: item}"></template>
+        <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
     </div>
 
 </div>
@@ -52,15 +50,9 @@
             }}</span>
             <span class="fill-space"></span>
         </div>
-        <button *ngIf="item.projectId !== zitadelProjectId" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn"
-            (click)="deleteProject(item)" class="delete-button" mat-icon-button>
-            <i class="las la-trash"></i>
-        </button>
-        <button matTooltip="{{'ACTIONS.PIN' | translate}}" [ngClass]="{ selected: selection.isSelected(item)}"
-            (click)="selection.toggle(item)" class="edit-button" mat-icon-button>
-            <mat-icon *ngIf="selection.isSelected(item)" svgIcon="mdi_pin"></mat-icon>
-            <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(item)"></mat-icon>
-        </button>
+
+        <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{key: item}"></template>
+        <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
     </div>
 
     <p class="n-items" *ngIf="!loading && items.length === 0">{{'PROJECT.PAGES.NOITEMS' | translate}}</p>
@@ -72,3 +64,18 @@
         </div>
     </ng-template>
 </div>
+
+<ng-template #deleteButton let-key="key">
+    <button *ngIf="key.projectId !== zitadelProjectId" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn"
+        (click)="deleteProject($event, key)" class="delete-button" mat-icon-button>
+        <i class="las la-trash"></i>
+    </button>
+</ng-template>
+
+<ng-template #toggleButton let-key="key">
+    <button matTooltip="{{'ACTIONS.PIN' | translate}}" [ngClass]="{ selected: selection.isSelected(key)}"
+        (click)="toggle(key,$event)" class="edit-button" mat-icon-button>
+        <mat-icon *ngIf="selection.isSelected(key)" svgIcon="mdi_pin"></mat-icon>
+        <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(key)"></mat-icon>
+    </button>
+</ng-template>

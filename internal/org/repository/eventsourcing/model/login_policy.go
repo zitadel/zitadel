@@ -44,6 +44,57 @@ func (o *Org) appendRemoveIdpProviderFromLoginPolicyEvent(event *es_models.Event
 		o.LoginPolicy.IDPProviders[i] = o.LoginPolicy.IDPProviders[len(o.LoginPolicy.IDPProviders)-1]
 		o.LoginPolicy.IDPProviders[len(o.LoginPolicy.IDPProviders)-1] = nil
 		o.LoginPolicy.IDPProviders = o.LoginPolicy.IDPProviders[:len(o.LoginPolicy.IDPProviders)-1]
+		return nil
+	}
+	return nil
+}
+
+func (o *Org) appendAddSecondFactorToLoginPolicyEvent(event *es_models.Event) error {
+	mfa := &iam_es_model.MFA{}
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	o.LoginPolicy.SecondFactors = append(o.LoginPolicy.SecondFactors, mfa.MFAType)
+	return nil
+}
+
+func (o *Org) appendRemoveSecondFactorFromLoginPolicyEvent(event *es_models.Event) error {
+	mfa := &iam_es_model.MFA{}
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	if i, m := iam_es_model.GetMFA(o.LoginPolicy.SecondFactors, mfa.MFAType); m != 0 {
+		o.LoginPolicy.SecondFactors[i] = o.LoginPolicy.SecondFactors[len(o.LoginPolicy.SecondFactors)-1]
+		o.LoginPolicy.SecondFactors[len(o.LoginPolicy.SecondFactors)-1] = 0
+		o.LoginPolicy.SecondFactors = o.LoginPolicy.SecondFactors[:len(o.LoginPolicy.SecondFactors)-1]
+		return nil
+	}
+	return nil
+}
+
+func (o *Org) appendAddMultiFactorToLoginPolicyEvent(event *es_models.Event) error {
+	mfa := &iam_es_model.MFA{}
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	o.LoginPolicy.MultiFactors = append(o.LoginPolicy.MultiFactors, mfa.MFAType)
+	return nil
+}
+
+func (o *Org) appendRemoveMultiFactorFromLoginPolicyEvent(event *es_models.Event) error {
+	mfa := &iam_es_model.MFA{}
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	if i, m := iam_es_model.GetMFA(o.LoginPolicy.MultiFactors, mfa.MFAType); m != 0 {
+		o.LoginPolicy.MultiFactors[i] = o.LoginPolicy.MultiFactors[len(o.LoginPolicy.MultiFactors)-1]
+		o.LoginPolicy.MultiFactors[len(o.LoginPolicy.MultiFactors)-1] = 0
+		o.LoginPolicy.MultiFactors = o.LoginPolicy.MultiFactors[:len(o.LoginPolicy.MultiFactors)-1]
+		return nil
 	}
 	return nil
 }

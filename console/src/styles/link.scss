@@ -1,0 +1,16 @@
+@import '~@angular/material/theming';
+
+@mixin link-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $primary-color: mat-color($primary, 500);
+  $primary-color-lighter: mat-color($primary, A300);
+
+  a {
+      color: $primary-color;
+  }
+
+  a:hover {
+      color: $primary-color-lighter;
+  }
+}

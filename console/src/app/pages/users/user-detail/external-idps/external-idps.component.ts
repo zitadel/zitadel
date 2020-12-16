@@ -105,7 +105,9 @@ export class ExternalIdpsComponent implements OnInit {
 
                 if (promise) {
                     promise.then(_ => {
-                        this.refreshPage();
+                        setTimeout(() => {
+                            this.refreshPage();
+                        }, 1000);
                     }).catch((error: any) => {
                         this.toast.showError(error);
                     });

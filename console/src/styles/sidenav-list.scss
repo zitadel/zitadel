@@ -7,11 +7,17 @@
   $primary-color: mat-color($primary, 500);
   $accent-color: mat-color($accent, 500);
   $primary-dark: mat-color($primary, A900);
+  $foreground: map-get($theme, foreground);
   $sec-dark: mat-color($primary, A800);
+  $is-dark-theme: map-get($theme, is-dark);
   /* stylelint-enable */
 
+  .meta {
+    box-shadow: inset 1px 0 if($is-dark-theme, #303131, #e3e8ee);
+  }
+
   .nav-item {
-    color: inherit;
+    color: mat-color($foreground, text) !important;
 
     &:hover {
       background-color: $sec-dark;
@@ -26,10 +32,8 @@
 
     .c_label {
       .count {
-        background-color: $primary-color;
         padding: 3px 6px;
         border-radius: 50vw;
-        color: white;
       }
     }
   }
@@ -48,27 +52,63 @@
   }
 
   .root-header {
-    box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
+    box-shadow: inset 0 -1px #e3e8ee;
     background-color: $primary-dark !important;
     transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
 
   .admin-line {
-    background: $accent-color;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    bottom: 0;
+    left: 0;
+    right: calc(100vw - 300px);
+    background-color: $primary-color;
     color: white;
-    margin-right: 1rem;
-    border-top-right-radius: 50vw;
-    border-bottom-right-radius: 50vw;
+    z-index: 1;
+    font-size: 13px;
+    padding: 3px 2rem;
+    transform: translateY(75%);
+    transition: all .2s;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
 
-    &::before {
-      content: '';
-      position: absolute;
-      width: 0;
-      bottom: 0;
-      left: 0;
-      border-bottom: 20px solid $primary-dark;
-      border-right: 20px solid transparent;
-      transition: border-color .3s cubic-bezier(.645, .045, .355, 1);
+    span {
+      display: none;
+    }
+
+    button {
+      height: 1.2rem;
+      width: 1.2rem;
+      line-height: 1.2rem;
+      margin-right: 1rem;
+
+      * {
+        height: 1.2rem;
+        width: 1.2rem;
+        line-height: 1rem;
+      }
+    }
+
+    &.expanded,
+    &:hover {
+      transform: translateY(0%);
+      right: 0;
+
+      span {
+        display: inline-block;
+      }
+    }
+  }
+
+  .divider {
+    .span {
+      border-color: if($is-dark-theme, #303131, #e3e8ee);
+    }
+
+    .line {
+      background-color: if($is-dark-theme, #303131, #e3e8ee);
     }
   }
 }

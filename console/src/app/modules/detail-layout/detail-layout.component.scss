@@ -10,11 +10,12 @@
   $lighter-color: rgba(mat-color($primary, 300), .5);
 
   .detail-container {
+    width: 100%;
     display: flex;
     padding-bottom: 3rem;
-    padding-top: 3rem;
 
     .detail-left {
+      align-self: flex-start;
       width: 100px;
       display: flex;
       padding: 1rem;
@@ -29,7 +30,6 @@
 
     .detail-right {
       flex: 1;
-      position: relative;
       padding-left: 1rem;
 
       @media only screen and (max-width: 500px) {

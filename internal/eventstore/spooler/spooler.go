@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/view/repository"
 
 	"time"
@@ -49,10 +50,11 @@ func (s *Spooler) Start() {
 			}
 		}(i)
 	}
-	for _, handler := range s.handlers {
-		handler := &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
-		s.queue <- handler
-	}
+	go func() {
+		for _, handler := range s.handlers {
+			s.queue <- &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
+		}
+	}()
 }
 
 func requeueTask(task *spooledHandler, queue chan<- *spooledHandler) {
@@ -74,8 +76,9 @@ func (s *spooledHandler) load(workerID string) {
 			errs <- err
 		} else {
 			errs <- s.process(ctx, events, workerID)
-			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("process done")
+			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("process done")
 		}
+
 	}
 	<-ctx.Done()
 }
@@ -92,7 +95,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 	for _, event := range events {
 		select {
 		case <-ctx.Done():
-			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID).Debug("context canceled")
+			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).Debug("context canceled")
 			return nil
 		default:
 			if err := s.Reduce(event); err != nil {
@@ -100,7 +103,9 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 			}
 		}
 	}
-	return nil
+	err := s.OnSuccess()
+	logging.LogWithFields("SPOOL-49ods", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("could not process on success func")
+	return err
 }
 
 func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
@@ -110,7 +115,7 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	}
 	factory := models.FactoryFromSearchQuery(query)
 	sequence, err := s.eventstore.LatestSequence(ctx, factory)
-	logging.Log("SPOOL-7SciK").OnError(err).Debug("unable to query latest sequence")
+	logging.Log("SPOOL-7SciK").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to query latest sequence")
 	var processedSequence uint64
 	for _, filter := range query.Filters {
 		if filter.GetField() == models.Field_LatestSequence {
@@ -162,7 +167,7 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 func HandleError(event *models.Event, failedErr error,
 	latestFailedEvent func(sequence uint64) (*repository.FailedEvent, error),
 	processFailedEvent func(*repository.FailedEvent) error,
-	processSequence func(uint64) error, errorCountUntilSkip uint64) error {
+	processSequence func(uint64, time.Time) error, errorCountUntilSkip uint64) error {
 	failedEvent, err := latestFailedEvent(event.Sequence)
 	if err != nil {
 		return err
@@ -174,7 +179,11 @@ func HandleError(event *models.Event, failedErr error,
 		return err
 	}
 	if errorCountUntilSkip <= failedEvent.FailureCount {
-		return processSequence(event.Sequence)
+		return processSequence(event.Sequence, event.CreationDate)
 	}
 	return nil
+}
+
+func HandleSuccess(updateSpoolerRunTimestamp func() error) error {
+	return updateSpoolerRunTimestamp()
 }

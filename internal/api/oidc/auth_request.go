@@ -13,10 +13,13 @@ import (
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
-func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (op.AuthRequest, error) {
+func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
@@ -37,7 +40,9 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	return AuthRequestFromBusiness(resp)
 }
 
-func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequest, error) {
+func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
@@ -49,7 +54,9 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequ
 	return AuthRequestFromBusiness(resp)
 }
 
-func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (op.AuthRequest, error) {
+func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.AuthRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	resp, err := o.repo.AuthRequestByCode(ctx, code)
 	if err != nil {
 		return nil, err
@@ -57,7 +64,9 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (op.Auth
 	return AuthRequestFromBusiness(resp)
 }
 
-func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) error {
+func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")
@@ -65,11 +74,15 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) error {
 	return o.repo.SaveAuthCode(ctx, id, code, userAgentID)
 }
 
-func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
+func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	return o.repo.DeleteAuthRequest(ctx, id)
 }
 
-func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (string, time.Time, error) {
+func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	var userAgentID, applicationID string
 	authReq, ok := req.(*AuthRequest)
 	if ok {
@@ -93,7 +106,9 @@ func grantsToScopes(grants []*grant_model.UserGrantView) []string {
 	return scopes
 }
 
-func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) error {
+func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
@@ -105,7 +120,9 @@ func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.Signing
 	o.repo.GetSigningKey(ctx, keyCh, o.signingKeyAlgorithm)
 }
 
-func (o *OPStorage) GetKeySet(ctx context.Context) (*jose.JSONWebKeySet, error) {
+func (o *OPStorage) GetKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	return o.repo.GetKeySet(ctx)
 }
 

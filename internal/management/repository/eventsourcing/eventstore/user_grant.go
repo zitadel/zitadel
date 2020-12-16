@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
 	caos_errors "github.com/caos/zitadel/internal/errors"
@@ -136,7 +137,7 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -182,7 +183,7 @@ func checkContainsPermID(ids []string, query *grant_model.UserGrantSearchQuery, 
 		}
 		if sequence != nil {
 			result.Sequence = sequence.CurrentSequence
-			result.Timestamp = sequence.CurrentTimestamp
+			result.Timestamp = sequence.LastSuccessfulSpoolerRun
 		}
 		return result
 	}

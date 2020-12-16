@@ -10,7 +10,6 @@
 .domain {
   display: flex;
   align-items: center;
-  padding: .5rem 0;
   flex-wrap: wrap;
 
   .title {
@@ -36,7 +35,7 @@
 
   .verified,
   .primary {
-    color: #5282c1;
+    color: var(--color-main);
     margin-right: 1rem;
   }
 
@@ -55,6 +54,7 @@
   &:hover {
     .rem-button {
       visibility: visible;
+      transition: none;
     }
   }
 }
@@ -62,32 +62,4 @@
 .new-desc {
   font-size: 14px;
   color: #818a8a;
-}
-
-.side {
-  .details {
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #81868a40;
-    padding-bottom: 1rem;
-
-    .row {
-      display: flex;
-      margin-bottom: .5rem;
-      align-items: center;
-
-      .first {
-        flex: 1;
-        font-size: .8rem;
-        margin-right: .5rem;
-      }
-
-      .second {
-        font-size: .8rem;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        margin-left: 1rem;
-        text-align: right;
-      }
-    }
-  }
 }

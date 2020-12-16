@@ -1,0 +1,20 @@
+<h1 mat-dialog-title>
+    <span class="title">{{data.titleKey | translate}}</span>
+</h1>
+<p class="desc">{{data.descriptionKey | translate}}</p>
+<div mat-dialog-content>
+    <cnsl-form-field class="formfield">
+        <cnsl-label>{{data.labelKey | translate }}</cnsl-label>
+        <input cnslInput [(ngModel)]="value" />
+    </cnsl-form-field>
+</div>
+<div mat-dialog-actions class="action">
+    <button cdkFocusInitial color="primary" mat-button class="ok-button" (click)="closeDialog()">
+        {{data.cancelKey | translate}}
+    </button>
+
+    <button [disabled]="!value" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
+        (click)="closeDialogWithValue(value)">
+        {{data.confirmKey | translate}}
+    </button>
+</div>

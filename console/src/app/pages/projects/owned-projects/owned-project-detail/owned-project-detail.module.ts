@@ -4,9 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -19,6 +17,7 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -48,11 +47,10 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         TranslateModule,
         ReactiveFormsModule,
         HasRoleModule,
-        MatInputModule,
-        MatTabsModule,
         MatButtonModule,
         MatIconModule,
         ContributorsModule,
+        MatTabsModule,
         WarnDialogModule,
         MatTooltipModule,
         ProjectRolesModule,
@@ -60,7 +58,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         UserGrantsModule,
         TimestampToDatePipeModule,
         MatTableModule,
-        MatFormFieldModule,
+        InputModule,
         CardModule,
         MatPaginatorModule,
         MatRippleModule,

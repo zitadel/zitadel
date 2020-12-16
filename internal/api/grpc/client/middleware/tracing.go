@@ -4,44 +4,32 @@ import (
 	"context"
 	"strings"
 
-	"go.opencensus.io/plugin/ocgrpc"
-	"go.opencensus.io/trace"
+	grpc_utils "github.com/caos/zitadel/internal/api/grpc"
+	grpc_trace "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/stats"
-
-	"github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/tracing"
 )
 
 type GRPCMethod string
 
-func TracingStatsClient(ignoredMethods ...GRPCMethod) grpc.DialOption {
-	return grpc.WithStatsHandler(
-		&tracingClientHandler{
-			ignoredMethods,
-			ocgrpc.ClientHandler{
-				StartOptions: trace.StartOptions{
-					Sampler:  tracing.Sampler(),
-					SpanKind: trace.SpanKindClient},
-			},
-		},
-	)
+func DefaultTracingClient() grpc.UnaryClientInterceptor {
+	return TracingServer(grpc_utils.Healthz, grpc_utils.Readiness, grpc_utils.Validation)
 }
 
-func DefaultTracingStatsClient() grpc.DialOption {
-	return TracingStatsClient(http.Healthz, http.Readiness, http.Validation)
-}
+func TracingServer(ignoredMethods ...GRPCMethod) grpc.UnaryClientInterceptor {
+	return func(
+		ctx context.Context,
+		method string,
+		req, reply interface{},
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
 
-type tracingClientHandler struct {
-	IgnoredMethods []GRPCMethod
-	ocgrpc.ClientHandler
-}
-
-func (s *tracingClientHandler) TagRPC(ctx context.Context, tagInfo *stats.RPCTagInfo) context.Context {
-	for _, method := range s.IgnoredMethods {
-		if strings.HasSuffix(tagInfo.FullMethodName, string(method)) {
-			return ctx
+		for _, ignoredMethod := range ignoredMethods {
+			if strings.HasSuffix(method, string(ignoredMethod)) {
+				return invoker(ctx, method, req, reply, cc, opts...)
+			}
 		}
+		return grpc_trace.UnaryClientInterceptor()(ctx, method, req, reply, cc, invoker, opts...)
 	}
-	return s.ClientHandler.TagRPC(ctx, tagInfo)
 }

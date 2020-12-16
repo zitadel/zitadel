@@ -3,28 +3,28 @@ InitCode:
   PreHeader: User initialisieren
   Subject: User initialisieren
   Greeting: Hallo {{.FirstName}} {{.LastName}},
-  Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen {{.PreferredLoginName}} kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliesen. (Code {{.Code}}) Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
+  Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen &lt;br&gt;&lt;strong&gt;{{.PreferredLoginName}}&lt;/strong&gt;&lt;br&gt; kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
   ButtonText: Initialisierung abschliessen
 PasswordReset:
   Title: Zitadel - Passwort zurücksetzen
   PreHeader: Passwort zurücksetzen
   Subject: Passwort zurücksetzen
   Greeting: Hallo {{.FirstName}} {{.LastName}},
-  Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen. (Code {{.Code}}) Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
+  Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
   ButtonText: Passwort zurücksetzen
 VerifyEmail:
   Title: Zitadel - Email verifizieren
   PreHeader: Email verifizieren
   Subject: Email verifizieren
   Greeting: Hallo {{.FirstName}} {{.LastName}},
-  Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren. (Code {{.Code}}) Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
+  Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
   ButtonText: Email verifizieren
 VerifyPhone:
   Title: Zitadel - Telefonnummer verifizieren
   PreHeader: Telefonnummer verifizieren
   Subject: Telefonnummer verifizieren
   Greeting: Hallo {{.FirstName}} {{.LastName}},
-  Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst {{.Code}}
+  Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst&lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; 
   ButtonText: Telefon verifizieren
 DomainClaimed:
   Title: Zitadel - Domain wurde beansprucht

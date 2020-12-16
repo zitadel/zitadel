@@ -1,5 +1,0 @@
-# Build
-
-## Console
-
-## Docker

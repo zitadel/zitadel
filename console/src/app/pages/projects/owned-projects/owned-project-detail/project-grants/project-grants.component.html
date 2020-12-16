@@ -1,6 +1,6 @@
 <app-refresh-table [loading]="dataSource?.loading$ | async" *ngIf="projectId" (refreshed)="loadGrantsPage()"
     [dataSize]="dataSource.totalResult" [selection]="selection" [timestamp]="dataSource?.viewTimestamp"
-    [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute">
+    [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" (refreshed)="getRoleOptions(projectId)">
     <ng-template appHasRole [appHasRole]="['project.grant.member.delete:'+projectId, 'project.grant.member.delete']"
         actions>
         <button (click)="deleteSelectedGrants()" [disabled]="disabled" mat-icon-button *ngIf="selection.hasValue()"
@@ -40,33 +40,33 @@
                     {{grant.grantedOrgName}} </td>
             </ng-container>
 
-            <ng-container matColumnDef="creationDate">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CREATIONDATE' | translate }} </th>
+            <ng-container matColumnDef="dates">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.DATES' | translate }} </th>
                 <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
                     *matCellDef="let grant">
-                    {{grant.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="changeDate">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
-                <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
-                    *matCellDef="let grant">
-                    {{grant.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
-
+                    <div class="date-block">
+                        <span class="date-sub">{{ 'PROJECT.GRANT.CREATIONDATE' | translate }}:</span>
+                        <span>{{grant.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                    </div>
+                    <div class="date-block">
+                        <span class="date-sub">{{ 'PROJECT.GRANT.CHANGEDATE' | translate }}</span>
+                        <span>{{grant.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                    </div>
             </ng-container>
 
             <ng-container matColumnDef="roleNamesList">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let grant">
-                    <mat-form-field class="form-field" appearance="outline" *ngIf="grant.roleKeysList">
-                        <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
+                <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
+                </th>
+                <td class="pointer role-row" mat-cell *matCellDef="let grant">
+                    <cnsl-form-field class="form-field" appearance="outline" *ngIf="grant.roleKeysList">
+                        <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
                         <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="disabled"
                             (selectionChange)="updateRoles(grant, $event)">
                             <mat-option *ngFor="let role of memberRoleOptions" [value]="role.key">
                                 {{role.key}}
                             </mat-option>
                         </mat-select>
-                    </mat-form-field>
+                    </cnsl-form-field>
                 </td>
             </ng-container>
 
@@ -74,6 +74,11 @@
             <tr class="highlight" mat-row *matRowDef="let grant; columns: displayedColumns;">
             </tr>
         </table>
+
+        <div *ngIf="(dataSource.loading$ | async) == false && !dataSource?.totalResult" class="no-content-row">
+            <i class="las la-exclamation"></i>
+            <span>{{'PROJECT.GRANT.EMPTY' | translate}}</span>
+        </div>
 
         <mat-paginator class="paginator" #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]"
             [length]="dataSource.totalResult" (page)="loadGrantsPage($event.pageIndex, $event.pageSize)">

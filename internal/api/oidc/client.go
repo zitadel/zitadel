@@ -4,17 +4,18 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/oidc/pkg/oidc"
+	"github.com/caos/oidc/pkg/op"
 	"golang.org/x/text/language"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/caos/oidc/pkg/oidc"
-	"github.com/caos/oidc/pkg/op"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
@@ -32,7 +33,9 @@ const (
 	oidcCtx = "oidc"
 )
 
-func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Client, error) {
+func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	client, err := o.repo.ApplicationByClientID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -51,7 +54,9 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, allowedScopes)
 }
 
-func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (*jose.JSONWebKey, error) {
+func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	key, err := o.repo.MachineKeyByID(ctx, keyID)
 	if err != nil {
 		return nil, err
@@ -70,7 +75,9 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 	}, nil
 }
 
-func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {
+func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	ctx = authz.SetCtxData(ctx, authz.CtxData{
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
@@ -78,7 +85,9 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
-func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, origin string) (oidc.UserInfo, error) {
+func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, origin string) (_ oidc.UserInfo, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	token, err := o.repo.TokenByID(ctx, subject, tokenID)
 	if err != nil {
 		return nil, errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
@@ -95,7 +104,9 @@ func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, 
 	return o.GetUserinfoFromScopes(ctx, token.UserID, token.ApplicationID, token.Scopes)
 }
 
-func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (oidc.UserInfo, error) {
+func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (_ oidc.UserInfo, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	user, err := o.repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -142,6 +153,9 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicati
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 			}
+			if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
+				userInfo.AppendClaims(model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
+			}
 		}
 	}
 
@@ -159,22 +173,24 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicati
 	return userInfo, nil
 }
 
-func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (claims map[string]interface{}, err error) {
+func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
 	roles := make([]string, 0)
 	for _, scope := range scopes {
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
+		} else if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
+			claims = appendClaim(claims, model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
 		}
 	}
-	if len(roles) == 0 || applicationID == "" {
-		return nil, nil
+	if len(roles) == 0 || clientID == "" {
+		return claims, nil
 	}
-	projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
+	projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
 	if err != nil {
 		return nil, err
 	}
 	if len(projectRoles) > 0 {
-		claims = map[string]interface{}{ClaimProjectRoles: projectRoles}
+		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
 	return claims, err
 }
@@ -222,4 +238,12 @@ func getGender(gender user_model.Gender) string {
 		return "diverse"
 	}
 	return ""
+}
+
+func appendClaim(claims map[string]interface{}, claim string, value interface{}) map[string]interface{} {
+	if claims == nil {
+		claims = make(map[string]interface{})
+	}
+	claims[claim] = value
+	return claims
 }

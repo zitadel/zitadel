@@ -147,7 +147,7 @@ func TestAuthRequest_IsValid(t *testing.T) {
 	}
 }
 
-func TestAuthRequest_MfaLevel(t *testing.T) {
+func TestAuthRequest_MFALevel(t *testing.T) {
 	type fields struct {
 		Prompt       Prompt
 		PossibleLOAs []LevelOfAssurance
@@ -155,7 +155,7 @@ func TestAuthRequest_MfaLevel(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   MfaLevel
+		want   MFALevel
 	}{
 		//PLANNED: Add / replace test cases when LOA is set
 		{"-1",
@@ -169,8 +169,8 @@ func TestAuthRequest_MfaLevel(t *testing.T) {
 				Prompt:       tt.fields.Prompt,
 				PossibleLOAs: tt.fields.PossibleLOAs,
 			}
-			if got := a.MfaLevel(); got != tt.want {
-				t.Errorf("MfaLevel() = %v, want %v", got, tt.want)
+			if got := a.MFALevel(); got != tt.want {
+				t.Errorf("MFALevel() = %v, want %v", got, tt.want)
 			}
 		})
 	}

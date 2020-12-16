@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { OAuthStorage } from 'angular-oauth2-oidc';
 
+const STORAGE_PREFIX = 'zitadel';
 
 @Injectable({
     providedIn: 'root',
 })
-
 export class StorageService implements OAuthStorage {
     private storage: Storage = window.sessionStorage;
 
@@ -28,7 +28,7 @@ export class StorageService implements OAuthStorage {
     }
 
     public getPrefixedKey(key: string): string {
-        return `caos:${key}`;
+        return `${STORAGE_PREFIX}:${key}`;
     }
 }
 

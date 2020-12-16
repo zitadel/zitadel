@@ -27,6 +27,7 @@ type IDPProviderView struct {
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 
 	Name            string `json:"-" gorm:"column:name"`
+	StylingType     int32  `json:"-" gorm:"column:styling_type"`
 	IDPConfigType   int32  `json:"-" gorm:"column:idp_config_type"`
 	IDPProviderType int32  `json:"idpProviderType" gorm:"column:idp_provider_type"`
 	IDPState        int32  `json:"-" gorm:"column:idp_state"`
@@ -41,6 +42,7 @@ func IDPProviderViewFromModel(provider *model.IDPProviderView) *IDPProviderView 
 		CreationDate:    provider.CreationDate,
 		ChangeDate:      provider.ChangeDate,
 		Name:            provider.Name,
+		StylingType:     int32(provider.StylingType),
 		IDPConfigID:     provider.IDPConfigID,
 		IDPConfigType:   int32(provider.IDPConfigType),
 		IDPProviderType: int32(provider.IDPProviderType),
@@ -55,6 +57,7 @@ func IDPProviderViewToModel(provider *IDPProviderView) *model.IDPProviderView {
 		CreationDate:    provider.CreationDate,
 		ChangeDate:      provider.ChangeDate,
 		Name:            provider.Name,
+		StylingType:     model.IDPStylingType(provider.StylingType),
 		IDPConfigID:     provider.IDPConfigID,
 		IDPConfigType:   model.IdpConfigType(provider.IDPConfigType),
 		IDPProviderType: model.IDPProviderType(provider.IDPProviderType),

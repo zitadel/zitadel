@@ -10,7 +10,6 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 )
 
@@ -75,6 +74,46 @@ func (mr *MockAdminServiceClientMockRecorder) AddIdpProviderToDefaultLoginPolicy
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddIdpProviderToDefaultLoginPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).AddIdpProviderToDefaultLoginPolicy), varargs...)
+}
+
+// AddMultiFactorToDefaultLoginPolicy mocks base method
+func (m *MockAdminServiceClient) AddMultiFactorToDefaultLoginPolicy(arg0 context.Context, arg1 *admin.MultiFactor, arg2 ...grpc.CallOption) (*admin.MultiFactor, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "AddMultiFactorToDefaultLoginPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.MultiFactor)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddMultiFactorToDefaultLoginPolicy indicates an expected call of AddMultiFactorToDefaultLoginPolicy
+func (mr *MockAdminServiceClientMockRecorder) AddMultiFactorToDefaultLoginPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMultiFactorToDefaultLoginPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).AddMultiFactorToDefaultLoginPolicy), varargs...)
+}
+
+// AddSecondFactorToDefaultLoginPolicy mocks base method
+func (m *MockAdminServiceClient) AddSecondFactorToDefaultLoginPolicy(arg0 context.Context, arg1 *admin.SecondFactor, arg2 ...grpc.CallOption) (*admin.SecondFactor, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "AddSecondFactorToDefaultLoginPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.SecondFactor)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddSecondFactorToDefaultLoginPolicy indicates an expected call of AddSecondFactorToDefaultLoginPolicy
+func (mr *MockAdminServiceClientMockRecorder) AddSecondFactorToDefaultLoginPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSecondFactorToDefaultLoginPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).AddSecondFactorToDefaultLoginPolicy), varargs...)
 }
 
 // ChangeIamMember mocks base method
@@ -177,6 +216,26 @@ func (mr *MockAdminServiceClientMockRecorder) DeactivateIdpConfig(arg0, arg1 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateIdpConfig", reflect.TypeOf((*MockAdminServiceClient)(nil).DeactivateIdpConfig), varargs...)
 }
 
+// GetDefaultLabelPolicy mocks base method
+func (m *MockAdminServiceClient) GetDefaultLabelPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultLabelPolicyView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultLabelPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultLabelPolicyView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultLabelPolicy indicates an expected call of GetDefaultLabelPolicy
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultLabelPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLabelPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLabelPolicy), varargs...)
+}
+
 // GetDefaultLoginPolicy mocks base method
 func (m *MockAdminServiceClient) GetDefaultLoginPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultLoginPolicyView, error) {
 	m.ctrl.T.Helper()
@@ -215,6 +274,46 @@ func (mr *MockAdminServiceClientMockRecorder) GetDefaultLoginPolicyIdpProviders(
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicyIdpProviders", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLoginPolicyIdpProviders), varargs...)
+}
+
+// GetDefaultLoginPolicyMultiFactors mocks base method
+func (m *MockAdminServiceClient) GetDefaultLoginPolicyMultiFactors(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.MultiFactorsResult, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultLoginPolicyMultiFactors", varargs...)
+	ret0, _ := ret[0].(*admin.MultiFactorsResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultLoginPolicyMultiFactors indicates an expected call of GetDefaultLoginPolicyMultiFactors
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultLoginPolicyMultiFactors(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicyMultiFactors", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLoginPolicyMultiFactors), varargs...)
+}
+
+// GetDefaultLoginPolicySecondFactors mocks base method
+func (m *MockAdminServiceClient) GetDefaultLoginPolicySecondFactors(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.SecondFactorsResult, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultLoginPolicySecondFactors", varargs...)
+	ret0, _ := ret[0].(*admin.SecondFactorsResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultLoginPolicySecondFactors indicates an expected call of GetDefaultLoginPolicySecondFactors
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultLoginPolicySecondFactors(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicySecondFactors", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLoginPolicySecondFactors), varargs...)
 }
 
 // GetDefaultOrgIamPolicy mocks base method
@@ -477,26 +576,6 @@ func (mr *MockAdminServiceClientMockRecorder) ReactivateIdpConfig(arg0, arg1 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReactivateIdpConfig", reflect.TypeOf((*MockAdminServiceClient)(nil).ReactivateIdpConfig), varargs...)
 }
 
-// Ready mocks base method
-func (m *MockAdminServiceClient) Ready(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Ready", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Ready indicates an expected call of Ready
-func (mr *MockAdminServiceClientMockRecorder) Ready(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ready", reflect.TypeOf((*MockAdminServiceClient)(nil).Ready), varargs...)
-}
-
 // RemoveFailedEvent mocks base method
 func (m *MockAdminServiceClient) RemoveFailedEvent(arg0 context.Context, arg1 *admin.FailedEventID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -577,6 +656,26 @@ func (mr *MockAdminServiceClientMockRecorder) RemoveIdpProviderFromDefaultLoginP
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveIdpProviderFromDefaultLoginPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).RemoveIdpProviderFromDefaultLoginPolicy), varargs...)
 }
 
+// RemoveMultiFactorFromDefaultLoginPolicy mocks base method
+func (m *MockAdminServiceClient) RemoveMultiFactorFromDefaultLoginPolicy(arg0 context.Context, arg1 *admin.MultiFactor, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveMultiFactorFromDefaultLoginPolicy", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveMultiFactorFromDefaultLoginPolicy indicates an expected call of RemoveMultiFactorFromDefaultLoginPolicy
+func (mr *MockAdminServiceClientMockRecorder) RemoveMultiFactorFromDefaultLoginPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMultiFactorFromDefaultLoginPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).RemoveMultiFactorFromDefaultLoginPolicy), varargs...)
+}
+
 // RemoveOrgIamPolicy mocks base method
 func (m *MockAdminServiceClient) RemoveOrgIamPolicy(arg0 context.Context, arg1 *admin.OrgIamPolicyID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -595,6 +694,26 @@ func (mr *MockAdminServiceClientMockRecorder) RemoveOrgIamPolicy(arg0, arg1 inte
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveOrgIamPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).RemoveOrgIamPolicy), varargs...)
+}
+
+// RemoveSecondFactorFromDefaultLoginPolicy mocks base method
+func (m *MockAdminServiceClient) RemoveSecondFactorFromDefaultLoginPolicy(arg0 context.Context, arg1 *admin.SecondFactor, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveSecondFactorFromDefaultLoginPolicy", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveSecondFactorFromDefaultLoginPolicy indicates an expected call of RemoveSecondFactorFromDefaultLoginPolicy
+func (mr *MockAdminServiceClientMockRecorder) RemoveSecondFactorFromDefaultLoginPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSecondFactorFromDefaultLoginPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).RemoveSecondFactorFromDefaultLoginPolicy), varargs...)
 }
 
 // SearchIamMembers mocks base method
@@ -675,6 +794,26 @@ func (mr *MockAdminServiceClientMockRecorder) SetUpOrg(arg0, arg1 interface{}, a
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUpOrg", reflect.TypeOf((*MockAdminServiceClient)(nil).SetUpOrg), varargs...)
+}
+
+// UpdateDefaultLabelPolicy mocks base method
+func (m *MockAdminServiceClient) UpdateDefaultLabelPolicy(arg0 context.Context, arg1 *admin.DefaultLabelPolicyUpdate, arg2 ...grpc.CallOption) (*admin.DefaultLabelPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateDefaultLabelPolicy", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultLabelPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateDefaultLabelPolicy indicates an expected call of UpdateDefaultLabelPolicy
+func (mr *MockAdminServiceClientMockRecorder) UpdateDefaultLabelPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDefaultLabelPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateDefaultLabelPolicy), varargs...)
 }
 
 // UpdateDefaultLoginPolicy mocks base method
@@ -835,24 +974,4 @@ func (mr *MockAdminServiceClientMockRecorder) UpdateOrgIamPolicy(arg0, arg1 inte
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrgIamPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateOrgIamPolicy), varargs...)
-}
-
-// Validate mocks base method
-func (m *MockAdminServiceClient) Validate(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*structpb.Struct, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Validate", varargs...)
-	ret0, _ := ret[0].(*structpb.Struct)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Validate indicates an expected call of Validate
-func (mr *MockAdminServiceClientMockRecorder) Validate(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockAdminServiceClient)(nil).Validate), varargs...)
 }

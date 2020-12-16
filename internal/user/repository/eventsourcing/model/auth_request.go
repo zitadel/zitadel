@@ -18,12 +18,27 @@ type AuthRequest struct {
 }
 
 func AuthRequestFromModel(request *model.AuthRequest) *AuthRequest {
-	return &AuthRequest{
+	req := &AuthRequest{
 		ID:                  request.ID,
 		UserAgentID:         request.AgentID,
-		BrowserInfo:         BrowserInfoFromModel(request.BrowserInfo),
 		SelectedIDPConfigID: request.SelectedIDPConfigID,
 	}
+	if request.BrowserInfo != nil {
+		req.BrowserInfo = BrowserInfoFromModel(request.BrowserInfo)
+	}
+	return req
+}
+
+func AuthRequestToModel(request *AuthRequest) *model.AuthRequest {
+	req := &model.AuthRequest{
+		ID:                  request.ID,
+		AgentID:             request.UserAgentID,
+		SelectedIDPConfigID: request.SelectedIDPConfigID,
+	}
+	if request.BrowserInfo != nil {
+		req.BrowserInfo = BrowserInfoToModel(request.BrowserInfo)
+	}
+	return req
 }
 
 type BrowserInfo struct {
@@ -40,6 +55,13 @@ func BrowserInfoFromModel(info *model.BrowserInfo) *BrowserInfo {
 	}
 }
 
+func BrowserInfoToModel(info *BrowserInfo) *model.BrowserInfo {
+	return &model.BrowserInfo{
+		UserAgent:      info.UserAgent,
+		AcceptLanguage: info.AcceptLanguage,
+		RemoteIP:       info.RemoteIP,
+	}
+}
 func (a *AuthRequest) SetData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-T5df6").WithError(err).Error("could not unmarshal event data")

@@ -305,7 +305,7 @@ func TestUserAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPAdded, ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateNotReady)}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append human add otp event",
@@ -313,39 +313,39 @@ func TestUserAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanMFAOTPAdded, ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateNotReady)}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append user verify otp event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPVerified, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateNotReady)}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateReady)}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append human verify otp event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanMFAOTPVerified, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateNotReady)}, State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateNotReady)}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateReady)}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append user remove otp event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.MFAOTPRemoved, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateReady)}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateUnspecified)}, State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateUnspecified)}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append human remove otp event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanMFAOTPRemoved, ResourceOwner: "OrgID"},
-				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateReady)}, State: int32(model.UserStateActive)},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateReady)}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MfaStateUnspecified)}, State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateUnspecified)}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append user mfa init skipped event",
@@ -353,7 +353,7 @@ func TestUserAppendEvent(t *testing.T) {
 				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_model.MFAInitSkipped, AggregateID: "AggregateID", ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MfaInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MFAInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},
 		},
 		{
 			name: "append human mfa init skipped event",
@@ -361,7 +361,7 @@ func TestUserAppendEvent(t *testing.T) {
 				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_model.HumanMFAInitSkipped, AggregateID: "AggregateID", ResourceOwner: "OrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
-			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MfaInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MFAInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},
 		},
 	}
 	for _, tt := range tests {
@@ -401,8 +401,8 @@ func TestUserAppendEvent(t *testing.T) {
 				if human.OTPState != tt.result.OTPState {
 					t.Errorf("got wrong result OTPState: expected: %v, actual: %v ", tt.result.OTPState, human.OTPState)
 				}
-				if human.MfaInitSkipped.Round(1*time.Second) != tt.result.MfaInitSkipped.Round(1*time.Second) {
-					t.Errorf("got wrong result MfaInitSkipped: expected: %v, actual: %v ", tt.result.MfaInitSkipped.Round(1*time.Second), human.MfaInitSkipped.Round(1*time.Second))
+				if human.MFAInitSkipped.Round(1*time.Second) != tt.result.MFAInitSkipped.Round(1*time.Second) {
+					t.Errorf("got wrong result MFAInitSkipped: expected: %v, actual: %v ", tt.result.MFAInitSkipped.Round(1*time.Second), human.MFAInitSkipped.Round(1*time.Second))
 				}
 				if human.PasswordSet != tt.result.PasswordSet {
 					t.Errorf("got wrong result PasswordSet: expected: %v, actual: %v ", tt.result.PasswordSet, human.PasswordSet)

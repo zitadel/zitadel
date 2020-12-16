@@ -6,7 +6,7 @@
 		max-width: 120rem;
 	}
 	section :global(h3) {
-		color: var(--text);
+		color: var(--heading);
 	}
 </style>
 

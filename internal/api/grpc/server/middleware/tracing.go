@@ -4,45 +4,30 @@ import (
 	"context"
 	"strings"
 
-	"go.opencensus.io/plugin/ocgrpc"
-	"go.opencensus.io/trace"
+	grpc_utils "github.com/caos/zitadel/internal/api/grpc"
+	grpc_trace "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/stats"
-
-	"github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/tracing"
 )
 
 type GRPCMethod string
 
-func TracingStatsServer(ignoredMethods ...GRPCMethod) grpc.ServerOption {
-	return grpc.StatsHandler(
-		&tracingServerHandler{
-			ignoredMethods,
-			ocgrpc.ServerHandler{
-				StartOptions: trace.StartOptions{
-					Sampler:  tracing.Sampler(),
-					SpanKind: trace.SpanKindServer,
-				},
-			},
-		},
-	)
+func DefaultTracingServer() grpc.UnaryServerInterceptor {
+	return TracingServer(grpc_utils.Healthz, grpc_utils.Readiness, grpc_utils.Validation)
 }
 
-func DefaultTracingStatsServer() grpc.ServerOption {
-	return TracingStatsServer(http.Healthz, http.Readiness, http.Validation)
-}
+func TracingServer(ignoredMethods ...GRPCMethod) grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		req interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
 
-type tracingServerHandler struct {
-	IgnoredMethods []GRPCMethod
-	ocgrpc.ServerHandler
-}
-
-func (s *tracingServerHandler) TagRPC(ctx context.Context, tagInfo *stats.RPCTagInfo) context.Context {
-	for _, method := range s.IgnoredMethods {
-		if strings.HasSuffix(tagInfo.FullMethodName, string(method)) {
-			return ctx
+		for _, ignoredMethod := range ignoredMethods {
+			if strings.HasSuffix(info.FullMethod, string(ignoredMethod)) {
+				return handler(ctx, req)
+			}
 		}
+		return grpc_trace.UnaryServerInterceptor()(ctx, req, info, handler)
 	}
-	return s.ServerHandler.TagRPC(ctx, tagInfo)
 }

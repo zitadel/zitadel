@@ -4,10 +4,11 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { ProjectView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -59,6 +60,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     public zitadelProjectId: string = '';
 
     constructor(private router: Router,
+        private route: ActivatedRoute,
         public translate: TranslateService,
         private mgmtService: ManagementService,
         private toast: ToastService,
@@ -70,7 +72,14 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit(): void {
-        this.getData(10, 0);
+        this.route.queryParams.pipe(take(1)).subscribe(params => {
+            this.getData();
+            if (params.deferredReload) {
+                setTimeout(() => {
+                    this.getData();
+                }, 2000);
+            }
+        });
     }
 
     public ngOnDestroy(): void {
@@ -97,7 +106,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         this.router.navigate(['/projects', 'create']);
     }
 
-    private async getData(limit: number, offset: number): Promise<void> {
+    private async getData(limit?: number, offset?: number): Promise<void> {
         this.loadingSubject.next(true);
         this.mgmtService.SearchProjects(limit, offset).then(res => {
             const response = res.toObject();

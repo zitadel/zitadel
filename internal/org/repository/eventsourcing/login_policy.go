@@ -9,18 +9,18 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-func LoginPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *iam_es_model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *iam_es_model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smla8", "Errors.Internal")
 		}
-		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
 		if err != nil {
 			return nil, err
 		}
 		validationQuery := es_models.NewSearchQuery().
 			AggregateTypeFilter(model.OrgAggregate).
-			AggregateIDFilter(existing.AggregateID)
+			AggregateIDFilter(org.AggregateID)
 
 		validation := checkExistingLoginPolicyValidation()
 		agg.SetPrecondition(validationQuery, validation)
@@ -28,16 +28,16 @@ func LoginPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
-func LoginPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *iam_es_model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, policy *iam_es_model.LoginPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Mlco9", "Errors.Internal")
 		}
-		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
 		if err != nil {
 			return nil, err
 		}
-		changes := existing.LoginPolicy.Changes(policy)
+		changes := org.LoginPolicy.Changes(policy)
 		if len(changes) == 0 {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Smk8d", "Errors.NoChangesFound")
 		}
@@ -45,12 +45,12 @@ func LoginPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func LoginPolicyRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyRemovedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if existing == nil {
+		if org == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-S8sio", "Errors.Internal")
 		}
-		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
 		if err != nil {
 			return nil, err
 		}
@@ -58,18 +58,18 @@ func LoginPolicyRemovedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func LoginPolicyIDPProviderAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IDPProvider, iamID string) func(ctx context.Context) (*es_models.Aggregate, error) {
+func LoginPolicyIDPProviderAddedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, provider *iam_es_model.IDPProvider, iamID string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if provider == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
 		}
-		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
 		if err != nil {
 			return nil, err
 		}
 		validationQuery := es_models.NewSearchQuery().
 			AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
-			AggregateIDsFilter(existing.AggregateID, iamID)
+			AggregateIDsFilter(org.AggregateID, iamID)
 
 		validation := checkExistingLoginPolicyIDPProviderValidation(provider)
 		agg.SetPrecondition(validationQuery, validation)
@@ -77,11 +77,11 @@ func LoginPolicyIDPProviderAddedAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
-func LoginPolicyIDPProviderRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, provider *iam_es_model.IDPProviderID, cascade bool) (*es_models.Aggregate, error) {
+func LoginPolicyIDPProviderRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, org *model.Org, provider *iam_es_model.IDPProviderID, cascade bool) (*es_models.Aggregate, error) {
 	if provider == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
 	}
-	agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+	agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +90,71 @@ func LoginPolicyIDPProviderRemovedAggregate(ctx context.Context, aggCreator *es_
 		eventType = model.LoginPolicyIDPProviderCascadeRemoved
 	}
 	return agg.AppendEvent(eventType, provider)
+}
+
+func LoginPolicySecondFactorAddedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, mfa *iam_es_model.MFA, iamID string) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if mfa == nil || org == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5Gk9s", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(model.OrgAggregate).
+			AggregateIDsFilter(org.AggregateID)
+
+		validation := checkExistingLoginPolicySecondFactorValidation(mfa.MFAType)
+		agg.SetPrecondition(validationQuery, validation)
+		return agg.AppendEvent(model.LoginPolicySecondFactorAdded, mfa)
+	}
+}
+
+func LoginPolicySecondFactorRemovedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, mfa *iam_es_model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if mfa == nil || org == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sml9d", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.LoginPolicySecondFactorRemoved, mfa)
+	}
+}
+
+func LoginPolicyMultiFactorAddedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, mfa *iam_es_model.MFA, iamID string) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if mfa == nil || org == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4Bm9s", "Errors.Internal")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(model.OrgAggregate).
+			AggregateIDsFilter(org.AggregateID)
+
+		validation := checkExistingLoginPolicyMultiFactorValidation(mfa.MFAType)
+		agg.SetPrecondition(validationQuery, validation)
+		return agg.AppendEvent(model.LoginPolicyMultiFactorAdded, mfa)
+	}
+}
+
+func LoginPolicyMultiFactorRemovedAggregate(aggCreator *es_models.AggregateCreator, org *model.Org, mfa *iam_es_model.MFA) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if mfa == nil || org == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-6Nm9s", "Errors.Internal")
+		}
+
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.LoginPolicyMultiFactorRemoved, mfa)
+	}
 }
 
 func checkExistingLoginPolicyValidation() func(...*es_models.Event) error {
@@ -163,6 +228,8 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 						break
 					}
 				}
+			case model.LoginPolicyRemoved:
+				idps = make([]*iam_es_model.IDPProvider, 0)
 			}
 		}
 		exists := false
@@ -177,6 +244,86 @@ func checkExistingLoginPolicyIDPProviderValidation(idpProvider *iam_es_model.IDP
 		for _, p := range idps {
 			if p.IDPConfigID == idpProvider.IDPConfigID {
 				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "Errors.Org.LoginPolicy.IdpProviderAlreadyExisting")
+			}
+		}
+		return nil
+	}
+}
+
+func checkExistingLoginPolicySecondFactorValidation(mfaType int32) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		mfas := make([]int32, 0)
+		for _, event := range events {
+			switch event.Type {
+			case model.LoginPolicySecondFactorAdded:
+				mfa := new(iam_es_model.MFA)
+				err := mfa.SetData(event)
+				if err != nil {
+					return err
+				}
+				mfas = append(mfas, mfa.MFAType)
+			case model.LoginPolicySecondFactorRemoved:
+				idp := new(iam_es_model.IDPProvider)
+				err := idp.SetData(event)
+				if err != nil {
+					return err
+				}
+				for i := len(mfas) - 1; i >= 0; i-- {
+					if mfas[i] == mfaType {
+						mfas[i] = mfas[len(mfas)-1]
+						mfas[len(mfas)-1] = 0
+						mfas = mfas[:len(mfas)-1]
+						break
+					}
+				}
+			case model.LoginPolicyRemoved:
+				mfas = make([]int32, 0)
+			}
+		}
+
+		for _, m := range mfas {
+			if m == mfaType {
+				return errors.ThrowPreconditionFailed(nil, "EVENT-4Bo0sw", "Errors.Org.LoginPolicy.MFA.AlreadyExisting")
+			}
+		}
+		return nil
+	}
+}
+
+func checkExistingLoginPolicyMultiFactorValidation(mfaType int32) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		mfas := make([]int32, 0)
+		for _, event := range events {
+			switch event.Type {
+			case model.LoginPolicyMultiFactorAdded:
+				mfa := new(iam_es_model.MFA)
+				err := mfa.SetData(event)
+				if err != nil {
+					return err
+				}
+				mfas = append(mfas, mfa.MFAType)
+			case model.LoginPolicyMultiFactorRemoved:
+				idp := new(iam_es_model.IDPProvider)
+				err := idp.SetData(event)
+				if err != nil {
+					return err
+				}
+				for i := len(mfas) - 1; i >= 0; i-- {
+					if mfas[i] == mfaType {
+						mfas[i] = mfas[len(mfas)-1]
+						mfas[len(mfas)-1] = 0
+						mfas = mfas[:len(mfas)-1]
+						break
+					}
+				}
+			case model.LoginPolicyRemoved:
+				mfas = make([]int32, 0)
+			}
+		}
+
+		for _, m := range mfas {
+			if m == mfaType {
+				return errors.ThrowPreconditionFailed(nil, "EVENT-4Bo0sw", "Errors.Org.LoginPolicy.MFA.AlreadyExisting")
 			}
 		}
 		return nil

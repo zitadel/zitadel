@@ -1,11 +1,10 @@
 
 .table-wrapper {
   overflow: auto;
+  width: 100%;
 
   .table,
   .paginator {
-    width: 100%;
-
     td,
     th {
       padding: 0 1rem;
@@ -22,11 +21,25 @@
   }
 }
 
+td {
+  outline: none;
+}
+
 tr {
   outline: none;
 
   &.disabled * {
-    color: var(--grey);
+    opacity: .8;
+  }
+
+  button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    button {
+      visibility: visible;
+    }
   }
 }
 

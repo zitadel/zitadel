@@ -25,6 +25,7 @@ const routes: Routes = [
                 canActivate: [RoleGuard],
                 data: {
                     roles: ['org.idp.write'],
+                    serviceType: PolicyComponentServiceType.MGMT,
                 },
             },
             {
@@ -33,7 +34,7 @@ const routes: Routes = [
                 canActivate: [RoleGuard],
                 data: {
                     roles: ['iam.idp.read'],
-                    serviceType: PolicyComponentServiceType.ADMIN,
+                    serviceType: PolicyComponentServiceType.MGMT,
                 },
             },
         ],

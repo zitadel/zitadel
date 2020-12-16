@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
@@ -28,6 +29,16 @@ type IAMRepository interface {
 	SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error)
 	RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error
+	SearchDefaultSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error)
+	AddSecondFactorToLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) (iam_model.SecondFactorType, error)
+	RemoveSecondFactorFromLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) error
+	SearchDefaultMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error)
+	AddMultiFactorToLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) (iam_model.MultiFactorType, error)
+	RemoveMultiFactorFromLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) error
+
+	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+	AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error)
+	ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error)
 
 	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
 	AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error)

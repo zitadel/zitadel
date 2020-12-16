@@ -10,6 +10,7 @@ type IDPProviderView struct {
 	IDPConfigID     string
 	IDPProviderType IDPProviderType
 	Name            string
+	StylingType     IDPStylingType
 	IDPConfigType   IdpConfigType
 	IDPState        IDPConfigState
 

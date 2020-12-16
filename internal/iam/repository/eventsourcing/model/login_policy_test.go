@@ -23,18 +23,18 @@ func TestLoginPolicyChanges(t *testing.T) {
 		{
 			name: "loginpolicy all attributes change",
 			args: args{
-				existing: &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false},
-				new:      &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true},
+				existing: &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false, ForceMFA: false},
+				new:      &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true, ForceMFA: true},
 			},
 			res: res{
-				changesLen: 3,
+				changesLen: 4,
 			},
 		},
 		{
 			name: "no changes",
 			args: args{
-				existing: &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false},
-				new:      &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false},
+				existing: &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false, ForceMFA: false},
+				new:      &LoginPolicy{AllowUsernamePassword: false, AllowRegister: false, AllowExternalIdp: false, ForceMFA: false},
 			},
 			res: res{
 				changesLen: 0,
@@ -66,10 +66,10 @@ func TestAppendAddLoginPolicyEvent(t *testing.T) {
 			name: "append add login policy event",
 			args: args{
 				iam:    new(IAM),
-				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true},
+				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true, ForceMFA: true},
 				event:  new(es_models.Event),
 			},
-			result: &IAM{DefaultLoginPolicy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true}},
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true, ForceMFA: true}},
 		},
 	}
 	for _, tt := range tests {
@@ -87,6 +87,9 @@ func TestAppendAddLoginPolicyEvent(t *testing.T) {
 			}
 			if tt.result.DefaultLoginPolicy.AllowExternalIdp != tt.args.iam.DefaultLoginPolicy.AllowExternalIdp {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowExternalIdp, tt.args.iam.DefaultLoginPolicy.AllowExternalIdp)
+			}
+			if tt.result.DefaultLoginPolicy.ForceMFA != tt.args.iam.DefaultLoginPolicy.ForceMFA {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.ForceMFA, tt.args.iam.DefaultLoginPolicy.ForceMFA)
 			}
 		})
 	}
@@ -110,14 +113,16 @@ func TestAppendChangeLoginPolicyEvent(t *testing.T) {
 					AllowExternalIdp:      false,
 					AllowRegister:         false,
 					AllowUsernamePassword: false,
+					ForceMFA:              false,
 				}},
-				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true},
+				policy: &LoginPolicy{AllowUsernamePassword: true, AllowRegister: true, AllowExternalIdp: true, ForceMFA: true},
 				event:  &es_models.Event{},
 			},
 			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
 				AllowExternalIdp:      true,
 				AllowRegister:         true,
 				AllowUsernamePassword: true,
+				ForceMFA:              true,
 			}},
 		},
 	}
@@ -136,6 +141,9 @@ func TestAppendChangeLoginPolicyEvent(t *testing.T) {
 			}
 			if tt.result.DefaultLoginPolicy.AllowExternalIdp != tt.args.iam.DefaultLoginPolicy.AllowExternalIdp {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.AllowExternalIdp, tt.args.iam.DefaultLoginPolicy.AllowExternalIdp)
+			}
+			if tt.result.DefaultLoginPolicy.ForceMFA != tt.args.iam.DefaultLoginPolicy.ForceMFA {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.ForceMFA, tt.args.iam.DefaultLoginPolicy.ForceMFA)
 			}
 		})
 	}
@@ -197,7 +205,7 @@ func TestAppendAddIdpToPolicyEvent(t *testing.T) {
 	}
 }
 
-func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
+func TestRemoveIdpToPolicyEvent(t *testing.T) {
 	type args struct {
 		iam      *IAM
 		provider *IDPProvider
@@ -247,6 +255,174 @@ func TestRemoveAddIdpToPolicyEvent(t *testing.T) {
 			}
 			if len(tt.result.DefaultLoginPolicy.IDPProviders) != len(tt.args.iam.DefaultLoginPolicy.IDPProviders) {
 				t.Errorf("got wrong idp provider len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.IDPProviders), len(tt.args.iam.DefaultLoginPolicy.IDPProviders))
+			}
+		})
+	}
+}
+
+func TestAppendAddSecondFactorToPolicyEvent(t *testing.T) {
+	type args struct {
+		iam   *IAM
+		mfa   *MFA
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *IAM
+	}{
+		{
+			name: "append add second factor to login policy event",
+			args: args{
+				iam:   &IAM{DefaultLoginPolicy: &LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
+				mfa:   &MFA{MFAType: int32(model.SecondFactorTypeOTP)},
+				event: &es_models.Event{},
+			},
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
+				SecondFactors: []int32{
+					int32(model.SecondFactorTypeOTP),
+				}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.mfa != nil {
+				data, _ := json.Marshal(tt.args.mfa)
+				tt.args.event.Data = data
+			}
+			tt.args.iam.appendAddSecondFactorToLoginPolicyEvent(tt.args.event)
+			if len(tt.result.DefaultLoginPolicy.SecondFactors) != len(tt.args.iam.DefaultLoginPolicy.SecondFactors) {
+				t.Errorf("got wrong second factors len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.SecondFactors), len(tt.args.iam.DefaultLoginPolicy.SecondFactors))
+			}
+			if tt.result.DefaultLoginPolicy.SecondFactors[0] != tt.args.mfa.MFAType {
+				t.Errorf("got wrong second factor: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.SecondFactors[0], tt.args.mfa)
+			}
+		})
+	}
+}
+
+func TestRemoveSecondFactorToPolicyEvent(t *testing.T) {
+	type args struct {
+		iam   *IAM
+		mfa   *MFA
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *IAM
+	}{
+		{
+			name: "append remove second factor to login policy event",
+			args: args{
+				iam: &IAM{
+					DefaultLoginPolicy: &LoginPolicy{
+						SecondFactors: []int32{
+							int32(model.SecondFactorTypeOTP),
+						}}},
+				mfa:   &MFA{MFAType: int32(model.SecondFactorTypeOTP)},
+				event: &es_models.Event{},
+			},
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
+				AllowExternalIdp:      true,
+				AllowRegister:         true,
+				AllowUsernamePassword: true,
+				SecondFactors:         []int32{}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.mfa != nil {
+				data, _ := json.Marshal(tt.args.mfa)
+				tt.args.event.Data = data
+			}
+			tt.args.iam.appendRemoveSecondFactorFromLoginPolicyEvent(tt.args.event)
+			if len(tt.result.DefaultLoginPolicy.SecondFactors) != len(tt.args.iam.DefaultLoginPolicy.SecondFactors) {
+				t.Errorf("got wrong second factor len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.SecondFactors), len(tt.args.iam.DefaultLoginPolicy.SecondFactors))
+			}
+		})
+	}
+}
+
+func TestAppendAddMultiFactorToPolicyEvent(t *testing.T) {
+	type args struct {
+		iam   *IAM
+		mfa   *MFA
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *IAM
+	}{
+		{
+			name: "append add mfa to login policy event",
+			args: args{
+				iam:   &IAM{DefaultLoginPolicy: &LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
+				mfa:   &MFA{MFAType: int32(model.MultiFactorTypeU2FWithPIN)},
+				event: &es_models.Event{},
+			},
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
+				MultiFactors: []int32{
+					int32(model.MultiFactorTypeU2FWithPIN),
+				}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.mfa != nil {
+				data, _ := json.Marshal(tt.args.mfa)
+				tt.args.event.Data = data
+			}
+			tt.args.iam.appendAddMultiFactorToLoginPolicyEvent(tt.args.event)
+			if len(tt.result.DefaultLoginPolicy.MultiFactors) != len(tt.args.iam.DefaultLoginPolicy.MultiFactors) {
+				t.Errorf("got wrong mfas len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.MultiFactors), len(tt.args.iam.DefaultLoginPolicy.MultiFactors))
+			}
+			if tt.result.DefaultLoginPolicy.MultiFactors[0] != tt.args.mfa.MFAType {
+				t.Errorf("got wrong mfa: expected: %v, actual: %v ", tt.result.DefaultLoginPolicy.MultiFactors[0], tt.args.mfa)
+			}
+		})
+	}
+}
+
+func TestRemoveMultiFactorToPolicyEvent(t *testing.T) {
+	type args struct {
+		iam   *IAM
+		mfa   *MFA
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *IAM
+	}{
+		{
+			name: "append remove mfa to login policy event",
+			args: args{
+				iam: &IAM{
+					DefaultLoginPolicy: &LoginPolicy{
+						MultiFactors: []int32{
+							int32(model.MultiFactorTypeU2FWithPIN),
+						}}},
+				mfa:   &MFA{MFAType: int32(model.MultiFactorTypeU2FWithPIN)},
+				event: &es_models.Event{},
+			},
+			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
+				AllowExternalIdp:      true,
+				AllowRegister:         true,
+				AllowUsernamePassword: true,
+				MultiFactors:          []int32{}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.mfa != nil {
+				data, _ := json.Marshal(tt.args.mfa)
+				tt.args.event.Data = data
+			}
+			tt.args.iam.appendRemoveMultiFactorFromLoginPolicyEvent(tt.args.event)
+			if len(tt.result.DefaultLoginPolicy.MultiFactors) != len(tt.args.iam.DefaultLoginPolicy.MultiFactors) {
+				t.Errorf("got wrong mfa len: expected: %v, actual: %v ", len(tt.result.DefaultLoginPolicy.MultiFactors), len(tt.args.iam.DefaultLoginPolicy.MultiFactors))
 			}
 		})
 	}

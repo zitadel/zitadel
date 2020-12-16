@@ -3,13 +3,12 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -33,6 +32,7 @@ import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
+import { InputModule } from './modules/input/input.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
@@ -43,6 +43,7 @@ import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
 import { RefreshService } from './services/refresh.service';
+import { SeoService } from './services/seo.service';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
 import { StorageService } from './services/storage.service';
@@ -108,12 +109,12 @@ const authConfig: AuthConfig = {
         MatSidenavModule,
         MatCardModule,
         OutsideClickModule,
-        MatFormFieldModule,
-        MatInputModule,
+        InputModule,
         HasRolePipeModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
         MatToolbarModule,
+        ReactiveFormsModule,
         MatMenuModule,
         MatSnackBarModule,
         AvatarModule,
@@ -167,6 +168,7 @@ const authConfig: AuthConfig = {
             multi: true,
             useClass: OrgInterceptor,
         },
+        SeoService,
         RefreshService,
         GrpcService,
         GrpcAuthService,

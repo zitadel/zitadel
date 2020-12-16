@@ -13,7 +13,7 @@ import {
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum UserGrantContext {
-    // AUTHUSER = 'authuser',
+    NONE = 'none',
     USER = 'user',
     OWNED_PROJECT = 'owned',
     GRANTED_PROJECT = 'granted',
@@ -42,14 +42,13 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
         },
         queries?: UserGrantSearchQuery[],
     ): void {
-        const offset = pageIndex * pageSize;
-
         switch (context) {
             case UserGrantContext.USER:
                 if (data && data.userId) {
                     this.loadingSubject.next(true);
                     const userfilter = new UserGrantSearchQuery();
                     userfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID);
+                    userfilter.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
                     userfilter.setValue(data.userId);
                     if (queries) {
                         queries.push(userfilter);
@@ -57,7 +56,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                         queries = [userfilter];
                     }
 
-                    const promise = this.userService.SearchUserGrants(10, 0, queries);
+                    const promise = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise);
                 }
                 break;
@@ -66,6 +65,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                     this.loadingSubject.next(true);
                     const projectfilter = new UserGrantSearchQuery();
                     projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
+                    projectfilter.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
                     projectfilter.setValue(data.projectId);
                     if (queries) {
                         queries.push(projectfilter);
@@ -73,7 +73,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                         queries = [projectfilter];
                     }
 
-                    const promise1 = this.userService.SearchUserGrants(10, 0, queries);
+                    const promise1 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise1);
                 }
                 break;
@@ -97,9 +97,14 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                         queries = [projectfilter, grantquery];
                     }
 
-                    const promise2 = this.userService.SearchUserGrants(10, 0, queries);
+                    const promise2 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise2);
                 }
+                break;
+            default:
+                this.loadingSubject.next(true);
+                const promise3 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries ?? []);
+                this.loadResponse(promise3);
                 break;
         }
     }

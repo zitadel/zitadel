@@ -79,6 +79,15 @@ html {
                 }
             }
         }
+
+        &.google {
+            color: $idpGoogleFontColorLight;
+            background-color: $idpGoogleBackgroundColorLight;
+
+            span.logo {
+                background-image: url($idpGoogleImg + '.png');
+            }
+        }
     }
 
     input:not([type='radio']), select {

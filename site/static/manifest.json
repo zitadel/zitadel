@@ -1,9 +1,9 @@
 {
 	"background_color": "#212224",
 	"theme_color": "#e91e63",
-    "name": "Zitadel Docs",
+    "name": "ZITADEL Documentation",
     "lang": "en",
-	"short_name": "Zitadel Docs",
+	"short_name": "ZITADEL Docs",
 	"display": "minimal-ui",
 	"start_url": "/",
 	"icons": [

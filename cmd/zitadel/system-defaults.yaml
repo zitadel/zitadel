@@ -47,15 +47,15 @@ SystemDefaults:
     MachineKeySize: 2048
   Multifactors:
     OTP:
-      Issuer: 'Zitadel'
+      Issuer: 'ZITADEL'
       VerificationKey:
         EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
   VerificationLifetimes:
     PasswordCheck: 240h #10d
     ExternalLoginCheck: 240h #10d
-    MfaInitSkip: 720h #30d
-    MfaSoftwareCheck: 18h
-    MfaHardwareCheck: 12h
+    MFAInitSkip: 720h #30d
+    SecondFactorCheck: 18h
+    MultiFactorCheck: 12h
   IamID: 'IAM'
   DomainVerification:
     VerificationKey:
@@ -86,9 +86,9 @@ SystemDefaults:
         FromName: $EMAIL_SENDER_NAME
         Tls: $SMTP_TLS
       Twilio:
-        SID:   $TWILIO_SERVICE_SID
+        SID: $TWILIO_SERVICE_SID
         Token: $TWILIO_TOKEN
-        From:  $TWILIO_SENDER_NAME
+        From: $TWILIO_SENDER_NAME
     TemplateData:
       InitCode:
         Title: 'InitCode.Title'
@@ -125,3 +125,8 @@ SystemDefaults:
         Greeting: 'DomainClaimed.Greeting'
         Text: 'DomainClaimed.Text'
         ButtonText: 'DomainClaimed.ButtonText'
+  WebAuthN:
+    ID: $ZITADEL_DEFAULT_DOMAIN
+    OriginLogin: $ZITADEL_ACCOUNTS
+    OriginConsole: $ZITADEL_CONSOLE
+    DisplayName: ZITADEL

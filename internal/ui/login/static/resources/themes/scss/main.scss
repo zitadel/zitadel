@@ -9,6 +9,10 @@
 
 body {
     margin: 0 0 100px 0;
+
+    &.waiting * {
+        cursor: wait !important;
+    }
 }
 
 html {
@@ -97,7 +101,8 @@ button, .button {
     outline: none;
     display: inline-block;
     text-align: center;
-    line-height: 40px;
+    line-height: 44px;
+    padding: 1px 6px;
 
     &:hover {
         background-color: $primaryColorHover;
@@ -123,6 +128,32 @@ button, .button {
             border: 1px solid $inputBorderColor;
         }
     }
+
+    &.google {
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding: 0 1px;
+        color: $idpGoogleFontColor;
+        background-color: $idpGoogleBackgroundColor;
+
+        span.logo {
+            height: 46px;
+            width: 46px;
+            background-color: #FFFFFF;
+            background-image: url($idpGoogleImg + '.png');
+            background-size: 25px;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 5px;
+        }
+
+        span.provider-name {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    }
 }
 
 
@@ -142,6 +173,7 @@ input:not([type='radio']), select {
         width: 80px;
         background-position: center;
         background-repeat: no-repeat;
+        background-size: contain;
         @include retina-background-image($profileImgDark, "png", false, 80px, 80px);
     }
 
@@ -264,10 +296,6 @@ form {
 
     button.user-selection {
         @extend %profile-image;
-        .profile-image {
-            height: 80px;
-            width: 80px;
-        }
 
         .sessionstate {
             display: inline-block;
@@ -295,13 +323,34 @@ form {
             position: relative;
 
             &.names {
-                margin: 15px;
+                margin: 0 15px;
 
                 .displayname {
                     font-size: 1.4rem;
                 }
                 .loginname {
                     color: $labelColor;
+                }
+            }
+        }
+
+        &:disabled {
+            background: transparent;
+            border: none;
+            cursor: not-allowed;
+
+            .profile-image {
+                opacity: 0.3;
+            }
+
+            .sessionstate {
+                background-color: $backgroundColor;
+            }
+
+            .names {
+                .displayname, .loginname {
+                    font-style: italic;
+                    color: #444444;
                 }
             }
         }
@@ -438,4 +487,12 @@ footer {
 
 .error {
     color: $nokColor;
+}
+
+.hidden {
+    display: none;
+}
+
+#wa-error {
+    margin-top: 20px;
 }

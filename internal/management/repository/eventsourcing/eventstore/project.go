@@ -141,7 +141,7 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 				}
 				if sequenceErr == nil {
 					result.Sequence = sequence.CurrentSequence
-					result.Timestamp = sequence.CurrentTimestamp
+					result.Timestamp = sequence.LastSuccessfulSpoolerRun
 				}
 				return result, nil
 			}
@@ -162,7 +162,7 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -212,7 +212,7 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -285,7 +285,7 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID strin
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -299,7 +299,12 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 		change.ModifierName = change.ModifierId
 		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
 		if user != nil {
-			change.ModifierName = user.DisplayName
+			if user.Human != nil {
+				change.ModifierName = user.DisplayName
+			}
+			if user.Machine != nil {
+				change.ModifierName = user.Machine.Name
+			}
 		}
 	}
 	return changes, nil
@@ -375,7 +380,7 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -389,7 +394,12 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appI
 		change.ModifierName = change.ModifierId
 		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
 		if user != nil {
-			change.ModifierName = user.DisplayName
+			if user.Human != nil {
+				change.ModifierName = user.DisplayName
+			}
+			if user.Machine != nil {
+				change.ModifierName = user.Machine.Name
+			}
 		}
 	}
 	return changes, nil
@@ -427,7 +437,7 @@ func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -457,7 +467,7 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 				}
 				if sequenceErr == nil {
 					result.Sequence = sequence.CurrentSequence
-					result.Timestamp = sequence.CurrentTimestamp
+					result.Timestamp = sequence.LastSuccessfulSpoolerRun
 				}
 				return result, nil
 			}
@@ -478,7 +488,7 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -616,7 +626,7 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }

@@ -1,5 +1,5 @@
 <app-refresh-table *ngIf="projectId" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
-    emitRefreshOnPreviousRoute="/projects/{{projectId}}/roles/create" [selection]="selection"
+    [emitRefreshOnPreviousRoutes]="['/projects/'+projectId+'/roles/create']" [selection]="selection"
     [loading]="dataSource?.loading$ | async" [timestamp]="dataSource?.viewTimestamp">
     <ng-template appHasRole [appHasRole]="['project.role.delete', 'project.role.delete:' + projectId]" actions>
         <button color="warn" class="icon-button" [disabled]="disabled"
@@ -59,6 +59,11 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
+
+        <div *ngIf="(dataSource.loading$ | async) == false && !dataSource?.totalResult" class="no-content-row">
+            <i class="las la-exclamation"></i>
+            <span>{{'PROJECT.ROLE.EMPTY' | translate}}</span>
+        </div>
 
         <mat-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50"
             [pageSizeOptions]="[25, 50, 100, 250]">

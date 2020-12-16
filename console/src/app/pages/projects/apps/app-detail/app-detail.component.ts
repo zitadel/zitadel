@@ -3,12 +3,12 @@ import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
-import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Application,
     AppState,
@@ -17,6 +17,7 @@ import {
     OIDCConfig,
     OIDCGrantType,
     OIDCResponseType,
+    OIDCTokenType,
     ZitadelDocs,
 } from 'src/app/proto/generated/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -67,6 +68,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
     ];
 
+    public oidcTokenTypes: OIDCTokenType[] = [
+        OIDCTokenType.OIDCTOKENTYPE_BEARER,
+        OIDCTokenType.OIDCTOKENTYPE_JWT,
+    ];
+
     public AppState: any = AppState;
     public appNameForm!: FormGroup;
     public appForm!: FormGroup;
@@ -80,11 +86,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public OIDCApplicationType: any = OIDCApplicationType;
     public OIDCAuthMethodType: any = OIDCAuthMethodType;
+    public OIDCTokenType: any = OIDCTokenType;
 
     public redirectControl: FormControl = new FormControl({ value: '', disabled: true });
     public postRedirectControl: FormControl = new FormControl({ value: '', disabled: true });
 
-
+    public ChangeType: any = ChangeType;
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
@@ -106,6 +113,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             grantTypesList: [{ value: [], disabled: true }],
             applicationType: [{ value: '', disabled: true }],
             authMethodType: [{ value: '', disabled: true }],
+            accessTokenType: [{ value: '', disabled: true }],
+            accessTokenRoleAssertion: [{ value: false, disabled: true }],
+            idTokenRoleAssertion: [{ value: false, disabled: true }],
         });
     }
 
@@ -170,19 +180,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         }
     }
 
-    public add(event: MatChipInputEvent, target: RedirectType): void {
+    public add(input: any, target: RedirectType): void {
         if (target === RedirectType.POSTREDIRECT && this.postRedirectControl.valid) {
-            const input = event.input;
-            if (event.value !== '' && event.value !== ' ' && event.value !== '/') {
-                this.postLogoutRedirectUrisList.push(event.value);
+            if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
+                this.postLogoutRedirectUrisList.push(input.value);
             }
             if (input) {
                 input.value = '';
             }
         } else if (target === RedirectType.REDIRECT && this.redirectControl.valid) {
-            const input = event.input;
-            if (event.value !== '' && event.value !== ' ' && event.value !== '/') {
-                this.redirectUrisList.push(event.value);
+            if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
+                this.redirectUrisList.push(input.value);
             }
             if (input) {
                 input.value = '';
@@ -206,6 +214,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         }
     }
 
+    public saveApp(): void {
+        if (this.appNameForm.valid) {
+            this.app.name = this.name?.value;
+
+            this.mgmtService
+                .UpdateApplication(this.projectId, this.app.id, this.name?.value)
+                .then(() => {
+                    this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+                })
+                .catch(error => {
+                    this.toast.showError(error);
+                });
+        }
+    }
+
+
     public saveOIDCApp(): void {
         if (this.appNameForm.valid) {
             this.app.name = this.name?.value;
@@ -220,6 +244,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
                 this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
                 this.app.oidcConfig.devMode = this.devMode?.value;
+                this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
+                this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
+                this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
 
                 this.mgmtService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
@@ -279,5 +306,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public get devMode(): AbstractControl | null {
         return this.appForm.get('devMode');
+    }
+
+    public get accessTokenType(): AbstractControl | null {
+        return this.appForm.get('accessTokenType');
+    }
+
+    public get idTokenRoleAssertion(): AbstractControl | null {
+        return this.appForm.get('idTokenRoleAssertion');
+    }
+
+    public get accessTokenRoleAssertion(): AbstractControl | null {
+        return this.appForm.get('accessTokenRoleAssertion');
     }
 }

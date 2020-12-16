@@ -1,0 +1,12 @@
+<div class="max-width-container">
+    <h1>{{ 'IAM.EVENTSTORE.TITLE' | translate }}</h1>
+    <p class="desc">{{'IAM.EVENTSTORE.DESCRIPTION' | translate }}</p>
+    <app-card title="{{ 'IAM.VIEWS.TITLE' | translate }}" description="{{ 'IAM.VIEWS.DESCRIPTION' | translate }}">
+        <app-iam-views></app-iam-views>
+    </app-card>
+
+    <app-card title="{{ 'IAM.FAILEDEVENTS.TITLE' | translate }}"
+        description="{{ 'IAM.FAILEDEVENTS.DESCRIPTION' | translate }}">
+        <app-iam-failed-events></app-iam-failed-events>
+    </app-card>
+</div>

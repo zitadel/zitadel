@@ -1,5 +1,0 @@
-# Exclude system dirs
-
-.dependabot
-.github
-.git

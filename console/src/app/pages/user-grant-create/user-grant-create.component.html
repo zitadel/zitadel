@@ -16,49 +16,51 @@
             {{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION_DESC' | translate}}
         </p>
 
-        <ng-container *ngIf="context && context == UserGrantContext.USER">
+        <ng-container>
+            <h1>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h1>
+
+            <app-search-user-autocomplete class="block" singleOutput="true" [users]="user ? [user] : []"
+                (selectionChanged)="selectUser($event)"
+                [target]="context === UserGrantContext.USER ? UserTarget.EXTERNAL : UserTarget.SELF">
+            </app-search-user-autocomplete>
+        </ng-container>
+
+        <ng-container *ngIf="context && (context == UserGrantContext.USER || context == UserGrantContext.NONE)">
             <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
 
             <app-search-project-autocomplete class="block" singleOutput="true"
                 (selectionChanged)="selectProject($event)">
             </app-search-project-autocomplete>
         </ng-container>
-
-        <ng-container
-            *ngIf="context && (context == UserGrantContext.GRANTED_PROJECT || context == UserGrantContext.OWNED_PROJECT)">
-            <h1>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h1>
-
-            <app-search-user-autocomplete class="block" singleOutput="true" (selectionChanged)="selectUser($event)">
-            </app-search-user-autocomplete>
-        </ng-container>
     </ng-container>
 
     <ng-container *ngIf="currentCreateStep === STEPS">
         <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
-        <ng-container *ngIf="context === UserGrantContext.OWNED_PROJECT && projectId">
+        <ng-container
+            *ngIf="(projectId && (context === UserGrantContext.OWNED_PROJECT || ((context === UserGrantContext.USER || context === UserGrantContext.NONE) && $any(project)?.id == undefined)))">
             <app-card>
                 <app-project-roles (changedSelection)="selectRoles($event)" [projectId]="projectId">
                 </app-project-roles>
             </app-card>
         </ng-container>
 
-        <ng-container *ngIf="context === UserGrantContext.GRANTED_PROJECT && grantRolesKeyList">
-            <mat-form-field class="form-field" appearance="outline">
-                <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
+        <ng-container
+            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || ((context === UserGrantContext.USER || context === UserGrantContext.NONE) && $any(project)?.id)) && grantRolesKeyList">
+            <cnsl-form-field class="form-field" appearance="outline">
+                <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
                 <mat-select multiple (selectionChange)="rolesList = $event.value">
                     <mat-option *ngFor="let role of grantRolesKeyList" [value]="role">
                         {{role}}
                     </mat-option>
                 </mat-select>
-            </mat-form-field>
+            </cnsl-form-field>
         </ng-container>
     </ng-container>
 
     <div class="btn-container">
         <ng-container *ngIf="currentCreateStep === 1">
-            <button
-                [disabled]="!org || ((context == UserGrantContext.GRANTED_PROJECT || context == UserGrantContext.OWNED_PROJECT) && !projectId) || (context == UserGrantContext.USER && !userId)"
-                (click)="next()" color="primary" mat-raised-button class="big-button" cdkFocusInitial>
+            <button [disabled]="!org || !projectId || !userId" (click)="next()" color="primary" mat-raised-button
+                class="big-button" cdkFocusInitial>
                 {{ 'ACTIONS.CONTINUE' | translate }}
             </button>
         </ng-container>

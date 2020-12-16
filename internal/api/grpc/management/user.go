@@ -2,9 +2,11 @@ package management
 
 import (
 	"context"
+
+	"github.com/golang/protobuf/ptypes/empty"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/management"
-	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, id *management.UserID) (*management.UserView, error) {
@@ -195,6 +197,11 @@ func (s *Server) SetInitialPassword(ctx context.Context, request *management.Pas
 	return &empty.Empty{}, err
 }
 
+func (s *Server) ResendInitialMail(ctx context.Context, request *management.InitialMailRequest) (*empty.Empty, error) {
+	err := s.user.ResendInitialMail(ctx, request.Id, request.Email)
+	return &empty.Empty{}, err
+}
+
 func (s *Server) SearchUserExternalIDPs(ctx context.Context, request *management.ExternalIDPSearchRequest) (*management.ExternalIDPSearchResponse, error) {
 	externalIDP, err := s.user.SearchExternalIDPs(ctx, externalIDPSearchRequestToModel(request))
 	if err != nil {
@@ -208,12 +215,35 @@ func (s *Server) RemoveExternalIDP(ctx context.Context, request *management.Exte
 	return &empty.Empty{}, err
 }
 
-func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*management.MultiFactors, error) {
-	mfas, err := s.user.UserMfas(ctx, userID.Id)
+func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*management.UserMultiFactors, error) {
+	mfas, err := s.user.UserMFAs(ctx, userID.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &management.MultiFactors{Mfas: mfasFromModel(mfas)}, nil
+	return &management.UserMultiFactors{Mfas: mfasFromModel(mfas)}, nil
+}
+
+func (s *Server) RemoveMfaOTP(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
+	err := s.user.RemoveOTP(ctx, userID.Id)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) RemoveMfaU2F(ctx context.Context, webAuthNTokenID *management.WebAuthNTokenID) (*empty.Empty, error) {
+	err := s.user.RemoveU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) GetPasswordless(ctx context.Context, userID *management.UserID) (_ *management.WebAuthNTokens, err error) {
+	tokens, err := s.user.GetPasswordless(ctx, userID.Id)
+	if err != nil {
+		return nil, err
+	}
+	return webAuthNTokensFromModel(tokens), err
+}
+
+func (s *Server) RemovePasswordless(ctx context.Context, id *management.WebAuthNTokenID) (*empty.Empty, error) {
+	err := s.user.RemovePasswordless(ctx, id.UserId, id.Id)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {

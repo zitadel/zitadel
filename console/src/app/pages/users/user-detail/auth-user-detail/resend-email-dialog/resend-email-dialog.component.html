@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>
+    <span class="title">{{'USER.SENDEMAILDIALOG.TITLE' | translate}} {{data?.number}}</span>
+</h1>
+<p class="desc">{{'USER.SENDEMAILDIALOG.DESCRIPTION' | translate}}</p>
+<div mat-dialog-content>
+    <cnsl-form-field class="formfield">
+        <cnsl-label>{{ 'USER.SENDEMAILDIALOG.NEWEMAIL' | translate }}</cnsl-label>
+        <input cnslInput [(ngModel)]="email" />
+    </cnsl-form-field>
+</div>
+<div mat-dialog-actions class="action">
+    <button color="primary" mat-button class="ok-button" (click)="closeDialog()">
+        {{'ACTIONS.CLOSE' | translate}}
+    </button>
+
+    <button cdkFocusInitial color="primary" mat-raised-button class="ok-button" (click)="closeDialogWithSend(email)">
+        {{'ACTIONS.SEND' | translate}}
+    </button>
+</div>

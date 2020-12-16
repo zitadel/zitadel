@@ -34,13 +34,39 @@ func UserGrantByIDs(db *gorm.DB, table, resourceOwnerID, projectID, userID strin
 }
 
 func SearchUserGrants(db *gorm.DB, table string, req *grant_model.UserGrantSearchRequest) ([]*model.UserGrantView, uint64, error) {
-	users := make([]*model.UserGrantView, 0)
+	grants := make([]*model.UserGrantView, 0)
+
+	var orgID string
+	var withGranted bool
+
+	for i := len(req.Queries) - 1; i >= 0; i-- {
+		shouldRemove := false
+		if req.Queries[i].Key == grant_model.UserGrantSearchKeyResourceOwner {
+			orgID = req.Queries[i].Value.(string)
+			shouldRemove = true
+		}
+		if req.Queries[i].Key == grant_model.UserGrantSearchKeyWithGranted {
+			withGranted = true
+			shouldRemove = true
+		}
+		if shouldRemove {
+			req.Queries[i] = req.Queries[len(req.Queries)-1]
+			req.Queries[len(req.Queries)-1] = nil
+			req.Queries = req.Queries[:len(req.Queries)-1]
+		}
+	}
+
+	if withGranted {
+		db = db.Where("resource_owner = ? OR project_owner = ?", orgID, orgID)
+	} else {
+		db = db.Where("resource_owner = ?", orgID)
+	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
-	count, err := query(db, &users)
+	count, err := query(db, &grants)
 	if err != nil {
 		return nil, 0, err
 	}
-	return users, count, nil
+	return grants, count, nil
 }
 
 func UserGrantsByUserID(db *gorm.DB, table, userID string) ([]*model.UserGrantView, error) {

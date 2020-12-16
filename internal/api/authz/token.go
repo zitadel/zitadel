@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -62,7 +63,10 @@ func prefixFromMethod(method string) (string, bool) {
 	return parts[1], true
 }
 
-func (v *TokenVerifier) clientIDFromMethod(ctx context.Context, method string) (string, error) {
+func (v *TokenVerifier) clientIDFromMethod(ctx context.Context, method string) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	prefix, ok := prefixFromMethod(method)
 	if !ok {
 		return "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-GRD2Q", "Errors.Internal")
@@ -71,7 +75,6 @@ func (v *TokenVerifier) clientIDFromMethod(ctx context.Context, method string) (
 	if !ok {
 		return "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-G2qrh", "Errors.Internal")
 	}
-	var err error
 	c := app.(*client)
 	if c.id != "" {
 		return c.id, nil
@@ -84,15 +87,22 @@ func (v *TokenVerifier) clientIDFromMethod(ctx context.Context, method string) (
 	return c.id, nil
 }
 
-func (v *TokenVerifier) ResolveGrant(ctx context.Context) (*Grant, error) {
+func (v *TokenVerifier) ResolveGrant(ctx context.Context) (_ *Grant, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	return v.authZRepo.ResolveGrants(ctx)
 }
 
-func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
+func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (_ string, _ []string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	return v.authZRepo.ProjectIDAndOriginsByClientID(ctx, clientID)
 }
 
-func (v *TokenVerifier) ExistsOrg(ctx context.Context, orgID string) error {
+func (v *TokenVerifier) ExistsOrg(ctx context.Context, orgID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	return v.authZRepo.ExistsOrg(ctx, orgID)
 }
 
@@ -102,6 +112,9 @@ func (v *TokenVerifier) CheckAuthMethod(method string) (Option, bool) {
 }
 
 func verifyAccessToken(ctx context.Context, token string, t *TokenVerifier, method string) (userID, clientID, agentID, prefLang string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	parts := strings.Split(token, BearerPrefix)
 	if len(parts) != 2 {
 		return "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")

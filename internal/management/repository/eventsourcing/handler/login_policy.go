@@ -46,24 +46,32 @@ func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 	switch event.Type {
 	case iam_es_model.LoginPolicyAdded, model.LoginPolicyAdded:
 		err = policy.AppendEvent(event)
-	case iam_es_model.LoginPolicyChanged, model.LoginPolicyChanged:
+	case iam_es_model.LoginPolicyChanged, model.LoginPolicyChanged,
+		iam_es_model.LoginPolicySecondFactorAdded, model.LoginPolicySecondFactorAdded,
+		iam_es_model.LoginPolicySecondFactorRemoved, model.LoginPolicySecondFactorRemoved,
+		iam_es_model.LoginPolicyMultiFactorAdded, model.LoginPolicyMultiFactorAdded,
+		iam_es_model.LoginPolicyMultiFactorRemoved, model.LoginPolicyMultiFactorRemoved:
 		policy, err = m.view.LoginPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
 	case model.LoginPolicyRemoved:
-		return m.view.DeleteLoginPolicy(event.AggregateID, event.Sequence)
+		return m.view.DeleteLoginPolicy(event.AggregateID, event.Sequence, event.CreationDate)
 	default:
-		return m.view.ProcessedLoginPolicySequence(event.Sequence)
+		return m.view.ProcessedLoginPolicySequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutLoginPolicy(policy, policy.Sequence)
+	return m.view.PutLoginPolicy(policy, policy.Sequence, event.CreationDate)
 }
 
 func (m *LoginPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in login policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestLoginPolicyFailedEvent, m.view.ProcessedLoginPolicyFailedEvent, m.view.ProcessedLoginPolicySequence, m.errorCountUntilSkip)
+}
+
+func (m *LoginPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(m.view.UpdateLoginPolicySpoolerRunTimestamp)
 }

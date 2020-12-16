@@ -30,6 +30,13 @@ const (
 	LoginPolicyIDPProviderAdded          models.EventType = "iam.policy.login.idpprovider.added"
 	LoginPolicyIDPProviderRemoved        models.EventType = "iam.policy.login.idpprovider.removed"
 	LoginPolicyIDPProviderCascadeRemoved models.EventType = "iam.policy.login.idpprovider.cascade.removed"
+	LoginPolicySecondFactorAdded         models.EventType = "iam.policy.login.secondfactor.added"
+	LoginPolicySecondFactorRemoved       models.EventType = "iam.policy.login.secondfactor.removed"
+	LoginPolicyMultiFactorAdded          models.EventType = "iam.policy.login.multifactor.added"
+	LoginPolicyMultiFactorRemoved        models.EventType = "iam.policy.login.multifactor.removed"
+
+	LabelPolicyAdded   models.EventType = "iam.policy.label.added"
+	LabelPolicyChanged models.EventType = "iam.policy.label.changed"
 
 	PasswordComplexityPolicyAdded   models.EventType = "iam.policy.password.complexity.added"
 	PasswordComplexityPolicyChanged models.EventType = "iam.policy.password.complexity.changed"

@@ -51,9 +51,18 @@ export default function generate_docs(dirpath, dir, lang) {
                 return '<div class="side-by-side"><div class="copy">';
             };
 
-            // renderer.list = (src) => {
-            //     console.log(src);
-            // };
+            renderer.table = (header, body) => {
+                if (body) body = '<tbody>' + body + '</tbody>';
+
+                return '<div class="table-wrapper">\n'
+                    + '<table>\n'
+                    + '<thead>\n'
+                    + header
+                    + '</thead>\n'
+                    + body
+                    + '</table>\n'
+                    + '</div>';
+            };
 
             renderer.code = (source, lang) => {
                 source = source.replace(/^ +/gm, (match) => match.split('    ').join('\t'));

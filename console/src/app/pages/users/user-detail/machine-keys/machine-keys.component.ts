@@ -5,6 +5,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MachineKeySearchResponse, MachineKeyType, MachineKeyView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -84,20 +85,18 @@ export class MachineKeysComponent implements OnInit {
 
                 let date: Timestamp | undefined;
 
-                if (resp.date as Date) {
+                if (resp.date as Moment) {
                     const ts = new Timestamp();
-
-                    const milliseconds = resp.date.getTime();
+                    console.log(resp.date.toDate());
+                    const milliseconds = resp.date.toDate().getTime();
                     const seconds = Math.abs(milliseconds / 1000);
                     const nanos = (milliseconds - seconds * 1000) * 1000 * 1000;
                     ts.setSeconds(seconds);
                     ts.setNanos(nanos);
                     date = ts;
-                    console.log(date.toObject());
                 }
 
                 if (type) {
-                    console.log(this.userId, type, date);
                     return this.userService.AddMachineKey(this.userId, type, date).then((response) => {
                         if (response) {
                             setTimeout(() => {
@@ -125,7 +124,6 @@ export class MachineKeysComponent implements OnInit {
         this.userService.SearchMachineKeys(this.userId, limit, offset).then(resp => {
             this.keyResult = resp.toObject();
             this.dataSource.data = this.keyResult.resultList;
-            console.log(this.keyResult.resultList);
             this.loadingSubject.next(false);
         }).catch((error: any) => {
             this.toast.showError(error);

@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type Querier interface {
@@ -55,7 +56,7 @@ func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.Searc
 	sequence := new(Sequence)
 	err := rowScanner(row.Scan, sequence)
 	if err != nil {
-		logging.Log("SQL-WsxTg").WithError(err).Info("query failed")
+		logging.Log("SQL-WsxTg").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Info("query failed")
 		return 0, errors.ThrowInternal(err, "SQL-Yczyx", "unable to filter latest sequence")
 	}
 	return uint64(*sequence), nil

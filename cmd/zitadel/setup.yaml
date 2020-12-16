@@ -29,7 +29,7 @@ SetUp:
     DefaultLoginPolicy:
       AllowUsernamePassword: true
       AllowRegister: true
-      AllowExternalIdp: true
+      AllowExternalIdp: true  
     Orgs:
       - Name: 'Global'
         Domain: 'global.caos.ch'
@@ -91,3 +91,11 @@ SetUp:
   Step5:
     DefaultOrgIAMPolicy:
       UserLoginMustBeDomain: true
+  Step6:
+    DefaultLabelPolicy:
+      PrimaryColor: '#222324'
+      SecondaryColor: '#ffffff'
+  Step7:
+    DefaultSecondFactor: 1 #SecondFactorTypeOTP
+  Step8:
+    DefaultSecondFactor: 2 #SecondFactorTypeU2F

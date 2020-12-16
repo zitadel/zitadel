@@ -9,6 +9,7 @@ import (
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/proto"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type ValidationFunction func(ctx context.Context) error
@@ -41,7 +42,7 @@ func validate(ctx context.Context, validations map[string]ValidationFunction) ma
 	errors := make(map[string]error)
 	for id, validation := range validations {
 		if err := validation(ctx); err != nil {
-			logging.Log("API-vf823").WithError(err).Error("validation failed")
+			logging.Log("API-vf823").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Error("validation failed")
 			errors[id] = err
 		}
 	}

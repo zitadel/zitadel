@@ -1,12 +1,17 @@
 <app-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
-    [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute" [timestamp]="dataSource?.viewTimestamp"
+    [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
     [dataSize]="dataSource?.totalResult" [selection]="selection">
+    <cnsl-form-field @appearfade *ngIf="userGrantSearchKey != undefined" actions class="filtername">
+        <input cnslInput (keyup)="applyFilter($event)"
+            [placeholder]="('USER.TABLE.FILTER.' + userGrantSearchKey.toString()) | translate" #input>
+    </cnsl-form-field>
+
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button actions
-        (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && allowDelete">
+        (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete == false">
         <i class="las la-trash"></i>
     </button>
-    <a *ngIf="allowWrite && context !== UserGrantContext.USER" matTooltip="{{'GRANTS.ADD' | translate}}" actions
-        color="primary" color="primary" mat-raised-button [routerLink]="routerLink">
+    <a *ngIf="disableWrite == false" matTooltip="{{'GRANTS.ADD' | translate}}" actions color="primary" color="primary"
+        mat-raised-button [routerLink]="routerLink">
         <mat-icon class="icon">add</mat-icon>{{ 'GRANTS.ADD_BTN' | translate }}
     </a>
 
@@ -14,104 +19,149 @@
         <table mat-table multiTemplateDataRows class="table" aria-label="Elements" [dataSource]="dataSource">
             <ng-container matColumnDef="select">
                 <th class="selection" mat-header-cell *matHeaderCellDef>
-                    <mat-checkbox [disabled]="allowWrite == false" color="primary"
-                        (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+                    <mat-checkbox [disabled]="disableWrite" color="primary" (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
                         [indeterminate]="selection.hasValue() && !isAllSelected()">
                     </mat-checkbox>
                 </th>
                 <td class="selection" mat-cell *matCellDef="let row">
-                    <mat-checkbox [disabled]="allowWrite == false" color="primary" (click)="$event.stopPropagation()"
+                    <mat-checkbox
+                        [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + row?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + row?.grantId] : []) | hasRole | async))"
+                        color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
-                        <app-avatar *ngIf="row && row?.displayName && row.firstName && row.lastName" class="avatar"
-                            [name]="row.displayName" [size]="32">
+                        <app-avatar
+                            *ngIf="context !== UserGrantContext.USER && row && row?.displayName && row.firstName && row.lastName"
+                            class="avatar" [name]="row.displayName" [size]="32">
                         </app-avatar>
                     </mat-checkbox>
                 </td>
             </ng-container>
 
-
             <ng-container matColumnDef="user">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let grant">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_DISPLAY_NAME}"></template>
+                </th>
+                <td mat-cell *matCellDef="let grant">
                     {{grant?.displayName}}</td>
             </ng-container>
 
             <ng-container matColumnDef="org">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORGDOMAIN' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let grant">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORGDOMAIN' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_ORG_NAME}"></template>
+                </th>
+                <td mat-cell *matCellDef="let grant">
                     {{grant.orgName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="projectId">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.PROJECTNAME' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let grant">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.PROJECTNAME' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_NAME}"></template>
+                </th>
+                <td mat-cell *matCellDef="let grant">
                     {{grant.projectName}} </td>
             </ng-container>
 
-            <ng-container matColumnDef="creationDate">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CREATIONDATE' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let grant">
-                    {{grant.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="changeDate">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let grant">
-                    {{grant.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
+            <ng-container matColumnDef="dates">
+                <th mat-header-cell *matHeaderCellDef> DATES </th>
+                <td mat-cell *matCellDef="let grant">
+                    <div class="date-block">
+                        <span class="date-sub">{{ 'PROJECT.GRANT.CREATIONDATE' | translate }}:</span>
+                        <span>{{grant.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                    </div>
+                    <div class="date-block">
+                        <span class="date-sub">{{ 'PROJECT.GRANT.CHANGEDATE' | translate }}</span>
+                        <span>{{grant.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                    </div>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="roleNamesList">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
-                <td mat-cell *matCellDef="let grant; let i = index">
-                    <ng-container *ngIf="context === UserGrantContext.USER">
-                        <span class="no-roles"
-                            *ngIf="grant.roleKeysList?.length === 0">{{'PROJECT.GRANT.NOROLES' | translate}}</span>
-                        <span
-                            *ngFor="let role of grant.roleKeysList">{{ (role.length>8)? (role | slice:0:8)+'..':(role) }}</span>
+                <th mat-header-cell *matHeaderCellDef class="role-data">
+                    {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
+                    <template [ngTemplateOutlet]="templateRef"
+                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_ROLE_KEY}"></template>
+                </th>
+                <td mat-cell *matCellDef="let grant; let i = index" class="role-data">
+                    <ng-container
+                        *ngIf="(context === UserGrantContext.USER || context === UserGrantContext.NONE) && (grant.grantId && grantToEdit !== grant.id) || (grantToEdit !== grant.id)">
+                        <div class="flex-row">
+                            <div class="role">
+                                <span *ngFor="let role of grant.roleKeysList">{{ role }}</span>
+                            </div>
+                            <span class="fill-space"></span>
+                            <button mat-stroked-button
+                                *ngIf="grant.grantId ? grantToEdit !== grant.id : grantToEdit !== grant.id"
+                                [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
+                                (click)="loadGrantOptions(grant)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
+                                <i class="las la-edit"></i>
+                                {{'ACTIONS.EDIT' | translate}}
+                            </button>
+                        </div>
                     </ng-container>
 
-                    <ng-container *ngIf="context === UserGrantContext.OWNED_PROJECT">
-                        <ng-container *ngIf="loadedProjectId !== grant.projectId">
-                            <span class="role app-label"
-                                *ngFor="let role of grant.roleKeysList">{{ (role.length>6)? (role | slice:0:6)+'..':(role) }}</span>
-                            <button mat-icon-button (click)="getProjectRoleOptions(grant.projectId)"
-                                matTooltip="{{'ACTIONS.CHANGE' | translate}}">
-                                <i class="las la-edit"></i>
+                    <div class="row-form">
+                        <ng-container
+                            *ngIf="(context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantToEdit == grant.id && loadedProjectId && loadedProjectId === grant.projectId">
+                            <cnsl-form-field class="form-field" appearance="outline">
+                                <!-- <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label> -->
+                                <mat-select [(ngModel)]="grant.roleKeysList" multiple
+                                    [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
+                                    (selectionChange)="updateRoles(grant, $event)">
+                                    <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
+                                        {{role.key}}
+                                    </mat-option>
+                                </mat-select>
+                            </cnsl-form-field>
+                            <button matTooltip="{{'ACTIONS.CLOSE' | translate}}"
+                                *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
+                                mat-icon-button (click)="grantToEdit=''">
+                                <mat-icon>close</mat-icon>
                             </button>
                         </ng-container>
-                        <mat-form-field class="form-field" appearance="outline"
-                            *ngIf="loadedProjectId === grant.projectId">
-                            <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
-                            <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowWrite == false"
-                                (selectionChange)="updateRoles(grant, $event)">
-                                <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
-                                    {{role.key}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </ng-container>
 
-                    <ng-container *ngIf="context === UserGrantContext.GRANTED_PROJECT">
-                        <mat-form-field class="form-field" appearance="outline">
-                            <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
-                            <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowWrite == false"
-                                (selectionChange)="updateRoles(grant, $event)">
-                                <mat-option *ngFor="let role of grantRoleOptions" [value]="role">
-                                    {{role}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </ng-container>
+                        <ng-container
+                            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && loadedGrantId && loadedGrantId === grant.grantId && grantToEdit == grant.id">
+                            <cnsl-form-field class="form-field" appearance="outline">
+                                <!-- <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label> -->
+                                <mat-select [(ngModel)]="grant.roleKeysList" multiple
+                                    [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
+                                    (selectionChange)="updateRoles(grant, $event)">
+                                    <mat-option *ngFor="let role of grantRoleOptions" [value]="role">
+                                        {{role}}
+                                    </mat-option>
+                                </mat-select>
+                            </cnsl-form-field>
+                            <button matTooltip="{{'ACTIONS.CLOSE' | translate}}"
+                                *ngIf="context === UserGrantContext.USER || context === UserGrantContext.NONE"
+                                mat-icon-button (click)="grantToEdit=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </ng-container>
+                    </div>
                 </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;">
             </tr>
         </table>
 
-        <mat-paginator class="paginator" #paginator [length]="dataSource.totalResult" [pageSize]="50"
+        <div *ngIf="(dataSource.loading$ | async) == false && !dataSource?.totalResult" class="no-content-row">
+            <i class="las la-exclamation"></i>
+            <span>{{'GRANTS.EMPTY' | translate}}</span>
+        </div>
+        <mat-paginator class="paginator" #paginator [length]="dataSource.totalResult" [pageSize]="INITIAL_PAGE_SIZE"
             [length]="dataSource.totalResult" [pageSizeOptions]="[2, 3, 25, 50, 100, 250]" (page)="changePage($event)">
         </mat-paginator>
     </div>
 </app-refresh-table>
+
+<ng-template #templateRef let-key="key">
+    <button class="search-button" mat-icon-button (click)="setFilter(key)">
+        <mat-icon class="icon" *ngIf="this.userGrantSearchKey != key">search</mat-icon>
+        <mat-icon class="icon" *ngIf="this.userGrantSearchKey == key">search_off</mat-icon>
+    </button>
+</ng-template>

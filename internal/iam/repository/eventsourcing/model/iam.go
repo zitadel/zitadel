@@ -30,6 +30,7 @@ type IAM struct {
 	Members                         []*IAMMember              `json:"-"`
 	IDPs                            []*IDPConfig              `json:"-"`
 	DefaultLoginPolicy              *LoginPolicy              `json:"-"`
+	DefaultLabelPolicy              *LabelPolicy              `json:"-"`
 	DefaultOrgIAMPolicy             *OrgIAMPolicy             `json:"-"`
 	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy `json:"-"`
 	DefaultPasswordAgePolicy        *PasswordAgePolicy        `json:"-"`
@@ -50,6 +51,9 @@ func IAMFromModel(iam *model.IAM) *IAM {
 	}
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyFromModel(iam.DefaultLoginPolicy)
+	}
+	if iam.DefaultLabelPolicy != nil {
+		converted.DefaultLabelPolicy = LabelPolicyFromModel(iam.DefaultLabelPolicy)
 	}
 	if iam.DefaultPasswordComplexityPolicy != nil {
 		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyFromModel(iam.DefaultPasswordComplexityPolicy)
@@ -80,6 +84,9 @@ func IAMToModel(iam *IAM) *model.IAM {
 	}
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyToModel(iam.DefaultLoginPolicy)
+	}
+	if iam.DefaultLabelPolicy != nil {
+		converted.DefaultLabelPolicy = LabelPolicyToModel(iam.DefaultLabelPolicy)
 	}
 	if iam.DefaultPasswordComplexityPolicy != nil {
 		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyToModel(iam.DefaultPasswordComplexityPolicy)
@@ -161,6 +168,18 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddIDPProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		return i.appendRemoveIDPProviderFromLoginPolicyEvent(event)
+	case LoginPolicySecondFactorAdded:
+		return i.appendAddSecondFactorToLoginPolicyEvent(event)
+	case LoginPolicySecondFactorRemoved:
+		return i.appendRemoveSecondFactorFromLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorAdded:
+		return i.appendAddMultiFactorToLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorRemoved:
+		return i.appendRemoveMultiFactorFromLoginPolicyEvent(event)
+	case LabelPolicyAdded:
+		return i.appendAddLabelPolicyEvent(event)
+	case LabelPolicyChanged:
+		return i.appendChangeLabelPolicyEvent(event)
 	case PasswordComplexityPolicyAdded:
 		return i.appendAddPasswordComplexityPolicyEvent(event)
 	case PasswordComplexityPolicyChanged:

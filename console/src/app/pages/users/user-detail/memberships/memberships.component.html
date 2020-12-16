@@ -1,5 +1,5 @@
 <div class="membership-groups">
-    <span class="header">{{ 'USER.MEMBERSHIPS.TITLE' | translate }}</span>
+    <span class="me-header">{{ 'USER.MEMBERSHIPS.TITLE' | translate }}</span>
     <div class="people" *ngIf="memberships">
         <div class="img-list" [@cardAnimation]="memberships.totalResult">
             <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
@@ -23,20 +23,20 @@
                 </ng-container>
             </ng-container>
             <ng-template #compact>
-                <div class="avatar-circle" matTooltip="Click to show detail">
+                <div class="avatar-circle" matTooltip="Click to show detail" (click)="navigateToObject()" role="button">
                     <div class="membership-avatar">
                         <span style="font-size: 16px;">{{memberships.totalResult}}</span>
                     </div>
                 </div>
             </ng-template>
             <button [disabled]="disabled" class="add-img" (click)="addMember()" mat-icon-button
-                aria-label="add membership">
+                matTooltip="{{'ACTIONS.ADD' | translate}}" aria-label="add membership">
                 <mat-icon>add</mat-icon>
             </button>
             <span class="fill-space"></span>
-            <button class="refresh-img" (click)="loadManager(user.id)" [disabled]="disabled" mat-icon-button
-                aria-label="refresh contributors">
-                <mat-icon>refresh</mat-icon>
+            <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" class="refresh-img" (click)="loadManager(user.id)"
+                [disabled]="disabled" mat-icon-button aria-label="refresh contributors">
+                <mat-icon class="icon">refresh</mat-icon>
             </button>
         </div>
     </div>

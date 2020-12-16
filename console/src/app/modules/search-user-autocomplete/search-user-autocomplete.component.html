@@ -1,8 +1,8 @@
 <form>
-    <mat-form-field *ngIf="target == UserTarget.SELF" appearance="outline" class="full-width">
-        <mat-label>Organizations User Loginname</mat-label>
+    <cnsl-form-field *ngIf="target && target == UserTarget.SELF" appearance="outline" class="full-width more-space">
+        <cnsl-label>Organizations User Loginname</cnsl-label>
 
-        <input matInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
+        <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
             [formControl]="myControl" [matAutocomplete]="auto" />
 
         <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="loginname selection">
@@ -13,8 +13,8 @@
                     {{selecteduser.preferredLoginName}}</small>
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip>
-            <input placeholder="{{'ORG_DETAIL.MEMBER.LOGINNAME' | translate}}" #usernameInput [formControl]="myControl"
-                [matAutocomplete]="auto" [matChipInputFor]="chipList"
+            <input cnslInput placeholder="{{'ORG_DETAIL.MEMBER.LOGINNAME' | translate}}" #usernameInput
+                [formControl]="myControl" [matAutocomplete]="auto" [matChipInputFor]="chipList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
                 (matChipInputTokenEnd)="add($event)" />
         </mat-chip-list>
@@ -28,30 +28,47 @@
                 <small>{{user.preferredLoginName}}</small>
             </mat-option>
         </mat-autocomplete>
-    </mat-form-field>
 
-    <div *ngIf="target == UserTarget.EXTERNAL" class="line">
-        <mat-form-field class="form-field" appearance="outline">
-            <mat-label>Global User Loginname</mat-label>
-            <input matInput type="text" [formControl]="globalLoginNameControl" />
-        </mat-form-field>
+        <span class="target-desc">
+            {{'USER.TARGET.SELF'| translate}}
+            <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
+        </span>
+    </cnsl-form-field>
+
+    <div *ngIf="target && target == UserTarget.EXTERNAL" class="line">
+        <cnsl-form-field class="form-field" appearance="outline">
+            <cnsl-label>Global User Loginname</cnsl-label>
+            <input cnslInput type="text" [formControl]="globalLoginNameControl" />
+            <span class="target-desc">
+                {{(target == UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
+                <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
+            </span>
+        </cnsl-form-field>
 
         <button color="primary" mat-icon-button (click)="getGlobalUser()">
             <i class="las la-search"></i>
         </button>
     </div>
 
-    <div *ngIf="target == UserTarget.EXTERNAL && users.length > 0">
+    <div class="found" *ngIf="target == UserTarget.EXTERNAL && users.length > 0">
         <span class="found-label">{{'USER.SEARCH.FOUND' | translate}}:</span>
         <div class="found-user-row" *ngFor="let user of users; index as i">
+            <div class="circle">
+                <app-avatar
+                    *ngIf="user.human && user.human.displayName && user.human?.firstName && user.human?.lastName; else cog"
+                    class="avatar" [name]="user.human.displayName" [size]="32">
+                </app-avatar>
+                <ng-template #cog>
+                    <div class="sa-icon">
+                        <i class="las la-user-cog"></i>
+                    </div>
+                </ng-template>
+            </div>
+
             <span>{{user.preferredLoginName}}</span>
-            <button mat-icon-button>
+            <button mat-icon-button color="warn">
                 <i class="las la-minus-circle" (click)="users.splice(i, 1)"></i>
             </button>
         </div>
     </div>
-
-    <p class="target-desc">{{(target == UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
-        <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
-    </p>
 </form>

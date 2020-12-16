@@ -43,7 +43,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&UserMembership{handler: handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount}, orgEvents: repos.OrgEvents, projectEvents: repos.ProjectEvents},
 		&Token{handler: handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount}, ProjectEvents: repos.ProjectEvents},
 		&Key{handler: handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount}},
-		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
+		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}, projectEvents: repos.ProjectEvents},
 		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 		&UserGrant{
 			handler:       handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount},

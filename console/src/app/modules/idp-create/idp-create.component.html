@@ -11,59 +11,62 @@
     <h1>{{'IDP.CREATE.TITLE' | translate}}</h1>
     <p>{{'IDP.CREATE.DESCRIPTION' | translate}}</p>
 
+    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+
     <form (ngSubmit)="addIdp()">
         <ng-container [formGroup]="formGroup">
             <div class="content">
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.NAME' | translate }}</mat-label>
-                    <input matInput formControlName="name" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.ISSUER' | translate }}</mat-label>
-                    <input matInput formControlName="issuer" />
-                </mat-form-field>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="name" />
+                </cnsl-form-field>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="issuer" />
+                </cnsl-form-field>
             </div>
             <div class="content">
                 <p class="desc">Client Id / Client Secret</p>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.CLIENTID' | translate }}</mat-label>
-                    <input matInput formControlName="clientId" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.CLIENTSECRET' | translate }}</mat-label>
-                    <input matInput formControlName="clientSecret" />
-                </mat-form-field>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="clientId" />
+                </cnsl-form-field>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="clientSecret" />
+                </cnsl-form-field>
             </div>
             <div class="content">
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'IDP.SCOPESLIST' | translate }}</mat-label>
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
                     <mat-chip-list #chipScopesList aria-label="scope selection" *ngIf="scopesList">
                         <mat-chip class="chip" *ngFor="let scope of scopesList.value" selectable="false" removable
                             (removed)="removeScope(scope)">
                             {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
                         </mat-chip>
-                        <input [matChipInputFor]="chipScopesList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                            [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addScope($event)">
+                        <input cnslInput [matChipInputFor]="chipScopesList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                            (matChipInputTokenEnd)="addScope($event)">
                     </mat-chip-list>
-                </mat-form-field>
+                </cnsl-form-field>
             </div>
             <div class="content">
-              <mat-form-field class="formfield" appearance="outline">
-                <mat-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</mat-label>
-                <mat-select formControlName="idpDisplayNameMapping">
-                  <mat-option *ngFor="let field of mappingFields" [value]="field">
-                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-              <mat-form-field class="formfield" appearance="outline">
-                <mat-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</mat-label>
-                <mat-select formControlName="usernameMapping">
-                  <mat-option *ngFor="let field of mappingFields" [value]="field">
-                    {{ 'IDP.MAPPINTFIELD.'+field | translate }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+                <cnsl-form-field class="formfield" appearance="outline">
+                    <cnsl-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</cnsl-label>
+                    <mat-select formControlName="idpDisplayNameMapping">
+                        <mat-option *ngFor="let field of mappingFields" [value]="field">
+                            {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                        </mat-option>
+                    </mat-select>
+                </cnsl-form-field>
+                <cnsl-form-field class="formfield" appearance="outline">
+                    <cnsl-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</cnsl-label>
+                    <mat-select formControlName="usernameMapping">
+                        <mat-option *ngFor="let field of mappingFields" [value]="field">
+                            {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                        </mat-option>
+                    </mat-select>
+                </cnsl-form-field>
             </div>
         </ng-container>
 

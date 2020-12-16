@@ -13,6 +13,10 @@ type LoginPolicy struct {
 	AllowRegister         bool
 	AllowExternalIdp      bool
 	IDPProviders          []*IDPProvider
+	ForceMFA              bool
+	SecondFactors         []SecondFactorType
+	MultiFactors          []MultiFactorType
+	PasswordlessType      PasswordlessType
 }
 
 type IDPProvider struct {
@@ -35,6 +39,28 @@ const (
 	IDPProviderTypeOrg
 )
 
+type SecondFactorType int32
+
+const (
+	SecondFactorTypeUnspecified SecondFactorType = iota
+	SecondFactorTypeOTP
+	SecondFactorTypeU2F
+)
+
+type MultiFactorType int32
+
+const (
+	MultiFactorTypeUnspecified MultiFactorType = iota
+	MultiFactorTypeU2FWithPIN
+)
+
+type PasswordlessType int32
+
+const (
+	PasswordlessTypeNotAllowed PasswordlessType = iota
+	PasswordlessTypeAllowed
+)
+
 func (p *LoginPolicy) IsValid() bool {
 	return p.ObjectRoot.AggregateID != ""
 }
@@ -50,4 +76,22 @@ func (p *LoginPolicy) GetIdpProvider(id string) (int, *IDPProvider) {
 		}
 	}
 	return -1, nil
+}
+
+func (p *LoginPolicy) GetSecondFactor(mfaType SecondFactorType) (int, SecondFactorType) {
+	for i, m := range p.SecondFactors {
+		if m == mfaType {
+			return i, m
+		}
+	}
+	return -1, 0
+}
+
+func (p *LoginPolicy) GetMultiFactor(mfaType MultiFactorType) (int, MultiFactorType) {
+	for i, m := range p.MultiFactors {
+		if m == mfaType {
+			return i, m
+		}
+	}
+	return -1, 0
 }

@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
@@ -23,6 +24,7 @@ type Org struct {
 	Domains                  []*OrgDomain                           `json:"-"`
 	Members                  []*OrgMember                           `json:"-"`
 	OrgIAMPolicy             *iam_es_model.OrgIAMPolicy             `json:"-"`
+	LabelPolicy              *iam_es_model.LabelPolicy              `json:"-"`
 	IDPs                     []*iam_es_model.IDPConfig              `json:"-"`
 	LoginPolicy              *iam_es_model.LoginPolicy              `json:"-"`
 	PasswordComplexityPolicy *iam_es_model.PasswordComplexityPolicy `json:"-"`
@@ -47,6 +49,9 @@ func OrgFromModel(org *org_model.Org) *Org {
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyFromModel(org.LoginPolicy)
+	}
+	if org.LabelPolicy != nil {
+		converted.LabelPolicy = iam_es_model.LabelPolicyFromModel(org.LabelPolicy)
 	}
 	if org.PasswordComplexityPolicy != nil {
 		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyFromModel(org.PasswordComplexityPolicy)
@@ -74,6 +79,9 @@ func OrgToModel(org *Org) *org_model.Org {
 	}
 	if org.LoginPolicy != nil {
 		converted.LoginPolicy = iam_es_model.LoginPolicyToModel(org.LoginPolicy)
+	}
+	if org.LabelPolicy != nil {
+		converted.LabelPolicy = iam_es_model.LabelPolicyToModel(org.LabelPolicy)
 	}
 	if org.PasswordComplexityPolicy != nil {
 		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyToModel(org.PasswordComplexityPolicy)
@@ -175,6 +183,12 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendAddOIDCIDPConfigEvent(event)
 	case OIDCIDPConfigChanged:
 		err = o.appendChangeOIDCIDPConfigEvent(event)
+	case LabelPolicyAdded:
+		err = o.appendAddLabelPolicyEvent(event)
+	case LabelPolicyChanged:
+		err = o.appendChangeLabelPolicyEvent(event)
+	case LabelPolicyRemoved:
+		o.appendRemoveLabelPolicyEvent(event)
 	case LoginPolicyAdded:
 		err = o.appendAddLoginPolicyEvent(event)
 	case LoginPolicyChanged:
@@ -185,6 +199,14 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendAddIdpProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		err = o.appendRemoveIdpProviderFromLoginPolicyEvent(event)
+	case LoginPolicySecondFactorAdded:
+		err = o.appendAddSecondFactorToLoginPolicyEvent(event)
+	case LoginPolicySecondFactorRemoved:
+		err = o.appendRemoveSecondFactorFromLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorAdded:
+		err = o.appendAddMultiFactorToLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorRemoved:
+		err = o.appendRemoveMultiFactorFromLoginPolicyEvent(event)
 	case PasswordComplexityPolicyAdded:
 		err = o.appendAddPasswordComplexityPolicyEvent(event)
 	case PasswordComplexityPolicyChanged:

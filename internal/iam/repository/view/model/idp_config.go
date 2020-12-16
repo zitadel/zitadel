@@ -26,7 +26,7 @@ type IDPConfigView struct {
 	IDPConfigID     string    `json:"idpConfigId" gorm:"column:idp_config_id;primary_key"`
 	AggregateID     string    `json:"-" gorm:"column:aggregate_id"`
 	Name            string    `json:"name" gorm:"column:name"`
-	LogoSrc         []byte    `json:"logoSrc" gorm:"column:logo_src"`
+	StylingType     int32     `json:"stylingType" gorm:"column:styling_type"`
 	CreationDate    time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate      time.Time `json:"-" gorm:"column:change_date"`
 	IDPState        int32     `json:"-" gorm:"column:idp_state"`
@@ -49,7 +49,7 @@ func IDPConfigViewFromModel(idp *model.IDPConfigView) *IDPConfigView {
 		AggregateID:               idp.AggregateID,
 		IDPState:                  int32(idp.State),
 		Name:                      idp.Name,
-		LogoSrc:                   idp.LogoSrc,
+		StylingType:               int32(idp.StylingType),
 		Sequence:                  idp.Sequence,
 		CreationDate:              idp.CreationDate,
 		ChangeDate:                idp.ChangeDate,
@@ -70,7 +70,7 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 		AggregateID:               idp.AggregateID,
 		State:                     model.IDPConfigState(idp.IDPState),
 		Name:                      idp.Name,
-		LogoSrc:                   idp.LogoSrc,
+		StylingType:               model.IDPStylingType(idp.StylingType),
 		Sequence:                  idp.Sequence,
 		CreationDate:              idp.CreationDate,
 		ChangeDate:                idp.ChangeDate,

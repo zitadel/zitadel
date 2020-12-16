@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
@@ -9,6 +10,7 @@ import (
 	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
@@ -170,7 +172,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -184,7 +186,12 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 		change.ModifierName = change.ModifierID
 		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierID)
 		if user != nil {
-			change.ModifierName = user.DisplayName
+			if user.Human != nil {
+				change.ModifierName = user.DisplayName
+			}
+			if user.Machine != nil {
+				change.ModifierName = user.Machine.Name
+			}
 		}
 	}
 	return changes, nil
@@ -202,7 +209,7 @@ func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) 
 	return repo.View.IsUserUnique(userName, email)
 }
 
-func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
+func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -210,10 +217,30 @@ func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-xx0hV", "Errors.User.NotHuman")
 	}
-	if user.OTPState == usr_model.MfaStateUnspecified {
-		return []*usr_model.MultiFactor{}, nil
+	mfas := make([]*usr_model.MultiFactor, 0)
+	if user.OTPState != usr_model.MFAStateUnspecified {
+		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeOTP, State: user.OTPState})
 	}
-	return []*usr_model.MultiFactor{{Type: usr_model.MfaTypeOTP, State: user.OTPState}}, nil
+	for _, u2f := range user.U2FTokens {
+		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name, ID: u2f.TokenID})
+	}
+	return mfas, nil
+}
+
+func (repo *UserRepo) RemoveOTP(ctx context.Context, userID string) error {
+	return repo.UserEvents.RemoveOTP(ctx, userID)
+}
+
+func (repo *UserRepo) RemoveU2F(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemoveU2FToken(ctx, userID, webAuthNTokenID)
+}
+
+func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
+	return repo.UserEvents.GetPasswordless(ctx, userID)
+}
+
+func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemovePasswordlessToken(ctx, userID, webAuthNTokenID)
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
@@ -230,6 +257,10 @@ func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_mode
 
 func (repo *UserRepo) RequestSetPassword(ctx context.Context, id string, notifyType usr_model.NotificationType) error {
 	return repo.UserEvents.RequestSetPassword(ctx, id, notifyType)
+}
+
+func (repo *UserRepo) ResendInitialMail(ctx context.Context, userID, email string) error {
+	return repo.UserEvents.ResendInitialMail(ctx, userID, email)
 }
 
 func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
@@ -259,7 +290,7 @@ func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model
 	}
 	if seqErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -296,7 +327,7 @@ func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *usr_model.
 	}
 	if seqErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -404,7 +435,7 @@ func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_mo
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -444,7 +475,7 @@ func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_mo
 			}
 			if sequence != nil {
 				result.Sequence = sequence.CurrentSequence
-				result.Timestamp = sequence.CurrentTimestamp
+				result.Timestamp = sequence.LastSuccessfulSpoolerRun
 			}
 			return result
 		}

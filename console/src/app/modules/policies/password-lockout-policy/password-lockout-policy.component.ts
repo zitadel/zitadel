@@ -45,11 +45,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
             return this.route.params;
         })).subscribe(() => {
-            this.getData().then(data => {
-                if (data) {
-                    this.lockoutData = data.toObject() as PasswordLockoutPolicyView.AsObject;
-                }
-            });
+            this.fetchData();
         });
     }
 
@@ -57,8 +53,15 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
         this.sub.unsubscribe();
     }
 
-    private getData(): Promise<PasswordLockoutPolicyView | DefaultPasswordLockoutPolicyView> {
+    private fetchData(): void {
+        this.getData().then(data => {
+            if (data) {
+                this.lockoutData = data.toObject() as PasswordLockoutPolicyView.AsObject;
+            }
+        });
+    }
 
+    private getData(): Promise<PasswordLockoutPolicyView | DefaultPasswordLockoutPolicyView> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
                 return (this.service as ManagementService).GetPasswordLockoutPolicy();
@@ -70,10 +73,8 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
     public removePolicy(): void {
         if (this.service instanceof ManagementService) {
             this.service.RemovePasswordLockoutPolicy().then(() => {
-                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
-                setTimeout(() => {
-                    this.getData();
-                }, 1000);
+                this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+                this.fetchData();
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -99,7 +100,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                 this.lockoutData.maxAttempts,
                 this.lockoutData.showLockoutFailure,
             ).then(() => {
-                this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                this.toast.showInfo('POLICY.TOAST.SET', true);
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -109,7 +110,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                     this.lockoutData.maxAttempts,
                     this.lockoutData.showLockoutFailure,
                 ).then(() => {
-                    this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    this.toast.showInfo('POLICY.TOAST.SET', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
@@ -118,7 +119,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                     this.lockoutData.maxAttempts,
                     this.lockoutData.showLockoutFailure,
                 ).then(() => {
-                    this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    this.toast.showInfo('POLICY.TOAST.SET', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });

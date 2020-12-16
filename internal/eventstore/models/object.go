@@ -16,6 +16,9 @@ func (o *ObjectRoot) AppendEvent(event *Event) {
 	if o.AggregateID == "" {
 		o.AggregateID = event.AggregateID
 	}
+	if o.ResourceOwner == "" {
+		o.ResourceOwner = event.ResourceOwner
+	}
 
 	o.ChangeDate = event.CreationDate
 	if event.PreviousSequence == 0 {
@@ -23,7 +26,6 @@ func (o *ObjectRoot) AppendEvent(event *Event) {
 	}
 
 	o.Sequence = event.Sequence
-	o.ResourceOwner = event.ResourceOwner
 }
 func (o *ObjectRoot) IsZero() bool {
 	return o.AggregateID == ""

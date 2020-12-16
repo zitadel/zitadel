@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/caos/logging"
 
@@ -37,6 +38,8 @@ type OIDCConfig struct {
 	AccessTokenType          OIDCTokenType
 	AccessTokenRoleAssertion bool
 	IDTokenRoleAssertion     bool
+	IDTokenUserinfoAssertion bool
+	ClockSkew                time.Duration
 }
 
 type OIDCVersion int32

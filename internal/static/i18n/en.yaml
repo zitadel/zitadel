@@ -4,6 +4,8 @@ Errors:
   OriginNotAllowed: This "Origin" is not allowed
   User:
     NotFound: User could not be found
+    NotFoundOnOrg: User could not be found on chosen organisation
+    NotAllowedOrg: User is no member of the required organisation
     UserIDMissing: User ID missing
     OrgIamPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
@@ -12,6 +14,8 @@ Errors:
     AlreadyInactive: User already inactive
     NotInactive: User is not inactive
     ShouldBeActiveOrInitial: User is not active or inital
+    AlreadyInitialised: User is already initialised
+    NotInitialised: User is not yet initialised
     NotLocked: User is not locked
     NoChanges: No changes found
     InitCodeNotFound: Initialization Code not found
@@ -51,12 +55,25 @@ Errors:
       IDPConfigNotExisting: IDP provider invalid for this organisation
       NotAllowed: External IDP not allowed on this organisation
       MinimumExternalIDPNeeded: At least one IDP must be added
-    Mfa:
-      Otp:
+    MFA:
+      OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
         NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
         InvalidCode: Invalid code
+      U2F:
+        NotExisting: U2F does not exist
+      Passwordless:
+        NotExisting: Passwordless does not exist
+    WebAuthN:
+      NotFound: WebAuthN Token could not be found
+      BeginRegisterFailed: WebAuthN begin registration failed
+      MarshalError: Error on marshal data
+      ErrorOnParseCredential: Error on parse credential data
+      CreateCredentialFailed: Error on create credentials
+      BeginLoginFailed: WebAuthN begin login failed
+      ValidateLoginFailed: Error on validate login credentials
+      CloneWarning: Credentials may be cloned
   Org:
     Invalid: Organisation is invalid
     AlreadyDeactivated: Organisation is already deactivated
@@ -83,16 +100,34 @@ Errors:
     IdpNotExisting: IDP configuration does not exist
     OIDCConfigInvalid: OIDC IDP configuration is invalid
     IdpIsNotOIDC: IDP configuration is not of type oidc
+    IDP:
+      InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:
+      NotFound: Login Policy not found
       Invalid: Login Policy is invalid
       NotExisting: Login Policy not existig
       AlreadyExists: Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
       IdpProviderNotExisting: Idp Provider not existing
+      MFA:
+        AlreadyExists: Multifactor already exists
+        NotExisting: Multifactor not existing
+        Unspecified: Multifactor invalid
     PasswordComplexity:
-      Empty: Passwort Complexity Policy is empty
-      NotExisting: Passwort Complexity Policy doesn't exist
-      AlreadyExists: Passwort Complexity Policy already exists
+      NotFound: Password  Complexity Policy not found
+      Empty: Password Complexity Policy is empty
+      NotExisting: Password Complexity Policy doesn't exist
+      AlreadyExists: Password Complexity Policy already exists
+    PasswordLockout:
+      NotFound: Password Lockout Policy not found
+      Empty: Passwort Lockout Policy is empty
+      NotExisting: Passwort Lockout Policy doesn't exist
+      AlreadyExists: Passwort Lockout Policy already exists
+    PasswordAge:
+      NotFound: Password Age Policy not found
+      Empty: Password Age Policy is empty
+      NotExisting: Password Age Policy doesn't exist
+      AlreadyExists: Password Age Policy already exists
     OrgIAM:
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy doesn't exist
@@ -130,7 +165,7 @@ Errors:
     GrantNotExists: Project grant doesn't exist
     GrantHasNotExistingRole: One role doesn't exist on project
     UserIDMisisng: User ID missing
-  Iam:
+  IAM:
     MemberInvalid: Member is invalid
     MemberAlreadyExisting: Member already exists
     MemberNotExisting: Member does not exist
@@ -145,31 +180,34 @@ Errors:
     LoginPolicyNotExisting: Login Policy doesn't exist
     IdpProviderInvalid: Idp Provider is invalid
     LoginPolicy:
+      NotFound: Default Login Policy not found
       NotExisting: Default Login Policy not existig
       AlreadyExists: Default Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
       IdpProviderNotExisting: Idp Provider not existing
+      MFA:
+        AlreadyExists: Multifactor already exists
+        NotExisting: Multifactor not existing
+        Unspecified: Multifactor invalid
+    LabelPolicy:
+      NotFound: Default Private Label Policy not found
     PasswordComplexityPolicy:
+      NotFound: Default Private Label Policy not found
       NotExisting: Default Password Complexity Policy not existing
       AlreadyExists: Default Password Complexity Policy already existing
       Empty: Default Password Complexity Policy empty
     PasswordAgePolicy:
+      NotFound: Default Password Age Policy not found
       NotExisting: Default Password Age Policy not existing
       AlreadyExists: Default Password Age Policy already existing
       Empty: Default Password Age Policy empty
     PasswordLockoutPolicy:
+      NotFound: Default Password Lockout Policy not found
       NotExisting: Default Password Lockout Policy not existing
       AlreadyExists: Default Password Lockout Policy already existing
       Empty: Default Password Lockout Policy empty
-    PasswordLockout:
-      Empty: Passwort Lockout Policy is empty
-      NotExisting: Passwort Lockout Policy not existing
-      AlreadyExists: Passwort Lockout Policy already exists
-    PasswordAge:
-      Empty: Passwort Age Policy is empty
-      NotExisting: Passwort Age Policy not existing
-      AlreadyExists: Passwort Age Policy already exists
-    OrgIAM:
+    OrgIAMPolicy:
+      NotFound: Org IAM Policy not found
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy not existing
       AlreadyExists: Org IAM Policy already exists
@@ -190,6 +228,10 @@ Errors:
     NotFound: UserSession not found
   Key:
     ExpireBeforeNow: The expiration date is in the past
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Multifactor is configured as required, but no possible providers are configured. Please contact your system administrator.
 EventTypes:
   user:
     added: User added
@@ -201,6 +243,8 @@ EventTypes:
       check:
         succeeded: Initialisation check succeded
         failed: Initialisation check failed
+    token:
+      added: Access Token ausgestellt
     username:
       reserved: Username reserved
       released: Username released
@@ -249,6 +293,9 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+      externallogin:
+        check:
+          succeeded: External login succeeded
       externalidp:
         added: Externer IDP added
         removed: Externer IDP removed
@@ -262,6 +309,7 @@ EventTypes:
         code:
           added: Phone number code generated
           sent: Phone number code sent
+        removed: Phone number removed
       profile:
         changed: User profile changed
       address:
@@ -274,8 +322,32 @@ EventTypes:
           check:
             succeeded: Multifactor OTP check succeeded
             failed: Multifactor OTP check failed
+        u2f:
+          token:
+            added: Multifactor U2F Token added
+            verified: Multifactor U2F Token verified
+            removed: Multifactor U2F Token removed
+            begin:
+              login: Multifactor U2F check started
+            check:
+              succeeded: Multifactor U2F check succeeded
+              failed: Multifactor U2F check failed
+            signcount:
+              changed: Checksum of the Multifactor U2F Token has been changed
         init:
           skipped: Multifactor initialisation skipped
+      passwordless:
+        token:
+          added: Token for Passwordless Login added
+          verified: Token for Passwordless Login verified
+          removed: Token for Passwordless Login removed
+          begin:
+            login: Passwordless Login check started
+          check:
+            succeeded: Passwordless Login check succeeded
+            failed: Passwordless Login check failed
+          signcount:
+            changed: Checksum of the Passwordless Login Token has been changed
       signed:
         out: User signed out
     locked: User locked
@@ -374,9 +446,29 @@ EventTypes:
       login:
         added: Login Policy added
         changed: Login Policy changed
+        removed: Login Policy removed
         idpprovider:
           added: Idp Provider added to Login Policy
           removed: Idp Provider removed from Login Policy
+        secondfactor:
+          added: Second factor added to Login Policy
+          removed: Second factor removed from Login Policy
+        multifactor:
+          added: Multi factor added to Login Policy
+          removed: Multi factor removed from Login Policy
+      password:
+        complexity:
+          added: Password complexity policy added
+          changed: Password complexity policy changed
+          removed: Password complexity policy removed
+        age:
+          added: Password age policy added
+          changed: Password age policy changed
+          removed: Password age policy removed
+        lockout:
+          added: Password lockout policy added
+          changed: Password lockout policy changed
+          removed: Password lockout policy removed
   project:
     added: Project added
     changed: Project changed

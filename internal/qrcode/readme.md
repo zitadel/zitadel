@@ -12,3 +12,4 @@ s.Rect(currX, currY, qs.blockSize, qs.blockSize, "fill:black;stroke:none")
 ```
 
 This allows the svg to be styled by css more easily and does not compromise Content Security Policy (CSP).
+

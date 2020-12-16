@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -20,22 +22,29 @@ const (
 	applicationTable = "management.applications"
 )
 
-func (p *Application) ViewModel() string {
+func (a *Application) ViewModel() string {
 	return applicationTable
 }
 
-func (p *Application) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestApplicationSequence()
+func (a *Application) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := a.view.GetLatestApplicationSequence()
 	if err != nil {
 		return nil, err
 	}
 	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
 }
 
-func (p *Application) Reduce(event *models.Event) (err error) {
+func (a *Application) Reduce(event *models.Event) (err error) {
 	app := new(view_model.ApplicationView)
 	switch event.Type {
 	case es_model.ApplicationAdded:
+		project, err := a.projectEvents.ProjectByID(context.Background(), event.AggregateID)
+		if err != nil {
+			return err
+		}
+		app.ProjectRoleCheck = project.ProjectRoleCheck
+		app.ProjectRoleAssertion = project.ProjectRoleAssertion
+
 		err = app.AppendEvent(event)
 	case es_model.ApplicationChanged,
 		es_model.OIDCConfigAdded,
@@ -46,7 +55,7 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		app, err = p.view.ApplicationByID(event.AggregateID, app.ID)
+		app, err = a.view.ApplicationByID(event.AggregateID, app.ID)
 		if err != nil {
 			return err
 		}
@@ -56,33 +65,37 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteApplication(app.ID, event.Sequence)
+		return a.view.DeleteApplication(app.ID, event.Sequence, event.CreationDate)
 	case es_model.ProjectChanged:
-		apps, err := p.view.ApplicationsByProjectID(event.AggregateID)
+		apps, err := a.view.ApplicationsByProjectID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		if len(apps) == 0 {
-			return p.view.ProcessedApplicationSequence(event.Sequence)
+			return a.view.ProcessedApplicationSequence(event.Sequence, event.CreationDate)
 		}
 		for _, app := range apps {
 			if err := app.AppendEvent(event); err != nil {
 				return err
 			}
 		}
-		return p.view.PutApplications(apps, event.Sequence)
+		return a.view.PutApplications(apps, event.Sequence, event.CreationDate)
 	case es_model.ProjectRemoved:
-		return p.view.DeleteApplicationsByProjectID(event.AggregateID)
+		return a.view.DeleteApplicationsByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedApplicationSequence(event.Sequence)
+		return a.view.ProcessedApplicationSequence(event.Sequence, event.CreationDate)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutApplication(app)
+	return a.view.PutApplication(app, event.CreationDate)
 }
 
-func (p *Application) OnError(event *models.Event, spoolerError error) error {
+func (a *Application) OnError(event *models.Event, spoolerError error) error {
 	logging.LogWithFields("SPOOL-ls9ew", "id", event.AggregateID).WithError(spoolerError).Warn("something went wrong in project app handler")
-	return spooler.HandleError(event, spoolerError, p.view.GetLatestApplicationFailedEvent, p.view.ProcessedApplicationFailedEvent, p.view.ProcessedApplicationSequence, p.errorCountUntilSkip)
+	return spooler.HandleError(event, spoolerError, a.view.GetLatestApplicationFailedEvent, a.view.ProcessedApplicationFailedEvent, a.view.ProcessedApplicationSequence, a.errorCountUntilSkip)
+}
+
+func (a *Application) OnSuccess() error {
+	return spooler.HandleSuccess(a.view.UpdateApplicationSpoolerRunTimestamp)
 }

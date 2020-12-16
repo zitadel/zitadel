@@ -1,5 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
@@ -12,6 +13,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 @Component({
     selector: 'app-idp-table',
@@ -37,7 +39,7 @@ export class IdpTableComponent implements OnInit {
     @Output() public changedSelection: EventEmitter<Array<AdminIdpView.AsObject | MgmtIdpView.AsObject>>
         = new EventEmitter();
 
-    constructor(public translate: TranslateService, private toast: ToastService) {
+    constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);
         });
@@ -47,6 +49,10 @@ export class IdpTableComponent implements OnInit {
         this.getData(10, 0);
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
             this.displayedColumns = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state', 'type'];
+        }
+
+        if (!this.disabled) {
+            this.displayedColumns.push('actions');
         }
     }
 
@@ -68,48 +74,79 @@ export class IdpTableComponent implements OnInit {
     }
 
     public deactivateSelectedIdps(): void {
+        this.selection.clear();
         Promise.all(this.selection.selected.map(value => {
             return this.service.DeactivateIdpConfig(value.id);
         })).then(() => {
-            this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
-            this.getData(10, 0);
+            this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
+            this.refreshPage();
         });
     }
 
     public reactivateSelectedIdps(): void {
+        this.selection.clear();
         Promise.all(this.selection.selected.map(value => {
             return this.service.ReactivateIdpConfig(value.id);
         })).then(() => {
-            this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
-            this.getData(10, 0);
+            this.toast.showInfo('IDP.TOAST.SELECTEDREACTIVATED', true);
+            this.refreshPage();
         });
     }
 
     public removeSelectedIdps(): void {
-        Promise.all(this.selection.selected.map(value => {
-            return this.service.RemoveIdpConfig(value.id);
-        })).then(() => {
-            this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
-            this.getData(10, 0);
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'IDP.DELETE_SELECTION_TITLE',
+                descriptionKey: 'IDP.DELETE_SELECTION_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.selection.clear();
+
+                Promise.all(this.selection.selected.map(value => {
+                    return this.service.RemoveIdpConfig(value.id);
+                })).then(() => {
+                    this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
+                    this.refreshPage();
+                });
+            }
+        });
+    }
+
+    public removeIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'IDP.DELETE_TITLE',
+                descriptionKey: 'IDP.DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.service.RemoveIdpConfig(idp.id).then(() => {
+                    this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                    setTimeout(() => {
+                        this.refreshPage();
+                    }, 1000);
+                });
+            }
         });
     }
 
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
 
-        // let query: AdminIdpSearchQuery | MgmtIdpSearchQuery;
-        // if (this.service instanceof AdminService) {
-        //     query = new AdminIdpSearchQuery();
-        //     query.setKey(AdminIdpSearchKey.IDPSEARCHKEY_IDP_CONFIG_ID);
-        // } else if (this.service instanceof ManagementService) {
-        //     query = new MgmtIdpSearchQuery();
-        //     query.setKey(MgmtIdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
-        // }
-
         this.service.SearchIdps(limit, offset).then(resp => {
             this.idpResult = resp.toObject();
             this.dataSource.data = this.idpResult.resultList;
-            console.log(this.idpResult.resultList);
             this.loadingSubject.next(false);
         }).catch(error => {
             this.toast.showError(error);
@@ -133,7 +170,13 @@ export class IdpTableComponent implements OnInit {
         if (row.id) {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
-                    return ['/org', 'idp', row.id];
+                    switch ((row as MgmtIdpView.AsObject).providerType) {
+                        case IdpProviderType.IDPPROVIDERTYPE_SYSTEM:
+                            return ['/iam', 'idp', row.id];
+                        case IdpProviderType.IDPPROVIDERTYPE_ORG:
+                            return ['/org', 'idp', row.id];
+                    }
+                    break;
                 case PolicyComponentServiceType.ADMIN:
                     return ['/iam', 'idp', row.id];
             }

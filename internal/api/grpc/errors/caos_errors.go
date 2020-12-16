@@ -2,6 +2,7 @@ package errors
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/pkg/grpc/message"
@@ -30,6 +31,9 @@ func CaosToGRPCError(ctx context.Context, err error) error {
 }
 
 func ExtractCaosError(err error) (c codes.Code, msg, id string, ok bool) {
+	if err == nil {
+		return codes.OK, "", "", false
+	}
 	switch caosErr := err.(type) {
 	case *caos_errs.AlreadyExistsError:
 		return codes.AlreadyExists, caosErr.GetMessage(), caosErr.GetID(), true
