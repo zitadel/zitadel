@@ -15,6 +15,16 @@ func writeModelToObjectRoot(writeModel eventstore.WriteModel) models.ObjectRoot 
 	}
 }
 
+func writeModelToIAM(wm *IAMWriteModel) *model.IAM {
+	return &model.IAM{
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		SetUpStarted: wm.SetUpStarted,
+		SetUpDone:    wm.SetUpDone,
+		GlobalOrgID:  wm.GlobalOrgID,
+		IAMProjectID: wm.ProjectID,
+	}
+}
+
 func writeModelToMember(writeModel *IAMMemberWriteModel) *model.IAMMember {
 	return &model.IAMMember{
 		ObjectRoot: writeModelToObjectRoot(writeModel.MemberWriteModel.WriteModel),

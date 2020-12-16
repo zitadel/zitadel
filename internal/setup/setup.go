@@ -21,6 +21,7 @@ import (
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/v2/business/command"
 )
 
 type Setup struct {
@@ -29,6 +30,8 @@ type Setup struct {
 	OrgEvents     *org_event.OrgEventstore
 	UserEvents    *usr_event.UserEventstore
 	ProjectEvents *proj_event.ProjectEventstore
+
+	Commands *command.CommandSide
 }
 
 const (
