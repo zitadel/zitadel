@@ -7,7 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/key/repository/view"
 	"github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
