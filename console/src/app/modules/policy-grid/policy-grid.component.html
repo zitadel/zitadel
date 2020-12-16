@@ -4,7 +4,7 @@
 
 <div class="row-lyt">
     <ng-template appHasRole
-        [appHasRole]="PolicyGridType.IAM ? ['iam.policy.read'] : PolicyGridType.ORG ?  ['policy.read'] : []">
+        [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
             <div class="avatar">
                 <mat-icon class="icon" svgIcon="mdi_textbox_password"></mat-icon>
@@ -21,7 +21,8 @@
 
             <span class="fill-space"></span>
             <div class="btn-wrapper">
-                <button [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY ]"
+                <button
+                    [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '', 'policy', PolicyComponentType.COMPLEXITY ]"
                     mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
             </div>
         </div>
@@ -45,7 +46,8 @@
             <span class="fill-space"></span>
             <div class="btn-wrapper">
                 <ng-template appHasRole [appHasRole]="['iam.policy.write']">
-                    <button [routerLink]="[ 'policy', PolicyComponentType.IAM ]"
+                    <button
+                        [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.IAM ]"
                         mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
             </div>
@@ -53,7 +55,7 @@
     </ng-template>
 
     <ng-template appHasRole
-        [appHasRole]="PolicyGridType.IAM ? ['iam.policy.read'] : PolicyGridType.ORG ?  ['policy.read'] : []">
+        [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
             <div class="avatar">
                 <i class="icon las la-sign-in-alt"></i>
@@ -73,7 +75,8 @@
             <span class="fill-space"></span>
             <div class="btn-wrapper">
                 <ng-template appHasRole [appHasRole]="['policy.write']">
-                    <button [routerLink]="[ 'policy', PolicyComponentType.LOGIN ]"
+                    <button
+                        [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.LOGIN ]"
                         mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
             </div>
@@ -99,7 +102,8 @@
                 <span class="fill-space"></span>
                 <div class="btn-wrapper">
                     <ng-template appHasRole [appHasRole]="['iam.policy.write']">
-                        <button [routerLink]="[ 'policy', PolicyComponentType.LABEL ]"
+                        <button
+                            [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.LABEL ]"
                             mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
                     </ng-template>
                 </div>

@@ -382,6 +382,7 @@ func mfaFromModel(mfa *usr_model.MultiFactor) *auth.MultiFactor {
 		State:     mfaStateFromModel(mfa.State),
 		Type:      mfaTypeFromModel(mfa.Type),
 		Attribute: mfa.Attribute,
+		Id:        mfa.ID,
 	}
 }
 
@@ -431,7 +432,23 @@ func userChangesToAPI(changes *usr_model.UserChanges) (_ []*auth.Change) {
 func verifyWebAuthNFromModel(u2f *usr_model.WebAuthNToken) *auth.WebAuthNResponse {
 	return &auth.WebAuthNResponse{
 		Id:        u2f.WebAuthNTokenID,
-		PublicKey: u2f.PublicKey,
+		PublicKey: u2f.CredentialCreationData,
 		State:     mfaStateFromModel(u2f.State),
+	}
+}
+
+func webAuthNTokensFromModel(tokens []*usr_model.WebAuthNToken) *auth.WebAuthNTokens {
+	result := make([]*auth.WebAuthNToken, len(tokens))
+	for i, token := range tokens {
+		result[i] = webAuthNTokenFromModel(token)
+	}
+	return &auth.WebAuthNTokens{Tokens: result}
+}
+
+func webAuthNTokenFromModel(token *usr_model.WebAuthNToken) *auth.WebAuthNToken {
+	return &auth.WebAuthNToken{
+		Id:    token.WebAuthNTokenID,
+		Name:  token.WebAuthNTokenName,
+		State: mfaStateFromModel(token.State),
 	}
 }

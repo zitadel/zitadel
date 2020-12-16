@@ -70,6 +70,7 @@ func (h *headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	headers.Set(http_utils.XContentTypeOptions, "nosniff")
 	headers.Set(http_utils.ReferrerPolicy, "same-origin")
 	headers.Set(http_utils.FeaturePolicy, "payment 'none'")
+	headers.Set(http_utils.PermissionsPolicy, "payment=()")
 	//PLANNED: add expect-ct
 
 	h.handler.ServeHTTP(w, r)

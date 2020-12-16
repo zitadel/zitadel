@@ -136,16 +136,6 @@ func (u *UserView) MFATypesSetupPossible(level req_model.MFALevel, policy *iam_m
 			}
 		}
 		//PLANNED: add sms
-		fallthrough
-	case req_model.MFALevelMultiFactor:
-		if policy.HasMultiFactors() {
-			for _, mfaType := range policy.MultiFactors {
-				switch mfaType {
-				case iam_model.MultiFactorTypeU2FWithPIN:
-					types = append(types, req_model.MFATypeU2FUserVerification)
-				}
-			}
-		}
 	}
 	return types
 }

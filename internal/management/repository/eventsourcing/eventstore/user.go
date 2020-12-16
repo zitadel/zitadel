@@ -217,14 +217,30 @@ func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-xx0hV", "Errors.User.NotHuman")
 	}
-	if user.OTPState == usr_model.MFAStateUnspecified {
-		return []*usr_model.MultiFactor{}, nil
+	mfas := make([]*usr_model.MultiFactor, 0)
+	if user.OTPState != usr_model.MFAStateUnspecified {
+		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeOTP, State: user.OTPState})
 	}
-	return []*usr_model.MultiFactor{{Type: usr_model.MFATypeOTP, State: user.OTPState}}, nil
+	for _, u2f := range user.U2FTokens {
+		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name, ID: u2f.TokenID})
+	}
+	return mfas, nil
 }
 
 func (repo *UserRepo) RemoveOTP(ctx context.Context, userID string) error {
 	return repo.UserEvents.RemoveOTP(ctx, userID)
+}
+
+func (repo *UserRepo) RemoveU2F(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemoveU2FToken(ctx, userID, webAuthNTokenID)
+}
+
+func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
+	return repo.UserEvents.GetPasswordless(ctx, userID)
+}
+
+func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemovePasswordlessToken(ctx, userID, webAuthNTokenID)
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {

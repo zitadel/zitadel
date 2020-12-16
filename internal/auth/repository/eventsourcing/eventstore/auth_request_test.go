@@ -56,8 +56,9 @@ type mockViewUserSession struct {
 }
 
 type mockUser struct {
-	UserID    string
-	LoginName string
+	UserID        string
+	LoginName     string
+	ResourceOwner string
 }
 
 func (m *mockViewUserSession) UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error) {
@@ -74,8 +75,9 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string) ([]*user_view_model.
 	sessions := make([]*user_view_model.UserSessionView, len(m.Users))
 	for i, user := range m.Users {
 		sessions[i] = &user_view_model.UserSessionView{
-			UserID:    user.UserID,
-			LoginName: user.LoginName,
+			UserID:        user.UserID,
+			LoginName:     user.LoginName,
+			ResourceOwner: user.ResourceOwner,
 		}
 	}
 	return sessions, nil
@@ -270,10 +272,12 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						{
 							"id1",
 							"loginname1",
+							"orgID1",
 						},
 						{
 							"id2",
 							"loginname2",
+							"orgID2",
 						},
 					},
 				},
@@ -285,12 +289,52 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				&model.SelectUserStep{
 					Users: []model.UserSelection{
 						{
-							UserID:    "id1",
-							LoginName: "loginname1",
+							UserID:            "id1",
+							LoginName:         "loginname1",
+							SelectionPossible: true,
 						},
 						{
-							UserID:    "id2",
-							LoginName: "loginname2",
+							UserID:            "id2",
+							LoginName:         "loginname2",
+							SelectionPossible: true,
+						},
+					},
+				}},
+			nil,
+		},
+		{
+			"user not set, primary domain set, prompt select account, login and select account steps",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					Users: []mockUser{
+						{
+							"id1",
+							"loginname1",
+							"orgID1",
+						},
+						{
+							"id2",
+							"loginname2",
+							"orgID2",
+						},
+					},
+				},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&model.AuthRequest{Prompt: model.PromptSelectAccount, RequestedOrgID: "orgID1"}, false},
+			[]model.NextStep{
+				&model.LoginStep{},
+				&model.SelectUserStep{
+					Users: []model.UserSelection{
+						{
+							UserID:            "id1",
+							LoginName:         "loginname1",
+							SelectionPossible: true,
+						},
+						{
+							UserID:            "id2",
+							LoginName:         "loginname2",
+							SelectionPossible: false,
 						},
 					},
 				}},
@@ -1208,7 +1252,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventErrUser{},
 				user:          &user_model.UserView{ID: "id"},
 			},
-			&user_model.UserSessionView{},
+			&user_model.UserSessionView{UserID: "id"},
 			nil,
 		},
 		{

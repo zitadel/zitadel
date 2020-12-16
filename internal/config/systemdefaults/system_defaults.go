@@ -92,7 +92,8 @@ type TemplateData struct {
 }
 
 type WebAuthN struct {
-	ID          string
-	Origin      string
-	DisplayName string
+	ID            string
+	OriginLogin   string
+	OriginConsole string
+	DisplayName   string
 }

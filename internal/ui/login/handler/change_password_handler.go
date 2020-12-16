@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
@@ -24,7 +25,8 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.OldPassword, data.NewPassword)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.OldPassword, data.NewPassword, userAgentID)
 	if err != nil {
 		l.renderChangePassword(w, r, authReq, err)
 		return

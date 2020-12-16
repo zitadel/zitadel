@@ -26,6 +26,7 @@ type MultiFactor struct {
 	Type      MFAType
 	State     MFAState
 	Attribute string
+	ID        string
 }
 
 type MFAType int32
