@@ -172,8 +172,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.toast.showError(error);
                 this.errorMessage = error.message;
             });
-
-
+        });
         this.docs = (await this.mgmtService.GetZitadelDocs()).toObject();
     }
 
