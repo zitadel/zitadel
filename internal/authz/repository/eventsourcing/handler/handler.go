@@ -31,14 +31,14 @@ type EventstoreRepos struct {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
-		&UserGrant{
-			handler:    handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount},
-			eventstore: eventstore,
-			iamID:      systemDefaults.IamID,
-			iamEvents:  repos.IamEvents,
-		},
-		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
-		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
+		// &UserGrant{
+		// 	handler:    handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount},
+		// 	eventstore: eventstore,
+		// 	iamID:      systemDefaults.IamID,
+		// 	iamEvents:  repos.IamEvents,
+		// },
+		// &Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
+		// &Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 	}
 }
 
