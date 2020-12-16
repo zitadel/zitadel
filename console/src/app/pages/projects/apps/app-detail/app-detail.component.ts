@@ -140,7 +140,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.mgmtService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
-        this.authService.isAllowed(['project.app.write$', 'project.app.write:' + id]).pipe(take(1)).subscribe((allowed) => {
+        this.authService.isAllowed(['project.app.write$', 'project.app.write:' + projectid]).pipe(take(1)).subscribe((allowed) => {
             this.canWrite = allowed;
             this.mgmtService.GetApplicationById(projectid, id).then(app => {
                 this.app = app.toObject();
@@ -172,7 +172,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.toast.showError(error);
                 this.errorMessage = error.message;
             });
-        });
 
 
         this.docs = (await this.mgmtService.GetZitadelDocs()).toObject();
