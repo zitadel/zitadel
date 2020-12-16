@@ -1,8 +1,11 @@
-package password_complexity
+package query
 
-import "github.com/caos/zitadel/internal/eventstore/v2"
+import (
+	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
+)
 
-type ReadModel struct {
+type PasswordComplexityPolicyReadModel struct {
 	eventstore.ReadModel
 
 	MinLength    uint64
@@ -12,16 +15,16 @@ type ReadModel struct {
 	HasSymbol    bool
 }
 
-func (rm *ReadModel) Reduce() error {
+func (rm *PasswordComplexityPolicyReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *AddedEvent:
+		case *policy.PasswordComplexityPolicyAddedEvent:
 			rm.MinLength = e.MinLength
 			rm.HasLowercase = e.HasLowercase
 			rm.HasUpperCase = e.HasUpperCase
 			rm.HasNumber = e.HasNumber
 			rm.HasSymbol = e.HasSymbol
-		case *ChangedEvent:
+		case *policy.PasswordComplexityPolicyChangedEvent:
 			rm.MinLength = e.MinLength
 			rm.HasLowercase = e.HasLowercase
 			rm.HasUpperCase = e.HasUpperCase

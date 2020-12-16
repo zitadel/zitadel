@@ -13,7 +13,7 @@ var (
 )
 
 type PasswordAgePolicyAddedEvent struct {
-	policy.PassowordAgePolicyAddedEvent
+	policy.PasswordAgePolicyAddedEvent
 }
 
 func NewPasswordAgePolicyAddedEvent(
@@ -22,7 +22,7 @@ func NewPasswordAgePolicyAddedEvent(
 	maxAgeDays uint64,
 ) *PasswordAgePolicyAddedEvent {
 	return &PasswordAgePolicyAddedEvent{
-		PassowordAgePolicyAddedEvent: *policy.NewPasswordAgePolicyAddedEvent(
+		PasswordAgePolicyAddedEvent: *policy.NewPasswordAgePolicyAddedEvent(
 			eventstore.NewBaseEventForPush(ctx, PasswordAgePolicyAddedEventType),
 			expireWarnDays,
 			maxAgeDays),
@@ -35,7 +35,7 @@ func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.Even
 		return nil, err
 	}
 
-	return &PasswordAgePolicyAddedEvent{PassowordAgePolicyAddedEvent: *e.(*policy.PassowordAgePolicyAddedEvent)}, nil
+	return &PasswordAgePolicyAddedEvent{PasswordAgePolicyAddedEvent: *e.(*policy.PasswordAgePolicyAddedEvent)}, nil
 }
 
 type PasswordAgePolicyChangedEvent struct {

@@ -19,17 +19,17 @@ func (rm *PasswordAgePolicyReadModel) AppendEvents(events ...eventstore.EventRea
 	for _, event := range events {
 		switch e := event.(type) {
 		case *PasswordAgePolicyAddedEvent:
-			rm.PasswordAgePolicyReadModel.AppendEvents(&e.PassowordAgePolicyAddedEvent)
+			rm.PasswordAgePolicyReadModel.AppendEvents(&e.PasswordAgePolicyAddedEvent)
 		case *PasswordAgePolicyChangedEvent:
 			rm.PasswordAgePolicyReadModel.AppendEvents(&e.PasswordAgePolicyChangedEvent)
-		case *policy.PassowordAgePolicyAddedEvent, *policy.PasswordAgePolicyChangedEvent:
+		case *policy.PasswordAgePolicyAddedEvent, *policy.PasswordAgePolicyChangedEvent:
 			rm.PasswordAgePolicyReadModel.AppendEvents(e)
 		}
 	}
 }
 
 type PasswordAgePolicyAddedEvent struct {
-	policy.PassowordAgePolicyAddedEvent
+	policy.PasswordAgePolicyAddedEvent
 }
 
 type PasswordAgePolicyChangedEvent struct {

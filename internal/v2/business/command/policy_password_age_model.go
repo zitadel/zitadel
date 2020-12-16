@@ -16,7 +16,7 @@ type PasswordAgePolicyWriteModel struct {
 func (wm *PasswordAgePolicyWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *policy.PassowordAgePolicyAddedEvent:
+		case *policy.PasswordAgePolicyAddedEvent:
 			wm.ExpireWarnDays = e.ExpireWarnDays
 			wm.MaxAgeDays = e.MaxAgeDays
 			wm.IsActive = true

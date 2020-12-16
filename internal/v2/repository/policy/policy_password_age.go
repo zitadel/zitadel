@@ -13,14 +13,14 @@ const (
 	PasswordAgePolicyRemovedEventType = "policy.password.age.removed"
 )
 
-type PassowordAgePolicyAddedEvent struct {
+type PasswordAgePolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ExpireWarnDays uint64 `json:"expireWarnDays"`
 	MaxAgeDays     uint64 `json:"maxAgeDays"`
 }
 
-func (e *PassowordAgePolicyAddedEvent) Data() interface{} {
+func (e *PasswordAgePolicyAddedEvent) Data() interface{} {
 	return e
 }
 
@@ -28,9 +28,9 @@ func NewPasswordAgePolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	expireWarnDays,
 	maxAgeDays uint64,
-) *PassowordAgePolicyAddedEvent {
+) *PasswordAgePolicyAddedEvent {
 
-	return &PassowordAgePolicyAddedEvent{
+	return &PasswordAgePolicyAddedEvent{
 		BaseEvent:      *base,
 		ExpireWarnDays: expireWarnDays,
 		MaxAgeDays:     maxAgeDays,
@@ -38,7 +38,7 @@ func NewPasswordAgePolicyAddedEvent(
 }
 
 func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &PassowordAgePolicyAddedEvent{
+	e := &PasswordAgePolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

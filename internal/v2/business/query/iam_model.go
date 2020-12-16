@@ -3,11 +3,9 @@ package query
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	iam_password_complexity "github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	iam_password_lockout "github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
-	"github.com/caos/zitadel/internal/v2/repository/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/policy/password_lockout"
 )
 
@@ -26,7 +24,7 @@ type ReadModel struct {
 	DefaultLoginPolicy              IAMLoginPolicyReadModel
 	DefaultLabelPolicy              IAMLabelPolicyReadModel
 	DefaultOrgIAMPolicy             IAMOrgIAMPolicyReadModel
-	DefaultPasswordComplexityPolicy iam_password_complexity.ReadModel
+	DefaultPasswordComplexityPolicy IAMPasswordComplexityPolicyReadModel
 	DefaultPasswordAgePolicy        IAMPasswordAgePolicyReadModel
 	DefaultPasswordLockoutPolicy    iam_password_lockout.ReadModel
 }
@@ -75,11 +73,11 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 			rm.DefaultLoginPolicy.AppendEvents(event)
 		case *policy.OrgIAMPolicyAddedEvent:
 			rm.DefaultOrgIAMPolicy.AppendEvents(event)
-		case *password_complexity.AddedEvent,
-			*password_complexity.ChangedEvent:
+		case *policy.PasswordComplexityPolicyAddedEvent,
+			*policy.PasswordComplexityPolicyChangedEvent:
 
 			rm.DefaultPasswordComplexityPolicy.AppendEvents(event)
-		case *policy.PassowordAgePolicyAddedEvent,
+		case *policy.PasswordAgePolicyAddedEvent,
 			*policy.PasswordAgePolicyChangedEvent:
 
 			rm.DefaultPasswordAgePolicy.AppendEvents(event)

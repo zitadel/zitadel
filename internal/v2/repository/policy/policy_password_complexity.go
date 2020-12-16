@@ -1,4 +1,4 @@
-package password_complexity
+package policy
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ const (
 	PasswordComplexityPolicyRemovedEventType = "policy.password.complexity.removed"
 )
 
-type AddedEvent struct {
+type PasswordComplexityPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	MinLength    uint64 `json:"minLength,omitempty"`
@@ -23,19 +23,19 @@ type AddedEvent struct {
 	HasSymbol    bool   `json:"hasSymbol"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *PasswordComplexityPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewAddedEvent(
+func NewPasswordComplexityPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	minLength uint64,
 	hasLowerCase,
 	hasUpperCase,
 	hasNumber,
 	hasSymbol bool,
-) *AddedEvent {
-	return &AddedEvent{
+) *PasswordComplexityPolicyAddedEvent {
+	return &PasswordComplexityPolicyAddedEvent{
 		BaseEvent:    *base,
 		MinLength:    minLength,
 		HasLowercase: hasLowerCase,
@@ -45,8 +45,8 @@ func NewAddedEvent(
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &AddedEvent{
+func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PasswordComplexityPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -58,7 +58,7 @@ func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return e, nil
 }
 
-type ChangedEvent struct {
+type PasswordComplexityPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	MinLength    uint64 `json:"minLength"`
@@ -68,45 +68,12 @@ type ChangedEvent struct {
 	HasSymbol    bool   `json:"hasSymbol"`
 }
 
-func (e *ChangedEvent) Data() interface{} {
+func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewChangedEvent(
-	base *eventstore.BaseEvent,
-	current *WriteModel,
-	minLength uint64,
-	hasLowerCase,
-	hasUpperCase,
-	hasNumber,
-	hasSymbol bool,
-) *ChangedEvent {
-
-	e := &ChangedEvent{
-		BaseEvent: *base,
-	}
-
-	if current.MinLength != minLength {
-		e.MinLength = minLength
-	}
-	if current.HasLowercase != hasLowerCase {
-		e.HasLowercase = hasLowerCase
-	}
-	if current.HasUpperCase != hasUpperCase {
-		e.HasUpperCase = hasUpperCase
-	}
-	if current.HasNumber != hasNumber {
-		e.HasNumber = hasNumber
-	}
-	if current.HasSymbol != hasSymbol {
-		e.HasSymbol = hasSymbol
-	}
-
-	return e
-}
-
-func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &ChangedEvent{
+func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PasswordComplexityPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -118,22 +85,22 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 	return e, nil
 }
 
-type RemovedEvent struct {
+type PasswordComplexityPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *PasswordComplexityPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewRemovedEvent(base *eventstore.BaseEvent) *RemovedEvent {
-	return &RemovedEvent{
+func NewPasswordComplexityPolicyRemovedEvent(base *eventstore.BaseEvent) *PasswordComplexityPolicyRemovedEvent {
+	return &PasswordComplexityPolicyRemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &RemovedEvent{
+func PasswordComplexityPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &PasswordComplexityPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

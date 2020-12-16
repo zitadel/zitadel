@@ -23,7 +23,7 @@ func (wm *IAMPasswordAgePolicyWriteModel) AppendEvents(events ...eventstore.Even
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.PasswordAgePolicyAddedEvent:
-			wm.PasswordAgePolicyWriteModel.AppendEvents(&e.PassowordAgePolicyAddedEvent)
+			wm.PasswordAgePolicyWriteModel.AppendEvents(&e.PasswordAgePolicyAddedEvent)
 		case *iam.PasswordAgePolicyChangedEvent:
 			wm.PasswordAgePolicyWriteModel.AppendEvents(&e.PasswordAgePolicyChangedEvent)
 		}

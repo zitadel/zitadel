@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/business/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
@@ -48,20 +47,6 @@ func (a *Aggregate) PushStepStarted(ctx context.Context, step Step) *Aggregate {
 
 func (a *Aggregate) PushStepDone(ctx context.Context, step Step) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewSetupStepDoneEvent(ctx, step))
-	return a
-}
-
-func (a *Aggregate) PushPasswordComplexityPolicyAddedEvent(ctx context.Context, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) *Aggregate {
-	a.Aggregate = *a.PushEvents(password_complexity.NewAddedEvent(ctx, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol))
-	return a
-}
-
-func (a *Aggregate) PushPasswordComplexityPolicyChangedFromExisting(ctx context.Context, current *password_complexity.WriteModel, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) *Aggregate {
-	e, err := password_complexity.ChangedEventFromExisting(ctx, current, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol)
-	if err != nil {
-		return a
-	}
-	a.Aggregate = *a.PushEvents(e)
 	return a
 }
 
