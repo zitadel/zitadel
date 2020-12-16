@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -26,7 +27,7 @@ type IAMMember struct {
 	subscription *eventstore.Subscription
 }
 
-func NewIAMMember(handler handler, userEvents *usr_event.UserEventstore) *IAMMember {
+func newIAMMember(handler handler, userEvents *usr_event.UserEventstore) *IAMMember {
 	iamMember := &IAMMember{
 		handler:    handler,
 		userEvents: userEvents,
@@ -41,42 +42,17 @@ func (m *IAMMember) subscribe() {
 	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
 	go func() {
 		for event := range m.subscription.Events {
-			m.subscriptionHandler(event)
+			query.ReduceEvent(m, event)
 		}
 	}()
 }
 
-func (m *IAMMember) subscriptionHandler(event *models.Event) {
+func (m *IAMMember) CurrentSequence() (uint64, error) {
 	sequence, err := m.view.GetLatestIAMMemberSequence()
 	if err != nil {
-		logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
-		return
+		return 0, err
 	}
-	if event.PreviousSequence > sequence.CurrentSequence {
-		searchQuery := models.NewSearchQuery().
-			AggregateTypeFilter(m.AggregateTypes()...).
-			SequenceBetween(sequence.CurrentSequence, event.PreviousSequence)
-
-		events, err := m.es.FilterEvents(context.Background(), searchQuery)
-		if err != nil {
-			logging.LogWithFields("HANDL-L6YH1", "seq", event.Sequence).Warn("filter failed")
-			return
-		}
-		for _, previousEvent := range events {
-			//if other process already updated view
-			if event.PreviousSequence > previousEvent.Sequence {
-				continue
-			}
-			err = m.Reduce(previousEvent)
-			logging.LogWithFields("HANDL-V42TI", "seq", previousEvent.Sequence).OnError(err).Warn("reduce failed")
-			return
-		}
-	} else if event.PreviousSequence < sequence.CurrentSequence {
-		logging.LogWithFields("HANDL-w9Bdy", "previousSeq", event.PreviousSequence, "currentSeq", sequence.CurrentSequence).Debug("already processed")
-		return
-	}
-	err = m.Reduce(event)
-	logging.LogWithFields("HANDL-wQDL2", "seq", event.Sequence).OnError(err).Warn("reduce failed")
+	return sequence.CurrentSequence, nil
 }
 
 func (m *IAMMember) ViewModel() string {
@@ -98,7 +74,6 @@ func (m *IAMMember) EventQuery() (*models.SearchQuery, error) {
 }
 
 func (m *IAMMember) Reduce(event *models.Event) (err error) {
-
 	switch event.AggregateType {
 	case model.IAMAggregate:
 		err = m.processIamMember(event)

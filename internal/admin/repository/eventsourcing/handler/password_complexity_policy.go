@@ -7,18 +7,39 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type PasswordComplexityPolicy struct {
-	handler
-}
-
 const (
 	passwordComplexityPolicyTable = "adminapi.password_complexity_policies"
 )
+
+type PasswordComplexityPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newPasswordComplexityPolicy(handler handler) *PasswordComplexityPolicy {
+	h := &PasswordComplexityPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (p *PasswordComplexityPolicy) subscribe() {
+	p.subscription = p.es.Subscribe(p.AggregateTypes()...)
+	go func() {
+		for event := range p.subscription.Events {
+			query.ReduceEvent(p, event)
+		}
+	}()
+}
 
 func (p *PasswordComplexityPolicy) ViewModel() string {
 	return passwordComplexityPolicyTable
@@ -28,7 +49,12 @@ func (p *PasswordComplexityPolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *PasswordComplexityPolicy) SetSubscription(s eventstore.Subscription) {
+func (p *PasswordComplexityPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (p *PasswordComplexityPolicy) EventQuery() (*models.SearchQuery, error) {

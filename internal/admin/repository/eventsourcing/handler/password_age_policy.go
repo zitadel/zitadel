@@ -7,18 +7,39 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type PasswordAgePolicy struct {
-	handler
-}
-
 const (
 	passwordAgePolicyTable = "adminapi.password_age_policies"
 )
+
+type PasswordAgePolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newPasswordAgePolicy(handler handler) *PasswordAgePolicy {
+	h := &PasswordAgePolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (p *PasswordAgePolicy) subscribe() {
+	p.subscription = p.es.Subscribe(p.AggregateTypes()...)
+	go func() {
+		for event := range p.subscription.Events {
+			query.ReduceEvent(p, event)
+		}
+	}()
+}
 
 func (p *PasswordAgePolicy) ViewModel() string {
 	return passwordAgePolicyTable
@@ -28,7 +49,12 @@ func (p *PasswordAgePolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *PasswordAgePolicy) SetSubscription(s eventstore.Subscription) {
+func (p *PasswordAgePolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestPasswordAgePolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (p *PasswordAgePolicy) EventQuery() (*models.SearchQuery, error) {

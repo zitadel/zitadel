@@ -7,18 +7,39 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type PasswordLockoutPolicy struct {
-	handler
-}
-
 const (
 	passwordLockoutPolicyTable = "adminapi.password_lockout_policies"
 )
+
+type PasswordLockoutPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newPasswordLockoutPolicy(handler handler) *PasswordLockoutPolicy {
+	h := &PasswordLockoutPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (p *PasswordLockoutPolicy) subscribe() {
+	p.subscription = p.es.Subscribe(p.AggregateTypes()...)
+	go func() {
+		for event := range p.subscription.Events {
+			query.ReduceEvent(p, event)
+		}
+	}()
+}
 
 func (p *PasswordLockoutPolicy) ViewModel() string {
 	return passwordLockoutPolicyTable
@@ -28,7 +49,12 @@ func (p *PasswordLockoutPolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *PasswordLockoutPolicy) SetSubscription(s eventstore.Subscription) {
+func (p *PasswordLockoutPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (p *PasswordLockoutPolicy) EventQuery() (*models.SearchQuery, error) {

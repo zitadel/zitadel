@@ -12,10 +12,15 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+)
+
+const (
+	idpProviderTable = "adminapi.idp_providers"
 )
 
 type IDPProvider struct {
@@ -23,11 +28,35 @@ type IDPProvider struct {
 	systemDefaults systemdefaults.SystemDefaults
 	iamEvents      *eventsourcing.IAMEventstore
 	orgEvents      *org_events.OrgEventstore
+	subscription   *eventstore.Subscription
 }
 
-const (
-	idpProviderTable = "adminapi.idp_providers"
-)
+func newIDPProvider(
+	handler handler,
+	systemDefaults systemdefaults.SystemDefaults,
+	iamEvents *eventsourcing.IAMEventstore,
+	orgEvents *org_events.OrgEventstore,
+) *IDPProvider {
+	h := &IDPProvider{
+		handler:        handler,
+		systemDefaults: systemDefaults,
+		iamEvents:      iamEvents,
+		orgEvents:      orgEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (i *IDPProvider) subscribe() {
+	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
+	go func() {
+		for event := range i.subscription.Events {
+			query.ReduceEvent(i, event)
+		}
+	}()
+}
 
 func (i *IDPProvider) ViewModel() string {
 	return idpProviderTable
@@ -37,7 +66,12 @@ func (i *IDPProvider) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
 }
 
-func (i *IDPProvider) SetSubscription(s eventstore.Subscription) {
+func (i *IDPProvider) CurrentSequence() (uint64, error) {
+	sequence, err := i.view.GetLatestIDPProviderSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (i *IDPProvider) EventQuery() (*models.SearchQuery, error) {

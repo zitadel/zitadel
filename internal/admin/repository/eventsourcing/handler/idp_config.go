@@ -7,18 +7,39 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 )
 
-type IDPConfig struct {
-	handler
-}
-
 const (
 	idpConfigTable = "adminapi.idp_configs"
 )
+
+type IDPConfig struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newIDPConfig(handler handler) *IDPConfig {
+	h := &IDPConfig{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (i *IDPConfig) subscribe() {
+	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
+	go func() {
+		for event := range i.subscription.Events {
+			query.ReduceEvent(i, event)
+		}
+	}()
+}
 
 func (i *IDPConfig) ViewModel() string {
 	return idpConfigTable
@@ -28,7 +49,12 @@ func (i *IDPConfig) AggregateTypes() []models.AggregateType {
 	return []es_models.AggregateType{model.IAMAggregate}
 }
 
-func (i *IDPConfig) SetSubscription(s eventstore.Subscription) {
+func (i *IDPConfig) CurrentSequence() (uint64, error) {
+	sequence, err := i.view.GetLatestIDPConfigSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {

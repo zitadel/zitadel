@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -19,17 +20,45 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
+const (
+	userTable = "adminapi.users"
+)
+
 type User struct {
 	handler
 	eventstore     eventstore.Eventstore
 	orgEvents      *org_events.OrgEventstore
 	iamEvents      *iam_es.IAMEventstore
 	systemDefaults systemdefaults.SystemDefaults
+	subscription   *eventstore.Subscription
 }
 
-const (
-	userTable = "adminapi.users"
-)
+func newUser(
+	handler handler,
+	orgEvents *org_events.OrgEventstore,
+	iamEvents *iam_es.IAMEventstore,
+	systemDefaults systemdefaults.SystemDefaults,
+) *User {
+	h := &User{
+		handler:        handler,
+		orgEvents:      orgEvents,
+		iamEvents:      iamEvents,
+		systemDefaults: systemDefaults,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (u *User) subscribe() {
+	u.subscription = u.es.Subscribe(u.AggregateTypes()...)
+	go func() {
+		for event := range u.subscription.Events {
+			query.ReduceEvent(u, event)
+		}
+	}()
+}
 
 func (u *User) ViewModel() string {
 	return userTable
@@ -39,7 +68,12 @@ func (u *User) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
 }
 
-func (u *User) SetSubscription(s eventstore.Subscription) {
+func (u *User) CurrentSequence() (uint64, error) {
+	sequence, err := u.view.GetLatestUserSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (u *User) EventQuery() (*models.SearchQuery, error) {

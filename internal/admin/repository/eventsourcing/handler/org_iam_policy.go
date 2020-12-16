@@ -7,18 +7,39 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type OrgIAMPolicy struct {
-	handler
-}
-
 const (
 	orgIAMPolicyTable = "adminapi.org_iam_policies"
 )
+
+type OrgIAMPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newOrgIAMPolicy(handler handler) *OrgIAMPolicy {
+	h := &OrgIAMPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (p *OrgIAMPolicy) subscribe() {
+	p.subscription = p.es.Subscribe(p.AggregateTypes()...)
+	go func() {
+		for event := range p.subscription.Events {
+			query.ReduceEvent(p, event)
+		}
+	}()
+}
 
 func (p *OrgIAMPolicy) ViewModel() string {
 	return orgIAMPolicyTable
@@ -38,7 +59,12 @@ func (p *OrgIAMPolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (p *OrgIAMPolicy) SetSubscription(s eventstore.Subscription) {
+func (p *OrgIAMPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (p *OrgIAMPolicy) Reduce(event *models.Event) (err error) {

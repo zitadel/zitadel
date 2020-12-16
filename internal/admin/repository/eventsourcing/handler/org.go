@@ -6,19 +6,40 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 )
 
-type Org struct {
-	handler
-}
-
 const (
 	orgTable = "adminapi.orgs"
 )
+
+type Org struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newOrg(handler handler) *Org {
+	h := &Org{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (o *Org) subscribe() {
+	o.subscription = o.es.Subscribe(o.AggregateTypes()...)
+	go func() {
+		for event := range o.subscription.Events {
+			query.ReduceEvent(o, event)
+		}
+	}()
+}
 
 func (o *Org) ViewModel() string {
 	return orgTable
@@ -36,7 +57,12 @@ func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 	return eventsourcing.OrgQuery(sequence.CurrentSequence), nil
 }
 
-func (o *Org) SetSubscription(s eventstore.Subscription) {
+func (o *Org) CurrentSequence() (uint64, error) {
+	sequence, err := o.view.GetLatestOrgSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (o *Org) Reduce(event *es_models.Event) error {

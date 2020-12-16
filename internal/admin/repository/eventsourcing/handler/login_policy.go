@@ -6,18 +6,39 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 )
 
-type LoginPolicy struct {
-	handler
-}
-
 const (
 	loginPolicyTable = "adminapi.login_policies"
 )
+
+type LoginPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newLoginPolicy(handler handler) *LoginPolicy {
+	h := &LoginPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (p *LoginPolicy) subscribe() {
+	p.subscription = p.es.Subscribe(p.AggregateTypes()...)
+	go func() {
+		for event := range p.subscription.Events {
+			query.ReduceEvent(p, event)
+		}
+	}()
+}
 
 func (p *LoginPolicy) ViewModel() string {
 	return loginPolicyTable
@@ -37,7 +58,12 @@ func (p *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (p *LoginPolicy) SetSubscription(s eventstore.Subscription) {
+func (p *LoginPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestLoginPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (p *LoginPolicy) Reduce(event *models.Event) (err error) {

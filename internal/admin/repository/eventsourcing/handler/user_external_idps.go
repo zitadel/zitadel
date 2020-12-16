@@ -16,9 +16,14 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+)
+
+const (
+	externalIDPTable = "adminapi.user_external_idps"
 )
 
 type ExternalIDP struct {
@@ -26,11 +31,35 @@ type ExternalIDP struct {
 	systemDefaults systemdefaults.SystemDefaults
 	iamEvents      *eventsourcing.IAMEventstore
 	orgEvents      *org_es.OrgEventstore
+	subscription   *eventstore.Subscription
 }
 
-const (
-	externalIDPTable = "adminapi.user_external_idps"
-)
+func newExternalIDP(
+	handler handler,
+	systemDefaults systemdefaults.SystemDefaults,
+	iamEvents *eventsourcing.IAMEventstore,
+	orgEvents *org_es.OrgEventstore,
+) *ExternalIDP {
+	h := &ExternalIDP{
+		handler:        handler,
+		systemDefaults: systemDefaults,
+		iamEvents:      iamEvents,
+		orgEvents:      orgEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (i *ExternalIDP) subscribe() {
+	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
+	go func() {
+		for event := range i.subscription.Events {
+			query.ReduceEvent(i, event)
+		}
+	}()
+}
 
 func (i *ExternalIDP) ViewModel() string {
 	return externalIDPTable
@@ -40,7 +69,12 @@ func (i *ExternalIDP) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
 }
 
-func (i *ExternalIDP) SetSubscription(s eventstore.Subscription) {
+func (i *ExternalIDP) CurrentSequence() (uint64, error) {
+	sequence, err := i.view.GetLatestExternalIDPSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (i *ExternalIDP) EventQuery() (*models.SearchQuery, error) {
