@@ -32,26 +32,29 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
 			monitor.Error(err)
-			return err
+			return nil
 		}
 
 		if err := gitClient.Clone(); err != nil {
 			monitor.Error(err)
-			return err
+			return nil
 		}
 
 		value, err := ioutil.ReadFile(kubeconfig)
 		if err != nil {
 			monitor.Error(err)
-			return err
+			return nil
 		}
 		kubeconfigStr := string(value)
 
-		return deployOperator(
+		if err := deployOperator(
 			monitor,
 			gitClient,
 			&kubeconfigStr,
-		)
+		); err != nil {
+			monitor.Error(err)
+		}
+		return nil
 	}
 	return cmd
 }

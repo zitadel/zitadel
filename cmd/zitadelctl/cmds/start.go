@@ -28,11 +28,15 @@ func StartOperator(rv RootValues) *cobra.Command {
 
 		k8sClient, err := kubernetes.NewK8sClientWithPath(monitor, kubeconfig)
 		if err != nil {
-			return err
+			monitor.Error(err)
+			return nil
 		}
 
 		if k8sClient.Available() {
-			return start.Operator(monitor, orbConfig.Path, k8sClient, migrationsPath, &version)
+			if err := start.Operator(monitor, orbConfig.Path, k8sClient, migrationsPath, &version); err != nil {
+				monitor.Error(err)
+				return nil
+			}
 		}
 		return nil
 	}

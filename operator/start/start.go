@@ -34,7 +34,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", migrationsPath, version, []string{"iam"}), k8sClient)
+		takeoff := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", migrationsPath, version, []string{"operator", "iam"}), k8sClient)
 
 		go func() {
 			started := time.Now()

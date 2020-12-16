@@ -17,7 +17,7 @@ func ReadSecretCommand(rv RootValues) *cobra.Command {
 		Example: `zitadelctl readsecret zitadel.emailappkey > ~/emailappkey`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			_, monitor, orbConfig, gitClient, _, errFunc := rv()
+			_, monitor, orbConfig, gitClient, version, errFunc := rv()
 			if errFunc != nil {
 				return errFunc(cmd)
 			}
@@ -39,13 +39,15 @@ func ReadSecretCommand(rv RootValues) *cobra.Command {
 				monitor,
 				gitClient,
 				path,
-				secrets.GetAllSecretsFunc(orbConfig))
+				secrets.GetAllSecretsFunc(orbConfig, &version))
 			if err != nil {
-				panic(err)
+				monitor.Error(err)
+				return nil
 			}
 
 			if _, err := os.Stdout.Write([]byte(value)); err != nil {
-				panic(err)
+				monitor.Error(err)
+				return nil
 			}
 			return nil
 		},

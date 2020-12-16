@@ -35,17 +35,19 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 		}
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-			return err
+			monitor.Error(err)
+			return nil
 		}
 
 		if err := gitClient.Clone(); err != nil {
-			return err
+			monitor.Error(err)
+			return nil
 		}
 
 		value, err := ioutil.ReadFile(kubeconfig)
 		if err != nil {
 			monitor.Error(err)
-			return err
+			return nil
 		}
 		kubeconfigStr := string(value)
 
@@ -53,7 +55,8 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 		if k8sClient.Available() {
 			list, err := databases.ListBackups(monitor, gitClient)
 			if err != nil {
-				return err
+				monitor.Error(err)
+				return nil
 			}
 
 			if backup == "" {
@@ -64,7 +67,8 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 
 				_, result, err := prompt.Run()
 				if err != nil {
-					return err
+					monitor.Error(err)
+					return nil
 				}
 				backup = result
 			}
@@ -76,10 +80,14 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 			}
 
 			if !existing {
-				return errors.New("chosen backup is not existing")
+				monitor.Error(errors.New("chosen backup is not existing"))
+				return nil
 			}
 
-			return start.Restore(monitor, gitClient, k8sClient, backup, migrationsPath, &version)
+			if err := start.Restore(monitor, gitClient, k8sClient, backup, migrationsPath, &version); err != nil {
+				monitor.Error(err)
+			}
+			return nil
 		}
 		return nil
 	}

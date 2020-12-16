@@ -72,15 +72,16 @@ func AdaptFunc(
 		}
 		secret.AppendSecrets("", allSecrets, zitadelSecrets)
 
-		queriers := []operator.QueryFunc{
-			queryIAM,
-		}
-		if desiredKind.Spec.SelfReconciling {
-			queriers = append(queriers, operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredTree, false)))
-		}
-
-		destroyers := []operator.DestroyFunc{
-			destroyIAM,
+		destroyers := make([]operator.DestroyFunc, 0)
+		queriers := make([]operator.QueryFunc, 0)
+		for _, feature := range features {
+			switch feature {
+			case "iam":
+				queriers = append(queriers, queryIAM)
+				destroyers = append(destroyers, destroyIAM)
+			case "operator":
+				queriers = append(queriers, operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredTree, false)))
+			}
 		}
 
 		currentTree.Parsed = &DesiredV0{
