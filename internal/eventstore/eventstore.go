@@ -47,6 +47,7 @@ func (es *eventstore) PushAggregates(ctx context.Context, aggregates ...*models.
 		return err
 	}
 
+	go es.notify(aggregates)
 	return nil
 }
 

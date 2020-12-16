@@ -4,7 +4,7 @@ import "github.com/caos/zitadel/internal/eventstore/models"
 
 type Subscription struct {
 	es         *eventstore
-	events     chan *models.Event
+	Events     chan *models.Event
 	aggregates []models.AggregateType
 }
 
@@ -12,7 +12,7 @@ func (es *eventstore) Subscribe(aggregates ...models.AggregateType) *Subscriptio
 	events := make(chan *models.Event, 100)
 	sub := &Subscription{
 		es:         es,
-		events:     events,
+		Events:     events,
 		aggregates: aggregates,
 	}
 
@@ -38,7 +38,7 @@ func (es *eventstore) notify(aggregates []*models.Aggregate) {
 		}
 		for _, subsctiption := range subscriptions {
 			for _, event := range aggregate.Events {
-				subsctiption.events <- event
+				subsctiption.Events <- event
 			}
 		}
 	}

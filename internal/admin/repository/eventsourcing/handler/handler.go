@@ -25,6 +25,7 @@ type handler struct {
 	bulkLimit           uint64
 	cycleDuration       time.Duration
 	errorCountUntilSkip uint64
+	es                  eventstore.Eventstore
 }
 
 type EventstoreRepos struct {
@@ -33,23 +34,23 @@ type EventstoreRepos struct {
 	OrgEvents  *org_event.OrgEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
 	return []query.Handler{
-		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
-		&IamMember{handler: handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount},
+		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}},
+		&IAMMember{handler: handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount, es},
 			userEvents: repos.UserEvents},
-		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
-		&LabelPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount}},
-		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
-		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount},
+		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}},
+		&LabelPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}},
+		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}},
+		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
 			systemDefaults: defaults, iamEvents: repos.IamEvents, orgEvents: repos.OrgEvents},
-		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount},
-			eventstore: eventstore, orgEvents: repos.OrgEvents, iamEvents: repos.IamEvents, systemDefaults: defaults},
-		&PasswordComplexityPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount}},
-		&PasswordAgePolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordAgePolicy"), errorCount}},
-		&PasswordLockoutPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordLockoutPolicy"), errorCount}},
-		&OrgIAMPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount}},
-		&ExternalIDP{handler: handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount},
+		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
+			eventstore: es, orgEvents: repos.OrgEvents, iamEvents: repos.IamEvents, systemDefaults: defaults},
+		&PasswordComplexityPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}},
+		&PasswordAgePolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordAgePolicy"), errorCount, es}},
+		&PasswordLockoutPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordLockoutPolicy"), errorCount, es}},
+		&OrgIAMPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}},
+		&ExternalIDP{handler: handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			orgEvents: repos.OrgEvents, iamEvents: repos.IamEvents, systemDefaults: defaults},
 	}
 }

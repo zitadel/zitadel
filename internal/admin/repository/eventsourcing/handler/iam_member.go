@@ -16,27 +16,45 @@ import (
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-type IamMember struct {
-	handler
-	userEvents *usr_event.UserEventstore
-}
-
 const (
 	iamMemberTable = "adminapi.iam_members"
 )
 
-func (m *IamMember) ViewModel() string {
+type IAMMember struct {
+	handler
+	userEvents   *usr_event.UserEventstore
+	subscription *eventstore.Subscription
+}
+
+func NewIAMMember(handler handler, userEvents *usr_event.UserEventstore) *IAMMember {
+	iamMember := &IAMMember{
+		handler:    handler,
+		userEvents: userEvents,
+	}
+
+	iamMember.subscribe()
+
+	return iamMember
+}
+
+func (m *IAMMember) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+
+		}
+	}()
+}
+
+func (m *IAMMember) ViewModel() string {
 	return iamMemberTable
 }
 
-func (m *IamMember) AggregateTypes() []models.AggregateType {
+func (m *IAMMember) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.IAMAggregate, usr_es_model.UserAggregate}
 }
 
-func (m *IamMember) SetSubscription(s eventstore.Subscription) {
-}
-
-func (m *IamMember) EventQuery() (*models.SearchQuery, error) {
+func (m *IAMMember) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestIAMMemberSequence()
 	if err != nil {
 		return nil, err
@@ -46,16 +64,7 @@ func (m *IamMember) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *IamMember) HandleSubscription(events <-chan *models.Event) {
-	for event := range events {
-		_ = event
-		//TODO: check current sequence with event.previoussEquence
-		//if false => load events between currentsequenece and event.previoussequence
-		//handle event
-	}
-}
-
-func (m *IamMember) Reduce(event *models.Event) (err error) {
+func (m *IAMMember) Reduce(event *models.Event) (err error) {
 
 	switch event.AggregateType {
 	case model.IAMAggregate:
@@ -66,7 +75,7 @@ func (m *IamMember) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (m *IamMember) processIamMember(event *models.Event) (err error) {
+func (m *IAMMember) processIamMember(event *models.Event) (err error) {
 	member := new(iam_model.IAMMemberView)
 	switch event.Type {
 	case model.IAMMemberAdded:
@@ -100,7 +109,7 @@ func (m *IamMember) processIamMember(event *models.Event) (err error) {
 	return m.view.PutIAMMember(member, member.Sequence, event.CreationDate)
 }
 
-func (m *IamMember) processUser(event *models.Event) (err error) {
+func (m *IAMMember) processUser(event *models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
 		usr_es_model.UserEmailChanged,
@@ -130,7 +139,7 @@ func (m *IamMember) processUser(event *models.Event) (err error) {
 	return nil
 }
 
-func (m *IamMember) fillData(member *iam_model.IAMMemberView) (err error) {
+func (m *IAMMember) fillData(member *iam_model.IAMMemberView) (err error) {
 	user, err := m.userEvents.UserByID(context.Background(), member.UserID)
 	if err != nil {
 		return err
@@ -139,7 +148,7 @@ func (m *IamMember) fillData(member *iam_model.IAMMemberView) (err error) {
 	return nil
 }
 
-func (m *IamMember) fillUserData(member *iam_model.IAMMemberView, user *usr_model.User) {
+func (m *IAMMember) fillUserData(member *iam_model.IAMMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	if user.Human != nil {
 		member.FirstName = user.FirstName
@@ -151,11 +160,11 @@ func (m *IamMember) fillUserData(member *iam_model.IAMMemberView, user *usr_mode
 		member.DisplayName = user.Machine.Name
 	}
 }
-func (m *IamMember) OnError(event *models.Event, err error) error {
+func (m *IAMMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Ld9ow", "id", event.AggregateID).WithError(err).Warn("something went wrong in iammember handler")
 	return spooler.HandleError(event, err, m.view.GetLatestIAMMemberFailedEvent, m.view.ProcessedIAMMemberFailedEvent, m.view.ProcessedIAMMemberSequence, m.errorCountUntilSkip)
 }
 
-func (m *IamMember) OnSuccess() error {
+func (m *IAMMember) OnSuccess() error {
 	return spooler.HandleSuccess(m.view.UpdateIAMMemberSpoolerRunTimestamp)
 }

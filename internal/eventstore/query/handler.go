@@ -3,7 +3,6 @@ package query
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
@@ -17,5 +16,4 @@ type Handler interface {
 	QueryLimit() uint64
 
 	AggregateTypes() []models.AggregateType
-	SetSubscription(eventstore.Subscription)
 }
