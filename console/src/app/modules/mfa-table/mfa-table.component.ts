@@ -4,12 +4,16 @@ import { MatPaginator } from '@angular/material/paginator';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {
-    MultiFactor as AdminMultiFactor, MultiFactorType as AdminMultiFactorType,
-    SecondFactor as AdminSecondFactor, SecondFactorType as AdminSecondFactorType,
+    MultiFactor as AdminMultiFactor,
+    MultiFactorType as AdminMultiFactorType,
+    SecondFactor as AdminSecondFactor,
+    SecondFactorType as AdminSecondFactorType,
 } from 'src/app/proto/generated/admin_pb';
 import {
-    MultiFactor as MgmtMultiFactor, MultiFactorType as MgmtMultiFactorType,
-    SecondFactor as MgmtSecondFactor, SecondFactorType as MgmtSecondFactorType,
+    MultiFactor as MgmtMultiFactor,
+    MultiFactorType as MgmtMultiFactorType,
+    SecondFactor as MgmtSecondFactor,
+    SecondFactorType as MgmtSecondFactorType,
 } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -111,11 +115,19 @@ export class MfaTableComponent implements OnInit {
                     [];
         } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             selection = this.serviceType === PolicyComponentServiceType.MGMT ?
-                [MgmtSecondFactorType.SECONDFACTORTYPE_U2F, MgmtSecondFactorType.SECONDFACTORTYPE_U2F] :
+                [MgmtSecondFactorType.SECONDFACTORTYPE_U2F, MgmtSecondFactorType.SECONDFACTORTYPE_OTP] :
                 this.serviceType === PolicyComponentServiceType.ADMIN ?
                     [AdminSecondFactorType.SECONDFACTORTYPE_OTP, AdminSecondFactorType.SECONDFACTORTYPE_U2F] :
                     [];
         }
+
+        this.mfas.forEach(mfa => {
+            const index = selection.findIndex(sel => sel === mfa);
+            if (index > -1) {
+                selection.splice(index, 1);
+            }
+        });
+
         const dialogRef = this.dialog.open(DialogAddTypeComponent, {
             data: {
                 title: 'MFA.CREATE.TITLE',

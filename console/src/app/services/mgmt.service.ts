@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
-import { MultiFactorsResult } from '../proto/generated/admin_pb';
 
+import { MultiFactorsResult } from '../proto/generated/admin_pb';
 import {
     AddMachineKeyRequest,
     AddMachineKeyResponse,
@@ -157,6 +157,7 @@ import {
     UserView,
     ValidateOrgDomainRequest,
     WebAuthNTokenID,
+    WebAuthNTokens,
     ZitadelDocs,
 } from '../proto/generated/management_pb';
 import { GrpcService } from './grpc.service';
@@ -188,6 +189,19 @@ export class ManagementService {
             req.setQueriesList(queryList);
         }
         return this.grpcService.mgmt.searchIdps(req);
+    }
+
+    public GetPasswordless(userId: string): Promise<WebAuthNTokens> {
+        const req = new UserID();
+        req.setId(userId);
+        return this.grpcService.mgmt.getPasswordless(req);
+    }
+
+    public RemovePasswordless(id: string, userId: string): Promise<Empty> {
+        const req = new WebAuthNTokenID();
+        req.setId(id);
+        req.setUserId(userId);
+        return this.grpcService.mgmt.removePasswordless(req);
     }
 
     public GetLoginPolicyMultiFactors(): Promise<MultiFactorsResult> {
@@ -714,9 +728,10 @@ export class ManagementService {
         return this.grpcService.mgmt.removeMfaOTP(req);
     }
 
-    public RemoveMfaU2F(id: string): Promise<Empty> {
+    public RemoveMfaU2F(userid: string, id: string): Promise<Empty> {
         const req = new WebAuthNTokenID();
         req.setId(id);
+        req.setUserId(userid);
         return this.grpcService.mgmt.removeMfaU2F(req);
     }
 
@@ -1344,21 +1359,7 @@ export class ManagementService {
         return this.grpcService.mgmt.updateApplication(req);
     }
 
-    public UpdateOIDCAppConfig(projectId: string,
-        appId: string, oidcConfig: OIDCConfig.AsObject): Promise<OIDCConfig> {
-        const req = new OIDCConfigUpdate();
-        req.setProjectId(projectId);
-        req.setApplicationId(appId);
-        req.setRedirectUrisList(oidcConfig.redirectUrisList);
-        req.setResponseTypesList(oidcConfig.responseTypesList);
-        req.setAuthMethodType(oidcConfig.authMethodType);
-        req.setPostLogoutRedirectUrisList(oidcConfig.postLogoutRedirectUrisList);
-        req.setGrantTypesList(oidcConfig.grantTypesList);
-        req.setApplicationType(oidcConfig.applicationType);
-        req.setDevMode(oidcConfig.devMode);
-        req.setAccessTokenType(oidcConfig.accessTokenType);
-        req.setAccessTokenRoleAssertion(oidcConfig.accessTokenRoleAssertion);
-        req.setIdTokenRoleAssertion(oidcConfig.idTokenRoleAssertion);
+    public UpdateOIDCAppConfig(req: OIDCConfigUpdate): Promise<OIDCConfig> {
         return this.grpcService.mgmt.updateApplicationOIDCConfig(req);
     }
 }

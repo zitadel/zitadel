@@ -51,6 +51,16 @@
             </mat-slide-toggle>
             <p> {{'POLICY.DATA.FORCEMFA_DESC' | translate}} </p>
         </div>
+        <div class="row">
+            <cnsl-form-field class="form-field" label="Access Code" required="true">
+                <cnsl-label>{{'MFA.TYPE' | translate}}</cnsl-label>
+                <mat-select [(ngModel)]="loginData.passwordlessType">
+                    <mat-option *ngFor="let pt of passwordlessTypes" [value]="pt">
+                        {{'LOGINPOLICY.PASSWORDLESSTYPE.'+pt | translate}}
+                    </mat-option>
+                </mat-select>
+            </cnsl-form-field>
+        </div>
     </div>
 
     <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
@@ -58,19 +68,21 @@
 
     <div class="divider"></div>
 
-    <h3 class="subheader">{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
-    <p class="subdesc">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
-    <app-mfa-table [service]="service" [serviceType]="serviceType"
-        [componentType]="LoginMethodComponentType.MultiFactor"
-        [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.policy.write' : ''] | hasRole | async) == false">
-    </app-mfa-table>
+    <ng-container *ngIf="!isDefault">
+        <h3 class="subheader">{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
+        <p class="subdesc">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
+        <app-mfa-table [service]="service" [serviceType]="serviceType"
+            [componentType]="LoginMethodComponentType.MultiFactor"
+            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'iam.policy.write' : ''] | hasRole | async) == false">
+        </app-mfa-table>
 
-    <h3 class="subheader">{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
-    <p class="subdesc">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
-    <app-mfa-table [service]="service" [serviceType]="serviceType"
-        [componentType]="LoginMethodComponentType.SecondFactor"
-        [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.policy.write' : ''] | hasRole | async) == false">
-    </app-mfa-table>
+        <h3 class="subheader">{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
+        <p class="subdesc">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
+        <app-mfa-table [service]="service" [serviceType]="serviceType"
+            [componentType]="LoginMethodComponentType.SecondFactor"
+            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'iam.policy.write' : ''] | hasRole | async) == false">
+        </app-mfa-table>
+    </ng-container>
 
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>
 

@@ -1353,7 +1353,7 @@ func (es *UserEventstore) RemoveU2FToken(ctx context.Context, userID, webAuthNTo
 		return err
 	}
 	if _, token := user.Human.GetU2F(webAuthNTokenID); token == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-2M9ds", "Errors.User.NotHuman")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-2M9ds", "Errors.User.MFA.U2F.NotExisting")
 	}
 	repoUser := model.UserFromModel(user)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FRemoveAggregate(es.AggregateCreator(), repoUser, &model.WebAuthNTokenID{webAuthNTokenID}))
