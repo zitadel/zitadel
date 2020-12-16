@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
 	"github.com/caos/logging"
@@ -33,13 +34,25 @@ func (p *NotifyUser) ViewModel() string {
 	return userTable
 }
 
+func (_ *NotifyUser) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
+}
+
+func (p *NotifyUser) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestNotifyUserSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *NotifyUser) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestNotifyUserSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(es_model.UserAggregate, org_es_model.OrgAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

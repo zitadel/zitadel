@@ -7,11 +7,9 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -20,7 +18,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -46,12 +43,24 @@ func (n *Notification) ViewModel() string {
 	return notificationTable
 }
 
+func (_ *Notification) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.UserAggregate}
+}
+
+func (n *Notification) CurrentSequence() (uint64, error) {
+	sequence, err := n.view.GetLatestNotificationSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (n *Notification) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := n.view.GetLatestNotificationSequence()
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.UserQuery(sequence.CurrentSequence), nil
+	return usr_event.UserQuery(sequence.CurrentSequence), nil
 }
 
 func (n *Notification) Reduce(event *models.Event) (err error) {
@@ -229,7 +238,7 @@ func (n *Notification) checkIfAlreadyHandled(userID string, sequence uint64, eve
 }
 
 func (n *Notification) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
-	query, err := eventsourcing.UserByIDQuery(userID, sequence)
+	query, err := usr_event.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +263,7 @@ func getSetNotifyContextData(orgID string) context.Context {
 func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	// read from Org
 	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg)
-	if errors.IsNotFound(err) {
+	if caos_errs.IsNotFound(err) {
 		// read from default
 		policy, err = n.view.LabelPolicyByAggregateID(n.systemDefaults.IamID, labelPolicyTableDef)
 		if err != nil {
