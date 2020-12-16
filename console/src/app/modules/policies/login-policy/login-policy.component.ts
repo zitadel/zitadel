@@ -6,6 +6,7 @@ import { switchMap } from 'rxjs/operators';
 import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
 import {
     DefaultLoginPolicy,
+    DefaultLoginPolicyRequest,
     DefaultLoginPolicyView,
     IdpProviderView as AdminIdpProviderView,
     IdpView as AdminIdpView,
@@ -16,6 +17,7 @@ import {
     IdpProviderView as MgmtIdpProviderView,
     IdpView as MgmtIdpView,
     LoginPolicy,
+    LoginPolicyRequest,
     LoginPolicyView,
     PasswordlessType as MgmtPasswordlessType,
 } from 'src/app/proto/generated/management_pb';
@@ -117,7 +119,7 @@ export class LoginPolicyComponent implements OnDestroy {
         Promise<LoginPolicy | DefaultLoginPolicy> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                const mgmtreq = new LoginPolicy();
+                const mgmtreq = new LoginPolicyRequest();
                 mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 mgmtreq.setAllowRegister(this.loginData.allowRegister);
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
@@ -130,7 +132,7 @@ export class LoginPolicyComponent implements OnDestroy {
                     return (this.service as ManagementService).UpdateLoginPolicy(mgmtreq);
                 }
             case PolicyComponentServiceType.ADMIN:
-                const adminreq = new DefaultLoginPolicy();
+                const adminreq = new DefaultLoginPolicyRequest();
                 adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 adminreq.setAllowRegister(this.loginData.allowRegister);
                 adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
