@@ -82,6 +82,9 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             if (credOptions.publicKey?.challenge) {
                 credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
                 credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
+                if (credOptions.publicKey.excludeCredentials) {
+                    credOptions.publicKey.excludeCredentials.map(cred => cred.id = _base64ToArrayBuffer(cred.id as any));
+                }
                 const dialogRef = this.dialog.open(DialogU2FComponent, {
                     width: '400px',
                     data: {
