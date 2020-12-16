@@ -157,6 +157,7 @@ import {
     UserView,
     ValidateOrgDomainRequest,
     WebAuthNTokenID,
+    WebAuthNTokens,
     ZitadelDocs,
 } from '../proto/generated/management_pb';
 import { GrpcService } from './grpc.service';
@@ -188,6 +189,19 @@ export class ManagementService {
             req.setQueriesList(queryList);
         }
         return this.grpcService.mgmt.searchIdps(req);
+    }
+
+    public GetPasswordless(userId: string): Promise<WebAuthNTokens> {
+        const req = new UserID();
+        req.setId(userId);
+        return this.grpcService.mgmt.getPasswordless(req);
+    }
+
+    public RemovePasswordless(id: string, userId: string): Promise<Empty> {
+        const req = new WebAuthNTokenID();
+        req.setId(id);
+        req.setUserId(userId);
+        return this.grpcService.mgmt.removePasswordless(req);
     }
 
     public GetLoginPolicyMultiFactors(): Promise<MultiFactorsResult> {

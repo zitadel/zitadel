@@ -17,19 +17,27 @@ export function _arrayBufferToBase64(buffer: any): string {
         .replace(/=/g, '');
 }
 
+export enum U2FComponentDestination {
+    MFA = "mfa",
+    PASSWORDLESS = "passwordless",
+}
+
 @Component({
     selector: 'app-dialog-u2f',
     templateUrl: './dialog-u2f.component.html',
     styleUrls: ['./dialog-u2f.component.scss'],
 })
 export class DialogU2FComponent {
+    private type!: U2FComponentDestination;
     public name: string = '';
     public error: string = '';
     public loading: boolean = false;
 
     constructor(public dialogRef: MatDialogRef<DialogU2FComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: { credOptions: any; },
-        private service: GrpcAuthService, private translate: TranslateService, private toast: ToastService) { }
+        @Inject(MAT_DIALOG_DATA) public data: { credOptions: any; type: U2FComponentDestination; },
+        private service: GrpcAuthService, private translate: TranslateService, private toast: ToastService) {
+        this.type = data.type;
+    }
 
     public closeDialog(): void {
         this.dialogRef.close();
@@ -61,16 +69,29 @@ export class DialogU2FComponent {
                     });
 
                     const base64 = btoa(data);
-                    this.service.VerifyMyMfaU2F(base64, this.name).then(() => {
-                        this.translate.get('USER.MFA.U2F_SUCCESS').pipe(take(1)).subscribe(msg => {
-                            this.toast.showInfo(msg);
+                    if (this.type == U2FComponentDestination.MFA) {
+                        this.service.VerifyMyMfaU2F(base64, this.name).then(() => {
+                            this.translate.get('USER.MFA.U2F_SUCCESS').pipe(take(1)).subscribe(msg => {
+                                this.toast.showInfo(msg);
+                            });
+                            this.dialogRef.close(true);
+                            this.loading = false;
+                        }).catch(error => {
+                            this.loading = false;
+                            this.toast.showError(error);
                         });
-                        this.dialogRef.close(true);
-                        this.loading = false;
-                    }).catch(error => {
-                        this.loading = false;
-                        this.toast.showError(error);
-                    });
+                    } else if (this.type == U2FComponentDestination.PASSWORDLESS) {
+                        this.service.verifyMyPasswordless(base64, this.name).then(() => {
+                            this.translate.get('USER.PASSWORDLESS.U2F_SUCCESS').pipe(take(1)).subscribe(msg => {
+                                this.toast.showInfo(msg);
+                            });
+                            this.dialogRef.close(true);
+                            this.loading = false;
+                        }).catch(error => {
+                            this.loading = false;
+                            this.toast.showError(error);
+                        });
+                    }
                 } else {
                     this.loading = false;
                     this.translate.get('USER.MFA.U2F_ERROR').pipe(take(1)).subscribe(msg => {

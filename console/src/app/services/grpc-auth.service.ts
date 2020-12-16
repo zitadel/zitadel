@@ -36,6 +36,7 @@ import {
     VerifyWebAuthN,
     WebAuthNResponse,
     WebAuthNTokenID,
+    WebAuthNTokens,
 } from '../proto/generated/auth_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageService } from './storage.service';
@@ -350,6 +351,12 @@ export class GrpcAuthService {
 
         return this.grpcService.auth.verifyMyMfaU2F(
             req,
+        );
+    }
+
+    public GetMyPasswordless(): Promise<WebAuthNTokens> {
+        return this.grpcService.auth.getMyPasswordless(
+            new Empty(),
         );
     }
 
