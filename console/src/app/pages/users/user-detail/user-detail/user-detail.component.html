@@ -84,6 +84,8 @@
             </app-contact>
         </app-card>
 
+        <app-passwordless *ngIf="user && user.human" [user]="user"></app-passwordless>
+
         <app-user-mfa *ngIf="user && user.human" [user]="user"></app-user-mfa>
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"

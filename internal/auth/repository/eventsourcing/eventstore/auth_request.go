@@ -110,6 +110,9 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 	}
 	request.Audience = appIDs
 	request.AppendAudIfNotExisting(app.ProjectID)
+	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
+		return nil, err
+	}
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
@@ -237,6 +240,9 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, userID)
 	if err != nil {
 		return err
+	}
+	if request.RequestedOrgID != "" && request.RequestedOrgID != user.ResourceOwner {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-fJe2a", "Errors.User.NotAllowedOrg")
 	}
 	request.SetUserInfo(user.ID, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
@@ -442,16 +448,9 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 }
 
 func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model.AuthRequest) error {
-	orgID := request.UserOrgID
+	orgID := request.RequestedOrgID
 	if orgID == "" {
-		primaryDomain := request.GetScopeOrgPrimaryDomain()
-		if primaryDomain != "" {
-			org, err := repo.GetOrgByPrimaryDomain(primaryDomain)
-			if err != nil {
-				return err
-			}
-			orgID = org.ID
-		}
+		orgID = request.UserOrgID
 	}
 	if orgID == "" {
 		orgID = repo.IAMID
@@ -469,19 +468,9 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model
 }
 
 func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.AuthRequest, loginName string) (err error) {
-	primaryDomain := request.GetScopeOrgPrimaryDomain()
-	orgID := ""
-	if primaryDomain != "" {
-		org, err := repo.GetOrgByPrimaryDomain(primaryDomain)
-		if err != nil {
-			return err
-		}
-		orgID = org.ID
-	}
-
 	user := new(user_view_model.UserView)
-	if orgID != "" {
-		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, orgID)
+	if request.RequestedOrgID != "" {
+		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, request.RequestedOrgID)
 	} else {
 		user, err = repo.View.UserByLoginName(loginName)
 		if err == nil {
@@ -497,14 +486,6 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.
 
 	request.SetUserInfo(user.ID, loginName, "", user.ResourceOwner)
 	return nil
-}
-
-func (repo AuthRequestRepo) GetOrgByPrimaryDomain(primaryDomain string) (*org_model.OrgView, error) {
-	org, err := repo.OrgViewProvider.OrgByPrimaryDomain(primaryDomain)
-	if err != nil {
-		return nil, err
-	}
-	return org_view_model.OrgToModel(org), nil
 }
 
 func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *model.AuthRequest, user *user_view_model.UserView) error {
@@ -537,15 +518,9 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *model.AuthRequest
 }
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(request *model.AuthRequest, idpConfigID, externalUserID string) (err error) {
-	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	externalIDP := new(user_view_model.ExternalIDPView)
-	org := new(org_model.OrgView)
-	if primaryDomain != "" {
-		org, err = repo.GetOrgByPrimaryDomain(primaryDomain)
-		if err != nil {
-			return err
-		}
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, org.ID)
+	if request.RequestedOrgID != "" {
+		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID)
 	} else {
 		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID)
 	}
@@ -653,10 +628,11 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 	users := make([]model.UserSelection, len(userSessions))
 	for i, session := range userSessions {
 		users[i] = model.UserSelection{
-			UserID:           session.UserID,
-			DisplayName:      session.DisplayName,
-			LoginName:        session.LoginName,
-			UserSessionState: session.State,
+			UserID:            session.UserID,
+			DisplayName:       session.DisplayName,
+			LoginName:         session.LoginName,
+			UserSessionState:  session.State,
+			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
 		}
 	}
 	return users, nil
@@ -751,6 +727,21 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 		return nil, err
 	}
 	return iam_es_model.LoginPolicyViewToModel(policy), err
+}
+
+func setOrgID(orgViewProvider orgViewProvider, request *model.AuthRequest) error {
+	primaryDomain := request.GetScopeOrgPrimaryDomain()
+	if primaryDomain == "" {
+		return nil
+	}
+
+	org, err := orgViewProvider.OrgByPrimaryDomain(primaryDomain)
+	if err != nil {
+		return err
+	}
+	request.RequestedOrgID = org.ID
+	request.RequestedOrgName = org.Name
+	return nil
 }
 
 func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*iam_model.IDPProviderView, error) {

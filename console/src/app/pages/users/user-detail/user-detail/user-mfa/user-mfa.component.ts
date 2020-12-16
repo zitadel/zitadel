@@ -20,7 +20,7 @@ export interface MFAItem {
     styleUrls: ['./user-mfa.component.scss'],
 })
 export class UserMfaComponent implements OnInit, OnDestroy {
-    public displayedColumns: string[] = ['type', 'state', 'actions'];
+    public displayedColumns: string[] = ['type', 'attr', 'state', 'actions'];
     @Input() private user!: UserView.AsObject;
     public mfaSubject: BehaviorSubject<UserMultiFactor.AsObject[]> = new BehaviorSubject<UserMultiFactor.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -37,7 +37,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
     constructor(private mgmtUserService: ManagementService, private dialog: MatDialog, private toast: ToastService) { }
 
     public ngOnInit(): void {
-        this.getOTP();
+        this.getMFAs();
     }
 
     public ngOnDestroy(): void {
@@ -45,7 +45,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
         this.loadingSubject.complete();
     }
 
-    public getOTP(): void {
+    public getMFAs(): void {
         this.mgmtUserService.getUserMfas(this.user.id).then(mfas => {
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
@@ -54,13 +54,14 @@ export class UserMfaComponent implements OnInit, OnDestroy {
         });
     }
 
-    public deleteMFA(type: MfaType): void {
+    public deleteMFA(type: MfaType, id?: string): void {
+        console.log(type, id);
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
                 cancelKey: 'ACTIONS.CANCEL',
-                titleKey: 'USER.MFA.DIALOG.OTP_DELETE_TITLE',
-                descriptionKey: 'USER.MFA.DIALOG.OTP_DELETE_DESCRIPTION',
+                titleKey: 'USER.MFA.DIALOG.MFA_DELETE_TITLE',
+                descriptionKey: 'USER.MFA.DIALOG.MFA_DELETE_DESCRIPTION',
             },
             width: '400px',
         });
@@ -75,7 +76,20 @@ export class UserMfaComponent implements OnInit, OnDestroy {
                         if (index > -1) {
                             this.dataSource.data.splice(index, 1);
                         }
-                        this.getOTP();
+                        this.getMFAs();
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                } else if (type === MfaType.MFATYPE_U2F && id) {
+                    console.log(id);
+                    this.mgmtUserService.RemoveMfaU2F(this.user.id, id).then(() => {
+                        this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+
+                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
+                        if (index > -1) {
+                            this.dataSource.data.splice(index, 1);
+                        }
+                        this.getMFAs();
                     }).catch(error => {
                         this.toast.showError(error);
                     });

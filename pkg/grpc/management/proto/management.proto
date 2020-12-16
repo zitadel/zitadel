@@ -399,6 +399,36 @@ service ManagementService {
     };
   }
 
+  rpc RemoveMfaU2F(WebAuthNTokenID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{user_id}/mfas/u2f/{id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
+  rpc GetPasswordless(UserID) returns (WebAuthNTokens) {
+    option (google.api.http) = {
+      get: "/users/{id}/passwordless"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.read"
+    };
+  }
+
+  rpc RemovePasswordless(WebAuthNTokenID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{user_id}/passwordless"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
   // Sends an Notification (Email/SMS) with a password reset Link
   rpc SendSetPasswordNotification(SetPasswordNotificationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -1646,6 +1676,21 @@ message UserID {
   string id = 1 [(validate.rules).string.min_len = 1];
 }
 
+message WebAuthNTokens {
+  repeated WebAuthNToken tokens = 1;
+}
+
+message WebAuthNToken {
+  string id = 1;
+  string name = 2;
+  MFAState state = 3;
+}
+
+message WebAuthNTokenID {
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+  string id = 2 [(validate.rules).string.min_len = 1];
+}
+
 message LoginName {
   string login_name = 1 [(validate.rules).string.min_len = 1];
 }
@@ -2030,6 +2075,7 @@ message UserMultiFactor {
   MfaType type = 1;
   MFAState state = 2;
   string attribute = 3;
+  string id = 4;
 }
 
 enum MfaType {
@@ -3080,6 +3126,7 @@ enum PasswordlessType {
   PASSWORDLESSTYPE_NOT_ALLOWED = 0;
   PASSWORDLESSTYPE_ALLOWED = 1;
 }
+
 
 message IdpProviderID {
   string idp_config_id = 1 [(validate.rules).string = {min_len: 1}];
