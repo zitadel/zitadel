@@ -39,12 +39,16 @@ func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.LabelPolicyWriteModel.AggregateID)
 }
 
-func (wm *IAMLabelPolicyWriteModel) HasChanged(primaryColor, secondaryColor string) bool {
-	if primaryColor != "" && wm.PrimaryColor != primaryColor {
-		return true
+func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(primaryColor, secondaryColor string) (*iam.LabelPolicyChangedEvent, bool) {
+	hasChanged := false
+	changedEvent := &iam.LabelPolicyChangedEvent{}
+	if wm.PrimaryColor == primaryColor {
+		hasChanged = true
+		changedEvent.PrimaryColor = primaryColor
 	}
-	if secondaryColor != "" && wm.SecondaryColor != secondaryColor {
-		return true
+	if wm.SecondaryColor == secondaryColor {
+		hasChanged = true
+		changedEvent.SecondaryColor = secondaryColor
 	}
-	return false
+	return changedEvent, hasChanged
 }

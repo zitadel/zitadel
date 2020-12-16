@@ -10,7 +10,7 @@ type IAMLoginPolicyWriteModel struct {
 	LoginPolicyWriteModel
 }
 
-func NewWriteModel(iamID string) *IAMLoginPolicyWriteModel {
+func NewIAMLoginPolicyWriteModel(iamID string) *IAMLoginPolicyWriteModel {
 	return &IAMLoginPolicyWriteModel{
 		LoginPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
@@ -40,21 +40,28 @@ func (wm *IAMLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.LoginPolicyWriteModel.AggregateID)
 }
 
-func (wm *IAMLoginPolicyWriteModel) HasChanged(allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType domain.PasswordlessType) bool {
-	if wm.AllowUserNamePassword != allowUsernamePassword {
-		return true
+func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType domain.PasswordlessType) (*iam.LoginPolicyChangedEvent, bool) {
+	hasChanged := false
+	changedEvent := &iam.LoginPolicyChangedEvent{}
+	if wm.AllowUserNamePassword == allowUsernamePassword {
+		hasChanged = true
+		changedEvent.AllowUserNamePassword = allowUsernamePassword
 	}
-	if wm.AllowRegister != allowRegister {
-		return true
+	if wm.AllowRegister == allowRegister {
+		hasChanged = true
+		changedEvent.AllowRegister = allowRegister
 	}
-	if wm.AllowExternalIDP != allowExternalIDP {
-		return true
+	if wm.AllowExternalIDP == allowExternalIDP {
+		hasChanged = true
+		changedEvent.AllowExternalIDP = allowExternalIDP
 	}
 	if wm.ForceMFA != forceMFA {
-		return true
+		hasChanged = true
+		changedEvent.ForceMFA = forceMFA
 	}
 	if wm.PasswordlessType != passwordlessType {
-		return true
+		hasChanged = true
+		changedEvent.PasswordlessType = passwordlessType
 	}
-	return false
+	return changedEvent, hasChanged
 }

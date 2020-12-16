@@ -70,6 +70,9 @@ type LoginPolicyChangedEvent struct {
 	PasswordlessType      domain.PasswordlessType `json:"passwordlessType"`
 }
 
+type LoginPolicyEventData struct {
+}
+
 func (e *LoginPolicyChangedEvent) Data() interface{} {
 	return e
 }

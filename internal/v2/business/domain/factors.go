@@ -1,4 +1,4 @@
-package factors
+package domain
 
 type SecondFactorType int32
 

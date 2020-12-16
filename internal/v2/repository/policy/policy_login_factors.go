@@ -1,14 +1,15 @@
-package factors
+package policy
 
 import (
 	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 )
 
 const (
-	loginPolicySecondFactorPrefix           = "policy.login.secondfactor."
+	loginPolicySecondFactorPrefix           = loginPolicyPrefix + "secondfactor."
 	LoginPolicySecondFactorAddedEventType   = loginPolicySecondFactorPrefix + "added"
 	LoginPolicySecondFactorRemovedEventType = loginPolicySecondFactorPrefix + "removed"
 
@@ -20,12 +21,12 @@ const (
 type SecondFactorAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MFAType SecondFactorType `json:"mfaType"`
+	MFAType domain.SecondFactorType `json:"mfaType"`
 }
 
 func NewSecondFactorAddedEvent(
 	base *eventstore.BaseEvent,
-	mfaType SecondFactorType,
+	mfaType domain.SecondFactorType,
 ) *SecondFactorAddedEvent {
 	return &SecondFactorAddedEvent{
 		BaseEvent: *base,
@@ -52,12 +53,12 @@ func (e *SecondFactorAddedEvent) Data() interface{} {
 
 type SecondFactorRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	MFAType              SecondFactorType `json:"mfaType"`
+	MFAType              domain.SecondFactorType `json:"mfaType"`
 }
 
 func NewSecondFactorRemovedEvent(
 	base *eventstore.BaseEvent,
-	mfaType SecondFactorType,
+	mfaType domain.SecondFactorType,
 ) *SecondFactorRemovedEvent {
 	return &SecondFactorRemovedEvent{
 		BaseEvent: *base,
@@ -85,12 +86,12 @@ func (e *SecondFactorRemovedEvent) Data() interface{} {
 type MultiFactorAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MFAType MultiFactorType `json:"mfaType"`
+	MFAType domain.MultiFactorType `json:"mfaType"`
 }
 
 func NewMultiFactorAddedEvent(
 	base *eventstore.BaseEvent,
-	mfaType MultiFactorType,
+	mfaType domain.MultiFactorType,
 ) *MultiFactorAddedEvent {
 	return &MultiFactorAddedEvent{
 		BaseEvent: *base,
@@ -117,12 +118,12 @@ func (e *MultiFactorAddedEvent) Data() interface{} {
 
 type MultiFactorRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	MFAType              MultiFactorType `json:"mfaType"`
+	MFAType              domain.MultiFactorType `json:"mfaType"`
 }
 
 func NewMultiFactorRemovedEvent(
 	base *eventstore.BaseEvent,
-	mfaType MultiFactorType,
+	mfaType domain.MultiFactorType,
 ) *MultiFactorRemovedEvent {
 	return &MultiFactorRemovedEvent{
 		BaseEvent: *base,

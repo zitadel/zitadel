@@ -190,6 +190,9 @@ Errors:
         AlreadyExists: Multifactor already exists
         NotExisting: Multifactor not existing
         Unspecified: Multifactor invalid
+      IDP:
+        AlreadyExists: Identitäts Provider existiert bereits
+        NotExisting: Identitäts Provider existiert nicht
     LabelPolicy:
       NotFound: Default Private Label Policy not found
       NotChanged: Default Private Label Policy has not been changed

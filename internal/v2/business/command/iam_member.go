@@ -27,7 +27,7 @@ func (r *CommandSide) AddIAMMember(ctx context.Context, member *iam_model.IAMMem
 		return nil, errors.ThrowAlreadyExists(nil, "IAM-PtXi1", "Errors.IAM.Member.AlreadyExists")
 	}
 
-	iamAgg := AggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
+	iamAgg := IAMAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
 
 	err = r.eventstore.PushAggregate(ctx, addedMember, iamAgg)
@@ -54,7 +54,7 @@ func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *iam_model.IAM
 	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.Member.RolesNotChanged")
 	}
-	iamAgg := AggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
+	iamAgg := IAMAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewMemberChangedEvent(ctx, member.UserID, member.Roles...))
 
 	events, err := r.eventstore.PushAggregates(ctx, iamAgg)
@@ -79,7 +79,7 @@ func (r *CommandSide) RemoveIAMMember(ctx context.Context, member *iam_model.IAM
 		return nil
 	}
 
-	iamAgg := AggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
+	iamAgg := IAMAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewMemberRemovedEvent(ctx, member.UserID))
 
 	return r.eventstore.PushAggregate(ctx, m, iamAgg)

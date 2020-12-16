@@ -22,7 +22,7 @@ func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *iam_mod
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.AlreadyExists")
 	}
 
-	iamAgg := AggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewLabelPolicyAddedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -46,12 +46,14 @@ func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_
 	if !existingPolicy.IsActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0K9dq", "Errors.IAM.LabelPolicy.NotFound")
 	}
-	if !existingPolicy.HasChanged(policy.PrimaryColor, policy.SecondaryColor) {
+
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(policy.PrimaryColor, policy.SecondaryColor)
+	if !hasChanged {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 
-	iamAgg := AggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewLabelPolicyChangedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor))
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	iamAgg.PushEvents(changedEvent)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)
 	if err != nil {

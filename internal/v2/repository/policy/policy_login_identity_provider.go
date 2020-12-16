@@ -1,44 +1,45 @@
-package idpprovider
+package policy
 
 import (
 	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 )
 
 const (
-	loginPolicyIDPProviderPrevix      = "policy.login.idpprovider."
+	loginPolicyIDPProviderPrevix      = loginPolicyPrefix + "idpprovider."
 	LoginPolicyIDPProviderAddedType   = loginPolicyIDPProviderPrevix + "added"
 	LoginPolicyIDPProviderRemovedType = loginPolicyIDPProviderPrevix + "removed"
 )
 
-type AddedEvent struct {
+type IdentityProviderAddedEvent struct {
 	eventstore.BaseEvent
 
-	IDPConfigID     string `json:"idpConfigId"`
-	IDPProviderType Type   `json:"idpProviderType"`
+	IDPConfigID     string                      `json:"idpConfigId"`
+	IDPProviderType domain.IdentityProviderType `json:"idpProviderType"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *IdentityProviderAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewAddedEvent(
+func NewIdentityProviderAddedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID string,
-	idpProviderType Type,
-) *AddedEvent {
+	idpProviderType domain.IdentityProviderType,
+) *IdentityProviderAddedEvent {
 
-	return &AddedEvent{
+	return &IdentityProviderAddedEvent{
 		*base,
 		idpConfigID,
 		idpProviderType,
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &AddedEvent{
+func IdentityProviderAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &IdentityProviderAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -50,28 +51,28 @@ func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return e, nil
 }
 
-type RemovedEvent struct {
+type IdentityProviderRemovedEvent struct {
 	eventstore.BaseEvent
 
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *IdentityProviderRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewRemovedEvent(
+func NewIdentityProviderRemovedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID string,
-) *RemovedEvent {
-	return &RemovedEvent{
+) *IdentityProviderRemovedEvent {
+	return &IdentityProviderRemovedEvent{
 		BaseEvent:   *base,
 		IDPConfigID: idpConfigID,
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &RemovedEvent{
+func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &IdentityProviderRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

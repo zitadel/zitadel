@@ -18,7 +18,7 @@ func (r *CommandSide) AddDefaultPasswordAgePolicy(ctx context.Context, policy *i
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-6L0pd", "Errors.IAM.PasswordAgePolicy.AlreadyExists")
 	}
 
-	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushPasswordAgePolicyAddedEvent(ctx, policy.ExpireWarnDays, policy.MaxAgeDays)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -35,7 +35,7 @@ func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy
 		return nil, err
 	}
 
-	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushPasswordAgePolicyChangedFromExisting(ctx, existingPolicy, policy.ExpireWarnDays, policy.MaxAgeDays)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

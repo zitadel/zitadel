@@ -18,7 +18,7 @@ func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, polic
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0olDf", "Errors.IAM.PasswordLockoutPolicy.AlreadyExists")
 	}
 
-	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushPasswordLockoutPolicyAddedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -35,7 +35,7 @@ func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, po
 		return nil, err
 	}
 
-	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushPasswordLockoutPolicyChangedFromExisting(ctx, existingPolicy, policy.MaxAttempts, policy.ShowLockOutFailures)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

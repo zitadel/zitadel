@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
@@ -106,9 +105,9 @@ func writeModelToIDPOIDCConfig(wm *oidc.ConfigWriteModel) *model.OIDCIDPConfig {
 	}
 }
 
-func writeModelToIDPProvider(wm *idpprovider.WriteModel) *model.IDPProvider {
+func writeModelToIDPProvider(wm *IAMIdentityProviderWriteModel) *model.IDPProvider {
 	return &model.IDPProvider{
-		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		ObjectRoot:  writeModelToObjectRoot(wm.IdentityProviderWriteModel.WriteModel),
 		IDPConfigID: wm.IDPConfigID,
 		Type:        model.IDPProviderType(wm.IDPProviderType),
 	}

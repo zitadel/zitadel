@@ -4,17 +4,13 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	factors2 "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
-	iam_factors "github.com/caos/zitadel/internal/v2/repository/iam/policy/login/factors"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/login/idpprovider"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
-	"github.com/caos/zitadel/internal/v2/repository/policy/login/factors"
-	idpprovider2 "github.com/caos/zitadel/internal/v2/repository/policy/login/idpprovider"
 )
 
 const (
@@ -161,24 +157,24 @@ func (a *Aggregate) PushPasswordLockoutPolicyChangedFromExisting(ctx context.Con
 //	a.Aggregate = *a.PushEvents(e)
 //	return a
 //}
+//
+//func (a *Aggregate) PushLoginPolicySecondFactorAdded(ctx context.Context, mfaType domain.SecondFactorType) *Aggregate {
+//	a.Aggregate = *a.PushEvents(NewLoginPolicySecondFactorAddedEvent(ctx, mfaType))
+//	return a
+//}
+//
+//func (a *Aggregate) PushLoginPolicySecondFactorRemoved(ctx context.Context, mfaType domain.SecondFactorType) *Aggregate {
+//	a.Aggregate = *a.PushEvents(NewLoginPolicySecondFactorRemovedEvent(ctx, mfaType))
+//	return a
+//}
 
-func (a *Aggregate) PushLoginPolicySecondFactorAdded(ctx context.Context, mfaType factors.SecondFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(iam_factors.NewLoginPolicySecondFactorAddedEvent(ctx, mfaType))
+func (a *Aggregate) PushLoginPolicyMultiFactorAdded(ctx context.Context, mfaType domain.MultiFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(NewLoginPolicyMultiFactorAddedEvent(ctx, mfaType))
 	return a
 }
 
-func (a *Aggregate) PushLoginPolicySecondFactorRemoved(ctx context.Context, mfaType factors.SecondFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(iam_factors.NewLoginPolicySecondFactorRemovedEvent(ctx, mfaType))
-	return a
-}
-
-func (a *Aggregate) PushLoginPolicyMultiFactorAdded(ctx context.Context, mfaType factors.MultiFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(factors2.NewLoginPolicyMultiFactorAddedEvent(ctx, mfaType))
-	return a
-}
-
-func (a *Aggregate) PushLoginPolicyMultiFactorRemoved(ctx context.Context, mfaType factors.MultiFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(factors2.NewLoginPolicyMultiFactorRemovedEvent(ctx, mfaType))
+func (a *Aggregate) PushLoginPolicyMultiFactorRemoved(ctx context.Context, mfaType domain.MultiFactorType) *Aggregate {
+	a.Aggregate = *a.PushEvents(NewLoginPolicyMultiFactorRemovedEvent(ctx, mfaType))
 	return a
 }
 
@@ -264,19 +260,19 @@ func (a *Aggregate) PushIDPOIDCConfigChanged(
 func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
 	ctx context.Context,
 	idpConfigID string,
-	providerType idpprovider2.Type,
+	providerType domain.IdentityProviderType,
 ) *Aggregate {
 
-	a.Aggregate = *a.PushEvents(idpprovider.NewAddedEvent(ctx, idpConfigID, providerType))
+	a.Aggregate = *a.PushEvents(NewIAMIdentityProviderAddedEvent(ctx, idpConfigID, providerType))
 	return a
 }
 
 func (a *Aggregate) PushLoginPolicyIDPProviderRemovedEvent(
 	ctx context.Context,
 	idpConfigID string,
-	providerType idpprovider2.Type,
+	providerType domain.IdentityProviderType,
 ) *Aggregate {
 
-	a.Aggregate = *a.PushEvents(idpprovider.NewRemovedEvent(ctx, idpConfigID))
+	a.Aggregate = *a.PushEvents(NewIAMIdentityProviderRemovedEvent(ctx, idpConfigID))
 	return a
 }

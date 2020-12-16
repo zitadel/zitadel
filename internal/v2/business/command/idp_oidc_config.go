@@ -24,7 +24,7 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *ia
 		}
 	}
 
-	aggregate := AggregateFromWriteModel(&writeModel.WriteModel).
+	aggregate := IAMAggregateFromWriteModel(&writeModel.WriteModel).
 		PushIDPOIDCConfigChanged(
 			ctx,
 			writeModel,

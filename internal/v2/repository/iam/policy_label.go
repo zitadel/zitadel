@@ -42,23 +42,6 @@ type LabelPolicyChangedEvent struct {
 	policy.LabelPolicyChangedEvent
 }
 
-func NewLabelPolicyChangedEvent(
-	ctx context.Context,
-	primaryColor,
-	secondaryColor string,
-) *LabelPolicyChangedEvent {
-	return &LabelPolicyChangedEvent{
-		*policy.NewLabelPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				LabelPolicyChangedEventType,
-			),
-			primaryColor,
-			secondaryColor,
-		),
-	}
-}
-
 func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.LabelPolicyChangedEventMapper(event)
 	if err != nil {

@@ -18,7 +18,7 @@ func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_mo
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.OrgIAMPolicy.AlreadyExists")
 	}
 
-	iamAgg := AggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
 		PushOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain)
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
@@ -35,7 +35,7 @@ func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam
 		return nil, err
 	}
 
-	iamAgg := AggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
 		PushOrgIAMPolicyChangedFromExisting(ctx, existingPolicy, policy.UserLoginMustBeDomain)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)

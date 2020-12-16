@@ -49,25 +49,6 @@ type LoginPolicyChangedEvent struct {
 	policy.LoginPolicyChangedEvent
 }
 
-func NewLoginPolicyChangedEvent(
-	ctx context.Context,
-	allowUsernamePassword,
-	allowRegister,
-	allowExternalIDP,
-	forceMFA bool,
-	passwordlessType domain.PasswordlessType,
-) *LoginPolicyChangedEvent {
-	return &LoginPolicyChangedEvent{
-		LoginPolicyChangedEvent: *policy.NewLoginPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyChangedEventType),
-			allowUsernamePassword,
-			allowRegister,
-			allowExternalIDP,
-			forceMFA,
-			passwordlessType),
-	}
-}
-
 func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.LoginPolicyChangedEventMapper(event)
 	if err != nil {
