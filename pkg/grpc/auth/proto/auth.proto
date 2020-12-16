@@ -337,6 +337,15 @@ service AuthService {
     };
   }
 
+  rpc GetMyPasswordless(google.protobuf.Empty) returns (WebAuthNTokens) {
+    option (google.api.http) = {
+      get: "/users/me/passwordless"
+    };
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
   rpc AddMyPasswordless(google.protobuf.Empty) returns (WebAuthNResponse) {
     option (google.api.http) = {
       post: "/users/me/passwordless"
@@ -664,6 +673,16 @@ message MfaOtpResponse {
   string url = 2;
   string secret = 3;
   MFAState state = 4;
+}
+
+message WebAuthNTokens {
+  repeated WebAuthNToken tokens = 1;
+}
+
+message WebAuthNToken {
+  string id = 1;
+  string name = 2;
+  MFAState state = 3;
 }
 
 message WebAuthNResponse {

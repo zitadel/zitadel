@@ -326,8 +326,16 @@ func (repo *UserRepo) RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string
 	return repo.UserEvents.RemoveU2FToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
 }
 
+func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error) {
+	return repo.UserEvents.GetPasswordless(ctx, userID)
+}
+
 func (repo *UserRepo) AddPasswordless(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
 	return repo.UserEvents.AddPasswordless(ctx, userID, true)
+}
+
+func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error) {
+	return repo.UserEvents.GetPasswordless(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error) {

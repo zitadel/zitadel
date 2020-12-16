@@ -34,6 +34,9 @@ type UserRepository interface {
 	RemoveOTP(ctx context.Context, userID string) error
 	RemoveU2F(ctx context.Context, userID, webAuthNTokenID string) error
 
+	GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error)
+	RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error
+
 	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
 	RemoveExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
 

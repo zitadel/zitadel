@@ -1353,7 +1353,7 @@ func (es *UserEventstore) RemoveU2FToken(ctx context.Context, userID, webAuthNTo
 		return err
 	}
 	if _, token := user.Human.GetU2F(webAuthNTokenID); token == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-2M9ds", "Errors.User.NotHuman")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-2M9ds", "Errors.User.MFA.U2F.NotExisting")
 	}
 	repoUser := model.UserFromModel(user)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FRemoveAggregate(es.AggregateCreator(), repoUser, &model.WebAuthNTokenID{webAuthNTokenID}))
@@ -1408,6 +1408,14 @@ func (es *UserEventstore) VerifyMFAU2F(ctx context.Context, userID string, crede
 		return err
 	}
 	return finishErr
+}
+
+func (es *UserEventstore) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
+	user, err := es.HumanByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return user.PasswordlessTokens, nil
 }
 
 func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
