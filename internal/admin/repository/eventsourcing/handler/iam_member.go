@@ -41,9 +41,42 @@ func (m *IAMMember) subscribe() {
 	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
 	go func() {
 		for event := range m.subscription.Events {
-
+			m.subscriptionHandler(event)
 		}
 	}()
+}
+
+func (m *IAMMember) subscriptionHandler(event *models.Event) {
+	sequence, err := m.view.GetLatestIAMMemberSequence()
+	if err != nil {
+		logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
+		return
+	}
+	if event.PreviousSequence > sequence.CurrentSequence {
+		searchQuery := models.NewSearchQuery().
+			AggregateTypeFilter(m.AggregateTypes()...).
+			SequenceBetween(sequence.CurrentSequence, event.PreviousSequence)
+
+		events, err := m.es.FilterEvents(context.Background(), searchQuery)
+		if err != nil {
+			logging.LogWithFields("HANDL-L6YH1", "seq", event.Sequence).Warn("filter failed")
+			return
+		}
+		for _, previousEvent := range events {
+			//if other process already updated view
+			if event.PreviousSequence > previousEvent.Sequence {
+				continue
+			}
+			err = m.Reduce(previousEvent)
+			logging.LogWithFields("HANDL-V42TI", "seq", previousEvent.Sequence).OnError(err).Warn("reduce failed")
+			return
+		}
+	} else if event.PreviousSequence < sequence.CurrentSequence {
+		logging.LogWithFields("HANDL-w9Bdy", "previousSeq", event.PreviousSequence, "currentSeq", sequence.CurrentSequence).Debug("already processed")
+		return
+	}
+	err = m.Reduce(event)
+	logging.LogWithFields("HANDL-wQDL2", "seq", event.Sequence).OnError(err).Warn("reduce failed")
 }
 
 func (m *IAMMember) ViewModel() string {
