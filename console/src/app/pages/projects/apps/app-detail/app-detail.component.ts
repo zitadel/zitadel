@@ -75,10 +75,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         OIDCTokenType.OIDCTOKENTYPE_JWT,
     ];
 
-    public formatClockSkewLabel(seconds: number) {
-        return seconds + 's';
-    }
-
     public AppState: any = AppState;
     public appNameForm!: FormGroup;
     public appForm!: FormGroup;
@@ -125,6 +121,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             idTokenUserinfoAssertion: [{ value: false, disabled: true }],
             clockSkewSeconds: [{ value: 0, disabled: true }],
         });
+    }
+
+    public formatClockSkewLabel(seconds: number): string {
+        return seconds + 's';
     }
 
     public ngOnInit(): void {

@@ -18,8 +18,8 @@ export function _arrayBufferToBase64(buffer: any): string {
 }
 
 export enum U2FComponentDestination {
-    MFA = "mfa",
-    PASSWORDLESS = "passwordless",
+    MFA = 'mfa',
+    PASSWORDLESS = 'passwordless',
 }
 
 @Component({
@@ -69,7 +69,7 @@ export class DialogU2FComponent {
                     });
 
                     const base64 = btoa(data);
-                    if (this.type == U2FComponentDestination.MFA) {
+                    if (this.type === U2FComponentDestination.MFA) {
                         this.service.VerifyMyMfaU2F(base64, this.name).then(() => {
                             this.translate.get('USER.MFA.U2F_SUCCESS').pipe(take(1)).subscribe(msg => {
                                 this.toast.showInfo(msg);
@@ -80,7 +80,7 @@ export class DialogU2FComponent {
                             this.loading = false;
                             this.toast.showError(error);
                         });
-                    } else if (this.type == U2FComponentDestination.PASSWORDLESS) {
+                    } else if (this.type === U2FComponentDestination.PASSWORDLESS) {
                         this.service.verifyMyPasswordless(base64, this.name).then(() => {
                             this.translate.get('USER.PASSWORDLESS.U2F_SUCCESS').pipe(take(1)).subscribe(msg => {
                                 this.toast.showInfo(msg);

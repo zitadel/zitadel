@@ -55,11 +55,13 @@ export class LoginPolicyComponent implements OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
-                    this.passwordlessTypes = [MgmtPasswordlessType.PASSWORDLESSTYPE_ALLOWED, MgmtPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
+                    this.passwordlessTypes = [MgmtPasswordlessType.PASSWORDLESSTYPE_ALLOWED,
+                    MgmtPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
-                    this.passwordlessTypes = [AdminPasswordlessType.PASSWORDLESSTYPE_ALLOWED, AdminPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
+                    this.passwordlessTypes = [AdminPasswordlessType.PASSWORDLESSTYPE_ALLOWED,
+                    AdminPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
                     break;
             }
 

@@ -122,7 +122,7 @@ export class MfaTableComponent implements OnInit {
         }
 
         this.mfas.forEach(mfa => {
-            const index = selection.findIndex(sel => sel == mfa);
+            const index = selection.findIndex(sel => sel === mfa);
             if (index > -1) {
                 selection.splice(index, 1);
             }
