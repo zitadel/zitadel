@@ -9,23 +9,21 @@ import (
 )
 
 var (
-	iamEventPrefix = eventstore.EventType("iam.")
-
-	LoginPolicyIDPProviderAddedEventType   = iamEventPrefix + policy.LoginPolicyIDPProviderAddedType
-	LoginPolicyIDPProviderRemovedEventType = iamEventPrefix + policy.LoginPolicyIDPProviderRemovedType
+	LoginPolicyIDPProviderAddedEventType   = iamEventTypePrefix + policy.LoginPolicyIDPProviderAddedType
+	LoginPolicyIDPProviderRemovedEventType = iamEventTypePrefix + policy.LoginPolicyIDPProviderRemovedType
 )
 
-type IAMIdentityProviderAddedEvent struct {
+type IdentityProviderAddedEvent struct {
 	policy.IdentityProviderAddedEvent
 }
 
-func NewIAMIdentityProviderAddedEvent(
+func NewIdentityProviderAddedEvent(
 	ctx context.Context,
 	idpConfigID string,
 	idpProviderType domain.IdentityProviderType,
-) *IAMIdentityProviderAddedEvent {
+) *IdentityProviderAddedEvent {
 
-	return &IAMIdentityProviderAddedEvent{
+	return &IdentityProviderAddedEvent{
 		IdentityProviderAddedEvent: *policy.NewIdentityProviderAddedEvent(
 			eventstore.NewBaseEventForPush(ctx, LoginPolicyIDPProviderAddedEventType),
 			idpConfigID,
@@ -39,7 +37,7 @@ func IdentityProviderAddedEventMapper(event *repository.Event) (eventstore.Event
 		return nil, err
 	}
 
-	return &IAMIdentityProviderAddedEvent{
+	return &IdentityProviderAddedEvent{
 		IdentityProviderAddedEvent: *e.(*policy.IdentityProviderAddedEvent),
 	}, nil
 }
@@ -48,7 +46,7 @@ type IdentityProviderRemovedEvent struct {
 	policy.IdentityProviderRemovedEvent
 }
 
-func NewIAMIdentityProviderRemovedEvent(
+func NewIdentityProviderRemovedEvent(
 	ctx context.Context,
 	idpConfigID string,
 ) *IdentityProviderRemovedEvent {

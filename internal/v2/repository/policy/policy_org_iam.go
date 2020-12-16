@@ -1,4 +1,4 @@
-package org_iam
+package policy
 
 import (
 	"encoding/json"
@@ -12,29 +12,29 @@ const (
 	OrgIAMPolicyChangedEventType = "policy.org.iam.changed"
 )
 
-type AddedEvent struct {
+type OrgIAMPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserLoginMustBeDomain bool `json:"userLoginMustBeDomain"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *OrgIAMPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewAddedEvent(
+func NewOrgIAMPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	userLoginMustBeDomain bool,
-) *AddedEvent {
+) *OrgIAMPolicyAddedEvent {
 
-	return &AddedEvent{
+	return &OrgIAMPolicyAddedEvent{
 		BaseEvent:             *base,
 		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &AddedEvent{
+func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &OrgIAMPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -46,32 +46,18 @@ func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return e, nil
 }
 
-type ChangedEvent struct {
+type OrgIAMPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserLoginMustBeDomain bool `json:"userLoginMustBeDomain"`
 }
 
-func (e *ChangedEvent) Data() interface{} {
+func (e *OrgIAMPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewChangedEvent(
-	base *eventstore.BaseEvent,
-	current *WriteModel,
-	userLoginMustBeDomain bool,
-) *ChangedEvent {
-	e := &ChangedEvent{
-		BaseEvent: *base,
-	}
-	if current.UserLoginMustBeDomain != userLoginMustBeDomain {
-		e.UserLoginMustBeDomain = userLoginMustBeDomain
-	}
-	return e
-}
-
-func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &ChangedEvent{
+func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &OrgIAMPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

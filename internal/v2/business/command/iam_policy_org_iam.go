@@ -5,21 +5,20 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
+	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	addedPolicy := org_iam.NewWriteModel(policy.AggregateID)
+	addedPolicy := NewIAMOrgIAMPolicyWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
-	if addedPolicy != nil {
+	if addedPolicy.IsActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.OrgIAMPolicy.AlreadyExists")
 	}
-
-	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
-		PushOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain)
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
 	if err != nil {
@@ -34,9 +33,17 @@ func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam
 	if err != nil {
 		return nil, err
 	}
+	if !existingPolicy.IsActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0Pl0d", "Errors.IAM.OrgIAMPolicy.NotFound")
+	}
 
-	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
-		PushOrgIAMPolicyChangedFromExisting(ctx, existingPolicy, policy.UserLoginMustBeDomain)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(policy.UserLoginMustBeDomain)
+	if !hasChanged {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+	}
+
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
+	iamAgg.PushEvents(changedEvent)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)
 	if err != nil {
@@ -46,11 +53,11 @@ func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam
 	return writeModelToOrgIAMPolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) defaultOrgIAMPolicyWriteModelByID(ctx context.Context, iamID string) (policy *org_iam.WriteModel, err error) {
+func (r *CommandSide) defaultOrgIAMPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMOrgIAMPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := org_iam.NewWriteModel(iamID)
+	writeModel := NewIAMOrgIAMPolicyWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

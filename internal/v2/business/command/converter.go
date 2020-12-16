@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
@@ -48,9 +47,9 @@ func writeModelToLabelPolicy(wm *IAMLabelPolicyWriteModel) *model.LabelPolicy {
 	}
 }
 
-func writeModelToOrgIAMPolicy(wm *org_iam.WriteModel) *model.OrgIAMPolicy {
+func writeModelToOrgIAMPolicy(wm *IAMOrgIAMPolicyWriteModel) *model.OrgIAMPolicy {
 	return &model.OrgIAMPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		ObjectRoot:            writeModelToObjectRoot(wm.PolicyOrgIAMWriteModel.WriteModel),
 		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
 	}
 }

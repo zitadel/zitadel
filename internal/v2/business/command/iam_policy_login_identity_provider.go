@@ -23,7 +23,7 @@ func NewIAMIdentityProviderWriteModel(iamID, idpConfigID string) *IAMIdentityPro
 func (wm *IAMIdentityProviderWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *iam.IAMIdentityProviderAddedEvent:
+		case *iam.IdentityProviderAddedEvent:
 			if e.IDPConfigID != wm.IDPConfigID {
 				continue
 			}

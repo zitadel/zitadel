@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
@@ -94,9 +93,9 @@ func readModelToLoginPolicy(readModel *IAMLoginPolicyReadModel) *model.LoginPoli
 		//TODO: State: int32,
 	}
 }
-func readModelToOrgIAMPolicy(readModel *org_iam.ReadModel) *model.OrgIAMPolicy {
+func readModelToOrgIAMPolicy(readModel *IAMOrgIAMPolicyReadModel) *model.OrgIAMPolicy {
 	return &model.OrgIAMPolicy{
-		ObjectRoot:            readModelToObjectRoot(readModel.ReadModel.ReadModel),
+		ObjectRoot:            readModelToObjectRoot(readModel.OrgIAMPolicyReadModel.ReadModel),
 		UserLoginMustBeDomain: readModel.UserLoginMustBeDomain,
 		Default:               true,
 		//TODO: State: int32,

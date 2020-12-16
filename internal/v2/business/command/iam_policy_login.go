@@ -72,7 +72,7 @@ func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, id
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&idpModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewIAMIdentityProviderAddedEvent(ctx, idpProvider.IDPConfigID, domain.IdentityProviderType(idpProvider.Type)))
+	iamAgg.PushEvents(iam_repo.NewIdentityProviderAddedEvent(ctx, idpProvider.IDPConfigID, domain.IdentityProviderType(idpProvider.Type)))
 
 	if err = r.eventstore.PushAggregate(ctx, idpModel, iamAgg); err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Contex
 		return caos_errs.ThrowAlreadyExists(nil, "IAM-39fjs", "Errors.IAM.LoginPolicy.IDP.NotExisting")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewIAMIdentityProviderRemovedEvent(ctx, idpProvider.IDPConfigID))
+	iamAgg.PushEvents(iam_repo.NewIdentityProviderRemovedEvent(ctx, idpProvider.IDPConfigID))
 
 	return r.eventstore.PushAggregate(ctx, idpModel, iamAgg)
 }

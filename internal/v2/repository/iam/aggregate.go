@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/business/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/org_iam"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
@@ -14,7 +13,7 @@ import (
 )
 
 const (
-	IAMEventTypePrefix = eventstore.EventType("iam.")
+	iamEventTypePrefix = eventstore.EventType("iam.")
 )
 
 const (
@@ -73,19 +72,20 @@ func (a *Aggregate) PushStepDone(ctx context.Context, step Step) *Aggregate {
 	return a
 }
 
-func (a *Aggregate) PushOrgIAMPolicyAddedEvent(ctx context.Context, userLoginMustBeDomain bool) *Aggregate {
-	a.Aggregate = *a.PushEvents(org_iam.NewAddedEvent(ctx, userLoginMustBeDomain))
-	return a
-}
-
-func (a *Aggregate) PushOrgIAMPolicyChangedFromExisting(ctx context.Context, current *org_iam.WriteModel, userLoginMustBeDomain bool) *Aggregate {
-	e, err := org_iam.ChangedEventFromExisting(ctx, current, userLoginMustBeDomain)
-	if err != nil {
-		return a
-	}
-	a.Aggregate = *a.PushEvents(e)
-	return a
-}
+//
+//func (a *Aggregate) PushOrgIAMPolicyAddedEvent(ctx context.Context, userLoginMustBeDomain bool) *Aggregate {
+//	a.Aggregate = *a.PushEvents(NewOrgIAMPolicyAddedEvent(ctx, userLoginMustBeDomain))
+//	return a
+//}
+//
+//func (a *Aggregate) PushOrgIAMPolicyChangedFromExisting(ctx context.Context, current *command.IAMOrgIAMPolicyWriteModel, userLoginMustBeDomain bool) *Aggregate {
+//	e, err := OrgIAMPolicyChangedEventFromExisting(ctx, current, userLoginMustBeDomain)
+//	if err != nil {
+//		return a
+//	}
+//	a.Aggregate = *a.PushEvents(e)
+//	return a
+//}
 
 func (a *Aggregate) PushPasswordAgePolicyAddedEvent(ctx context.Context, expireWarnDays, maxAgeDays uint64) *Aggregate {
 	a.Aggregate = *a.PushEvents(password_age.NewAddedEvent(ctx, expireWarnDays, maxAgeDays))
@@ -257,22 +257,23 @@ func (a *Aggregate) PushIDPOIDCConfigChanged(
 	return a
 }
 
-func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
-	ctx context.Context,
-	idpConfigID string,
-	providerType domain.IdentityProviderType,
-) *Aggregate {
-
-	a.Aggregate = *a.PushEvents(NewIAMIdentityProviderAddedEvent(ctx, idpConfigID, providerType))
-	return a
-}
-
-func (a *Aggregate) PushLoginPolicyIDPProviderRemovedEvent(
-	ctx context.Context,
-	idpConfigID string,
-	providerType domain.IdentityProviderType,
-) *Aggregate {
-
-	a.Aggregate = *a.PushEvents(NewIAMIdentityProviderRemovedEvent(ctx, idpConfigID))
-	return a
-}
+//
+//func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
+//	ctx context.Context,
+//	idpConfigID string,
+//	providerType domain.IdentityProviderType,
+//) *Aggregate {
+//
+//	a.Aggregate = *a.PushEvents(NewIdentityProviderAddedEvent(ctx, idpConfigID, providerType))
+//	return a
+//}
+//
+//func (a *Aggregate) PushLoginPolicyIDPProviderRemovedEvent(
+//	ctx context.Context,
+//	idpConfigID string,
+//	providerType domain.IdentityProviderType,
+//) *Aggregate {
+//
+//	a.Aggregate = *a.PushEvents(NewIdentityProviderRemovedEvent(ctx, idpConfigID))
+//	return a
+//}
