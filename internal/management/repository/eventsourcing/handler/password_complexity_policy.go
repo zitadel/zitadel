@@ -2,11 +2,10 @@ package handler
 
 import (
 	"github.com/caos/logging"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
@@ -23,13 +22,25 @@ func (p *PasswordComplexityPolicy) ViewModel() string {
 	return passwordComplexityPolicyTable
 }
 
+func (_ *PasswordComplexityPolicy) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (p *PasswordComplexityPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *PasswordComplexityPolicy) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

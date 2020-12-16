@@ -48,7 +48,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 			logging.LogWithFields("HANDL-V42TI", "seq", previousEvent.Sequence).OnError(err).Warn("reduce failed")
 			return
 		}
-	} else if event.PreviousSequence < sequence {
+	} else if event.PreviousSequence > 0 && event.PreviousSequence < sequence {
 		logging.LogWithFields("HANDL-w9Bdy", "previousSeq", event.PreviousSequence, "currentSeq", sequence).Debug("already processed")
 		return
 	}

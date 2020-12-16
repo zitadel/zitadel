@@ -28,13 +28,25 @@ func (p *ProjectMember) ViewModel() string {
 	return projectMemberTable
 }
 
+func (_ *ProjectMember) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{proj_es_model.ProjectAggregate, usr_es_model.UserAggregate}
+}
+
+func (p *ProjectMember) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestProjectMemberSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *ProjectMember) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestProjectMemberSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(proj_es_model.ProjectAggregate, usr_es_model.UserAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

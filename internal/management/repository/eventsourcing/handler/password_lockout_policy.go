@@ -23,13 +23,25 @@ func (p *PasswordLockoutPolicy) ViewModel() string {
 	return passwordLockoutPolicyTable
 }
 
+func (_ *PasswordLockoutPolicy) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (p *PasswordLockoutPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *PasswordLockoutPolicy) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

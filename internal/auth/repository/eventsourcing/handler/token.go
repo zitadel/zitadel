@@ -28,6 +28,18 @@ func (t *Token) ViewModel() string {
 	return tokenTable
 }
 
+func (_ *Token) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{user_es_model.UserAggregate, project_es_model.ProjectAggregate}
+}
+
+func (p *Token) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestTokenSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (t *Token) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := t.view.GetLatestTokenSequence()
 	if err != nil {

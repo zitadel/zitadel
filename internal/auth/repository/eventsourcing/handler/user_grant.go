@@ -46,6 +46,18 @@ func (u *UserGrant) ViewModel() string {
 	return userGrantTable
 }
 
+func (_ *UserGrant) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{grant_es_model.UserGrantAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate}
+}
+
+func (u *UserGrant) CurrentSequence() (uint64, error) {
+	sequence, err := u.view.GetLatestUserGrantSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 	if u.iamProjectID == "" {
 		err := u.setIamProjectID()
@@ -58,7 +70,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(grant_es_model.UserGrantAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate).
+		AggregateTypeFilter(u.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

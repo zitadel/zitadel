@@ -2,14 +2,13 @@ package handler
 
 import (
 	"context"
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -33,13 +32,25 @@ func (u *User) ViewModel() string {
 	return userTable
 }
 
+func (_ *User) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
+}
+
+func (u *User) CurrentSequence() (uint64, error) {
+	sequence, err := u.view.GetLatestUserSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (u *User) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := u.view.GetLatestUserSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(es_model.UserAggregate, org_es_model.OrgAggregate).
+		AggregateTypeFilter(u.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

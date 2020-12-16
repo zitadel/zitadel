@@ -23,13 +23,25 @@ func (m *OrgIAMPolicy) ViewModel() string {
 	return orgIAMPolicyTable
 }
 
+func (_ *OrgIAMPolicy) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (p *OrgIAMPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (m *OrgIAMPolicy) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestOrgIAMPolicySequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

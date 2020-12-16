@@ -23,13 +23,25 @@ func (p *LoginPolicy) ViewModel() string {
 	return loginPolicyTable
 }
 
+func (_ *LoginPolicy) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (p *LoginPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestLoginPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestLoginPolicySequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

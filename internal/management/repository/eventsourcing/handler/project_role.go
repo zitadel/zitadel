@@ -24,6 +24,18 @@ func (p *ProjectRole) ViewModel() string {
 	return projectRoleTable
 }
 
+func (_ *ProjectRole) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.ProjectAggregate}
+}
+
+func (p *ProjectRole) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestProjectRoleSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *ProjectRole) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestProjectRoleSequence()
 	if err != nil {

@@ -28,13 +28,25 @@ func (m *OrgMember) ViewModel() string {
 	return orgMemberTable
 }
 
+func (_ *OrgMember) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, usr_es_model.UserAggregate}
+}
+
+func (p *OrgMember) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgMemberSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (m *OrgMember) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestOrgMemberSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, usr_es_model.UserAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

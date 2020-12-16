@@ -23,13 +23,25 @@ func (m *LabelPolicy) ViewModel() string {
 	return labelPolicyTable
 }
 
+func (_ *LabelPolicy) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (m *LabelPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := m.view.GetLatestLabelPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (m *LabelPolicy) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestLabelPolicySequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -23,17 +22,29 @@ func (m *IDPConfig) ViewModel() string {
 	return idpConfigTable
 }
 
-func (m *IDPConfig) EventQuery() (*models.SearchQuery, error) {
+func (_ *IDPConfig) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (m *IDPConfig) CurrentSequence() (uint64, error) {
+	sequence, err := m.view.GetLatestIDPConfigSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
+func (m *IDPConfig) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *IDPConfig) Reduce(event *models.Event) (err error) {
+func (m *IDPConfig) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate:
 		err = m.processIdpConfig(iam_model.IDPProviderTypeOrg, event)
@@ -43,7 +54,7 @@ func (m *IDPConfig) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, event *models.Event) (err error) {
+func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, event *es_models.Event) (err error) {
 	idp := new(iam_view_model.IDPConfigView)
 	switch event.Type {
 	case model.IDPConfigAdded,
@@ -76,7 +87,7 @@ func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 	return m.view.PutIDPConfig(idp, idp.Sequence, event.CreationDate)
 }
 
-func (i *IDPConfig) OnError(event *models.Event, err error) error {
+func (i *IDPConfig) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Nxu8s", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
 	return spooler.HandleError(event, err, i.view.GetLatestIDPConfigFailedEvent, i.view.ProcessedIDPConfigFailedEvent, i.view.ProcessedIDPConfigSequence, i.errorCountUntilSkip)
 }

@@ -22,13 +22,25 @@ func (d *OrgDomain) ViewModel() string {
 	return orgDomainTable
 }
 
+func (_ *OrgDomain) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate}
+}
+
+func (p *OrgDomain) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgDomainSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := d.view.GetLatestOrgDomainSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate).
+		AggregateTypeFilter(d.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

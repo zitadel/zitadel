@@ -87,7 +87,7 @@ func subscribe(es eventstore.Eventstore, handlers []query.Handler) {
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 1 * time.Second
+		return 30 * time.Second
 	}
 	return c.MinimumCycleDuration.Duration
 }

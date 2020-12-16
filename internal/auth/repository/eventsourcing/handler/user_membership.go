@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -34,13 +35,25 @@ func (m *UserMembership) ViewModel() string {
 	return userMembershipTable
 }
 
+func (_ *UserMembership) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate}
+}
+
+func (m *UserMembership) CurrentSequence() (uint64, error) {
+	sequence, err := m.view.GetLatestUserMembershipSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (m *UserMembership) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestUserMembershipSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

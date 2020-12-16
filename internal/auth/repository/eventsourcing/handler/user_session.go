@@ -1,16 +1,14 @@
 package handler
 
 import (
+	"github.com/caos/logging"
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	user_events "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -25,6 +23,18 @@ const (
 
 func (u *UserSession) ViewModel() string {
 	return userSessionTable
+}
+
+func (_ *UserSession) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.UserAggregate}
+}
+
+func (u *UserSession) CurrentSequence() (uint64, error) {
+	sequence, err := u.view.GetLatestUserSessionSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (u *UserSession) EventQuery() (*models.SearchQuery, error) {

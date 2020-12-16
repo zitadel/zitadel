@@ -17,10 +17,12 @@ func (es *eventstore) Subscribe(aggregates ...models.AggregateType) *Subscriptio
 	}
 
 	es.subsMutext.Lock()
+	defer es.subsMutext.Unlock()
+
 	for _, aggregate := range aggregates {
 		_, ok := es.subscriptions[aggregate]
 		if !ok {
-			es.subscriptions[aggregate] = make([]*Subscription, 1)
+			es.subscriptions[aggregate] = make([]*Subscription, 0)
 		}
 		es.subscriptions[aggregate] = append(es.subscriptions[aggregate], sub)
 	}
@@ -36,9 +38,9 @@ func (es *eventstore) notify(aggregates []*models.Aggregate) {
 		if !ok {
 			continue
 		}
-		for _, subsctiption := range subscriptions {
+		for _, subscription := range subscriptions {
 			for _, event := range aggregate.Events {
-				subsctiption.Events <- event
+				subscription.Events <- event
 			}
 		}
 	}

@@ -32,6 +32,18 @@ func (p *ProjectGrant) ViewModel() string {
 	return grantedProjectTable
 }
 
+func (_ *ProjectGrant) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.ProjectAggregate}
+}
+
+func (p *ProjectGrant) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestProjectGrantSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *ProjectGrant) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestProjectGrantSequence()
 	if err != nil {

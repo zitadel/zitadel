@@ -26,6 +26,18 @@ func (a *Application) ViewModel() string {
 	return applicationTable
 }
 
+func (_ *Application) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.ProjectAggregate}
+}
+
+func (a *Application) CurrentSequence() (uint64, error) {
+	sequence, err := a.view.GetLatestApplicationSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (a *Application) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := a.view.GetLatestApplicationSequence()
 	if err != nil {

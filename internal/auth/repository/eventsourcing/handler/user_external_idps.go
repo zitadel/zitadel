@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -33,13 +34,25 @@ func (i *ExternalIDP) ViewModel() string {
 	return externalIDPTable
 }
 
+func (_ *ExternalIDP) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
+}
+
+func (i *ExternalIDP) CurrentSequence() (uint64, error) {
+	sequence, err := i.view.GetLatestExternalIDPSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (i *ExternalIDP) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := i.view.GetLatestExternalIDPSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate).
+		AggregateTypeFilter(i.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

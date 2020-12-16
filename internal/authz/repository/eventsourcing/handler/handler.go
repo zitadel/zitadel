@@ -23,22 +23,28 @@ type handler struct {
 	bulkLimit           uint64
 	cycleDuration       time.Duration
 	errorCountUntilSkip uint64
+
+	es eventstore.Eventstore
+}
+
+func (h *handler) Eventstore() eventstore.Eventstore {
+	return h.es
 }
 
 type EventstoreRepos struct {
-	IamEvents *iam_events.IAMEventstore
+	IAMEvents *iam_events.IAMEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
-		// &UserGrant{
-		// 	handler:    handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount},
-		// 	eventstore: eventstore,
-		// 	iamID:      systemDefaults.IamID,
-		// 	iamEvents:  repos.IamEvents,
-		// },
-		// &Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
-		// &Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
+		&UserGrant{
+			handler:    handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
+			eventstore: es,
+			iamID:      systemDefaults.IamID,
+			iamEvents:  repos.IAMEvents,
+		},
+		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}},
+		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}},
 	}
 }
 

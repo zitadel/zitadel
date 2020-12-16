@@ -23,13 +23,25 @@ func (m *PasswordAgePolicy) ViewModel() string {
 	return passwordAgePolicyTable
 }
 
-func (m *PasswordAgePolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestPasswordAgePolicySequence()
+func (_ *PasswordAgePolicy) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (o *PasswordAgePolicy) CurrentSequence() (uint64, error) {
+	sequence, err := o.view.GetLatestPasswordAgePolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
+func (p *PasswordAgePolicy) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := p.view.GetLatestPasswordAgePolicySequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

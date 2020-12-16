@@ -2,20 +2,18 @@ package handler
 
 import (
 	"context"
+
+	"github.com/caos/logging"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-
-	"github.com/caos/logging"
-
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -33,17 +31,29 @@ func (m *UserMembership) ViewModel() string {
 	return userMembershipTable
 }
 
-func (m *UserMembership) EventQuery() (*models.SearchQuery, error) {
+func (_ *UserMembership) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate}
+}
+
+func (u *UserMembership) CurrentSequence() (uint64, error) {
+	sequence, err := u.view.GetLatestUserMembershipSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
+func (m *UserMembership) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestUserMembershipSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *UserMembership) Reduce(event *models.Event) (err error) {
+func (m *UserMembership) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case iam_es_model.IAMAggregate:
 		err = m.processIam(event)
@@ -57,7 +67,7 @@ func (m *UserMembership) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (m *UserMembership) processIam(event *models.Event) (err error) {
+func (m *UserMembership) processIam(event *es_models.Event) (err error) {
 	member := new(usr_es_model.UserMembershipView)
 	err = member.AppendEvent(event)
 	if err != nil {
@@ -87,7 +97,7 @@ func (m *UserMembership) fillIamDisplayName(member *usr_es_model.UserMembershipV
 	member.DisplayName = member.AggregateID
 }
 
-func (m *UserMembership) processOrg(event *models.Event) (err error) {
+func (m *UserMembership) processOrg(event *es_models.Event) (err error) {
 	member := new(usr_es_model.UserMembershipView)
 	err = member.AppendEvent(event)
 	if err != nil {
@@ -124,7 +134,7 @@ func (m *UserMembership) fillOrgDisplayName(member *usr_es_model.UserMembershipV
 	return nil
 }
 
-func (m *UserMembership) updateOrgDisplayName(event *models.Event) error {
+func (m *UserMembership) updateOrgDisplayName(event *es_models.Event) error {
 	org, err := m.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.AggregateID))
 	if err != nil {
 		return err
@@ -140,7 +150,7 @@ func (m *UserMembership) updateOrgDisplayName(event *models.Event) error {
 	return m.view.BulkPutUserMemberships(memberships, event.Sequence, event.CreationDate)
 }
 
-func (m *UserMembership) processProject(event *models.Event) (err error) {
+func (m *UserMembership) processProject(event *es_models.Event) (err error) {
 	member := new(usr_es_model.UserMembershipView)
 	err = member.AppendEvent(event)
 	if err != nil {
@@ -189,7 +199,7 @@ func (m *UserMembership) fillProjectDisplayName(member *usr_es_model.UserMembers
 	return nil
 }
 
-func (m *UserMembership) updateProjectDisplayName(event *models.Event) error {
+func (m *UserMembership) updateProjectDisplayName(event *es_models.Event) error {
 	project, err := m.projectEvents.ProjectByID(context.Background(), event.AggregateID)
 	if err != nil {
 		return err
@@ -205,7 +215,7 @@ func (m *UserMembership) updateProjectDisplayName(event *models.Event) error {
 	return m.view.BulkPutUserMemberships(memberships, event.Sequence, event.CreationDate)
 }
 
-func (m *UserMembership) processUser(event *models.Event) (err error) {
+func (m *UserMembership) processUser(event *es_models.Event) (err error) {
 	switch event.Type {
 	case model.UserRemoved:
 		return m.view.DeleteUserMembershipsByUserID(event.AggregateID, event.Sequence, event.CreationDate)
@@ -214,7 +224,7 @@ func (m *UserMembership) processUser(event *models.Event) (err error) {
 	}
 }
 
-func (m *UserMembership) OnError(event *models.Event, err error) error {
+func (m *UserMembership) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Fwer2", "id", event.AggregateID).WithError(err).Warn("something went wrong in user membership handler")
 	return spooler.HandleError(event, err, m.view.GetLatestUserMembershipFailedEvent, m.view.ProcessedUserMembershipFailedEvent, m.view.ProcessedUserMembershipSequence, m.errorCountUntilSkip)
 }

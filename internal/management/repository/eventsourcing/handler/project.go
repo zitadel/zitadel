@@ -24,6 +24,18 @@ func (p *Project) ViewModel() string {
 	return projectTable
 }
 
+func (_ *Project) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.ProjectAggregate}
+}
+
+func (p *Project) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestProjectSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *Project) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestProjectSequence()
 	if err != nil {

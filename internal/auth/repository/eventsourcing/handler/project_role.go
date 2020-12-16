@@ -3,11 +3,11 @@ package handler
 import (
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	proj_events "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
@@ -24,20 +24,32 @@ func (p *ProjectRole) ViewModel() string {
 	return projectRoleTable
 }
 
-func (p *ProjectRole) EventQuery() (*models.SearchQuery, error) {
+func (_ *ProjectRole) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.ProjectAggregate}
+}
+
+func (p *ProjectRole) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestProjectRoleSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
+func (p *ProjectRole) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestProjectRoleSequence()
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
+	return proj_events.ProjectQuery(sequence.CurrentSequence), nil
 }
 
-func (p *ProjectRole) Reduce(event *models.Event) (err error) {
+func (p *ProjectRole) Reduce(event *es_models.Event) (err error) {
 	role := new(view_model.ProjectRoleView)
 	switch event.Type {
-	case es_model.ProjectRoleAdded:
+	case model.ProjectRoleAdded:
 		err = role.AppendEvent(event)
-	case es_model.ProjectRoleChanged:
+	case model.ProjectRoleChanged:
 		err = role.SetData(event)
 		if err != nil {
 			return err
@@ -47,13 +59,13 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 			return err
 		}
 		err = role.AppendEvent(event)
-	case es_model.ProjectRoleRemoved:
+	case model.ProjectRoleRemoved:
 		err = role.SetData(event)
 		if err != nil {
 			return err
 		}
 		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event.Sequence, event.CreationDate)
-	case es_model.ProjectRemoved:
+	case model.ProjectRemoved:
 		return p.view.DeleteProjectRolesByProjectID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectRoleSequence(event.Sequence, event.CreationDate)
@@ -64,7 +76,7 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 	return p.view.PutProjectRole(role, event.CreationDate)
 }
 
-func (p *ProjectRole) OnError(event *models.Event, err error) error {
+func (p *ProjectRole) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-lso9w", "id", event.AggregateID).WithError(err).Warn("something went wrong in project role handler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectRoleFailedEvent, p.view.ProcessedProjectRoleFailedEvent, p.view.ProcessedProjectRoleSequence, p.errorCountUntilSkip)
 }

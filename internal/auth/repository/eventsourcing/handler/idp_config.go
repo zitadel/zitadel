@@ -23,13 +23,25 @@ func (i *IDPConfig) ViewModel() string {
 	return idpConfigTable
 }
 
+func (_ *IDPConfig) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (i *IDPConfig) CurrentSequence() (uint64, error) {
+	sequence, err := i.view.GetLatestIDPConfigSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := i.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(i.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

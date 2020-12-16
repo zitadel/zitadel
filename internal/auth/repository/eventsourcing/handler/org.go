@@ -22,6 +22,18 @@ func (o *Org) ViewModel() string {
 	return orgTable
 }
 
+func (_ *Org) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate}
+}
+
+func (o *Org) CurrentSequence() (uint64, error) {
+	sequence, err := o.view.GetLatestOrgSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := o.view.GetLatestOrgSequence()
 	if err != nil {
