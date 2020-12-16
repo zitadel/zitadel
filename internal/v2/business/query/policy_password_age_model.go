@@ -1,21 +1,24 @@
-package password_age
+package query
 
-import "github.com/caos/zitadel/internal/eventstore/v2"
+import (
+	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
+)
 
-type ReadModel struct {
+type PasswordAgePolicyReadModel struct {
 	eventstore.ReadModel
 
 	ExpireWarnDays uint64
 	MaxAgeDays     uint64
 }
 
-func (rm *ReadModel) Reduce() error {
+func (rm *PasswordAgePolicyReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *AddedEvent:
+		case *policy.PassowordAgePolicyAddedEvent:
 			rm.ExpireWarnDays = e.ExpireWarnDays
 			rm.MaxAgeDays = e.MaxAgeDays
-		case *ChangedEvent:
+		case *policy.PasswordAgePolicyChangedEvent:
 			rm.ExpireWarnDays = e.ExpireWarnDays
 			rm.MaxAgeDays = e.MaxAgeDays
 		}

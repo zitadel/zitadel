@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/business/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
@@ -42,26 +41,6 @@ func NewAggregate(
 	}
 }
 
-//
-//func (a *Aggregate) PushMemberAdded(ctx context.Context, userID string, roles ...string) *Aggregate {
-//	a.Aggregate = *a.PushEvents(NewMemberAddedEvent(ctx, userID, roles...))
-//	return a
-//}
-//
-//func (a *Aggregate) PushMemberChangedFromExisting(ctx context.Context, current *command.IAMMemberWriteModel, roles ...string) *Aggregate {
-//	e, err := MemberChangedEventFromExisting(ctx, current, roles...)
-//	if err != nil {
-//		return a
-//	}
-//	a.Aggregate = *a.PushEvents(e)
-//	return a
-//}
-//
-//func (a *Aggregate) PushMemberRemoved(ctx context.Context, userID string) *Aggregate {
-//	a.Aggregate = *a.PushEvents(NewMemberRemovedEvent(ctx, userID))
-//	return a
-//}
-
 func (a *Aggregate) PushStepStarted(ctx context.Context, step Step) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewSetupStepStartedEvent(ctx, step))
 	return a
@@ -69,35 +48,6 @@ func (a *Aggregate) PushStepStarted(ctx context.Context, step Step) *Aggregate {
 
 func (a *Aggregate) PushStepDone(ctx context.Context, step Step) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewSetupStepDoneEvent(ctx, step))
-	return a
-}
-
-//
-//func (a *Aggregate) PushOrgIAMPolicyAddedEvent(ctx context.Context, userLoginMustBeDomain bool) *Aggregate {
-//	a.Aggregate = *a.PushEvents(NewOrgIAMPolicyAddedEvent(ctx, userLoginMustBeDomain))
-//	return a
-//}
-//
-//func (a *Aggregate) PushOrgIAMPolicyChangedFromExisting(ctx context.Context, current *command.IAMOrgIAMPolicyWriteModel, userLoginMustBeDomain bool) *Aggregate {
-//	e, err := OrgIAMPolicyChangedEventFromExisting(ctx, current, userLoginMustBeDomain)
-//	if err != nil {
-//		return a
-//	}
-//	a.Aggregate = *a.PushEvents(e)
-//	return a
-//}
-
-func (a *Aggregate) PushPasswordAgePolicyAddedEvent(ctx context.Context, expireWarnDays, maxAgeDays uint64) *Aggregate {
-	a.Aggregate = *a.PushEvents(password_age.NewAddedEvent(ctx, expireWarnDays, maxAgeDays))
-	return a
-}
-
-func (a *Aggregate) PushPasswordAgePolicyChangedFromExisting(ctx context.Context, current *password_age.WriteModel, expireWarnDays, maxAgeDays uint64) *Aggregate {
-	e, err := password_age.ChangedEventFromExisting(ctx, current, expireWarnDays, maxAgeDays)
-	if err != nil {
-		return a
-	}
-	a.Aggregate = *a.PushEvents(e)
 	return a
 }
 
@@ -128,45 +78,6 @@ func (a *Aggregate) PushPasswordLockoutPolicyChangedFromExisting(ctx context.Con
 	a.Aggregate = *a.PushEvents(e)
 	return a
 }
-
-//
-//func (a *Aggregate) PushLabelPolicyAddedEvent(ctx context.Context, primaryColor, secondaryColor string) *Aggregate {
-//	a.Aggregate = *a.PushEvents(NewLabelPolicyAddedEvent(ctx, primaryColor, secondaryColor))
-//	return a
-//}
-//
-//func (a *Aggregate) PushLabelPolicyChangedFromExisting(ctx context.Context, current *command.IAMLabelPolicyWriteModel, primaryColor, secondaryColor string) *Aggregate {
-//	e, err := NewLabelPolicyChangedEvent(ctx, current, primaryColor, secondaryColor)
-//	if err != nil {
-//		return a
-//	}
-//	a.Aggregate = *a.PushEvents(e)
-//	return a
-//}
-//
-//func (a *Aggregate) PushLoginPolicyAddedEvent(ctx context.Context, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType domain.PasswordlessType) *Aggregate {
-//	a.Aggregate = *a.PushEvents(NewLoginPolicyAddedEvent(ctx, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType))
-//	return a
-//}
-//
-//func (a *Aggregate) PushLoginPolicyChangedFromExisting(ctx context.Context, current *command.IAMLoginPolicyWriteModel, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType domain.PasswordlessType) *Aggregate {
-//	e, err := NewLoginPolicyChangedEvent(ctx, current, allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, passwordlessType)
-//	if err != nil {
-//		return a
-//	}
-//	a.Aggregate = *a.PushEvents(e)
-//	return a
-//}
-//
-//func (a *Aggregate) PushLoginPolicySecondFactorAdded(ctx context.Context, mfaType domain.SecondFactorType) *Aggregate {
-//	a.Aggregate = *a.PushEvents(NewLoginPolicySecondFactorAddedEvent(ctx, mfaType))
-//	return a
-//}
-//
-//func (a *Aggregate) PushLoginPolicySecondFactorRemoved(ctx context.Context, mfaType domain.SecondFactorType) *Aggregate {
-//	a.Aggregate = *a.PushEvents(NewLoginPolicySecondFactorRemovedEvent(ctx, mfaType))
-//	return a
-//}
 
 func (a *Aggregate) PushLoginPolicyMultiFactorAdded(ctx context.Context, mfaType domain.MultiFactorType) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewLoginPolicyMultiFactorAddedEvent(ctx, mfaType))
@@ -256,24 +167,3 @@ func (a *Aggregate) PushIDPOIDCConfigChanged(
 	a.Aggregate = *a.PushEvents(event)
 	return a
 }
-
-//
-//func (a *Aggregate) PushLoginPolicyIDPProviderAddedEvent(
-//	ctx context.Context,
-//	idpConfigID string,
-//	providerType domain.IdentityProviderType,
-//) *Aggregate {
-//
-//	a.Aggregate = *a.PushEvents(NewIdentityProviderAddedEvent(ctx, idpConfigID, providerType))
-//	return a
-//}
-//
-//func (a *Aggregate) PushLoginPolicyIDPProviderRemovedEvent(
-//	ctx context.Context,
-//	idpConfigID string,
-//	providerType domain.IdentityProviderType,
-//) *Aggregate {
-//
-//	a.Aggregate = *a.PushEvents(NewIdentityProviderRemovedEvent(ctx, idpConfigID))
-//	return a
-//}

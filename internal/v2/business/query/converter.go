@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
@@ -101,9 +100,9 @@ func readModelToOrgIAMPolicy(readModel *IAMOrgIAMPolicyReadModel) *model.OrgIAMP
 		//TODO: State: int32,
 	}
 }
-func readModelToPasswordAgePolicy(readModel *password_age.ReadModel) *model.PasswordAgePolicy {
+func readModelToPasswordAgePolicy(readModel *IAMPasswordAgePolicyReadModel) *model.PasswordAgePolicy {
 	return &model.PasswordAgePolicy{
-		ObjectRoot:     readModelToObjectRoot(readModel.ReadModel.ReadModel),
+		ObjectRoot:     readModelToObjectRoot(readModel.PasswordAgePolicyReadModel.ReadModel),
 		ExpireWarnDays: uint64(readModel.ExpireWarnDays),
 		MaxAgeDays:     uint64(readModel.MaxAgeDays),
 		//TODO: State: int32,

@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_age"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_complexity"
 	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
@@ -54,9 +53,9 @@ func writeModelToOrgIAMPolicy(wm *IAMOrgIAMPolicyWriteModel) *model.OrgIAMPolicy
 	}
 }
 
-func writeModelToPasswordAgePolicy(wm *password_age.WriteModel) *model.PasswordAgePolicy {
+func writeModelToPasswordAgePolicy(wm *IAMPasswordAgePolicyWriteModel) *model.PasswordAgePolicy {
 	return &model.PasswordAgePolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		ObjectRoot:     writeModelToObjectRoot(wm.PasswordAgePolicyWriteModel.WriteModel),
 		MaxAgeDays:     wm.MaxAgeDays,
 		ExpireWarnDays: wm.ExpireWarnDays,
 	}

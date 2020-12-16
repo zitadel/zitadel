@@ -1,4 +1,4 @@
-package password_age
+package policy
 
 import (
 	"encoding/json"
@@ -13,32 +13,32 @@ const (
 	PasswordAgePolicyRemovedEventType = "policy.password.age.removed"
 )
 
-type AddedEvent struct {
+type PassowordAgePolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ExpireWarnDays uint64 `json:"expireWarnDays"`
 	MaxAgeDays     uint64 `json:"maxAgeDays"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *PassowordAgePolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewAddedEvent(
+func NewPasswordAgePolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	expireWarnDays,
 	maxAgeDays uint64,
-) *AddedEvent {
+) *PassowordAgePolicyAddedEvent {
 
-	return &AddedEvent{
+	return &PassowordAgePolicyAddedEvent{
 		BaseEvent:      *base,
 		ExpireWarnDays: expireWarnDays,
 		MaxAgeDays:     maxAgeDays,
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &AddedEvent{
+func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PassowordAgePolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -50,40 +50,19 @@ func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return e, nil
 }
 
-type ChangedEvent struct {
+type PasswordAgePolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ExpireWarnDays uint64 `json:"expireWarnDays,omitempty"`
 	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
 }
 
-func (e *ChangedEvent) Data() interface{} {
+func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewChangedEvent(
-	base *eventstore.BaseEvent,
-	current *WriteModel,
-	expireWarnDays,
-	maxAgeDays uint64,
-) *ChangedEvent {
-
-	e := &ChangedEvent{
-		BaseEvent: *base,
-	}
-
-	if current.ExpireWarnDays != expireWarnDays {
-		e.ExpireWarnDays = expireWarnDays
-	}
-	if current.MaxAgeDays != maxAgeDays {
-		e.MaxAgeDays = maxAgeDays
-	}
-
-	return e
-}
-
-func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &ChangedEvent{
+func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PasswordAgePolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -95,24 +74,24 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 	return e, nil
 }
 
-type RemovedEvent struct {
+type PasswordAgePolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *PasswordAgePolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewRemovedEvent(
+func NewPasswordAgePolicyRemovedEvent(
 	base *eventstore.BaseEvent,
-) *RemovedEvent {
-	return &RemovedEvent{
+) *PasswordAgePolicyRemovedEvent {
+	return &PasswordAgePolicyRemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &RemovedEvent{
+func PasswordAgePolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &PasswordAgePolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
