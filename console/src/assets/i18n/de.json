@@ -152,16 +152,20 @@
             },
             "EMPTY":"Keine Einträge"
         },
-        "MFA": {
+        "PASSWORDLESS": {
             "TABLETYPE":"Typ",
             "TABLESTATE":"Status",
+            "NAME":"Name",
             "TABLEACTIONS":"Aktionen",
-            "TITLE": "Multifaktor-Authentisierung",
-            "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
+            "TITLE": "Passwortlose Authentifizierungsmethoden",
+            "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
             "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
-            "OTP": "OTP konfigurieren",
-            "OTP_DIALOG_TITLE": "OTP hinzufügen",
-            "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+            "U2F":"U2F hinzufügen",
+            "U2F_DIALOG_TITLE": "U2F hinzufügen",
+            "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Login an.",
+            "U2F_SUCCESS":"Passwordless erfolgreich erstellt!",
+            "U2F_ERROR":"Ein Fehler ist aufgetreten!",
+            "U2F_NAME":"U2F Name",
             "TYPE": {
                 "0":"Keine MFA definiert",
                 "1":"OTP",
@@ -174,8 +178,41 @@
                 "3": "Gelöscht"
             },
             "DIALOG": {
-                "OTP_DELETE_TITLE":"OTP Faktor entfernen",
-                "OTP_DELETE_DESCRIPTION":"Sie sind im Begriff OTP als Zweitfaktormethode zu entfernen. Sind sie sicher?"
+                "DELETE_TITLE":"Passwordless entfernen",
+                "DELETE_DESCRIPTION":"Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?"
+            }
+        },
+        "MFA": {
+            "TABLETYPE":"Typ",
+            "TABLESTATE":"Status",
+            "ATTRIBUTE":"Attribut",
+            "TABLEACTIONS":"Aktionen",
+            "TITLE": "Multifaktor-Authentisierung",
+            "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
+            "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
+            "OTP": "OTP konfigurieren",
+            "OTP_DIALOG_TITLE": "OTP hinzufügen",
+            "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+            "U2F":"U2F hinzufügen",
+            "U2F_DIALOG_TITLE": "U2F hinzufügen",
+            "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
+            "U2F_SUCCESS":"U2F erfolgreich erstellt!",
+            "U2F_ERROR":"Ein Fehler ist aufgetreten!",
+            "U2F_NAME":"U2F Name",
+            "TYPE": {
+                "0":"Keine MFA definiert",
+                "1":"OTP",
+                "2":"U2F"
+            },
+            "STATE": {
+                "0": "Kein Status",
+                "1": "Nicht bereit",
+                "2": "Bereit",
+                "3": "Gelöscht"
+            },
+            "DIALOG": {
+                "MFA_DELETE_TITLE":"Zweiten Faktor entfernen",
+                "MFA_DELETE_DESCRIPTION":"Sie sind im Begriff eine Zweitfaktormethode zu entfernen. Sind sie sicher?"
             }
         },
         "EXTERNALIDP": {
@@ -345,6 +382,8 @@
             "PHONEVERIFICATIONSENT":"Bestätigungscode per Telefonnummer gesendet.",
             "EMAILVERIFICATIONSENT":"Bestätigungscode per E-Mail gesendet.",
             "OTPREMOVED":"OTP entfernt.",
+            "U2FREMOVED":"U2F entfernt.",
+            "PASSWORDLESSREMOVED":"Passwordless entfernt.",
             "INITIALPASSWORDSET":"Initiales Passwort gesetzt.",
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt.",
             "PASSWORDCHANGED":"Passwort geändert.",
@@ -551,7 +590,9 @@
             "ALLOWREGISTER":"Registrieren erlaubt",
             "ALLOWUSERNAMEPASSWORD_DESC":"Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
             "ALLOWEXTERNALIDP_DESC":"Der Login wird für die darunter liegenden Identity Provider erlaubt.",
-            "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers."
+            "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
+            "FORCEMFA":"Mfa erzwingen",
+            "FORCEMFA_DESC":"Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden."
         },
         "RESET":"Richtlinie zurücksetzen",
         "CREATECUSTOM":"Benutzerdefinierte Richtlinie erstellen",
@@ -763,7 +804,7 @@
     },
     "IDP":{
         "LIST": {
-            "TITLE":"Identitäts Providers",
+            "TITLE":"Identitäts Provider",
             "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
         },
         "CREATE": {
@@ -826,6 +867,37 @@
             "DELETED":"Idp erfolgreich gelöscht!"
         }
     },
+    "MFA":{
+        "LIST": {
+            "MULTIFACTORTITLE":"Multifaktoren",
+            "MULTIFACTORDESCRIPTION":"Definieren Sie hier Ihre Multifaktoren, die sie für die Authentifizierung verwenden können.",
+            "SECONDFACTORTITLE":"Zweitfaktoren",
+            "SECONDFACTORDESCRIPTION":"Definieren Sie hier Ihre Zweitfaktoren, die sie für die Authentifizierung verwenden können."
+        },
+        "CREATE": {
+            "TITLE":"Neuer Faktor",
+            "DESCRIPTION":"Definieren Sie hier den gewünschten Typ."
+        },
+        "DELETE": {
+            "TITLE":"Faktor löschen",
+            "DESCRIPTION":"Sie sind im Begriff einen Faktor zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?"
+        },
+        "TOAST": {
+            "ADDED":"Erfolgreich hinzugefügt.",
+            "SAVED": "Erfolgreich gespeichert.",
+            "DELETED":"Mfa erfolgreich gelöscht!"
+        },
+        "TYPE":"Typ",
+        "MULTIFACTORTYPES": {
+            "0":"Unknown",
+            "1":"U2F with Pin"
+        },
+        "SECONDFACTORTYPES": {
+            "0":"Unknown",
+            "1":"OTP",
+            "2":"U2F"
+        }
+    },
     "LOGINPOLICY": {
         "CREATE": {
             "TITLE":"Login Policy",
@@ -836,6 +908,10 @@
             "TITLE":"Identity Provider hinzufügen",
             "DESCRIPTION":"Sie können vordefinierte oder selbsterstellten Provider auswählen",
             "SELECTIDPS":"Identity Provider"
+        },
+        "PASSWORDLESSTYPE": {
+            "0":"Nicht erlaubt",
+            "1":"Erlaubt"
         }
     },
     "APP": {
@@ -910,8 +986,11 @@
             "OVERVIEWTITLE":"Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen.",
             "ACCESSTOKENROLEASSERTION":"Benutzerrollen dem Access Token hinzufügen",
             "ACCESSTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Access Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
-            "IDTOKENROLEASSERTION":"Benutzerrollen dem Id Token hinzufügen",
-            "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt."
+            "IDTOKENROLEASSERTION":"Benutzerrollen im ID Token",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
+            "IDTOKENUSERINFOASSERTION":"User Info im ID Token",
+            "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
+            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen."
         },
         "TOAST": {
             "REACTIVATED":"Anwendung reaktiviert.",

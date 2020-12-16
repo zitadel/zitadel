@@ -1410,6 +1410,14 @@ func (es *UserEventstore) VerifyMFAU2F(ctx context.Context, userID string, crede
 	return finishErr
 }
 
+func (es *UserEventstore) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
+	user, err := es.HumanByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return user.PasswordlessTokens, nil
+}
+
 func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
