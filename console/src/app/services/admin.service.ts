@@ -36,6 +36,8 @@ import {
     IdpSearchRequest,
     IdpSearchResponse,
     IdpView,
+    MultiFactor,
+    MultiFactorsResult,
     OidcIdpConfig,
     OidcIdpConfigCreate,
     OidcIdpConfigUpdate,
@@ -46,6 +48,8 @@ import {
     OrgSetUpRequest,
     OrgSetUpResponse,
     RemoveIamMemberRequest,
+    SecondFactor,
+    SecondFactorsResult,
     ViewID,
     Views,
 } from '../proto/generated/admin_pb';
@@ -71,6 +75,32 @@ export class AdminService {
         req.setUser(userReq);
 
         return this.grpcService.admin.setUpOrg(req);
+    }
+
+    public getDefaultLoginPolicyMultiFactors(): Promise<MultiFactorsResult> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultLoginPolicyMultiFactors(req);
+    }
+
+    public addMultiFactorToDefaultLoginPolicy(req: MultiFactor): Promise<MultiFactor> {
+        return this.grpcService.admin.addMultiFactorToDefaultLoginPolicy(req);
+    }
+
+    public RemoveMultiFactorFromDefaultLoginPolicy(req: MultiFactor): Promise<Empty> {
+        return this.grpcService.admin.removeMultiFactorFromDefaultLoginPolicy(req);
+    }
+
+    public GetDefaultLoginPolicySecondFactors(): Promise<SecondFactorsResult> {
+        const req = new Empty();
+        return this.grpcService.admin.getDefaultLoginPolicySecondFactors(req);
+    }
+
+    public AddSecondFactorToDefaultLoginPolicy(req: SecondFactor): Promise<SecondFactor> {
+        return this.grpcService.admin.addSecondFactorToDefaultLoginPolicy(req);
+    }
+
+    public RemoveSecondFactorFromDefaultLoginPolicy(req: SecondFactor): Promise<Empty> {
+        return this.grpcService.admin.removeSecondFactorFromDefaultLoginPolicy(req);
     }
 
     public GetIamMemberRoles(): Promise<IamMemberRoles> {

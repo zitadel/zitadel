@@ -231,6 +231,18 @@ func (repo *UserRepo) RemoveOTP(ctx context.Context, userID string) error {
 	return repo.UserEvents.RemoveOTP(ctx, userID)
 }
 
+func (repo *UserRepo) RemoveU2F(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemoveU2FToken(ctx, userID, webAuthNTokenID)
+}
+
+func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
+	return repo.UserEvents.GetPasswordless(ctx, userID)
+}
+
+func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemovePasswordlessToken(ctx, userID, webAuthNTokenID)
+}
+
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && caos_errs.IsNotFound(err) {

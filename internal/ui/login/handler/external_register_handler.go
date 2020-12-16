@@ -85,17 +85,9 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		Roles:      []string{orgProjectCreatorRole},
 	}
 
-	if authReq.GetScopeOrgPrimaryDomain() != "" {
-		primaryDomain := authReq.GetScopeOrgPrimaryDomain()
-		org, err := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
-		if err != nil {
-			l.renderRegisterOption(w, r, authReq, err)
-			return
-		}
-		if org.ID != iam.GlobalOrgID {
-			member = nil
-			resourceOwner = org.ID
-		}
+	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
+		member = nil
+		resourceOwner = authReq.RequestedOrgID
 	}
 	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
 	if err != nil {

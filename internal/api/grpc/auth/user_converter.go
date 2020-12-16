@@ -436,3 +436,19 @@ func verifyWebAuthNFromModel(u2f *usr_model.WebAuthNToken) *auth.WebAuthNRespons
 		State:     mfaStateFromModel(u2f.State),
 	}
 }
+
+func webAuthNTokensFromModel(tokens []*usr_model.WebAuthNToken) *auth.WebAuthNTokens {
+	result := make([]*auth.WebAuthNToken, len(tokens))
+	for i, token := range tokens {
+		result[i] = webAuthNTokenFromModel(token)
+	}
+	return &auth.WebAuthNTokens{Tokens: result}
+}
+
+func webAuthNTokenFromModel(token *usr_model.WebAuthNToken) *auth.WebAuthNToken {
+	return &auth.WebAuthNToken{
+		Id:    token.WebAuthNTokenID,
+		Name:  token.WebAuthNTokenName,
+		State: mfaStateFromModel(token.State),
+	}
+}

@@ -75,7 +75,6 @@
   font-family: Lato;
   font-size: 16px;
   font-weight: 400;
-  cursor: default !important;
 }
 
 body {
@@ -227,6 +226,7 @@ form button.user-selection .profile-image, .login-profile .profile-image {
   width: 80px;
   background-position: center;
   background-repeat: no-repeat;
+  background-size: contain;
   background-image: url("../../../images/icon-user-dark.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
@@ -334,10 +334,6 @@ form button.clean * {
 form .user-selection-list {
   margin-bottom: 40px;
 }
-form button.user-selection .profile-image {
-  height: 80px;
-  width: 80px;
-}
 form button.user-selection .sessionstate {
   display: inline-block;
   height: 20px;
@@ -360,13 +356,28 @@ form button.user-selection > div {
   position: relative;
 }
 form button.user-selection > div.names {
-  margin: 15px;
+  margin: 0 15px;
 }
 form button.user-selection > div.names .displayname {
   font-size: 1.4rem;
 }
 form button.user-selection > div.names .loginname {
   color: #898989;
+}
+form button.user-selection:disabled {
+  background: transparent;
+  border: none;
+  cursor: not-allowed;
+}
+form button.user-selection:disabled .profile-image {
+  opacity: 0.3;
+}
+form button.user-selection:disabled .sessionstate {
+  background-color: #282828;
+}
+form button.user-selection:disabled .names .displayname, form button.user-selection:disabled .names .loginname {
+  font-style: italic;
+  color: #444444;
 }
 .user-selection + form button.other-user {
   margin-top: 80px;
