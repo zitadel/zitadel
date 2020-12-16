@@ -2,35 +2,36 @@ package org
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/policy/password_lockout"
+	"github.com/caos/zitadel/internal/v2/business/query"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 var (
-	PasswordLockoutPolicyAddedEventType   = orgEventTypePrefix + password_lockout.PasswordLockoutPolicyAddedEventType
-	PasswordLockoutPolicyChangedEventType = orgEventTypePrefix + password_lockout.PasswordLockoutPolicyChangedEventType
+	PasswordLockoutPolicyAddedEventType   = orgEventTypePrefix + policy.PasswordLockoutPolicyAddedEventType
+	PasswordLockoutPolicyChangedEventType = orgEventTypePrefix + policy.PasswordLockoutPolicyChangedEventType
 )
 
 type PasswordLockoutPolicyReadModel struct {
-	password_lockout.ReadModel
+	query.PasswordLockoutPolicyReadModel
 }
 
 func (rm *PasswordLockoutPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *PasswordLockoutPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.AddedEvent)
+			rm.PasswordLockoutPolicyReadModel.AppendEvents(&e.PasswordLockoutPolicyAddedEvent)
 		case *PasswordLockoutPolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.ChangedEvent)
-		case *password_lockout.AddedEvent, *password_lockout.ChangedEvent:
-			rm.ReadModel.AppendEvents(e)
+			rm.PasswordLockoutPolicyReadModel.AppendEvents(&e.PasswordLockoutPolicyChangedEvent)
+		case *policy.PasswordLockoutPolicyAddedEvent, *policy.PasswordLockoutPolicyChangedEvent:
+			rm.PasswordLockoutPolicyReadModel.AppendEvents(e)
 		}
 	}
 }
 
 type PasswordLockoutPolicyAddedEvent struct {
-	password_lockout.AddedEvent
+	policy.PasswordLockoutPolicyAddedEvent
 }
 
 type PasswordLockoutPolicyChangedEvent struct {
-	password_lockout.ChangedEvent
+	policy.PasswordLockoutPolicyChangedEvent
 }

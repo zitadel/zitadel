@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
@@ -118,9 +117,9 @@ func readModelToPasswordComplexityPolicy(readModel *IAMPasswordComplexityPolicyR
 		//TODO: State: int32,
 	}
 }
-func readModelToPasswordLockoutPolicy(readModel *password_lockout.ReadModel) *model.PasswordLockoutPolicy {
+func readModelToPasswordLockoutPolicy(readModel *IAMPasswordLockoutPolicyReadModel) *model.PasswordLockoutPolicy {
 	return &model.PasswordLockoutPolicy{
-		ObjectRoot:          readModelToObjectRoot(readModel.ReadModel.ReadModel),
+		ObjectRoot:          readModelToObjectRoot(readModel.PasswordLockoutPolicyReadModel.ReadModel),
 		MaxAttempts:         uint64(readModel.MaxAttempts),
 		ShowLockOutFailures: readModel.ShowLockOutFailures,
 		//TODO: State: int32,

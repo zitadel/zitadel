@@ -5,21 +5,21 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
+	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
-	addedPolicy := password_lockout.NewWriteModel(policy.AggregateID)
+	addedPolicy := NewIAMPasswordLockoutPolicyWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
-	if addedPolicy != nil {
+	if addedPolicy.IsActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0olDf", "Errors.IAM.PasswordLockoutPolicy.AlreadyExists")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel.WriteModel).
-		PushPasswordLockoutPolicyAddedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures)
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.PasswordLockoutPolicyWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewPasswordLockoutPolicyAddedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
 	if err != nil {
@@ -34,9 +34,17 @@ func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, po
 	if err != nil {
 		return nil, err
 	}
+	if !existingPolicy.IsActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0oPew", "Errors.IAM.PasswordLockoutPolicy.NotFound")
+	}
 
-	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.WriteModel.WriteModel).
-		PushPasswordLockoutPolicyChangedFromExisting(ctx, existingPolicy, policy.MaxAttempts, policy.ShowLockOutFailures)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(policy.MaxAttempts, policy.ShowLockOutFailures)
+	if !hasChanged {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.PasswordLockoutPolicy.NotChanged")
+	}
+
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.PasswordLockoutPolicyWriteModel.WriteModel)
+	iamAgg.PushEvents(changedEvent)
 
 	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)
 	if err != nil {
@@ -46,11 +54,11 @@ func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, po
 	return writeModelToPasswordLockoutPolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) defaultPasswordLockoutPolicyWriteModelByID(ctx context.Context, iamID string) (policy *password_lockout.WriteModel, err error) {
+func (r *CommandSide) defaultPasswordLockoutPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMPasswordLockoutPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := password_lockout.NewWriteModel(iamID)
+	writeModel := NewIAMPasswordLockoutPolicyWriteModel(iamID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

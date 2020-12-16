@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
@@ -71,9 +70,9 @@ func writeModelToPasswordComplexityPolicy(wm *IAMPasswordComplexityPolicyWriteMo
 	}
 }
 
-func writeModelToPasswordLockoutPolicy(wm *password_lockout.WriteModel) *model.PasswordLockoutPolicy {
+func writeModelToPasswordLockoutPolicy(wm *IAMPasswordLockoutPolicyWriteModel) *model.PasswordLockoutPolicy {
 	return &model.PasswordLockoutPolicy{
-		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel.WriteModel),
+		ObjectRoot:          writeModelToObjectRoot(wm.PasswordLockoutPolicyWriteModel.WriteModel),
 		MaxAttempts:         wm.MaxAttempts,
 		ShowLockOutFailures: wm.ShowLockOutFailures,
 	}

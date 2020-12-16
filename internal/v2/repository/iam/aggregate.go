@@ -4,8 +4,6 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/business/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 	"github.com/caos/zitadel/internal/v2/repository/idp"
 	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
@@ -47,30 +45,6 @@ func (a *Aggregate) PushStepStarted(ctx context.Context, step Step) *Aggregate {
 
 func (a *Aggregate) PushStepDone(ctx context.Context, step Step) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewSetupStepDoneEvent(ctx, step))
-	return a
-}
-
-func (a *Aggregate) PushPasswordLockoutPolicyAddedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) *Aggregate {
-	a.Aggregate = *a.PushEvents(password_lockout.NewAddedEvent(ctx, maxAttempts, showLockoutFailure))
-	return a
-}
-
-func (a *Aggregate) PushPasswordLockoutPolicyChangedFromExisting(ctx context.Context, current *password_lockout.WriteModel, maxAttempts uint64, showLockoutFailure bool) *Aggregate {
-	e, err := password_lockout.ChangedEventFromExisting(ctx, current, maxAttempts, showLockoutFailure)
-	if err != nil {
-		return a
-	}
-	a.Aggregate = *a.PushEvents(e)
-	return a
-}
-
-func (a *Aggregate) PushLoginPolicyMultiFactorAdded(ctx context.Context, mfaType domain.MultiFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(NewLoginPolicyMultiFactorAddedEvent(ctx, mfaType))
-	return a
-}
-
-func (a *Aggregate) PushLoginPolicyMultiFactorRemoved(ctx context.Context, mfaType domain.MultiFactorType) *Aggregate {
-	a.Aggregate = *a.PushEvents(NewLoginPolicyMultiFactorRemovedEvent(ctx, mfaType))
 	return a
 }
 

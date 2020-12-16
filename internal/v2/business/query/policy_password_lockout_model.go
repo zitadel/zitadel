@@ -1,21 +1,24 @@
-package password_lockout
+package query
 
-import "github.com/caos/zitadel/internal/eventstore/v2"
+import (
+	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
+)
 
-type ReadModel struct {
+type PasswordLockoutPolicyReadModel struct {
 	eventstore.ReadModel
 
 	MaxAttempts         uint64
 	ShowLockOutFailures bool
 }
 
-func (rm *ReadModel) Reduce() error {
+func (rm *PasswordLockoutPolicyReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *AddedEvent:
+		case *policy.PasswordLockoutPolicyAddedEvent:
 			rm.MaxAttempts = e.MaxAttempts
 			rm.ShowLockOutFailures = e.ShowLockOutFailures
-		case *ChangedEvent:
+		case *policy.PasswordLockoutPolicyChangedEvent:
 			rm.MaxAttempts = e.MaxAttempts
 			rm.ShowLockOutFailures = e.ShowLockOutFailures
 		}

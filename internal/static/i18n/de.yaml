@@ -201,21 +201,25 @@ Errors:
       NotExisting: Default Password Complexity Policy existiert nicht
       AlreadyExists: Default Password Complexity Policy existiert bereits
       Empty: Default Password Complexity Policy leer
+      NotChanged: Default Password Complexity Policy wurde nicht verändert
     PasswordAgePolicy:
       NotFound: Default Password Age Policy konnte nicht gefunden werden
       NotExisting: Default Password Age Policy existiert nicht
       AlreadyExists: Default Password Age Policy existiert bereits
       Empty: Default Password Age Policy leer
+      NotChanged: Default Password Age Policy wurde nicht verändert
     PasswordLockoutPolicy:
       NotFound: Default Password Lockout Policy konnte nicht gefunden werden
       NotExisting: Default Password Lockout Policy existiert nicht
       AlreadyExists: Default Password Lockout Policy existiert bereits
       Empty: Default Password Lockout Policy leer
+      NotChanged: Default Password Lockout Policy wurde nicht verändert
     OrgIAMPolicy:
       NotFound: Default Org IAM Policy konnte nicht gefunden werden
       NotExisting: Default Org IAM Policy existiert nicht
       AlreadyExists: Default Org IAM Policy existiert bereits
       Empty: Default Org IAM Policy leer
+      NotChanged: Default Org IAM Policy wurde nicht verändert
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:

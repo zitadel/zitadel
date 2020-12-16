@@ -2,7 +2,6 @@ package iam
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/iam/policy/password_lockout"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
@@ -19,8 +18,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(PasswordAgePolicyChangedEventType, PasswordAgePolicyChangedEventMapper).
 		RegisterFilterEventMapper(PasswordComplexityPolicyAddedEventType, PasswordComplexityPolicyAddedEventMapper).
 		RegisterFilterEventMapper(PasswordComplexityPolicyChangedEventType, PasswordComplexityPolicyChangedEventMapper).
-		RegisterFilterEventMapper(password_lockout.PasswordLockoutPolicyAddedEventType, password_lockout.AddedEventMapper).
-		RegisterFilterEventMapper(password_lockout.PasswordLockoutPolicyChangedEventType, password_lockout.ChangedEventMapper).
+		RegisterFilterEventMapper(PasswordLockoutPolicyAddedEventType, PasswordLockoutPolicyAddedEventMapper).
+		RegisterFilterEventMapper(PasswordLockoutPolicyChangedEventType, PasswordLockoutPolicyChangedEventMapper).
 		RegisterFilterEventMapper(MemberAddedEventType, MemberAddedEventMapper).
 		RegisterFilterEventMapper(MemberChangedEventType, MemberChangedEventMapper).
 		RegisterFilterEventMapper(MemberRemovedEventType, MemberRemovedEventMapper).
