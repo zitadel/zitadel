@@ -1302,12 +1302,12 @@ func (es *UserEventstore) verifyMFAOTP(otp *usr_model.OTP, code string) error {
 	return nil
 }
 
-func (es *UserEventstore) AddU2F(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
+func (es *UserEventstore) AddU2F(ctx context.Context, userID string, accountName string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, isLoginUI, user.U2FTokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, accountName, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, isLoginUI, user.U2FTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1418,12 +1418,12 @@ func (es *UserEventstore) GetPasswordless(ctx context.Context, userID string) ([
 	return user.PasswordlessTokens, nil
 }
 
-func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
+func (es *UserEventstore) AddPasswordless(ctx context.Context, userID, accountName string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementRequired, isLoginUI, user.PasswordlessTokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, accountName, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementRequired, isLoginUI, user.PasswordlessTokens...)
 	if err != nil {
 		return nil, err
 	}
