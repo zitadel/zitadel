@@ -1,4 +1,4 @@
-package address
+package user
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	addressEventPrefix      = eventstore.EventType("user.human.address.")
+	addressEventPrefix      = humanEventPrefix + "address."
 	HumanAddressChangedType = addressEventPrefix + "changed"
 )
 
-type ChangedEvent struct {
+type HumanAddressChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Country       string `json:"country,omitempty"`
@@ -23,47 +23,21 @@ type ChangedEvent struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (e *ChangedEvent) Data() interface{} {
+func (e *HumanAddressChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewChangedEvent(
-	ctx context.Context,
-	current *WriteModel,
-	country,
-	locality,
-	postalCode,
-	region,
-	streetAddress string,
-) *ChangedEvent {
-	e := &ChangedEvent{
+func NewHumanAddressChangedEvent(ctx context.Context) *HumanAddressChangedEvent {
+	return &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanAddressChangedType,
 		),
 	}
-
-	if current.Country != country {
-		e.Country = country
-	}
-	if current.Locality != locality {
-		e.Locality = locality
-	}
-	if current.PostalCode != postalCode {
-		e.PostalCode = postalCode
-	}
-	if current.Region != region {
-		e.Region = region
-	}
-	if current.StreetAddress != streetAddress {
-		e.StreetAddress = streetAddress
-	}
-
-	return e
 }
 
-func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	addressChanged := &ChangedEvent{
+func HumanAddressChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	addressChanged := &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, addressChanged)

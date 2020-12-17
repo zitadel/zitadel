@@ -47,7 +47,7 @@ func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0K9dq", "Errors.IAM.LabelPolicy.NotFound")
 	}
 
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(policy.PrimaryColor, policy.SecondaryColor)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor)
 	if !hasChanged {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}

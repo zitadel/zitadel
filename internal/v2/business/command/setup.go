@@ -37,7 +37,7 @@ func (r *CommandSide) setup(ctx context.Context, iamID string, step iam_repo.Ste
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "setup error")
 	}
 
-	aggregate := query.AggregateFromReadModel(iam).
+	aggregate := query.IAMAggregateFromReadModel(iam).
 		PushEvents(event)
 
 	events, err := r.eventstore.PushAggregates(ctx, aggregate)

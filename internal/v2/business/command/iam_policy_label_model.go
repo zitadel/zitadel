@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -39,9 +40,14 @@ func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.LabelPolicyWriteModel.AggregateID)
 }
 
-func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(primaryColor, secondaryColor string) (*iam.LabelPolicyChangedEvent, bool) {
+func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
+	ctx context.Context,
+	primaryColor,
+	secondaryColor string,
+) (*iam.LabelPolicyChangedEvent, bool) {
+
 	hasChanged := false
-	changedEvent := &iam.LabelPolicyChangedEvent{}
+	changedEvent := iam.NewLabelPolicyChangedEvent(ctx)
 	if wm.PrimaryColor != primaryColor {
 		hasChanged = true
 		changedEvent.PrimaryColor = primaryColor

@@ -61,6 +61,14 @@ func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
+func NewPasswordLockoutPolicyChangedEvent(
+	base *eventstore.BaseEvent,
+) *PasswordLockoutPolicyChangedEvent {
+	return &PasswordLockoutPolicyChangedEvent{
+		BaseEvent: *base,
+	}
+}
+
 func PasswordLockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &PasswordLockoutPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

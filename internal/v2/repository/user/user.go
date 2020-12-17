@@ -22,16 +22,16 @@ const (
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
 )
 
-type LockedEvent struct {
+type UserLockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LockedEvent) Data() interface{} {
+func (e *UserLockedEvent) Data() interface{} {
 	return nil
 }
 
-func NewLockedEvent(ctx context.Context) *LockedEvent {
-	return &LockedEvent{
+func NewUserLockedEvent(ctx context.Context) *UserLockedEvent {
+	return &UserLockedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserLockedType,
@@ -39,22 +39,22 @@ func NewLockedEvent(ctx context.Context) *LockedEvent {
 	}
 }
 
-func LockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &LockedEvent{
+func UserLockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &UserLockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type UnlockedEvent struct {
+type UserUnlockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UnlockedEvent) Data() interface{} {
+func (e *UserUnlockedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUnlockedEvent(ctx context.Context) *UnlockedEvent {
-	return &UnlockedEvent{
+func NewUserUnlockedEvent(ctx context.Context) *UserUnlockedEvent {
+	return &UserUnlockedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserUnlockedType,
@@ -62,22 +62,22 @@ func NewUnlockedEvent(ctx context.Context) *UnlockedEvent {
 	}
 }
 
-func UnlockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &UnlockedEvent{
+func UserUnlockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &UserUnlockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type DeactivatedEvent struct {
+type UserDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DeactivatedEvent) Data() interface{} {
+func (e *UserDeactivatedEvent) Data() interface{} {
 	return nil
 }
 
-func NewDeactivatedEvent(ctx context.Context) *DeactivatedEvent {
-	return &DeactivatedEvent{
+func NewUserDeactivatedEvent(ctx context.Context) *UserDeactivatedEvent {
+	return &UserDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserDeactivatedType,
@@ -85,22 +85,22 @@ func NewDeactivatedEvent(ctx context.Context) *DeactivatedEvent {
 	}
 }
 
-func DeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &DeactivatedEvent{
+func UserDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &UserDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type ReactivatedEvent struct {
+type UserReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ReactivatedEvent) Data() interface{} {
+func (e *UserReactivatedEvent) Data() interface{} {
 	return nil
 }
 
-func NewReactivatedEvent(ctx context.Context) *ReactivatedEvent {
-	return &ReactivatedEvent{
+func NewUserReactivatedEvent(ctx context.Context) *UserReactivatedEvent {
+	return &UserReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserReactivatedType,
@@ -108,22 +108,22 @@ func NewReactivatedEvent(ctx context.Context) *ReactivatedEvent {
 	}
 }
 
-func ReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &ReactivatedEvent{
+func UserReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &UserReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type RemovedEvent struct {
+type UserRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *UserRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewRemovedEvent(ctx context.Context) *RemovedEvent {
-	return &RemovedEvent{
+func NewUserRemovedEvent(ctx context.Context) *UserRemovedEvent {
+	return &UserRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserRemovedType,
@@ -131,13 +131,13 @@ func NewRemovedEvent(ctx context.Context) *RemovedEvent {
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &RemovedEvent{
+func UserRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &UserRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type TokenAddedEvent struct {
+type UserTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	TokenID           string    `json:"tokenId"`
@@ -149,11 +149,11 @@ type TokenAddedEvent struct {
 	PreferredLanguage string    `json:"preferredLanguage"`
 }
 
-func (e *TokenAddedEvent) Data() interface{} {
+func (e *UserTokenAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewTokenAddedEvent(
+func NewUserTokenAddedEvent(
 	ctx context.Context,
 	tokenID,
 	applicationID,
@@ -162,8 +162,8 @@ func NewTokenAddedEvent(
 	audience,
 	scopes []string,
 	expiration time.Time,
-) *TokenAddedEvent {
-	return &TokenAddedEvent{
+) *UserTokenAddedEvent {
+	return &UserTokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserTokenAddedType,
@@ -177,8 +177,8 @@ func NewTokenAddedEvent(
 	}
 }
 
-func TokenAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	tokenAdded := &TokenAddedEvent{
+func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	tokenAdded := &UserTokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, tokenAdded)

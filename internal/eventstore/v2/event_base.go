@@ -36,7 +36,7 @@ func (e *BaseEvent) EditorUser() string {
 	return e.User
 }
 
-//Type implements EventPusher
+//KeyType implements EventPusher
 func (e *BaseEvent) Type() EventType {
 	return e.EventType
 }

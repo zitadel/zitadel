@@ -2,11 +2,10 @@ package iam
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/business/domain"
-	"github.com/caos/zitadel/internal/v2/repository/idpconfig"
-
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/repository/idpconfig"
 )
 
 const (
@@ -54,6 +53,16 @@ func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 
 type IDPConfigChangedEvent struct {
 	idpconfig.IDPConfigChangedEvent
+}
+
+func NewIDPConfigChangedEvent(
+	ctx context.Context,
+) *IDPConfigChangedEvent {
+	return &IDPConfigChangedEvent{
+		IDPConfigChangedEvent: *idpconfig.NewIDPConfigChangedEvent(
+			eventstore.NewBaseEventForPush(ctx, IDPConfigChangedEventType),
+		),
+	}
 }
 
 func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

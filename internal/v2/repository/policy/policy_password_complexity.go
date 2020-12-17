@@ -72,6 +72,14 @@ func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
+func NewPasswordComplexityPolicyChangedEvent(
+	base *eventstore.BaseEvent,
+) *PasswordComplexityPolicyChangedEvent {
+	return &PasswordComplexityPolicyChangedEvent{
+		BaseEvent: *base,
+	}
+}
+
 func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &PasswordComplexityPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

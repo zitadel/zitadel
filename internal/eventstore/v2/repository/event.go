@@ -26,7 +26,7 @@ type Event struct {
 	// time drifts in different services could cause integrity problems
 	CreationDate time.Time
 
-	//Type describes the cause of the event (e.g. user.added)
+	//KeyType describes the cause of the event (e.g. user.added)
 	// it should always be in past-form
 	Type EventType
 

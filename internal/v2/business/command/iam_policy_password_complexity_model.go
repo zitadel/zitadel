@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -39,9 +40,17 @@ func (wm *IAMPasswordComplexityPolicyWriteModel) Query() *eventstore.SearchQuery
 		AggregateIDs(wm.PasswordComplexityPolicyWriteModel.AggregateID)
 }
 
-func (wm *IAMPasswordComplexityPolicyWriteModel) NewChangedEvent(minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) (*iam.PasswordComplexityPolicyChangedEvent, bool) {
+func (wm *IAMPasswordComplexityPolicyWriteModel) NewChangedEvent(
+	ctx context.Context,
+	minLength uint64,
+	hasLowercase,
+	hasUppercase,
+	hasNumber,
+	hasSymbol bool,
+) (*iam.PasswordComplexityPolicyChangedEvent, bool) {
+
 	hasChanged := false
-	changedEvent := &iam.PasswordComplexityPolicyChangedEvent{}
+	changedEvent := iam.NewPasswordComplexityPolicyChangedEvent(ctx)
 	if wm.MinLength != minLength {
 		hasChanged = true
 		changedEvent.MinLength = minLength

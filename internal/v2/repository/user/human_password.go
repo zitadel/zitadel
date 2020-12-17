@@ -1,4 +1,4 @@
-package password
+package user
 
 import (
 	"context"
@@ -7,12 +7,12 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/repository/user/human"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 	"time"
 )
 
 const (
-	passwordEventPrefix             = eventstore.EventType("user.human.password.")
+	passwordEventPrefix             = humanEventPrefix + "password."
 	HumanPasswordChangedType        = passwordEventPrefix + "changed"
 	HumanPasswordCodeAddedType      = passwordEventPrefix + "code.added"
 	HumanPasswordCodeSentType       = passwordEventPrefix + "code.sent"
@@ -20,23 +20,23 @@ const (
 	HumanPasswordCheckFailedType    = passwordEventPrefix + "check.failed"
 )
 
-type ChangedEvent struct {
+type HumanPasswordChangedChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
 	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
-func (e *ChangedEvent) Data() interface{} {
+func (e *HumanPasswordChangedChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewChangedEvent(
+func NewHumanPasswordChangedEvent(
 	ctx context.Context,
 	secret *crypto.CryptoValue,
 	changeRequired bool,
-) *ChangedEvent {
-	return &ChangedEvent{
+) *HumanPasswordChangedChangedEvent {
+	return &HumanPasswordChangedChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordChangedType,
@@ -46,8 +46,8 @@ func NewChangedEvent(
 	}
 }
 
-func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	humanAdded := &ChangedEvent{
+func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	humanAdded := &HumanPasswordChangedChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, humanAdded)
@@ -58,25 +58,25 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 	return humanAdded, nil
 }
 
-type CodeAddedEvent struct {
+type HumanPasswordCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code             *crypto.CryptoValue    `json:"code,omitempty"`
-	Expiry           time.Duration          `json:"expiry,omitempty"`
-	NotificationType human.NotificationType `json:"notificationType,omitempty"`
+	Code             *crypto.CryptoValue     `json:"code,omitempty"`
+	Expiry           time.Duration           `json:"expiry,omitempty"`
+	NotificationType domain.NotificationType `json:"notificationType,omitempty"`
 }
 
-func (e *CodeAddedEvent) Data() interface{} {
+func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewPasswordCodeAddedEvent(
+func NewHumanPasswordCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	notificationType human.NotificationType,
-) *CodeAddedEvent {
-	return &CodeAddedEvent{
+	notificationType domain.NotificationType,
+) *HumanPasswordCodeAddedEvent {
+	return &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordCodeAddedType,
@@ -87,8 +87,8 @@ func NewPasswordCodeAddedEvent(
 	}
 }
 
-func CodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	humanAdded := &CodeAddedEvent{
+func HumanPasswordCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	humanAdded := &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, humanAdded)
@@ -99,16 +99,16 @@ func CodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, erro
 	return humanAdded, nil
 }
 
-type CodeSentEvent struct {
+type HumanPasswordCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CodeSentEvent) Data() interface{} {
+func (e *HumanPasswordCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewCodeSentEvent(ctx context.Context) *CodeSentEvent {
-	return &CodeSentEvent{
+func NewHumanPasswordCodeSentEvent(ctx context.Context) *HumanPasswordCodeSentEvent {
+	return &HumanPasswordCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordCodeSentType,
@@ -116,22 +116,22 @@ func NewCodeSentEvent(ctx context.Context) *CodeSentEvent {
 	}
 }
 
-func CodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &CodeSentEvent{
+func HumanPasswordCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanPasswordCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type CheckSucceededEvent struct {
+type HumanPasswordCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CheckSucceededEvent) Data() interface{} {
+func (e *HumanPasswordCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
-	return &CheckSucceededEvent{
+func NewHumanPasswordCheckSucceededEvent(ctx context.Context) *HumanPasswordCheckSucceededEvent {
+	return &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordCheckSucceededType,
@@ -139,22 +139,22 @@ func NewCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
 	}
 }
 
-func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &CheckSucceededEvent{
+func HumanPasswordCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type CheckFailedEvent struct {
+type HumanPasswordCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CheckFailedEvent) Data() interface{} {
+func (e *HumanPasswordCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
-	return &CheckFailedEvent{
+func NewHumanPasswordCheckFailedEvent(ctx context.Context) *HumanPasswordCheckFailedEvent {
+	return &HumanPasswordCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordCheckFailedType,
@@ -162,8 +162,8 @@ func NewCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
 	}
 }
 
-func CheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &CheckFailedEvent{
+func HumanPasswordCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanPasswordCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

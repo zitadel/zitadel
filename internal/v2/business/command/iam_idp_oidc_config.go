@@ -20,6 +20,7 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *ia
 	}
 
 	changedEvent, hasChanged, err := existingConfig.NewChangedEvent(
+		ctx,
 		config.ClientID,
 		config.Issuer,
 		config.ClientSecretString,

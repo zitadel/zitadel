@@ -1,4 +1,4 @@
-package human
+package user
 
 import (
 	"context"
@@ -7,12 +7,13 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 	"golang.org/x/text/language"
 	"time"
 )
 
 const (
-	humanEventPrefix                   = eventstore.EventType("user.human.")
+	humanEventPrefix                   = userEventTypePrefix + "human."
 	HumanAddedType                     = humanEventPrefix + "added"
 	HumanRegisteredType                = humanEventPrefix + "selfregistered"
 	HumanInitialCodeAddedType          = humanEventPrefix + "initialization.code.added"
@@ -22,17 +23,17 @@ const (
 	HumanSignedOutType                 = humanEventPrefix + "signed.out"
 )
 
-type AddedEvent struct {
+type HumanAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
 
-	FirstName         string       `json:"firstName,omitempty"`
-	LastName          string       `json:"lastName,omitempty"`
-	NickName          string       `json:"nickName,omitempty"`
-	DisplayName       string       `json:"displayName,omitempty"`
-	PreferredLanguage language.Tag `json:"preferredLanguage,omitempty"`
-	Gender            Gender       `json:"gender,omitempty"`
+	FirstName         string        `json:"firstName,omitempty"`
+	LastName          string        `json:"lastName,omitempty"`
+	NickName          string        `json:"nickName,omitempty"`
+	DisplayName       string        `json:"displayName,omitempty"`
+	PreferredLanguage language.Tag  `json:"preferredLanguage,omitempty"`
+	Gender            domain.Gender `json:"gender,omitempty"`
 
 	EmailAddress string `json:"email,omitempty"`
 
@@ -45,7 +46,7 @@ type AddedEvent struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *HumanAddedEvent) Data() interface{} {
 	return e
 }
 
@@ -57,7 +58,7 @@ func NewAddedEvent(
 	nickName,
 	displayName string,
 	preferredLanguage language.Tag,
-	gender Gender,
+	gender domain.Gender,
 	emailAddress,
 	phoneNumber,
 	country,
@@ -65,8 +66,8 @@ func NewAddedEvent(
 	postalCode,
 	region,
 	streetAddress string,
-) *AddedEvent {
-	return &AddedEvent{
+) *HumanAddedEvent {
+	return &HumanAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanAddedType,
@@ -88,8 +89,8 @@ func NewAddedEvent(
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	humanAdded := &AddedEvent{
+func HumanAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	humanAdded := &HumanAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, humanAdded)
@@ -100,7 +101,7 @@ func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return humanAdded, nil
 }
 
-type RegisteredEvent struct {
+type HumanRegisteredEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
@@ -123,11 +124,11 @@ type RegisteredEvent struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (e *RegisteredEvent) Data() interface{} {
+func (e *HumanRegisteredEvent) Data() interface{} {
 	return e
 }
 
-func NewRegisteredEvent(
+func NewHumanRegisteredEvent(
 	ctx context.Context,
 	userName,
 	firstName,
@@ -143,8 +144,8 @@ func NewRegisteredEvent(
 	postalCode,
 	region,
 	streetAddress string,
-) *RegisteredEvent {
-	return &RegisteredEvent{
+) *HumanRegisteredEvent {
+	return &HumanRegisteredEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanRegisteredType,
@@ -166,8 +167,8 @@ func NewRegisteredEvent(
 	}
 }
 
-func RegisteredEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	humanRegistered := &RegisteredEvent{
+func HumanRegisteredEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	humanRegistered := &HumanRegisteredEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, humanRegistered)
@@ -178,22 +179,22 @@ func RegisteredEventMapper(event *repository.Event) (eventstore.EventReader, err
 	return humanRegistered, nil
 }
 
-type InitialCodeAddedEvent struct {
+type HumanInitialCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	Code                 *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry               time.Duration       `json:"expiry,omitempty"`
 }
 
-func (e *InitialCodeAddedEvent) Data() interface{} {
+func (e *HumanInitialCodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewInitialCodeAddedEvent(
+func NewHumanInitialCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-) *InitialCodeAddedEvent {
-	return &InitialCodeAddedEvent{
+) *HumanInitialCodeAddedEvent {
+	return &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanInitialCodeAddedType,
@@ -203,8 +204,8 @@ func NewInitialCodeAddedEvent(
 	}
 }
 
-func InitialCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	humanRegistered := &InitialCodeAddedEvent{
+func HumanInitialCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	humanRegistered := &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, humanRegistered)
@@ -215,16 +216,16 @@ func InitialCodeAddedEventMapper(event *repository.Event) (eventstore.EventReade
 	return humanRegistered, nil
 }
 
-type InitialCodeSentEvent struct {
+type HumanInitialCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *InitialCodeSentEvent) Data() interface{} {
+func (e *HumanInitialCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func NewInitialCodeSentEvent(ctx context.Context) *InitialCodeSentEvent {
-	return &InitialCodeSentEvent{
+func NewHumanInitialCodeSentEvent(ctx context.Context) *HumanInitialCodeSentEvent {
+	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanInitialCodeSentType,
@@ -232,22 +233,22 @@ func NewInitialCodeSentEvent(ctx context.Context) *InitialCodeSentEvent {
 	}
 }
 
-func InitialCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &InitialCodeSentEvent{
+func HumanInitialCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type InitializedCheckSucceededEvent struct {
+type HumanInitializedCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *InitializedCheckSucceededEvent) Data() interface{} {
+func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewInitializedCheckSucceededEvent(ctx context.Context) *InitializedCheckSucceededEvent {
-	return &InitializedCheckSucceededEvent{
+func NewHumanInitializedCheckSucceededEvent(ctx context.Context) *HumanInitializedCheckSucceededEvent {
+	return &HumanInitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanInitializedCheckSucceededType,
@@ -255,22 +256,22 @@ func NewInitializedCheckSucceededEvent(ctx context.Context) *InitializedCheckSuc
 	}
 }
 
-func InitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &InitializedCheckSucceededEvent{
+func HumanInitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanInitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type InitializedCheckFailedEvent struct {
+type HumanInitializedCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *InitializedCheckFailedEvent) Data() interface{} {
+func (e *HumanInitializedCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewInitializedCheckFailedEvent(ctx context.Context) *InitializedCheckFailedEvent {
-	return &InitializedCheckFailedEvent{
+func NewHumanInitializedCheckFailedEvent(ctx context.Context) *HumanInitializedCheckFailedEvent {
+	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanInitializedCheckFailedType,
@@ -278,22 +279,22 @@ func NewInitializedCheckFailedEvent(ctx context.Context) *InitializedCheckFailed
 	}
 }
 
-func InitializedCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &InitializedCheckFailedEvent{
+func HumanInitializedCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type SignedOutEvent struct {
+type HumanSignedOutEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *SignedOutEvent) Data() interface{} {
+func (e *HumanSignedOutEvent) Data() interface{} {
 	return nil
 }
 
-func NewSignedOutEvent(ctx context.Context) *SignedOutEvent {
-	return &SignedOutEvent{
+func NewHumanSignedOutEvent(ctx context.Context) *HumanSignedOutEvent {
+	return &HumanSignedOutEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanSignedOutType,
@@ -301,8 +302,8 @@ func NewSignedOutEvent(ctx context.Context) *SignedOutEvent {
 	}
 }
 
-func SignedOutEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &SignedOutEvent{
+func HumanSignedOutEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanSignedOutEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

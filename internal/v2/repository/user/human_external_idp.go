@@ -1,4 +1,4 @@
-package external_idp
+package user
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	externalIDPEventPrefix   = eventstore.EventType("user.human.externalidp.")
-	externalLoginEventPrefix = eventstore.EventType("user.human.externallogin.")
+	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
+	externalLoginEventPrefix = humanEventPrefix + "externallogin."
 
 	//TODO: Handle unique Aggregate
 	HumanExternalIDPReservedType = externalIDPEventPrefix + "reserved"
@@ -23,16 +23,16 @@ const (
 	HumanExternalLoginCheckSucceededType = externalLoginEventPrefix + "check.succeeded"
 )
 
-type ReservedEvent struct {
+type HumanExternalIDPReservedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ReservedEvent) Data() interface{} {
+func (e *HumanExternalIDPReservedEvent) Data() interface{} {
 	return nil
 }
 
-func NewReservedEvent(ctx context.Context) *ReservedEvent {
-	return &ReservedEvent{
+func NewHumanExternalIDPReservedEvent(ctx context.Context) *HumanExternalIDPReservedEvent {
+	return &HumanExternalIDPReservedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalIDPReservedType,
@@ -40,16 +40,16 @@ func NewReservedEvent(ctx context.Context) *ReservedEvent {
 	}
 }
 
-type ReleasedEvent struct {
+type HumanExternalIDPReleasedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ReleasedEvent) Data() interface{} {
+func (e *HumanExternalIDPReleasedEvent) Data() interface{} {
 	return nil
 }
 
-func NewReleasedEvent(ctx context.Context) *ReleasedEvent {
-	return &ReleasedEvent{
+func NewHumanExternalIDPReleasedEvent(ctx context.Context) *HumanExternalIDPReleasedEvent {
+	return &HumanExternalIDPReleasedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalIDPReleasedType,
@@ -57,19 +57,19 @@ func NewReleasedEvent(ctx context.Context) *ReleasedEvent {
 	}
 }
 
-type AddedEvent struct {
+type HumanExternalIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId,omitempty"`
 	DisplayName string `json:"displayName,omitempty"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *HumanExternalIDPAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewAddedEvent(ctx context.Context, idpConfigID, displayName string) *AddedEvent {
-	return &AddedEvent{
+func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName string) *HumanExternalIDPAddedEvent {
+	return &HumanExternalIDPAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalIDPAddedType,
@@ -79,8 +79,8 @@ func NewAddedEvent(ctx context.Context, idpConfigID, displayName string) *AddedE
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &AddedEvent{
+func HumanExternalIDPAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &HumanExternalIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -92,18 +92,18 @@ func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return e, nil
 }
 
-type RemovedEvent struct {
+type HumanExternalIDPRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewRemovedEvent(ctx context.Context, idpConfigID string) *RemovedEvent {
-	return &RemovedEvent{
+func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID string) *HumanExternalIDPRemovedEvent {
+	return &HumanExternalIDPRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalIDPRemovedType,
@@ -112,8 +112,8 @@ func NewRemovedEvent(ctx context.Context, idpConfigID string) *RemovedEvent {
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &RemovedEvent{
+func HumanExternalIDPRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &HumanExternalIDPRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -125,18 +125,18 @@ func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 	return e, nil
 }
 
-type CascadeRemovedEvent struct {
+type HumanExternalIDPCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *CascadeRemovedEvent) Data() interface{} {
+func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewCascadeRemovedEvent(ctx context.Context, idpConfigID string) *CascadeRemovedEvent {
-	return &CascadeRemovedEvent{
+func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID string) *HumanExternalIDPCascadeRemovedEvent {
+	return &HumanExternalIDPCascadeRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalIDPCascadeRemovedType,
@@ -145,8 +145,8 @@ func NewCascadeRemovedEvent(ctx context.Context, idpConfigID string) *CascadeRem
 	}
 }
 
-func CascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &CascadeRemovedEvent{
+func HumanExternalIDPCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &HumanExternalIDPCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -158,16 +158,16 @@ func CascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader,
 	return e, nil
 }
 
-type CheckSucceededEvent struct {
+type HumanExternalIDPCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CheckSucceededEvent) Data() interface{} {
+func (e *HumanExternalIDPCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func NewCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
-	return &CheckSucceededEvent{
+func NewHumanExternalIDPCheckSucceededEvent(ctx context.Context) *HumanExternalIDPCheckSucceededEvent {
+	return &HumanExternalIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalLoginCheckSucceededType,
@@ -175,8 +175,8 @@ func NewCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
 	}
 }
 
-func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &CheckSucceededEvent{
+func HumanExternalIDPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanExternalIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

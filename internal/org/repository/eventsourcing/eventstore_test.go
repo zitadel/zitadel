@@ -2637,7 +2637,7 @@ func TestAddIdpProviderToLoginPolicy(t *testing.T) {
 				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
 			if result.Type != tt.res.result.Type {
-				t.Errorf("got wrong result Type: expected: %v, actual: %v ", tt.res.result.Type, result.Type)
+				t.Errorf("got wrong result KeyType: expected: %v, actual: %v ", tt.res.result.Type, result.Type)
 			}
 		})
 	}

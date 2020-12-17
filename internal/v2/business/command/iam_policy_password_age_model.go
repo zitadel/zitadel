@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -39,9 +40,9 @@ func (wm *IAMPasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder
 		AggregateIDs(wm.PasswordAgePolicyWriteModel.AggregateID)
 }
 
-func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(expireWarnDays, maxAgeDays uint64) (*iam.PasswordAgePolicyChangedEvent, bool) {
+func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(ctx context.Context, expireWarnDays, maxAgeDays uint64) (*iam.PasswordAgePolicyChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := &iam.PasswordAgePolicyChangedEvent{}
+	changedEvent := iam.NewPasswordAgePolicyChangedEvent(ctx)
 	if wm.ExpireWarnDays != expireWarnDays {
 		hasChanged = true
 		changedEvent.ExpireWarnDays = expireWarnDays

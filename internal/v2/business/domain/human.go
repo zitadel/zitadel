@@ -1,4 +1,4 @@
-package human
+package domain
 
 type Gender int32
 

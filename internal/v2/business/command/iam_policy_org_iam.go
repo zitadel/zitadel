@@ -37,7 +37,7 @@ func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0Pl0d", "Errors.IAM.OrgIAMPolicy.NotFound")
 	}
 
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(policy.UserLoginMustBeDomain)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.UserLoginMustBeDomain)
 	if !hasChanged {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}

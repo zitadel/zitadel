@@ -1,4 +1,4 @@
-package phone
+package user
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	phoneEventPrefix                 = eventstore.EventType("user.human.phone.")
+	phoneEventPrefix                 = humanEventPrefix + "phone."
 	HumanPhoneChangedType            = phoneEventPrefix + "changed"
 	HumanPhoneRemovedType            = phoneEventPrefix + "removed"
 	HumanPhoneVerifiedType           = phoneEventPrefix + "verified"
@@ -20,18 +20,18 @@ const (
 	HumanPhoneCodeSentType           = phoneEventPrefix + "code.sent"
 )
 
-type ChangedEvent struct {
+type HumanPhoneChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	PhoneNumber string `json:"phone,omitempty"`
 }
 
-func (e *ChangedEvent) Data() interface{} {
+func (e *HumanPhoneChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewChangedEvent(ctx context.Context, phone string) *ChangedEvent {
-	return &ChangedEvent{
+func NewHumanPhoneChangedEvent(ctx context.Context, phone string) *HumanPhoneChangedEvent {
+	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPhoneChangedType,
@@ -40,8 +40,8 @@ func NewChangedEvent(ctx context.Context, phone string) *ChangedEvent {
 	}
 }
 
-func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	phoneChangedEvent := &ChangedEvent{
+func HumanPhoneChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	phoneChangedEvent := &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, phoneChangedEvent)
@@ -52,16 +52,16 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 	return phoneChangedEvent, nil
 }
 
-type RemovedEvent struct {
+type HumanPhoneRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *HumanPhoneRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewRemovedEvent(ctx context.Context) *RemovedEvent {
-	return &RemovedEvent{
+func NewHumanPhoneRemovedEvent(ctx context.Context) *HumanPhoneRemovedEvent {
+	return &HumanPhoneRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPhoneRemovedType,
@@ -69,24 +69,24 @@ func NewRemovedEvent(ctx context.Context) *RemovedEvent {
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &ChangedEvent{
+func HumanPhoneRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type VerifiedEvent struct {
+type HumanPhoneVerifiedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IsPhoneVerified bool `json:"-"`
 }
 
-func (e *VerifiedEvent) Data() interface{} {
+func (e *HumanPhoneVerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func NewVerifiedEvent(ctx context.Context) *VerifiedEvent {
-	return &VerifiedEvent{
+func NewHumanPhoneVerifiedEvent(ctx context.Context) *HumanPhoneVerifiedEvent {
+	return &HumanPhoneVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPhoneVerifiedType,
@@ -94,23 +94,23 @@ func NewVerifiedEvent(ctx context.Context) *VerifiedEvent {
 	}
 }
 
-func VerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &VerifiedEvent{
+func HumanPhoneVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanPhoneVerifiedEvent{
 		BaseEvent:       *eventstore.BaseEventFromRepo(event),
 		IsPhoneVerified: true,
 	}, nil
 }
 
-type VerificationFailedEvent struct {
+type HumanPhoneVerificationFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *VerificationFailedEvent) Data() interface{} {
+func (e *HumanPhoneVerificationFailedEvent) Data() interface{} {
 	return nil
 }
 
-func NewVerificationFailedEvent(ctx context.Context) *VerificationFailedEvent {
-	return &VerificationFailedEvent{
+func NewHumanPhoneVerificationFailedEvent(ctx context.Context) *HumanPhoneVerificationFailedEvent {
+	return &HumanPhoneVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPhoneVerificationFailedType,
@@ -118,29 +118,29 @@ func NewVerificationFailedEvent(ctx context.Context) *VerificationFailedEvent {
 	}
 }
 
-func VerificationFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &VerificationFailedEvent{
+func HumanPhoneVerificationFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanPhoneVerificationFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
 
-type CodeAddedEvent struct {
+type HumanPhoneCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Code   *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry time.Duration       `json:"expiry,omitempty"`
 }
 
-func (e *CodeAddedEvent) Data() interface{} {
+func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewCodeAddedEvent(
+func NewHumanPhoneCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-) *CodeAddedEvent {
-	return &CodeAddedEvent{
+) *HumanPhoneCodeAddedEvent {
+	return &HumanPhoneCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPhoneCodeAddedType,
@@ -150,8 +150,8 @@ func NewCodeAddedEvent(
 	}
 }
 
-func CodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	codeAdded := &CodeAddedEvent{
+func HumanPhoneCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	codeAdded := &HumanPhoneCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, codeAdded)
@@ -162,16 +162,16 @@ func CodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, erro
 	return codeAdded, nil
 }
 
-type CodeSentEvent struct {
+type HumanPhoneCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CodeSentEvent) Data() interface{} {
+func (e *HumanPhoneCodeSentEvent) Data() interface{} {
 	return e
 }
 
-func NewCodeSentEvent(ctx context.Context) *CodeSentEvent {
-	return &CodeSentEvent{
+func NewHumanPhoneCodeSentEvent(ctx context.Context) *HumanPhoneCodeSentEvent {
+	return &HumanPhoneCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPhoneCodeSentType,
@@ -179,8 +179,8 @@ func NewCodeSentEvent(ctx context.Context) *CodeSentEvent {
 	}
 }
 
-func CodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &CodeSentEvent{
+func HumanPhoneCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &HumanPhoneCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

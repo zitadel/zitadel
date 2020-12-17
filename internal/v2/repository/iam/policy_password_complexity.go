@@ -48,6 +48,16 @@ type PasswordComplexityPolicyChangedEvent struct {
 	policy.PasswordComplexityPolicyChangedEvent
 }
 
+func NewPasswordComplexityPolicyChangedEvent(
+	ctx context.Context,
+) *PasswordComplexityPolicyChangedEvent {
+	return &PasswordComplexityPolicyChangedEvent{
+		PasswordComplexityPolicyChangedEvent: *policy.NewPasswordComplexityPolicyChangedEvent(
+			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
+		),
+	}
+}
+
 func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.PasswordComplexityPolicyChangedEventMapper(event)
 	if err != nil {

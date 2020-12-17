@@ -61,6 +61,14 @@ func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
 	return e
 }
 
+func NewPasswordAgePolicyChangedEvent(
+	base *eventstore.BaseEvent,
+) *PasswordAgePolicyChangedEvent {
+	return &PasswordAgePolicyChangedEvent{
+		BaseEvent: *base,
+	}
+}
+
 func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &PasswordAgePolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

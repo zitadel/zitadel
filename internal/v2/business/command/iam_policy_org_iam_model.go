@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -39,9 +40,9 @@ func (wm *IAMOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.PolicyOrgIAMWriteModel.AggregateID)
 }
 
-func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(userLoginMustBeDomain bool) (*iam.OrgIAMPolicyChangedEvent, bool) {
+func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(ctx context.Context, userLoginMustBeDomain bool) (*iam.OrgIAMPolicyChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := &iam.OrgIAMPolicyChangedEvent{}
+	changedEvent := iam.NewOrgIAMPolicyChangedEvent(ctx)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
 		hasChanged = true
 		changedEvent.UserLoginMustBeDomain = userLoginMustBeDomain

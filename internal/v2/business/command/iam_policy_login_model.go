@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/business/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
@@ -40,9 +41,17 @@ func (wm *IAMLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.LoginPolicyWriteModel.AggregateID)
 }
 
-func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA bool, passwordlessType domain.PasswordlessType) (*iam.LoginPolicyChangedEvent, bool) {
+func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
+	ctx context.Context,
+	allowUsernamePassword,
+	allowRegister,
+	allowExternalIDP,
+	forceMFA bool,
+	passwordlessType domain.PasswordlessType,
+) (*iam.LoginPolicyChangedEvent, bool) {
+
 	hasChanged := false
-	changedEvent := &iam.LoginPolicyChangedEvent{}
+	changedEvent := iam.NewLoginPolicyChangedEvent(ctx)
 	if wm.AllowUserNamePassword == allowUsernamePassword {
 		hasChanged = true
 		changedEvent.AllowUserNamePassword = allowUsernamePassword

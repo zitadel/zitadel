@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/business/domain"
@@ -70,6 +71,7 @@ func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (wm *IDPOIDCConfigWriteModel) NewChangedEvent(
+	ctx context.Context,
 	clientID,
 	issuer,
 	clientSecretString string,
@@ -79,7 +81,7 @@ func (wm *IDPOIDCConfigWriteModel) NewChangedEvent(
 	scopes ...string,
 ) (*iam.IDPOIDCConfigChangedEvent, bool, error) {
 	hasChanged := false
-	changedEvent := &iam.IDPOIDCConfigChangedEvent{}
+	changedEvent := iam.NewIDPOIDCConfigChangedEvent(ctx)
 	var clientSecret *crypto.CryptoValue
 	var err error
 	if clientSecretString != "" {

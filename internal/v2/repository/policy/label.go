@@ -63,20 +63,10 @@ func (e *LabelPolicyChangedEvent) Data() interface{} {
 
 func NewLabelPolicyChangedEvent(
 	base *eventstore.BaseEvent,
-	primaryColor,
-	secondaryColor string,
 ) *LabelPolicyChangedEvent {
-
-	e := &LabelPolicyChangedEvent{
+	return &LabelPolicyChangedEvent{
 		BaseEvent: *base,
 	}
-	if primaryColor != "" {
-		e.PrimaryColor = primaryColor
-	}
-	if secondaryColor != "" {
-		e.SecondaryColor = secondaryColor
-	}
-	return e
 }
 
 func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

@@ -29,21 +29,3 @@ func NewAggregate(
 		),
 	}
 }
-
-func AggregateFromWriteModel(wm *eventstore.WriteModel) *Aggregate {
-	return &Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, AggregateType, AggregateVersion),
-	}
-}
-
-func AggregateFromReadModel(rm *ReadModel) *Aggregate {
-	return &Aggregate{
-		Aggregate: *eventstore.NewAggregate(
-			rm.AggregateID,
-			AggregateType,
-			rm.ResourceOwner,
-			AggregateVersion,
-			rm.ProcessedSequence,
-		),
-	}
-}

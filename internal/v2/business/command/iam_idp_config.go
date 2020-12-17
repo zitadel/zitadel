@@ -67,7 +67,7 @@ func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *iam_mo
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotExisting")
 	}
 
-	changedEvent, hasChanged := existingIDP.NewChangedEvent(config.IDPConfigID, config.Name, domain.IDPConfigStylingType(config.StylingType))
+	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, config.IDPConfigID, config.Name, domain.IDPConfigStylingType(config.StylingType))
 	if !hasChanged {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}

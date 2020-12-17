@@ -42,6 +42,16 @@ type PasswordAgePolicyChangedEvent struct {
 	policy.PasswordAgePolicyChangedEvent
 }
 
+func NewPasswordAgePolicyChangedEvent(
+	ctx context.Context,
+) *PasswordAgePolicyChangedEvent {
+	return &PasswordAgePolicyChangedEvent{
+		PasswordAgePolicyChangedEvent: *policy.NewPasswordAgePolicyChangedEvent(
+			eventstore.NewBaseEventForPush(ctx, PasswordAgePolicyChangedEventType),
+		),
+	}
+}
+
 func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.PasswordAgePolicyChangedEventMapper(event)
 	if err != nil {

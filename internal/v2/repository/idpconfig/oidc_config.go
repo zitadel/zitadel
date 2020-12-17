@@ -85,6 +85,14 @@ func (e *OIDCConfigChangedEvent) Data() interface{} {
 	return e
 }
 
+func NewOIDCConfigChangedEvent(
+	base *eventstore.BaseEvent,
+) *OIDCConfigChangedEvent {
+	return &OIDCConfigChangedEvent{
+		BaseEvent: *base,
+	}
+}
+
 func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &OIDCConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/business/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
@@ -77,9 +78,15 @@ func (wm *IAMIDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventRead
 	return wm.Reduce()
 }
 
-func (wm *IAMIDPConfigWriteModel) NewChangedEvent(configID, name string, stylingType domain.IDPConfigStylingType) (*iam.IDPConfigChangedEvent, bool) {
+func (wm *IAMIDPConfigWriteModel) NewChangedEvent(
+	ctx context.Context,
+	configID,
+	name string,
+	stylingType domain.IDPConfigStylingType,
+) (*iam.IDPConfigChangedEvent, bool) {
+
 	hasChanged := false
-	changedEvent := &iam.IDPConfigChangedEvent{}
+	changedEvent := iam.NewIDPConfigChangedEvent(ctx)
 	changedEvent.ConfigID = configID
 	if wm.Name != name {
 		hasChanged = true

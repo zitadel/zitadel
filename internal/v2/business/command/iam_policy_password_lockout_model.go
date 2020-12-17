@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -39,9 +40,9 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBui
 		AggregateIDs(wm.PasswordLockoutPolicyWriteModel.AggregateID)
 }
 
-func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(maxAttempts uint64, showLockoutFailure bool) (*iam.PasswordLockoutPolicyChangedEvent, bool) {
+func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) (*iam.PasswordLockoutPolicyChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := &iam.PasswordLockoutPolicyChangedEvent{}
+	changedEvent := iam.NewPasswordLockoutPolicyChangedEvent(ctx)
 	if wm.MaxAttempts != maxAttempts {
 		hasChanged = true
 		changedEvent.MaxAttempts = maxAttempts

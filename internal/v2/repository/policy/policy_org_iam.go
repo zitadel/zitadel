@@ -56,6 +56,14 @@ func (e *OrgIAMPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
+func NewOrgIAMPolicyChangedEvent(
+	base *eventstore.BaseEvent,
+) *OrgIAMPolicyChangedEvent {
+	return &OrgIAMPolicyChangedEvent{
+		BaseEvent: *base,
+	}
+}
+
 func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &OrgIAMPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

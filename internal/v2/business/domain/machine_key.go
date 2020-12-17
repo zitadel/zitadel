@@ -1,4 +1,4 @@
-package keys
+package domain
 
 type MachineKeyType int32
 

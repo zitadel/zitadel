@@ -9,7 +9,7 @@ type EventPusher interface {
 	EditorService() string
 	//EditorUser is the user who wants to push the event
 	EditorUser() string
-	//Type must return an event type which should be unique in the aggregate
+	//KeyType must return an event type which should be unique in the aggregate
 	Type() EventType
 	//Data returns the payload of the event. It represent the changed fields by the event
 	// valid types are:
@@ -25,7 +25,7 @@ type EventReader interface {
 	EditorService() string
 	//EditorUser is the user who pushed the event
 	EditorUser() string
-	//Type is the type of the event
+	//KeyType is the type of the event
 	Type() EventType
 
 	AggregateID() string

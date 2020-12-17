@@ -38,7 +38,7 @@ func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0oPew", "Errors.IAM.PasswordAgePolicy.NotFound")
 	}
 
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(policy.ExpireWarnDays, policy.MaxAgeDays)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.ExpireWarnDays, policy.MaxAgeDays)
 	if !hasChanged {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}

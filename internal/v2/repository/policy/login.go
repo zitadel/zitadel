@@ -79,19 +79,9 @@ func (e *LoginPolicyChangedEvent) Data() interface{} {
 
 func NewLoginPolicyChangedEvent(
 	base *eventstore.BaseEvent,
-	allowUserNamePassword,
-	allowRegister,
-	allowExternalIDP,
-	forceMFA bool,
-	passwordlessType domain.PasswordlessType,
 ) *LoginPolicyChangedEvent {
 	return &LoginPolicyChangedEvent{
-		BaseEvent:             *base,
-		AllowUserNamePassword: allowUserNamePassword,
-		AllowRegister:         allowRegister,
-		AllowExternalIDP:      allowExternalIDP,
-		ForceMFA:              forceMFA,
-		PasswordlessType:      passwordlessType,
+		BaseEvent: *base,
 	}
 }
 

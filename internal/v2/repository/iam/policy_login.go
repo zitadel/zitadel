@@ -49,6 +49,16 @@ type LoginPolicyChangedEvent struct {
 	policy.LoginPolicyChangedEvent
 }
 
+func NewLoginPolicyChangedEvent(
+	ctx context.Context,
+) *LoginPolicyChangedEvent {
+	return &LoginPolicyChangedEvent{
+		LoginPolicyChangedEvent: *policy.NewLoginPolicyChangedEvent(
+			eventstore.NewBaseEventForPush(ctx, LoginPolicyChangedEventType),
+		),
+	}
+}
+
 func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.LoginPolicyChangedEventMapper(event)
 	if err != nil {

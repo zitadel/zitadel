@@ -41,6 +41,16 @@ type OrgIAMPolicyChangedEvent struct {
 	policy.OrgIAMPolicyChangedEvent
 }
 
+func NewOrgIAMPolicyChangedEvent(
+	ctx context.Context,
+) *OrgIAMPolicyChangedEvent {
+	return &OrgIAMPolicyChangedEvent{
+		OrgIAMPolicyChangedEvent: *policy.NewOrgIAMPolicyChangedEvent(
+			eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyChangedEventType),
+		),
+	}
+}
+
 func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.OrgIAMPolicyChangedEventMapper(event)
 	if err != nil {

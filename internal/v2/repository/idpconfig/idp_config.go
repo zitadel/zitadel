@@ -63,6 +63,14 @@ func (e *IDPConfigChangedEvent) Data() interface{} {
 	return e
 }
 
+func NewIDPConfigChangedEvent(
+	base *eventstore.BaseEvent,
+) *IDPConfigChangedEvent {
+	return &IDPConfigChangedEvent{
+		BaseEvent: *base,
+	}
+}
+
 func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &IDPConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

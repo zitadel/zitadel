@@ -1,4 +1,4 @@
-package machine
+package user
 
 import (
 	"context"
@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	machineEventPrefix      = eventstore.EventType("user.machine.")
+	machineEventPrefix      = userEventTypePrefix + "machine."
 	MachineAddedEventType   = machineEventPrefix + "added"
 	MachineChangedEventType = machineEventPrefix + "changed"
 )
 
-type AddedEvent struct {
+type MachineAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
@@ -23,17 +23,17 @@ type AddedEvent struct {
 	Description string `json:"description,omitempty"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *MachineAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewAddedEvent(
+func NewMachineAddedEvent(
 	ctx context.Context,
 	userName,
 	name,
 	description string,
-) *AddedEvent {
-	return &AddedEvent{
+) *MachineAddedEvent {
+	return &MachineAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			MachineAddedEventType,
@@ -44,8 +44,8 @@ func NewAddedEvent(
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	machineAdded := &AddedEvent{
+func MachineAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	machineAdded := &MachineAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, machineAdded)
@@ -56,7 +56,7 @@ func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return machineAdded, nil
 }
 
-type ChangedEvent struct {
+type MachineChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName string `json:"userName"`
@@ -65,29 +65,23 @@ type ChangedEvent struct {
 	Description string `json:"description,omitempty"`
 }
 
-func (e *ChangedEvent) Data() interface{} {
+func (e *MachineChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewChangedEvent(
+func NewMachineChangedEvent(
 	ctx context.Context,
-	userName,
-	name,
-	description string,
-) *ChangedEvent {
-	return &ChangedEvent{
+) *MachineChangedEvent {
+	return &MachineChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			MachineChangedEventType,
 		),
-		UserName:    userName,
-		Name:        name,
-		Description: description,
 	}
 }
 
-func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	machineChanged := &ChangedEvent{
+func MachineChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	machineChanged := &MachineChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, machineChanged)

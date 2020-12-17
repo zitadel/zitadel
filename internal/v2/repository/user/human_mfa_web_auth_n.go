@@ -1,4 +1,4 @@
-package web_auth_n
+package user
 
 import (
 	"context"
@@ -6,11 +6,11 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/repository/user/human/mfa"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 )
 
 const (
-	u2fEventPrefix                    = eventstore.EventType("user.human.mfa.u2f.token.")
+	u2fEventPrefix                    = mfaEventPrefix + "u2f.token."
 	HumanU2FTokenAddedType            = u2fEventPrefix + "added"
 	HumanU2FTokenVerifiedType         = u2fEventPrefix + "verified"
 	HumanU2FTokenSignCountChangedType = u2fEventPrefix + "signcount.changed"
@@ -19,7 +19,7 @@ const (
 	HumanU2FTokenCheckSucceededType   = u2fEventPrefix + "check.succeeded"
 	HumanU2FTokenCheckFailedType      = u2fEventPrefix + "check.failed"
 
-	passwordlessEventPrefix                    = eventstore.EventType("user.human.mfa.passwordless.token.")
+	passwordlessEventPrefix                    = humanEventPrefix + "passwordless.token."
 	HumanPasswordlessTokenAddedType            = passwordlessEventPrefix + "added"
 	HumanPasswordlessTokenVerifiedType         = passwordlessEventPrefix + "verified"
 	HumanPasswordlessTokenSignCountChangedType = passwordlessEventPrefix + "signcount.changed"
@@ -29,24 +29,24 @@ const (
 	HumanPasswordlessTokenCheckFailedType      = passwordlessEventPrefix + "check.failed"
 )
 
-type AddedEvent struct {
+type HumanWebAuthNAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	WebAuthNTokenID string    `json:"webAuthNTokenId"`
-	Challenge       string    `json:"challenge"`
-	State           mfa.State `json:"-"`
+	WebAuthNTokenID string          `json:"webAuthNTokenId"`
+	Challenge       string          `json:"challenge"`
+	State           domain.MFAState `json:"-"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *HumanWebAuthNAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewU2FAddedEvent(
+func NewHumanU2FAddedEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	challenge string,
-) *AddedEvent {
-	return &AddedEvent{
+) *HumanWebAuthNAddedEvent {
+	return &HumanWebAuthNAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanU2FTokenAddedType,
@@ -56,12 +56,12 @@ func NewU2FAddedEvent(
 	}
 }
 
-func NewPasswordlessAddedEvent(
+func NewHumanPasswordlessAddedEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	challenge string,
-) *AddedEvent {
-	return &AddedEvent{
+) *HumanWebAuthNAddedEvent {
+	return &HumanWebAuthNAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordlessTokenAddedType,
@@ -71,10 +71,10 @@ func NewPasswordlessAddedEvent(
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	webAuthNAdded := &AddedEvent{
+func WebAuthNAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webAuthNAdded := &HumanWebAuthNAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     mfa.StateNotReady,
+		State:     domain.MFAStateNotReady,
 	}
 	err := json.Unmarshal(event.Data, webAuthNAdded)
 	if err != nil {
@@ -83,24 +83,24 @@ func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return webAuthNAdded, nil
 }
 
-type VerifiedEvent struct {
+type HumanWebAuthNVerifiedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	WebAuthNTokenID   string    `json:"webAuthNTokenId"`
-	KeyID             []byte    `json:"keyId"`
-	PublicKey         []byte    `json:"publicKey"`
-	AttestationType   string    `json:"attestationType"`
-	AAGUID            []byte    `json:"aaguid"`
-	SignCount         uint32    `json:"signCount"`
-	WebAuthNTokenName string    `json:"webAuthNTokenName"`
-	State             mfa.State `json:"-"`
+	WebAuthNTokenID   string          `json:"webAuthNTokenId"`
+	KeyID             []byte          `json:"keyId"`
+	PublicKey         []byte          `json:"publicKey"`
+	AttestationType   string          `json:"attestationType"`
+	AAGUID            []byte          `json:"aaguid"`
+	SignCount         uint32          `json:"signCount"`
+	WebAuthNTokenName string          `json:"webAuthNTokenName"`
+	State             domain.MFAState `json:"-"`
 }
 
-func (e *VerifiedEvent) Data() interface{} {
+func (e *HumanWebAuthNVerifiedEvent) Data() interface{} {
 	return e
 }
 
-func NewU2FVerifiedEvent(
+func NewHumanU2FVerifiedEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	webAuthNTokenName,
@@ -109,8 +109,8 @@ func NewU2FVerifiedEvent(
 	publicKey,
 	aaguid []byte,
 	signCount uint32,
-) *VerifiedEvent {
-	return &VerifiedEvent{
+) *HumanWebAuthNVerifiedEvent {
+	return &HumanWebAuthNVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanU2FTokenVerifiedType,
@@ -125,7 +125,7 @@ func NewU2FVerifiedEvent(
 	}
 }
 
-func NewPasswordlessVerifiedEvent(
+func NewHumanPasswordlessVerifiedEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	webAuthNTokenName,
@@ -134,8 +134,8 @@ func NewPasswordlessVerifiedEvent(
 	publicKey,
 	aaguid []byte,
 	signCount uint32,
-) *VerifiedEvent {
-	return &VerifiedEvent{
+) *HumanWebAuthNVerifiedEvent {
+	return &HumanWebAuthNVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordlessTokenVerifiedType,
@@ -150,10 +150,10 @@ func NewPasswordlessVerifiedEvent(
 	}
 }
 
-func VerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	webauthNVerified := &VerifiedEvent{
+func HumanWebAuthNVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webauthNVerified := &HumanWebAuthNVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     mfa.StateReady,
+		State:     domain.MFAStateReady,
 	}
 	err := json.Unmarshal(event.Data, webauthNVerified)
 	if err != nil {
@@ -162,24 +162,24 @@ func VerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error
 	return webauthNVerified, nil
 }
 
-type SignCountChangedEvent struct {
+type HumanWebAuthNSignCountChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	WebAuthNTokenID string    `json:"webAuthNTokenId"`
-	SignCount       uint32    `json:"signCount"`
-	State           mfa.State `json:"-"`
+	WebAuthNTokenID string          `json:"webAuthNTokenId"`
+	SignCount       uint32          `json:"signCount"`
+	State           domain.MFAState `json:"-"`
 }
 
-func (e *SignCountChangedEvent) Data() interface{} {
+func (e *HumanWebAuthNSignCountChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewU2FSignCountChangedEvent(
+func NewHumanU2FSignCountChangedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
 	signCount uint32,
-) *SignCountChangedEvent {
-	return &SignCountChangedEvent{
+) *HumanWebAuthNSignCountChangedEvent {
+	return &HumanWebAuthNSignCountChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanU2FTokenSignCountChangedType,
@@ -189,12 +189,12 @@ func NewU2FSignCountChangedEvent(
 	}
 }
 
-func NewPasswordlessSignCountChangedEvent(
+func NewHumanPasswordlessSignCountChangedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
 	signCount uint32,
-) *SignCountChangedEvent {
-	return &SignCountChangedEvent{
+) *HumanWebAuthNSignCountChangedEvent {
+	return &HumanWebAuthNSignCountChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordlessTokenSignCountChangedType,
@@ -204,8 +204,8 @@ func NewPasswordlessSignCountChangedEvent(
 	}
 }
 
-func SignCountChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	webauthNVerified := &SignCountChangedEvent{
+func HumanWebAuthNSignCountChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webauthNVerified := &HumanWebAuthNSignCountChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, webauthNVerified)
@@ -215,22 +215,22 @@ func SignCountChangedEventMapper(event *repository.Event) (eventstore.EventReade
 	return webauthNVerified, nil
 }
 
-type RemovedEvent struct {
+type HumanWebAuthNRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	WebAuthNTokenID string    `json:"webAuthNTokenId"`
-	State           mfa.State `json:"-"`
+	WebAuthNTokenID string          `json:"webAuthNTokenId"`
+	State           domain.MFAState `json:"-"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *HumanWebAuthNRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewU2FRemovedEvent(
+func NewHumanU2FRemovedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
-) *RemovedEvent {
-	return &RemovedEvent{
+) *HumanWebAuthNRemovedEvent {
+	return &HumanWebAuthNRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanU2FTokenRemovedType,
@@ -239,11 +239,11 @@ func NewU2FRemovedEvent(
 	}
 }
 
-func NewPasswordlessRemovedEvent(
+func NewHumanPasswordlessRemovedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
-) *RemovedEvent {
-	return &RemovedEvent{
+) *HumanWebAuthNRemovedEvent {
+	return &HumanWebAuthNRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordlessTokenRemovedType,
@@ -252,8 +252,8 @@ func NewPasswordlessRemovedEvent(
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	webauthNVerified := &RemovedEvent{
+func HumanWebAuthNRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webauthNVerified := &HumanWebAuthNRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, webauthNVerified)
@@ -263,7 +263,7 @@ func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 	return webauthNVerified, nil
 }
 
-type BeginLoginEvent struct {
+type HumanWebAuthNBeginLoginEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	WebAuthNTokenID string `json:"webAuthNTokenId"`
@@ -272,16 +272,16 @@ type BeginLoginEvent struct {
 	//*AuthRequest
 }
 
-func (e *BeginLoginEvent) Data() interface{} {
+func (e *HumanWebAuthNBeginLoginEvent) Data() interface{} {
 	return e
 }
 
-func NewU2FBeginLoginEvent(
+func NewHumanU2FBeginLoginEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	challenge string,
-) *BeginLoginEvent {
-	return &BeginLoginEvent{
+) *HumanWebAuthNBeginLoginEvent {
+	return &HumanWebAuthNBeginLoginEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanU2FTokenRemovedType,
@@ -291,12 +291,12 @@ func NewU2FBeginLoginEvent(
 	}
 }
 
-func NewPasswordlessBeginLoginEvent(
+func NewHumanPasswordlessBeginLoginEvent(
 	ctx context.Context,
 	webAuthNTokenID,
 	challenge string,
-) *BeginLoginEvent {
-	return &BeginLoginEvent{
+) *HumanWebAuthNBeginLoginEvent {
+	return &HumanWebAuthNBeginLoginEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordlessTokenRemovedType,
@@ -306,8 +306,8 @@ func NewPasswordlessBeginLoginEvent(
 	}
 }
 
-func BeginLoginEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	webAuthNAdded := &BeginLoginEvent{
+func HumanWebAuthNBeginLoginEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webAuthNAdded := &HumanWebAuthNBeginLoginEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, webAuthNAdded)
@@ -317,19 +317,19 @@ func BeginLoginEventMapper(event *repository.Event) (eventstore.EventReader, err
 	return webAuthNAdded, nil
 }
 
-type CheckSucceededEvent struct {
+type HumanWebAuthNCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	//TODO: Handle Auth Req??
 	//*AuthRequest
 }
 
-func (e *CheckSucceededEvent) Data() interface{} {
+func (e *HumanWebAuthNCheckSucceededEvent) Data() interface{} {
 	return e
 }
 
-func NewU2FCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
-	return &CheckSucceededEvent{
+func NewHumanU2FCheckSucceededEvent(ctx context.Context) *HumanWebAuthNCheckSucceededEvent {
+	return &HumanWebAuthNCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanU2FTokenCheckSucceededType,
@@ -337,8 +337,8 @@ func NewU2FCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
 	}
 }
 
-func NewPasswordlessCheckSucceededEvent(ctx context.Context) *CheckSucceededEvent {
-	return &CheckSucceededEvent{
+func NewHumanPasswordlessCheckSucceededEvent(ctx context.Context) *HumanWebAuthNCheckSucceededEvent {
+	return &HumanWebAuthNCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordlessTokenCheckSucceededType,
@@ -346,8 +346,8 @@ func NewPasswordlessCheckSucceededEvent(ctx context.Context) *CheckSucceededEven
 	}
 }
 
-func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	webAuthNAdded := &CheckSucceededEvent{
+func HumanWebAuthNCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webAuthNAdded := &HumanWebAuthNCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, webAuthNAdded)
@@ -357,19 +357,19 @@ func CheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader,
 	return webAuthNAdded, nil
 }
 
-type CheckFailedEvent struct {
+type HumanWebAuthNCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	//TODO: Handle Auth Req??
 	//*AuthRequest
 }
 
-func (e *CheckFailedEvent) Data() interface{} {
+func (e *HumanWebAuthNCheckFailedEvent) Data() interface{} {
 	return e
 }
 
-func NewU2FCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
-	return &CheckFailedEvent{
+func NewHumanU2FCheckFailedEvent(ctx context.Context) *HumanWebAuthNCheckFailedEvent {
+	return &HumanWebAuthNCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanU2FTokenCheckFailedType,
@@ -377,8 +377,8 @@ func NewU2FCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
 	}
 }
 
-func NewPasswordlessCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
-	return &CheckFailedEvent{
+func NewHumanPasswordlessCheckFailedEvent(ctx context.Context) *HumanWebAuthNCheckFailedEvent {
+	return &HumanWebAuthNCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordlessTokenCheckFailedType,
@@ -386,8 +386,8 @@ func NewPasswordlessCheckFailedEvent(ctx context.Context) *CheckFailedEvent {
 	}
 }
 
-func CheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	webAuthNAdded := &CheckFailedEvent{
+func HumanWebAuthNCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	webAuthNAdded := &HumanWebAuthNCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, webAuthNAdded)

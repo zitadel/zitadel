@@ -130,7 +130,7 @@ func (rm *ReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).AggregateIDs(rm.AggregateID)
 }
 
-func AggregateFromReadModel(rm *ReadModel) *iam.Aggregate {
+func IAMAggregateFromReadModel(rm *ReadModel) *iam.Aggregate {
 	return &iam.Aggregate{
 		Aggregate: *eventstore.NewAggregate(
 			rm.AggregateID,
