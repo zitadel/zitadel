@@ -4,7 +4,7 @@
 
     <cnsl-form-field class="form-field" label="Name" required="true">
         <cnsl-label>{{'USER.MFA.U2F_NAME' | translate}}</cnsl-label>
-        <input cnslInput [(ngModel)]="name" required (keydown.enter)="name ? closeDialogWithCode(name) : null" />
+        <input cnslInput [(ngModel)]="name" required (keydown.enter)="name ? closeDialogWithCode() : null" />
     </cnsl-form-field>
 
     <mat-spinner diameter="30" *ngIf="loading"></mat-spinner>
