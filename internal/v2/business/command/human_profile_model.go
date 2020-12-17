@@ -17,6 +17,8 @@ type HumanProfileWriteModel struct {
 	DisplayName       string
 	PreferredLanguage language.Tag
 	Gender            domain.Gender
+
+	UserState domain.UserState
 }
 
 func NewHumanProfileWriteModel(userID string) *HumanProfileWriteModel {
@@ -32,15 +34,45 @@ func (wm *HumanProfileWriteModel) AppendEvents(events ...eventstore.EventReader)
 		switch e := event.(type) {
 		case *user.HumanProfileChangedEvent:
 			wm.AppendEvents(e)
-			//TODO: Handle relevant User Events (remove, etc)
-
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
+			wm.AppendEvents(e)
+		case *user.UserRemovedEvent:
+			wm.AppendEvents(e)
 		}
 	}
 }
 
 func (wm *HumanProfileWriteModel) Reduce() error {
-	//TODO: implement
-	return nil
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanAddedEvent:
+			wm.FirstName = e.FirstName
+			wm.LastName = e.LastName
+			wm.NickName = e.NickName
+			wm.DisplayName = e.DisplayName
+			wm.PreferredLanguage = e.PreferredLanguage
+			wm.Gender = e.Gender
+			wm.UserState = domain.UserStateActive
+		case *user.HumanRegisteredEvent:
+			wm.FirstName = e.FirstName
+			wm.LastName = e.LastName
+			wm.NickName = e.NickName
+			wm.DisplayName = e.DisplayName
+			wm.PreferredLanguage = e.PreferredLanguage
+			wm.Gender = e.Gender
+			wm.UserState = domain.UserStateActive
+		case *user.HumanProfileChangedEvent:
+			wm.FirstName = e.FirstName
+			wm.LastName = e.LastName
+			wm.NickName = e.NickName
+			wm.DisplayName = e.DisplayName
+			wm.PreferredLanguage = e.PreferredLanguage
+			wm.Gender = e.Gender
+		case *user.UserRemovedEvent:
+			wm.UserState = domain.UserStateDeleted
+		}
+	}
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *HumanProfileWriteModel) Query() *eventstore.SearchQueryBuilder {

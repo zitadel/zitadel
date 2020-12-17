@@ -106,12 +106,12 @@ type HumanRegisteredEvent struct {
 
 	UserName string `json:"userName"`
 
-	FirstName         string       `json:"firstName,omitempty"`
-	LastName          string       `json:"lastName,omitempty"`
-	NickName          string       `json:"nickName,omitempty"`
-	DisplayName       string       `json:"displayName,omitempty"`
-	PreferredLanguage language.Tag `json:"preferredLanguage,omitempty"`
-	Gender            int32        `json:"gender,omitempty"`
+	FirstName         string        `json:"firstName,omitempty"`
+	LastName          string        `json:"lastName,omitempty"`
+	NickName          string        `json:"nickName,omitempty"`
+	DisplayName       string        `json:"displayName,omitempty"`
+	PreferredLanguage language.Tag  `json:"preferredLanguage,omitempty"`
+	Gender            domain.Gender `json:"gender,omitempty"`
 
 	EmailAddress string `json:"email,omitempty"`
 
@@ -136,7 +136,7 @@ func NewHumanRegisteredEvent(
 	nickName,
 	displayName string,
 	preferredLanguage language.Tag,
-	gender int32,
+	gender domain.Gender,
 	emailAddress,
 	phoneNumber,
 	country,

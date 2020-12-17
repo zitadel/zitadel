@@ -3,13 +3,17 @@ package command
 import (
 	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
 type HumanEmailWriteModel struct {
 	eventstore.WriteModel
 
-	Email string
+	Email           string
+	IsEmailVerified bool
+
+	UserState domain.UserState
 }
 
 func NewHumanEmailWriteModel(userID string) *HumanEmailWriteModel {
@@ -27,14 +31,33 @@ func (wm *HumanEmailWriteModel) AppendEvents(events ...eventstore.EventReader) {
 			wm.AppendEvents(e)
 		case *user.HumanEmailVerifiedEvent:
 			wm.AppendEvents(e)
-			//TODO: Handle relevant User Events (remove, etc)
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
+			wm.AppendEvents(e)
+		case *user.UserRemovedEvent:
+			wm.AppendEvents(e)
 		}
 	}
 }
 
 func (wm *HumanEmailWriteModel) Reduce() error {
-	//TODO: implement
-	return nil
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanAddedEvent:
+			wm.Email = e.EmailAddress
+			wm.UserState = domain.UserStateActive
+		case *user.HumanRegisteredEvent:
+			wm.Email = e.EmailAddress
+			wm.UserState = domain.UserStateActive
+		case *user.HumanEmailChangedEvent:
+			wm.Email = e.EmailAddress
+			wm.IsEmailVerified = false
+		case *user.HumanEmailVerifiedEvent:
+			wm.IsEmailVerified = true
+		case *user.UserRemovedEvent:
+			wm.UserState = domain.UserStateDeleted
+		}
+	}
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {

@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
@@ -14,6 +15,8 @@ type HumanAddressWriteModel struct {
 	PostalCode    string
 	Region        string
 	StreetAddress string
+
+	UserState domain.UserState
 }
 
 func NewHumanAddressWriteModel(userID string) *HumanAddressWriteModel {
@@ -29,15 +32,42 @@ func (wm *HumanAddressWriteModel) AppendEvents(events ...eventstore.EventReader)
 		switch e := event.(type) {
 		case *user.HumanAddressChangedEvent:
 			wm.AppendEvents(e)
-			//TODO: Handle relevant User Events (remove, etc)
-
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
+			wm.AppendEvents(e)
+		case *user.UserRemovedEvent:
+			wm.AppendEvents(e)
 		}
 	}
 }
 
 func (wm *HumanAddressWriteModel) Reduce() error {
-	//TODO: implement
-	return nil
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanAddedEvent:
+			wm.Country = e.Country
+			wm.Locality = e.Locality
+			wm.PostalCode = e.PostalCode
+			wm.Region = e.Region
+			wm.StreetAddress = e.StreetAddress
+			wm.UserState = domain.UserStateActive
+		case *user.HumanRegisteredEvent:
+			wm.Country = e.Country
+			wm.Locality = e.Locality
+			wm.PostalCode = e.PostalCode
+			wm.Region = e.Region
+			wm.StreetAddress = e.StreetAddress
+			wm.UserState = domain.UserStateActive
+		case *user.HumanAddressChangedEvent:
+			wm.Country = e.Country
+			wm.Locality = e.Locality
+			wm.PostalCode = e.PostalCode
+			wm.Region = e.Region
+			wm.StreetAddress = e.StreetAddress
+		case *user.UserRemovedEvent:
+			wm.UserState = domain.UserStateDeleted
+		}
+	}
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *HumanAddressWriteModel) Query() *eventstore.SearchQueryBuilder {

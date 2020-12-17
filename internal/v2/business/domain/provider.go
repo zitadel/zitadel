@@ -6,9 +6,9 @@ const (
 	IdentityProviderTypeSystem IdentityProviderType = iota
 	IdentityProviderTypeOrg
 
-	typeCount
+	identityProviderCount
 )
 
 func (f IdentityProviderType) Valid() bool {
-	return f >= 0 && f < typeCount
+	return f >= 0 && f < identityProviderCount
 }
