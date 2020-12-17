@@ -48,7 +48,7 @@ func (_ *Notification) AggregateTypes() []models.AggregateType {
 }
 
 func (n *Notification) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := n.view.GetLatestNotificationSequence()
+	sequence, err := n.view.GetLatestNotificationSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -56,7 +56,7 @@ func (n *Notification) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (n *Notification) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := n.view.GetLatestNotificationSequence()
+	sequence, err := n.view.GetLatestNotificationSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -80,12 +80,12 @@ func (n *Notification) Reduce(event *models.Event) (err error) {
 	case es_model.DomainClaimed:
 		err = n.handleDomainClaimed(event)
 	default:
-		return n.view.ProcessedNotificationSequence(event.Sequence, event.CreationDate)
+		return n.view.ProcessedNotificationSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return n.view.ProcessedNotificationSequence(event.Sequence, event.CreationDate)
+	return n.view.ProcessedNotificationSequence(event)
 }
 
 func (n *Notification) handleInitUserCode(event *models.Event) (err error) {

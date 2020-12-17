@@ -28,7 +28,7 @@ func (_ *PasswordAgePolicy) AggregateTypes() []es_models.AggregateType {
 }
 
 func (o *PasswordAgePolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := o.view.GetLatestPasswordAgePolicySequence()
+	sequence, err := o.view.GetLatestPasswordAgePolicySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -36,7 +36,7 @@ func (o *PasswordAgePolicy) CurrentSequence(event *models.Event) (uint64, error)
 }
 
 func (p *PasswordAgePolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestPasswordAgePolicySequence()
+	sequence, err := p.view.GetLatestPasswordAgePolicySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -65,14 +65,14 @@ func (m *PasswordAgePolicy) processPasswordAgePolicy(event *models.Event) (err e
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordAgePolicyRemoved:
-		return m.view.DeletePasswordAgePolicy(event.AggregateID, event.Sequence, event.CreationDate)
+		return m.view.DeletePasswordAgePolicy(event.AggregateID, event)
 	default:
-		return m.view.ProcessedPasswordAgePolicySequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedPasswordAgePolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutPasswordAgePolicy(policy, policy.Sequence, event.CreationDate)
+	return m.view.PutPasswordAgePolicy(policy, event)
 }
 
 func (m *PasswordAgePolicy) OnError(event *models.Event, err error) error {

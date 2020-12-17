@@ -41,7 +41,7 @@ func (_ *UserGrant) AggregateTypes() []es_models.AggregateType {
 }
 
 func (u *UserGrant) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := u.view.GetLatestUserGrantSequence()
+	sequence, err := u.view.GetLatestUserGrantSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -55,7 +55,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 			return nil, err
 		}
 	}
-	sequence, err := u.view.GetLatestUserGrantSequence()
+	sequence, err := u.view.GetLatestUserGrantSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 		member.SetData(event)
 		return u.processMember(event, "PROJECT_GRANT", member.GrantID, member.UserID, member.Roles)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserGrantSequence(event)
 	}
 }
 
@@ -98,7 +98,7 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 		member.SetData(event)
 		return u.processMember(event, "ORG", "", member.UserID, member.Roles)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserGrantSequence(event)
 	}
 }
 
@@ -136,16 +136,16 @@ func (u *UserGrant) processIAMMember(event *models.Event, rolePrefix string, suf
 		}
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate
-		return u.view.PutUserGrant(grant, grant.Sequence, event.CreationDate)
+		return u.view.PutUserGrant(grant, event)
 	case iam_es_model.IAMMemberRemoved:
 		member.SetData(event)
 		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
 		if err != nil {
 			return err
 		}
-		return u.view.DeleteUserGrant(grant.ID, event.Sequence, event.CreationDate)
+		return u.view.DeleteUserGrant(grant.ID, event)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserGrantSequence(event)
 	}
 }
 
@@ -181,7 +181,7 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix st
 		}
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate
-		return u.view.PutUserGrant(grant, event.Sequence, event.CreationDate)
+		return u.view.PutUserGrant(grant, event)
 	case org_es_model.OrgMemberRemoved,
 		proj_es_model.ProjectMemberRemoved,
 		proj_es_model.ProjectGrantMemberRemoved:
@@ -191,18 +191,18 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix st
 			return err
 		}
 		if errors.IsNotFound(err) {
-			return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+			return u.view.ProcessedUserGrantSequence(event)
 		}
 		if roleSuffix != "" {
 			roleKeys = suffixRoles(roleSuffix, roleKeys)
 		}
 		if grant.RoleKeys == nil {
-			return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+			return u.view.ProcessedUserGrantSequence(event)
 		}
 		grant.RoleKeys = mergeExistingRoles(rolePrefix, roleSuffix, grant.RoleKeys, nil)
-		return u.view.PutUserGrant(grant, event.Sequence, event.CreationDate)
+		return u.view.PutUserGrant(grant, event)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserGrantSequence(event)
 	}
 }
 

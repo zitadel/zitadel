@@ -27,7 +27,7 @@ func (_ *OrgDomain) AggregateTypes() []es_models.AggregateType {
 }
 
 func (p *OrgDomain) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestOrgDomainSequence()
+	sequence, err := p.view.GetLatestOrgDomainSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -35,7 +35,7 @@ func (p *OrgDomain) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := d.view.GetLatestOrgDomainSequence()
+	sequence, err := d.view.GetLatestOrgDomainSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		for _, existingDomain := range existingDomains {
 			existingDomain.Primary = false
 		}
-		err = d.view.PutOrgDomains(existingDomains, 0, event.CreationDate)
+		err = d.view.PutOrgDomains(existingDomains, event)
 		if err != nil {
 			return err
 		}
@@ -94,14 +94,14 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return d.view.DeleteOrgDomain(event.AggregateID, domain.Domain, event.Sequence, event.CreationDate)
+		return d.view.DeleteOrgDomain(event.AggregateID, domain.Domain, event)
 	default:
-		return d.view.ProcessedOrgDomainSequence(event.Sequence, event.CreationDate)
+		return d.view.ProcessedOrgDomainSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return d.view.PutOrgDomain(domain, domain.Sequence, event.CreationDate)
+	return d.view.PutOrgDomain(domain, event)
 }
 
 func (d *OrgDomain) OnError(event *models.Event, err error) error {

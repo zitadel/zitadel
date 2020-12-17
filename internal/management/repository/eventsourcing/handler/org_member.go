@@ -33,7 +33,7 @@ func (_ *OrgMember) AggregateTypes() []es_models.AggregateType {
 }
 
 func (p *OrgMember) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestOrgMemberSequence()
+	sequence, err := p.view.GetLatestOrgMemberSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -41,7 +41,7 @@ func (p *OrgMember) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *OrgMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestOrgMemberSequence()
+	sequence, err := m.view.GetLatestOrgMemberSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -84,14 +84,14 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteOrgMember(event.AggregateID, member.UserID, event.Sequence, event.CreationDate)
+		return m.view.DeleteOrgMember(event.AggregateID, member.UserID, event)
 	default:
-		return m.view.ProcessedOrgMemberSequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedOrgMemberSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutOrgMember(member, member.Sequence, event.CreationDate)
+	return m.view.PutOrgMember(member, event)
 }
 
 func (m *OrgMember) processUser(event *models.Event) (err error) {
@@ -106,7 +106,7 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(members) == 0 {
-			return m.view.ProcessedOrgMemberSequence(event.Sequence, event.CreationDate)
+			return m.view.ProcessedOrgMemberSequence(event)
 		}
 		user, err := m.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -115,11 +115,11 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 		for _, member := range members {
 			m.fillUserData(member, user)
 		}
-		return m.view.PutOrgMembers(members, event.Sequence, event.CreationDate)
+		return m.view.PutOrgMembers(members, event)
 	case usr_es_model.UserRemoved:
-		return m.view.DeleteOrgMembersByUserID(event.AggregateID, event.Sequence, event.CreationDate)
+		return m.view.DeleteOrgMembersByUserID(event.AggregateID, event)
 	default:
-		return m.view.ProcessedOrgMemberSequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedOrgMemberSequence(event)
 	}
 	return nil
 }

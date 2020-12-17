@@ -30,7 +30,7 @@ func (_ *UserSession) AggregateTypes() []models.AggregateType {
 }
 
 func (u *UserSession) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := u.view.GetLatestUserSessionSequence()
+	sequence, err := u.view.GetLatestUserSessionSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -38,7 +38,7 @@ func (u *UserSession) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserSessionSequence()
+	sequence, err := u.view.GetLatestUserSessionSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 			return err
 		}
 		if len(sessions) == 0 {
-			return u.view.ProcessedUserSessionSequence(event.Sequence, event.CreationDate)
+			return u.view.ProcessedUserSessionSequence(event)
 		}
 		for _, session := range sessions {
 			if err := session.AppendEvent(event); err != nil {
@@ -110,11 +110,11 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 				return err
 			}
 		}
-		return u.view.PutUserSessions(sessions, event.Sequence, event.CreationDate)
+		return u.view.PutUserSessions(sessions, event)
 	case es_model.UserRemoved:
-		return u.view.DeleteUserSessions(event.AggregateID, event.Sequence, event.CreationDate)
+		return u.view.DeleteUserSessions(event.AggregateID, event)
 	default:
-		return u.view.ProcessedUserSessionSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserSessionSequence(event)
 	}
 }
 
@@ -134,7 +134,7 @@ func (u *UserSession) updateSession(session *view_model.UserSessionView, event *
 	if err := u.fillUserInfo(session, event.AggregateID); err != nil {
 		return err
 	}
-	return u.view.PutUserSession(session, event.CreationDate)
+	return u.view.PutUserSession(session, event)
 }
 
 func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id string) error {

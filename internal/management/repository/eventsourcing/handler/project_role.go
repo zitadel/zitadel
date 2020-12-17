@@ -29,7 +29,7 @@ func (_ *ProjectRole) AggregateTypes() []models.AggregateType {
 }
 
 func (p *ProjectRole) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestProjectRoleSequence()
+	sequence, err := p.view.GetLatestProjectRoleSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -37,7 +37,7 @@ func (p *ProjectRole) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (p *ProjectRole) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectRoleSequence()
+	sequence, err := p.view.GetLatestProjectRoleSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -64,16 +64,16 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event.Sequence, event.CreationDate)
+		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event)
 	case es_model.ProjectRemoved:
 		return p.view.DeleteProjectRolesByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedProjectRoleSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectRoleSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectRole(role, event.CreationDate)
+	return p.view.PutProjectRole(role, event)
 }
 
 func (p *ProjectRole) OnError(event *models.Event, err error) error {

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -37,7 +36,7 @@ func (_ *ProjectGrant) AggregateTypes() []models.AggregateType {
 }
 
 func (p *ProjectGrant) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestProjectGrantSequence()
+	sequence, err := p.view.GetLatestProjectGrantSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -45,7 +44,7 @@ func (p *ProjectGrant) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (p *ProjectGrant) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectGrantSequence()
+	sequence, err := p.view.GetLatestProjectGrantSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +59,7 @@ func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.updateExistingProjects(project, event.Sequence, event.CreationDate)
+		return p.updateExistingProjects(project, event)
 	case es_model.ProjectGrantAdded:
 		err = grantedProject.AppendEvent(event)
 		if err != nil {
@@ -98,16 +97,16 @@ func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectGrant(grant.GrantID, event.Sequence, event.CreationDate)
+		return p.view.DeleteProjectGrant(grant.GrantID, event)
 	case es_model.ProjectRemoved:
 		return p.view.DeleteProjectGrantsByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedProjectGrantSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectGrantSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectGrant(grantedProject, event.CreationDate)
+	return p.view.PutProjectGrant(grantedProject, event)
 }
 
 func (p *ProjectGrant) fillOrgData(grantedProject *view_model.ProjectGrantView, org, resourceOwner *org_model.Org) {
@@ -119,7 +118,7 @@ func (p *ProjectGrant) getProject(projectID string) (*proj_model.Project, error)
 	return p.projectEvents.ProjectByID(context.Background(), projectID)
 }
 
-func (p *ProjectGrant) updateExistingProjects(project *view_model.ProjectView, sequence uint64, eventTimestamp time.Time) error {
+func (p *ProjectGrant) updateExistingProjects(project *view_model.ProjectView, event *models.Event) error {
 	projectGrants, err := p.view.ProjectGrantsByProjectID(project.ProjectID)
 	if err != nil {
 		logging.LogWithFields("SPOOL-los03", "id", project.ProjectID).WithError(err).Warn("could not update existing projects")
@@ -127,7 +126,7 @@ func (p *ProjectGrant) updateExistingProjects(project *view_model.ProjectView, s
 	for _, existingGrant := range projectGrants {
 		existingGrant.Name = project.Name
 	}
-	return p.view.PutProjectGrants(projectGrants, sequence, eventTimestamp)
+	return p.view.PutProjectGrants(projectGrants, event)
 }
 
 func (p *ProjectGrant) OnError(event *models.Event, err error) error {

@@ -33,7 +33,7 @@ func (_ *ProjectGrantMember) AggregateTypes() []es_models.AggregateType {
 }
 
 func (p *ProjectGrantMember) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestProjectGrantMemberSequence()
+	sequence, err := p.view.GetLatestProjectGrantMemberSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -41,7 +41,7 @@ func (p *ProjectGrantMember) CurrentSequence(event *models.Event) (uint64, error
 }
 
 func (p *ProjectGrantMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectGrantMemberSequence()
+	sequence, err := p.view.GetLatestProjectGrantMemberSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -84,16 +84,16 @@ func (p *ProjectGrantMember) processProjectGrantMember(event *models.Event) (err
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectGrantMember(member.GrantID, member.UserID, event.Sequence, event.CreationDate)
+		return p.view.DeleteProjectGrantMember(member.GrantID, member.UserID, event)
 	case proj_es_model.ProjectRemoved:
 		return p.view.DeleteProjectGrantMembersByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectGrantMemberSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectGrantMember(member, member.Sequence, event.CreationDate)
+	return p.view.PutProjectGrantMember(member, event)
 }
 
 func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
@@ -108,7 +108,7 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(members) == 0 {
-			return p.view.ProcessedProjectGrantMemberSequence(event.Sequence, event.CreationDate)
+			return p.view.ProcessedProjectGrantMemberSequence(event)
 		}
 		user, err := p.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -117,9 +117,9 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 		for _, member := range members {
 			p.fillUserData(member, user)
 		}
-		return p.view.PutProjectGrantMembers(members, event.Sequence, event.CreationDate)
+		return p.view.PutProjectGrantMembers(members, event)
 	default:
-		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectGrantMemberSequence(event)
 	}
 	return nil
 }

@@ -2,10 +2,10 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	global_view "github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -16,28 +16,28 @@ func (v *View) LabelPolicyByAggregateID(aggregateID string) (*model.LabelPolicyV
 	return view.GetLabelPolicyByAggregateID(v.Db, labelPolicyTable, aggregateID)
 }
 
-func (v *View) PutLabelPolicy(policy *model.LabelPolicyView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutLabelPolicy(policy *model.LabelPolicyView, event *models.Event) error {
 	err := view.PutLabelPolicy(v.Db, labelPolicyTable, policy)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedLabelPolicySequence(sequence, eventTimestamp)
+	return v.ProcessedLabelPolicySequence(event)
 }
 
-func (v *View) DeleteLabelPolicy(aggregateID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteLabelPolicy(aggregateID string, event *models.Event) error {
 	err := view.DeleteLabelPolicy(v.Db, labelPolicyTable, aggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedLabelPolicySequence(eventSequence, eventTimestamp)
+	return v.ProcessedLabelPolicySequence(event)
 }
 
-func (v *View) GetLatestLabelPolicySequence() (*global_view.CurrentSequence, error) {
-	return v.latestSequence(labelPolicyTable)
+func (v *View) GetLatestLabelPolicySequence(aggregateType string) (*global_view.CurrentSequence, error) {
+	return v.latestSequence(labelPolicyTable, aggregateType)
 }
 
-func (v *View) ProcessedLabelPolicySequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(labelPolicyTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedLabelPolicySequence(event *models.Event) error {
+	return v.saveCurrentSequence(labelPolicyTable, event)
 }
 
 func (v *View) UpdateLabelPolicySpoolerRunTimestamp() error {

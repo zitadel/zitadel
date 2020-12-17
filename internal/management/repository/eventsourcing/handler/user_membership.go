@@ -37,7 +37,7 @@ func (_ *UserMembership) AggregateTypes() []es_models.AggregateType {
 }
 
 func (u *UserMembership) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := u.view.GetLatestUserMembershipSequence()
+	sequence, err := u.view.GetLatestUserMembershipSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -45,7 +45,7 @@ func (u *UserMembership) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *UserMembership) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestUserMembershipSequence()
+	sequence, err := m.view.GetLatestUserMembershipSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -84,14 +84,14 @@ func (m *UserMembership) processIam(event *es_models.Event) (err error) {
 		}
 		err = member.AppendEvent(event)
 	case iam_es_model.IAMMemberRemoved:
-		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeIam, event.Sequence, event.CreationDate)
+		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeIam, event)
 	default:
-		return m.view.ProcessedUserMembershipSequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedUserMembershipSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutUserMembership(member, event.Sequence, event.CreationDate)
+	return m.view.PutUserMembership(member, event)
 }
 
 func (m *UserMembership) fillIamDisplayName(member *usr_es_model.UserMembershipView) {
@@ -114,16 +114,16 @@ func (m *UserMembership) processOrg(event *es_models.Event) (err error) {
 		}
 		err = member.AppendEvent(event)
 	case org_es_model.OrgMemberRemoved:
-		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation, event.Sequence, event.CreationDate)
+		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation, event)
 	case org_es_model.OrgChanged:
 		return m.updateOrgDisplayName(event)
 	default:
-		return m.view.ProcessedUserMembershipSequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedUserMembershipSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutUserMembership(member, event.Sequence, event.CreationDate)
+	return m.view.PutUserMembership(member, event)
 }
 
 func (m *UserMembership) fillOrgDisplayName(member *usr_es_model.UserMembershipView) (err error) {
@@ -148,7 +148,7 @@ func (m *UserMembership) updateOrgDisplayName(event *es_models.Event) error {
 	for _, membership := range memberships {
 		membership.DisplayName = org.Name
 	}
-	return m.view.BulkPutUserMemberships(memberships, event.Sequence, event.CreationDate)
+	return m.view.BulkPutUserMemberships(memberships, event)
 }
 
 func (m *UserMembership) processProject(event *es_models.Event) (err error) {
@@ -167,7 +167,7 @@ func (m *UserMembership) processProject(event *es_models.Event) (err error) {
 		}
 		err = member.AppendEvent(event)
 	case proj_es_model.ProjectMemberRemoved:
-		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeProject, event.Sequence, event.CreationDate)
+		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeProject, event)
 	case proj_es_model.ProjectGrantMemberChanged:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant)
 		if err != nil {
@@ -175,20 +175,20 @@ func (m *UserMembership) processProject(event *es_models.Event) (err error) {
 		}
 		err = member.AppendEvent(event)
 	case proj_es_model.ProjectGrantMemberRemoved:
-		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event.Sequence, event.CreationDate)
+		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event)
 	case proj_es_model.ProjectChanged:
 		return m.updateProjectDisplayName(event)
 	case proj_es_model.ProjectRemoved:
-		return m.view.DeleteUserMembershipsByAggregateID(event.AggregateID, event.Sequence, event.CreationDate)
+		return m.view.DeleteUserMembershipsByAggregateID(event.AggregateID, event)
 	case proj_es_model.ProjectGrantRemoved:
-		return m.view.DeleteUserMembershipsByAggregateIDAndObjectID(event.AggregateID, member.ObjectID, event.Sequence, event.CreationDate)
+		return m.view.DeleteUserMembershipsByAggregateIDAndObjectID(event.AggregateID, member.ObjectID, event)
 	default:
-		return m.view.ProcessedUserMembershipSequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedUserMembershipSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutUserMembership(member, event.Sequence, event.CreationDate)
+	return m.view.PutUserMembership(member, event)
 }
 
 func (m *UserMembership) fillProjectDisplayName(member *usr_es_model.UserMembershipView) (err error) {
@@ -213,15 +213,15 @@ func (m *UserMembership) updateProjectDisplayName(event *es_models.Event) error 
 	for _, membership := range memberships {
 		membership.DisplayName = project.Name
 	}
-	return m.view.BulkPutUserMemberships(memberships, event.Sequence, event.CreationDate)
+	return m.view.BulkPutUserMemberships(memberships, event)
 }
 
 func (m *UserMembership) processUser(event *es_models.Event) (err error) {
 	switch event.Type {
 	case model.UserRemoved:
-		return m.view.DeleteUserMembershipsByUserID(event.AggregateID, event.Sequence, event.CreationDate)
+		return m.view.DeleteUserMembershipsByUserID(event.AggregateID, event)
 	default:
-		return m.view.ProcessedUserMembershipSequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedUserMembershipSequence(event)
 	}
 }
 

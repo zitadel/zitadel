@@ -29,7 +29,7 @@ func (_ *Project) AggregateTypes() []models.AggregateType {
 }
 
 func (p *Project) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestProjectSequence()
+	sequence, err := p.view.GetLatestProjectSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -37,7 +37,7 @@ func (p *Project) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (p *Project) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectSequence()
+	sequence, err := p.view.GetLatestProjectSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -58,14 +58,14 @@ func (p *Project) Reduce(event *models.Event) (err error) {
 		}
 		err = project.AppendEvent(event)
 	case es_model.ProjectRemoved:
-		return p.view.DeleteProject(event.AggregateID, event.Sequence, event.CreationDate)
+		return p.view.DeleteProject(event.AggregateID, event)
 	default:
-		return p.view.ProcessedProjectSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProject(project, event.CreationDate)
+	return p.view.PutProject(project, event)
 }
 
 func (p *Project) OnError(event *models.Event, err error) error {

@@ -1,24 +1,26 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/view/repository"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
 	sequencesTable = "auth.current_sequences"
 )
 
-func (v *View) saveCurrentSequence(viewName string, sequence uint64, eventTimestamp time.Time) error {
-	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, sequence, eventTimestamp)
+func (v *View) saveCurrentSequence(viewName string, event *models.Event) error {
+	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, string(event.AggregateType), event.Sequence, event.CreationDate)
 }
 
-func (v *View) latestSequence(viewName string) (*repository.CurrentSequence, error) {
-	return repository.LatestSequence(v.Db, sequencesTable, viewName)
+func (v *View) latestSequence(viewName, aggregateType string) (*repository.CurrentSequence, error) {
+	return repository.LatestSequence(v.Db, sequencesTable, viewName, aggregateType)
 }
 
 func (v *View) updateSpoolerRunSequence(viewName string) error {
-	currentSequence, err := repository.LatestSequence(v.Db, sequencesTable, viewName)
+	currentSequence, err := repository.LatestSequence(v.Db, sequencesTable, viewName, "")
 	if err != nil {
 		return err
 	}

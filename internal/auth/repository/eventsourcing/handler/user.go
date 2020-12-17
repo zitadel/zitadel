@@ -37,7 +37,7 @@ func (_ *User) AggregateTypes() []models.AggregateType {
 }
 
 func (u *User) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := u.view.GetLatestUserSequence()
+	sequence, err := u.view.GetLatestUserSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -45,7 +45,7 @@ func (u *User) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (u *User) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserSequence()
+	sequence, err := u.view.GetLatestUserSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -130,14 +130,14 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		}
 		err = u.fillLoginNames(user)
 	case es_model.UserRemoved:
-		return u.view.DeleteUser(event.AggregateID, event.Sequence, event.CreationDate)
+		return u.view.DeleteUser(event.AggregateID, event)
 	default:
-		return u.view.ProcessedUserSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return u.view.PutUser(user, user.Sequence, event.CreationDate)
+	return u.view.PutUser(user, event)
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
@@ -168,7 +168,7 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 	case org_es_model.OrgDomainPrimarySet:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
 	default:
-		return u.view.ProcessedUserSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserSequence(event)
 	}
 }
 
@@ -191,7 +191,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	for _, user := range users {
 		user.SetLoginNames(policy, org.Domains)
 	}
-	return u.view.PutUsers(users, event.Sequence, event.CreationDate)
+	return u.view.PutUsers(users, event)
 }
 
 func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
@@ -216,7 +216,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	for _, user := range users {
 		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
 	}
-	return u.view.PutUsers(users, 0, event.CreationDate)
+	return u.view.PutUsers(users, event)
 }
 
 func (u *User) OnError(event *models.Event, err error) error {

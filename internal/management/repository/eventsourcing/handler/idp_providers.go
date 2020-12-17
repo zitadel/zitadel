@@ -37,7 +37,7 @@ func (_ *IDPProvider) AggregateTypes() []models.AggregateType {
 }
 
 func (m *IDPProvider) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := m.view.GetLatestIDPProviderSequence()
+	sequence, err := m.view.GetLatestIDPProviderSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -45,7 +45,7 @@ func (m *IDPProvider) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *IDPProvider) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestIDPProviderSequence()
+	sequence, err := m.view.GetLatestIDPProviderSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event.Sequence, event.CreationDate)
+		return m.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event)
 	case model.IDPConfigChanged, org_es_model.IDPConfigChanged:
 		esConfig := new(iam_view_model.IDPConfigView)
 		providerType := iam_model.IDPProviderTypeSystem
@@ -101,16 +101,16 @@ func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		for _, provider := range providers {
 			m.fillConfigData(provider, config)
 		}
-		return m.view.PutIDPProviders(event.Sequence, event.CreationDate, providers...)
+		return m.view.PutIDPProviders(event, providers...)
 	case org_es_model.LoginPolicyRemoved:
-		return m.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event.Sequence, event.CreationDate)
+		return m.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event)
 	default:
-		return m.view.ProcessedIDPProviderSequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedIDPProviderSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIDPProvider(provider, provider.Sequence, event.CreationDate)
+	return m.view.PutIDPProvider(provider, event)
 }
 
 func (m *IDPProvider) fillData(provider *iam_view_model.IDPProviderView) (err error) {

@@ -33,7 +33,7 @@ func (_ *ProjectMember) AggregateTypes() []models.AggregateType {
 }
 
 func (p *ProjectMember) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestProjectMemberSequence()
+	sequence, err := p.view.GetLatestProjectMemberSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -41,7 +41,7 @@ func (p *ProjectMember) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (p *ProjectMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectMemberSequence()
+	sequence, err := p.view.GetLatestProjectMemberSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -84,16 +84,16 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectMember(event.AggregateID, member.UserID, event.Sequence, event.CreationDate)
+		return p.view.DeleteProjectMember(event.AggregateID, member.UserID, event)
 	case proj_es_model.ProjectRemoved:
 		return p.view.DeleteProjectMembersByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedProjectMemberSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectMemberSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectMember(member, member.Sequence, event.CreationDate)
+	return p.view.PutProjectMember(member, event)
 }
 
 func (p *ProjectMember) processUser(event *models.Event) (err error) {
@@ -108,7 +108,7 @@ func (p *ProjectMember) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(members) == 0 {
-			return p.view.ProcessedProjectMemberSequence(event.Sequence, event.CreationDate)
+			return p.view.ProcessedProjectMemberSequence(event)
 		}
 		user, err := p.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -117,9 +117,9 @@ func (p *ProjectMember) processUser(event *models.Event) (err error) {
 		for _, member := range members {
 			p.fillUserData(member, user)
 		}
-		return p.view.PutProjectMembers(members, event.Sequence, event.CreationDate)
+		return p.view.PutProjectMembers(members, event)
 	default:
-		return p.view.ProcessedProjectMemberSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectMemberSequence(event)
 	}
 	return nil
 }

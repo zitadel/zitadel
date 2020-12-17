@@ -28,7 +28,7 @@ func (_ *OrgIAMPolicy) AggregateTypes() []es_models.AggregateType {
 }
 
 func (p *OrgIAMPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -36,7 +36,7 @@ func (p *OrgIAMPolicy) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *OrgIAMPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestOrgIAMPolicySequence()
+	sequence, err := m.view.GetLatestOrgIAMPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -65,14 +65,14 @@ func (m *OrgIAMPolicy) processOrgIAMPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	case model.OrgIAMPolicyRemoved:
-		return m.view.DeleteOrgIAMPolicy(event.AggregateID, event.Sequence, event.CreationDate)
+		return m.view.DeleteOrgIAMPolicy(event.AggregateID, event)
 	default:
-		return m.view.ProcessedOrgIAMPolicySequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedOrgIAMPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutOrgIAMPolicy(policy, policy.Sequence, event.CreationDate)
+	return m.view.PutOrgIAMPolicy(policy, event)
 }
 
 func (m *OrgIAMPolicy) OnError(event *models.Event, err error) error {

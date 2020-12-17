@@ -31,7 +31,7 @@ func (_ *Application) AggregateTypes() []models.AggregateType {
 }
 
 func (a *Application) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := a.view.GetLatestApplicationSequence()
+	sequence, err := a.view.GetLatestApplicationSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -39,7 +39,7 @@ func (a *Application) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (a *Application) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := a.view.GetLatestApplicationSequence()
+	sequence, err := a.view.GetLatestApplicationSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -77,30 +77,30 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return a.view.DeleteApplication(app.ID, event.Sequence, event.CreationDate)
+		return a.view.DeleteApplication(app.ID, event)
 	case es_model.ProjectChanged:
 		apps, err := a.view.ApplicationsByProjectID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		if len(apps) == 0 {
-			return a.view.ProcessedApplicationSequence(event.Sequence, event.CreationDate)
+			return a.view.ProcessedApplicationSequence(event)
 		}
 		for _, app := range apps {
 			if err := app.AppendEvent(event); err != nil {
 				return err
 			}
 		}
-		return a.view.PutApplications(apps, event.Sequence, event.CreationDate)
+		return a.view.PutApplications(apps, event)
 	case es_model.ProjectRemoved:
 		return a.view.DeleteApplicationsByProjectID(event.AggregateID)
 	default:
-		return a.view.ProcessedApplicationSequence(event.Sequence, event.CreationDate)
+		return a.view.ProcessedApplicationSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return a.view.PutApplication(app, event.CreationDate)
+	return a.view.PutApplication(app, event)
 }
 
 func (a *Application) OnError(event *models.Event, spoolerError error) error {

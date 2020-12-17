@@ -39,7 +39,7 @@ func (_ *NotifyUser) AggregateTypes() []models.AggregateType {
 }
 
 func (p *NotifyUser) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestNotifyUserSequence()
+	sequence, err := p.view.GetLatestNotifyUserSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -47,7 +47,7 @@ func (p *NotifyUser) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (p *NotifyUser) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestNotifyUserSequence()
+	sequence, err := p.view.GetLatestNotifyUserSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -106,14 +106,14 @@ func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
 		}
 		u.fillLoginNames(user)
 	case es_model.UserRemoved:
-		return u.view.DeleteNotifyUser(event.AggregateID, event.Sequence, event.CreationDate)
+		return u.view.DeleteNotifyUser(event.AggregateID, event)
 	default:
-		return u.view.ProcessedNotifyUserSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedNotifyUserSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return u.view.PutNotifyUser(user, user.Sequence, event.CreationDate)
+	return u.view.PutNotifyUser(user, event)
 }
 
 func (u *NotifyUser) ProcessOrg(event *models.Event) (err error) {
@@ -127,7 +127,7 @@ func (u *NotifyUser) ProcessOrg(event *models.Event) (err error) {
 	case org_es_model.OrgDomainPrimarySet:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
 	default:
-		return u.view.ProcessedNotifyUserSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedNotifyUserSequence(event)
 	}
 }
 
@@ -149,12 +149,12 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	}
 	for _, user := range users {
 		user.SetLoginNames(policy, org.Domains)
-		err := u.view.PutNotifyUser(user, 0, event.CreationDate)
+		err := u.view.PutNotifyUser(user, event)
 		if err != nil {
 			return err
 		}
 	}
-	return u.view.ProcessedNotifyUserSequence(event.Sequence, event.CreationDate)
+	return u.view.ProcessedNotifyUserSequence(event)
 }
 
 func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
@@ -178,7 +178,7 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *models.Event) erro
 	}
 	for _, user := range users {
 		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
-		err := u.view.PutNotifyUser(user, 0, event.CreationDate)
+		err := u.view.PutNotifyUser(user, event)
 		if err != nil {
 			return err
 		}

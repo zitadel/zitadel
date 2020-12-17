@@ -28,7 +28,7 @@ func (_ *Org) AggregateTypes() []es_models.AggregateType {
 }
 
 func (o *Org) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := o.view.GetLatestOrgSequence()
+	sequence, err := o.view.GetLatestOrgSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -36,7 +36,7 @@ func (o *Org) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := o.view.GetLatestOrgSequence()
+	sequence, err := o.view.GetLatestOrgSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -66,10 +66,10 @@ func (o *Org) Reduce(event *es_models.Event) error {
 			return err
 		}
 	default:
-		return o.view.ProcessedOrgSequence(event.Sequence, event.CreationDate)
+		return o.view.ProcessedOrgSequence(event)
 	}
 
-	return o.view.PutOrg(org, event.CreationDate)
+	return o.view.PutOrg(org, event)
 }
 
 func (o *Org) OnError(event *es_models.Event, spoolerErr error) error {

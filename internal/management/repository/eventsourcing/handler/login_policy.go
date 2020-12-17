@@ -28,7 +28,7 @@ func (_ *LoginPolicy) AggregateTypes() []models.AggregateType {
 }
 
 func (m *LoginPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := m.view.GetLatestLoginPolicySequence()
+	sequence, err := m.view.GetLatestLoginPolicySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -36,7 +36,7 @@ func (m *LoginPolicy) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestLoginPolicySequence()
+	sequence, err := m.view.GetLatestLoginPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -69,14 +69,14 @@ func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	case model.LoginPolicyRemoved:
-		return m.view.DeleteLoginPolicy(event.AggregateID, event.Sequence, event.CreationDate)
+		return m.view.DeleteLoginPolicy(event.AggregateID, event)
 	default:
-		return m.view.ProcessedLoginPolicySequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedLoginPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutLoginPolicy(policy, policy.Sequence, event.CreationDate)
+	return m.view.PutLoginPolicy(policy, event)
 }
 
 func (m *LoginPolicy) OnError(event *models.Event, err error) error {

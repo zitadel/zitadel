@@ -39,7 +39,7 @@ func (_ *ExternalIDP) AggregateTypes() []es_models.AggregateType {
 }
 
 func (i *ExternalIDP) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := i.view.GetLatestExternalIDPSequence()
+	sequence, err := i.view.GetLatestExternalIDPSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -47,7 +47,7 @@ func (i *ExternalIDP) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (i *ExternalIDP) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestExternalIDPSequence()
+	sequence, err := i.view.GetLatestExternalIDPSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -80,16 +80,16 @@ func (i *ExternalIDP) processUser(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event.Sequence, event.CreationDate)
+		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event)
 	case model.UserRemoved:
-		return i.view.DeleteExternalIDPsByUserID(event.AggregateID, event.Sequence, event.CreationDate)
+		return i.view.DeleteExternalIDPsByUserID(event.AggregateID, event)
 	default:
-		return i.view.ProcessedExternalIDPSequence(event.Sequence, event.CreationDate)
+		return i.view.ProcessedExternalIDPSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return i.view.PutExternalIDP(externalIDP, externalIDP.Sequence, event.CreationDate)
+	return i.view.PutExternalIDP(externalIDP, event)
 }
 
 func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
@@ -117,9 +117,9 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 		for _, provider := range exterinalIDPs {
 			i.fillConfigData(provider, config)
 		}
-		return i.view.PutExternalIDPs(event.Sequence, event.CreationDate, exterinalIDPs...)
+		return i.view.PutExternalIDPs(event, exterinalIDPs...)
 	default:
-		return i.view.ProcessedExternalIDPSequence(event.Sequence, event.CreationDate)
+		return i.view.ProcessedExternalIDPSequence(event)
 	}
 	return nil
 }

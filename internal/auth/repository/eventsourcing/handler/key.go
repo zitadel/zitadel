@@ -28,7 +28,7 @@ func (_ *Key) AggregateTypes() []models.AggregateType {
 }
 
 func (k *Key) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := k.view.GetLatestKeySequence()
+	sequence, err := k.view.GetLatestKeySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -36,7 +36,7 @@ func (k *Key) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (k *Key) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := k.view.GetLatestKeySequence()
+	sequence, err := k.view.GetLatestKeySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -51,11 +51,11 @@ func (k *Key) Reduce(event *models.Event) error {
 			return err
 		}
 		if privateKey.Expiry.Before(time.Now()) && publicKey.Expiry.Before(time.Now()) {
-			return k.view.ProcessedKeySequence(event.Sequence, event.CreationDate)
+			return k.view.ProcessedKeySequence(event)
 		}
-		return k.view.PutKeys(privateKey, publicKey, event.Sequence, event.CreationDate)
+		return k.view.PutKeys(privateKey, publicKey, event)
 	default:
-		return k.view.ProcessedKeySequence(event.Sequence, event.CreationDate)
+		return k.view.ProcessedKeySequence(event)
 	}
 }
 

@@ -28,7 +28,7 @@ func (_ *PasswordLockoutPolicy) AggregateTypes() []es_models.AggregateType {
 }
 
 func (p *PasswordLockoutPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
+	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -36,7 +36,7 @@ func (p *PasswordLockoutPolicy) CurrentSequence(event *models.Event) (uint64, er
 }
 
 func (p *PasswordLockoutPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
+	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -65,14 +65,14 @@ func (p *PasswordLockoutPolicy) processPasswordLockoutPolicy(event *models.Event
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordLockoutPolicyRemoved:
-		return p.view.DeletePasswordLockoutPolicy(event.AggregateID, event.Sequence, event.CreationDate)
+		return p.view.DeletePasswordLockoutPolicy(event.AggregateID, event)
 	default:
-		return p.view.ProcessedPasswordLockoutPolicySequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedPasswordLockoutPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutPasswordLockoutPolicy(policy, policy.Sequence, event.CreationDate)
+	return p.view.PutPasswordLockoutPolicy(policy, event)
 }
 
 func (p *PasswordLockoutPolicy) OnError(event *models.Event, err error) error {

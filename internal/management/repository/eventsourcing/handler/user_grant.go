@@ -41,7 +41,7 @@ func (_ *UserGrant) AggregateTypes() []es_models.AggregateType {
 }
 
 func (u *UserGrant) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := u.view.GetLatestUserGrantSequence()
+	sequence, err := u.view.GetLatestUserGrantSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -49,7 +49,7 @@ func (u *UserGrant) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (u *UserGrant) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserGrantSequence()
+	sequence, err := u.view.GetLatestUserGrantSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -89,14 +89,14 @@ func (u *UserGrant) processUserGrant(event *es_models.Event) (err error) {
 		}
 		err = grant.AppendEvent(event)
 	case grant_es_model.UserGrantRemoved, grant_es_model.UserGrantCascadeRemoved:
-		return u.view.DeleteUserGrant(event.AggregateID, event.Sequence, event.CreationDate)
+		return u.view.DeleteUserGrant(event.AggregateID, event)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserGrantSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return u.view.PutUserGrant(grant, grant.Sequence, event.CreationDate)
+	return u.view.PutUserGrant(grant, event)
 }
 
 func (u *UserGrant) processUser(event *es_models.Event) (err error) {
@@ -111,7 +111,7 @@ func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 			return err
 		}
 		if len(grants) == 0 {
-			return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+			return u.view.ProcessedUserGrantSequence(event)
 		}
 		user, err := u.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -120,9 +120,9 @@ func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 		for _, grant := range grants {
 			u.fillUserData(grant, user)
 		}
-		return u.view.PutUserGrants(grants, event.Sequence, event.CreationDate)
+		return u.view.PutUserGrants(grants, event)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserGrantSequence(event)
 	}
 	return nil
 }
@@ -135,7 +135,7 @@ func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 			return err
 		}
 		if len(grants) == 0 {
-			return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+			return u.view.ProcessedUserGrantSequence(event)
 		}
 		project, err := u.projectEvents.ProjectByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -144,9 +144,9 @@ func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 		for _, grant := range grants {
 			u.fillProjectData(grant, project)
 		}
-		return u.view.PutUserGrants(grants, event.Sequence, event.CreationDate)
+		return u.view.PutUserGrants(grants, event)
 	default:
-		return u.view.ProcessedUserGrantSequence(event.Sequence, event.CreationDate)
+		return u.view.ProcessedUserGrantSequence(event)
 	}
 	return nil
 }

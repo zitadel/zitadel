@@ -28,7 +28,7 @@ func (_ *LabelPolicy) AggregateTypes() []models.AggregateType {
 }
 
 func (m *LabelPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := m.view.GetLatestLabelPolicySequence()
+	sequence, err := m.view.GetLatestLabelPolicySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -36,7 +36,7 @@ func (m *LabelPolicy) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *LabelPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestLabelPolicySequence()
+	sequence, err := m.view.GetLatestLabelPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -65,12 +65,12 @@ func (m *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	default:
-		return m.view.ProcessedLabelPolicySequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedLabelPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutLabelPolicy(policy, policy.Sequence, event.CreationDate)
+	return m.view.PutLabelPolicy(policy, event)
 }
 
 func (m *LabelPolicy) OnError(event *models.Event, err error) error {

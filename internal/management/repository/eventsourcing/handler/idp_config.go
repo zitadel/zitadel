@@ -28,7 +28,7 @@ func (_ *IDPConfig) AggregateTypes() []es_models.AggregateType {
 }
 
 func (m *IDPConfig) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := m.view.GetLatestIDPConfigSequence()
+	sequence, err := m.view.GetLatestIDPConfigSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -36,7 +36,7 @@ func (m *IDPConfig) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *IDPConfig) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestIDPConfigSequence()
+	sequence, err := m.view.GetLatestIDPConfigSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -78,14 +78,14 @@ func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIDPConfig(idp.IDPConfigID, event.Sequence, event.CreationDate)
+		return m.view.DeleteIDPConfig(idp.IDPConfigID, event)
 	default:
-		return m.view.ProcessedIDPConfigSequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedIDPConfigSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIDPConfig(idp, idp.Sequence, event.CreationDate)
+	return m.view.PutIDPConfig(idp, event)
 }
 
 func (i *IDPConfig) OnError(event *es_models.Event, err error) error {

@@ -33,7 +33,7 @@ func (_ *Token) AggregateTypes() []es_models.AggregateType {
 }
 
 func (p *Token) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestTokenSequence()
+	sequence, err := p.view.GetLatestTokenSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -41,7 +41,7 @@ func (p *Token) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (t *Token) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := t.view.GetLatestTokenSequence()
+	sequence, err := t.view.GetLatestTokenSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (t *Token) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return t.view.PutToken(token, event.CreationDate)
+		return t.view.PutToken(token, event)
 	case user_es_model.UserProfileChanged,
 		user_es_model.HumanProfileChanged:
 		user := new(view_model.UserView)
@@ -73,25 +73,25 @@ func (t *Token) Reduce(event *models.Event) (err error) {
 		for _, token := range tokens {
 			token.PreferredLanguage = user.PreferredLanguage
 		}
-		return t.view.PutTokens(tokens, event.Sequence, event.CreationDate)
+		return t.view.PutTokens(tokens, event)
 	case user_es_model.SignedOut,
 		user_es_model.HumanSignedOut:
 		id, err := agentIDFromSession(event)
 		if err != nil {
 			return err
 		}
-		return t.view.DeleteSessionTokens(id, event.AggregateID, event.Sequence, event.CreationDate)
+		return t.view.DeleteSessionTokens(id, event.AggregateID, event)
 	case user_es_model.UserLocked,
 		user_es_model.UserDeactivated,
 		user_es_model.UserRemoved:
-		return t.view.DeleteUserTokens(event.AggregateID, event.Sequence, event.CreationDate)
+		return t.view.DeleteUserTokens(event.AggregateID, event)
 	case project_es_model.ApplicationDeactivated,
 		project_es_model.ApplicationRemoved:
 		application, err := applicationFromSession(event)
 		if err != nil {
 			return err
 		}
-		return t.view.DeleteApplicationTokens(event.Sequence, event.CreationDate, application.AppID)
+		return t.view.DeleteApplicationTokens(event, application.AppID)
 	case project_es_model.ProjectDeactivated,
 		project_es_model.ProjectRemoved:
 		project, err := t.ProjectEvents.ProjectByID(context.Background(), event.AggregateID)
@@ -102,9 +102,9 @@ func (t *Token) Reduce(event *models.Event) (err error) {
 		for _, app := range project.Applications {
 			applicationsIDs = append(applicationsIDs, app.AppID)
 		}
-		return t.view.DeleteApplicationTokens(event.Sequence, event.CreationDate, applicationsIDs...)
+		return t.view.DeleteApplicationTokens(event, applicationsIDs...)
 	default:
-		return t.view.ProcessedTokenSequence(event.Sequence, event.CreationDate)
+		return t.view.ProcessedTokenSequence(event)
 	}
 }
 

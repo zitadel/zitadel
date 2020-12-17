@@ -29,7 +29,7 @@ func (_ *MachineKeys) AggregateTypes() []es_models.AggregateType {
 }
 
 func (k *MachineKeys) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := k.view.GetLatestMachineKeySequence()
+	sequence, err := k.view.GetLatestMachineKeySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -37,7 +37,7 @@ func (k *MachineKeys) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (d *MachineKeys) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := d.view.GetLatestMachineKeySequence()
+	sequence, err := d.view.GetLatestMachineKeySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -60,23 +60,23 @@ func (d *MachineKeys) processMachineKeys(event *models.Event) (err error) {
 	case model.MachineKeyAdded:
 		err = key.AppendEvent(event)
 		if key.ExpirationDate.Before(time.Now()) {
-			return d.view.ProcessedMachineKeySequence(event.Sequence, event.CreationDate)
+			return d.view.ProcessedMachineKeySequence(event)
 		}
 	case model.MachineKeyRemoved:
 		err = key.SetData(event)
 		if err != nil {
 			return err
 		}
-		return d.view.DeleteMachineKey(key.ID, event.Sequence, event.CreationDate)
+		return d.view.DeleteMachineKey(key.ID, event)
 	case model.UserRemoved:
-		return d.view.DeleteMachineKeysByUserID(event.AggregateID, event.Sequence, event.CreationDate)
+		return d.view.DeleteMachineKeysByUserID(event.AggregateID, event)
 	default:
-		return d.view.ProcessedMachineKeySequence(event.Sequence, event.CreationDate)
+		return d.view.ProcessedMachineKeySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return d.view.PutMachineKey(key, key.Sequence, event.CreationDate)
+	return d.view.PutMachineKey(key, event)
 }
 
 func (d *MachineKeys) OnError(event *models.Event, err error) error {
