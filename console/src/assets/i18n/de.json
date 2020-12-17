@@ -909,6 +909,7 @@
             "DESCRIPTION":"Sie können vordefinierte oder selbsterstellten Provider auswählen",
             "SELECTIDPS":"Identity Provider"
         },
+        "PASSWORDLESS":"Passwordloser Login",
         "PASSWORDLESSTYPE": {
             "0":"Nicht erlaubt",
             "1":"Erlaubt"

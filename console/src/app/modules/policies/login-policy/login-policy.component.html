@@ -53,7 +53,7 @@
         </div>
         <div class="row">
             <cnsl-form-field class="form-field" label="Access Code" required="true">
-                <cnsl-label>{{'MFA.TYPE' | translate}}</cnsl-label>
+                <cnsl-label>{{'LOGINPOLICY.PASSWORDLESS' | translate}}</cnsl-label>
                 <mat-select [(ngModel)]="loginData.passwordlessType">
                     <mat-option *ngFor="let pt of passwordlessTypes" [value]="pt">
                         {{'LOGINPOLICY.PASSWORDLESSTYPE.'+pt | translate}}
