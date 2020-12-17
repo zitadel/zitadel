@@ -17,11 +17,15 @@ Errors:
     NotLocked: Benutzer ist nicht gesperrt
     NoChanges: Keine Änderungen gefunden
     InitCodeNotFound: Kein Initialisierungs Code gefunden
-    ProfileNotFound: Profil nicht gefunden
-    ProfileInvalid: Profildaten sind ungültig
-    EmailNotFound: Email nicht gefunden
-    EmailInvalid: Email ist ungültig
-    EmailAlreadyVerified: Email ist bereits verifiziert
+    Profile:
+      NotFound: Profil nicht gefunden
+      NotChanged: Profile nicht verändert
+      Invalid: Profildaten sind ungültig
+    Email:
+      NotFound: Email nicht gefunden
+      Invalid: Email ist ungültig
+      AlreadyVerified: Email ist bereits verifiziert
+      NotChanged: Email wurde nicht geändert
     PhoneNotFound: Telfonnummer nicht gefunden
     PhoneInvalid: Telefonnummer ist ungültig
     PhoneAlreadyVerified: Telefonnummer bereits verifiziert

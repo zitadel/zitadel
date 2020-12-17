@@ -862,13 +862,13 @@ func (es *UserEventstore) ProfileByID(ctx context.Context, userID string) (*usr_
 	if user.Profile != nil {
 		return user.Profile, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dk23f", "Errors.User.ProfileNotFound")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dk23f", "Errors.User.Profile.NotFound")
 }
 
 func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
 	profile.SetNamesAsDisplayname()
 	if !profile.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d82i3", "Errors.User.ProfileInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d82i3", "Errors.User.Profile.Invalid")
 	}
 	user, err := es.HumanByID(ctx, profile.AggregateID)
 	if err != nil {
@@ -897,12 +897,12 @@ func (es *UserEventstore) EmailByID(ctx context.Context, userID string) (*usr_mo
 	if user.Email != nil {
 		return user.Email, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dki89", "Errors.User.EmailNotFound")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dki89", "Errors.User.Email.NotFound")
 }
 
 func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Email) (*usr_model.Email, error) {
 	if !email.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "Errors.User.EmailInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "Errors.User.Email.Invalid")
 	}
 	user, err := es.HumanByID(ctx, email.AggregateID)
 	if err != nil {
@@ -975,10 +975,10 @@ func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userI
 		return errors.ThrowPreconditionFailed(nil, "EVENT-E3fbw", "Errors.User.NotInitialised")
 	}
 	if user.Email == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "Errors.User.EmailNotFound")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "Errors.User.Email.NotFound")
 	}
 	if user.IsEmailVerified {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "Errors.User.EmailAlreadyVerified")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "Errors.User.Email.AlreadyVerified")
 	}
 
 	emailCode := new(usr_model.EmailCode)
