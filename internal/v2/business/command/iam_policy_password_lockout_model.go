@@ -42,11 +42,11 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBui
 func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(maxAttempts uint64, showLockoutFailure bool) (*iam.PasswordLockoutPolicyChangedEvent, bool) {
 	hasChanged := false
 	changedEvent := &iam.PasswordLockoutPolicyChangedEvent{}
-	if wm.MaxAttempts == maxAttempts {
+	if wm.MaxAttempts != maxAttempts {
 		hasChanged = true
 		changedEvent.MaxAttempts = maxAttempts
 	}
-	if wm.ShowLockOutFailures == showLockoutFailure {
+	if wm.ShowLockOutFailures != showLockoutFailure {
 		hasChanged = true
 		changedEvent.ShowLockOutFailures = showLockoutFailure
 	}

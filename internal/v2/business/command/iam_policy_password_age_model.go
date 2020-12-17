@@ -42,11 +42,11 @@ func (wm *IAMPasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder
 func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(expireWarnDays, maxAgeDays uint64) (*iam.PasswordAgePolicyChangedEvent, bool) {
 	hasChanged := false
 	changedEvent := &iam.PasswordAgePolicyChangedEvent{}
-	if wm.ExpireWarnDays == expireWarnDays {
+	if wm.ExpireWarnDays != expireWarnDays {
 		hasChanged = true
 		changedEvent.ExpireWarnDays = expireWarnDays
 	}
-	if wm.MaxAgeDays == maxAgeDays {
+	if wm.MaxAgeDays != maxAgeDays {
 		hasChanged = true
 		changedEvent.MaxAgeDays = maxAgeDays
 	}

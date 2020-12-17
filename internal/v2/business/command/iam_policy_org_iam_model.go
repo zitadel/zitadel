@@ -42,7 +42,7 @@ func (wm *IAMOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(userLoginMustBeDomain bool) (*iam.OrgIAMPolicyChangedEvent, bool) {
 	hasChanged := false
 	changedEvent := &iam.OrgIAMPolicyChangedEvent{}
-	if wm.UserLoginMustBeDomain == userLoginMustBeDomain {
+	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
 		hasChanged = true
 		changedEvent.UserLoginMustBeDomain = userLoginMustBeDomain
 	}

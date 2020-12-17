@@ -42,11 +42,11 @@ func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(primaryColor, secondaryColor string) (*iam.LabelPolicyChangedEvent, bool) {
 	hasChanged := false
 	changedEvent := &iam.LabelPolicyChangedEvent{}
-	if wm.PrimaryColor == primaryColor {
+	if wm.PrimaryColor != primaryColor {
 		hasChanged = true
 		changedEvent.PrimaryColor = primaryColor
 	}
-	if wm.SecondaryColor == secondaryColor {
+	if wm.SecondaryColor != secondaryColor {
 		hasChanged = true
 		changedEvent.SecondaryColor = secondaryColor
 	}

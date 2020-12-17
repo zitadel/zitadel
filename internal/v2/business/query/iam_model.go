@@ -14,7 +14,7 @@ type ReadModel struct {
 	SetUpDone    iam.Step
 
 	Members IAMMembersReadModel
-	IDPs    iam.IDPConfigsReadModel
+	IDPs    IAMIDPConfigsReadModel
 
 	GlobalOrgID string
 	ProjectID   string
@@ -35,12 +35,12 @@ func NewReadModel(id string) *ReadModel {
 	}
 }
 
-func (rm *ReadModel) IDPByID(idpID string) *iam.IDPConfigReadModel {
+func (rm *ReadModel) IDPByID(idpID string) *IAMIDPConfigReadModel {
 	_, config := rm.IDPs.ConfigByID(idpID)
 	if config == nil {
 		return nil
 	}
-	return &iam.IDPConfigReadModel{ConfigReadModel: *config}
+	return &IAMIDPConfigReadModel{IDPConfigReadModel: *config}
 }
 
 func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {

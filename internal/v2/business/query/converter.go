@@ -4,8 +4,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
 func readModelToIAM(readModel *ReadModel) *model.IAM {
@@ -26,7 +24,7 @@ func readModelToIAM(readModel *ReadModel) *model.IAM {
 	}
 }
 
-func readModelToIDPConfigView(rm *iam.IDPConfigReadModel) *model.IDPConfigView {
+func readModelToIDPConfigView(rm *IAMIDPConfigReadModel) *model.IDPConfigView {
 	return &model.IDPConfigView{
 		AggregateID:               rm.AggregateID,
 		ChangeDate:                rm.ChangeDate,
@@ -126,15 +124,15 @@ func readModelToPasswordLockoutPolicy(readModel *IAMPasswordLockoutPolicyReadMod
 	}
 }
 
-func readModelToIDPConfigs(rm *iam.IDPConfigsReadModel) []*model.IDPConfig {
+func readModelToIDPConfigs(rm *IAMIDPConfigsReadModel) []*model.IDPConfig {
 	configs := make([]*model.IDPConfig, len(rm.Configs))
 	for i, config := range rm.Configs {
-		configs[i] = readModelToIDPConfig(&iam.IDPConfigReadModel{ConfigReadModel: *config})
+		configs[i] = readModelToIDPConfig(&IAMIDPConfigReadModel{IDPConfigReadModel: *config})
 	}
 	return configs
 }
 
-func readModelToIDPConfig(rm *iam.IDPConfigReadModel) *model.IDPConfig {
+func readModelToIDPConfig(rm *IAMIDPConfigReadModel) *model.IDPConfig {
 	return &model.IDPConfig{
 		ObjectRoot:  readModelToObjectRoot(rm.ReadModel),
 		OIDCConfig:  readModelToIDPOIDCConfig(rm.OIDCConfig),
@@ -145,7 +143,7 @@ func readModelToIDPConfig(rm *iam.IDPConfigReadModel) *model.IDPConfig {
 	}
 }
 
-func readModelToIDPOIDCConfig(rm *oidc.ConfigReadModel) *model.OIDCIDPConfig {
+func readModelToIDPOIDCConfig(rm *OIDCConfigReadModel) *model.OIDCIDPConfig {
 	return &model.OIDCIDPConfig{
 		ObjectRoot:            readModelToObjectRoot(rm.ReadModel),
 		ClientID:              rm.ClientID,

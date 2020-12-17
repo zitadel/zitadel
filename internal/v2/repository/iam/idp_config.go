@@ -2,10 +2,11 @@ package iam
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/repository/idpconfig"
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/repository/idp"
 )
 
 const (
@@ -16,138 +17,20 @@ const (
 	IDPConfigReactivatedEventType eventstore.EventType = "iam.idp.config.reactivated"
 )
 
-type IDPConfigReadModel struct {
-	idp.ConfigReadModel
-
-	iamID    string
-	configID string
-}
-
-func NewIDPConfigReadModel(iamID, configID string) *IDPConfigReadModel {
-	return &IDPConfigReadModel{
-		iamID:    iamID,
-		configID: configID,
-	}
-}
-
-func (rm *IDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *IDPConfigAddedEvent:
-			rm.ConfigReadModel.AppendEvents(&e.ConfigAddedEvent)
-		case *IDPConfigChangedEvent:
-			rm.ConfigReadModel.AppendEvents(&e.ConfigChangedEvent)
-		case *IDPConfigDeactivatedEvent:
-			rm.ConfigReadModel.AppendEvents(&e.ConfigDeactivatedEvent)
-		case *IDPConfigReactivatedEvent:
-			rm.ConfigReadModel.AppendEvents(&e.ConfigReactivatedEvent)
-		case *IDPConfigRemovedEvent:
-			rm.ConfigReadModel.AppendEvents(&e.ConfigRemovedEvent)
-		case *IDPOIDCConfigAddedEvent:
-			rm.ConfigReadModel.AppendEvents(&e.ConfigAddedEvent)
-		case *IDPOIDCConfigChangedEvent:
-			rm.ConfigReadModel.AppendEvents(&e.ConfigChangedEvent)
-		}
-	}
-}
-
-func (rm *IDPConfigReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
-		AggregateIDs(rm.iamID).
-		EventData(map[string]interface{}{
-			"idpConfigId": rm.configID,
-		})
-}
-
-type IDPConfigWriteModel struct {
-	eventstore.WriteModel
-	idp.ConfigWriteModel
-
-	iamID    string
-	configID string
-}
-
-func NewIDPConfigWriteModel(iamID, configID string) *IDPConfigWriteModel {
-	return &IDPConfigWriteModel{
-		iamID:    iamID,
-		configID: configID,
-	}
-}
-
-func (wm *IDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, AggregateType).
-		AggregateIDs(wm.iamID)
-}
-
-func (wm *IDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-	for _, event := range events {
-		switch e := event.(type) {
-		case *IDPConfigAddedEvent:
-			if wm.configID != e.ConfigID {
-				continue
-			}
-			wm.ConfigWriteModel.AppendEvents(&e.ConfigAddedEvent)
-		case *IDPConfigChangedEvent:
-			if wm.configID != e.ConfigID {
-				continue
-			}
-			wm.ConfigWriteModel.AppendEvents(&e.ConfigChangedEvent)
-		case *IDPConfigDeactivatedEvent:
-			if wm.configID != e.ConfigID {
-				continue
-			}
-			wm.ConfigWriteModel.AppendEvents(&e.ConfigDeactivatedEvent)
-		case *IDPConfigReactivatedEvent:
-			if wm.configID != e.ConfigID {
-				continue
-			}
-			wm.ConfigWriteModel.AppendEvents(&e.ConfigReactivatedEvent)
-		case *IDPConfigRemovedEvent:
-			if wm.configID != e.ConfigID {
-				continue
-			}
-			wm.ConfigWriteModel.AppendEvents(&e.ConfigRemovedEvent)
-		case *IDPOIDCConfigAddedEvent:
-			if wm.configID != e.IDPConfigID {
-				continue
-			}
-			wm.ConfigWriteModel.AppendEvents(&e.ConfigAddedEvent)
-		case *IDPOIDCConfigChangedEvent:
-			if wm.configID != e.IDPConfigID {
-				continue
-			}
-			wm.ConfigWriteModel.AppendEvents(&e.ConfigChangedEvent)
-		}
-	}
-}
-
-func (wm *IDPConfigWriteModel) Reduce() error {
-	if err := wm.ConfigWriteModel.Reduce(); err != nil {
-		return err
-	}
-	return wm.WriteModel.Reduce()
-}
-
-func (wm *IDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventReader) error {
-	wm.AppendEvents(events...)
-	return wm.Reduce()
-}
-
 type IDPConfigAddedEvent struct {
-	idp.ConfigAddedEvent
+	idpconfig.IDPConfigAddedEvent
 }
 
 func NewIDPConfigAddedEvent(
 	ctx context.Context,
 	configID string,
 	name string,
-	configType idp.ConfigType,
-	stylingType idp.StylingType,
+	configType domain.IDPConfigType,
+	stylingType domain.IDPConfigStylingType,
 ) *IDPConfigAddedEvent {
 
 	return &IDPConfigAddedEvent{
-		ConfigAddedEvent: *idp.NewConfigAddedEvent(
+		IDPConfigAddedEvent: *idpconfig.NewIDPConfigAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				IDPConfigAddedEventType,
@@ -161,57 +44,29 @@ func NewIDPConfigAddedEvent(
 }
 
 func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := idp.ConfigAddedEventMapper(event)
+	e, err := idpconfig.IDPConfigAddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &IDPConfigAddedEvent{ConfigAddedEvent: *e.(*idp.ConfigAddedEvent)}, nil
+	return &IDPConfigAddedEvent{IDPConfigAddedEvent: *e.(*idpconfig.IDPConfigAddedEvent)}, nil
 }
 
 type IDPConfigChangedEvent struct {
-	idp.ConfigChangedEvent
-}
-
-func NewIDPConfigChangedEvent(
-	ctx context.Context,
-	current *IDPConfigWriteModel,
-	configID string,
-	name string,
-	configType idp.ConfigType,
-	stylingType idp.StylingType,
-) (*IDPConfigChangedEvent, error) {
-
-	event, err := idp.NewConfigChangedEvent(
-		eventstore.NewBaseEventForPush(
-			ctx,
-			IDPConfigChangedEventType,
-		),
-		&current.ConfigWriteModel,
-		name,
-		stylingType,
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &IDPConfigChangedEvent{
-		ConfigChangedEvent: *event,
-	}, nil
+	idpconfig.IDPConfigChangedEvent
 }
 
 func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := idp.ConfigChangedEventMapper(event)
+	e, err := idpconfig.IDPConfigChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &IDPConfigChangedEvent{ConfigChangedEvent: *e.(*idp.ConfigChangedEvent)}, nil
+	return &IDPConfigChangedEvent{IDPConfigChangedEvent: *e.(*idpconfig.IDPConfigChangedEvent)}, nil
 }
 
 type IDPConfigRemovedEvent struct {
-	idp.ConfigRemovedEvent
+	idpconfig.IDPConfigRemovedEvent
 }
 
 func NewIDPConfigRemovedEvent(
@@ -220,7 +75,7 @@ func NewIDPConfigRemovedEvent(
 ) *IDPConfigRemovedEvent {
 
 	return &IDPConfigRemovedEvent{
-		ConfigRemovedEvent: *idp.NewConfigRemovedEvent(
+		IDPConfigRemovedEvent: *idpconfig.NewIDPConfigRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				IDPConfigRemovedEventType,
@@ -231,16 +86,16 @@ func NewIDPConfigRemovedEvent(
 }
 
 func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := idp.ConfigRemovedEventMapper(event)
+	e, err := idpconfig.IDPConfigRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &IDPConfigRemovedEvent{ConfigRemovedEvent: *e.(*idp.ConfigRemovedEvent)}, nil
+	return &IDPConfigRemovedEvent{IDPConfigRemovedEvent: *e.(*idpconfig.IDPConfigRemovedEvent)}, nil
 }
 
 type IDPConfigDeactivatedEvent struct {
-	idp.ConfigDeactivatedEvent
+	idpconfig.IDPConfigDeactivatedEvent
 }
 
 func NewIDPConfigDeactivatedEvent(
@@ -249,7 +104,7 @@ func NewIDPConfigDeactivatedEvent(
 ) *IDPConfigDeactivatedEvent {
 
 	return &IDPConfigDeactivatedEvent{
-		ConfigDeactivatedEvent: *idp.NewConfigDeactivatedEvent(
+		IDPConfigDeactivatedEvent: *idpconfig.NewIDPConfigDeactivatedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				IDPConfigDeactivatedEventType,
@@ -260,16 +115,16 @@ func NewIDPConfigDeactivatedEvent(
 }
 
 func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := idp.ConfigDeactivatedEventMapper(event)
+	e, err := idpconfig.IDPConfigDeactivatedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &IDPConfigDeactivatedEvent{ConfigDeactivatedEvent: *e.(*idp.ConfigDeactivatedEvent)}, nil
+	return &IDPConfigDeactivatedEvent{IDPConfigDeactivatedEvent: *e.(*idpconfig.IDPConfigDeactivatedEvent)}, nil
 }
 
 type IDPConfigReactivatedEvent struct {
-	idp.ConfigReactivatedEvent
+	idpconfig.IDPConfigReactivatedEvent
 }
 
 func NewIDPConfigReactivatedEvent(
@@ -278,7 +133,7 @@ func NewIDPConfigReactivatedEvent(
 ) *IDPConfigReactivatedEvent {
 
 	return &IDPConfigReactivatedEvent{
-		ConfigReactivatedEvent: *idp.NewConfigReactivatedEvent(
+		IDPConfigReactivatedEvent: *idpconfig.NewIDPConfigReactivatedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				IDPConfigReactivatedEventType,
@@ -289,10 +144,10 @@ func NewIDPConfigReactivatedEvent(
 }
 
 func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := idp.ConfigReactivatedEventMapper(event)
+	e, err := idpconfig.IDPConfigReactivatedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &IDPConfigReactivatedEvent{ConfigReactivatedEvent: *e.(*idp.ConfigReactivatedEvent)}, nil
+	return &IDPConfigReactivatedEvent{IDPConfigReactivatedEvent: *e.(*idpconfig.IDPConfigReactivatedEvent)}, nil
 }

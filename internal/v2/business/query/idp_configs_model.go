@@ -1,17 +1,17 @@
-package idp
+package query
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
+	"github.com/caos/zitadel/internal/v2/repository/idpconfig"
 )
 
-type ConfigsReadModel struct {
+type IDPConfigsReadModel struct {
 	eventstore.ReadModel
 
-	Configs []*ConfigReadModel
+	Configs []*IDPConfigReadModel
 }
 
-func (rm *ConfigsReadModel) ConfigByID(id string) (idx int, config *ConfigReadModel) {
+func (rm *IDPConfigsReadModel) ConfigByID(id string) (idx int, config *IDPConfigReadModel) {
 	for idx, config = range rm.Configs {
 		if config.ConfigID == id {
 			return idx, config
@@ -20,29 +20,29 @@ func (rm *ConfigsReadModel) ConfigByID(id string) (idx int, config *ConfigReadMo
 	return -1, nil
 }
 
-func (rm *ConfigsReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IDPConfigsReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *ConfigAddedEvent:
-			config := NewConfigReadModel(e.ConfigID)
+		case *idpconfig.IDPConfigAddedEvent:
+			config := NewIDPConfigReadModel(e.ConfigID)
 			rm.Configs = append(rm.Configs, config)
 			config.AppendEvents(event)
-		case *ConfigChangedEvent:
+		case *idpconfig.IDPConfigChangedEvent:
 			_, config := rm.ConfigByID(e.ConfigID)
 			config.AppendEvents(e)
-		case *ConfigDeactivatedEvent:
+		case *idpconfig.IDPConfigDeactivatedEvent:
 			_, config := rm.ConfigByID(e.ConfigID)
 			config.AppendEvents(e)
-		case *ConfigReactivatedEvent:
+		case *idpconfig.IDPConfigReactivatedEvent:
 			_, config := rm.ConfigByID(e.ConfigID)
 			config.AppendEvents(e)
-		case *oidc.ConfigAddedEvent:
+		case *idpconfig.OIDCConfigAddedEvent:
 			_, config := rm.ConfigByID(e.IDPConfigID)
 			config.AppendEvents(e)
-		case *oidc.ConfigChangedEvent:
+		case *idpconfig.OIDCConfigChangedEvent:
 			_, config := rm.ConfigByID(e.IDPConfigID)
 			config.AppendEvents(e)
-		case *ConfigRemovedEvent:
+		case *idpconfig.IDPConfigRemovedEvent:
 			idx, _ := rm.ConfigByID(e.ConfigID)
 			if idx < 0 {
 				continue
@@ -54,7 +54,7 @@ func (rm *ConfigsReadModel) AppendEvents(events ...eventstore.EventReader) {
 	}
 }
 
-func (rm *ConfigsReadModel) Reduce() error {
+func (rm *IDPConfigsReadModel) Reduce() error {
 	for _, config := range rm.Configs {
 		if err := config.Reduce(); err != nil {
 			return err

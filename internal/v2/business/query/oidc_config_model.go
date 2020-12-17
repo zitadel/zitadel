@@ -1,11 +1,13 @@
-package oidc
+package query
 
 import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/repository/idpconfig"
 )
 
-type ConfigReadModel struct {
+type OIDCConfigReadModel struct {
 	eventstore.ReadModel
 
 	IDPConfigID           string
@@ -13,16 +15,16 @@ type ConfigReadModel struct {
 	ClientSecret          *crypto.CryptoValue
 	Issuer                string
 	Scopes                []string
-	IDPDisplayNameMapping MappingField
-	UserNameMapping       MappingField
+	IDPDisplayNameMapping domain.OIDCMappingField
+	UserNameMapping       domain.OIDCMappingField
 }
 
-func (rm *ConfigReadModel) Reduce() error {
+func (rm *OIDCConfigReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *ConfigAddedEvent:
+		case *idpconfig.OIDCConfigAddedEvent:
 			rm.reduceConfigAddedEvent(e)
-		case *ConfigChangedEvent:
+		case *idpconfig.OIDCConfigChangedEvent:
 			rm.reduceConfigChangedEvent(e)
 		}
 	}
@@ -30,7 +32,7 @@ func (rm *ConfigReadModel) Reduce() error {
 	return rm.ReadModel.Reduce()
 }
 
-func (rm *ConfigReadModel) reduceConfigAddedEvent(e *ConfigAddedEvent) {
+func (rm *OIDCConfigReadModel) reduceConfigAddedEvent(e *idpconfig.OIDCConfigAddedEvent) {
 	rm.IDPConfigID = e.IDPConfigID
 	rm.ClientID = e.ClientID
 	rm.ClientSecret = e.ClientSecret
@@ -40,7 +42,7 @@ func (rm *ConfigReadModel) reduceConfigAddedEvent(e *ConfigAddedEvent) {
 	rm.UserNameMapping = e.UserNameMapping
 }
 
-func (rm *ConfigReadModel) reduceConfigChangedEvent(e *ConfigChangedEvent) {
+func (rm *OIDCConfigReadModel) reduceConfigChangedEvent(e *idpconfig.OIDCConfigChangedEvent) {
 	if e.ClientID != "" {
 		rm.ClientID = e.ClientID
 	}

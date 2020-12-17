@@ -193,6 +193,11 @@ Errors:
       IDP:
         AlreadyExists: Identitäts Provider existiert bereits
         NotExisting: Identitäts Provider existiert nicht
+      IDPConfig:
+        AlreadyExists: Identitäts Provider Konfiguration existiert bereits
+        NotExisting: Identitäts Provider Konfiguration existiert nicht
+        NotInactive: Identitäts Provider Konfiguration nicht inaktive
+        NotActive: Identitäts Provider Konfiguration nicht aktive
     LabelPolicy:
       NotFound: Default Private Label Policy konnte nicht gefunden
       NotChanged: Default Private Label Policy wurde nicht verändert

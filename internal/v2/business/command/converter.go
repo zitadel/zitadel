@@ -4,8 +4,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/idp/oidc"
 )
 
 func writeModelToObjectRoot(writeModel eventstore.WriteModel) models.ObjectRoot {
@@ -78,7 +76,7 @@ func writeModelToPasswordLockoutPolicy(wm *IAMPasswordLockoutPolicyWriteModel) *
 	}
 }
 
-func writeModelToIDPConfig(wm *iam.IDPConfigWriteModel) *model.IDPConfig {
+func writeModelToIDPConfig(wm *IAMIDPConfigWriteModel) *model.IDPConfig {
 	return &model.IDPConfig{
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
 		OIDCConfig:  writeModelToIDPOIDCConfig(wm.OIDCConfig),
@@ -89,7 +87,7 @@ func writeModelToIDPConfig(wm *iam.IDPConfigWriteModel) *model.IDPConfig {
 	}
 }
 
-func writeModelToIDPOIDCConfig(wm *oidc.ConfigWriteModel) *model.OIDCIDPConfig {
+func writeModelToIDPOIDCConfig(wm *OIDCConfigWriteModel) *model.OIDCIDPConfig {
 	return &model.OIDCIDPConfig{
 		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
 		ClientID:              wm.ClientID,

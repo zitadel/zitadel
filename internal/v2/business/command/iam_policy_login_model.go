@@ -59,7 +59,7 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(allowUsernamePassword, allow
 		hasChanged = true
 		changedEvent.ForceMFA = forceMFA
 	}
-	if wm.PasswordlessType != passwordlessType {
+	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
 		hasChanged = true
 		changedEvent.PasswordlessType = passwordlessType
 	}
