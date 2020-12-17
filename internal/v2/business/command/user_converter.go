@@ -4,6 +4,14 @@ import (
 	"github.com/caos/zitadel/internal/user/model"
 )
 
+func writeModelToUser(wm *UserWriteModel) *model.User {
+	return &model.User{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		UserName:   wm.UserName,
+		State:      model.UserState(wm.UserState),
+	}
+}
+
 func writeModelToProfile(wm *HumanProfileWriteModel) *model.Profile {
 	return &model.Profile{
 		ObjectRoot:        writeModelToObjectRoot(wm.WriteModel),

@@ -104,7 +104,7 @@ func NewUserV1RegisteredEvent(
 	nickName,
 	displayName string,
 	preferredLanguage language.Tag,
-	gender int32,
+	gender domain.Gender,
 	emailAddress,
 	phoneNumber,
 	country,
