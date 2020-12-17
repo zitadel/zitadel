@@ -446,7 +446,7 @@ func TestHandleError(t *testing.T) {
 				func(*repository.FailedEvent) error {
 					return nil
 				},
-				func(uint64, time.Time) error {
+				func(*models.Event) error {
 					processedSequence = true
 					return nil
 				},
