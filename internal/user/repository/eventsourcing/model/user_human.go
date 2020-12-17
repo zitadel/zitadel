@@ -69,6 +69,9 @@ func HumanFromModel(user *model.Human) *Human {
 	if user.U2FLogins != nil {
 		human.U2FLogins = WebAuthNLoginsFromModel(user.U2FLogins)
 	}
+	if user.PasswordlessLogins != nil {
+		human.PasswordlessLogins = WebAuthNLoginsFromModel(user.PasswordlessLogins)
+	}
 	return human
 }
 
@@ -115,6 +118,9 @@ func HumanToModel(user *Human) *model.Human {
 	}
 	if user.U2FLogins != nil {
 		human.U2FLogins = WebAuthNLoginsToModel(user.U2FLogins)
+	}
+	if user.PasswordlessLogins != nil {
+		human.PasswordlessLogins = WebAuthNLoginsToModel(user.PasswordlessLogins)
 	}
 	return human
 }
