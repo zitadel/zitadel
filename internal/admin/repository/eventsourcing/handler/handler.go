@@ -3,13 +3,12 @@ package handler
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
+	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )

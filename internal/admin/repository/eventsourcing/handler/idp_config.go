@@ -3,11 +3,10 @@ package handler
 import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 )

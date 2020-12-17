@@ -3,15 +3,12 @@ package handler
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-
 	"github.com/caos/logging"
-
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -62,11 +59,11 @@ func (p *NotifyUser) ViewModel() string {
 	return userTable
 }
 
-func (_ *NotifyUser) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
+func (_ *NotifyUser) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
 }
 
-func (p *NotifyUser) CurrentSequence(event *models.Event) (uint64, error) {
+func (p *NotifyUser) CurrentSequence(event *es_models.Event) (uint64, error) {
 	sequence, err := p.view.GetLatestNotifyUserSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
@@ -74,7 +71,7 @@ func (p *NotifyUser) CurrentSequence(event *models.Event) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (p *NotifyUser) EventQuery() (*models.SearchQuery, error) {
+func (p *NotifyUser) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestNotifyUserSequence("")
 	if err != nil {
 		return nil, err
@@ -84,7 +81,7 @@ func (p *NotifyUser) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (u *NotifyUser) Reduce(event *models.Event) (err error) {
+func (u *NotifyUser) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case es_model.UserAggregate:
 		return u.ProcessUser(event)
@@ -95,7 +92,7 @@ func (u *NotifyUser) Reduce(event *models.Event) (err error) {
 	}
 }
 
-func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
+func (u *NotifyUser) ProcessUser(event *es_models.Event) (err error) {
 	user := new(view_model.NotifyUser)
 	switch event.Type {
 	case es_model.UserAdded,
@@ -144,7 +141,7 @@ func (u *NotifyUser) ProcessUser(event *models.Event) (err error) {
 	return u.view.PutNotifyUser(user, event)
 }
 
-func (u *NotifyUser) ProcessOrg(event *models.Event) (err error) {
+func (u *NotifyUser) ProcessOrg(event *es_models.Event) (err error) {
 	switch event.Type {
 	case org_es_model.OrgDomainVerified,
 		org_es_model.OrgDomainRemoved,
@@ -159,7 +156,7 @@ func (u *NotifyUser) ProcessOrg(event *models.Event) (err error) {
 	}
 }
 
-func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *models.Event) error {
+func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
 	if err != nil {
 		return err
@@ -185,7 +182,7 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	return u.view.ProcessedNotifyUserSequence(event)
 }
 
-func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
+func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
 	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
 	if err != nil {
 		return err
@@ -231,7 +228,7 @@ func (u *NotifyUser) fillLoginNames(user *view_model.NotifyUser) (err error) {
 	return nil
 }
 
-func (p *NotifyUser) OnError(event *models.Event, err error) error {
+func (p *NotifyUser) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-9spwf", "id", event.AggregateID).WithError(err).Warn("something went wrong in notify user handler")
 	return spooler.HandleError(event, err, p.view.GetLatestNotifyUserFailedEvent, p.view.ProcessedNotifyUserFailedEvent, p.view.ProcessedNotifyUserSequence, p.errorCountUntilSkip)
 }

@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"sync"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/internal/repository"
@@ -23,8 +22,6 @@ var _ Eventstore = (*eventstore)(nil)
 type eventstore struct {
 	repo             repository.Repository
 	aggregateCreator *models.AggregateCreator
-	subscriptions    map[models.AggregateType][]*Subscription
-	subsMutext       sync.Mutex
 }
 
 func (es *eventstore) AggregateCreator() *models.AggregateCreator {
@@ -47,7 +44,7 @@ func (es *eventstore) PushAggregates(ctx context.Context, aggregates ...*models.
 		return err
 	}
 
-	go es.notify(aggregates)
+	go notify(aggregates)
 	return nil
 }
 

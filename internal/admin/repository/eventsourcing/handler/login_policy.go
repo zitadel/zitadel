@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"

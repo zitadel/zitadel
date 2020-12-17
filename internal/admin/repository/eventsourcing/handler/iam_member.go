@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
