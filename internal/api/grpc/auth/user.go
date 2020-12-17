@@ -163,6 +163,9 @@ func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Emp
 
 func (s *Server) AddMyMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
 	u2f, err := s.repo.AddMyMFAU2F(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return verifyWebAuthNFromModel(u2f), err
 }
 
@@ -186,6 +189,9 @@ func (s *Server) GetMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth
 
 func (s *Server) AddMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
 	u2f, err := s.repo.AddMyPasswordless(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return verifyWebAuthNFromModel(u2f), err
 }
 
