@@ -12,7 +12,7 @@ import (
 )
 
 type Human struct {
-	*User `json:"-"`
+	user *User `json:"-"`
 
 	*Password
 	*Profile
@@ -231,27 +231,27 @@ func (h *Human) AppendEvent(event *es_models.Event) (err error) {
 }
 
 func (h *Human) ComputeObject() {
-	if h.State == int32(model.UserStateUnspecified) || h.State == int32(model.UserStateInitial) {
+	if h.user.State == int32(model.UserStateUnspecified) || h.user.State == int32(model.UserStateInitial) {
 		if h.Email != nil && h.IsEmailVerified {
-			h.State = int32(model.UserStateActive)
+			h.user.State = int32(model.UserStateActive)
 		} else {
-			h.State = int32(model.UserStateInitial)
+			h.user.State = int32(model.UserStateInitial)
 		}
 	}
 	if h.Password != nil && h.Password.ObjectRoot.IsZero() {
-		h.Password.ObjectRoot = h.User.ObjectRoot
+		h.Password.ObjectRoot = h.user.ObjectRoot
 	}
 	if h.Profile != nil && h.Profile.ObjectRoot.IsZero() {
-		h.Profile.ObjectRoot = h.User.ObjectRoot
+		h.Profile.ObjectRoot = h.user.ObjectRoot
 	}
 	if h.Email != nil && h.Email.ObjectRoot.IsZero() {
-		h.Email.ObjectRoot = h.User.ObjectRoot
+		h.Email.ObjectRoot = h.user.ObjectRoot
 	}
 	if h.Phone != nil && h.Phone.ObjectRoot.IsZero() {
-		h.Phone.ObjectRoot = h.User.ObjectRoot
+		h.Phone.ObjectRoot = h.user.ObjectRoot
 	}
 	if h.Address != nil && h.Address.ObjectRoot.IsZero() {
-		h.Address.ObjectRoot = h.User.ObjectRoot
+		h.Address.ObjectRoot = h.user.ObjectRoot
 	}
 }
 
