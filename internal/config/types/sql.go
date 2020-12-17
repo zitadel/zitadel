@@ -62,8 +62,10 @@ func (s *SQL) Start() (*sql.DB, error) {
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "TYPES-9qBtr", "unable to open database connection")
 	}
-	client.SetMaxIdleConns(3)
+	// as we open many sql clients we set the max
+	// open cons deep. now 3(maxconn) * 8(clients) = max 24 conns per pod
 	client.SetMaxOpenConns(3)
+	client.SetMaxIdleConns(3)
 	return client, nil
 }
 

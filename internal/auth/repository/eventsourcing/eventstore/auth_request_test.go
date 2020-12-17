@@ -430,7 +430,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{}}, false},
 			[]model.NextStep{&model.PasswordStep{}},
 			nil,
 		},
@@ -475,7 +475,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
 				MultiFactorCheckLifeTime: 10 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{PasswordlessType: iam_model.PasswordlessTypeAllowed}}, false},
 			[]model.NextStep{&model.PasswordlessStep{}},
 			nil,
 		},
@@ -500,7 +500,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			args{&model.AuthRequest{
 				UserID: "UserID",
 				LoginPolicy: &iam_model.LoginPolicyView{
-					MultiFactors: []iam_model.MultiFactorType{iam_model.MultiFactorTypeU2FWithPIN},
+					PasswordlessType: iam_model.PasswordlessTypeAllowed,
+					MultiFactors:     []iam_model.MultiFactorType{iam_model.MultiFactorTypeU2FWithPIN},
 				},
 			}, false},
 			[]model.NextStep{&model.VerifyEMailStep{}},
@@ -514,7 +515,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider:       &mockEventUser{},
 				orgViewProvider:         &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{}}, false},
 			[]model.NextStep{&model.InitPasswordStep{}},
 			nil,
 		},
@@ -578,7 +579,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:       &mockViewOrg{State: org_model.OrgStateActive},
 				PasswordCheckLifeTime: 10 * 24 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{}}, false},
 			[]model.NextStep{&model.PasswordStep{}},
 			nil,
 		},
@@ -887,6 +888,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			args{
 				&model.AuthRequest{
 					UserID:              "UserID",
+					LoginPolicy:         &iam_model.LoginPolicyView{},
 					SelectedIDPConfigID: "IDPConfigID",
 					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
 				}, false},

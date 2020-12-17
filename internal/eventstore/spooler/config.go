@@ -1,6 +1,7 @@
 package spooler
 
 import (
+	"math/rand"
 	"os"
 
 	"github.com/caos/logging"
@@ -22,6 +23,11 @@ func (c *Config) New() *Spooler {
 		lockID, err = id.SonyFlakeGenerator.Next()
 		logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
 	}
+
+	//shuffle the handlers for better balance when running multiple pods
+	rand.Shuffle(len(c.ViewHandlers), func(i, j int) {
+		c.ViewHandlers[i], c.ViewHandlers[j] = c.ViewHandlers[j], c.ViewHandlers[i]
+	})
 
 	return &Spooler{
 		handlers:   c.ViewHandlers,
