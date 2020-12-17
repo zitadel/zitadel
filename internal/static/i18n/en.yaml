@@ -29,7 +29,9 @@ Errors:
     PhoneNotFound: Phone not found
     PhoneInvalid: Phone is invalid
     PhoneAlreadyVerified: Phone already verified
-    AddressNotFound: Address not found
+    Address:
+      NotFound: Address not found
+      NotChanged: Address not changed
     NotHuman: The User must be personal
     NotMachine: The User must be technical
     NotAllowedToLink: User is not allowed to link with external login provider

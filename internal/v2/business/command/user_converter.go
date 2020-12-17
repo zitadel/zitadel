@@ -23,3 +23,14 @@ func writeModelToEmail(wm *HumanEmailWriteModel) *model.Email {
 		IsEmailVerified: wm.IsEmailVerified,
 	}
 }
+
+func writeModelToAddress(wm *HumanAddressWriteModel) *model.Address {
+	return &model.Address{
+		ObjectRoot:    writeModelToObjectRoot(wm.WriteModel),
+		Country:       wm.Country,
+		Locality:      wm.Locality,
+		PostalCode:    wm.PostalCode,
+		Region:        wm.Region,
+		StreetAddress: wm.StreetAddress,
+	}
+}

@@ -29,7 +29,9 @@ Errors:
     PhoneNotFound: Telfonnummer nicht gefunden
     PhoneInvalid: Telefonnummer ist ungültig
     PhoneAlreadyVerified: Telefonnummer bereits verifiziert
-    AddressNotFound: Addresse nicht gefunden
+    Address:
+      NotFound: Addresse nicht gefunden
+      NotChanged: Addresse wurde nicht geändert
     NotHuman: Der Benutzer muss eine Person sein
     NotMachine: Der Benutzer muss technisch sein
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden

@@ -1158,7 +1158,7 @@ func (es *UserEventstore) AddressByID(ctx context.Context, userID string) (*usr_
 	if user.Address != nil {
 		return user.Address, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-so9wa", "Errors.User.AddressNotFound")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-so9wa", "Errors.User.Address.NotFound")
 }
 
 func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {
