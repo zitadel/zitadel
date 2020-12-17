@@ -42,7 +42,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
         this.init();
         if (this.refresh) {
             this.refresh.pipe(takeUntil(this.destroyed$), debounceTime(2000)).subscribe(() => {
-                console.log('asdf');
                 this.init();
             });
         }
