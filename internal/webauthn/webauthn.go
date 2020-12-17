@@ -42,6 +42,7 @@ func StartServer(sd systemdefaults.WebAuthN) (*WebAuthN, error) {
 
 type webUser struct {
 	*usr_model.User
+	accountName string
 	credentials []webauthn.Credential
 }
 
@@ -50,7 +51,10 @@ func (u *webUser) WebAuthnID() []byte {
 }
 
 func (u *webUser) WebAuthnName() string {
-	return u.PreferredLoginName
+	if u.accountName != "" {
+		return u.accountName
+	}
+	return u.UserName
 }
 
 func (u *webUser) WebAuthnDisplayName() string {
@@ -65,7 +69,7 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType usr_model.AuthenticatorAttachment, userVerification usr_model.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNToken, error) {
+func (w *WebAuthN) BeginRegistration(user *usr_model.User, accountName string, authType usr_model.AuthenticatorAttachment, userVerification usr_model.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNToken, error) {
 	creds := WebAuthNsToCredentials(webAuthNs)
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
@@ -77,6 +81,7 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType usr_model.Au
 	credentialOptions, sessionData, err := w.web(isLoginUI).BeginRegistration(
 		&webUser{
 			User:        user,
+			accountName: accountName,
 			credentials: creds,
 		},
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
