@@ -27,7 +27,7 @@ func (_ *IDPConfig) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (i *IDPConfig) CurrentSequence() (uint64, error) {
+func (i *IDPConfig) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := i.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return 0, err

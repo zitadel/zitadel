@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -28,7 +29,7 @@ func (_ *ProjectRole) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.ProjectAggregate}
 }
 
-func (p *ProjectRole) CurrentSequence() (uint64, error) {
+func (p *ProjectRole) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := p.view.GetLatestProjectRoleSequence()
 	if err != nil {
 		return 0, err

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -26,7 +27,7 @@ func (_ *IDPConfig) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (m *IDPConfig) CurrentSequence() (uint64, error) {
+func (m *IDPConfig) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := m.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return 0, err

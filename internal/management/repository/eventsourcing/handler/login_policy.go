@@ -27,7 +27,7 @@ func (_ *LoginPolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (m *LoginPolicy) CurrentSequence() (uint64, error) {
+func (m *LoginPolicy) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := m.view.GetLatestLoginPolicySequence()
 	if err != nil {
 		return 0, err

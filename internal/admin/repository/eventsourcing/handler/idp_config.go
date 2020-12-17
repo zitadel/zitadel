@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -45,20 +44,20 @@ func (i *IDPConfig) ViewModel() string {
 	return idpConfigTable
 }
 
-func (i *IDPConfig) AggregateTypes() []models.AggregateType {
+func (i *IDPConfig) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.IAMAggregate}
 }
 
-func (i *IDPConfig) CurrentSequence() (uint64, error) {
-	sequence, err := i.view.GetLatestIDPConfigSequence()
+func (i *IDPConfig) CurrentSequence(event *es_models.Event) (uint64, error) {
+	sequence, err := i.view.GetLatestIDPConfigSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestIDPConfigSequence()
+func (i *IDPConfig) EventQuery() (*es_models.SearchQuery, error) {
+	sequence, err := i.view.GetLatestIDPConfigSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +66,7 @@ func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (i *IDPConfig) Reduce(event *models.Event) (err error) {
+func (i *IDPConfig) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IAMAggregate:
 		err = i.processIDPConfig(event)
@@ -75,7 +74,7 @@ func (i *IDPConfig) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (i *IDPConfig) processIDPConfig(event *models.Event) (err error) {
+func (i *IDPConfig) processIDPConfig(event *es_models.Event) (err error) {
 	idp := new(iam_view_model.IDPConfigView)
 	switch event.Type {
 	case model.IDPConfigAdded:
@@ -97,17 +96,17 @@ func (i *IDPConfig) processIDPConfig(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return i.view.DeleteIDPConfig(idp.IDPConfigID, event.Sequence, event.CreationDate)
+		return i.view.DeleteIDPConfig(idp.IDPConfigID, event)
 	default:
-		return i.view.ProcessedIDPConfigSequence(event.Sequence, event.CreationDate)
+		return i.view.ProcessedIDPConfigSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return i.view.PutIDPConfig(idp, idp.Sequence, event.CreationDate)
+	return i.view.PutIDPConfig(idp, event)
 }
 
-func (i *IDPConfig) OnError(event *models.Event, err error) error {
+func (i *IDPConfig) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Mslo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
 	return spooler.HandleError(event, err, i.view.GetLatestIDPConfigFailedEvent, i.view.ProcessedIDPConfigFailedEvent, i.view.ProcessedIDPConfigSequence, i.errorCountUntilSkip)
 }

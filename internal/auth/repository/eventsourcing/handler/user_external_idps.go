@@ -38,7 +38,7 @@ func (_ *ExternalIDP) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
 }
 
-func (i *ExternalIDP) CurrentSequence() (uint64, error) {
+func (i *ExternalIDP) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := i.view.GetLatestExternalIDPSequence()
 	if err != nil {
 		return 0, err

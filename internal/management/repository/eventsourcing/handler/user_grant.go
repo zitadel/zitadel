@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -39,7 +40,7 @@ func (_ *UserGrant) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{grant_es_model.UserGrantAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate}
 }
 
-func (u *UserGrant) CurrentSequence() (uint64, error) {
+func (u *UserGrant) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
 		return 0, err

@@ -29,7 +29,7 @@ func (_ *UserSession) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.UserAggregate}
 }
 
-func (u *UserSession) CurrentSequence() (uint64, error) {
+func (u *UserSession) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := u.view.GetLatestUserSessionSequence()
 	if err != nil {
 		return 0, err

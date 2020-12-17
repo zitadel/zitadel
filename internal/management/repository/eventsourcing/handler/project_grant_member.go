@@ -32,7 +32,7 @@ func (_ *ProjectGrantMember) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{proj_es_model.ProjectAggregate, usr_es_model.UserAggregate}
 }
 
-func (p *ProjectGrantMember) CurrentSequence() (uint64, error) {
+func (p *ProjectGrantMember) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := p.view.GetLatestProjectGrantMemberSequence()
 	if err != nil {
 		return 0, err

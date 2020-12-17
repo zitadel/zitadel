@@ -26,7 +26,7 @@ func (_ *PasswordComplexityPolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *PasswordComplexityPolicy) CurrentSequence() (uint64, error) {
+func (p *PasswordComplexityPolicy) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence()
 	if err != nil {
 		return 0, err

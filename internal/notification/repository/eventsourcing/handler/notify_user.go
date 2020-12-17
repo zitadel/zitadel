@@ -38,7 +38,7 @@ func (_ *NotifyUser) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
 }
 
-func (p *NotifyUser) CurrentSequence() (uint64, error) {
+func (p *NotifyUser) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := p.view.GetLatestNotifyUserSequence()
 	if err != nil {
 		return 0, err

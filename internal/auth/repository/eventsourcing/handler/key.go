@@ -27,7 +27,7 @@ func (_ *Key) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.KeyPairAggregate}
 }
 
-func (k *Key) CurrentSequence() (uint64, error) {
+func (k *Key) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := k.view.GetLatestKeySequence()
 	if err != nil {
 		return 0, err

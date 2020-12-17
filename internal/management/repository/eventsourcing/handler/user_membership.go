@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -35,7 +36,7 @@ func (_ *UserMembership) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate}
 }
 
-func (u *UserMembership) CurrentSequence() (uint64, error) {
+func (u *UserMembership) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := u.view.GetLatestUserMembershipSequence()
 	if err != nil {
 		return 0, err

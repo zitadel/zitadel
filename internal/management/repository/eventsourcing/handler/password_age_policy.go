@@ -27,7 +27,7 @@ func (_ *PasswordAgePolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (o *PasswordAgePolicy) CurrentSequence() (uint64, error) {
+func (o *PasswordAgePolicy) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := o.view.GetLatestPasswordAgePolicySequence()
 	if err != nil {
 		return 0, err

@@ -32,7 +32,7 @@ func (_ *OrgMember) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, usr_es_model.UserAggregate}
 }
 
-func (p *OrgMember) CurrentSequence() (uint64, error) {
+func (p *OrgMember) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := p.view.GetLatestOrgMemberSequence()
 	if err != nil {
 		return 0, err

@@ -26,7 +26,7 @@ func (a *Application) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.ProjectAggregate}
 }
 
-func (a *Application) CurrentSequence() (uint64, error) {
+func (a *Application) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := a.view.GetLatestApplicationSequence()
 	if err != nil {
 		return 0, err

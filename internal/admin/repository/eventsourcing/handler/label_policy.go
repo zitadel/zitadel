@@ -4,7 +4,6 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -44,12 +43,12 @@ func (p *LabelPolicy) ViewModel() string {
 	return labelPolicyTable
 }
 
-func (p *LabelPolicy) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{model.IAMAggregate}
+func (p *LabelPolicy) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.IAMAggregate}
 }
 
-func (p *LabelPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestLabelPolicySequence()
+func (p *LabelPolicy) EventQuery() (*es_models.SearchQuery, error) {
+	sequence, err := p.view.GetLatestLabelPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -58,15 +57,15 @@ func (p *LabelPolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (p *LabelPolicy) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestLabelPolicySequence()
+func (p *LabelPolicy) CurrentSequence(event *es_models.Event) (uint64, error) {
+	sequence, err := p.view.GetLatestLabelPolicySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (p *LabelPolicy) Reduce(event *models.Event) (err error) {
+func (p *LabelPolicy) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IAMAggregate:
 		err = p.processLabelPolicy(event)
@@ -74,7 +73,7 @@ func (p *LabelPolicy) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (p *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
+func (p *LabelPolicy) processLabelPolicy(event *es_models.Event) (err error) {
 	policy := new(iam_model.LabelPolicyView)
 	switch event.Type {
 	case model.LabelPolicyAdded:
@@ -86,15 +85,15 @@ func (p *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	default:
-		return p.view.ProcessedLabelPolicySequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedLabelPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutLabelPolicy(policy, policy.Sequence, event.CreationDate)
+	return p.view.PutLabelPolicy(policy, event)
 }
 
-func (p *LabelPolicy) OnError(event *models.Event, err error) error {
+func (p *LabelPolicy) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Wj8sf", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
 	return spooler.HandleError(event, err, p.view.GetLatestLabelPolicyFailedEvent, p.view.ProcessedLabelPolicyFailedEvent, p.view.ProcessedLabelPolicySequence, p.errorCountUntilSkip)
 }

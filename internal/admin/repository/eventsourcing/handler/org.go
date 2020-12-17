@@ -4,7 +4,6 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -45,20 +44,20 @@ func (o *Org) ViewModel() string {
 	return orgTable
 }
 
-func (o *Org) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{model.OrgAggregate}
+func (o *Org) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate}
 }
 
 func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := o.view.GetLatestOrgSequence()
+	sequence, err := o.view.GetLatestOrgSequence("")
 	if err != nil {
 		return nil, err
 	}
 	return eventsourcing.OrgQuery(sequence.CurrentSequence), nil
 }
 
-func (o *Org) CurrentSequence() (uint64, error) {
-	sequence, err := o.view.GetLatestOrgSequence()
+func (o *Org) CurrentSequence(event *es_models.Event) (uint64, error) {
+	sequence, err := o.view.GetLatestOrgSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -88,10 +87,10 @@ func (o *Org) Reduce(event *es_models.Event) error {
 			return err
 		}
 	default:
-		return o.view.ProcessedOrgSequence(event.Sequence, event.CreationDate)
+		return o.view.ProcessedOrgSequence(event)
 	}
 
-	return o.view.PutOrg(org, event.CreationDate)
+	return o.view.PutOrg(org, event)
 }
 
 func (o *Org) OnError(event *es_models.Event, spoolerErr error) error {

@@ -36,7 +36,7 @@ func (_ *IDPProvider) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
 }
 
-func (i *IDPProvider) CurrentSequence() (uint64, error) {
+func (i *IDPProvider) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := i.view.GetLatestIDPProviderSequence()
 	if err != nil {
 		return 0, err

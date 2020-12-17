@@ -19,20 +19,20 @@ type Handler interface {
 	QueryLimit() uint64
 
 	AggregateTypes() []models.AggregateType
-	CurrentSequence() (uint64, error)
+	CurrentSequence(*models.Event) (uint64, error)
 	Eventstore() eventstore.Eventstore
 }
 
 func ReduceEvent(handler Handler, event *models.Event) {
-	sequence, err := handler.CurrentSequence()
+	currentSequence, err := handler.CurrentSequence(event)
 	if err != nil {
 		logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
 		return
 	}
-	if event.PreviousSequence > sequence {
+	if event.PreviousSequence > currentSequence {
 		searchQuery := models.NewSearchQuery().
 			AggregateTypeFilter(handler.AggregateTypes()...).
-			SequenceBetween(sequence, event.PreviousSequence)
+			SequenceBetween(currentSequence, event.PreviousSequence)
 
 		events, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
 		if err != nil {
@@ -41,6 +41,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		}
 		for _, previousEvent := range events {
 			//if other process already updated view
+			//TODO: correct?
 			if event.PreviousSequence > previousEvent.Sequence {
 				continue
 			}
@@ -48,8 +49,8 @@ func ReduceEvent(handler Handler, event *models.Event) {
 			logging.LogWithFields("HANDL-V42TI", "seq", previousEvent.Sequence).OnError(err).Warn("reduce failed")
 			return
 		}
-	} else if event.PreviousSequence > 0 && event.PreviousSequence < sequence {
-		logging.LogWithFields("HANDL-w9Bdy", "previousSeq", event.PreviousSequence, "currentSeq", sequence).Debug("already processed")
+	} else if event.PreviousSequence > 0 && event.PreviousSequence < currentSequence {
+		logging.LogWithFields("HANDL-w9Bdy", "previousSeq", event.PreviousSequence, "currentSeq", currentSequence).Debug("already processed")
 		return
 	}
 	err = handler.Reduce(event)

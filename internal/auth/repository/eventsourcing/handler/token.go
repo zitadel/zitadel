@@ -32,7 +32,7 @@ func (_ *Token) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user_es_model.UserAggregate, project_es_model.ProjectAggregate}
 }
 
-func (p *Token) CurrentSequence() (uint64, error) {
+func (p *Token) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := p.view.GetLatestTokenSequence()
 	if err != nil {
 		return 0, err

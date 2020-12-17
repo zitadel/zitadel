@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -27,7 +28,7 @@ func (_ *MachineKeys) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.UserAggregate}
 }
 
-func (k *MachineKeys) CurrentSequence() (uint64, error) {
+func (k *MachineKeys) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := k.view.GetLatestMachineKeySequence()
 	if err != nil {
 		return 0, err

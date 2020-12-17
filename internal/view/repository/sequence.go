@@ -1,11 +1,13 @@
 package repository
 
 import (
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/view/model"
-	"github.com/jinzhu/gorm"
 	"strings"
 	"time"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	int_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/view/model"
+	"github.com/jinzhu/gorm"
 )
 
 type CurrentSequence struct {
@@ -13,6 +15,7 @@ type CurrentSequence struct {
 	CurrentSequence          uint64    `gorm:"column:current_sequence"`
 	EventTimestamp           time.Time `gorm:"column:event_timestamp"`
 	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
+	AggregateType            string    `gorm:"column:aggregate_type"`
 }
 
 type SequenceSearchKey int32
@@ -20,6 +23,7 @@ type SequenceSearchKey int32
 const (
 	SequenceSearchKeyUndefined SequenceSearchKey = iota
 	SequenceSearchKeyViewName
+	SequenceSearchKeyAggregateType
 )
 
 type sequenceSearchKey SequenceSearchKey
@@ -28,9 +32,28 @@ func (key sequenceSearchKey) ToColumnName() string {
 	switch SequenceSearchKey(key) {
 	case SequenceSearchKeyViewName:
 		return "view_name"
+	case SequenceSearchKeyAggregateType:
+		return "aggregate_type"
 	default:
 		return ""
 	}
+}
+
+type sequenceSearchQuery struct {
+	key   sequenceSearchKey
+	value string
+}
+
+func (q *sequenceSearchQuery) GetKey() ColumnKey {
+	return q.key
+}
+
+func (q *sequenceSearchQuery) GetMethod() int_model.SearchMethod {
+	return int_model.SearchMethodEquals
+}
+
+func (q *sequenceSearchQuery) GetValue() interface{} {
+	return q.value
 }
 
 func CurrentSequenceToModel(sequence *CurrentSequence) *model.View {
@@ -41,11 +64,12 @@ func CurrentSequenceToModel(sequence *CurrentSequence) *model.View {
 		CurrentSequence:          sequence.CurrentSequence,
 		EventTimestamp:           sequence.EventTimestamp,
 		LastSuccessfulSpoolerRun: sequence.LastSuccessfulSpoolerRun,
+		AggregateType:            sequence.AggregateType,
 	}
 }
 
-func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64, eventTimestamp time.Time) error {
-	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, sequence, eventTimestamp, time.Now()})
+func SaveCurrentSequence(db *gorm.DB, table, viewName, aggregateType string, sequence uint64, eventTimestamp time.Time) error {
+	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, sequence, eventTimestamp, time.Now(), aggregateType})
 }
 
 func UpdateCurrentSequence(db *gorm.DB, table string, currentSequence *CurrentSequence) error {
@@ -58,9 +82,15 @@ func UpdateCurrentSequence(db *gorm.DB, table string, currentSequence *CurrentSe
 	return nil
 }
 
-func LatestSequence(db *gorm.DB, table, viewName string) (*CurrentSequence, error) {
+func LatestSequence(db *gorm.DB, table, viewName, aggregateType string) (*CurrentSequence, error) {
+	searchQueries := make([]SearchQuery, 0, 2)
+	searchQueries = append(searchQueries, &sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyViewName), value: viewName})
+	if aggregateType != "" {
+		searchQueries = append(searchQueries, &sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyAggregateType), value: aggregateType})
+	}
+
+	query := PrepareGetByQuery(table, searchQueries...)
 	sequence := new(CurrentSequence)
-	query := PrepareGetByKey(table, sequenceSearchKey(SequenceSearchKeyViewName), viewName)
 	err := query(db, sequence)
 
 	if err == nil {
@@ -89,5 +119,5 @@ func ClearView(db *gorm.DB, truncateView, sequenceTable string) error {
 	if err != nil {
 		return err
 	}
-	return SaveCurrentSequence(db, sequenceTable, truncateView, 0, time.Now())
+	return SaveCurrentSequence(db, sequenceTable, truncateView, "", 0, time.Now())
 }

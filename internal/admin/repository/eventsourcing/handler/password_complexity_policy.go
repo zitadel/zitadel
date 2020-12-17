@@ -49,8 +49,8 @@ func (p *PasswordComplexityPolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *PasswordComplexityPolicy) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence()
+func (p *PasswordComplexityPolicy) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
@@ -58,7 +58,7 @@ func (p *PasswordComplexityPolicy) CurrentSequence() (uint64, error) {
 }
 
 func (p *PasswordComplexityPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence()
+	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -87,14 +87,14 @@ func (p *PasswordComplexityPolicy) processPasswordComplexityPolicy(event *models
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordComplexityPolicyRemoved:
-		return p.view.DeletePasswordComplexityPolicy(event.AggregateID, event.Sequence, event.CreationDate)
+		return p.view.DeletePasswordComplexityPolicy(event.AggregateID, event)
 	default:
-		return p.view.ProcessedPasswordComplexityPolicySequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedPasswordComplexityPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutPasswordComplexityPolicy(policy, policy.Sequence, event.CreationDate)
+	return p.view.PutPasswordComplexityPolicy(policy, event)
 }
 
 func (p *PasswordComplexityPolicy) OnError(event *models.Event, err error) error {

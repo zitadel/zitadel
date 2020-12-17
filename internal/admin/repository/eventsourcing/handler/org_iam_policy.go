@@ -3,12 +3,10 @@ package handler
 import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
@@ -45,12 +43,12 @@ func (p *OrgIAMPolicy) ViewModel() string {
 	return orgIAMPolicyTable
 }
 
-func (p *OrgIAMPolicy) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+func (p *OrgIAMPolicy) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *OrgIAMPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
+func (p *OrgIAMPolicy) EventQuery() (*es_models.SearchQuery, error) {
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -59,15 +57,15 @@ func (p *OrgIAMPolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (p *OrgIAMPolicy) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
+func (p *OrgIAMPolicy) CurrentSequence(event *es_models.Event) (uint64, error) {
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (p *OrgIAMPolicy) Reduce(event *models.Event) (err error) {
+func (p *OrgIAMPolicy) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate, iam_es_model.IAMAggregate:
 		err = p.processOrgIAMPolicy(event)
@@ -75,7 +73,7 @@ func (p *OrgIAMPolicy) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (p *OrgIAMPolicy) processOrgIAMPolicy(event *models.Event) (err error) {
+func (p *OrgIAMPolicy) processOrgIAMPolicy(event *es_models.Event) (err error) {
 	policy := new(iam_model.OrgIAMPolicyView)
 	switch event.Type {
 	case iam_es_model.OrgIAMPolicyAdded, model.OrgIAMPolicyAdded:
@@ -87,17 +85,17 @@ func (p *OrgIAMPolicy) processOrgIAMPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	case model.OrgIAMPolicyRemoved:
-		return p.view.DeleteOrgIAMPolicy(event.AggregateID, event.Sequence, event.CreationDate)
+		return p.view.DeleteOrgIAMPolicy(event.AggregateID, event)
 	default:
-		return p.view.ProcessedOrgIAMPolicySequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedOrgIAMPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutOrgIAMPolicy(policy, policy.Sequence, event.CreationDate)
+	return p.view.PutOrgIAMPolicy(policy, event)
 }
 
-func (p *OrgIAMPolicy) OnError(event *models.Event, err error) error {
+func (p *OrgIAMPolicy) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Wm8fs", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgIAM policy handler")
 	return spooler.HandleError(event, err, p.view.GetLatestOrgIAMPolicyFailedEvent, p.view.ProcessedOrgIAMPolicyFailedEvent, p.view.ProcessedOrgIAMPolicySequence, p.errorCountUntilSkip)
 }

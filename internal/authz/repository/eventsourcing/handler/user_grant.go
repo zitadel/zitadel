@@ -40,7 +40,7 @@ func (_ *UserGrant) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate}
 }
 
-func (u *UserGrant) CurrentSequence() (uint64, error) {
+func (u *UserGrant) CurrentSequence(event *models.Event) (uint64, error) {
 	sequence, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
 		return 0, err

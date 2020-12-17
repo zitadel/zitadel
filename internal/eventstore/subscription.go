@@ -22,7 +22,7 @@ func (es *eventstore) Subscribe(aggregates ...models.AggregateType) *Subscriptio
 	for _, aggregate := range aggregates {
 		_, ok := es.subscriptions[aggregate]
 		if !ok {
-			es.subscriptions[aggregate] = make([]*Subscription, 0)
+			es.subscriptions[aggregate] = make([]*Subscription, 0, 1)
 		}
 		es.subscriptions[aggregate] = append(es.subscriptions[aggregate], sub)
 	}
@@ -62,4 +62,5 @@ func (s *Subscription) Unsubscribe() {
 			}
 		}
 	}
+	close(s.Events)
 }
