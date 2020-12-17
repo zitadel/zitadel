@@ -643,7 +643,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user
 		return &model.InitUserStep{PasswordSet: user.PasswordSet}
 	}
 
-	if user.IsPasswordlessReady() {
+	if request.LoginPolicy.PasswordlessType != iam_model.PasswordlessTypeNotAllowed && user.IsPasswordlessReady() {
 		if !checkVerificationTime(userSession.PasswordlessVerification, repo.MultiFactorCheckLifeTime) {
 			return &model.PasswordlessStep{}
 		}
