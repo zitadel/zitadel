@@ -37,21 +37,21 @@ type EventstoreRepos struct {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
-		&UserGrant{
-			handler:    handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
-			eventstore: es,
-			iamID:      systemDefaults.IamID,
-			iamEvents:  repos.IAMEvents,
-		},
-		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}},
-		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}},
+		newUserGrant(
+			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
+			repos.IAMEvents,
+			systemDefaults.IamID),
+		newApplication(
+			handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
+		newOrg(
+			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 	}
 }
 
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 1 * time.Second
+		return 3 * time.Minute
 	}
 	return c.MinimumCycleDuration.Duration
 }

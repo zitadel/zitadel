@@ -48,28 +48,27 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
 	return []query.Handler{
-		&NotifyUser{
-			handler:   handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			orgEvents: repos.OrgEvents,
-			iamEvents: repos.IAMEvents,
-			iamID:     systemDefaults.IamID,
-		},
-		&Notification{
-			handler:        handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
-			eventstore:     es,
-			userEvents:     repos.UserEvents,
-			systemDefaults: systemDefaults,
-			AesCrypto:      aesCrypto,
-			i18n:           i18n,
-			statikDir:      dir,
-		},
+		newNotifyUser(
+			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
+			repos.OrgEvents,
+			repos.IAMEvents,
+			systemDefaults.IamID,
+		),
+		newNotification(
+			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
+			repos.UserEvents,
+			systemDefaults,
+			aesCrypto,
+			i18n,
+			dir,
+		),
 	}
 }
 
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 1 * time.Second
+		return 3 * time.Minute
 	}
 	return c.MinimumCycleDuration.Duration
 }

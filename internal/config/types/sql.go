@@ -62,6 +62,8 @@ func (s *SQL) Start() (*sql.DB, error) {
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "TYPES-9qBtr", "unable to open database connection")
 	}
+	client.SetMaxIdleConns(3)
+	client.SetMaxOpenConns(3)
 	return client, nil
 }
 

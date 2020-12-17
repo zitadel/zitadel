@@ -2,22 +2,43 @@ package handler
 
 import (
 	"github.com/caos/logging"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type OrgIAMPolicy struct {
-	handler
-}
-
 const (
 	orgIAMPolicyTable = "management.org_iam_policies"
 )
+
+type OrgIAMPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newOrgIAMPolicy(handler handler) *OrgIAMPolicy {
+	h := &OrgIAMPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *OrgIAMPolicy) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (m *OrgIAMPolicy) ViewModel() string {
 	return orgIAMPolicyTable

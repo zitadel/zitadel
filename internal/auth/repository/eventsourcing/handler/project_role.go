@@ -3,8 +3,10 @@ package handler
 import (
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_events "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -12,14 +14,38 @@ import (
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
-type ProjectRole struct {
-	handler
-	projectEvents *proj_event.ProjectEventstore
-}
-
 const (
 	projectRoleTable = "auth.project_roles"
 )
+
+type ProjectRole struct {
+	handler
+	projectEvents *proj_event.ProjectEventstore
+	subscription  *eventstore.Subscription
+}
+
+func newProjectRole(
+	handler handler,
+	projectEvents *proj_events.ProjectEventstore,
+) *ProjectRole {
+	h := &ProjectRole{
+		handler:       handler,
+		projectEvents: projectEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *ProjectRole) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
 
 func (p *ProjectRole) ViewModel() string {
 	return projectRoleTable

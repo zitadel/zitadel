@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
@@ -27,20 +28,51 @@ import (
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
+const (
+	userGrantTable = "auth.user_grants"
+)
+
 type UserGrant struct {
 	handler
-	eventstore    eventstore.Eventstore
 	projectEvents *proj_event.ProjectEventstore
 	userEvents    *usr_events.UserEventstore
 	orgEvents     *org_events.OrgEventstore
 	iamEvents     *iam_events.IAMEventstore
 	iamID         string
 	iamProjectID  string
+	subscription  *eventstore.Subscription
 }
 
-const (
-	userGrantTable = "auth.user_grants"
-)
+func newUserGrant(
+	handler handler,
+	projectEvents *proj_event.ProjectEventstore,
+	userEvents *usr_events.UserEventstore,
+	orgEvents *org_events.OrgEventstore,
+	iamEvents *iam_events.IAMEventstore,
+	iamID string,
+) *UserGrant {
+	h := &UserGrant{
+		handler:       handler,
+		projectEvents: projectEvents,
+		userEvents:    userEvents,
+		orgEvents:     orgEvents,
+		iamEvents:     iamEvents,
+		iamID:         iamID,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *UserGrant) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
 
 func (u *UserGrant) ViewModel() string {
 	return userGrantTable

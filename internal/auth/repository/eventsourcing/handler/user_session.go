@@ -4,7 +4,9 @@ import (
 	"github.com/caos/logging"
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	user_events "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -12,14 +14,38 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-type UserSession struct {
-	handler
-	userEvents *user_events.UserEventstore
-}
-
 const (
 	userSessionTable = "auth.user_sessions"
 )
+
+type UserSession struct {
+	handler
+	userEvents   *user_events.UserEventstore
+	subscription *eventstore.Subscription
+}
+
+func newUserSession(
+	handler handler,
+	userEvents *user_events.UserEventstore,
+) *UserSession {
+	h := &UserSession{
+		handler:    handler,
+		userEvents: userEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *UserSession) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
 
 func (u *UserSession) ViewModel() string {
 	return userSessionTable

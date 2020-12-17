@@ -3,21 +3,43 @@ package handler
 import (
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 )
 
-type Org struct {
-	handler
-}
-
 const (
 	orgTable = "authz.orgs"
 )
+
+type Org struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newOrg(handler handler) *Org {
+	h := &Org{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *Org) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
 
 func (o *Org) ViewModel() string {
 	return orgTable

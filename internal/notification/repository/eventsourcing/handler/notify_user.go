@@ -3,13 +3,14 @@ package handler
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -18,17 +19,44 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-type NotifyUser struct {
-	handler
-	eventstore eventstore.Eventstore
-	orgEvents  *org_events.OrgEventstore
-	iamEvents  *iam_es.IAMEventstore
-	iamID      string
-}
-
 const (
 	userTable = "notification.notify_users"
 )
+
+type NotifyUser struct {
+	handler
+	orgEvents    *org_events.OrgEventstore
+	iamEvents    *iam_es.IAMEventstore
+	iamID        string
+	subscription *eventstore.Subscription
+}
+
+func newNotifyUser(
+	handler handler,
+	orgEvents *org_events.OrgEventstore,
+	iamEvents *iam_es.IAMEventstore,
+	iamID string,
+) *NotifyUser {
+	h := &NotifyUser{
+		handler:   handler,
+		orgEvents: orgEvents,
+		iamEvents: iamEvents,
+		iamID:     iamID,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *NotifyUser) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
 
 func (p *NotifyUser) ViewModel() string {
 	return userTable

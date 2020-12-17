@@ -7,6 +7,7 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -16,16 +17,41 @@ import (
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
-type ProjectGrant struct {
-	handler
-	eventstore    eventstore.Eventstore
-	projectEvents *proj_event.ProjectEventstore
-	orgEvents     *org_event.OrgEventstore
-}
-
 const (
 	grantedProjectTable = "management.project_grants"
 )
+
+type ProjectGrant struct {
+	handler
+	projectEvents *proj_event.ProjectEventstore
+	orgEvents     *org_event.OrgEventstore
+	subscription  *eventstore.Subscription
+}
+
+func newProjectGrant(
+	handler handler,
+	projectEvents *proj_event.ProjectEventstore,
+	orgEvents *org_event.OrgEventstore,
+) *ProjectGrant {
+	h := &ProjectGrant{
+		handler:       handler,
+		projectEvents: projectEvents,
+		orgEvents:     orgEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *ProjectGrant) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (p *ProjectGrant) ViewModel() string {
 	return grantedProjectTable

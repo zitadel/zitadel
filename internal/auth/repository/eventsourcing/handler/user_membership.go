@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -15,21 +16,48 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
+const (
+	userMembershipTable = "auth.user_memberships"
+)
+
 type UserMembership struct {
 	handler
 	orgEvents     *org_event.OrgEventstore
 	projectEvents *proj_event.ProjectEventstore
+	subscription  *eventstore.Subscription
 }
 
-const (
-	userMembershipTable = "auth.user_memberships"
-)
+func newUserMembership(
+	handler handler,
+	orgEvents *org_event.OrgEventstore,
+	projectEvents *proj_event.ProjectEventstore,
+) *UserMembership {
+	h := &UserMembership{
+		handler:       handler,
+		orgEvents:     orgEvents,
+		projectEvents: projectEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *UserMembership) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (m *UserMembership) ViewModel() string {
 	return userMembershipTable

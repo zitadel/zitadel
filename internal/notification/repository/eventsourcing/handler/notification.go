@@ -13,6 +13,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -22,22 +23,53 @@ import (
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-type Notification struct {
-	handler
-	eventstore     eventstore.Eventstore
-	userEvents     *usr_event.UserEventstore
-	systemDefaults sd.SystemDefaults
-	AesCrypto      crypto.EncryptionAlgorithm
-	i18n           *i18n.Translator
-	statikDir      http.FileSystem
-}
-
 const (
 	notificationTable   = "notification.notifications"
 	NotifyUserID        = "NOTIFICATION"
 	labelPolicyTableOrg = "management.label_policies"
 	labelPolicyTableDef = "adminapi.label_policies"
 )
+
+type Notification struct {
+	handler
+	userEvents     *usr_event.UserEventstore
+	systemDefaults sd.SystemDefaults
+	AesCrypto      crypto.EncryptionAlgorithm
+	i18n           *i18n.Translator
+	statikDir      http.FileSystem
+	subscription   *eventstore.Subscription
+}
+
+func newNotification(
+	handler handler,
+	userEvents *usr_event.UserEventstore,
+	defaults sd.SystemDefaults,
+	aesCrypto crypto.EncryptionAlgorithm,
+	translator *i18n.Translator,
+	statikDir http.FileSystem,
+) *Notification {
+	h := &Notification{
+		handler:        handler,
+		userEvents:     userEvents,
+		systemDefaults: defaults,
+		i18n:           translator,
+		statikDir:      statikDir,
+		AesCrypto:      aesCrypto,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *Notification) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
 
 func (n *Notification) ViewModel() string {
 	return notificationTable
@@ -243,7 +275,7 @@ func (n *Notification) getUserEvents(userID string, sequence uint64) ([]*models.
 		return nil, err
 	}
 
-	return n.eventstore.FilterEvents(context.Background(), query)
+	return n.es.FilterEvents(context.Background(), query)
 }
 
 func (n *Notification) OnError(event *models.Event, err error) error {

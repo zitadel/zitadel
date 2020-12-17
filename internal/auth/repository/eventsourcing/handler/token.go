@@ -6,8 +6,10 @@ import (
 
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -15,14 +17,38 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-type Token struct {
-	handler
-	ProjectEvents *proj_event.ProjectEventstore
-}
-
 const (
 	tokenTable = "auth.tokens"
 )
+
+type Token struct {
+	handler
+	ProjectEvents *proj_event.ProjectEventstore
+	subscription  *eventstore.Subscription
+}
+
+func newToken(
+	handler handler,
+	projectEvents *proj_event.ProjectEventstore,
+) *Token {
+	h := &Token{
+		handler:       handler,
+		ProjectEvents: projectEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (t *Token) subscribe() {
+	t.subscription = t.es.Subscribe(t.AggregateTypes()...)
+	go func() {
+		for event := range t.subscription.Events {
+			query.ReduceEvent(t, event)
+		}
+	}()
+}
 
 func (t *Token) ViewModel() string {
 	return tokenTable

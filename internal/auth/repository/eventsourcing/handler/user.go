@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -16,17 +17,44 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-type User struct {
-	handler
-	eventstore eventstore.Eventstore
-	orgEvents  *org_events.OrgEventstore
-	iamEvents  *iam_es.IAMEventstore
-	iamID      string
-}
-
 const (
 	userTable = "auth.users"
 )
+
+type User struct {
+	handler
+	orgEvents    *org_events.OrgEventstore
+	iamEvents    *iam_es.IAMEventstore
+	iamID        string
+	subscription *eventstore.Subscription
+}
+
+func newUser(
+	handler handler,
+	orgEvents *org_events.OrgEventstore,
+	iamEvents *iam_es.IAMEventstore,
+	iamID string,
+) *User {
+	h := &User{
+		handler:   handler,
+		orgEvents: orgEvents,
+		iamEvents: iamEvents,
+		iamID:     iamID,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *User) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
 
 func (u *User) ViewModel() string {
 	return userTable

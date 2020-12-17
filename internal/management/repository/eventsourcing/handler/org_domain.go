@@ -2,21 +2,42 @@ package handler
 
 import (
 	"github.com/caos/logging"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 )
 
-type OrgDomain struct {
-	handler
-}
-
 const (
 	orgDomainTable = "management.org_domains"
 )
+
+type OrgDomain struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newOrgDomain(handler handler) *OrgDomain {
+	h := &OrgDomain{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *OrgDomain) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (d *OrgDomain) ViewModel() string {
 	return orgDomainTable

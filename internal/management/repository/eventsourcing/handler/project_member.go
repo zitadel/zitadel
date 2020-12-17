@@ -5,8 +5,10 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
@@ -15,14 +17,38 @@ import (
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-type ProjectMember struct {
-	handler
-	userEvents *usr_event.UserEventstore
-}
-
 const (
 	projectMemberTable = "management.project_members"
 )
+
+type ProjectMember struct {
+	handler
+	userEvents   *usr_event.UserEventstore
+	subscription *eventstore.Subscription
+}
+
+func newProjectMember(
+	handler handler,
+	userEvents *usr_event.UserEventstore,
+) *ProjectMember {
+	h := &ProjectMember{
+		handler:    handler,
+		userEvents: userEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *ProjectMember) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (p *ProjectMember) ViewModel() string {
 	return projectMemberTable

@@ -3,20 +3,42 @@ package handler
 import (
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
-type Application struct {
-	handler
-}
-
 const (
 	applicationTable = "authz.applications"
 )
+
+type Application struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newApplication(handler handler) *Application {
+	h := &Application{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *Application) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
 
 func (a *Application) ViewModel() string {
 	return applicationTable

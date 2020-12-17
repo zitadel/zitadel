@@ -5,22 +5,44 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-type MachineKeys struct {
-	handler
-}
-
 const (
 	machineKeysTable = "auth.machine_keys"
 )
 
-func (d *MachineKeys) ViewModel() string {
+type MachineKeys struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newMachineKeys(handler handler) *MachineKeys {
+	h := &MachineKeys{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *MachineKeys) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
+
+func (k *MachineKeys) ViewModel() string {
 	return machineKeysTable
 }
 

@@ -6,8 +6,10 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
@@ -19,16 +21,44 @@ import (
 	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
+const (
+	externalIDPTable = "management.user_external_idps"
+)
+
 type ExternalIDP struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
 	iamEvents      *eventsourcing.IAMEventstore
 	orgEvents      *org_es.OrgEventstore
+	subscription   *eventstore.Subscription
 }
 
-const (
-	externalIDPTable = "management.user_external_idps"
-)
+func newExternalIDP(
+	handler handler,
+	systemDefaults systemdefaults.SystemDefaults,
+	iamEvents *eventsourcing.IAMEventstore,
+	orgEvents *org_es.OrgEventstore,
+) *ExternalIDP {
+	h := &ExternalIDP{
+		handler:        handler,
+		systemDefaults: systemDefaults,
+		iamEvents:      iamEvents,
+		orgEvents:      orgEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *ExternalIDP) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (i *ExternalIDP) ViewModel() string {
 	return externalIDPTable

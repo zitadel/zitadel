@@ -2,8 +2,10 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -11,13 +13,33 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type IDPConfig struct {
-	handler
-}
-
 const (
 	idpConfigTable = "auth.idp_configs"
 )
+
+type IDPConfig struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newIDPConfig(h handler) *IDPConfig {
+	idpConfig := &IDPConfig{
+		handler: h,
+	}
+
+	idpConfig.subscribe()
+
+	return idpConfig
+}
+
+func (i *IDPConfig) subscribe() {
+	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
+	go func() {
+		for event := range i.subscription.Events {
+			query.ReduceEvent(i, event)
+		}
+	}()
+}
 
 func (i *IDPConfig) ViewModel() string {
 	return idpConfigTable

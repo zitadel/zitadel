@@ -2,22 +2,44 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type PasswordLockoutPolicy struct {
-	handler
-}
-
 const (
 	passwordLockoutPolicyTable = "management.password_lockout_policies"
 )
+
+type PasswordLockoutPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newPasswordLockoutPolicy(handler handler) *PasswordLockoutPolicy {
+	h := &PasswordLockoutPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *PasswordLockoutPolicy) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (p *PasswordLockoutPolicy) ViewModel() string {
 	return passwordLockoutPolicyTable

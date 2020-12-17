@@ -5,7 +5,9 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -13,14 +15,35 @@ import (
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
-type Application struct {
-	handler
-	projectEvents *proj_event.ProjectEventstore
-}
-
 const (
 	applicationTable = "auth.applications"
 )
+
+type Application struct {
+	handler
+	projectEvents *proj_event.ProjectEventstore
+	subscription  *eventstore.Subscription
+}
+
+func newApplication(handler handler, projectEvents *proj_event.ProjectEventstore) *Application {
+	h := &Application{
+		handler:       handler,
+		projectEvents: projectEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (a *Application) subscribe() {
+	a.subscription = a.es.Subscribe(a.AggregateTypes()...)
+	go func() {
+		for event := range a.subscription.Events {
+			query.ReduceEvent(a, event)
+		}
+	}()
+}
 
 func (a *Application) ViewModel() string {
 	return applicationTable

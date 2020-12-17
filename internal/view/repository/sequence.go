@@ -15,7 +15,18 @@ type CurrentSequence struct {
 	CurrentSequence          uint64    `gorm:"column:current_sequence"`
 	EventTimestamp           time.Time `gorm:"column:event_timestamp"`
 	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
-	AggregateType            string    `gorm:"column:aggregate_type"`
+	AggregateType            string    `gorm:"column:aggregate_type;primary_key"`
+}
+
+type currentSequenceViewWithSequence struct {
+	ViewName                 string    `gorm:"column:view_name;primary_key"`
+	CurrentSequence          uint64    `gorm:"column:current_sequence"`
+	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
+}
+
+type currentSequenceView struct {
+	ViewName                 string    `gorm:"column:view_name;primary_key"`
+	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
 }
 
 type SequenceSearchKey int32
@@ -72,10 +83,18 @@ func SaveCurrentSequence(db *gorm.DB, table, viewName, aggregateType string, seq
 	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, sequence, eventTimestamp, time.Now(), aggregateType})
 }
 
-func UpdateCurrentSequence(db *gorm.DB, table string, currentSequence *CurrentSequence) error {
-	save := PrepareSave(table)
-	err := save(db, currentSequence)
+func UpdateCurrentSequence(db *gorm.DB, table string, currentSequence *CurrentSequence) (err error) {
+	var seq interface{} = currentSequence
+	if currentSequence.AggregateType == "" && currentSequence.CurrentSequence > 0 {
+		//spooler run
+		seq = &currentSequenceView{ViewName: currentSequence.ViewName, LastSuccessfulSpoolerRun: currentSequence.LastSuccessfulSpoolerRun}
+	} else if currentSequence.AggregateType == "" {
+		//reset current sequence on view
+		seq = &currentSequenceViewWithSequence{ViewName: currentSequence.ViewName, LastSuccessfulSpoolerRun: currentSequence.LastSuccessfulSpoolerRun, CurrentSequence: currentSequence.CurrentSequence}
+	}
 
+	save := PrepareSave(table)
+	err = save(db, seq)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "VIEW-5kOhP", "unable to updated processed sequence")
 	}
@@ -87,6 +106,9 @@ func LatestSequence(db *gorm.DB, table, viewName, aggregateType string) (*Curren
 	searchQueries = append(searchQueries, &sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyViewName), value: viewName})
 	if aggregateType != "" {
 		searchQueries = append(searchQueries, &sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyAggregateType), value: aggregateType})
+	} else {
+		// ensure highest sequence of view
+		db = db.Order("current_sequence DESC")
 	}
 
 	query := PrepareGetByQuery(table, searchQueries...)

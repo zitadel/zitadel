@@ -5,8 +5,10 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
@@ -15,14 +17,38 @@ import (
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-type ProjectGrantMember struct {
-	handler
-	userEvents *usr_event.UserEventstore
-}
-
 const (
 	projectGrantMemberTable = "management.project_grant_members"
 )
+
+type ProjectGrantMember struct {
+	handler
+	userEvents   *usr_event.UserEventstore
+	subscription *eventstore.Subscription
+}
+
+func newProjectGrantMember(
+	handler handler,
+	userEvents *usr_event.UserEventstore,
+) *ProjectGrantMember {
+	h := &ProjectGrantMember{
+		handler:    handler,
+		userEvents: userEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *ProjectGrantMember) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (p *ProjectGrantMember) ViewModel() string {
 	return projectGrantMemberTable
@@ -121,7 +147,6 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 	default:
 		return p.view.ProcessedProjectGrantMemberSequence(event)
 	}
-	return nil
 }
 
 func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView) (err error) {

@@ -5,20 +5,40 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
-type Project struct {
-	handler
-	eventstore eventstore.Eventstore
-}
-
 const (
 	projectTable = "management.projects"
 )
+
+type Project struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newProject(handler handler) *Project {
+	h := &Project{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *Project) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (p *Project) ViewModel() string {
 	return projectTable

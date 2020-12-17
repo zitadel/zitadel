@@ -5,16 +5,20 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+)
+
+const (
+	idpProviderTable = "management.idp_providers"
 )
 
 type IDPProvider struct {
@@ -22,21 +26,45 @@ type IDPProvider struct {
 	systemDefaults systemdefaults.SystemDefaults
 	iamEvents      *eventsourcing.IAMEventstore
 	orgEvents      *org_es.OrgEventstore
+	subscription   *eventstore.Subscription
 }
 
-const (
-	idpProviderTable = "management.idp_providers"
-)
+func newIDPProvider(
+	handler handler,
+	systemDefaults systemdefaults.SystemDefaults,
+	iamEvents *eventsourcing.IAMEventstore,
+	orgEvents *org_es.OrgEventstore,
+) *IDPProvider {
+	h := &IDPProvider{
+		handler:        handler,
+		systemDefaults: systemDefaults,
+		iamEvents:      iamEvents,
+		orgEvents:      orgEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *IDPProvider) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (m *IDPProvider) ViewModel() string {
 	return idpProviderTable
 }
 
-func (_ *IDPProvider) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
+func (_ *IDPProvider) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
 }
 
-func (m *IDPProvider) CurrentSequence(event *models.Event) (uint64, error) {
+func (m *IDPProvider) CurrentSequence(event *es_models.Event) (uint64, error) {
 	sequence, err := m.view.GetLatestIDPProviderSequence(string(event.AggregateType))
 	if err != nil {
 		return 0, err
@@ -44,7 +72,7 @@ func (m *IDPProvider) CurrentSequence(event *models.Event) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (m *IDPProvider) EventQuery() (*models.SearchQuery, error) {
+func (m *IDPProvider) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestIDPProviderSequence("")
 	if err != nil {
 		return nil, err
@@ -54,7 +82,7 @@ func (m *IDPProvider) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *IDPProvider) Reduce(event *models.Event) (err error) {
+func (m *IDPProvider) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IAMAggregate, org_es_model.OrgAggregate:
 		err = m.processIdpProvider(event)
@@ -62,7 +90,7 @@ func (m *IDPProvider) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (m *IDPProvider) processIdpProvider(event *models.Event) (err error) {
+func (m *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 	provider := new(iam_view_model.IDPProviderView)
 	switch event.Type {
 	case model.LoginPolicyIDPProviderAdded, org_es_model.LoginPolicyIDPProviderAdded:
@@ -134,7 +162,7 @@ func (m *IDPProvider) fillConfigData(provider *iam_view_model.IDPProviderView, c
 	provider.IDPState = int32(config.State)
 }
 
-func (m *IDPProvider) OnError(event *models.Event, err error) error {
+func (m *IDPProvider) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Msj8c", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
 	return spooler.HandleError(event, err, m.view.GetLatestIDPProviderFailedEvent, m.view.ProcessedIDPProviderFailedEvent, m.view.ProcessedIDPProviderSequence, m.errorCountUntilSkip)
 }

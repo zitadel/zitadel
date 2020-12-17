@@ -5,16 +5,22 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+)
+
+const (
+	idpProviderTable = "auth.idp_providers"
 )
 
 type IDPProvider struct {
@@ -22,11 +28,35 @@ type IDPProvider struct {
 	systemDefaults systemdefaults.SystemDefaults
 	iamEvents      *eventsourcing.IAMEventstore
 	orgEvents      *org_es.OrgEventstore
+	subscription   *eventstore.Subscription
 }
 
-const (
-	idpProviderTable = "auth.idp_providers"
-)
+func newIDPProvider(
+	h handler,
+	defaults systemdefaults.SystemDefaults,
+	iamEvents *eventsourcing.IAMEventstore,
+	orgEvents *org_es.OrgEventstore,
+) *IDPProvider {
+	idpProvider := &IDPProvider{
+		handler:        h,
+		systemDefaults: defaults,
+		iamEvents:      iamEvents,
+		orgEvents:      orgEvents,
+	}
+
+	idpProvider.subscribe()
+
+	return idpProvider
+}
+
+func (i *IDPProvider) subscribe() {
+	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
+	go func() {
+		for event := range i.subscription.Events {
+			query.ReduceEvent(i, event)
+		}
+	}()
+}
 
 func (i *IDPProvider) ViewModel() string {
 	return idpProviderTable
