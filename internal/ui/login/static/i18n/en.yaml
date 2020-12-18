@@ -209,6 +209,7 @@ Actions:
   RegisterToken: Register Token
   ValidateToken: Validate Token
   Recreate: recreate
+  PasswordLogin: Login with password
 
 Errors:
   Internal: An internal error occured
