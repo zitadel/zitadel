@@ -9,6 +9,10 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
+const (
+	eventLimit = 10000
+)
+
 type Handler interface {
 	ViewModel() string
 	EventQuery() (*models.SearchQuery, error)
@@ -29,23 +33,36 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
 		return
 	}
-	if event.PreviousSequence > currentSequence {
-		searchQuery := models.NewSearchQuery().
-			AggregateTypeFilter(handler.AggregateTypes()...).
-			SequenceBetween(currentSequence, event.PreviousSequence)
 
-		events, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
+	searchQuery := models.NewSearchQuery().
+		AggregateTypeFilter(handler.AggregateTypes()...).
+		SequenceBetween(currentSequence, event.Sequence).
+		SetLimit(eventLimit)
+
+	events, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
+	if err != nil {
+		logging.LogWithFields("HANDL-L6YH1", "seq", event.Sequence).Warn("filter failed")
+		return
+	}
+
+	processedSequence := currentSequence
+	for _, previousEvent := range events {
+		currentSequence, err := handler.CurrentSequence(event)
 		if err != nil {
-			logging.LogWithFields("HANDL-L6YH1", "seq", event.Sequence).Warn("filter failed")
+			logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
 			return
 		}
-		for _, previousEvent := range events {
-			//TODO: if other process already updated view (recheck current sequence? => additional call to db)
-			err = handler.Reduce(previousEvent)
-			logging.LogWithFields("HANDL-V42TI", "seq", previousEvent.Sequence).OnError(err).Warn("reduce failed")
+		if processedSequence != currentSequence {
+			logging.LogWithFields("QUERY-DOYVN", "processed", processedSequence, "current", currentSequence).Warn("sequence not matching")
+			return
 		}
-	} else if event.PreviousSequence > 0 && event.PreviousSequence < currentSequence {
-		logging.LogWithFields("HANDL-w9Bdy", "previousSeq", event.PreviousSequence, "currentSeq", currentSequence).Debug("already processed")
+
+		err = handler.Reduce(previousEvent)
+		logging.LogWithFields("HANDL-V42TI", "seq", previousEvent.Sequence).OnError(err).Warn("reduce failed")
+		processedSequence = previousEvent.Sequence
+	}
+	if len(events) == eventLimit {
+		logging.LogWithFields("QUERY-BSqe9", "seq", event.Sequence).Warn("didnt process event")
 		return
 	}
 	err = handler.Reduce(event)

@@ -49,7 +49,7 @@ AuthZ:
         Key: $CR_AUTHZ_KEY
     Spooler:
       ConcurrentWorkers: 1
-      BulkLimit: 100
+      BulkLimit: 10000
       FailureCountUntilSkip: 5
 
 Auth:
@@ -98,7 +98,7 @@ Auth:
       Key: $CR_AUTH_KEY
   Spooler:
     ConcurrentWorkers: 1
-    BulkLimit: 100
+    BulkLimit: 10000
     FailureCountUntilSkip: 5
   KeyConfig:
     Size: 2048
@@ -142,7 +142,7 @@ Admin:
       Key: $CR_ADMINAPI_KEY
   Spooler:
     ConcurrentWorkers: 1
-    BulkLimit: 100
+    BulkLimit: 10000
     FailureCountUntilSkip: 5
 
 Mgmt:
@@ -179,7 +179,7 @@ Mgmt:
       Key: $CR_MANAGEMENT_KEY
   Spooler:
     ConcurrentWorkers: 1
-    BulkLimit: 100
+    BulkLimit: 10000
     FailureCountUntilSkip: 5
 
 API:
@@ -292,6 +292,6 @@ Notification:
         Key: $CR_NOTIFICATION_KEY
     Spooler:
       ConcurrentWorkers: 1
-      BulkLimit: 100
+      BulkLimit: 10000
       FailureCountUntilSkip: 5
       Handlers:
