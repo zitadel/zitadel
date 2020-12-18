@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/caos/logging"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -12,8 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"net/http"
-	"time"
 )
 
 type Configs map[string]*Config
@@ -27,6 +28,12 @@ type handler struct {
 	bulkLimit           uint64
 	cycleDuration       time.Duration
 	errorCountUntilSkip uint64
+
+	es eventstore.Eventstore
+}
+
+func (h *handler) Eventstore() eventstore.Eventstore {
+	return h.es
 }
 
 type EventstoreRepos struct {
@@ -35,34 +42,33 @@ type EventstoreRepos struct {
 	IAMEvents  *iam_es.IAMEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults, i18n *i18n.Translator, dir http.FileSystem) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults, i18n *i18n.Translator, dir http.FileSystem) []query.Handler {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
 	return []query.Handler{
-		&NotifyUser{
-			handler:   handler{view, bulkLimit, configs.cycleDuration("User"), errorCount},
-			orgEvents: repos.OrgEvents,
-			iamEvents: repos.IAMEvents,
-			iamID:     systemDefaults.IamID,
-		},
-		&Notification{
-			handler:        handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount},
-			eventstore:     eventstore,
-			userEvents:     repos.UserEvents,
-			systemDefaults: systemDefaults,
-			AesCrypto:      aesCrypto,
-			i18n:           i18n,
-			statikDir:      dir,
-		},
+		newNotifyUser(
+			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
+			repos.OrgEvents,
+			repos.IAMEvents,
+			systemDefaults.IamID,
+		),
+		newNotification(
+			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
+			repos.UserEvents,
+			systemDefaults,
+			aesCrypto,
+			i18n,
+			dir,
+		),
 	}
 }
 
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 1 * time.Second
+		return 3 * time.Minute
 	}
 	return c.MinimumCycleDuration.Duration
 }

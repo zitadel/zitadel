@@ -295,7 +295,3 @@ Notification:
       BulkLimit: 100
       FailureCountUntilSkip: 5
       Handlers:
-        Notification:
-          MinimumCycleDuration: 5s
-        User:
-          MinimumCycleDuration: 5s

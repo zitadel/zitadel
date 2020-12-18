@@ -1,10 +1,10 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -15,13 +15,13 @@ func (v *View) NotifyUserByID(userID string) (*model.NotifyUser, error) {
 	return view.NotifyUserByID(v.Db, notifyUserTable, userID)
 }
 
-func (v *View) PutNotifyUser(user *model.NotifyUser, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutNotifyUser(user *model.NotifyUser, event *models.Event) error {
 	err := view.PutNotifyUser(v.Db, notifyUserTable, user)
 	if err != nil {
 		return err
 	}
-	if sequence != 0 {
-		return v.ProcessedNotifyUserSequence(sequence, eventTimestamp)
+	if event.Sequence != 0 {
+		return v.ProcessedNotifyUserSequence(event)
 	}
 	return nil
 }
@@ -30,20 +30,20 @@ func (v *View) NotifyUsersByOrgID(orgID string) ([]*model.NotifyUser, error) {
 	return view.NotifyUsersByOrgID(v.Db, notifyUserTable, orgID)
 }
 
-func (v *View) DeleteNotifyUser(userID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteNotifyUser(userID string, event *models.Event) error {
 	err := view.DeleteNotifyUser(v.Db, notifyUserTable, userID)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedNotifyUserSequence(eventSequence, eventTimestamp)
+	return v.ProcessedNotifyUserSequence(event)
 }
 
-func (v *View) GetLatestNotifyUserSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(notifyUserTable)
+func (v *View) GetLatestNotifyUserSequence(aggregateType string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(notifyUserTable, aggregateType)
 }
 
-func (v *View) ProcessedNotifyUserSequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(notifyUserTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedNotifyUserSequence(event *models.Event) error {
+	return v.saveCurrentSequence(notifyUserTable, event)
 }
 
 func (v *View) UpdateNotifyUserSpoolerRunTimestamp() error {

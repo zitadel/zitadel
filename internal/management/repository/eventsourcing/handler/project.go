@@ -5,27 +5,59 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
-type Project struct {
-	handler
-	eventstore eventstore.Eventstore
-}
-
 const (
 	projectTable = "management.projects"
 )
+
+type Project struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newProject(handler handler) *Project {
+	h := &Project{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *Project) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (p *Project) ViewModel() string {
 	return projectTable
 }
 
+func (_ *Project) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.ProjectAggregate}
+}
+
+func (p *Project) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := p.view.GetLatestProjectSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *Project) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectSequence()
+	sequence, err := p.view.GetLatestProjectSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -46,14 +78,14 @@ func (p *Project) Reduce(event *models.Event) (err error) {
 		}
 		err = project.AppendEvent(event)
 	case es_model.ProjectRemoved:
-		return p.view.DeleteProject(event.AggregateID, event.Sequence, event.CreationDate)
+		return p.view.DeleteProject(event.AggregateID, event)
 	default:
-		return p.view.ProcessedProjectSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProject(project, event.CreationDate)
+	return p.view.PutProject(project, event)
 }
 
 func (p *Project) OnError(event *models.Event, err error) error {

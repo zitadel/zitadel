@@ -43,4 +43,5 @@ tmp/
 console/src/app/proto/generated/
 
 pkg/grpc/*/*.pb.*
+pkg/grpc/*/mock/*.mock.go
 pkg/grpc/*/*.swagger.json
