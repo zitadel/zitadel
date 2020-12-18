@@ -41,13 +41,13 @@ func notify(aggregates []*models.Aggregate) {
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
 	for _, aggregate := range aggregates {
-		subscriptions, ok := subscriptions[aggregate.Type()]
+		subs, ok := subscriptions[aggregate.Type()]
 		if !ok {
 			continue
 		}
-		for _, subscription := range subscriptions {
+		for _, sub := range subs {
 			for _, event := range aggregate.Events {
-				subscription.Events <- event
+				sub.Events <- event
 			}
 		}
 	}
