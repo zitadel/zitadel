@@ -60,6 +60,9 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 	case model.MFATypeOTP:
 		data.MFAProviders = removeSelectedProviderFromList(verificationStep.MFAProviders, model.MFATypeOTP)
 		data.SelectedMFAProvider = model.MFATypeOTP
+	default:
+		l.renderError(w, r, authReq, err)
+		return
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMFAVerify], data, nil)
 }
