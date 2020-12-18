@@ -643,24 +643,28 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user
 		return &model.InitUserStep{PasswordSet: user.PasswordSet}
 	}
 
+	var step model.NextStep
 	if request.LoginPolicy.PasswordlessType != iam_model.PasswordlessTypeNotAllowed && user.IsPasswordlessReady() {
-		if !checkVerificationTime(userSession.PasswordlessVerification, repo.MultiFactorCheckLifeTime) {
-			return &model.PasswordlessStep{}
+		if checkVerificationTime(userSession.PasswordlessVerification, repo.MultiFactorCheckLifeTime) {
+			request.AuthTime = userSession.PasswordlessVerification
+			return nil
 		}
-		request.AuthTime = userSession.PasswordlessVerification
-		return nil
+		step = &model.PasswordlessStep{}
 	}
 
 	if !user.PasswordSet {
 		return &model.InitPasswordStep{}
 	}
 
-	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
-		return &model.PasswordStep{}
+	if checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
+		request.PasswordVerified = true
+		request.AuthTime = userSession.PasswordVerification
+		return nil
 	}
-	request.PasswordVerified = true
-	request.AuthTime = userSession.PasswordVerification
-	return nil
+	if step != nil {
+		return step
+	}
+	return &model.PasswordStep{}
 }
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool, error) {

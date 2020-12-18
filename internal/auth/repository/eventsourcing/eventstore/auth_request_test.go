@@ -612,6 +612,35 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"password verified, passwordless set up, mfa not verified, mfa check step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:        true,
+					PasswordlessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MFAStateReady)}},
+					OTPState:           int32(user_model.MFAStateReady),
+					MFAMaxSetUp:        int32(model.MFALevelMultiFactor),
+				},
+				userEventProvider:         &mockEventUser{},
+				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
+				PasswordCheckLifeTime:     10 * 24 * time.Hour,
+				SecondFactorCheckLifeTime: 18 * time.Hour,
+			},
+			args{
+				&model.AuthRequest{
+					UserID: "UserID",
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+					},
+				}, false},
+			[]model.NextStep{&model.MFAVerificationStep{
+				MFAProviders: []model.MFAType{model.MFATypeOTP},
+			}},
+			nil,
+		},
+		{
 			"mfa not verified, mfa check step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
