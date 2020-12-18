@@ -1,10 +1,11 @@
 package deployment
 
 import (
+	"strings"
+
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"strings"
 )
 
 func GetContainer(

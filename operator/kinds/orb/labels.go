@@ -2,6 +2,12 @@ package orb
 
 import "github.com/caos/orbos/pkg/labels"
 
-func mustDatabaseOperator(binaryVersion string) *labels.Operator {
-	return labels.MustForOperator("ZITADEL", "zitadel.caos.ch", binaryVersion)
+func mustDatabaseOperator(binaryVersion *string) *labels.Operator {
+
+	version := "unknown"
+	if binaryVersion != nil {
+		version = *binaryVersion
+	}
+
+	return labels.MustForOperator("ZITADEL", "zitadel.caos.ch", version)
 }

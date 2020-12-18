@@ -31,7 +31,7 @@ func AdaptFunc(
 	nameLabels *labels.Name,
 	podSelector *labels.Selector,
 	force bool,
-	version string,
+	version *string,
 	namespace string,
 	replicaCount int,
 	affinity *k8s.Affinity,
@@ -57,6 +57,63 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("type", "deployment")
 
+	destroy, err := deployment.AdaptFuncToDestroy(namespace, deployName)
+	if err != nil {
+		return nil, nil, err
+	}
+	destroyers := []operator.DestroyFunc{
+		operator.ResourceDestroyToZitadelDestroy(destroy),
+	}
+
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+
+			deploymentDef := deploymentDef(
+				nameLabels,
+				namespace,
+				replicaCount,
+				podSelector,
+				nodeSelector,
+				tolerations,
+				affinity,
+				users,
+				version,
+				resources,
+				cmName,
+				certPath,
+				secretName,
+				secretPath,
+				consoleCMName,
+				secretVarsName,
+				secretPasswordsName,
+			)
+
+			hashes := getConfigurationHashes(k8sClient, queried)
+			if hashes != nil && len(hashes) != 0 {
+				for k, v := range hashes {
+					deploymentDef.Annotations[k] = v
+					deploymentDef.Spec.Template.Annotations[k] = v
+				}
+			}
+
+			query, err := deployment.AdaptFuncToEnsure(deploymentDef, force)
+			if err != nil {
+				return nil, err
+			}
+
+			queriers := []operator.QueryFunc{
+				operator.EnsureFuncToQueryFunc(migrationDone),
+				operator.EnsureFuncToQueryFunc(configurationDone),
+				operator.EnsureFuncToQueryFunc(setupDone),
+				operator.ResourceQueryToZitadelQuery(query),
+			}
+
+			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
+		},
+		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
+		nil
+}
+
+func deploymentDef(nameLabels *labels.Name, namespace string, replicaCount int, podSelector *labels.Selector, nodeSelector map[string]string, tolerations []corev1.Toleration, affinity *k8s.Affinity, users []string, version *string, resources *k8s.Resources, cmName string, certPath string, secretName string, secretPath string, consoleCMName string, secretVarsName string, secretPasswordsName string) *appsv1.Deployment {
 	deploymentDef := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        nameLabels.Name(),
@@ -96,7 +153,7 @@ func AdaptFunc(
 					Containers: []corev1.Container{
 						GetContainer(
 							containerName,
-							version,
+							*version,
 							RunAsUser,
 							true,
 							GetResourcesFromDefault(resources),
@@ -122,38 +179,5 @@ func AdaptFunc(
 			},
 		},
 	}
-
-	destroy, err := deployment.AdaptFuncToDestroy(namespace, deployName)
-	if err != nil {
-		return nil, nil, err
-	}
-	destroyers := []operator.DestroyFunc{
-		operator.ResourceDestroyToZitadelDestroy(destroy),
-	}
-
-	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			hashes := getConfigurationHashes(k8sClient, queried)
-			if hashes != nil && len(hashes) != 0 {
-				for k, v := range hashes {
-					deploymentDef.Annotations[k] = v
-					deploymentDef.Spec.Template.Annotations[k] = v
-				}
-			}
-
-			query, err := deployment.AdaptFuncToEnsure(deploymentDef, force)
-			if err != nil {
-				return nil, err
-			}
-
-			queriers := []operator.QueryFunc{
-				operator.EnsureFuncToQueryFunc(migrationDone),
-				operator.EnsureFuncToQueryFunc(configurationDone),
-				operator.EnsureFuncToQueryFunc(setupDone),
-				operator.ResourceQueryToZitadelQuery(query),
-			}
-
-			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
-		},
-		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-		nil
+	return deploymentDef
 }

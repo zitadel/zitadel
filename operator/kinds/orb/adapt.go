@@ -3,7 +3,6 @@ package orb
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
@@ -48,10 +47,7 @@ func AdaptFunc(
 			orbMonitor = orbMonitor.Verbose()
 		}
 
-		operatorLabels := labels.NoopOperator("ZITADEL")
-		if binaryVersion != nil {
-			operatorLabels = mustDatabaseOperator(*binaryVersion)
-		}
+		operatorLabels := mustDatabaseOperator(binaryVersion)
 
 		iamCurrent := &tree.Tree{}
 		queryIAM, destroyIAM, zitadelSecrets, err := iam.GetQueryAndDestroyFuncs(
@@ -64,7 +60,7 @@ func AdaptFunc(
 			orbconfig,
 			action,
 			migrationsPath,
-			*binaryVersion,
+			binaryVersion,
 			features,
 		)
 		if err != nil {

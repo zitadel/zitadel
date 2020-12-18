@@ -2,6 +2,7 @@ package iam
 
 import (
 	"fmt"
+
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/orb"
 
@@ -24,7 +25,7 @@ func GetQueryAndDestroyFuncs(
 	orbconfig *orb.Orb,
 	action string,
 	migrationsPath string,
-	version string,
+	version *string,
 	features []string,
 ) (
 	query operator.QueryFunc,

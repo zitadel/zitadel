@@ -31,7 +31,7 @@ func AdaptFunc(
 	orbconfig *orb.Orb,
 	action string,
 	migrationsPath string,
-	version string,
+	version *string,
 	features []string,
 ) operator.AdaptFunc {
 	return func(

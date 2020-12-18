@@ -1,8 +1,9 @@
 package zitadel
 
 import (
-	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 	"sort"
+
+	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 )
 
 const migrationUser = "flyway"
@@ -58,7 +59,7 @@ func getAllUsers(desired *DesiredV0) map[string]string {
 	esUser := "eventstore"
 	esPassword := esUser
 	if passwords != nil && passwords.Eventstore != nil {
-		esPassword = passwords.Notification.Value
+		esPassword = passwords.Eventstore.Value
 	}
 	users[esUser] = esPassword
 

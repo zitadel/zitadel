@@ -32,7 +32,7 @@ func main() {
 		panic(err)
 	}
 
-	version := "unknown"
+	version := "0.108.4"
 	if err := start.Operator(
 		monitor,
 		helpers.PruneHome(*orbconfig),
