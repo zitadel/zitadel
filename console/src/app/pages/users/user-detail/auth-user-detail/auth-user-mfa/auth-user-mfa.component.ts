@@ -10,7 +10,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { _base64ToArrayBuffer } from '../../u2f-util';
 import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
-import { DialogU2FComponent } from '../dialog-u2f/dialog-u2f.component';
+import { DialogU2FComponent, U2FComponentDestination } from '../dialog-u2f/dialog-u2f.component';
 
 export interface WebAuthNOptions {
     challenge: string;
@@ -93,6 +93,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                     width: '400px',
                     data: {
                         credOptions,
+                        type: U2FComponentDestination.MFA,
                     },
                 });
 
