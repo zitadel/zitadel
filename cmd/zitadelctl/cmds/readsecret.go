@@ -41,11 +41,13 @@ func ReadSecretCommand(rv RootValues) *cobra.Command {
 				path,
 				secrets.GetAllSecretsFunc(orbConfig))
 			if err != nil {
-				panic(err)
+				monitor.Error(err)
+				return nil
 			}
 
 			if _, err := os.Stdout.Write([]byte(value)); err != nil {
-				panic(err)
+				monitor.Error(err)
+				return nil
 			}
 			return nil
 		},

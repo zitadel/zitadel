@@ -2,6 +2,7 @@ package cmds
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/caos/orbos/pkg/databases"
 	"github.com/spf13/cobra"
@@ -23,18 +24,24 @@ func BackupListCommand(rv RootValues) *cobra.Command {
 		}
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-			return err
+			monitor.Error(err)
+			return nil
 		}
 
 		if err := gitClient.Clone(); err != nil {
-			return err
+			monitor.Error(err)
+			return nil
 		}
 
 		backups, err := databases.ListBackups(monitor, gitClient)
 		if err != nil {
-			return err
+			monitor.Error(err)
+			return nil
 		}
 
+		sort.Slice(backups, func(i, j int) bool {
+			return backups[i] > backups[j]
+		})
 		for _, backup := range backups {
 			fmt.Println(backup)
 		}

@@ -33,22 +33,25 @@ orbctl writesecret mygceprovider.google_application_credentials_value --value "$
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 
-		s, err := key(value, file, stdin)
-		if err != nil {
-			return err
-		}
-
 		_, monitor, orbConfig, gitClient, _, errFunc := rv()
 		if errFunc != nil {
 			return errFunc(cmd)
 		}
 
+		s, err := key(value, file, stdin)
+		if err != nil {
+			monitor.Error(err)
+			return nil
+		}
+
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-			return err
+			monitor.Error(err)
+			return nil
 		}
 
 		if err := gitClient.Clone(); err != nil {
-			return err
+			monitor.Error(err)
+			return nil
 		}
 
 		path := ""
@@ -62,8 +65,9 @@ orbctl writesecret mygceprovider.google_application_credentials_value --value "$
 			path,
 			s,
 			secrets.GetAllSecretsFunc(orbConfig),
-			secrets.PushFunc()); err != nil {
-			panic(err)
+			secrets.PushFunc(),
+		); err != nil {
+			monitor.Error(err)
 		}
 		return nil
 	}

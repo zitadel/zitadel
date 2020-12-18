@@ -21,12 +21,12 @@ func GetAllSecretsFunc(orb *orb.Orb) func(monitor mntr.Monitor, gitClient *git.C
 	return func(monitor mntr.Monitor, gitClient *git.Client) (map[string]*secret.Secret, map[string]*tree.Tree, error) {
 		allSecrets := make(map[string]*secret.Secret, 0)
 		allTrees := make(map[string]*tree.Tree, 0)
-		foundBoom, err := api.ExistsZitadelYml(gitClient)
+		foundZitadel, err := api.ExistsZitadelYml(gitClient)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		if foundBoom {
+		if foundZitadel {
 			zitadelYML, err := api.ReadZitadelYml(gitClient)
 			if err != nil {
 				return nil, nil, err
@@ -40,6 +40,8 @@ func GetAllSecretsFunc(orb *orb.Orb) func(monitor mntr.Monitor, gitClient *git.C
 			if zitadelSecrets != nil && len(zitadelSecrets) > 0 {
 				secret.AppendSecrets(zitadel, allSecrets, zitadelSecrets)
 			}
+		} else {
+			monitor.Info("no file for zitadel found")
 		}
 		return allSecrets, allTrees, nil
 	}
