@@ -49,7 +49,7 @@ func (step *Step2) execute(ctx context.Context) (*iam_model.IAM, error) {
 func (step *Step2) passwordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_es_model.IAM, *models.Aggregate, error) {
 	logging.Log("SETUP-Bs8id").Info("setting up password complexity policy")
 	policy.AggregateID = step.setup.iamID
-	iam, aggregate, err := step.setup.Commands.AddDefaultPasswordComplexityPolicy(ctx, policy)
+	iam, aggregate, err := step.setup.IamEvents.PrepareAddPasswordComplexityPolicy(ctx, policy)
 	if err != nil {
 		return nil, nil, err
 	}

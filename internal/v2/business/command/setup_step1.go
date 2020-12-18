@@ -5,7 +5,6 @@ import (
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/v2/business/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -13,8 +12,8 @@ import (
 type Step1 struct {
 	GlobalOrg          string
 	IAMProject         string
-	DefaultLoginPolicy *iam_model.LoginPolicy
-	Orgs               []org_model.Org
+	DefaultLoginPolicy LoginPolicy //*iam_model.LoginPolicy
+	Orgs               []Org
 	Owners             []string
 
 	//setup              *Setup
@@ -24,13 +23,58 @@ type Step1 struct {
 	//pwComplexityPolicy *iam_model.PasswordComplexityPolicyView
 }
 
+type LoginPolicy struct {
+	AllowRegister         bool
+	AllowUsernamePassword bool
+	AllowExternalIdp      bool
+}
+
+type User struct {
+	FirstName string
+	LastName  string
+	UserName  string
+	Email     string
+	Password  string
+}
+
+type Org struct {
+	Name         string
+	Domain       string
+	OrgIamPolicy bool
+	Users        []User
+	Owners       []string
+	Projects     []Project
+}
+
+type Project struct {
+	Name     string
+	Users    []User
+	Members  []string
+	OIDCApps []OIDCApp
+}
+
+type OIDCApp struct {
+	Name                   string
+	RedirectUris           []string
+	ResponseTypes          []string
+	GrantTypes             []string
+	ApplicationType        string
+	AuthMethodType         string
+	PostLogoutRedirectUris []string
+	DevMode                bool
+}
+
 func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 Step1) error {
 	iam, err := r.iamByID(ctx, iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
 	//create default login policy
-	_, err = r.addDefaultLoginPolicy(ctx, iam, step1.DefaultLoginPolicy)
+	_, err = r.addDefaultLoginPolicy(ctx, iam, &iam_model.LoginPolicy{
+		AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
+		AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
+		AllowExternalIdp:      step1.DefaultLoginPolicy.AllowExternalIdp,
+	})
 	if err != nil {
 		return err
 	}
@@ -40,6 +84,17 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 Step1)
 	//set iam owners
 	//set global org
 	//set iam project id
+
+	/*aggregates:
+	iam:
+		default login policy
+		iam owner
+	org:
+		default
+		caos
+			zitadel
+
+	*/
 	_, err = r.setup(ctx, iam, domain.Step1, iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
 	return err
 }
@@ -49,7 +104,7 @@ func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, iam *IAMWriteMo
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mv0s", "Errors.IAM.LoginPolicyInvalid")
 	}
 
-	addedPolicy := NewWriteModel(policy.AggregateID)
+	addedPolicy := NewIAMLoginPolicyWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -58,5 +113,6 @@ func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, iam *IAMWriteMo
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LoginPolicy.AlreadyExists")
 	}
 
-	iamAgg.PushEvents(iam_repo.NewLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType)))
+	//iamAgg.PushEvents(iam_repo.NewLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType)))
+	return nil, nil
 }

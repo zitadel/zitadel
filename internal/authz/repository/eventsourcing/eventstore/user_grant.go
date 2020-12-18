@@ -6,10 +6,10 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 )
 
 type UserGrantRepo struct {
@@ -72,7 +72,7 @@ func (repo *UserGrantRepo) FillIamProjectID(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if iam.SetUpDone < iam_model.StepCount-1 {
+	if iam.SetUpDone < domain.StepCount-1 {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-skiwS", "Setup not done")
 	}
 	repo.IamProjectID = iam.IAMProjectID

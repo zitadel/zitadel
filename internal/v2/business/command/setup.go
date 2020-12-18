@@ -27,7 +27,7 @@ func (r *CommandSide) setup(ctx context.Context, iam *IAMWriteModel, step domain
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "setup error")
 	}
 
-	aggregate := AggregateFromWriteModel(&iam.WriteModel).PushEvents(event)
+	aggregate := IAMAggregateFromWriteModel(&iam.WriteModel).PushEvents(event)
 
 	err := r.eventstore.PushAggregate(ctx, iam, aggregate)
 	if err != nil {

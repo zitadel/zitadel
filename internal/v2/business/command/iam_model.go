@@ -51,6 +51,7 @@ func (wm *IAMWriteModel) Reduce() error {
 			}
 		}
 	}
+	return nil
 }
 
 func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {

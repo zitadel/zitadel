@@ -3,6 +3,7 @@ package iam
 import (
 	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 )
 
 const (
@@ -35,12 +36,12 @@ func NewAggregate(
 	}
 }
 
-func (a *Aggregate) PushStepStarted(ctx context.Context, step Step) *Aggregate {
+func (a *Aggregate) PushStepStarted(ctx context.Context, step domain.Step) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewSetupStepStartedEvent(ctx, step))
 	return a
 }
 
-func (a *Aggregate) PushStepDone(ctx context.Context, step Step) *Aggregate {
+func (a *Aggregate) PushStepDone(ctx context.Context, step domain.Step) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewSetupStepDoneEvent(ctx, step))
 	return a
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/business/command"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 )
 
 func StartSetupV2(esConfig es_int.Config, sd systemdefaults.SystemDefaults) (*Setup, error) {
@@ -34,14 +35,14 @@ func StartSetupV2(esConfig es_int.Config, sd systemdefaults.SystemDefaults) (*Se
 }
 
 func (s *Setup) ExecuteV2(ctx context.Context, setUpConfig IAMSetUp) error {
-	logging.Log("SETUP-hwG32").Info("starting setup")
+	logging.Log("SETUP-JAK2q").Info("starting setup")
 
 	iam, err := s.IamEvents.IAMByID(ctx, s.iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
-	if iam != nil && (iam.SetUpDone == iam_model.StepCount-1 || iam.SetUpStarted != iam.SetUpDone) {
-		logging.Log("SETUP-cWEsn").Info("all steps done")
+	if iam != nil && (iam.SetUpDone == domain.StepCount-1 || iam.SetUpStarted != iam.SetUpDone) {
+		logging.Log("SETUP-VA2k1").Info("all steps done")
 		return nil
 	}
 
@@ -49,7 +50,7 @@ func (s *Setup) ExecuteV2(ctx context.Context, setUpConfig IAMSetUp) error {
 		iam = &iam_model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: s.iamID}}
 	}
 
-	steps, err := setUpConfig.steps(iam.SetUpDone)
+	steps, err := setUpConfig.steps(iam_model.Step(iam.SetUpDone))
 	if err != nil || len(steps) == 0 {
 		return err
 	}
@@ -57,17 +58,17 @@ func (s *Setup) ExecuteV2(ctx context.Context, setUpConfig IAMSetUp) error {
 	ctx = setSetUpContextData(ctx, s.iamID)
 
 	for _, step := range steps {
-		step.init(s)
-		if step.step() != iam.SetUpDone+1 {
+		//step.init(s)
+		if step.step() != iam_model.Step(iam.SetUpDone+1) {
 			logging.LogWithFields("SETUP-rxRM1", "step", step.step(), "previous", iam.SetUpDone).Warn("wrong step order")
-			return errors.ThrowPreconditionFailed(nil, "SETUP-wwAqO", "too few steps for this zitadel verison")
+			return caos_errs.ThrowPreconditionFailed(nil, "SETUP-wwAqO", "too few steps for this zitadel verison")
 		}
-		iam, err = s.Commands.StartSetup(ctx, s.iamID, step.step())
+		iam, err = s.Commands.StartSetup(ctx, s.iamID, domain.Step(step.step()))
 		if err != nil {
 			return err
 		}
 
-		iam, err = step.execute(ctx)
+		err = step.execute(ctx, *s.Commands)
 		if err != nil {
 			return err
 		}
@@ -79,5 +80,16 @@ func (s *Setup) ExecuteV2(ctx context.Context, setUpConfig IAMSetUp) error {
 	}
 
 	logging.Log("SETUP-ds31h").Info("setup done")
+	return nil
+}
+
+func (s *Setup) validateExecutedStep(ctx context.Context) error {
+	iam, err := s.IamEvents.IAMByID(ctx, s.iamID)
+	if err != nil {
+		return err
+	}
+	if iam.SetUpStarted != iam.SetUpDone {
+		return caos_errs.ThrowInternal(nil, "SETUP-QeukK", "started step is not equal to done")
+	}
 	return nil
 }

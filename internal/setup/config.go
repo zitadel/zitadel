@@ -7,28 +7,28 @@ import (
 
 type IAMSetUp struct {
 	Step1 *Step1
-	Step2 *Step2
-	Step3 *Step3
-	Step4 *Step4
-	Step5 *Step5
-	Step6 *Step6
-	Step7 *Step7
-	Step8 *Step8
+	//Step2 *Step2
+	//Step3 *Step3
+	//Step4 *Step4
+	//Step5 *Step5
+	//Step6 *Step6
+	//Step7 *Step7
+	//Step8 *Step8
 }
 
-func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]step, error) {
-	steps := make([]step, 0)
+func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]stepV2, error) {
+	steps := make([]stepV2, 0)
 	missingSteps := make([]iam_model.Step, 0)
 
-	for _, step := range []step{
+	for _, step := range []stepV2{
 		setup.Step1,
-		setup.Step2,
-		setup.Step3,
-		setup.Step4,
-		setup.Step5,
-		setup.Step6,
-		setup.Step7,
-		setup.Step8,
+		//setup.Step2,
+		//setup.Step3,
+		//setup.Step4,
+		//setup.Step5,
+		//setup.Step6,
+		//setup.Step7,
+		//setup.Step8,
 	} {
 		if step.step() <= currentDone {
 			continue

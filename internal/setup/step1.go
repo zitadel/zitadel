@@ -5,28 +5,23 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	proj_model "github.com/caos/zitadel/internal/project/model"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/business/command"
 )
 
 type Step1 struct {
-	GlobalOrg          string
-	IAMProject         string
-	DefaultLoginPolicy LoginPolicy
-	Orgs               []Org
-	Owners             []string
+	//GlobalOrg          string
+	//IAMProject         string
+	//DefaultLoginPolicy LoginPolicy
+	//Orgs               []Org
+	//Owners             []string
+	command.Step1
 
-	setup              *Setup
-	createdUsers       map[string]*usr_model.User
-	createdOrgs        map[string]*org_model.Org
-	createdProjects    map[string]*proj_model.Project
-	pwComplexityPolicy *iam_model.PasswordComplexityPolicyView
+	//setup              *Setup
+	//createdUsers       map[string]*usr_model.User
+	//createdOrgs        map[string]*org_model.Org
+	//createdProjects    map[string]*proj_model.Project
+	//pwComplexityPolicy *iam_model.PasswordComplexityPolicyView
 }
 
 func (s *Step1) isNil() bool {
@@ -37,12 +32,12 @@ func (s *Step1) step() iam_model.Step {
 	return iam_model.Step1
 }
 
-func (s *Step1) init(setup *Setup) {
-	s.setup = setup
-	s.createdUsers = make(map[string]*usr_model.User)
-	s.createdOrgs = make(map[string]*org_model.Org)
-	s.createdProjects = make(map[string]*proj_model.Project)
-}
+//func (s *Step1) init(setup *Setup) {
+//	s.setup = setup
+//	s.createdUsers = make(map[string]*usr_model.User)
+//	s.createdOrgs = make(map[string]*org_model.Org)
+//	s.createdProjects = make(map[string]*proj_model.Project)
+//}
 
 func (s *Step1) execute(ctx context.Context, commands command.CommandSide) error {
 	step2 := command.Step1{
@@ -52,7 +47,7 @@ func (s *Step1) execute(ctx context.Context, commands command.CommandSide) error
 		Orgs:               nil,
 		Owners:             nil,
 	}
-	err := commands.SetupStep1(ctx, iamID, step2)
+	err := commands.SetupStep1(ctx, "iamID", step2)
 	if err != nil {
 		logging.Log("SETUP-de342").WithField("step", s.step()).WithError(err).Error("unable to finish setup")
 		return err
