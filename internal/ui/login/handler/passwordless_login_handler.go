@@ -13,6 +13,11 @@ const (
 	tmplPasswordlessVerification = "passwordlessverification"
 )
 
+type passwordlessData struct {
+	webAuthNData
+	PasswordLogin bool
+}
+
 type passwordlessFormData struct {
 	webAuthNFormData
 	PasswordLogin bool `schema:"passwordlogin"`
@@ -31,9 +36,16 @@ func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Re
 	if webAuthNLogin != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(webAuthNLogin.CredentialAssertionData)
 	}
-	data := &webAuthNData{
-		userData:               l.getUserData(r, authReq, "Login Passwordless", errType, errMessage),
-		CredentialCreationData: credentialData,
+	var passwordLogin bool
+	if authReq.LoginPolicy != nil {
+		passwordLogin = authReq.LoginPolicy.AllowUsernamePassword
+	}
+	data := &passwordlessData{
+		webAuthNData{
+			userData:               l.getUserData(r, authReq, "Login Passwordless", errType, errMessage),
+			CredentialCreationData: credentialData,
+		},
+		passwordLogin,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPasswordlessVerification], data, nil)
 }
