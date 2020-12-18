@@ -40,14 +40,9 @@ func ReduceEvent(handler Handler, event *models.Event) {
 			return
 		}
 		for _, previousEvent := range events {
-			//if other process already updated view
-			//TODO: correct?
-			if event.PreviousSequence > previousEvent.Sequence {
-				continue
-			}
+			//TODO: if other process already updated view (recheck current sequence? => additional call to db)
 			err = handler.Reduce(previousEvent)
 			logging.LogWithFields("HANDL-V42TI", "seq", previousEvent.Sequence).OnError(err).Warn("reduce failed")
-			return
 		}
 	} else if event.PreviousSequence > 0 && event.PreviousSequence < currentSequence {
 		logging.LogWithFields("HANDL-w9Bdy", "previousSeq", event.PreviousSequence, "currentSeq", currentSequence).Debug("already processed")
