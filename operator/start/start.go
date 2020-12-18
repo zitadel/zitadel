@@ -52,7 +52,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 	return nil
 }
 
-func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.Client, backup, migrationsPath string, version *string) error {
+func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb, k8sClient *kubernetes.Client, backup, migrationsPath string, version *string) error {
 	databasesList := []string{
 		"notification",
 		"adminapi",
@@ -61,13 +61,12 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.
 		"eventstore",
 		"management",
 	}
-	emptyOrbConfig := &orbconfig.Orb{}
 
 	if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "scaledown", migrationsPath, version, []string{"scaledown"}), k8sClient)(); err != nil {
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", migrationsPath, version, []string{"scaledown"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -75,7 +74,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "migration", migrationsPath, version, []string{"migration"}), k8sClient)(); err != nil {
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "migration", migrationsPath, version, []string{"migration"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -89,7 +88,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, k8sClient *kubernetes.
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(emptyOrbConfig, "scaleup", migrationsPath, version, []string{"scaleup"}), k8sClient)(); err != nil {
+	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", migrationsPath, version, []string{"scaleup"}), k8sClient)(); err != nil {
 		return err
 	}
 

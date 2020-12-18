@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/databases"
 	"github.com/caos/orbos/pkg/git"
@@ -35,7 +36,6 @@ func NewClient(monitor mntr.Monitor, repoURL, repoKey string) (*Client, error) {
 func newGit(monitor mntr.Monitor, repoURL string, repoKey string) (*git.Client, error) {
 	gitClient := git.New(context.Background(), monitor, "orbos", "orbos@caos.ch")
 	if err := gitClient.Configure(repoURL, []byte(repoKey)); err != nil {
-		monitor.Error(err)
 		return nil, err
 	}
 

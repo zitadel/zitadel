@@ -4,6 +4,8 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/caos/zitadel/operator/helpers"
+
 	"github.com/caos/orbos/pkg/databases"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator/start"
@@ -25,11 +27,13 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 
 	flags := cmd.Flags()
 	flags.StringVar(&backup, "backup", "", "Backup used for db restore")
-	flags.StringVar(&kubeconfig, "kubeconfig", "", "Kubeconfig for ZITADEL operator deployment")
+	flags.StringVar(&kubeconfig, "kubeconfig", "~/.kube/config", "Kubeconfig for ZITADEL operator deployment")
 	flags.StringVar(&migrationsPath, "migrations", "./migrations/", "Path to the migration files")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		_, monitor, orbConfig, gitClient, version, errFunc := rv()
+		kubeconfig = helpers.PruneHome(kubeconfig)
+
 		if errFunc != nil {
 			return errFunc(cmd)
 		}
@@ -84,7 +88,7 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 				return nil
 			}
 
-			if err := start.Restore(monitor, gitClient, k8sClient, backup, migrationsPath, &version); err != nil {
+			if err := start.Restore(monitor, gitClient, orbConfig, k8sClient, backup, migrationsPath, &version); err != nil {
 				monitor.Error(err)
 			}
 			return nil

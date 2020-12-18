@@ -3,6 +3,8 @@ package cmds
 import (
 	"io/ioutil"
 
+	"github.com/caos/zitadel/operator/helpers"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -22,10 +24,11 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 	)
 
 	flags := cmd.Flags()
-	flags.StringVar(&kubeconfig, "kubeconfig", "", "Kubeconfig for ZITADEL operator deployment")
+	flags.StringVar(&kubeconfig, "kubeconfig", "~/.kube/config", "Kubeconfig for ZITADEL operator deployment")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		_, monitor, orbConfig, gitClient, _, errFunc := rv()
+		kubeconfig = helpers.PruneHome(kubeconfig)
 		if errFunc != nil {
 			return errFunc(cmd)
 		}
