@@ -71,32 +71,27 @@ func (s *spooledHandler) load(workerID string) {
 
 	if <-hasLocked {
 		for {
-			err := s.processAllEvents(ctx, workerID)
-			if err == nil {
-				errs <- nil
+			events, err := s.query(ctx)
+			if err != nil {
+				errs <- err
+				break
+			}
+			err = s.process(ctx, events, workerID)
+			if err != nil {
+				errs <- err
+				break
+			}
+			if uint64(len(events)) < s.QueryLimit() {
+				// no more events to process
+				// stop chan
+				if ctx.Err() == nil {
+					errs <- nil
+				}
 				break
 			}
 		}
 	}
 	<-ctx.Done()
-}
-
-func (s *spooledHandler) processAllEvents(ctx context.Context, workerID string) error {
-	for {
-		events, err := s.query(ctx)
-		if err != nil {
-			return err
-		}
-		err = s.process(ctx, events, workerID)
-		if err != nil {
-			return err
-		}
-		if uint64(len(events)) < s.QueryLimit() {
-			// no more events to process
-			// stop chan
-			return nil
-		}
-	}
 }
 
 func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID string) {
@@ -108,14 +103,19 @@ func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID str
 }
 
 func (s *spooledHandler) process(ctx context.Context, events []*models.Event, workerID string) error {
-	for _, event := range events {
+	for i, event := range events {
 		select {
 		case <-ctx.Done():
 			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).Debug("context canceled")
 			return nil
 		default:
 			if err := s.Reduce(event); err != nil {
-				return s.OnError(event, err)
+				err = s.OnError(event, err)
+				if err == nil {
+					return nil
+				}
+				time.Sleep(500 * time.Millisecond)
+				return s.process(ctx, events[i:], workerID)
 			}
 		}
 	}

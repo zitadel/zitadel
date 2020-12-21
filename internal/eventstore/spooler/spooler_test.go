@@ -22,6 +22,7 @@ type testHandler struct {
 	queryError    error
 	viewModel     string
 	bulkLimit     uint64
+	maxErrCount   int
 }
 
 func (h *testHandler) AggregateTypes() []models.AggregateType {
@@ -50,6 +51,10 @@ func (h *testHandler) Reduce(*models.Event) error {
 	return h.processError
 }
 func (h *testHandler) OnError(event *models.Event, err error) error {
+	if h.maxErrCount == 1 {
+		return nil
+	}
+	h.maxErrCount++
 	return err
 }
 func (h *testHandler) OnSuccess() error {
@@ -222,14 +227,14 @@ func TestSpooler_load(t *testing.T) {
 		{
 			"lock exists",
 			fields{
-				currentHandler: &testHandler{processSleep: 500 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second},
+				currentHandler: &testHandler{processSleep: 500 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second, bulkLimit: 10},
 				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, fmt.Errorf("lock already exists"), 2000*time.Millisecond),
 			},
 		},
 		{
 			"lock fails",
 			fields{
-				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second},
+				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second, bulkLimit: 10},
 				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, fmt.Errorf("fail"), 2000*time.Millisecond),
 				eventstore:     &eventstoreStub{events: []*models.Event{{}}},
 			},
@@ -237,7 +242,7 @@ func TestSpooler_load(t *testing.T) {
 		{
 			"query fails",
 			fields{
-				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", queryError: fmt.Errorf("query fail"), cycleDuration: 1 * time.Second},
+				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", queryError: fmt.Errorf("query fail"), cycleDuration: 1 * time.Second, bulkLimit: 10},
 				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 2000*time.Millisecond),
 				eventstore:     &eventstoreStub{err: fmt.Errorf("fail")},
 			},
@@ -245,8 +250,8 @@ func TestSpooler_load(t *testing.T) {
 		{
 			"process event fails",
 			fields{
-				currentHandler: &testHandler{processError: fmt.Errorf("oups"), processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 500 * time.Millisecond},
-				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 1000*time.Millisecond),
+				currentHandler: &testHandler{processError: fmt.Errorf("oups"), processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 500 * time.Millisecond, bulkLimit: 10},
+				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 1000*time.Millisecond).expectRenew(t, nil, 1000*time.Millisecond),
 				eventstore:     &eventstoreStub{events: []*models.Event{{}}},
 			},
 		},
