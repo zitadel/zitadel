@@ -20,6 +20,7 @@ func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context, ag
 }
 
 func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}

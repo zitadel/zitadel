@@ -62,7 +62,8 @@ const (
 )
 
 func (p *LoginPolicy) IsValid() bool {
-	return p.ObjectRoot.AggregateID != ""
+	return true
+	//return p.ObjectRoot.AggregateID != ""
 }
 
 func (p *IDPProvider) IsValid() bool {

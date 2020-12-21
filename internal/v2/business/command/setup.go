@@ -4,7 +4,6 @@ import (
 	"context"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v2"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/business/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
@@ -15,29 +14,27 @@ func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
-	iam, err := r.setup(ctx, nil, iamWriteModel, step, iam_repo.NewSetupStepStartedEvent(ctx, step))
-	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-zx03n", "Setup start failed")
-	}
-	return iam, nil
-}
-
-func (r *CommandSide) setup(ctx context.Context, iamAgg *iam_repo.Aggregate, iam *IAMWriteModel, step domain.Step, event eventstore.EventPusher) (*iam_model.IAM, error) {
-	if iam != nil && (iam.SetUpStarted >= step || iam.SetUpStarted != iam.SetUpDone) {
+	if iamWriteModel.SetUpStarted >= step || iamWriteModel.SetUpStarted != iamWriteModel.SetUpDone {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "setup error")
 	}
-
-	if iamAgg == nil {
-		iamAgg = IAMAggregateFromWriteModel(&iam.WriteModel)
-	}
-	aggregate := iamAgg.PushEvents(event)
-
-	err := r.eventstore.PushAggregate(ctx, iam, aggregate)
+	aggregate := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel).PushEvents(iam_repo.NewSetupStepStartedEvent(ctx, step))
+	err = r.eventstore.PushAggregate(ctx, iamWriteModel, aggregate)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Grgh1", "Setup start failed")
 	}
-	return writeModelToIAM(iam), nil
+	return writeModelToIAM(iamWriteModel), nil
 }
+
+//func (r *CommandSide) setupDone(ctx context.Context, iamAgg *iam_repo.Aggregate, event eventstore.EventPusher, aggregates ...eventstore.Aggregater) error {
+//	aggregate := iamAgg.PushEvents(event)
+//
+//	aggregates = append(aggregates, aggregate)
+//	_, err := r.eventstore.PushAggregates(ctx, aggregates...)
+//	if err != nil {
+//		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dgd2", "Setup done failed")
+//	}
+//	return nil
+//}
 
 //
 ////TODO: should not use readmodel

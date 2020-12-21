@@ -81,7 +81,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 Step1)
 		return err
 	}
 	//create orgs
-	//create porjects
+	//create projects
 	//create applications
 	//set iam owners
 	//set global org
@@ -97,6 +97,11 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 Step1)
 			zitadel
 
 	*/
-	_, err = r.setup(ctx, iamAgg, iam, domain.Step1, iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
-	return err
+	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
+
+	_, err = r.eventstore.PushAggregates(ctx, iamAgg)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Gr2hh", "Setup Step1 failed")
+	}
+	return nil
 }
