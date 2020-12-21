@@ -74,6 +74,7 @@ func (s *spooledHandler) load(workerID string) {
 			events, err := s.query(ctx)
 			if err != nil {
 				errs <- err
+				break
 			} else {
 				err = s.process(ctx, events, workerID)
 				if err != nil {
