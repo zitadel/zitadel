@@ -39,39 +39,37 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		SequenceBetween(currentSequence, event.Sequence).
 		SetLimit(eventLimit)
 
-	events, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
+	unprocessedEvents, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
 	if err != nil {
 		logging.LogWithFields("HANDL-L6YH1", "seq", event.Sequence).Warn("filter failed")
 		return
 	}
 
-	processedSequences := map[models.AggregateType]uint64{
-		event.AggregateType: currentSequence,
-	}
+	processedSequences := map[models.AggregateType]uint64{}
 
-	for _, previousEvent := range events {
-		currentSequence, err := handler.CurrentSequence(previousEvent)
+	for _, unprocessedEvent := range unprocessedEvents {
+		currentSequence, err := handler.CurrentSequence(unprocessedEvent)
 		if err != nil {
 			logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
 			return
 		}
-		_, ok := processedSequences[previousEvent.AggregateType]
+		_, ok := processedSequences[unprocessedEvent.AggregateType]
 		if !ok {
-			processedSequences[previousEvent.AggregateType] = currentSequence
+			processedSequences[unprocessedEvent.AggregateType] = currentSequence
 		}
-		if processedSequences[previousEvent.AggregateType] != currentSequence {
+		if processedSequences[unprocessedEvent.AggregateType] != currentSequence {
 			logging.LogWithFields("QUERY-DOYVN",
-				"processed", processedSequences[previousEvent.AggregateType],
+				"processed", processedSequences[unprocessedEvent.AggregateType],
 				"current", currentSequence).
 				Warn("sequence not matching")
 			return
 		}
 
-		err = handler.Reduce(previousEvent)
-		logging.LogWithFields("HANDL-V42TI", "seq", previousEvent.Sequence).OnError(err).Warn("reduce failed")
-		processedSequences[previousEvent.AggregateType] = previousEvent.Sequence
+		err = handler.Reduce(unprocessedEvent)
+		logging.LogWithFields("HANDL-V42TI", "seq", unprocessedEvent.Sequence).OnError(err).Warn("reduce failed")
+		processedSequences[unprocessedEvent.AggregateType] = unprocessedEvent.Sequence
 	}
-	if len(events) == eventLimit {
+	if len(unprocessedEvents) == eventLimit {
 		logging.LogWithFields("QUERY-BSqe9", "seq", event.Sequence).Warn("didnt process event")
 		return
 	}
