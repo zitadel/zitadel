@@ -44,7 +44,7 @@ COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadelctl /app/zitade
 RUN chmod a+x /app/zitadelctl
 
 #Migrations for cockroach-secure
-COPY migrations/cockroach-secure /migrations
+COPY migrations/cockroach /migrations
 RUN ls /migrations
 
 
