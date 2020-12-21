@@ -45,21 +45,31 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		return
 	}
 
-	processedSequence := currentSequence
+	processedSequences := map[models.AggregateType]uint64{
+		event.AggregateType: currentSequence,
+	}
+
 	for _, previousEvent := range events {
-		currentSequence, err := handler.CurrentSequence(event)
+		currentSequence, err := handler.CurrentSequence(previousEvent)
 		if err != nil {
 			logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
 			return
 		}
-		if processedSequence != currentSequence {
-			logging.LogWithFields("QUERY-DOYVN", "processed", processedSequence, "current", currentSequence).Warn("sequence not matching")
+		_, ok := processedSequences[previousEvent.AggregateType]
+		if !ok {
+			processedSequences[previousEvent.AggregateType] = currentSequence
+		}
+		if processedSequences[previousEvent.AggregateType] != currentSequence {
+			logging.LogWithFields("QUERY-DOYVN",
+				"processed", processedSequences[previousEvent.AggregateType],
+				"current", currentSequence).
+				Warn("sequence not matching")
 			return
 		}
 
 		err = handler.Reduce(previousEvent)
 		logging.LogWithFields("HANDL-V42TI", "seq", previousEvent.Sequence).OnError(err).Warn("reduce failed")
-		processedSequence = previousEvent.Sequence
+		processedSequences[previousEvent.AggregateType] = previousEvent.Sequence
 	}
 	if len(events) == eventLimit {
 		logging.LogWithFields("QUERY-BSqe9", "seq", event.Sequence).Warn("didnt process event")
