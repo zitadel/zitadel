@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -11,8 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/view/repository"
-
-	"time"
 )
 
 type Spooler struct {
@@ -71,12 +70,23 @@ func (s *spooledHandler) load(workerID string) {
 	hasLocked := s.lock(ctx, errs, workerID)
 
 	if <-hasLocked {
-		events, err := s.query(ctx)
-		if err != nil {
-			errs <- err
-		} else {
-			errs <- s.process(ctx, events, workerID)
-			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("process done")
+		for {
+			events, err := s.query(ctx)
+			if err != nil {
+				errs <- err
+			} else {
+				err = s.process(ctx, events, workerID)
+				if err != nil {
+					errs <- err
+					break
+				}
+			}
+			if uint64(len(events)) < s.QueryLimit() {
+				// no more events to process
+				// stop chan
+				errs <- nil
+				break
+			}
 		}
 
 	}
