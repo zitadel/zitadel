@@ -15,19 +15,22 @@ func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
-	iam, err := r.setup(ctx, iamWriteModel, step, iam_repo.NewSetupStepStartedEvent(ctx, step))
+	iam, err := r.setup(ctx, nil, iamWriteModel, step, iam_repo.NewSetupStepStartedEvent(ctx, step))
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-zx03n", "Setup start failed")
 	}
 	return iam, nil
 }
 
-func (r *CommandSide) setup(ctx context.Context, iam *IAMWriteModel, step domain.Step, event eventstore.EventPusher) (*iam_model.IAM, error) {
+func (r *CommandSide) setup(ctx context.Context, iamAgg *iam_repo.Aggregate, iam *IAMWriteModel, step domain.Step, event eventstore.EventPusher) (*iam_model.IAM, error) {
 	if iam != nil && (iam.SetUpStarted >= step || iam.SetUpStarted != iam.SetUpDone) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "setup error")
 	}
 
-	aggregate := IAMAggregateFromWriteModel(&iam.WriteModel).PushEvents(event)
+	if iamAgg == nil {
+		iamAgg = IAMAggregateFromWriteModel(&iam.WriteModel)
+	}
+	aggregate := iamAgg.PushEvents(event)
 
 	err := r.eventstore.PushAggregate(ctx, iam, aggregate)
 	if err != nil {

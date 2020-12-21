@@ -10,6 +10,7 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/v2/business/command"
 	"github.com/caos/zitadel/internal/v2/business/domain"
 )
@@ -19,6 +20,14 @@ func StartSetupV2(esConfig es_int.Config, sd systemdefaults.SystemDefaults) (*Se
 		iamID: sd.IamID,
 	}
 	es, err := es_int.Start(esConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	setup.IamEvents, err = es_iam.StartIAM(es_iam.IAMConfig{
+		Eventstore: es,
+		Cache:      esConfig.Cache,
+	}, sd)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +77,7 @@ func (s *Setup) ExecuteV2(ctx context.Context, setUpConfig IAMSetUp) error {
 			return err
 		}
 
-		err = step.execute(ctx, *s.Commands)
+		err = step.execute(ctx, iam.AggregateID, *s.Commands)
 		if err != nil {
 			return err
 		}

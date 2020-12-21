@@ -16,6 +16,6 @@ type step interface {
 
 type stepV2 interface {
 	step() iam_model.Step
-	execute(context.Context, command.CommandSide) error
+	execute(context.Context, string, command.CommandSide) error
 	isNil() bool
 }

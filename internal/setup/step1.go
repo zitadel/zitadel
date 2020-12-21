@@ -39,15 +39,8 @@ func (s *Step1) step() iam_model.Step {
 //	s.createdProjects = make(map[string]*proj_model.Project)
 //}
 
-func (s *Step1) execute(ctx context.Context, commands command.CommandSide) error {
-	step2 := command.Step1{
-		GlobalOrg:          "",
-		IAMProject:         "",
-		DefaultLoginPolicy: nil,
-		Orgs:               nil,
-		Owners:             nil,
-	}
-	err := commands.SetupStep1(ctx, "iamID", step2)
+func (s *Step1) execute(ctx context.Context, iamID string, commands command.CommandSide) error {
+	err := commands.SetupStep1(ctx, iamID, s.Step1)
 	if err != nil {
 		logging.Log("SETUP-de342").WithField("step", s.step()).WithError(err).Error("unable to finish setup")
 		return err

@@ -70,11 +70,13 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 Step1)
 		return err
 	}
 	//create default login policy
-	_, err = r.addDefaultLoginPolicy(ctx, iam, &iam_model.LoginPolicy{
-		AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
-		AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
-		AllowExternalIdp:      step1.DefaultLoginPolicy.AllowExternalIdp,
-	})
+	iamAgg, err := r.addDefaultLoginPolicy(ctx,
+		NewIAMLoginPolicyWriteModel(iam.AggregateID),
+		&iam_model.LoginPolicy{
+			AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
+			AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
+			AllowExternalIdp:      step1.DefaultLoginPolicy.AllowExternalIdp,
+		})
 	if err != nil {
 		return err
 	}
@@ -95,24 +97,6 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 Step1)
 			zitadel
 
 	*/
-	_, err = r.setup(ctx, iam, domain.Step1, iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
+	_, err = r.setup(ctx, iamAgg, iam, domain.Step1, iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
 	return err
-}
-
-func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, iam *IAMWriteModel, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mv0s", "Errors.IAM.LoginPolicyInvalid")
-	}
-
-	addedPolicy := NewIAMLoginPolicyWriteModel(policy.AggregateID)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
-	if err != nil {
-		return nil, err
-	}
-	if addedPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LoginPolicy.AlreadyExists")
-	}
-
-	//iamAgg.PushEvents(iam_repo.NewLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType)))
-	return nil, nil
 }

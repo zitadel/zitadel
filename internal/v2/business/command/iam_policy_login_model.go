@@ -32,6 +32,10 @@ func (wm *IAMLoginPolicyWriteModel) AppendEvents(events ...eventstore.EventReade
 	}
 }
 
+func (wm *IAMLoginPolicyWriteModel) IsValid() bool {
+	return wm.AggregateID != ""
+}
+
 func (wm *IAMLoginPolicyWriteModel) Reduce() error {
 	return wm.LoginPolicyWriteModel.Reduce()
 }
