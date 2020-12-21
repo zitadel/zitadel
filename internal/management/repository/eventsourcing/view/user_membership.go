@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
@@ -42,32 +43,32 @@ func (v *View) BulkPutUserMemberships(memberships []*model.UserMembershipView, e
 
 func (v *View) DeleteUserMembership(userID, aggregateID, objectID string, memberType usr_model.MemberType, event *models.Event) error {
 	err := view.DeleteUserMembership(v.Db, userMembershipTable, userID, aggregateID, objectID, memberType)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedUserMembershipSequence(event)
 }
 
 func (v *View) DeleteUserMembershipsByUserID(userID string, event *models.Event) error {
 	err := view.DeleteUserMembershipsByUserID(v.Db, userMembershipTable, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedUserMembershipSequence(event)
 }
 
 func (v *View) DeleteUserMembershipsByAggregateID(aggregateID string, event *models.Event) error {
 	err := view.DeleteUserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedUserMembershipSequence(event)
 }
 
 func (v *View) DeleteUserMembershipsByAggregateIDAndObjectID(aggregateID, objectID string, event *models.Event) error {
 	err := view.DeleteUserMembershipsByAggregateIDAndObjectID(v.Db, userMembershipTable, aggregateID, objectID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedUserMembershipSequence(event)
 }

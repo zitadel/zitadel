@@ -85,7 +85,7 @@ func (m *UserMembership) EventQuery() (*es_models.SearchQuery, error) {
 func (m *UserMembership) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case iam_es_model.IAMAggregate:
-		err = m.processIam(event)
+		err = m.processIAM(event)
 	case org_es_model.OrgAggregate:
 		err = m.processOrg(event)
 	case proj_es_model.ProjectAggregate:
@@ -96,7 +96,7 @@ func (m *UserMembership) Reduce(event *es_models.Event) (err error) {
 	return err
 }
 
-func (m *UserMembership) processIam(event *es_models.Event) (err error) {
+func (m *UserMembership) processIAM(event *es_models.Event) (err error) {
 	member := new(usr_es_model.UserMembershipView)
 	err = member.AppendEvent(event)
 	if err != nil {

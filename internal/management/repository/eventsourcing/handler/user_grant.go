@@ -152,7 +152,6 @@ func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event)
 	}
-	return nil
 }
 
 func (u *UserGrant) processProject(event *es_models.Event) (err error) {
@@ -176,7 +175,6 @@ func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event)
 	}
-	return nil
 }
 
 func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner string) (err error) {

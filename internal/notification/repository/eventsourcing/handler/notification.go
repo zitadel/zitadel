@@ -111,8 +111,6 @@ func (n *Notification) Reduce(event *models.Event) (err error) {
 		err = n.handlePasswordCode(event)
 	case es_model.DomainClaimed:
 		err = n.handleDomainClaimed(event)
-	default:
-		return n.view.ProcessedNotificationSequence(event)
 	}
 	if err != nil {
 		return err

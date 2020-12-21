@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
@@ -37,32 +38,32 @@ func (v *View) PutTokens(token []*model.TokenView, event *models.Event) error {
 
 func (v *View) DeleteToken(tokenID string, event *models.Event) error {
 	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
 func (v *View) DeleteSessionTokens(agentID, userID string, event *models.Event) error {
 	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
 func (v *View) DeleteUserTokens(userID string, event *models.Event) error {
 	err := usr_view.DeleteUserTokens(v.Db, tokenTable, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
 func (v *View) DeleteApplicationTokens(event *models.Event, ids ...string) error {
 	err := usr_view.DeleteApplicationTokens(v.Db, tokenTable, ids)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }

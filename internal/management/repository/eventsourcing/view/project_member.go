@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
@@ -46,8 +47,8 @@ func (v *View) PutProjectMembers(project []*model.ProjectMemberView, event *mode
 
 func (v *View) DeleteProjectMember(projectID, userID string, event *models.Event) error {
 	err := view.DeleteProjectMember(v.Db, projectMemberTable, projectID, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedProjectMemberSequence(event)
 }

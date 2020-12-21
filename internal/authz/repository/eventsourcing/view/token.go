@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -25,16 +26,16 @@ func (v *View) PutToken(token *usr_view_model.TokenView, event *models.Event) er
 
 func (v *View) DeleteToken(tokenID string, event *models.Event) error {
 	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
 func (v *View) DeleteSessionTokens(agentID, userID string, event *models.Event) error {
 	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }

@@ -116,7 +116,10 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 		}
 		return a.view.PutApplications(apps, event)
 	case es_model.ProjectRemoved:
-		return a.view.DeleteApplicationsByProjectID(event.AggregateID)
+		err = a.view.DeleteApplicationsByProjectID(event.AggregateID)
+		if err == nil {
+			return a.view.ProcessedApplicationSequence(event)
+		}
 	default:
 		return a.view.ProcessedApplicationSequence(event)
 	}
