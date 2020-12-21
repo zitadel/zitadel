@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
@@ -30,8 +31,8 @@ func (v *View) PutProject(project *model.ProjectView, event *models.Event) error
 
 func (v *View) DeleteProject(projectID string, event *models.Event) error {
 	err := view.DeleteProject(v.Db, projectTable, projectID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedProjectSequence(event)
 }

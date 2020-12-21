@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
@@ -46,8 +47,8 @@ func (v *View) PutProjectGrantMembers(members []*model.ProjectGrantMemberView, e
 
 func (v *View) DeleteProjectGrantMember(grantID, userID string, event *models.Event) error {
 	err := view.DeleteProjectGrantMember(v.Db, projectGrantMemberTable, grantID, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedProjectGrantMemberSequence(event)
 }

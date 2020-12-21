@@ -125,7 +125,11 @@ func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 		}
 		return p.view.DeleteProjectGrant(grant.GrantID, event)
 	case es_model.ProjectRemoved:
-		return p.view.DeleteProjectGrantsByProjectID(event.AggregateID)
+		err = p.view.DeleteProjectGrantsByProjectID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		return p.view.ProcessedProjectGrantSequence(event)
 	default:
 		return p.view.ProcessedProjectGrantSequence(event)
 	}

@@ -152,7 +152,6 @@ func (i *ExternalIDP) processIdpConfig(event *models.Event) (err error) {
 	default:
 		return i.view.ProcessedExternalIDPSequence(event)
 	}
-	return nil
 }
 
 func (i *ExternalIDP) fillData(externalIDP *usr_view_model.ExternalIDPView) error {

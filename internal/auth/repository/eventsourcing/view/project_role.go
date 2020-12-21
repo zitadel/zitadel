@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
@@ -42,8 +43,8 @@ func (v *View) PutProjectRole(role *model.ProjectRoleView, event *models.Event) 
 
 func (v *View) DeleteProjectRole(projectID, orgID, key string, event *models.Event) error {
 	err := view.DeleteProjectRole(v.Db, projectRoleTable, projectID, orgID, key)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedProjectRoleSequence(event)
 }

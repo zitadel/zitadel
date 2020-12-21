@@ -70,7 +70,7 @@ func (q *SearchQuery) ResourceOwnerFilter(resourceOwner string) *SearchQuery {
 
 func (q *SearchQuery) setFilter(filter *Filter) *SearchQuery {
 	for i, f := range q.Filters {
-		if f.field == filter.field {
+		if f.field == filter.field && f.field != Field_LatestSequence {
 			q.Filters[i] = filter
 			return q
 		}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -11,8 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/view/repository"
-
-	"time"
 )
 
 type Spooler struct {
@@ -71,14 +70,26 @@ func (s *spooledHandler) load(workerID string) {
 	hasLocked := s.lock(ctx, errs, workerID)
 
 	if <-hasLocked {
-		events, err := s.query(ctx)
-		if err != nil {
-			errs <- err
-		} else {
-			errs <- s.process(ctx, events, workerID)
-			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("process done")
+		for {
+			events, err := s.query(ctx)
+			if err != nil {
+				errs <- err
+				break
+			}
+			err = s.process(ctx, events, workerID)
+			if err != nil {
+				errs <- err
+				break
+			}
+			if uint64(len(events)) < s.QueryLimit() {
+				// no more events to process
+				// stop chan
+				if ctx.Err() == nil {
+					errs <- nil
+				}
+				break
+			}
 		}
-
 	}
 	<-ctx.Done()
 }
@@ -92,14 +103,19 @@ func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID str
 }
 
 func (s *spooledHandler) process(ctx context.Context, events []*models.Event, workerID string) error {
-	for _, event := range events {
+	for i, event := range events {
 		select {
 		case <-ctx.Done():
 			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).Debug("context canceled")
 			return nil
 		default:
 			if err := s.Reduce(event); err != nil {
-				return s.OnError(event, err)
+				err = s.OnError(event, err)
+				if err == nil {
+					continue
+				}
+				time.Sleep(100 * time.Millisecond)
+				return s.process(ctx, events[i:], workerID)
 			}
 		}
 	}
@@ -167,7 +183,8 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 func HandleError(event *models.Event, failedErr error,
 	latestFailedEvent func(sequence uint64) (*repository.FailedEvent, error),
 	processFailedEvent func(*repository.FailedEvent) error,
-	processSequence func(*models.Event) error, errorCountUntilSkip uint64) error {
+	processSequence func(*models.Event) error,
+	errorCountUntilSkip uint64) error {
 	failedEvent, err := latestFailedEvent(event.Sequence)
 	if err != nil {
 		return err
@@ -181,7 +198,7 @@ func HandleError(event *models.Event, failedErr error,
 	if errorCountUntilSkip <= failedEvent.FailureCount {
 		return processSequence(event)
 	}
-	return nil
+	return failedErr
 }
 
 func HandleSuccess(updateSpoolerRunTimestamp func() error) error {

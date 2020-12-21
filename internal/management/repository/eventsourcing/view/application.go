@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
@@ -26,7 +27,7 @@ func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) 
 
 func (v *View) PutApplication(app *model.ApplicationView, event *models.Event) error {
 	err := view.PutApplication(v.Db, applicationTable, app)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedApplicationSequence(event)
@@ -43,7 +44,7 @@ func (v *View) PutApplications(apps []*model.ApplicationView, event *models.Even
 func (v *View) DeleteApplication(appID string, event *models.Event) error {
 	err := view.DeleteApplication(v.Db, applicationTable, appID)
 	if err != nil {
-		return nil
+		return err
 	}
 	return v.ProcessedApplicationSequence(event)
 }

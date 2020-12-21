@@ -22,6 +22,7 @@ type testHandler struct {
 	queryError    error
 	viewModel     string
 	bulkLimit     uint64
+	maxErrCount   int
 }
 
 func (h *testHandler) AggregateTypes() []models.AggregateType {
@@ -50,6 +51,10 @@ func (h *testHandler) Reduce(*models.Event) error {
 	return h.processError
 }
 func (h *testHandler) OnError(event *models.Event, err error) error {
+	if h.maxErrCount == 2 {
+		return nil
+	}
+	h.maxErrCount++
 	return err
 }
 func (h *testHandler) OnSuccess() error {
@@ -93,17 +98,18 @@ func (es *eventstoreStub) LatestSequence(ctx context.Context, in *models.SearchQ
 
 func TestSpooler_process(t *testing.T) {
 	type fields struct {
-		currentHandler query.Handler
+		currentHandler *testHandler
 	}
 	type args struct {
 		timeout time.Duration
 		events  []*models.Event
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name        string
+		fields      fields
+		args        args
+		wantErr     bool
+		wantRetries int
 	}{
 		{
 			name: "process all events",
@@ -135,7 +141,8 @@ func TestSpooler_process(t *testing.T) {
 			args: args{
 				events: []*models.Event{{}, {}},
 			},
-			wantErr: true,
+			wantErr:     false,
+			wantRetries: 2,
 		},
 	}
 	for _, tt := range tests {
@@ -153,6 +160,9 @@ func TestSpooler_process(t *testing.T) {
 
 			if err := s.process(ctx, tt.args.events, "test"); (err != nil) != tt.wantErr {
 				t.Errorf("Spooler.process() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.fields.currentHandler.maxErrCount != tt.wantRetries {
+				t.Errorf("Spooler.process() wrong retry count got: %d want %d", tt.fields.currentHandler.maxErrCount, tt.wantRetries)
 			}
 
 			elapsed := time.Since(start).Round(1 * time.Second)
@@ -222,14 +232,14 @@ func TestSpooler_load(t *testing.T) {
 		{
 			"lock exists",
 			fields{
-				currentHandler: &testHandler{processSleep: 500 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second},
+				currentHandler: &testHandler{processSleep: 500 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second, bulkLimit: 10},
 				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, fmt.Errorf("lock already exists"), 2000*time.Millisecond),
 			},
 		},
 		{
 			"lock fails",
 			fields{
-				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second},
+				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second, bulkLimit: 10},
 				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, fmt.Errorf("fail"), 2000*time.Millisecond),
 				eventstore:     &eventstoreStub{events: []*models.Event{{}}},
 			},
@@ -237,7 +247,7 @@ func TestSpooler_load(t *testing.T) {
 		{
 			"query fails",
 			fields{
-				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", queryError: fmt.Errorf("query fail"), cycleDuration: 1 * time.Second},
+				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", queryError: fmt.Errorf("query fail"), cycleDuration: 1 * time.Second, bulkLimit: 10},
 				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 2000*time.Millisecond),
 				eventstore:     &eventstoreStub{err: fmt.Errorf("fail")},
 			},
@@ -245,8 +255,8 @@ func TestSpooler_load(t *testing.T) {
 		{
 			"process event fails",
 			fields{
-				currentHandler: &testHandler{processError: fmt.Errorf("oups"), processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 500 * time.Millisecond},
-				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 1000*time.Millisecond),
+				currentHandler: &testHandler{processError: fmt.Errorf("oups"), processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 500 * time.Millisecond, bulkLimit: 10},
+				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 1000*time.Millisecond).expectRenew(t, nil, 1000*time.Millisecond),
 				eventstore:     &eventstoreStub{events: []*models.Event{{}}},
 			},
 		},
@@ -433,6 +443,7 @@ func TestHandleError(t *testing.T) {
 			},
 			res: res{
 				shouldProcessSequence: false,
+				wantErr:               true,
 			},
 		},
 	}
