@@ -58,10 +58,12 @@ func ReduceEvent(handler Handler, event *models.Event) {
 			processedSequences[unprocessedEvent.AggregateType] = currentSequence
 		}
 		if processedSequences[unprocessedEvent.AggregateType] != currentSequence {
-			logging.LogWithFields("QUERY-DOYVN",
-				"processed", processedSequences[unprocessedEvent.AggregateType],
-				"current", currentSequence).
-				Warn("sequence not matching")
+			if currentSequence < processedSequences[unprocessedEvent.AggregateType] {
+				logging.LogWithFields("QUERY-DOYVN",
+					"processed", processedSequences[unprocessedEvent.AggregateType],
+					"current", currentSequence).
+					Warn("sequence not matching")
+			}
 			return
 		}
 
