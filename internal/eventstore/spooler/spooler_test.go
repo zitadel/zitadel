@@ -51,7 +51,7 @@ func (h *testHandler) Reduce(*models.Event) error {
 	return h.processError
 }
 func (h *testHandler) OnError(event *models.Event, err error) error {
-	if h.maxErrCount == 1 {
+	if h.maxErrCount == 2 {
 		return nil
 	}
 	h.maxErrCount++
@@ -142,7 +142,7 @@ func TestSpooler_process(t *testing.T) {
 				events: []*models.Event{{}, {}},
 			},
 			wantErr:     false,
-			wantRetries: 1,
+			wantRetries: 2,
 		},
 	}
 	for _, tt := range tests {

@@ -112,9 +112,9 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 			if err := s.Reduce(event); err != nil {
 				err = s.OnError(event, err)
 				if err == nil {
-					return nil
+					continue
 				}
-				time.Sleep(500 * time.Millisecond)
+				time.Sleep(100 * time.Millisecond)
 				return s.process(ctx, events[i:], workerID)
 			}
 		}
