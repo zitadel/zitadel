@@ -183,7 +183,8 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 func HandleError(event *models.Event, failedErr error,
 	latestFailedEvent func(sequence uint64) (*repository.FailedEvent, error),
 	processFailedEvent func(*repository.FailedEvent) error,
-	processSequence func(*models.Event) error, errorCountUntilSkip uint64) error {
+	processSequence func(*models.Event) error,
+	errorCountUntilSkip uint64) error {
 	failedEvent, err := latestFailedEvent(event.Sequence)
 	if err != nil {
 		return err
@@ -195,11 +196,9 @@ func HandleError(event *models.Event, failedErr error,
 		return err
 	}
 	if errorCountUntilSkip <= failedEvent.FailureCount {
-		err = processSequence(event)
-		logging.Log("SPOOL-Gg20m").OnError(err).Warn("unable to set failure count")
-		return failedErr
+		return processSequence(event)
 	}
-	return nil
+	return failedErr
 }
 
 func HandleSuccess(updateSpoolerRunTimestamp func() error) error {

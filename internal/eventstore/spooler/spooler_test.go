@@ -98,17 +98,18 @@ func (es *eventstoreStub) LatestSequence(ctx context.Context, in *models.SearchQ
 
 func TestSpooler_process(t *testing.T) {
 	type fields struct {
-		currentHandler query.Handler
+		currentHandler *testHandler
 	}
 	type args struct {
 		timeout time.Duration
 		events  []*models.Event
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name        string
+		fields      fields
+		args        args
+		wantErr     bool
+		wantRetries int
 	}{
 		{
 			name: "process all events",
@@ -140,7 +141,8 @@ func TestSpooler_process(t *testing.T) {
 			args: args{
 				events: []*models.Event{{}, {}},
 			},
-			wantErr: true,
+			wantErr:     false,
+			wantRetries: 1,
 		},
 	}
 	for _, tt := range tests {
@@ -158,6 +160,9 @@ func TestSpooler_process(t *testing.T) {
 
 			if err := s.process(ctx, tt.args.events, "test"); (err != nil) != tt.wantErr {
 				t.Errorf("Spooler.process() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.fields.currentHandler.maxErrCount != tt.wantRetries {
+				t.Errorf("Spooler.process() wrong retry count got: %d want %d", tt.fields.currentHandler.maxErrCount, tt.wantRetries)
 			}
 
 			elapsed := time.Since(start).Round(1 * time.Second)
@@ -438,6 +443,7 @@ func TestHandleError(t *testing.T) {
 			},
 			res: res{
 				shouldProcessSequence: false,
+				wantErr:               true,
 			},
 		},
 	}
