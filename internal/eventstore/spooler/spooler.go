@@ -71,27 +71,32 @@ func (s *spooledHandler) load(workerID string) {
 
 	if <-hasLocked {
 		for {
-			events, err := s.query(ctx)
-			if err != nil {
-				errs <- err
-				break
-			} else {
-				err = s.process(ctx, events, workerID)
-				if err != nil {
-					errs <- err
-					break
-				}
-			}
-			if uint64(len(events)) < s.QueryLimit() {
-				// no more events to process
-				// stop chan
+			err := s.processAllEvents(ctx, workerID)
+			if err == nil {
 				errs <- nil
 				break
 			}
 		}
-
 	}
 	<-ctx.Done()
+}
+
+func (s *spooledHandler) processAllEvents(ctx context.Context, workerID string) error {
+	for {
+		events, err := s.query(ctx)
+		if err != nil {
+			return err
+		}
+		err = s.process(ctx, events, workerID)
+		if err != nil {
+			return err
+		}
+		if uint64(len(events)) < s.QueryLimit() {
+			// no more events to process
+			// stop chan
+			return nil
+		}
+	}
 }
 
 func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID string) {
@@ -190,7 +195,9 @@ func HandleError(event *models.Event, failedErr error,
 		return err
 	}
 	if errorCountUntilSkip <= failedEvent.FailureCount {
-		return processSequence(event)
+		err = processSequence(event)
+		logging.Log("SPOOL-Gg20m").OnError(err).Warn("unable to set failure count")
+		return failedErr
 	}
 	return nil
 }
