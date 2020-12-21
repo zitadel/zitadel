@@ -6,6 +6,7 @@ package mock
 
 import (
 	context "context"
+	eventstore "github.com/caos/zitadel/internal/eventstore"
 	models "github.com/caos/zitadel/internal/eventstore/models"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
@@ -109,4 +110,22 @@ func (mr *MockEventstoreMockRecorder) PushAggregates(arg0 interface{}, arg1 ...i
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushAggregates", reflect.TypeOf((*MockEventstore)(nil).PushAggregates), varargs...)
+}
+
+// Subscribe mocks base method
+func (m *MockEventstore) Subscribe(arg0 ...models.AggregateType) *eventstore.Subscription {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{}
+	for _, a := range arg0 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Subscribe", varargs...)
+	ret0, _ := ret[0].(*eventstore.Subscription)
+	return ret0
+}
+
+// Subscribe indicates an expected call of Subscribe
+func (mr *MockEventstoreMockRecorder) Subscribe(arg0 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockEventstore)(nil).Subscribe), arg0...)
 }

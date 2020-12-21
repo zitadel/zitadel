@@ -2,9 +2,11 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -14,9 +16,14 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+)
+
+const (
+	externalIDPTable = "adminapi.user_external_idps"
 )
 
 type ExternalIDP struct {
@@ -24,23 +31,59 @@ type ExternalIDP struct {
 	systemDefaults systemdefaults.SystemDefaults
 	iamEvents      *eventsourcing.IAMEventstore
 	orgEvents      *org_es.OrgEventstore
+	subscription   *eventstore.Subscription
 }
 
-const (
-	externalIDPTable = "adminapi.user_external_idps"
-)
+func newExternalIDP(
+	handler handler,
+	systemDefaults systemdefaults.SystemDefaults,
+	iamEvents *eventsourcing.IAMEventstore,
+	orgEvents *org_es.OrgEventstore,
+) *ExternalIDP {
+	h := &ExternalIDP{
+		handler:        handler,
+		systemDefaults: systemDefaults,
+		iamEvents:      iamEvents,
+		orgEvents:      orgEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (i *ExternalIDP) subscribe() {
+	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
+	go func() {
+		for event := range i.subscription.Events {
+			query.ReduceEvent(i, event)
+		}
+	}()
+}
 
 func (i *ExternalIDP) ViewModel() string {
 	return externalIDPTable
 }
 
+func (i *ExternalIDP) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
+}
+
+func (i *ExternalIDP) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := i.view.GetLatestExternalIDPSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (i *ExternalIDP) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestExternalIDPSequence()
+	sequence, err := i.view.GetLatestExternalIDPSequence("")
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate).
+		AggregateTypeFilter(i.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -68,16 +111,16 @@ func (i *ExternalIDP) processUser(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event.Sequence, event.CreationDate)
+		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event)
 	case model.UserRemoved:
-		return i.view.DeleteExternalIDPsByUserID(event.AggregateID, event.Sequence, event.CreationDate)
+		return i.view.DeleteExternalIDPsByUserID(event.AggregateID, event)
 	default:
-		return i.view.ProcessedExternalIDPSequence(event.Sequence, event.CreationDate)
+		return i.view.ProcessedExternalIDPSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return i.view.PutExternalIDP(externalIDP, externalIDP.Sequence, event.CreationDate)
+	return i.view.PutExternalIDP(externalIDP, event)
 }
 
 func (i *ExternalIDP) processIdpConfig(event *models.Event) (err error) {
@@ -105,9 +148,9 @@ func (i *ExternalIDP) processIdpConfig(event *models.Event) (err error) {
 		for _, provider := range exterinalIDPs {
 			i.fillConfigData(provider, config)
 		}
-		return i.view.PutExternalIDPs(event.Sequence, event.CreationDate, exterinalIDPs...)
+		return i.view.PutExternalIDPs(event, exterinalIDPs...)
 	default:
-		return i.view.ProcessedExternalIDPSequence(event.Sequence, event.CreationDate)
+		return i.view.ProcessedExternalIDPSequence(event)
 	}
 	return nil
 }

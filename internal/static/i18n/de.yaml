@@ -4,6 +4,8 @@ Errors:
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
+    NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     UserIDMissing: User ID fehlt
     OrgIamPolicyNil: Organisations Policy ist leer
     EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
@@ -320,8 +322,32 @@ EventTypes:
           check:
             succeeded: Multifaktor OTP Verifikation erfolgreich
             failed: Multifaktor OTP Verifikation fehlgeschlagen
+        u2f:
+          token:
+            added: Multifaktor U2F Token hinzugefügt
+            verified: Multifaktor U2F Token verifiziert
+            removed: Multifaktor U2F Token entfernt
+            begin:
+              login: Multifaktor U2F Verifikation begonnen
+            check:
+              succeeded: Multifaktor U2F Verifikation erfolgreich
+              failed: Multifaktor U2F Verifikation fehlgeschlagen
+            signcount:
+              changed: Prüfsumme des Multifaktor U2F Tokens wurde verändert
         init:
           skipped: Multifaktor Initialisierung übersprungen
+      passwordless:
+        token:
+          added: Token für Passwortlos Login hinzugefügt
+          verified: Token für Passwortlos Login verifiziert
+          removed: Token für Passwortlos Login entfernt
+          begin:
+            login: Verifikation für Passwortlos Login begonnen
+          check:
+            succeeded: Verifikation für Passwortlos Login erfolgreich
+            failed: Verifikation für Passwortlos Login fehlgeschlagen
+          signcount:
+            changed: Prüfsumme des Tokens für Passwortlos Login wurde verändert
       signed:
         out: Benutzer erfolgreich abgemeldet
     locked: Benutzer gesperrt
@@ -420,9 +446,16 @@ EventTypes:
       login:
         added: Login Richtlinie hinzugefügt
         changed: Login Richtlinie geändert
+        removed: Login Richtline gelöscht
         idpprovider:
           added: Idp Provider zu Login Richtlinie hinzugefügt
           removed: Idp Provider aus Login Richtlinie gelöscht
+        secondfactor:
+          added: Zweitfaktor zu Login Richtlinie hinzugefügt
+          removed: Zweitfaktor aus Login Richtlinie gelöscht
+        multifactor:
+          added: Multifaktor zu Login Richtlinie hinzugefügt
+          removed: Multifaktor aus Login Richtlinie gelöscht
       password:
         complexity:
           added: Passwort Komplexitäts Richtlinie hinzugefügt

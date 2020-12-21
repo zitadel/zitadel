@@ -367,13 +367,14 @@ func (u *UserView) addPasswordlessToken(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	for _, t := range u.PasswordlessTokens {
+	for i, t := range u.PasswordlessTokens {
 		if t.State == int32(model.MFAStateNotReady) {
-			t = token
+			u.PasswordlessTokens[i].ID = token.ID
 			return nil
 		}
 	}
-	u.U2FTokens = append(u.U2FTokens, token)
+	token.State = int32(model.MFAStateNotReady)
+	u.PasswordlessTokens = append(u.PasswordlessTokens, token)
 	return nil
 }
 
@@ -413,12 +414,13 @@ func (u *UserView) addU2FToken(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	for _, t := range u.U2FTokens {
+	for i, t := range u.U2FTokens {
 		if t.State == int32(model.MFAStateNotReady) {
-			t = token
+			u.U2FTokens[i].ID = token.ID
 			return nil
 		}
 	}
+	token.State = int32(model.MFAStateNotReady)
 	u.U2FTokens = append(u.U2FTokens, token)
 	return nil
 }

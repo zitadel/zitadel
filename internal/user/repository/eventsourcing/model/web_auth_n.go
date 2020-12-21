@@ -17,11 +17,12 @@ type WebAuthNToken struct {
 	Challenge       string `json:"challenge"`
 	State           int32  `json:"-"`
 
-	KeyID           []byte `json:"keyId"`
-	PublicKey       []byte `json:"publicKey"`
-	AttestationType string `json:"attestationType"`
-	AAGUID          []byte `json:"aaguid"`
-	SignCount       uint32 `json:"signCount"`
+	KeyID             []byte `json:"keyId"`
+	PublicKey         []byte `json:"publicKey"`
+	AttestationType   string `json:"attestationType"`
+	AAGUID            []byte `json:"aaguid"`
+	SignCount         uint32 `json:"signCount"`
+	WebAuthNTokenName string `json:"webAuthNTokenName"`
 }
 
 type WebAuthNVerify struct {
@@ -32,6 +33,7 @@ type WebAuthNVerify struct {
 	AAGUID            []byte `json:"aaguid"`
 	SignCount         uint32 `json:"signCount"`
 	WebAuthNTokenName string `json:"webAuthNTokenName"`
+	UserAgentID       string `json:"userAgentID,omitempty"`
 }
 
 type WebAuthNSignCount struct {
@@ -78,33 +80,35 @@ func WebAuthNsFromModel(u2fs []*model.WebAuthNToken) []*WebAuthNToken {
 
 func WebAuthNFromModel(webAuthN *model.WebAuthNToken) *WebAuthNToken {
 	return &WebAuthNToken{
-		ObjectRoot:      webAuthN.ObjectRoot,
-		WebauthNTokenID: webAuthN.WebAuthNTokenID,
-		Challenge:       webAuthN.Challenge,
-		State:           int32(webAuthN.State),
-		KeyID:           webAuthN.KeyID,
-		PublicKey:       webAuthN.PublicKey,
-		AAGUID:          webAuthN.AAGUID,
-		SignCount:       webAuthN.SignCount,
-		AttestationType: webAuthN.AttestationType,
+		ObjectRoot:        webAuthN.ObjectRoot,
+		WebauthNTokenID:   webAuthN.WebAuthNTokenID,
+		Challenge:         webAuthN.Challenge,
+		State:             int32(webAuthN.State),
+		KeyID:             webAuthN.KeyID,
+		PublicKey:         webAuthN.PublicKey,
+		AAGUID:            webAuthN.AAGUID,
+		SignCount:         webAuthN.SignCount,
+		AttestationType:   webAuthN.AttestationType,
+		WebAuthNTokenName: webAuthN.WebAuthNTokenName,
 	}
 }
 
 func WebAuthNToModel(webAuthN *WebAuthNToken) *model.WebAuthNToken {
 	return &model.WebAuthNToken{
-		ObjectRoot:      webAuthN.ObjectRoot,
-		WebAuthNTokenID: webAuthN.WebauthNTokenID,
-		Challenge:       webAuthN.Challenge,
-		State:           model.MFAState(webAuthN.State),
-		KeyID:           webAuthN.KeyID,
-		PublicKey:       webAuthN.PublicKey,
-		AAGUID:          webAuthN.AAGUID,
-		SignCount:       webAuthN.SignCount,
-		AttestationType: webAuthN.AttestationType,
+		ObjectRoot:        webAuthN.ObjectRoot,
+		WebAuthNTokenID:   webAuthN.WebauthNTokenID,
+		Challenge:         webAuthN.Challenge,
+		State:             model.MFAState(webAuthN.State),
+		KeyID:             webAuthN.KeyID,
+		PublicKey:         webAuthN.PublicKey,
+		AAGUID:            webAuthN.AAGUID,
+		SignCount:         webAuthN.SignCount,
+		AttestationType:   webAuthN.AttestationType,
+		WebAuthNTokenName: webAuthN.WebAuthNTokenName,
 	}
 }
 
-func WebAuthNVerifyFromModel(webAuthN *model.WebAuthNToken) *WebAuthNVerify {
+func WebAuthNVerifyFromModel(webAuthN *model.WebAuthNToken, userAgentID string) *WebAuthNVerify {
 	return &WebAuthNVerify{
 		WebAuthNTokenID:   webAuthN.WebAuthNTokenID,
 		KeyID:             webAuthN.KeyID,
@@ -113,6 +117,7 @@ func WebAuthNVerifyFromModel(webAuthN *model.WebAuthNToken) *WebAuthNVerify {
 		SignCount:         webAuthN.SignCount,
 		AttestationType:   webAuthN.AttestationType,
 		WebAuthNTokenName: webAuthN.WebAuthNTokenName,
+		UserAgentID:       userAgentID,
 	}
 }
 
@@ -146,6 +151,14 @@ func WebAuthNLoginToModel(webAuthN *WebAuthNLogin) *model.WebAuthNLogin {
 		Challenge:   webAuthN.Challenge,
 		AuthRequest: AuthRequestToModel(webAuthN.AuthRequest),
 	}
+}
+
+func (w *WebAuthNVerify) SetData(event *es_models.Event) error {
+	if err := json.Unmarshal(event.Data, w); err != nil {
+		logging.Log("EVEN-G342rf").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(err, "MODEL-B6641", "could not unmarshal event")
+	}
+	return nil
 }
 
 func (u *Human) appendU2FAddedEvent(event *es_models.Event) error {

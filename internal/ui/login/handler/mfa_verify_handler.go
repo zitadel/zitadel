@@ -35,6 +35,15 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderMFAVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, verificationStep *model.MFAVerificationStep, err error) {
+	if verificationStep == nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	provider := verificationStep.MFAProviders[len(verificationStep.MFAProviders)-1]
+	l.renderMFAVerifySelected(w, r, authReq, verificationStep, provider, err)
+}
+
+func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, verificationStep *model.MFAVerificationStep, selectedProvider model.MFAType, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -44,13 +53,26 @@ func (l *Login) renderMFAVerify(w http.ResponseWriter, r *http.Request, authReq 
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	switch verificationStep.MFAProviders[len(verificationStep.MFAProviders)-1] {
+	switch selectedProvider {
 	case model.MFATypeU2F:
-		l.renderU2FVerification(w, r, authReq, nil)
+		l.renderU2FVerification(w, r, authReq, removeSelectedProviderFromList(verificationStep.MFAProviders, model.MFATypeU2F), nil)
 		return
 	case model.MFATypeOTP:
-		data.MFAProviders = verificationStep.MFAProviders
+		data.MFAProviders = removeSelectedProviderFromList(verificationStep.MFAProviders, model.MFATypeOTP)
 		data.SelectedMFAProvider = model.MFATypeOTP
+	default:
+		l.renderError(w, r, authReq, err)
+		return
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMFAVerify], data, nil)
+}
+
+func removeSelectedProviderFromList(providers []model.MFAType, selected model.MFAType) []model.MFAType {
+	for i := len(providers) - 1; i >= 0; i-- {
+		if providers[i] == selected {
+			copy(providers[i:], providers[i+1:])
+			return providers[:len(providers)-1]
+		}
+	}
+	return providers
 }

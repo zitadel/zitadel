@@ -13,6 +13,7 @@ import (
 func main() {
 	orbconfig := flag.String("orbconfig", "~/.orb/config", "The orbconfig file to use")
 	kubeconfig := flag.String("kubeconfig", "~/.kube/config", "The kubeconfig file to use")
+	version := flag.String("version", "", "The ZITADEL version to deploy")
 	verbose := flag.Bool("verbose", false, "Print debug levelled logs")
 
 	flag.Parse()
@@ -21,6 +22,10 @@ func main() {
 		OnInfo:   mntr.LogMessage,
 		OnChange: mntr.LogMessage,
 		OnError:  mntr.LogError,
+	}
+
+	if *version == "" {
+		panic("flag --version is missing")
 	}
 
 	if *verbose {
@@ -32,13 +37,12 @@ func main() {
 		panic(err)
 	}
 
-	version := "0.108.4"
 	if err := start.Operator(
 		monitor,
 		helpers.PruneHome(*orbconfig),
 		kubernetes.NewK8sClient(monitor, strPtr(string(kc))),
 		"./migrations/cockroach/",
-		&version,
+		version,
 	); err != nil {
 		panic(err)
 	}

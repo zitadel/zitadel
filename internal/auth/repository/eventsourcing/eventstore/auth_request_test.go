@@ -56,8 +56,9 @@ type mockViewUserSession struct {
 }
 
 type mockUser struct {
-	UserID    string
-	LoginName string
+	UserID        string
+	LoginName     string
+	ResourceOwner string
 }
 
 func (m *mockViewUserSession) UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error) {
@@ -74,8 +75,9 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string) ([]*user_view_model.
 	sessions := make([]*user_view_model.UserSessionView, len(m.Users))
 	for i, user := range m.Users {
 		sessions[i] = &user_view_model.UserSessionView{
-			UserID:    user.UserID,
-			LoginName: user.LoginName,
+			UserID:        user.UserID,
+			LoginName:     user.LoginName,
+			ResourceOwner: user.ResourceOwner,
 		}
 	}
 	return sessions, nil
@@ -270,10 +272,12 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						{
 							"id1",
 							"loginname1",
+							"orgID1",
 						},
 						{
 							"id2",
 							"loginname2",
+							"orgID2",
 						},
 					},
 				},
@@ -285,12 +289,52 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				&model.SelectUserStep{
 					Users: []model.UserSelection{
 						{
-							UserID:    "id1",
-							LoginName: "loginname1",
+							UserID:            "id1",
+							LoginName:         "loginname1",
+							SelectionPossible: true,
 						},
 						{
-							UserID:    "id2",
-							LoginName: "loginname2",
+							UserID:            "id2",
+							LoginName:         "loginname2",
+							SelectionPossible: true,
+						},
+					},
+				}},
+			nil,
+		},
+		{
+			"user not set, primary domain set, prompt select account, login and select account steps",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					Users: []mockUser{
+						{
+							"id1",
+							"loginname1",
+							"orgID1",
+						},
+						{
+							"id2",
+							"loginname2",
+							"orgID2",
+						},
+					},
+				},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&model.AuthRequest{Prompt: model.PromptSelectAccount, RequestedOrgID: "orgID1"}, false},
+			[]model.NextStep{
+				&model.LoginStep{},
+				&model.SelectUserStep{
+					Users: []model.UserSelection{
+						{
+							UserID:            "id1",
+							LoginName:         "loginname1",
+							SelectionPossible: true,
+						},
+						{
+							UserID:            "id2",
+							LoginName:         "loginname2",
+							SelectionPossible: false,
 						},
 					},
 				}},
@@ -386,7 +430,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{}}, false},
 			[]model.NextStep{&model.PasswordStep{}},
 			nil,
 		},
@@ -431,7 +475,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
 				MultiFactorCheckLifeTime: 10 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{PasswordlessType: iam_model.PasswordlessTypeAllowed}}, false},
 			[]model.NextStep{&model.PasswordlessStep{}},
 			nil,
 		},
@@ -456,7 +500,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			args{&model.AuthRequest{
 				UserID: "UserID",
 				LoginPolicy: &iam_model.LoginPolicyView{
-					MultiFactors: []iam_model.MultiFactorType{iam_model.MultiFactorTypeU2FWithPIN},
+					PasswordlessType: iam_model.PasswordlessTypeAllowed,
+					MultiFactors:     []iam_model.MultiFactorType{iam_model.MultiFactorTypeU2FWithPIN},
 				},
 			}, false},
 			[]model.NextStep{&model.VerifyEMailStep{}},
@@ -470,7 +515,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider:       &mockEventUser{},
 				orgViewProvider:         &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{}}, false},
 			[]model.NextStep{&model.InitPasswordStep{}},
 			nil,
 		},
@@ -534,7 +579,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:       &mockViewOrg{State: org_model.OrgStateActive},
 				PasswordCheckLifeTime: 10 * 24 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{}}, false},
 			[]model.NextStep{&model.PasswordStep{}},
 			nil,
 		},
@@ -564,6 +609,35 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					LoginPolicy:         &iam_model.LoginPolicyView{},
 				}, false},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"password verified, passwordless set up, mfa not verified, mfa check step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:        true,
+					PasswordlessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MFAStateReady)}},
+					OTPState:           int32(user_model.MFAStateReady),
+					MFAMaxSetUp:        int32(model.MFALevelMultiFactor),
+				},
+				userEventProvider:         &mockEventUser{},
+				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
+				PasswordCheckLifeTime:     10 * 24 * time.Hour,
+				SecondFactorCheckLifeTime: 18 * time.Hour,
+			},
+			args{
+				&model.AuthRequest{
+					UserID: "UserID",
+					LoginPolicy: &iam_model.LoginPolicyView{
+						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+					},
+				}, false},
+			[]model.NextStep{&model.MFAVerificationStep{
+				MFAProviders: []model.MFAType{model.MFATypeOTP},
+			}},
 			nil,
 		},
 		{
@@ -843,6 +917,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			args{
 				&model.AuthRequest{
 					UserID:              "UserID",
+					LoginPolicy:         &iam_model.LoginPolicyView{},
 					SelectedIDPConfigID: "IDPConfigID",
 					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
 				}, false},
@@ -1208,7 +1283,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventErrUser{},
 				user:          &user_model.UserView{ID: "id"},
 			},
-			&user_model.UserSessionView{},
+			&user_model.UserSessionView{UserID: "id"},
 			nil,
 		},
 		{

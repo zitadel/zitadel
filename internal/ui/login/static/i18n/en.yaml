@@ -6,6 +6,7 @@ Login:
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
   ExternalLogin: Login with an external user.
+  MustBeMemberOfOrg: The user must be mermber of the {{.OrgDomain}} organisation.
 
 UserSelection:
   Title: Select account
@@ -15,6 +16,7 @@ UserSelection:
   OtherUser: Other User
   SessionState0: active
   SessionState1: inactive
+  MustBeMemberOfOrg: The user must be mermber of the {{.OrgDomain}} organisation.
 
 Password:
   Title: Password
@@ -63,6 +65,11 @@ InitUserDone:
   Title: User activated
   Description: Email verified and Password successfully set
 
+MFA:
+  Provider0: OTP (One Time Password)
+  Provider1: U2F (Universal 2nd Factor)
+  ChooseOther: or choose an other option
+
 MFAPrompt:
   Title: Multifactor Setup
   Description: Would you like to setup multifactor authentication?
@@ -78,7 +85,7 @@ MFAInitVerify:
 
 MFAInitDone:
   Title: Multifcator Verification done
-  Description: Multifactor verification successfully done. The multifactor has to be entered on each login, even in the actual authentification process.
+  Description: Multifactor verification successfully done. The multifactor has to be entered on each login.
 
 MFAInitU2F:
   Title: Multifactor Setup U2F / WebAuthN
@@ -202,6 +209,7 @@ Actions:
   RegisterToken: Register Token
   ValidateToken: Validate Token
   Recreate: recreate
+  PasswordLogin: Login with password
 
 Errors:
   Internal: An internal error occured
@@ -211,6 +219,8 @@ Errors:
     RequestTypeNotSupported: Request type is not supported
   User:
     NotFound: User could not be found
+    NotFoundOnOrg: User could not be found on chosen organisation
+    NotAllowedOrg: User is no member of the required organisation
     NotMatchingUserID: User and user in authrequest don't match
     UserIDMissing: UserID is empty
     Invalid: Invalid userdata

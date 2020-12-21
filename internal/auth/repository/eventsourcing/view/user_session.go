@@ -1,10 +1,10 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -27,36 +27,36 @@ func (v *View) ActiveUserSessions() ([]*model.UserSessionView, error) {
 	return view.ActiveUserSessions(v.Db, userSessionTable)
 }
 
-func (v *View) PutUserSession(userSession *model.UserSessionView, eventTimestamp time.Time) error {
+func (v *View) PutUserSession(userSession *model.UserSessionView, event *models.Event) error {
 	err := view.PutUserSession(v.Db, userSessionTable, userSession)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserSessionSequence(userSession.Sequence, eventTimestamp)
+	return v.ProcessedUserSessionSequence(event)
 }
 
-func (v *View) PutUserSessions(userSession []*model.UserSessionView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutUserSessions(userSession []*model.UserSessionView, event *models.Event) error {
 	err := view.PutUserSessions(v.Db, userSessionTable, userSession...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserSessionSequence(sequence, eventTimestamp)
+	return v.ProcessedUserSessionSequence(event)
 }
 
-func (v *View) DeleteUserSessions(userID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteUserSessions(userID string, event *models.Event) error {
 	err := view.DeleteUserSessions(v.Db, userSessionTable, userID)
 	if err != nil {
 		return nil
 	}
-	return v.ProcessedUserSessionSequence(eventSequence, eventTimestamp)
+	return v.ProcessedUserSessionSequence(event)
 }
 
-func (v *View) GetLatestUserSessionSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(userSessionTable)
+func (v *View) GetLatestUserSessionSequence(aggregateType string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(userSessionTable, aggregateType)
 }
 
-func (v *View) ProcessedUserSessionSequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(userSessionTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedUserSessionSequence(event *models.Event) error {
+	return v.saveCurrentSequence(userSessionTable, event)
 }
 
 func (v *View) UpdateUserSessionSpoolerRunTimestamp() error {

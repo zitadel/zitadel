@@ -35,8 +35,10 @@
         </div>
     {{end}}
 
+    {{ template "error-message" .}}
+
     <div class="actions">
-        <button class="primary right" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        <button class="primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
         <a class="button secondary" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
             {{t "Actions.Back"}}
         </a>

@@ -24,6 +24,18 @@ type testHandler struct {
 	bulkLimit     uint64
 }
 
+func (h *testHandler) AggregateTypes() []models.AggregateType {
+	return nil
+}
+
+func (h *testHandler) CurrentSequence(event *models.Event) (uint64, error) {
+	return 0, nil
+}
+
+func (h *testHandler) Eventstore() eventstore.Eventstore {
+	return nil
+}
+
 func (h *testHandler) ViewModel() string {
 	return h.viewModel
 }
@@ -54,6 +66,8 @@ type eventstoreStub struct {
 	events []*models.Event
 	err    error
 }
+
+func (es *eventstoreStub) Subscribe(...models.AggregateType) *eventstore.Subscription { return nil }
 
 func (es *eventstoreStub) Health(ctx context.Context) error {
 	return nil
@@ -432,7 +446,7 @@ func TestHandleError(t *testing.T) {
 				func(*repository.FailedEvent) error {
 					return nil
 				},
-				func(uint64, time.Time) error {
+				func(*models.Event) error {
 					processedSequence = true
 					return nil
 				},

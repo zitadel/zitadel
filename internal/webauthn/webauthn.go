@@ -7,30 +7,42 @@ import (
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
 type WebAuthN struct {
-	web *webauthn.WebAuthn
+	webLogin   *webauthn.WebAuthn
+	webConsole *webauthn.WebAuthn
 }
 
-func StartServer(displayName, id, origin string) (*WebAuthN, error) {
-	web, err := webauthn.New(&webauthn.Config{
-		RPDisplayName: displayName,
-		RPID:          id,
-		RPOrigin:      origin,
+func StartServer(sd systemdefaults.WebAuthN) (*WebAuthN, error) {
+	webLogin, err := webauthn.New(&webauthn.Config{
+		RPDisplayName: sd.DisplayName,
+		RPID:          sd.ID,
+		RPOrigin:      sd.OriginLogin,
+	})
+	if err != nil {
+		return nil, err
+	}
+	webConsole, err := webauthn.New(&webauthn.Config{
+		RPDisplayName: sd.DisplayName,
+		RPID:          sd.ID,
+		RPOrigin:      sd.OriginConsole,
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &WebAuthN{
-		web: web,
+		webLogin:   webLogin,
+		webConsole: webConsole,
 	}, err
 }
 
 type webUser struct {
 	*usr_model.User
+	accountName string
 	credentials []webauthn.Credential
 }
 
@@ -39,6 +51,9 @@ func (u *webUser) WebAuthnID() []byte {
 }
 
 func (u *webUser) WebAuthnName() string {
+	if u.accountName != "" {
+		return u.accountName
+	}
 	return u.UserName
 }
 
@@ -54,7 +69,7 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType usr_model.AuthenticatorAttachment, userVerification usr_model.UserVerificationRequirement, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNToken, error) {
+func (w *WebAuthN) BeginRegistration(user *usr_model.User, accountName string, authType usr_model.AuthenticatorAttachment, userVerification usr_model.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNToken, error) {
 	creds := WebAuthNsToCredentials(webAuthNs)
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
@@ -63,9 +78,10 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType usr_model.Au
 			CredentialID: cred.ID,
 		}
 	}
-	credentialOptions, sessionData, err := w.web.BeginRegistration(
+	credentialOptions, sessionData, err := w.web(isLoginUI).BeginRegistration(
 		&webUser{
 			User:        user,
+			accountName: accountName,
 			credentials: creds,
 		},
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
@@ -90,7 +106,7 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, authType usr_model.Au
 	}, nil
 }
 
-func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, tokenName string, credData []byte) (*usr_model.WebAuthNToken, error) {
+func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, tokenName string, credData []byte, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
 	if webAuthN == nil {
 		return nil, caos_errs.ThrowInternal(nil, "WEBAU-5M9so", "Errors.User.WebAuthN.NotFound")
 	}
@@ -99,7 +115,7 @@ func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-sEr8c", "Errors.User.WebAuthN.ErrorOnParseCredential")
 	}
 	sessionData := WebAuthNToSessionData(webAuthN)
-	credential, err := w.web.CreateCredential(
+	credential, err := w.web(isLoginUI).CreateCredential(
 		&webUser{
 			User: user,
 		},
@@ -117,8 +133,8 @@ func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.
 	return webAuthN, nil
 }
 
-func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.UserVerificationRequirement, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNLogin, error) {
-	assertion, sessionData, err := w.web.BeginLogin(&webUser{
+func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNLogin, error) {
+	assertion, sessionData, err := w.web(isLoginUI).BeginLogin(&webUser{
 		User:        user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
 	}, webauthn.WithUserVerification(UserVerificationFromModel(userVerification)))
@@ -137,7 +153,7 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.U
 	}, nil
 }
 
-func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuthNLogin, credData []byte, webAuthNs ...*usr_model.WebAuthNToken) ([]byte, uint32, error) {
+func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuthNLogin, credData []byte, isLoginUI bool, webAuthNs ...*usr_model.WebAuthNToken) ([]byte, uint32, error) {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	if err != nil {
 		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-ADgv4", "Errors.User.WebAuthN.ValidateLoginFailed")
@@ -146,7 +162,7 @@ func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuth
 		User:        user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
 	}
-	credential, err := w.web.ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
+	credential, err := w.web(isLoginUI).ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
 	if err != nil {
 		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.User.WebAuthN.ValidateLoginFailed")
 	}
@@ -155,4 +171,11 @@ func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuth
 		return credential.ID, credential.Authenticator.SignCount, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
 	}
 	return credential.ID, credential.Authenticator.SignCount, nil
+}
+
+func (w *WebAuthN) web(isLoginUI bool) *webauthn.WebAuthn {
+	if isLoginUI {
+		return w.webLogin
+	}
+	return w.webConsole
 }
