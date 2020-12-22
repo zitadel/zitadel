@@ -811,12 +811,13 @@ func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, project
 	err = crypto.CompareHash(app.OIDCConfig.ClientSecret, []byte(secret), es.passwordAlg)
 	spanHash.EndWithError(err)
 	if err == nil {
-		return es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckSucceededAggregate)
+		err = es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckSucceededAggregate)
+		logging.Log("EVENT-AE1vf").OnError(err).Warn("could not push event OIDCClientSecretCheckSucceeded")
+		return nil
 	}
-	if err := es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckFailedAggregate); err != nil {
-		return err
-	}
-	return caos_errs.ThrowInvalidArgument(nil, "EVENT-wg24q", "Errors.Internal")
+	err = es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckFailedAggregate)
+	logging.Log("EVENT-GD1gh").OnError(err).Warn("could not push event OIDCClientSecretCheckFailed")
+	return caos_errs.ThrowInvalidArgument(nil, "EVENT-wg24q", "Errors.Project.OIDCSecretInvalid")
 }
 
 func (es *ProjectEventstore) setOIDCClientSecretCheckResult(ctx context.Context, project *proj_model.Project, appID string, check func(*es_models.AggregateCreator, *model.Project, string) es_sdk.AggregateFunc) error {

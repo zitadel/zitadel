@@ -165,6 +165,7 @@ Errors:
     GrantNotExists: Projekt Grant existiert nicht
     GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
     UserIDMisisng: User ID fehlt
+    OIDCSecretInvalid: Client Secret ist ungültig
   IAM:
     MemberInvalid: Member ist ungültig
     MemberAlreadyExisting: Member existiert bereits
