@@ -20,6 +20,7 @@ type Handler interface {
 	OnError(event *models.Event, err error) error
 	OnSuccess() error
 	MinimumCycleDuration() time.Duration
+	LockDuration() time.Duration
 	QueryLimit() uint64
 
 	AggregateTypes() []models.AggregateType

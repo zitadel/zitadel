@@ -160,12 +160,12 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 			case <-ctx.Done():
 				return
 			case <-renewTimer:
-				err := s.locker.Renew(workerID, s.ViewModel(), s.MinimumCycleDuration()*2)
+				err := s.locker.Renew(workerID, s.ViewModel(), s.LockDuration())
 				firstLock.Do(func() {
 					locked <- err == nil
 				})
 				if err == nil {
-					renewTimer = time.After(s.MinimumCycleDuration())
+					renewTimer = time.After(s.LockDuration())
 					continue
 				}
 

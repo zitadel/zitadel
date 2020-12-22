@@ -108,6 +108,10 @@ func (h *handler) MinimumCycleDuration() time.Duration {
 	return h.cycleDuration
 }
 
+func (h *handler) LockDuration() time.Duration {
+	return h.cycleDuration / 3
+}
+
 func (h *handler) QueryLimit() uint64 {
 	return h.bulkLimit
 }

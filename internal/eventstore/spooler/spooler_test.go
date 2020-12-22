@@ -40,16 +40,19 @@ func (h *testHandler) Eventstore() eventstore.Eventstore {
 func (h *testHandler) ViewModel() string {
 	return h.viewModel
 }
+
 func (h *testHandler) EventQuery() (*models.SearchQuery, error) {
 	if h.queryError != nil {
 		return nil, h.queryError
 	}
 	return &models.SearchQuery{}, nil
 }
+
 func (h *testHandler) Reduce(*models.Event) error {
 	<-time.After(h.processSleep)
 	return h.processError
 }
+
 func (h *testHandler) OnError(event *models.Event, err error) error {
 	if h.maxErrCount == 2 {
 		return nil
@@ -57,12 +60,19 @@ func (h *testHandler) OnError(event *models.Event, err error) error {
 	h.maxErrCount++
 	return err
 }
+
 func (h *testHandler) OnSuccess() error {
 	return nil
 }
+
 func (h *testHandler) MinimumCycleDuration() time.Duration {
 	return h.cycleDuration
 }
+
+func (h *testHandler) LockDuration() time.Duration {
+	return h.cycleDuration / 2
+}
+
 func (h *testHandler) QueryLimit() uint64 {
 	return h.bulkLimit
 }
@@ -232,31 +242,31 @@ func TestSpooler_load(t *testing.T) {
 		{
 			"lock exists",
 			fields{
-				currentHandler: &testHandler{processSleep: 500 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second, bulkLimit: 10},
-				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, fmt.Errorf("lock already exists"), 2000*time.Millisecond),
+				currentHandler: &testHandler{processSleep: 500 * time.Millisecond, viewModel: "testView1", cycleDuration: 1 * time.Second, bulkLimit: 10},
+				locker:         newTestLocker(t, "testID", "testView1").expectRenew(t, fmt.Errorf("lock already exists"), 500*time.Millisecond),
 			},
 		},
 		{
 			"lock fails",
 			fields{
-				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 1 * time.Second, bulkLimit: 10},
-				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, fmt.Errorf("fail"), 2000*time.Millisecond),
+				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView2", cycleDuration: 1 * time.Second, bulkLimit: 10},
+				locker:         newTestLocker(t, "testID", "testView2").expectRenew(t, fmt.Errorf("fail"), 500*time.Millisecond),
 				eventstore:     &eventstoreStub{events: []*models.Event{{}}},
 			},
 		},
 		{
 			"query fails",
 			fields{
-				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView", queryError: fmt.Errorf("query fail"), cycleDuration: 1 * time.Second, bulkLimit: 10},
-				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 2000*time.Millisecond),
+				currentHandler: &testHandler{processSleep: 100 * time.Millisecond, viewModel: "testView3", queryError: fmt.Errorf("query fail"), cycleDuration: 1 * time.Second, bulkLimit: 10},
+				locker:         newTestLocker(t, "testID", "testView3").expectRenew(t, nil, 500*time.Millisecond),
 				eventstore:     &eventstoreStub{err: fmt.Errorf("fail")},
 			},
 		},
 		{
 			"process event fails",
 			fields{
-				currentHandler: &testHandler{processError: fmt.Errorf("oups"), processSleep: 100 * time.Millisecond, viewModel: "testView", cycleDuration: 500 * time.Millisecond, bulkLimit: 10},
-				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 1000*time.Millisecond).expectRenew(t, nil, 1000*time.Millisecond),
+				currentHandler: &testHandler{processError: fmt.Errorf("oups"), processSleep: 100 * time.Millisecond, viewModel: "testView4", cycleDuration: 500 * time.Millisecond, bulkLimit: 10},
+				locker:         newTestLocker(t, "testID", "testView4").expectRenew(t, nil, 250*time.Millisecond),
 				eventstore:     &eventstoreStub{events: []*models.Event{{}}},
 			},
 		},
@@ -292,7 +302,7 @@ func TestSpooler_lock(t *testing.T) {
 			"renew correct",
 			fields{
 				currentHandler: &testHandler{cycleDuration: 1 * time.Second, viewModel: "testView"},
-				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 2000*time.Millisecond),
+				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, nil, 500*time.Millisecond),
 				expectsErr:     false,
 			},
 			args{
@@ -303,7 +313,7 @@ func TestSpooler_lock(t *testing.T) {
 			"renew fails",
 			fields{
 				currentHandler: &testHandler{cycleDuration: 900 * time.Millisecond, viewModel: "testView"},
-				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, fmt.Errorf("renew failed"), 1800*time.Millisecond),
+				locker:         newTestLocker(t, "testID", "testView").expectRenew(t, fmt.Errorf("renew failed"), 450*time.Millisecond),
 				expectsErr:     true,
 			},
 			args{
@@ -357,13 +367,15 @@ func newTestLocker(t *testing.T, lockerID, viewName string) *testLocker {
 }
 
 func (l *testLocker) expectRenew(t *testing.T, err error, waitTime time.Duration) *testLocker {
+	t.Helper()
 	l.mock.EXPECT().Renew(gomock.Any(), l.viewName, gomock.Any()).DoAndReturn(
 		func(_, _ string, gotten time.Duration) error {
+			t.Helper()
 			if waitTime-gotten != 0 {
 				t.Errorf("expected waittime %v got %v", waitTime, gotten)
 			}
 			return err
-		}).Times(1)
+		}).MinTimes(1).MaxTimes(3)
 
 	return l
 }
