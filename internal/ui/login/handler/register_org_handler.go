@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	auth_model "github.com/caos/zitadel/internal/auth/model"
-
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	org_model "github.com/caos/zitadel/internal/org/model"
