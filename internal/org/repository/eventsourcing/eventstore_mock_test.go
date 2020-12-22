@@ -42,7 +42,7 @@ func GetMockChangesOrgOK(ctrl *gomock.Controller) *OrgEventstore {
 
 	}
 	events := []*es_models.Event{
-		{AggregateID: "AggregateIDApp", Sequence: 1, AggregateType: repo_model.OrgAggregate, Data: data},
+		{AggregateID: "AggregateID", Sequence: 1, AggregateType: repo_model.OrgAggregate, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

@@ -3,18 +3,23 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
 import {
     DefaultLoginPolicy,
+    DefaultLoginPolicyRequest,
     DefaultLoginPolicyView,
     IdpProviderView as AdminIdpProviderView,
     IdpView as AdminIdpView,
+    PasswordlessType as AdminPasswordlessType,
 } from 'src/app/proto/generated/admin_pb';
 import {
     IdpProviderType,
     IdpProviderView as MgmtIdpProviderView,
     IdpView as MgmtIdpView,
     LoginPolicy,
+    LoginPolicyRequest,
     LoginPolicyView,
+    PasswordlessType as MgmtPasswordlessType,
 } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -22,7 +27,6 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
-import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
 
 @Component({
     selector: 'app-login-policy',
@@ -31,6 +35,7 @@ import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.co
 })
 export class LoginPolicyComponent implements OnDestroy {
     public LoginMethodComponentType: any = LoginMethodComponentType;
+    public passwordlessTypes: Array<AdminPasswordlessType | MgmtPasswordlessType> = [];
     public loginData!: LoginPolicyView.AsObject | DefaultLoginPolicyView.AsObject;
 
     private sub: Subscription = new Subscription();
@@ -52,9 +57,13 @@ export class LoginPolicyComponent implements OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
+                    this.passwordlessTypes = [MgmtPasswordlessType.PASSWORDLESSTYPE_ALLOWED,
+                    MgmtPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
+                    this.passwordlessTypes = [AdminPasswordlessType.PASSWORDLESSTYPE_ALLOWED,
+                    AdminPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
                     break;
             }
 
@@ -110,11 +119,12 @@ export class LoginPolicyComponent implements OnDestroy {
         Promise<LoginPolicy | DefaultLoginPolicy> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                const mgmtreq = new LoginPolicy();
+                const mgmtreq = new LoginPolicyRequest();
                 mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 mgmtreq.setAllowRegister(this.loginData.allowRegister);
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
                 mgmtreq.setForceMfa(this.loginData.forceMfa);
+                mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
                 // console.log(mgmtreq.toObject());
                 if ((this.loginData as LoginPolicyView.AsObject).pb_default) {
                     return (this.service as ManagementService).CreateLoginPolicy(mgmtreq);
@@ -122,11 +132,13 @@ export class LoginPolicyComponent implements OnDestroy {
                     return (this.service as ManagementService).UpdateLoginPolicy(mgmtreq);
                 }
             case PolicyComponentServiceType.ADMIN:
-                const adminreq = new DefaultLoginPolicy();
+                const adminreq = new DefaultLoginPolicyRequest();
                 adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 adminreq.setAllowRegister(this.loginData.allowRegister);
                 adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
                 adminreq.setForceMfa(this.loginData.forceMfa);
+                adminreq.setPasswordlessType(this.loginData.passwordlessType);
+
                 // console.log(adminreq.toObject());
 
                 return (this.service as AdminService).UpdateDefaultLoginPolicy(adminreq);

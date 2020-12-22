@@ -11,7 +11,8 @@ type SearchQueryFactory struct {
 	desc           bool
 	aggregateTypes []AggregateType
 	aggregateIDs   []string
-	eventSequence  uint64
+	sequenceFrom   uint64
+	sequenceTo     uint64
 	eventTypes     []EventType
 	resourceOwner  string
 }
@@ -51,7 +52,11 @@ func FactoryFromSearchQuery(query *SearchQuery) *SearchQueryFactory {
 				factory = factory.AggregateIDs(aggregateIDs...)
 			}
 		case Field_LatestSequence:
-			factory = factory.SequenceGreater(filter.value.(uint64))
+			if filter.operation == Operation_Greater {
+				factory = factory.SequenceGreater(filter.value.(uint64))
+			} else {
+				factory = factory.SequenceLess(filter.value.(uint64))
+			}
 		case Field_ResourceOwner:
 			factory = factory.ResourceOwner(filter.value.(string))
 		case Field_EventType:
@@ -82,7 +87,12 @@ func (factory *SearchQueryFactory) Limit(limit uint64) *SearchQueryFactory {
 }
 
 func (factory *SearchQueryFactory) SequenceGreater(sequence uint64) *SearchQueryFactory {
-	factory.eventSequence = sequence
+	factory.sequenceFrom = sequence
+	return factory
+}
+
+func (factory *SearchQueryFactory) SequenceLess(sequence uint64) *SearchQueryFactory {
+	factory.sequenceTo = sequence
 	return factory
 }
 
@@ -128,7 +138,8 @@ func (factory *SearchQueryFactory) Build() (*searchQuery, error) {
 
 	for _, f := range []func() *Filter{
 		factory.aggregateIDFilter,
-		factory.eventSequenceFilter,
+		factory.sequenceFromFilter,
+		factory.sequenceToFilter,
 		factory.eventTypeFilter,
 		factory.resourceOwnerFilter,
 	} {
@@ -172,15 +183,26 @@ func (factory *SearchQueryFactory) aggregateTypeFilter() *Filter {
 	return NewFilter(Field_AggregateType, factory.aggregateTypes, Operation_In)
 }
 
-func (factory *SearchQueryFactory) eventSequenceFilter() *Filter {
-	if factory.eventSequence == 0 {
+func (factory *SearchQueryFactory) sequenceFromFilter() *Filter {
+	if factory.sequenceFrom == 0 {
 		return nil
 	}
 	sortOrder := Operation_Greater
 	if factory.desc {
 		sortOrder = Operation_Less
 	}
-	return NewFilter(Field_LatestSequence, factory.eventSequence, sortOrder)
+	return NewFilter(Field_LatestSequence, factory.sequenceFrom, sortOrder)
+}
+
+func (factory *SearchQueryFactory) sequenceToFilter() *Filter {
+	if factory.sequenceTo == 0 {
+		return nil
+	}
+	sortOrder := Operation_Less
+	if factory.desc {
+		sortOrder = Operation_Greater
+	}
+	return NewFilter(Field_LatestSequence, factory.sequenceTo, sortOrder)
 }
 
 func (factory *SearchQueryFactory) resourceOwnerFilter() *Filter {

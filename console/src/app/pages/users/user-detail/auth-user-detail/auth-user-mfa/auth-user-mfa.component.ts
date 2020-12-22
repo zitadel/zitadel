@@ -8,18 +8,9 @@ import { MfaOtpResponse, MFAState, MfaType, MultiFactor, WebAuthNResponse } from
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { _base64ToArrayBuffer } from '../../u2f-util';
 import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
-import { DialogU2FComponent } from '../dialog-u2f/dialog-u2f.component';
-
-export function _base64ToArrayBuffer(base64: string): any {
-    const binaryString = atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes.buffer;
-}
+import { DialogU2FComponent, U2FComponentDestination } from '../dialog-u2f/dialog-u2f.component';
 
 export interface WebAuthNOptions {
     challenge: string;
@@ -50,6 +41,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public error: string = '';
     public otpAvailable: boolean = false;
+
     constructor(private service: GrpcAuthService,
         private toast: ToastService,
         private dialog: MatDialog) { }
@@ -82,10 +74,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
         });
     }
 
-    public verifyU2f(): void {
-
-    }
-
     public addU2F(): void {
         this.service.AddMyMfaU2F().then((u2fresp) => {
             const webauthn: WebAuthNResponse.AsObject = u2fresp.toObject();
@@ -94,10 +82,18 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             if (credOptions.publicKey?.challenge) {
                 credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
                 credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
+                if (credOptions.publicKey.excludeCredentials) {
+                    credOptions.publicKey.excludeCredentials.map(cred => {
+                        cred.id = _base64ToArrayBuffer(cred.id as any);
+                        return cred;
+                    });
+                }
+                console.log(credOptions);
                 const dialogRef = this.dialog.open(DialogU2FComponent, {
                     width: '400px',
                     data: {
                         credOptions,
+                        type: U2FComponentDestination.MFA,
                     },
                 });
 

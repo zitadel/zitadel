@@ -374,7 +374,7 @@ func (u *UserView) addPasswordlessToken(event *models.Event) error {
 		}
 	}
 	token.State = int32(model.MFAStateNotReady)
-	u.U2FTokens = append(u.U2FTokens, token)
+	u.PasswordlessTokens = append(u.PasswordlessTokens, token)
 	return nil
 }
 

@@ -11,6 +11,7 @@ import {
     DefaultLabelPolicyUpdate,
     DefaultLabelPolicyView,
     DefaultLoginPolicy,
+    DefaultLoginPolicyRequest,
     DefaultLoginPolicyView,
     DefaultPasswordAgePolicyRequest,
     DefaultPasswordAgePolicyView,
@@ -214,7 +215,7 @@ export class AdminService {
         return this.grpcService.admin.getDefaultLoginPolicy(req);
     }
 
-    public UpdateDefaultLoginPolicy(req: DefaultLoginPolicy): Promise<DefaultLoginPolicy> {
+    public UpdateDefaultLoginPolicy(req: DefaultLoginPolicyRequest): Promise<DefaultLoginPolicy> {
         return this.grpcService.admin.updateDefaultLoginPolicy(req);
     }
 

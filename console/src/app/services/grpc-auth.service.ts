@@ -5,37 +5,38 @@ import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import {
-  Changes,
-  ChangesRequest,
-  ExternalIDPRemoveRequest,
-  ExternalIDPSearchRequest,
-  ExternalIDPSearchResponse,
-  Gender,
-  MfaOtpResponse,
-  MultiFactors,
-  MyPermissions,
-  MyProjectOrgSearchQuery,
-  MyProjectOrgSearchRequest,
-  MyProjectOrgSearchResponse,
-  Org,
-  PasswordChange,
-  PasswordComplexityPolicy,
-  UpdateUserAddressRequest,
-  UpdateUserEmailRequest,
-  UpdateUserPhoneRequest,
-  UpdateUserProfileRequest,
-  UserAddress,
-  UserEmail,
-  UserPhone,
-  UserProfile,
-  UserProfileView,
-  UserSessionViews,
-  UserView,
-  VerifyMfaOtp,
-  VerifyUserPhoneRequest,
-  VerifyWebAuthN,
-  WebAuthNResponse,
-  WebAuthNTokenID,
+    Changes,
+    ChangesRequest,
+    ExternalIDPRemoveRequest,
+    ExternalIDPSearchRequest,
+    ExternalIDPSearchResponse,
+    Gender,
+    MfaOtpResponse,
+    MultiFactors,
+    MyPermissions,
+    MyProjectOrgSearchQuery,
+    MyProjectOrgSearchRequest,
+    MyProjectOrgSearchResponse,
+    Org,
+    PasswordChange,
+    PasswordComplexityPolicy,
+    UpdateUserAddressRequest,
+    UpdateUserEmailRequest,
+    UpdateUserPhoneRequest,
+    UpdateUserProfileRequest,
+    UserAddress,
+    UserEmail,
+    UserPhone,
+    UserProfile,
+    UserProfileView,
+    UserSessionViews,
+    UserView,
+    VerifyMfaOtp,
+    VerifyUserPhoneRequest,
+    VerifyWebAuthN,
+    WebAuthNResponse,
+    WebAuthNTokenID,
+    WebAuthNTokens,
 } from '../proto/generated/auth_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageService } from './storage.service';
@@ -338,9 +339,9 @@ export class GrpcAuthService {
     }
 
     public RemoveMyMfaU2F(id: string): Promise<Empty> {
-      const req = new WebAuthNTokenID();
-      req.setId(id);
-      return this.grpcService.auth.removeMyMfaU2F(req);
+        const req = new WebAuthNTokenID();
+        req.setId(id);
+        return this.grpcService.auth.removeMyMfaU2F(req);
     }
 
     public VerifyMyMfaU2F(credential: string, tokenname: string): Promise<Empty> {
@@ -353,9 +354,37 @@ export class GrpcAuthService {
         );
     }
 
+    public GetMyPasswordless(): Promise<WebAuthNTokens> {
+        return this.grpcService.auth.getMyPasswordless(
+            new Empty(),
+        );
+    }
+
+    public AddMyPasswordless(): Promise<WebAuthNResponse> {
+        return this.grpcService.auth.addMyPasswordless(
+            new Empty(),
+        );
+    }
+
+    public RemoveMyPasswordless(id: string): Promise<Empty> {
+        const req = new WebAuthNTokenID();
+        req.setId(id);
+        return this.grpcService.auth.removeMyPasswordless(req);
+    }
+
+    public verifyMyPasswordless(credential: string, tokenname: string): Promise<Empty> {
+        const req = new VerifyWebAuthN();
+        req.setPublicKeyCredential(credential);
+        req.setTokenName(tokenname);
+
+        return this.grpcService.auth.verifyMyPasswordless(
+            req,
+        );
+    }
+
     public RemoveMfaOTP(): Promise<Empty> {
         return this.grpcService.auth.removeMfaOTP(
-          new Empty(),
+            new Empty(),
         );
     }
 

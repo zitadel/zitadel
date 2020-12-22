@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	lockTable = "auth.locks"
+	lockTable = "management.locks"
 )
 
 type locker struct {

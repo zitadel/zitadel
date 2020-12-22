@@ -3,24 +3,22 @@ package eventstore
 import (
 	"context"
 
-	es_int "github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
-
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
+	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -158,7 +156,7 @@ func (repo *UserRepo) RemoveUser(ctx context.Context, id string) error {
 
 func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest) (*usr_model.UserSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, sequenceErr := repo.View.GetLatestUserSequence()
+	sequence, sequenceErr := repo.View.GetLatestUserSequence("")
 	logging.Log("EVENT-Lcn7d").OnError(sequenceErr).Warn("could not read latest user sequence")
 	users, count, err := repo.View.SearchUsers(request)
 	if err != nil {
@@ -187,7 +185,7 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierID)
 		if user != nil {
 			if user.Human != nil {
-				change.ModifierName = user.DisplayName
+				change.ModifierName = user.Human.DisplayName
 			}
 			if user.Machine != nil {
 				change.ModifierName = user.Machine.Name
@@ -235,6 +233,14 @@ func (repo *UserRepo) RemoveU2F(ctx context.Context, userID, webAuthNTokenID str
 	return repo.UserEvents.RemoveU2FToken(ctx, userID, webAuthNTokenID)
 }
 
+func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
+	return repo.UserEvents.GetPasswordless(ctx, userID)
+}
+
+func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {
+	return repo.UserEvents.RemovePasswordlessToken(ctx, userID, webAuthNTokenID)
+}
+
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && caos_errs.IsNotFound(err) {
@@ -268,7 +274,7 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 
 func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model.ExternalIDPSearchRequest) (*usr_model.ExternalIDPSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
+	sequence, seqErr := repo.View.GetLatestExternalIDPSequence("")
 	logging.Log("EVENT-Qs7uf").OnError(seqErr).Warn("could not read latest external idp sequence")
 	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
 	if err != nil {
@@ -305,7 +311,7 @@ func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (
 
 func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *usr_model.MachineKeySearchRequest) (*usr_model.MachineKeySearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, seqErr := repo.View.GetLatestMachineKeySequence()
+	sequence, seqErr := repo.View.GetLatestMachineKeySequence("")
 	logging.Log("EVENT-Sk8fs").OnError(seqErr).Warn("could not read latest user sequence")
 	keys, count, err := repo.View.SearchMachineKeys(request)
 	if err != nil {
@@ -407,7 +413,7 @@ func (repo *UserRepo) ChangeAddress(ctx context.Context, address *usr_model.Addr
 
 func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_model.UserMembershipSearchRequest) (*usr_model.UserMembershipSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
+	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence("")
 	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
 
 	result := handleSearchUserMembershipsPermissions(ctx, request, sequence)

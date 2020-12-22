@@ -12,8 +12,8 @@
     </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
-    <button mat-button (click)="closeDialog()"><span translate>ACTIONS.CLOSE</span></button>
-    <button mat-raised-button class="ok-button" color="primary" (click)="closeDialogWithCode()"><span
-            translate>ACTIONS.OK</span>
+    <button mat-button (click)="closeDialog()"><span>{{'ACTIONS.CLOSE' | translate}}</span></button>
+    <button [disabled]="newMfaType == undefined" mat-raised-button class="ok-button" color="primary"
+        (click)="closeDialogWithCode()"><span>{{'ACTIONS.OK' | translate}}</span>
     </button>
 </div>

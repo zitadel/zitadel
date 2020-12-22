@@ -2,10 +2,11 @@ package eventstore
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 var dbList = []string{"management", "auth", "authz", "adminapi", "notification"}
@@ -47,7 +48,7 @@ func (repo *AdministratorRepo) GetViews() ([]*view_model.View, error) {
 }
 
 func (repo *AdministratorRepo) GetSpoolerDiv(database, view string) int64 {
-	sequence, err := repo.View.GetCurrentSequence(database, view)
+	sequence, err := repo.View.GetCurrentSequence(database, view, "")
 	if err != nil {
 
 		return 0

@@ -1,11 +1,12 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -32,32 +33,32 @@ func (v *View) SearchProjectRoles(request *proj_model.ProjectRoleSearchRequest) 
 	return view.SearchProjectRoles(v.Db, projectRoleTable, request)
 }
 
-func (v *View) PutProjectRole(project *model.ProjectRoleView, eventTimestamp time.Time) error {
-	err := view.PutProjectRole(v.Db, projectRoleTable, project)
+func (v *View) PutProjectRole(role *model.ProjectRoleView, event *models.Event) error {
+	err := view.PutProjectRole(v.Db, projectRoleTable, role)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectRoleSequence(project.Sequence, eventTimestamp)
+	return v.ProcessedProjectRoleSequence(event)
 }
 
-func (v *View) DeleteProjectRole(projectID, orgID, key string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteProjectRole(projectID, orgID, key string, event *models.Event) error {
 	err := view.DeleteProjectRole(v.Db, projectRoleTable, projectID, orgID, key)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedProjectRoleSequence(eventSequence, eventTimestamp)
+	return v.ProcessedProjectRoleSequence(event)
 }
 
 func (v *View) DeleteProjectRolesByProjectID(projectID string) error {
 	return view.DeleteProjectRolesByProjectID(v.Db, projectRoleTable, projectID)
 }
 
-func (v *View) GetLatestProjectRoleSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(projectRoleTable)
+func (v *View) GetLatestProjectRoleSequence(aggregateType string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(projectRoleTable, aggregateType)
 }
 
-func (v *View) ProcessedProjectRoleSequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(projectRoleTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedProjectRoleSequence(event *models.Event) error {
+	return v.saveCurrentSequence(projectRoleTable, event)
 }
 
 func (v *View) UpdateProjectRoleSpoolerRunTimestamp() error {

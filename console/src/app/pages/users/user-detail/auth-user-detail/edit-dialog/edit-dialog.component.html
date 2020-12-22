@@ -5,7 +5,7 @@
 <div mat-dialog-content>
     <cnsl-form-field class="formfield">
         <cnsl-label>{{data.labelKey | translate }}</cnsl-label>
-        <input cnslInput [(ngModel)]="value" />
+        <input cnslInput [(ngModel)]="value" (keydown.enter)="value ? closeDialogWithValue(value) : null" />
     </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
