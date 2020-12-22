@@ -266,11 +266,8 @@ func TestSpooler_load(t *testing.T) {
 			"process event fails",
 			fields{
 				currentHandler: &testHandler{processError: fmt.Errorf("oups"), processSleep: 100 * time.Millisecond, viewModel: "testView4", cycleDuration: 500 * time.Millisecond, bulkLimit: 10},
-				locker: newTestLocker(t, "testID", "testView4").
-					expectRenew(t, nil, 250*time.Millisecond).
-					expectRenew(t, nil, 250*time.Millisecond).
-					expectRenew(t, nil, 250*time.Millisecond),
-				eventstore: &eventstoreStub{events: []*models.Event{{}}},
+				locker:         newTestLocker(t, "testID", "testView4").expectRenew(t, nil, 250*time.Millisecond),
+				eventstore:     &eventstoreStub{events: []*models.Event{{}}},
 			},
 		},
 	}
