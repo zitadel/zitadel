@@ -95,6 +95,10 @@ func (h *handler) MinimumCycleDuration() time.Duration {
 	return h.cycleDuration
 }
 
+func (h *handler) LockDuration() time.Duration{
+	return 1 * time.Minute
+}
+
 func (h *handler) QueryLimit() uint64 {
 	return h.bulkLimit
 }
