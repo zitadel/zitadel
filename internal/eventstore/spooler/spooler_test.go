@@ -375,7 +375,7 @@ func (l *testLocker) expectRenew(t *testing.T, err error, waitTime time.Duration
 				t.Errorf("expected waittime %v got %v", waitTime, gotten)
 			}
 			return err
-		}).Times(1)
+		}).MinTimes(1).MaxTimes(3)
 
 	return l
 }
