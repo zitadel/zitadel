@@ -3,13 +3,12 @@ package handler
 import (
 	"time"
 
+	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-
-	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/config/types"
 )
 
 type Configs map[string]*Config
@@ -61,7 +60,7 @@ func (h *handler) MinimumCycleDuration() time.Duration {
 }
 
 func (h *handler) LockDuration() time.Duration {
-	return 1 * time.Minute
+	return h.cycleDuration / 3
 }
 
 func (h *handler) QueryLimit() uint64 {

@@ -78,7 +78,7 @@ func (h *handler) MinimumCycleDuration() time.Duration {
 }
 
 func (h *handler) LockDuration() time.Duration {
-	return 1 * time.Minute
+	return h.cycleDuration / 3
 }
 
 func (h *handler) QueryLimit() uint64 {
