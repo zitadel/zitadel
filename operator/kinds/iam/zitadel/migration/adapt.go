@@ -4,6 +4,12 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/configmap"
@@ -12,14 +18,9 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
-	"io/ioutil"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"os"
-	"path/filepath"
-	"regexp"
-	"sort"
 )
 
 const (
@@ -138,7 +139,7 @@ func AdaptFunc(
 			for _, script := range allScripts {
 				allScriptsMap[script.Filename] = script.Data
 			}
-			queryCM, err := configmap.AdaptFuncToEnsure(namespace, migrationConfigmap, nameLabels, allScriptsMap)
+			queryCM, err := configmap.AdaptFuncToEnsure(namespace, migrationConfigmap, labels.MustForNameK8SMap(componentLabels, migrationConfigmap), allScriptsMap)
 			if err != nil {
 				return nil, err
 			}

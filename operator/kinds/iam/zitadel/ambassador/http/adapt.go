@@ -99,7 +99,7 @@ func AdaptFunc(
 			queryAdminR, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AdminRName,
-				labels.MustForNameAsSelectableK8SMap(componentLabels, AdminRName),
+				labels.MustForNameK8SMap(componentLabels, AdminRName),
 				false,
 				apiDomain,
 				"/admin/v1",
@@ -116,7 +116,7 @@ func AdaptFunc(
 			queryMgmtRest, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				MgmtName,
-				labels.MustForNameAsSelectableK8SMap(componentLabels, MgmtName),
+				labels.MustForNameK8SMap(componentLabels, MgmtName),
 				false,
 				apiDomain,
 				"/management/v1/",
@@ -133,7 +133,7 @@ func AdaptFunc(
 			queryOAuthv2, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				OauthName,
-				labels.MustForNameAsSelectableK8SMap(componentLabels, OauthName),
+				labels.MustForNameK8SMap(componentLabels, OauthName),
 				false,
 				apiDomain,
 				"/oauth/v2/",
@@ -150,7 +150,7 @@ func AdaptFunc(
 			queryAuthR, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AuthRName,
-				labels.MustForNameAsSelectableK8SMap(componentLabels, AuthRName),
+				labels.MustForNameK8SMap(componentLabels, AuthRName),
 				false,
 				apiDomain,
 				"/auth/v1/",
@@ -167,7 +167,7 @@ func AdaptFunc(
 			queryAuthorize, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AuthorizeName,
-				labels.MustForNameAsSelectableK8SMap(componentLabels, AuthorizeName),
+				labels.MustForNameK8SMap(componentLabels, AuthorizeName),
 				false,
 				accountsDomain,
 				"/oauth/v2/authorize",
@@ -184,7 +184,7 @@ func AdaptFunc(
 			queryEndsession, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				EndsessionName,
-				labels.MustForNameAsSelectableK8SMap(componentLabels, EndsessionName),
+				labels.MustForNameK8SMap(componentLabels, EndsessionName),
 				false,
 				accountsDomain,
 				"/oauth/v2/endsession",
@@ -201,7 +201,7 @@ func AdaptFunc(
 			queryIssuer, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				IssuerName,
-				labels.MustForNameAsSelectableK8SMap(componentLabels, IssuerName),
+				labels.MustForNameK8SMap(componentLabels, IssuerName),
 				false,
 				issuerDomain,
 				"/.well-known/openid-configuration",
@@ -230,4 +230,3 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 		nil
 }
-

@@ -1,6 +1,10 @@
 package deployment
 
 import (
+	"testing"
+
+	"github.com/caos/orbos/pkg/labels/mocklabels"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
@@ -12,14 +16,13 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"testing"
 )
 
 func TestDeployment_Adapt(t *testing.T) {
 	monitor := mntr.Monitor{}
-	version := "test"
+	imageVersion := "test"
 	namespace := "test"
-	labels := map[string]string{"test": "test"}
+
 	replicaCount := 1
 	nodeSelector := map[string]string{"test": "test"}
 	secretVarsName := "testVars"
@@ -31,6 +34,7 @@ func TestDeployment_Adapt(t *testing.T) {
 	cmName := "testCM"
 	users := []string{"test"}
 	annotations := map[string]string{"testHash": "test"}
+
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	resources := &k8s.Resources{
@@ -46,15 +50,15 @@ func TestDeployment_Adapt(t *testing.T) {
 
 	deploymentDef := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        deployName,
+			Name:        mocklabels.NameVal,
 			Namespace:   namespace,
-			Labels:      labels,
+			Labels:      mocklabels.NameMap,
 			Annotations: annotations,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: helpers.PointerInt32(int32(replicaCount)),
 			Selector: &metav1.LabelSelector{
-				MatchLabels: labels,
+				MatchLabels: mocklabels.ClosedNameSelectorMap,
 			},
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.RollingUpdateDeploymentStrategyType,
@@ -65,7 +69,7 @@ func TestDeployment_Adapt(t *testing.T) {
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels:      labels,
+					Labels:      mocklabels.SelectableMap,
 					Annotations: annotations,
 				},
 				Spec: corev1.PodSpec{
@@ -83,7 +87,7 @@ func TestDeployment_Adapt(t *testing.T) {
 					Containers: []corev1.Container{
 						GetContainer(
 							containerName,
-							version,
+							imageVersion,
 							RunAsUser,
 							true,
 							resources,
@@ -109,7 +113,7 @@ func TestDeployment_Adapt(t *testing.T) {
 			},
 		},
 	}
-	k8sClient.EXPECT().ApplyDeployment(deploymentDef).Times(1)
+	k8sClient.EXPECT().ApplyDeployment(deploymentDef, false).Times(1)
 
 	getConfigurationHashes := func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) map[string]string {
 		return map[string]string{"testHash": "test"}
@@ -126,9 +130,11 @@ func TestDeployment_Adapt(t *testing.T) {
 
 	query, _, err := AdaptFunc(
 		monitor,
-		version,
+		mocklabels.Name,
+		mocklabels.ClosedNameSelector,
+		false,
+		&imageVersion,
 		namespace,
-		labels,
 		replicaCount,
 		nil,
 		cmName,

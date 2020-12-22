@@ -1,8 +1,11 @@
 package ambassador
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
+	"github.com/caos/orbos/pkg/labels/mocklabels"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/ambassador/grpc"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/ambassador/hosts"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/ambassador/http"
@@ -12,7 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	apixv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"testing"
 )
 
 func SetReturnResourceVersion(
@@ -115,7 +117,6 @@ func TestAmbassador_Adapt(t *testing.T) {
 
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	labels := map[string]string{"test": "test"}
 	grpcURL := "grpc"
 	httpURL := "http"
 	uiURL := "ui"
@@ -136,7 +137,7 @@ func TestAmbassador_Adapt(t *testing.T) {
 	SetMappingsGRPC(k8sClient, namespace)
 	SetHosts(k8sClient, namespace)
 
-	query, _, err := AdaptFunc(monitor, namespace, labels, grpcURL, httpURL, uiURL, dns)
+	query, _, err := AdaptFunc(monitor, mocklabels.Component, namespace, grpcURL, httpURL, uiURL, dns)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)

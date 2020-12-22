@@ -1,6 +1,12 @@
 package migration
 
 import (
+	"testing"
+
+	"github.com/caos/orbos/pkg/labels"
+
+	"github.com/caos/orbos/pkg/labels/mocklabels"
+
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/zitadel/operator/helpers"
@@ -12,7 +18,6 @@ import (
 	macherrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"testing"
 )
 
 func TestMigration_BaseEnvVars(t *testing.T) {
@@ -61,8 +66,6 @@ func TestMigration_AdaptFunc(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	namespace := "test"
 	reason := "test"
-	labels := map[string]string{"test": "test"}
-	internalLabels := map[string]string{"test": "test", "app.kubernetes.io/component": "migration"}
 	secretPasswordName := "test"
 	migrationUser := "migration"
 	users := []string{"test"}
@@ -77,11 +80,14 @@ func TestMigration_AdaptFunc(t *testing.T) {
 	initContainers := getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName)
 	initContainers = append(initContainers, getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users))
 
+	componentLabels := mocklabels.Component
+	jobName := labels.MustForName(componentLabels, jobNamePrefix+reason)
+
 	jobDef := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      jobNamePrefix + reason,
+			Name:      jobName.Name(),
 			Namespace: namespace,
-			Labels:    internalLabels,
+			Labels:    labels.MustK8sMap(jobName),
 			Annotations: map[string]string{
 				"migrationhash": getHash(allScripts),
 			},
@@ -132,11 +138,13 @@ func TestMigration_AdaptFunc(t *testing.T) {
 	for _, script := range allScripts {
 		allScriptsMap[script.Filename] = script.Data
 	}
+
+	cmName := labels.MustForName(componentLabels, migrationConfigmap)
 	cm := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      migrationConfigmap,
+			Name:      cmName.Name(),
 			Namespace: namespace,
-			Labels:    labels,
+			Labels:    labels.MustK8sMap(cmName),
 		},
 		Data: allScriptsMap,
 	}
@@ -146,9 +154,9 @@ func TestMigration_AdaptFunc(t *testing.T) {
 
 	query, _, err := AdaptFunc(
 		mntr.Monitor{},
+		componentLabels,
 		namespace,
 		reason,
-		labels,
 		secretPasswordName,
 		migrationUser,
 		users,

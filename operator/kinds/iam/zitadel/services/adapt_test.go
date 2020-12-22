@@ -1,27 +1,31 @@
 package services
 
 import (
+	"testing"
+
+	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/orbos/pkg/labels/mocklabels"
+
 	"github.com/caos/orbos/mntr"
-	"github.com/caos/orbos/pkg/kubernetes/mock"
+	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/golang/mock/gomock"
 	"gotest.tools/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"testing"
 )
 
 func GetExpectedService(
 	namespace string,
-	labels map[string]string,
+	zitadelPodSelector *labels.Selector,
 	grpcPortName string,
-	grpcServiceName string,
+	grpcServiceName *labels.Name,
 	grpcPort int,
 	httpPortName string,
-	httpServiceName string,
+	httpServiceName *labels.Name,
 	httpPort int,
 	uiPortName string,
-	uiServiceName string,
+	uiServiceName *labels.Name,
 	uiPort int,
 ) []*corev1.Service {
 
@@ -52,17 +56,19 @@ func GetExpectedService(
 	},
 	}
 
+	zitadelPodSelectorMap := labels.MustK8sMap(zitadelPodSelector)
+
 	return []*corev1.Service{
 		{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      grpcServiceName,
+				Name:      grpcServiceName.Name(),
 				Namespace: namespace,
-				Labels:    labels,
+				Labels:    labels.MustK8sMap(grpcServiceName),
 			},
 			Spec: corev1.ServiceSpec{
 				Ports:                    grpcPorts,
-				Selector:                 labels,
-				Type:                     corev1.ServiceType(""),
+				Selector:                 zitadelPodSelectorMap,
+				Type:                     "",
 				PublishNotReadyAddresses: false,
 				ClusterIP:                "",
 				ExternalName:             "",
@@ -70,14 +76,14 @@ func GetExpectedService(
 		},
 		{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      httpServiceName,
+				Name:      httpServiceName.Name(),
 				Namespace: namespace,
-				Labels:    labels,
+				Labels:    labels.MustK8sMap(httpServiceName),
 			},
 			Spec: corev1.ServiceSpec{
 				Ports:                    httpPorts,
-				Selector:                 labels,
-				Type:                     corev1.ServiceType(""),
+				Selector:                 zitadelPodSelectorMap,
+				Type:                     "",
 				PublishNotReadyAddresses: false,
 				ClusterIP:                "",
 				ExternalName:             "",
@@ -85,28 +91,36 @@ func GetExpectedService(
 		},
 		{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      uiServiceName,
+				Name:      uiServiceName.Name(),
 				Namespace: namespace,
-				Labels:    labels,
+				Labels:    labels.MustK8sMap(uiServiceName),
 			},
 			Spec: corev1.ServiceSpec{
 				Ports:                    uiPorts,
-				Selector:                 labels,
-				Type:                     corev1.ServiceType(""),
+				Selector:                 zitadelPodSelectorMap,
+				Type:                     "",
 				PublishNotReadyAddresses: false,
 				ClusterIP:                "",
 				ExternalName:             "",
 			},
 		},
 	}
+}
 
+func serviceLabels(name ...string) (*labels.Component, *labels.Selector, []*labels.Name) {
+	componentLabels := mocklabels.Component
+	podSelectorLabels := labels.DeriveNameSelector(labels.MustForName(componentLabels, "zitadel"), false)
+	nameLabels := make([]*labels.Name, len(name))
+	for idx := range name {
+		nameLabels[idx] = labels.MustForName(componentLabels, name[idx])
+	}
+	return componentLabels, podSelectorLabels, nameLabels
 }
 
 func TestServices_AdaptEnsure1(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	namespace := "test"
-	labels := map[string]string{"test": "test"}
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc"
 	grpcPort := 1
@@ -117,32 +131,36 @@ func TestServices_AdaptEnsure1(t *testing.T) {
 	uiServiceName := "ui"
 	uiPort := 3
 
+	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
+
 	for _, rsc := range GetExpectedService(
 		namespace,
-		labels,
+		podSelectorLabels,
 		grpcPortName,
-		grpcServiceName,
+		nameLabels[0],
 		grpcPort,
 		httpPortName,
-		httpServiceName,
+		nameLabels[1],
 		httpPort,
 		uiPortName,
-		uiServiceName,
-		uiPort) {
-
+		nameLabels[2],
+		uiPort,
+	) {
 		client.EXPECT().ApplyService(rsc).Times(1)
 	}
 
 	query, _, err := AdaptFunc(
 		mntr.Monitor{},
+		componentLabels,
+		podSelectorLabels,
 		namespace,
-		labels,
 		grpcServiceName,
 		grpcPort,
 		httpServiceName,
 		httpPort,
 		uiServiceName,
-		uiPort)
+		uiPort,
+	)
 
 	assert.NilError(t, err)
 	ensure, err := query(client, nil)
@@ -154,7 +172,6 @@ func TestServices_AdaptEnsure2(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	namespace := "test0"
-	labels := map[string]string{"test0": "test0"}
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc1"
 	grpcPort := 11
@@ -165,26 +182,30 @@ func TestServices_AdaptEnsure2(t *testing.T) {
 	uiServiceName := "ui3"
 	uiPort := 33
 
+	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
+
 	for _, rsc := range GetExpectedService(
 		namespace,
-		labels,
+		podSelectorLabels,
 		grpcPortName,
-		grpcServiceName,
+		nameLabels[0],
 		grpcPort,
 		httpPortName,
-		httpServiceName,
+		nameLabels[1],
 		httpPort,
 		uiPortName,
-		uiServiceName,
-		uiPort) {
+		nameLabels[2],
+		uiPort,
+	) {
 
 		client.EXPECT().ApplyService(rsc).Times(1)
 	}
 
 	query, _, err := AdaptFunc(
 		mntr.Monitor{},
+		componentLabels,
+		podSelectorLabels,
 		namespace,
-		labels,
 		grpcServiceName,
 		grpcPort,
 		httpServiceName,
@@ -202,7 +223,6 @@ func TestServices_AdaptEnsure3(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	namespace := "test00"
-	labels := map[string]string{"test00": "test00"}
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc11"
 	grpcPort := 111
@@ -213,26 +233,30 @@ func TestServices_AdaptEnsure3(t *testing.T) {
 	uiServiceName := "ui33"
 	uiPort := 333
 
+	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
+
 	for _, rsc := range GetExpectedService(
 		namespace,
-		labels,
+		podSelectorLabels,
 		grpcPortName,
-		grpcServiceName,
+		nameLabels[0],
 		grpcPort,
 		httpPortName,
-		httpServiceName,
+		nameLabels[1],
 		httpPort,
 		uiPortName,
-		uiServiceName,
-		uiPort) {
+		nameLabels[2],
+		uiPort,
+	) {
 
 		client.EXPECT().ApplyService(rsc).Times(1)
 	}
 
 	query, _, err := AdaptFunc(
 		mntr.Monitor{},
+		componentLabels,
+		podSelectorLabels,
 		namespace,
-		labels,
 		grpcServiceName,
 		grpcPort,
 		httpServiceName,
@@ -250,7 +274,6 @@ func TestServices_AdaptDestroy1(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	namespace := "test"
-	labels := map[string]string{"test": "test"}
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc"
 	grpcPort := 1
@@ -261,26 +284,30 @@ func TestServices_AdaptDestroy1(t *testing.T) {
 	uiServiceName := "ui"
 	uiPort := 3
 
+	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
+
 	for _, rsc := range GetExpectedService(
 		namespace,
-		labels,
+		podSelectorLabels,
 		grpcPortName,
-		grpcServiceName,
+		nameLabels[0],
 		grpcPort,
 		httpPortName,
-		httpServiceName,
+		nameLabels[1],
 		httpPort,
 		uiPortName,
-		uiServiceName,
-		uiPort) {
+		nameLabels[2],
+		uiPort,
+	) {
 
 		client.EXPECT().DeleteService(rsc.Namespace, rsc.Name).Times(1)
 	}
 
 	_, destroy, err := AdaptFunc(
 		mntr.Monitor{},
+		componentLabels,
+		podSelectorLabels,
 		namespace,
-		labels,
 		grpcServiceName,
 		grpcPort,
 		httpServiceName,
@@ -296,7 +323,6 @@ func TestServices_AdaptDestroy2(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	namespace := "test0"
-	labels := map[string]string{"test0": "test0"}
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc1"
 	grpcPort := 11
@@ -307,26 +333,30 @@ func TestServices_AdaptDestroy2(t *testing.T) {
 	uiServiceName := "ui3"
 	uiPort := 33
 
+	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
+
 	for _, rsc := range GetExpectedService(
 		namespace,
-		labels,
+		podSelectorLabels,
 		grpcPortName,
-		grpcServiceName,
+		nameLabels[0],
 		grpcPort,
 		httpPortName,
-		httpServiceName,
+		nameLabels[1],
 		httpPort,
 		uiPortName,
-		uiServiceName,
-		uiPort) {
+		nameLabels[2],
+		uiPort,
+	) {
 
 		client.EXPECT().DeleteService(rsc.Namespace, rsc.Name).Times(1)
 	}
 
 	_, destroy, err := AdaptFunc(
 		mntr.Monitor{},
+		componentLabels,
+		podSelectorLabels,
 		namespace,
-		labels,
 		grpcServiceName,
 		grpcPort,
 		httpServiceName,
@@ -342,7 +372,6 @@ func TestServices_AdaptDestroy3(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	namespace := "test00"
-	labels := map[string]string{"test00": "test00"}
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc11"
 	grpcPort := 111
@@ -353,26 +382,30 @@ func TestServices_AdaptDestroy3(t *testing.T) {
 	uiServiceName := "ui33"
 	uiPort := 333
 
+	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
+
 	for _, rsc := range GetExpectedService(
 		namespace,
-		labels,
+		podSelectorLabels,
 		grpcPortName,
-		grpcServiceName,
+		nameLabels[0],
 		grpcPort,
 		httpPortName,
-		httpServiceName,
+		nameLabels[1],
 		httpPort,
 		uiPortName,
-		uiServiceName,
-		uiPort) {
+		nameLabels[2],
+		uiPort,
+	) {
 
 		client.EXPECT().DeleteService(rsc.Namespace, rsc.Name).Times(1)
 	}
 
 	_, destroy, err := AdaptFunc(
 		mntr.Monitor{},
+		componentLabels,
+		podSelectorLabels,
 		namespace,
-		labels,
 		grpcServiceName,
 		grpcPort,
 		httpServiceName,

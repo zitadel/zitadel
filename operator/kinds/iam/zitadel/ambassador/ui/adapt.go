@@ -54,7 +54,7 @@ func AdaptFunc(
 			queryConsole, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				ConsoleName,
-				labels.MustForNameAsSelectableK8SMap(componentLabels, ConsoleName),
+				labels.MustForNameK8SMap(componentLabels, ConsoleName),
 				false,
 				consoleDomain,
 				"/",
@@ -71,7 +71,7 @@ func AdaptFunc(
 			queryAcc, err := mapping.AdaptFuncToEnsure(
 				namespace,
 				AccountsName,
-				labels.MustForNameAsSelectableK8SMap(componentLabels, AccountsName),
+				labels.MustForNameK8SMap(componentLabels, AccountsName),
 				false,
 				accountsDomain,
 				"/",
@@ -95,4 +95,3 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 		nil
 }
-

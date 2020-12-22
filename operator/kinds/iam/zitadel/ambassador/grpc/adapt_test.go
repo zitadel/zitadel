@@ -1,14 +1,18 @@
 package grpc
 
 import (
+	"testing"
+
+	"github.com/caos/orbos/pkg/labels"
+
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
+	"github.com/caos/orbos/pkg/labels/mocklabels"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	apixv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"testing"
 )
 
 func SetReturnResourceVersion(
@@ -33,7 +37,6 @@ func SetReturnResourceVersion(
 func TestGrpc_Adapt(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	labels := map[string]string{"test": "test"}
 	url := "url"
 	dns := &configuration.DNS{
 		Domain:    "",
@@ -45,6 +48,9 @@ func TestGrpc_Adapt(t *testing.T) {
 			Issuer:   "",
 		},
 	}
+
+	componentLabels := mocklabels.Component
+
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
@@ -61,13 +67,14 @@ func TestGrpc_Adapt(t *testing.T) {
 		"exposed_headers": "*",
 		"max_age":         "86400",
 	}
+	adminMName := labels.MustForName(componentLabels, AdminMName)
 	adminM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AdminMName,
+				"labels":    labels.MustK8sMap(adminMName),
+				"name":      adminMName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -85,13 +92,14 @@ func TestGrpc_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminMName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminMName, adminM).Times(1)
 
+	authMName := labels.MustForName(componentLabels, AuthMName)
 	authM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AuthMName,
+				"labels":    labels.MustK8sMap(authMName),
+				"name":      authMName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -109,13 +117,14 @@ func TestGrpc_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthMName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthMName, authM).Times(1)
 
+	mgmtMName := labels.MustForName(componentLabels, MgmtMName)
 	mgmtM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      MgmtMName,
+				"labels":    labels.MustK8sMap(mgmtMName),
+				"name":      mgmtMName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -133,7 +142,7 @@ func TestGrpc_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtMName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtMName, mgmtM).Times(1)
 
-	query, _, err := AdaptFunc(monitor, namespace, labels, url, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)
@@ -144,7 +153,6 @@ func TestGrpc_Adapt(t *testing.T) {
 func TestGrpc_Adapt2(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	labels := map[string]string{"test": "test"}
 	url := "url"
 	dns := &configuration.DNS{
 		Domain:    "domain",
@@ -156,6 +164,9 @@ func TestGrpc_Adapt2(t *testing.T) {
 			Issuer:   "issuer",
 		},
 	}
+
+	componentLabels := mocklabels.Component
+
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
@@ -172,13 +183,15 @@ func TestGrpc_Adapt2(t *testing.T) {
 		"exposed_headers": "*",
 		"max_age":         "86400",
 	}
+
+	adminMName := labels.MustForName(componentLabels, AdminMName)
 	adminM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AdminMName,
+				"labels":    labels.MustK8sMap(adminMName),
+				"name":      adminMName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -196,13 +209,14 @@ func TestGrpc_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminMName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminMName, adminM).Times(1)
 
+	authMName := labels.MustForName(componentLabels, AuthMName)
 	authM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AuthMName,
+				"labels":    labels.MustK8sMap(authMName),
+				"name":      authMName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -220,13 +234,14 @@ func TestGrpc_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthMName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthMName, authM).Times(1)
 
+	mgmtMName := labels.MustForName(componentLabels, MgmtMName)
 	mgmtM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      MgmtMName,
+				"labels":    labels.MustK8sMap(mgmtMName),
+				"name":      mgmtMName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -244,7 +259,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtMName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtMName, mgmtM).Times(1)
 
-	query, _, err := AdaptFunc(monitor, namespace, labels, url, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)

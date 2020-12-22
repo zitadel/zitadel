@@ -1,14 +1,17 @@
 package http
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
+	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/orbos/pkg/labels/mocklabels"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/configuration"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	apixv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"testing"
 )
 
 func SetReturnResourceVersion(
@@ -33,7 +36,6 @@ func SetReturnResourceVersion(
 func TestHttp_Adapt(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	labels := map[string]string{"test": "test"}
 	url := "url"
 	dns := &configuration.DNS{
 		Domain:    "",
@@ -62,13 +64,15 @@ func TestHttp_Adapt(t *testing.T) {
 		"max_age":         "86400",
 	}
 
+	componentLabels := mocklabels.Component
+	endSessionName := labels.MustForName(componentLabels, EndsessionName)
 	endsession := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      EndsessionName,
+				"labels":    labels.MustK8sMap(endSessionName),
+				"name":      endSessionName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -85,13 +89,14 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, EndsessionName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, EndsessionName, endsession).Times(1)
 
+	issuerName := labels.MustForName(componentLabels, IssuerName)
 	issuer := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      IssuerName,
+				"labels":    labels.MustK8sMap(issuerName),
+				"name":      issuerName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -108,13 +113,14 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerName, issuer).Times(1)
 
+	authorizeName := labels.MustForName(componentLabels, AuthorizeName)
 	authorize := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AuthorizeName,
+				"labels":    labels.MustK8sMap(authorizeName),
+				"name":      authorizeName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -131,13 +137,14 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthorizeName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthorizeName, authorize).Times(1)
 
+	oauthName := labels.MustForName(componentLabels, OauthName)
 	oauth := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      OauthName,
+				"labels":    labels.MustK8sMap(oauthName),
+				"name":      oauthName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -154,13 +161,14 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, OauthName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OauthName, oauth).Times(1)
 
+	mgmtName := labels.MustForName(componentLabels, MgmtName)
 	mgmt := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      MgmtName,
+				"labels":    labels.MustK8sMap(mgmtName),
+				"name":      mgmtName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -177,13 +185,14 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtName, mgmt).Times(1)
 
+	adminRName := labels.MustForName(componentLabels, AdminRName)
 	adminR := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AdminRName,
+				"labels":    labels.MustK8sMap(adminRName),
+				"name":      adminRName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -200,13 +209,14 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminRName, adminR).Times(1)
 
+	authRName := labels.MustForName(componentLabels, AuthRName)
 	authR := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AuthRName,
+				"labels":    labels.MustK8sMap(authRName),
+				"name":      authRName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -223,7 +233,7 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).Times(1)
 
-	query, _, err := AdaptFunc(monitor, namespace, labels, url, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)
@@ -234,7 +244,6 @@ func TestHttp_Adapt(t *testing.T) {
 func TestHttp_Adapt2(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	labels := map[string]string{"test": "test"}
 	url := "url"
 	dns := &configuration.DNS{
 		Domain:    "domain",
@@ -263,13 +272,16 @@ func TestHttp_Adapt2(t *testing.T) {
 		"max_age":         "86400",
 	}
 
+	componentLabels := mocklabels.Component
+
+	endsessionName := labels.MustForName(componentLabels, EndsessionName)
 	endsession := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      EndsessionName,
+				"labels":    labels.MustK8sMap(endsessionName),
+				"name":      endsessionName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -286,13 +298,14 @@ func TestHttp_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, EndsessionName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, EndsessionName, endsession).Times(1)
 
+	issuerName := labels.MustForName(componentLabels, IssuerName)
 	issuer := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      IssuerName,
+				"labels":    labels.MustK8sMap(issuerName),
+				"name":      issuerName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -309,13 +322,14 @@ func TestHttp_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerName, issuer).Times(1)
 
+	authorizeName := labels.MustForName(componentLabels, AuthorizeName)
 	authorize := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AuthorizeName,
+				"labels":    labels.MustK8sMap(authorizeName),
+				"name":      authorizeName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -332,13 +346,14 @@ func TestHttp_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthorizeName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthorizeName, authorize).Times(1)
 
+	oauthName := labels.MustForName(componentLabels, OauthName)
 	oauth := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      OauthName,
+				"labels":    labels.MustK8sMap(oauthName),
+				"name":      oauthName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -355,13 +370,14 @@ func TestHttp_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, OauthName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OauthName, oauth).Times(1)
 
+	mgmtName := labels.MustForName(componentLabels, MgmtName)
 	mgmt := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      MgmtName,
+				"labels":    labels.MustK8sMap(mgmtName),
+				"name":      mgmtName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -378,13 +394,14 @@ func TestHttp_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtName, mgmt).Times(1)
 
+	adminRName := labels.MustForName(componentLabels, AdminRName)
 	adminR := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AdminRName,
+				"labels":    labels.MustK8sMap(adminRName),
+				"name":      adminRName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -401,13 +418,14 @@ func TestHttp_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminRName, adminR).Times(1)
 
+	authRName := labels.MustForName(componentLabels, AuthRName)
 	authR := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":    labels,
-				"name":      AuthRName,
+				"labels":    labels.MustK8sMap(authRName),
+				"name":      authRName.Name(),
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
@@ -424,7 +442,7 @@ func TestHttp_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).Times(1)
 
-	query, _, err := AdaptFunc(monitor, namespace, labels, url, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)

@@ -1,10 +1,14 @@
 package setup
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
+	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/orbos/pkg/labels/mocklabels"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/deployment"
@@ -16,7 +20,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"testing"
 )
 
 func TestSetup_AdaptFunc(t *testing.T) {
@@ -24,8 +27,6 @@ func TestSetup_AdaptFunc(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	namespace := "test"
 	reason := "test"
-	labels := map[string]string{"test": "test"}
-	internalLabels := map[string]string{"test": "test"}
 	users := []string{"test"}
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{}
@@ -41,6 +42,8 @@ func TestSetup_AdaptFunc(t *testing.T) {
 	consoleCMName := "testConsoleCM"
 	cmName := "testCM"
 	annotations := map[string]string{"testHash": "test"}
+
+	componentLabels := mocklabels.Component
 
 	resources := &k8s.Resources{
 		Limits: corev1.ResourceList{
@@ -73,11 +76,12 @@ func TestSetup_AdaptFunc(t *testing.T) {
 	)}
 	volumes := deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName, users)
 
+	jobName := labels.MustForName(componentLabels, jobNamePrefix+reason)
 	jobDef := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        jobNamePrefix + reason,
+			Name:        jobName.Name(),
 			Namespace:   namespace,
-			Labels:      internalLabels,
+			Labels:      labels.MustK8sMap(jobName),
 			Annotations: annotations,
 		},
 		Spec: batchv1.JobSpec{
@@ -118,13 +122,13 @@ func TestSetup_AdaptFunc(t *testing.T) {
 
 	query, _, err := AdaptFunc(
 		monitor,
+		componentLabels,
 		namespace,
 		reason,
-		labels,
 		nodeselector,
 		tolerations,
 		resources,
-		version,
+		&version,
 		cmName,
 		certPath,
 		secretName,

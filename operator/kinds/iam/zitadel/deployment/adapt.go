@@ -18,7 +18,6 @@ import (
 const (
 	rootSecret    = "client-root"
 	dbSecrets     = "db-secrets"
-	deployName    = "zitadel"
 	containerName = "zitadel"
 	RunAsUser     = int64(1000)
 	//zitadelImage can be found in github.com/caos/zitadel repo
@@ -57,7 +56,7 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("type", "deployment")
 
-	destroy, err := deployment.AdaptFuncToDestroy(namespace, deployName)
+	destroy, err := deployment.AdaptFuncToDestroy(namespace, nameLabels.Name())
 	if err != nil {
 		return nil, nil, err
 	}

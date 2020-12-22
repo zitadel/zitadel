@@ -247,7 +247,7 @@ func AdaptFunc(
 					queryS,
 					querySetup,
 					queryD,
-					operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr)),
+					operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr, zitadelDeploymentName)),
 					queryAmbassador,
 				)
 				destroyers = append(destroyers,
@@ -261,11 +261,11 @@ func AdaptFunc(
 				)
 			case "scaledown":
 				queriers = append(queriers,
-					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr)(0)),
+					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(0)),
 				)
 			case "scaleup":
 				queriers = append(queriers,
-					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr)(desiredKind.Spec.ReplicaCount)),
+					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(desiredKind.Spec.ReplicaCount)),
 				)
 			}
 		}

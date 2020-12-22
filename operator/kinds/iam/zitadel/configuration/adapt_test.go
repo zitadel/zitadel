@@ -2,15 +2,18 @@ package configuration
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
+	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/orbos/pkg/labels/mocklabels"
 	"github.com/caos/zitadel/operator/kinds/iam/zitadel/database"
 	databasemock "github.com/caos/zitadel/operator/kinds/iam/zitadel/database/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"testing"
 )
 
 func SetConfigMap(
@@ -115,7 +118,6 @@ func TestConfiguration_Adapt(t *testing.T) {
 
 	monitor := mntr.Monitor{Fields: map[string]interface{}{"component": "configuration"}}
 	namespace := "test"
-	labels := map[string]string{"test": "test"}
 	cmName := "cm"
 	secretName := "secret"
 	consoleCMName := "console"
@@ -133,6 +135,9 @@ func TestConfiguration_Adapt(t *testing.T) {
 		"notification": "notification",
 		"eventstore":   "eventstore",
 	}
+
+	componentLabels := mocklabels.Component
+
 	queried := map[string]interface{}{}
 	database.SetDatabaseInQueried(queried, &database.Current{
 		Host:  "host",
@@ -147,7 +152,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 		k8sClient,
 		namespace,
 		cmName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, cmName),
 		queried,
 		desiredEmpty,
 		users,
@@ -160,7 +165,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 		k8sClient,
 		namespace,
 		secretVarsName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, secretVarsName),
 		desiredEmpty,
 	)
 
@@ -168,7 +173,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 		k8sClient,
 		namespace,
 		consoleCMName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, consoleCMName),
 		getClientID,
 		desiredEmpty,
 	)
@@ -177,7 +182,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 		k8sClient,
 		namespace,
 		secretName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, secretName),
 		desiredEmpty,
 	)
 
@@ -185,14 +190,14 @@ func TestConfiguration_Adapt(t *testing.T) {
 		k8sClient,
 		namespace,
 		secretPasswordName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, secretPasswordName),
 		users,
 	)
 
 	query, _, _, err := AdaptFunc(
 		monitor,
+		componentLabels,
 		namespace,
-		labels,
 		desiredEmpty,
 		cmName,
 		certPath,
@@ -219,7 +224,6 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 
 	monitor := mntr.Monitor{Fields: map[string]interface{}{"component": "configuration"}}
 	namespace := "test2"
-	labels := map[string]string{"test2": "test2"}
 	cmName := "cm2"
 	secretName := "secret2"
 	consoleCMName := "console2"
@@ -238,6 +242,8 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		"eventstore":   "eventstore",
 	}
 
+	componentLabels := mocklabels.Component
+
 	queried := map[string]interface{}{}
 	database.SetDatabaseInQueried(queried, &database.Current{
 		Host:  "host2",
@@ -252,7 +258,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		k8sClient,
 		namespace,
 		cmName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, cmName),
 		queried,
 		desiredFull,
 		users,
@@ -265,7 +271,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		k8sClient,
 		namespace,
 		secretVarsName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, secretVarsName),
 		desiredFull,
 	)
 
@@ -273,7 +279,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		k8sClient,
 		namespace,
 		consoleCMName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, consoleCMName),
 		getClientID,
 		desiredFull,
 	)
@@ -282,7 +288,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		k8sClient,
 		namespace,
 		secretName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, secretName),
 		desiredFull,
 	)
 
@@ -290,14 +296,14 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		k8sClient,
 		namespace,
 		secretPasswordName,
-		labels,
+		labels.MustForNameK8SMap(componentLabels, secretPasswordName),
 		users,
 	)
 
 	query, _, _, err := AdaptFunc(
 		monitor,
+		componentLabels,
 		namespace,
-		labels,
 		desiredFull,
 		cmName,
 		certPath,
