@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
@@ -53,16 +54,13 @@ func (v *View) PutUser(user *model.UserView, event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	if event.Sequence != 0 {
-		return v.ProcessedUserSequence(event)
-	}
-	return nil
+	return v.ProcessedUserSequence(event)
 }
 
 func (v *View) DeleteUser(userID string, event *models.Event) error {
 	err := view.DeleteUser(v.Db, userTable, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedUserSequence(event)
 }

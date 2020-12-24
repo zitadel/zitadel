@@ -1624,11 +1624,10 @@ func (es *UserEventstore) AddMachineKey(ctx context.Context, key *usr_model.Mach
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5ROh4", "Errors.User.NotMachine")
 	}
 
-	id, err := es.idGenerator.Next()
+	key.KeyID, err = es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	key.KeyID = id
 
 	if key.ExpirationDate.IsZero() {
 		key.ExpirationDate, err = time.Parse(yearLayout, defaultExpirationDate)

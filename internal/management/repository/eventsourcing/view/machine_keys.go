@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
@@ -29,24 +30,21 @@ func (v *View) PutMachineKey(org *model.MachineKeyView, event *models.Event) err
 	if err != nil {
 		return err
 	}
-	if event.Sequence != 0 {
-		return v.ProcessedMachineKeySequence(event)
-	}
-	return nil
+	return v.ProcessedMachineKeySequence(event)
 }
 
 func (v *View) DeleteMachineKey(keyID string, event *models.Event) error {
 	err := view.DeleteMachineKey(v.Db, machineKeyTable, keyID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedMachineKeySequence(event)
 }
 
 func (v *View) DeleteMachineKeysByUserID(userID string, event *models.Event) error {
 	err := view.DeleteMachineKey(v.Db, machineKeyTable, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedMachineKeySequence(event)
 }

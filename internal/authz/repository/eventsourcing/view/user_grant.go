@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view"
@@ -42,8 +43,8 @@ func (v *View) PutUserGrant(grant *model.UserGrantView, event *models.Event) err
 
 func (v *View) DeleteUserGrant(grantID string, event *models.Event) error {
 	err := view.DeleteUserGrant(v.Db, userGrantTable, grantID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedUserGrantSequence(event)
 }

@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
@@ -20,10 +21,7 @@ func (v *View) PutNotifyUser(user *model.NotifyUser, event *models.Event) error 
 	if err != nil {
 		return err
 	}
-	if event.Sequence != 0 {
-		return v.ProcessedNotifyUserSequence(event)
-	}
-	return nil
+	return v.ProcessedNotifyUserSequence(event)
 }
 
 func (v *View) NotifyUsersByOrgID(orgID string) ([]*model.NotifyUser, error) {
@@ -32,8 +30,8 @@ func (v *View) NotifyUsersByOrgID(orgID string) ([]*model.NotifyUser, error) {
 
 func (v *View) DeleteNotifyUser(userID string, event *models.Event) error {
 	err := view.DeleteNotifyUser(v.Db, notifyUserTable, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedNotifyUserSequence(event)
 }

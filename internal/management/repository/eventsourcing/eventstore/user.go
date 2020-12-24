@@ -3,24 +3,22 @@ package eventstore
 import (
 	"context"
 
-	es_int "github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
-
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
+	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 

@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
@@ -33,10 +34,7 @@ func (v *View) PutOrgDomain(org *model.OrgDomainView, event *models.Event) error
 	if err != nil {
 		return err
 	}
-	if event.Sequence != 0 {
-		return v.ProcessedOrgDomainSequence(event)
-	}
-	return nil
+	return v.ProcessedOrgDomainSequence(event)
 }
 
 func (v *View) PutOrgDomains(domains []*model.OrgDomainView, event *models.Event) error {
@@ -49,8 +47,8 @@ func (v *View) PutOrgDomains(domains []*model.OrgDomainView, event *models.Event
 
 func (v *View) DeleteOrgDomain(orgID, domain string, event *models.Event) error {
 	err := view.DeleteOrgDomain(v.Db, orgDomainTable, orgID, domain)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedOrgDomainSequence(event)
 }
