@@ -16,7 +16,14 @@ func (o *Org) appendAddMailTemplateEvent(event *es_models.Event) error {
 }
 
 func (o *Org) appendChangeMailTemplateEvent(event *es_models.Event) error {
-	return o.MailTemplate.SetDataLabel(event)
+	mailTemplate := &iam_es_model.MailTemplate{}
+	err := mailTemplate.SetDataLabel(event)
+	if err != nil {
+		return err
+	}
+	mailTemplate.ObjectRoot.ChangeDate = event.CreationDate
+	o.MailTemplate = mailTemplate
+	return nil
 }
 
 func (o *Org) appendRemoveMailTemplateEvent(event *es_models.Event) {

@@ -46,6 +46,7 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
+		role.ChangeDate = event.CreationDate
 		err = role.AppendEvent(event)
 	case es_model.ProjectRoleRemoved:
 		err = role.SetData(event)

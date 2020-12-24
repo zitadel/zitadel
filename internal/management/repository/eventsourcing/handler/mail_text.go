@@ -55,6 +55,7 @@ func (m *MailText) processMailText(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
+		text.ChangeDate = event.CreationDate
 		err = text.AppendEvent(event)
 	case model.MailTextRemoved:
 		err = text.SetData(event)

@@ -75,6 +75,7 @@ func (r *ProjectRoleView) AppendEvent(event *models.Event) (err error) {
 		r.CreationDate = event.CreationDate
 		err = r.SetData(event)
 	case es_model.ProjectRoleChanged:
+		r.ChangeDate = event.CreationDate
 		err = r.SetData(event)
 	}
 	return err

@@ -92,13 +92,13 @@ func MailTextViewToModel(template *MailTextView) *model.MailTextView {
 
 func (i *MailTextView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
-	i.ChangeDate = event.CreationDate
 	switch event.Type {
 	case es_model.MailTextAdded, org_es_model.MailTextAdded:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
 	case es_model.MailTextChanged, org_es_model.MailTextChanged:
+		i.ChangeDate = event.CreationDate
 		err = i.SetData(event)
 	}
 	return err

@@ -22,6 +22,7 @@ func (o *Org) appendChangeMailTextEvent(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
+	mailText.ObjectRoot.ChangeDate = event.CreationDate
 	if n, m := iam_es_model.GetMailText(o.MailTexts, mailText.MailTextType, mailText.Language); m != nil {
 		o.MailTexts[n] = mailText
 	}
