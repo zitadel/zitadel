@@ -2,12 +2,13 @@ package spooler
 
 import (
 	"database/sql"
-	es_locker "github.com/caos/zitadel/internal/eventstore/locker"
 	"time"
+
+	es_locker "github.com/caos/zitadel/internal/eventstore/locker"
 )
 
 const (
-	lockTable = "management.locks"
+	lockTable = "auth.locks"
 )
 
 type locker struct {

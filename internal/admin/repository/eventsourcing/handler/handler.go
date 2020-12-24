@@ -77,12 +77,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 	}
 }
 
-func subscribe(es eventstore.Eventstore, handlers []query.Handler) {
-	for _, handler := range handlers {
-		es.Subscribe(handler.AggregateTypes()...)
-	}
-}
-
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
