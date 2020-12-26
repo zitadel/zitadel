@@ -15,7 +15,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { SearchMethod, UserSearchKey, UserSearchQuery, UserView } from 'src/app/proto/generated/management_pb';
+import { SearchMethod, UserSearchKey, UserSearchQuery, UserView } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 

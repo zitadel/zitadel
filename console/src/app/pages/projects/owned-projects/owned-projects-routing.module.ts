@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RoleGuard } from 'src/app/guards/role.guard';
-import { ProjectType } from 'src/app/proto/generated/management_pb';
+import { ProjectType } from 'src/app/proto/generated/zitadel/management_pb';
 
 import { OwnedProjectsComponent } from './owned-projects.component';
 

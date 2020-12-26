@@ -7,8 +7,8 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { IamMembersDataSource } from 'src/app/pages/iam/iam-members/iam-members-datasource';
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
-import { IamMemberView } from 'src/app/proto/generated/admin_pb';
-import { OrgMemberView, ProjectMemberView } from 'src/app/proto/generated/management_pb';
+import { IamMemberView } from 'src/app/proto/generated/zitadel/admin_pb';
+import { OrgMemberView, ProjectMemberView } from 'src/app/proto/generated/zitadel/management_pb';
 
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
 

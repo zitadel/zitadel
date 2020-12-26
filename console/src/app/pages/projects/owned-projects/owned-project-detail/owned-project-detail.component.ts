@@ -24,7 +24,7 @@ import {
     ProjectView,
     UserGrantSearchKey,
     UserView,
-} from 'src/app/proto/generated/management_pb';
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 

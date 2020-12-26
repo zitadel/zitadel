@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, scan, take, takeUntil, tap } from 'rxjs/operators';
-import { Change, Changes } from 'src/app/proto/generated/management_pb';
+import { Change, Changes } from 'src/app/proto/generated/zitadel/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 

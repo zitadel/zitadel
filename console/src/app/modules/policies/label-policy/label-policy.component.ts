@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { DefaultLabelPolicyUpdate, DefaultLabelPolicyView } from 'src/app/proto/generated/admin_pb';
+import { DefaultLabelPolicyUpdate, DefaultLabelPolicyView } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 

@@ -12,7 +12,7 @@ import {
     UserProfile,
     UserState,
     UserView,
-} from 'src/app/proto/generated/auth_pb';
+} from 'src/app/proto/generated/zitadel/auth_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 

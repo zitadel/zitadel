@@ -6,11 +6,11 @@ import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 
-import { ExternalIDPView as AuthExternalIDPView } from '../../../../proto/generated/auth_pb';
+import { ExternalIDPView as AuthExternalIDPView } from '../../../../proto/generated/zitadel/auth_pb';
 import {
     ExternalIDPSearchResponse,
     ExternalIDPView as MgmtExternalIDPView,
-} from '../../../../proto/generated/management_pb';
+} from '../../../../proto/generated/zitadel/management_pb';
 import { GrpcAuthService } from '../../../../services/grpc-auth.service';
 import { ManagementService } from '../../../../services/mgmt.service';
 import { ToastService } from '../../../../services/toast.service';

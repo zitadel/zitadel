@@ -4,8 +4,8 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Org } from 'src/app/proto/generated/auth_pb';
-import { ProjectState, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/auth_pb';
+import { ProjectState, ProjectType, ProjectView } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';

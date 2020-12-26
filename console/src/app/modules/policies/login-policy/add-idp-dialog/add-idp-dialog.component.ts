@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
+import { IdpView as AdminIdpView } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
     Idp,
     IdpProviderType,
@@ -8,7 +8,7 @@ import {
     IdpSearchQuery,
     IdpView as MgmtIdpView,
     SearchMethod,
-} from 'src/app/proto/generated/management_pb';
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 

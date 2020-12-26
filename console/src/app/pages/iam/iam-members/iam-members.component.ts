@@ -3,8 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { IamMember, IamMemberView } from 'src/app/proto/generated/admin_pb';
-import { ProjectMember, ProjectType, UserView } from 'src/app/proto/generated/management_pb';
+import { IamMember, IamMemberView } from 'src/app/proto/generated/zitadel/admin_pb';
+import { ProjectMember, ProjectType, UserView } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 

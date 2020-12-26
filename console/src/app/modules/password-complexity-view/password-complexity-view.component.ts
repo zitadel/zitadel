@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
+import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/management_pb';
 
 @Component({
     selector: 'app-password-complexity-view',

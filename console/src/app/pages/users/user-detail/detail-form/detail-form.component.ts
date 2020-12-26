@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Gender as authGender, UserProfile as authUP, UserView as authUV } from 'src/app/proto/generated/auth_pb';
-import { Gender as mgmtGender, UserProfile as mgmtUP, UserView as mgmtUV } from 'src/app/proto/generated/management_pb';
+import { Gender as authGender, UserProfile as authUP, UserView as authUV } from 'src/app/proto/generated/zitadel/auth_pb';
+import { Gender as mgmtGender, UserProfile as mgmtUP, UserView as mgmtUV } from 'src/app/proto/generated/zitadel/management_pb';
 
 
 @Component({

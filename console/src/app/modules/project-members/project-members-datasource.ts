@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { ProjectMember, ProjectMemberSearchResponse, ProjectType } from 'src/app/proto/generated/management_pb';
+import { ProjectMember, ProjectMemberSearchResponse, ProjectType } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 /**

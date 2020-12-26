@@ -48,8 +48,8 @@ import {
     RemoveIamMemberRequest,
     ViewID,
     Views,
-} from '../proto/generated/admin_pb';
-import { IdpUpdate } from '../proto/generated/management_pb';
+} from '../proto/generated/zitadel/admin_pb';
+import { IdpUpdate } from '../proto/generated/zitadel/management_pb';
 import { GrpcService } from './grpc.service';
 
 @Injectable({

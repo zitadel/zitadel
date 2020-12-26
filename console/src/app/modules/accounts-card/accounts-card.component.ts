@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig } from 'angular-oauth2-oidc';
-import { UserProfileView, UserSessionView } from 'src/app/proto/generated/auth_pb';
+import { UserProfileView, UserSessionView } from 'src/app/proto/generated/zitadel/auth_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 

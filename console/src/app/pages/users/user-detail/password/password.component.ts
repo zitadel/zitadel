@@ -3,7 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
+import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/auth_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';

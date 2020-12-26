@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UserView } from 'src/app/proto/generated/management_pb';
+import { UserView } from 'src/app/proto/generated/zitadel/management_pb';
 
 export interface ProjectGrantMembersCreateDialogExportType {
     userIds: string[];

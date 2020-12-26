@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { MfaOtpResponse, MFAState, MfaType, MultiFactor } from 'src/app/proto/generated/auth_pb';
+import { MfaOtpResponse, MFAState, MfaType, MultiFactor } from 'src/app/proto/generated/zitadel/auth_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 

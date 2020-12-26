@@ -6,7 +6,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { PolicyGridType } from 'src/app/modules/policy-grid/policy-grid.component';
-import { OrgMemberView, UserView } from 'src/app/proto/generated/management_pb';
+import { OrgMemberView, UserView } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 

@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
-import { UserView } from '../../../../proto/generated/management_pb';
+import { UserView } from '../../../../proto/generated/zitadel/management_pb';
 
 @Component({
     selector: 'app-detail-form-machine',

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
-import { ProjectType } from 'src/app/proto/generated/management_pb';
+import { ProjectType } from 'src/app/proto/generated/zitadel/management_pb';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { GrantedProjectsComponent } from './granted-projects.component';

@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MachineKeyType } from 'src/app/proto/generated/management_pb';
+import { MachineKeyType } from 'src/app/proto/generated/zitadel/management_pb';
 
 @Component({
     selector: 'app-add-key-dialog',

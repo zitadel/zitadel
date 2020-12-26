@@ -7,7 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { MachineKeySearchResponse, MachineKeyType, MachineKeyView } from 'src/app/proto/generated/management_pb';
+import { MachineKeySearchResponse, MachineKeyType, MachineKeyView } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 

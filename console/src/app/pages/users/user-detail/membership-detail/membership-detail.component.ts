@@ -6,7 +6,7 @@ import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { UserMembershipSearchResponse, UserMembershipView, UserView } from 'src/app/proto/generated/management_pb';
+import { UserMembershipSearchResponse, UserMembershipView, UserView } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';

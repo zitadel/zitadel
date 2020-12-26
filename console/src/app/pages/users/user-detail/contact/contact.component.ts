@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { HumanView as AuthHumanView, UserState as AuthUserState } from 'src/app/proto/generated/auth_pb';
-import { HumanView as MgmtHumanView, UserState as MgmtUserState } from 'src/app/proto/generated/management_pb';
+import { HumanView as AuthHumanView, UserState as AuthUserState } from 'src/app/proto/generated/zitadel/auth_pb';
+import { HumanView as MgmtHumanView, UserState as MgmtUserState } from 'src/app/proto/generated/zitadel/management_pb';
 
 import { CodeDialogComponent } from '../auth-user-detail/code-dialog/code-dialog.component';
 import { EditDialogType } from '../user-detail/user-detail.component';

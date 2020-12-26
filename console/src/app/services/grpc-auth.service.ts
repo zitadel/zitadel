@@ -33,7 +33,7 @@ import {
     UserView,
     VerifyMfaOtp,
     VerifyUserPhoneRequest,
-} from '../proto/generated/auth_pb';
+} from '../proto/generated/zitadel/auth_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageService } from './storage.service';
 

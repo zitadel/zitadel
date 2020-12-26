@@ -11,13 +11,13 @@ import {
     IdpUpdate as AdminIdpConfigUpdate,
     OidcIdpConfigUpdate as AdminOidcIdpConfigUpdate,
     OIDCMappingField as adminMappingFields,
-} from 'src/app/proto/generated/admin_pb';
+} from 'src/app/proto/generated/zitadel/admin_pb';
 import {
     IdpStylingType as mgmtIdpStylingType,
     IdpUpdate as MgmtIdpConfigUpdate,
     OidcIdpConfigUpdate as MgmtOidcIdpConfigUpdate,
     OIDCMappingField as mgmtMappingFields,
-} from 'src/app/proto/generated/management_pb';
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';

@@ -9,14 +9,14 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { UserView } from 'src/app/proto/generated/auth_pb';
+import { UserView } from 'src/app/proto/generated/zitadel/auth_pb';
 import {
     SearchMethod,
     UserSearchKey,
     UserSearchQuery,
     UserSearchResponse,
     UserState,
-} from 'src/app/proto/generated/management_pb';
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 

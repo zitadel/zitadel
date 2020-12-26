@@ -5,7 +5,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { merge, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Application } from 'src/app/proto/generated/management_pb';
+import { Application } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 

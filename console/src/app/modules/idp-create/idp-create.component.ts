@@ -9,7 +9,7 @@ import { take } from 'rxjs/operators';
 import {
     OidcIdpConfigCreate as AdminOidcIdpConfigCreate,
     OIDCMappingField as authMappingFields,
-} from 'src/app/proto/generated/admin_pb';
+} from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -17,7 +17,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import {
     OidcIdpConfigCreate as MgmtOidcIdpConfigCreate,
     OIDCMappingField as mgmtMappingFields,
-} from '../../proto/generated/management_pb';
+} from '../../proto/generated/zitadel/management_pb';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 
 @Component({

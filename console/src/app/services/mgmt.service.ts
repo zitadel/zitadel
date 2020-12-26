@@ -153,7 +153,7 @@ import {
     UserView,
     ValidateOrgDomainRequest,
     ZitadelDocs,
-} from '../proto/generated/management_pb';
+} from '../proto/generated/zitadel/management_pb';
 import { GrpcService } from './grpc.service';
 
 export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;

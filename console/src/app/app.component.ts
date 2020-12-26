@@ -18,7 +18,7 @@ import {
     Org,
     SearchMethod,
     UserProfileView,
-} from './proto/generated/auth_pb';
+} from './proto/generated/zitadel/auth_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';

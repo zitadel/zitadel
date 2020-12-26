@@ -2,8 +2,8 @@ import { animate, animateChild, query, stagger, style, transition, trigger } fro
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
-import { Org } from 'src/app/proto/generated/auth_pb';
-import { ProjectGrantView, ProjectState, ProjectType } from 'src/app/proto/generated/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/auth_pb';
+import { ProjectGrantView, ProjectState, ProjectType } from 'src/app/proto/generated/zitadel/management_pb';
 import { StorageKey, StorageService } from 'src/app/services/storage.service';
 
 @Component({

@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
-import { AddMachineKeyResponse } from 'src/app/proto/generated/management_pb';
+import { AddMachineKeyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 
 @Component({
     selector: 'app-show-key-dialog',
