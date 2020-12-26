@@ -1198,16 +1198,16 @@ func linkEvents(events ...*repository.Event) []*repository.Event {
 func generateEvent(t *testing.T, aggregateID string, checkPrevious bool, previousSeq uint64, opts ...func(*repository.Event)) *repository.Event {
 	t.Helper()
 	e := &repository.Event{
-		AggregateID:           aggregateID,
-		AggregateType:         repository.AggregateType(t.Name()),
-		CheckPreviousSequence: checkPrevious,
-		EditorService:         "svc",
-		EditorUser:            "user",
-		PreviousEvent:         nil,
-		PreviousSequence:      previousSeq,
-		ResourceOwner:         "ro",
-		Type:                  "test.created",
-		Version:               "v1",
+		AggregateID:   aggregateID,
+		AggregateType: repository.AggregateType(t.Name()),
+		// CheckPreviousSequence: checkPrevious,
+		EditorService:    "svc",
+		EditorUser:       "user",
+		PreviousEvent:    nil,
+		PreviousSequence: previousSeq,
+		ResourceOwner:    "ro",
+		Type:             "test.created",
+		Version:          "v1",
 	}
 
 	for _, opt := range opts {
@@ -1220,16 +1220,16 @@ func generateEvent(t *testing.T, aggregateID string, checkPrevious bool, previou
 func generateEventWithData(t *testing.T, aggregateID string, checkPrevious bool, previousSeq uint64, data []byte) *repository.Event {
 	t.Helper()
 	return &repository.Event{
-		AggregateID:           aggregateID,
-		AggregateType:         repository.AggregateType(t.Name()),
-		CheckPreviousSequence: checkPrevious,
-		EditorService:         "svc",
-		EditorUser:            "user",
-		PreviousEvent:         nil,
-		PreviousSequence:      previousSeq,
-		ResourceOwner:         "ro",
-		Type:                  "test.created",
-		Version:               "v1",
-		Data:                  data,
+		AggregateID:   aggregateID,
+		AggregateType: repository.AggregateType(t.Name()),
+		// CheckPreviousSequence: checkPrevious,
+		EditorService:    "svc",
+		EditorUser:       "user",
+		PreviousEvent:    nil,
+		PreviousSequence: previousSeq,
+		ResourceOwner:    "ro",
+		Type:             "test.created",
+		Version:          "v1",
+		Data:             data,
 	}
 }

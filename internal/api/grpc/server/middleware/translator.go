@@ -3,9 +3,9 @@ package middleware
 import (
 	"context"
 	"errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
@@ -47,7 +47,7 @@ func newZitadelTranslator(defaultLanguage language.Tag) *i18n.Translator {
 
 func translatorFromNamespace(namespace string, defaultLanguage language.Tag) *i18n.Translator {
 	dir, err := fs.NewWithNamespace(namespace)
-	logging.LogWithFields("ERROR-7usEW", "namespace", namespace).OnError(err).Panic("unable to get namespace")
+	logging.LogWithFields("ERROR-gflZt", "namespace", namespace).OnError(err).Panic("unable to get namespace")
 
 	translator, err := i18n.NewTranslator(dir, i18n.TranslatorConfig{DefaultLanguage: defaultLanguage})
 	logging.Log("ERROR-Sk8sf").OnError(err).Panic("unable to get i18n translator")

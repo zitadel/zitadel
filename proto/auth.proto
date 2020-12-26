@@ -6,8 +6,8 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
-import "authoption/options.proto";
-import "proto/message.proto";
+import "zitadel/options.proto";
+import "zitadel/message.proto";
 
 package caos.zitadel.auth.api.v1;
 

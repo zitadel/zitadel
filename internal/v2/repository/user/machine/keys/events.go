@@ -3,10 +3,11 @@ package keys
 import (
 	"context"
 	"encoding/json"
+	"time"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"time"
 )
 
 const (
@@ -19,7 +20,7 @@ type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	KeyID          string         `json:"keyId,omitempty"`
-	Type           MachineKeyType `json:"type,omitempty"`
+	Typ            MachineKeyType `json:"type,omitempty"`
 	ExpirationDate time.Time      `json:"expirationDate,omitempty"`
 	PublicKey      []byte         `json:"publicKey,omitempty"`
 }
@@ -41,7 +42,7 @@ func NewAddedEvent(
 			MachineKeyAddedEventType,
 		),
 		KeyID:          keyID,
-		Type:           keyType,
+		Typ:            keyType,
 		ExpirationDate: expirationDate,
 		PublicKey:      publicKey,
 	}

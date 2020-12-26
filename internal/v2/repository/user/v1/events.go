@@ -2,6 +2,8 @@ package v1
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/user/human"
@@ -13,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user/human/phone"
 	"github.com/caos/zitadel/internal/v2/repository/user/human/profile"
 	"golang.org/x/text/language"
-	"time"
 )
 
 const (
@@ -305,13 +306,13 @@ func NewUserV1EmailCodeSentEvent(ctx context.Context) *email.CodeSentEvent {
 	}
 }
 
-func NewUserV1PhoneChangedEvent(ctx context.Context, phone string) *phone.ChangedEvent {
-	return phone.HumanPhoneChangedEvent{
+func NewUserV1PhoneChangedEvent(ctx context.Context, phoneNbr string) *phone.ChangedEvent {
+	return &phone.ChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserV1PhoneChangedType,
 		),
-		PhoneNumber: phone,
+		PhoneNumber: phoneNbr,
 	}
 }
 
@@ -396,8 +397,8 @@ func NewUserV1AddressChangedEvent(
 	postalCode,
 	region,
 	streetAddress string,
-) *address.HumanAddressChangedEvent {
-	return &address.HumanAddressChangedEvent{
+) *address.ChangedEvent {
+	return &address.ChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserV1AddressChangedType,

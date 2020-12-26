@@ -45,3 +45,7 @@ console/src/app/proto/generated/
 
 pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
+
+#generated filed
+**.pb.go
+**.gen.go

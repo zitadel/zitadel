@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler/mock"
+	es_v2 "github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/golang/mock/gomock"
 )
@@ -53,6 +54,10 @@ func (h *testHandler) QueryLimit() uint64 {
 type eventstoreStub struct {
 	events []*models.Event
 	err    error
+}
+
+func (es *eventstoreStub) V2() *es_v2.Eventstore {
+	return nil
 }
 
 func (es *eventstoreStub) Health(ctx context.Context) error {

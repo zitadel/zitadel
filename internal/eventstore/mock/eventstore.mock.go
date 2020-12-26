@@ -7,6 +7,7 @@ package mock
 import (
 	context "context"
 	models "github.com/caos/zitadel/internal/eventstore/models"
+	eventstore "github.com/caos/zitadel/internal/eventstore/v2"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -109,4 +110,18 @@ func (mr *MockEventstoreMockRecorder) PushAggregates(arg0 interface{}, arg1 ...i
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushAggregates", reflect.TypeOf((*MockEventstore)(nil).PushAggregates), varargs...)
+}
+
+// V2 mocks base method
+func (m *MockEventstore) V2() *eventstore.Eventstore {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "V2")
+	ret0, _ := ret[0].(*eventstore.Eventstore)
+	return ret0
+}
+
+// V2 indicates an expected call of V2
+func (mr *MockEventstoreMockRecorder) V2() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "V2", reflect.TypeOf((*MockEventstore)(nil).V2))
 }

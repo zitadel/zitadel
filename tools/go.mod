@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
+	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/iancoleman/strcase v0.1.2 // indirect
@@ -17,6 +18,6 @@ require (
 	golang.org/x/text v0.3.4 // indirect
 	golang.org/x/tools v0.0.0-20201223010750-3fa0e8f87c1a // indirect
 	google.golang.org/genproto v0.0.0-20201214200347-8c77b98c765d // indirect
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.1
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

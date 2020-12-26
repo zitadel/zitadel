@@ -1,0 +1,10 @@
+apiVersion: skaffold/v2beta10
+kind: Config
+metadata:
+  name: zitadel
+build:
+  artifacts:
+  - image: docker.pkg.github.com/caos/zitadel/zitadel
+    context: .
+    docker:
+      dockerfile: build/Dockerfile
