@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
-	github.com/go-bindata/go-bindata v3.1.2+incompatible
+	github.com/go-bindata/go-bindata/v3 v3.1.3
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0

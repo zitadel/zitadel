@@ -4,55 +4,48 @@ set -eux
 
 echo "Generate grpc"
 
-protoc -I=/proto/include/ -I$GOPATH/src --go_out=plugins=grpc:$GOPATH/src options.proto
+#TODO: find a way to generate swagger and authoption to the correct package without mv
+mkdir $GOPATH/src/github.com/caos/zitadel/swagger
+mkdir /proto/output
+move() {
+  mv /proto/output/zitadel/$1*.swagger.json $GOPATH/src/github.com/caos/zitadel/swagger/
+  mv /proto/output/zitadel/$1*.go $GOPATH/src/github.com/caos/zitadel/pkg/grpc/$1/
+}
 
 protoc \
-  -I=/proto/proto \
   -I=/proto/include \
-  #-I=${GOPATH}/src \
-  --go_grpc_out=$GOPATH/src \
-  /proto/include/proto/message.proto
-
-ls ${GOPATH}/src/github.com/caos/zitadel/pkg/grpc/message
+  --go_out=plugins=grpc:$GOPATH/src \
+  /proto/include/zitadel/message.proto
 
 protoc \
-  -I=/proto/proto \
-  -I=/proto/zitadel \
   -I=/proto/include \
-  #-I=${GOPATH}/src \
-  --go_grpc_out=$GOPATH/src \
+  --go_out=plugins=grpc:$GOPATH/src \
   --grpc-gateway_out=logtostderr=true:$GOPATH/src \
-  --swagger_out=logtostderr=true:. \
-  --authoption_out=. \
+  --swagger_out=logtostderr=true:/proto/output \
+  --authoption_out=/proto/output \
   --validate_out=lang=go:${GOPATH}/src \
-  /proto/zitadel/admin.proto
-
-mv admin* $GOPATH/src/github.com/caos/zitadel/pkg/grpc/admin/
+  /proto/include/zitadel/admin.proto
 
 protoc \
-  -I=/proto/proto \
-  -I=/proto/zitadel \
   -I=/proto/include \
-  --go_grpc_out=$GOPATH/src \
+  --go_out=plugins=grpc:$GOPATH/src \
   --grpc-gateway_out=logtostderr=true,allow_delete_body=true:${GOPATH}/src \
-  --swagger_out=logtostderr=true,allow_delete_body=true:. \
-  --authoption_out=. \
+  --swagger_out=logtostderr=true,allow_delete_body=true:/proto/output \
+  --authoption_out=/proto/output \
   --validate_out=lang=go:${GOPATH}/src \
-  /proto/zitadel/management.proto
-
-mv management* $GOPATH/src/github.com/caos/zitadel/pkg/grpc/management/
+  /proto/include/zitadel/management.proto
 
 protoc \
-  -I=/proto/proto \
-  -I=/proto/zitadel \
   -I=/proto/include \
-  --go_grpc_out=$GOPATH/src \
+  --go_out=plugins=grpc:$GOPATH/src \
   --grpc-gateway_out=logtostderr=true:$GOPATH/src \
-  --swagger_out=logtostderr=true:. \
-  --authoption_out=. \
+  --swagger_out=logtostderr=true:/proto/output \
+  --authoption_out=/proto/output \
   --validate_out=lang=go:${GOPATH}/src \
-  /proto/zitadel/auth.proto
+  /proto/include/zitadel/auth.proto
 
-mv auth* $GOPATH/src/github.com/caos/zitadel/pkg/grpc/auth/
+move "admin"
+move "auth"
+move "management"
 
-echo "done generating"
+echo "done generating grpc"

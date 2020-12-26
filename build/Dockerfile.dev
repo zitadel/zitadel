@@ -77,6 +77,38 @@ RUN mv /go/bin/protoc-gen-go-grpc /go/bin/protoc-gen-go_grpc
 FROM go-dep as go-base
 COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
-RUN go-bindata -pkg main -o ./internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates \
+RUN build/zitadel/generate-authoption.sh
+RUN go-bindata \
+        -pkg main \
+        -prefix internal/protoc/protoc-gen-authoption \
+        -o ./internal/protoc/protoc-gen-authoption/templates.gen.go \
+        ./internal/protoc/protoc-gen-authoption/templates \
     && go install ./internal/protoc/protoc-gen-authoption
-#RUN build/zitadel/generate-grpc.sh
+RUN build/zitadel/generate-grpc.sh
+
+# ## Go test
+# FROM go-base as go-test
+# RUN go test -race -v -coverprofile=profile.cov ./...
+
+# ## Go test
+# FROM scratch as go-codecov
+# COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
+
+## Go prod build
+FROM go-base as prod-go-build
+COPY --from=prod-angular-build console/dist/console console/dist/console/
+RUN ./build/console/generate-static.sh \
+    && ./build/login/generate-static.sh \
+    && ./build/notification/generate-static.sh \
+    && ./build/zitadel/generate-static.sh
+
+# `skaffold debug` sets SKAFFOLD_GO_GCFLAGS to disable compiler optimizations
+ARG SKAFFOLD_GO_GCFLAGS
+RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /app cmd/zitadel/main.go
+
+FROM golang:1.15.6
+# Define GOTRACEBACK to mark this container as using the Go language runtime
+# for `skaffold debug` (https://skaffold.dev/docs/workflows/debug/).
+ENV GOTRACEBACK=single
+CMD ["./app"]
+COPY --from=prod-go-build /app .

@@ -6,7 +6,7 @@ import (
 	//proto
 	_ "github.com/envoyproxy/protoc-gen-validate"
 	//proto custom authoptions
-	_ "github.com/go-bindata/go-bindata/go-bindata"
+	_ "github.com/go-bindata/go-bindata/v3/go-bindata"
 	//proto
 	_ "github.com/golang/protobuf/protoc-gen-go"
 	//proto gateway
