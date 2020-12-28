@@ -3757,7 +3757,7 @@ func TestChangeMailTemplate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "add label template, ok",
+			name: "add mail template, ok",
 			args: args{
 				es:  GetMockChangesOrgWithMailTemplate(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
@@ -3819,167 +3819,166 @@ func TestChangeMailTemplate(t *testing.T) {
 	}
 }
 
-// ToDo Michi
-// func TestAddMailText(t *testing.T) {
-// 	ctrl := gomock.NewController(t)
-// 	type args struct {
-// 		es       *OrgEventstore
-// 		ctx      context.Context
-// 		mailtext *iam_model.MailText
-// 	}
-// 	type res struct {
-// 		result  *iam_model.MailText
-// 		wantErr bool
-// 		errFunc func(err error) bool
-// 	}
-// 	tests := []struct {
-// 		name string
-// 		args args
-// 		res  res
-// 	}{
-// 		{
-// 			name: "add label mailtext, ok",
-// 			args: args{
-// 				es:  GetMockChangesOrgOK(ctrl),
-// 				ctx: authz.NewMockContext("orgID", "userID"),
-// 				mailtext: &iam_model.MailText{
-// 					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-// 					MailTextType: "Type",
-// 					Language:     "DE",
-// 				},
-// 			},
-// 			res: res{
-// 				result: &iam_model.MailText{
-// 					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-// 					MailTextType: "Type",
-// 					Language:     "DE",
-// 				},
-// 			},
-// 		},
-// 		{
-// 			name: "invalid mailtext",
-// 			args: args{
-// 				es:  GetMockChangesOrgOK(ctrl),
-// 				ctx: authz.NewMockContext("orgID", "userID"),
-// 				mailtext: &iam_model.MailText{
-// 					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
-// 				},
-// 			},
-// 			res: res{
-// 				wantErr: true,
-// 				errFunc: caos_errs.IsPreconditionFailed,
-// 			},
-// 		},
-// 		{
-// 			name: "existing org not found",
-// 			args: args{
-// 				es:  GetMockChangesOrgNoEvents(ctrl),
-// 				ctx: authz.NewMockContext("orgID", "userID"),
-// 				mailtext: &iam_model.MailText{
-// 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-// 				},
-// 			},
-// 			res: res{
-// 				wantErr: true,
-// 				errFunc: caos_errs.IsNotFound,
-// 			},
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			result, err := tt.args.es.AddMailText(tt.args.ctx, tt.args.mailtext)
-// 			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
-// 				t.Errorf("got wrong err: %v ", err)
-// 				return
-// 			}
-// 			if tt.res.wantErr && tt.res.errFunc(err) {
-// 				return
-// 			}
-// 			if result.MailTextType != tt.res.result.MailTextType {
-// 				t.Errorf("got wrong result MailTextType: expected: %v, actual: %v ", tt.res.result.MailTextType, result.MailTextType)
-// 			}
-// 		})
-// 	}
-// }
+func TestAddMailText(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *OrgEventstore
+		ctx      context.Context
+		mailtext *iam_model.MailText
+	}
+	type res struct {
+		result  *iam_model.MailText
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add label mailtext, ok",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				mailtext: &iam_model.MailText{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MailTextType: "Type",
+					Language:     "DE",
+				},
+			},
+			res: res{
+				result: &iam_model.MailText{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MailTextType: "Type",
+					Language:     "DE",
+				},
+			},
+		},
+		{
+			name: "invalid mailtext",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				mailtext: &iam_model.MailText{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing org not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				mailtext: &iam_model.MailText{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddMailText(tt.args.ctx, tt.args.mailtext)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result.MailTextType != tt.res.result.MailTextType {
+				t.Errorf("got wrong result MailTextType: expected: %v, actual: %v ", tt.res.result.MailTextType, result.MailTextType)
+			}
+		})
+	}
+}
 
-// func TestChangeMailText(t *testing.T) {
-// 	ctrl := gomock.NewController(t)
-// 	type args struct {
-// 		es       *OrgEventstore
-// 		ctx      context.Context
-// 		mailtext *iam_model.MailText
-// 	}
-// 	type res struct {
-// 		result  *iam_model.MailText
-// 		wantErr bool
-// 		errFunc func(err error) bool
-// 	}
-// 	tests := []struct {
-// 		name string
-// 		args args
-// 		res  res
-// 	}{
-// 		{
-// 			name: "add label mailtext, ok",
-// 			args: args{
-// 				es:  GetMockChangesOrgWithMailText(ctrl),
-// 				ctx: authz.NewMockContext("orgID", "userID"),
-// 				mailtext: &iam_model.MailText{
-// 					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-// 					MailTextType: "Type",
-// 					Language:     "DE",
-// 				},
-// 			},
-// 			res: res{
-// 				result: &iam_model.MailText{
-// 					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-// 					MailTextType: "Type",
-// 					Language:     "DE",
-// 				},
-// 			},
-// 		},
-// 		{
-// 			name: "invalid mailtext",
-// 			args: args{
-// 				es:  GetMockChangesOrgOK(ctrl),
-// 				ctx: authz.NewMockContext("orgID", "userID"),
-// 				mailtext: &iam_model.MailText{
-// 					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
-// 				},
-// 			},
-// 			res: res{
-// 				wantErr: true,
-// 				errFunc: caos_errs.IsPreconditionFailed,
-// 			},
-// 		},
-// 		{
-// 			name: "existing iam not found",
-// 			args: args{
-// 				es:  GetMockChangesOrgNoEvents(ctrl),
-// 				ctx: authz.NewMockContext("orgID", "userID"),
-// 				mailtext: &iam_model.MailText{
-// 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-// 				},
-// 			},
-// 			res: res{
-// 				wantErr: true,
-// 				errFunc: caos_errs.IsNotFound,
-// 			},
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			result, err := tt.args.es.ChangeMailText(tt.args.ctx, tt.args.mailtext)
-// 			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
-// 				t.Errorf("got wrong err: %v ", err)
-// 				return
-// 			}
-// 			if tt.res.wantErr && tt.res.errFunc(err) {
-// 				return
-// 			}
-// 			if string(result.MailTextType) != string(tt.res.result.MailTextType) {
-// 				t.Errorf("got wrong result MailTextType: expected: %v, actual: %v ", tt.res.result.MailTextType, result.MailTextType)
-// 			}
-// 		})
-// 	}
-// }
+func TestChangeMailText(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *OrgEventstore
+		ctx      context.Context
+		mailtext *iam_model.MailText
+	}
+	type res struct {
+		result  *iam_model.MailText
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add label mailtext, ok",
+			args: args{
+				es:  GetMockChangesOrgWithMailText(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				mailtext: &iam_model.MailText{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MailTextType: "Type",
+					Language:     "DE",
+				},
+			},
+			res: res{
+				result: &iam_model.MailText{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MailTextType: "Type",
+					Language:     "DE",
+				},
+			},
+		},
+		{
+			name: "invalid mailtext",
+			args: args{
+				es:  GetMockChangesOrgOK(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				mailtext: &iam_model.MailText{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockChangesOrgNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				mailtext: &iam_model.MailText{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeMailText(tt.args.ctx, tt.args.mailtext)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if string(result.MailTextType) != string(tt.res.result.MailTextType) {
+				t.Errorf("got wrong result MailTextType: expected: %v, actual: %v ", tt.res.result.MailTextType, result.MailTextType)
+			}
+		})
+	}
+}

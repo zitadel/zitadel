@@ -1,8 +1,6 @@
 package view
 
 import (
-	"fmt"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -19,8 +17,6 @@ func GetMailTemplateByAggregateID(db *gorm.DB, table, aggregateID string) (*mode
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-iPnmU", "Errors.IAM.MailTemplate.NotExisting")
 	}
-	//	sDec, _ := b64.StdEncoding.DecodeString(string(template.Template))
-	fmt.Println(string(template.Template))
 	return template, err
 }
 

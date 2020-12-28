@@ -2,7 +2,6 @@ package management
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -37,7 +36,6 @@ func (s *Server) UpdateMailTemplate(ctx context.Context, template *management.Ma
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(result.Template))
 	return mailTemplateFromModel(result), nil
 }
 

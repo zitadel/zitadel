@@ -61,6 +61,7 @@ func (i *MailTemplateView) AppendEvent(event *models.Event) (err error) {
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
 	case es_model.MailTemplateChanged, org_es_model.MailTemplateChanged:
+		i.ChangeDate = event.CreationDate
 		err = i.SetData(event)
 	}
 	return err

@@ -97,6 +97,9 @@ func IAMToModel(iam *IAM) *model.IAM {
 	if iam.DefaultLabelPolicy != nil {
 		converted.DefaultLabelPolicy = LabelPolicyToModel(iam.DefaultLabelPolicy)
 	}
+	if iam.DefaultMailTemplate != nil {
+		converted.DefaultMailTemplate = MailTemplateToModel(iam.DefaultMailTemplate)
+	}
 	if iam.DefaultPasswordComplexityPolicy != nil {
 		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyToModel(iam.DefaultPasswordComplexityPolicy)
 	}

@@ -3,8 +3,6 @@ package eventsourcing
 import (
 	"encoding/json"
 
-	b64 "encoding/base64"
-
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/id"
 
@@ -200,12 +198,10 @@ func GetMockManipulateIAMWithLabelPolicy(ctrl *gomock.Controller) *IAMEventstore
 }
 
 func GetMockManipulateIAMWithMailTemplate(ctrl *gomock.Controller) *IAMEventstore {
-	var fritzli = make([]byte, 10000)
-	b64.StdEncoding.Encode(fritzli, []byte("<!doctypeX html>"))
-	policyData, _ := json.Marshal(model.MailTemplate{Template: fritzli})
+	mailTemplate, _ := json.Marshal(model.MailTemplate{Template: []byte("<!doctype htm>")})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTemplateAdded, Data: policyData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTemplateAdded, Data: mailTemplate},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -215,10 +211,10 @@ func GetMockManipulateIAMWithMailTemplate(ctrl *gomock.Controller) *IAMEventstor
 }
 
 func GetMockManipulateIAMWithMailText(ctrl *gomock.Controller) *IAMEventstore {
-	policyData, _ := json.Marshal(model.MailText{MailTextType: "Type", Language: "DE"})
+	mailText, _ := json.Marshal(model.MailText{MailTextType: "Type", Language: "DE"})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTextAdded, Data: policyData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTextAdded, Data: mailText},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

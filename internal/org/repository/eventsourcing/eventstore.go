@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/caos/logging"
 	http_utils "github.com/caos/zitadel/internal/api/http"
@@ -1081,10 +1080,6 @@ func (es *OrgEventstore) ChangeMailTemplate(ctx context.Context, template *iam_m
 		return nil, err
 	}
 
-	//	sDec, _ := b64.StdEncoding.DecodeString(string(template.Template))
-	fmt.Println(string(template.Template))
-	//	return template, err
-
 	repoOrg := model.OrgFromModel(org)
 	repoMailTemplate := iam_es_model.MailTemplateFromModel(template)
 
@@ -1093,6 +1088,7 @@ func (es *OrgEventstore) ChangeMailTemplate(ctx context.Context, template *iam_m
 	if err != nil {
 		return nil, err
 	}
+	repoOrg.MailTemplate.Template = repoMailTemplate.Template
 	return iam_es_model.MailTemplateToModel(repoOrg.MailTemplate), nil
 }
 

@@ -3,7 +3,6 @@ package model
 import (
 	b64 "encoding/base64"
 	"encoding/json"
-	"fmt"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -18,7 +17,6 @@ type MailTemplate struct {
 }
 
 func MailTemplateToModel(template *MailTemplate) *iam_model.MailTemplate {
-	fmt.Println(string(template.Template))
 	return &iam_model.MailTemplate{
 		ObjectRoot: template.ObjectRoot,
 		State:      iam_model.PolicyState(template.State),
@@ -36,10 +34,8 @@ func MailTemplateFromModel(template *iam_model.MailTemplate) *MailTemplate {
 
 func (p *MailTemplate) Changes(changed *MailTemplate) map[string]interface{} {
 	changes := make(map[string]interface{}, 2)
-	fmt.Println(string(changed.Template))
-	fmt.Println(string(p.Template))
 	if b64.StdEncoding.EncodeToString(changed.Template) != b64.StdEncoding.EncodeToString(p.Template) {
-		changes["mailTemplate"] = b64.StdEncoding.EncodeToString(changed.Template)
+		changes["template"] = b64.StdEncoding.EncodeToString(changed.Template)
 	}
 
 	return changes
