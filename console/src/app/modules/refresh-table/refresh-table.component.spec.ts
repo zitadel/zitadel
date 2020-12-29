@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { RefreshTableComponent } from './refresh-table.component';
 
@@ -6,7 +6,7 @@ describe('RefreshTableComponent', () => {
     let component: RefreshTableComponent;
     let fixture: ComponentFixture<RefreshTableComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [RefreshTableComponent],
         })

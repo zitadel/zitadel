@@ -37,7 +37,7 @@ Go check it out under [zitadel.ch](https://zitadel.ch)
 ### Run your own IAM
 
 Stay tuned, we will soon publish a guide how you can deploy a **hyperconverged** system with our automation tooling called [**ORBOS**](https://github.com/caos/orbos/).
-With [**ORBOS**](https://github.com/caos/orbos/) you will be able to run [**Kubernetes**](https://kubernetes.io/) on **GCE** or **StaticProvider** within 20 minutes. To achieve this, [[**ORBOS**](https://github.com/caos/orbos/) will bootstrap and maintain a [**Kubernetes**](https://kubernetes.io/) cluster, essential platform components (logging, metrics, ingress, ...), a secure [**CockroachDB**](https://www.cockroachlabs.com/) cluster and **ZITADEL** itself.
+With [**ORBOS**](https://github.com/caos/orbos/) you will be able to run [**Kubernetes**](https://kubernetes.io/) with Google on **[GCEProvider](https://cloud.google.com/compute)**, on **[StaticProvider](https://github.com/caos/orbos/blob/master/docs/orbiter/static.md)** for in-house scenarios or on the Swiss based **[CloudscaleProvider](https://www.cloudscale.ch/)** within 20 minutes. To achieve this, [**ORBOS**](https://github.com/caos/orbos/) will bootstrap and maintain a [**Kubernetes**](https://kubernetes.io/) cluster, essential platform components (logging, metrics, ingress, ...), a secure [**CockroachDB**](https://www.cockroachlabs.com/) cluster and **ZITADEL** itself.
 
 The combination of the tools [**ORBOS**](https://github.com/caos/orbos/) and **ZITADEL** is what makes the operation easy and scalable.
 
@@ -51,6 +51,8 @@ Details need to be announced, but feel free to contribute already. As long as yo
 
 We already have documentation specific [guidelines](./site/CONTRIBUTING.md).
 
+Howto develop ZITADEL: [contribute](./CONTRIBUTING.md)
+
 ## Security
 
 See the policy [here](./SECURITY.md)
@@ -60,4 +62,3 @@ See the policy [here](./SECURITY.md)
 See the exact licensing terms [here](./LICENSE)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-

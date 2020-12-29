@@ -42,3 +42,45 @@ func (s *Server) RemoveIdpProviderFromDefaultLoginPolicy(ctx context.Context, pr
 	err := s.iam.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
 	return &empty.Empty{}, err
 }
+
+func (s *Server) GetDefaultLoginPolicySecondFactors(ctx context.Context, _ *empty.Empty) (*admin.SecondFactorsResult, error) {
+	result, err := s.iam.SearchDefaultSecondFactors(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return secondFactorsResultFromModel(result), nil
+}
+
+func (s *Server) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, mfa *admin.SecondFactor) (*admin.SecondFactor, error) {
+	result, err := s.iam.AddSecondFactorToLoginPolicy(ctx, secondFactorTypeToModel(mfa))
+	if err != nil {
+		return nil, err
+	}
+	return secondFactorFromModel(result), nil
+}
+
+func (s *Server) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, mfa *admin.SecondFactor) (*empty.Empty, error) {
+	err := s.iam.RemoveSecondFactorFromLoginPolicy(ctx, secondFactorTypeToModel(mfa))
+	return &empty.Empty{}, err
+}
+
+func (s *Server) GetDefaultLoginPolicyMultiFactors(ctx context.Context, _ *empty.Empty) (*admin.MultiFactorsResult, error) {
+	result, err := s.iam.SearchDefaultMultiFactors(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return multiFactorResultFromModel(result), nil
+}
+
+func (s *Server) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, mfa *admin.MultiFactor) (*admin.MultiFactor, error) {
+	result, err := s.iam.AddMultiFactorToLoginPolicy(ctx, multiFactorTypeToModel(mfa))
+	if err != nil {
+		return nil, err
+	}
+	return multiFactorFromModel(result), nil
+}
+
+func (s *Server) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, mfa *admin.MultiFactor) (*empty.Empty, error) {
+	err := s.iam.RemoveMultiFactorFromLoginPolicy(ctx, multiFactorTypeToModel(mfa))
+	return &empty.Empty{}, err
+}

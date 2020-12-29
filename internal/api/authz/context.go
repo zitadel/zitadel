@@ -6,7 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type key int
@@ -36,29 +36,36 @@ type Grant struct {
 	Roles []string
 }
 
-func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t *TokenVerifier, method string) (_ context.Context, err error) {
+func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *TokenVerifier, method string) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if orgID != "" {
 		err = t.ExistsOrg(ctx, orgID)
 		if err != nil {
-			return nil, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
 		}
 	}
 
 	userID, clientID, agentID, prefLang, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
-		return nil, err
+		return CtxData{}, err
 	}
 	projectID, origins, err := t.ProjectIDAndOriginsByClientID(ctx, clientID)
 	if err != nil {
-		return nil, errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
+		return CtxData{}, errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
 	}
 	if err := checkOrigin(ctx, origins); err != nil {
-		return nil, err
+		return CtxData{}, err
 	}
-	return context.WithValue(ctx, dataKey, CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID, PreferredLanguage: prefLang}), nil
+	return CtxData{
+		UserID:            userID,
+		OrgID:             orgID,
+		ProjectID:         projectID,
+		AgentID:           agentID,
+		PreferredLanguage: prefLang,
+	}, nil
+
 }
 
 func SetCtxData(ctx context.Context, ctxData CtxData) context.Context {

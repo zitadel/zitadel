@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -76,7 +77,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 	if err != nil {
 		return nil, err
 	}
-	repos := handler.EventstoreRepos{IamEvents: iam}
+	repos := handler.EventstoreRepos{IAMEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
 	return &EsRepository{

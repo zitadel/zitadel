@@ -30,6 +30,7 @@ const (
 	XContentTypeOptions     = "x-content-type-options"
 	ReferrerPolicy          = "referrer-policy"
 	FeaturePolicy           = "feature-policy"
+	PermissionsPolicy       = "permissions-policy"
 
 	ZitadelOrgID = "x-zitadel-orgid"
 )

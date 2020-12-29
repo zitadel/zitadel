@@ -1,5 +1,5 @@
 .default {
-  color: #5282c1;
+  color: var(--color-main);
   margin-top: 0;
 }
 
@@ -35,6 +35,11 @@
 
 .subheader {
   width: 100%;
+}
+
+.subdesc {
+  color: var(--grey);
+  font-size: 14px;
 }
 
 .idps {
@@ -92,4 +97,11 @@
       object-fit: scale-down;
     }
   }
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--grey);
+  margin: 1rem 0;
 }

@@ -17,7 +17,7 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: "docker"
-  directory: "/build/docker"
+  directory: "/build/"
   schedule:
     interval: "weekly"
   open-pull-requests-limit: 10
@@ -28,6 +28,14 @@ updates:
   directory: "/site"
   schedule:
     interval: monthly
+  open-pull-requests-limit: 10
+  commit-message:
+    prefix: chore
+    include: scope
+- package-ecosystem: "docker"
+  directory: "/site/"
+  schedule:
+    interval: "weekly"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore

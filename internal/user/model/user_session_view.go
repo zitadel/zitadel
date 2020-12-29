@@ -8,23 +8,24 @@ import (
 )
 
 type UserSessionView struct {
-	CreationDate                time.Time
-	ChangeDate                  time.Time
-	State                       req_model.UserSessionState
-	ResourceOwner               string
-	UserAgentID                 string
-	UserID                      string
-	UserName                    string
-	LoginName                   string
-	DisplayName                 string
-	SelectedIDPConfigID         string
-	PasswordVerification        time.Time
-	ExternalLoginVerification   time.Time
-	MfaSoftwareVerification     time.Time
-	MfaSoftwareVerificationType req_model.MfaType
-	MfaHardwareVerification     time.Time
-	MfaHardwareVerificationType req_model.MfaType
-	Sequence                    uint64
+	CreationDate                 time.Time
+	ChangeDate                   time.Time
+	State                        req_model.UserSessionState
+	ResourceOwner                string
+	UserAgentID                  string
+	UserID                       string
+	UserName                     string
+	LoginName                    string
+	DisplayName                  string
+	SelectedIDPConfigID          string
+	PasswordVerification         time.Time
+	PasswordlessVerification     time.Time
+	ExternalLoginVerification    time.Time
+	SecondFactorVerification     time.Time
+	SecondFactorVerificationType req_model.MFAType
+	MultiFactorVerification      time.Time
+	MultiFactorVerificationType  req_model.MFAType
+	Sequence                     uint64
 }
 
 type UserSessionSearchRequest struct {

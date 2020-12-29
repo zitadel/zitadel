@@ -106,6 +106,14 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 	return model.OrgToModel(esOrg), nil
 }
 
+func (es *OrgEventstore) OrgEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+	query, err := OrgByIDQuery(id, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return es.FilterEvents(ctx, query)
+}
+
 func (es *OrgEventstore) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	var found bool
 	err = es_sdk.Filter(ctx, es.FilterEvents, isUniqueValidation(&found), OrgNameUniqueQuery(name))
@@ -421,16 +429,20 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ara6l", "Errors.Org.InvalidMember")
 	}
 
-	existingMember, err := es.OrgMemberByIDs(ctx, member)
+	org, err := es.OrgByID(ctx, &org_model.Org{ObjectRoot: es_models.ObjectRoot{AggregateID: member.AggregateID, Sequence: member.Sequence}})
 	if err != nil {
 		return nil, err
 	}
+	existingMember, _ := org.MemeberByUserID(member.UserID)
+	if existingMember == nil {
+		return nil, errors.ThrowNotFound(nil, "EVENT-VB2Pn", "Errors.Org.MemberNotExisting")
+	}
 
-	member.ObjectRoot = existingMember.ObjectRoot
+	repoOrg := model.OrgFromModel(org)
 	repoMember := model.OrgMemberFromModel(member)
 	repoExistingMember := model.OrgMemberFromModel(existingMember)
 
-	orgAggregate := orgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoExistingMember, repoMember)
+	orgAggregate := orgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoExistingMember, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 	if err != nil {
 		return nil, err
@@ -444,18 +456,19 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 		return errors.ThrowInvalidArgument(nil, "EVENT-d43fs", "Errors.Org.UserIDMissing")
 	}
 
-	existingMember, err := es.OrgMemberByIDs(ctx, member)
-	if errors.IsNotFound(err) {
-		return nil
-	}
+	org, err := es.OrgByID(ctx, &org_model.Org{ObjectRoot: es_models.ObjectRoot{AggregateID: member.AggregateID, Sequence: member.Sequence}})
 	if err != nil {
 		return err
 	}
+	existingMember, _ := org.MemeberByUserID(member.UserID)
+	if existingMember == nil {
+		return nil
+	}
 
-	member.ObjectRoot = existingMember.ObjectRoot
+	repoOrg := model.OrgFromModel(org)
 	repoMember := model.OrgMemberFromModel(member)
 
-	orgAggregate := orgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoMember)
+	orgAggregate := orgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMember)
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }
 
@@ -767,7 +780,7 @@ func (es *OrgEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.L
 
 func (es *OrgEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	if policy == nil || !policy.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Org.LoginPolicy.Invalid")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-mL0ps", "Errors.Org.LoginPolicy.Invalid")
 	}
 	org, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
 	if err != nil {
@@ -775,7 +788,7 @@ func (es *OrgEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_mode
 	}
 
 	if org.LoginPolicy == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lso02", "Errors.Org.LoginPolicy.NotExisting")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-3Mg9s", "Errors.Org.LoginPolicy.NotExisting")
 	}
 
 	repoOrg := model.OrgFromModel(org)
@@ -868,6 +881,96 @@ func (es *OrgEventstore) RemoveIDPProviderFromLoginPolicy(ctx context.Context, p
 		return err
 	}
 	return es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
+}
+
+func (es *OrgEventstore) AddSecondFactorToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
+	if mfa == iam_model.SecondFactorTypeUnspecified {
+		return 0, errors.ThrowPreconditionFailed(nil, "EVENT-3Rf8s", "Errors.Org.LoginPolicy.MFA.Unspecified")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
+	if err != nil {
+		return 0, err
+	}
+	if org.LoginPolicy == nil {
+		return 0, errors.ThrowAlreadyExists(nil, "EVENT-hMd9s", "Errors.Org.LoginPolicy.NotExisting")
+	}
+	if _, m := org.LoginPolicy.GetSecondFactor(mfa); m != 0 {
+		return 0, errors.ThrowAlreadyExists(nil, "EVENT-3Bm9s", "Errors.Org.LoginPolicy.MFA.AlreadyExisting")
+	}
+	repoOrg := model.OrgFromModel(org)
+	repoMFA := iam_es_model.SecondFactorFromModel(mfa)
+
+	addAggregate := LoginPolicySecondFactorAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA, es.IamID)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return 0, err
+	}
+	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.SecondFactors, repoMFA.MFAType); m != 0 {
+		return iam_model.SecondFactorType(m), nil
+	}
+	return 0, errors.ThrowInternal(nil, "EVENT-rM9so", "Errors.Internal")
+}
+
+func (es *OrgEventstore) RemoveSecondFactorFromLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.SecondFactorType) error {
+	if mfa == iam_model.SecondFactorTypeUnspecified {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-6Nm9s", "Errors.Org.LoginPolicy.MFA.Unspecified")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
+	if err != nil {
+		return err
+	}
+	if _, m := org.LoginPolicy.GetSecondFactor(mfa); m == 0 {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-5Mso9", "Errors.IAM.LoginPolicy.MFA.NotExisting")
+	}
+	repoOrg := model.OrgFromModel(org)
+	repoMFA := iam_es_model.SecondFactorFromModel(mfa)
+	agg := LoginPolicySecondFactorRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA)
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
+}
+
+func (es *OrgEventstore) AddMultiFactorToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
+	if mfa == iam_model.MultiFactorTypeUnspecified {
+		return 0, errors.ThrowPreconditionFailed(nil, "EVENT-6Zms9", "Errors.Org.LoginPolicy.MFA.Unspecified")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
+	if err != nil {
+		return 0, err
+	}
+	if org.LoginPolicy == nil {
+		return 0, errors.ThrowAlreadyExists(nil, "EVENT-fGmx9", "Errors.Org.LoginPolicy.NotExisting")
+	}
+	if _, m := org.LoginPolicy.GetMultiFactor(mfa); m != 0 {
+		return 0, errors.ThrowAlreadyExists(nil, "EVENT-2Fj9s", "Errors.Org.LoginPolicy.MFA.AlreadyExisting")
+	}
+	repoOrg := model.OrgFromModel(org)
+	repoMFA := iam_es_model.MultiFactorFromModel(mfa)
+
+	addAggregate := LoginPolicyMultiFactorAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA, es.IamID)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	if err != nil {
+		return 0, err
+	}
+	if _, m := iam_es_model.GetMFA(repoOrg.LoginPolicy.MultiFactors, repoMFA.MFAType); m != 0 {
+		return iam_model.MultiFactorType(m), nil
+	}
+	return 0, errors.ThrowInternal(nil, "EVENT-2fMo0", "Errors.Internal")
+}
+
+func (es *OrgEventstore) RemoveMultiFactorFromLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.MultiFactorType) error {
+	if mfa == iam_model.MultiFactorTypeUnspecified {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-lsM9c", "Errors.Org.LoginPolicy.MFA.Unspecified")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
+	if err != nil {
+		return err
+	}
+	if _, m := org.LoginPolicy.GetMultiFactor(mfa); m == 0 {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-3dM0s", "Errors.IAM.LoginPolicy.MFA.NotExisting")
+	}
+	repoOrg := model.OrgFromModel(org)
+	repoMFA := iam_es_model.MultiFactorFromModel(mfa)
+	agg := LoginPolicyMultiFactorRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMFA)
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, agg)
 }
 
 func (es *OrgEventstore) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {

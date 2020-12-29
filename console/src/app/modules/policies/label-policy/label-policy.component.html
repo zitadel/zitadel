@@ -1,0 +1,20 @@
+<app-detail-layout [backRouterLink]="['/iam']" [title]="'POLICY.LABEL.TITLE' | translate"
+    [description]="'POLICY.LABEL.DESCRIPTION' | translate">
+
+    <div class="content" *ngIf="labelData">
+        <cnsl-form-field class="form-field" appearance="outline">
+            <cnsl-label>{{'POLICY.LABEL.PRIMARYCOLOR' | translate}}</cnsl-label>
+            <input cnslInput [(ngModel)]="labelData.primaryColor" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="form-field" appearance="outline">
+            <cnsl-label>{{'POLICY.LABEL.SECONDARYCOLOR' | translate}}</cnsl-label>
+            <input cnslInput [(ngModel)]="labelData.secondaryColor" />
+        </cnsl-form-field>
+    </div>
+
+    <div class="btn-container">
+        <button (click)="savePolicy()" color="primary" type="submit"
+            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+    </div>
+</app-detail-layout>

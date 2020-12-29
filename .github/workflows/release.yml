@@ -8,128 +8,49 @@ env:
   GO_VERSION: '1.15'
 
 jobs:
-
-  ## Angular test, will be added later
-
-  angular-lint: 
+  container:
     runs-on: ubuntu-18.04
-    defaults:
-      run:
-        working-directory: ./console
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install Protoc
-      uses: arduino/setup-protoc@master
-      with:
-        version: '3.x'
-    - run: wget -O protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64
-    - run: sudo mv protoc-gen-grpc-web /usr/local/bin/protoc-gen-grpc-web
-    - run: sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-    - run: npm ci
-    - run: npm run lint
-
-  angular-build:
-    runs-on: ubuntu-18.04
-    defaults:
-      run:
-        working-directory: ./console
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install Protoc
-      uses: arduino/setup-protoc@master
-      with:
-        version: '3.x'
-    - run: wget -O protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64
-    - run: sudo mv protoc-gen-grpc-web /usr/local/bin/protoc-gen-grpc-web
-    - run: sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
-    - uses: actions/setup-node@v1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-    - run: npm ci
-    - run: npm run prodbuild
-    - uses: actions/upload-artifact@v1
-      with:
-        name: angular
-        path: console/dist/console
-
-  go-test:
-    runs-on: ubuntu-18.04
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2-beta
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - run: go test -race -v -coverprofile=profile.cov ./...
-    - uses: actions/upload-artifact@v1
-      with:
-        name: go-coverage
-        path: profile.cov
-    - uses: codecov/codecov-action@v1
-      with:
-        file: ./profile.cov
-        name: codecov-go
-      
-  ## go lint, will be added later
-  
-  go-build:
-    runs-on: ubuntu-18.04
-    needs: [angular-build, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
-    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
-    strategy:
-      matrix:
-        goos: [ 'linux', 'darwin', 'windows' ]
-        goarch: ['amd64']
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2-beta
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - uses: actions/download-artifact@v2
-      with:
-        name: angular
-        path: console/dist/console
-    - run: go get github.com/rakyll/statik
-    - run: ./build/console/generate-static.sh
-    - run: cat internal/ui/console/statik/statik.go
-    - run: ./build/login/generate-static.sh
-    - run: cat internal/ui/login/statik/statik.go
-    - run: ./build/notification/generate-static.sh
-    - run: cat internal/notification/statik/statik.go
-    - run: ./build/zitadel/generate-static.sh
-    - run: cat internal/statik/statik.go
-    - run: CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-${{ matrix.goos }}-${{ matrix.goarch }} cmd/zitadel/main.go
-    - uses: actions/upload-artifact@v1
-      with:
-        name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
-
-  container-prod:
-    runs-on: ubuntu-18.04
-    needs: go-build
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: Set output
+      id: branch
+      run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+    - name: Check output
+      run: echo ${{ steps.branch.outputs.short_ref }}
+    - name: Generate Short SHA Container Tag
+      id: vars
+      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - name: Cache Docker layers
+      uses: actions/cache@v2
       with:
-        name: zitadel-linux-amd64
-        path: .artifacts
-    - uses: docker/build-push-action@v1
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to DockerHub
+      uses: docker/login-action@v1 
       with:
-        dockerfile: build/docker/Dockerfile
         username: ${{ github.actor }}
         password: ${{ secrets.CR_PAT }}
         registry: ${{ env.REGISTRY }}
-        repository: ${{ github.repository }}
-        tag_with_ref: true
-        tag_with_sha: true
+    - uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./build/dockerfile
+        platforms: linux/amd64
+        tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.branch.outputs.short_ref }}
+        push: true
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
   release:
     runs-on: ubuntu-18.04
-    needs: [container-prod]
+    needs: [container]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
       DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
@@ -139,32 +60,32 @@ jobs:
     - name: Generate Short SHA Container Tag
       id: vars
       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-    - uses: actions/download-artifact@v2
-      with:
-        path: .artifacts
-    - name: Display structure of downloaded files
-      run: ls -R
-      working-directory: .artifacts
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Pull short-sha
       run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }}
     - name: Semantic Release
+      id: semantic
       uses: cycjimmy/semantic-release-action@v2
       with:
         dry_run: false
         semantic_version: 17.0.4
-        extra_plugins: |
-          @semantic-release/exec@5.0.0
+    - name: Do something when a new release published
+      if: steps.semantic.outputs.new_release_published == 'true'
+      run: |
+        echo ${{ steps.semantic.outputs.new_release_version }}
+        echo ${{ steps.semantic.outputs.new_release_major_version }}
+        echo ${{ steps.semantic.outputs.new_release_minor_version }}
+        echo ${{ steps.semantic.outputs.new_release_patch_version }}
     - name: Docker Tag Version
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:$CAOS_NEXT_VERSION
-      if: env.CAOS_NEXT_VERSION !=  ''
+      run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
+      if: steps.semantic.outputs.new_release_published == 'true'
     - name: Docker Tag Latest
       run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
-      if: env.CAOS_NEXT_VERSION !=  ''
+      if: steps.semantic.outputs.new_release_published == 'true'
     - name: Docker Push Version
-      run: docker push $REGISTRY/$GITHUB_REPOSITORY:$CAOS_NEXT_VERSION
-      if: env.CAOS_NEXT_VERSION !=  ''
+      run: docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
+      if: steps.semantic.outputs.new_release_published == 'true'
     - name: Docker Push Latest
       run: docker push $REGISTRY/$GITHUB_REPOSITORY:latest
-      if: env.CAOS_NEXT_VERSION !=  ''
+      if: steps.semantic.outputs.new_release_published == 'true'

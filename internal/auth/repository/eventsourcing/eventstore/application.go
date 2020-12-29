@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type ApplicationRepo struct {
@@ -22,7 +23,10 @@ func (a *ApplicationRepo) ApplicationByClientID(ctx context.Context, clientID st
 	return proj_view_model.ApplicationViewToModel(app), nil
 }
 
-func (a *ApplicationRepo) AuthorizeOIDCApplication(ctx context.Context, clientID, secret string) error {
+func (a *ApplicationRepo) AuthorizeOIDCApplication(ctx context.Context, clientID, secret string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	app, err := a.View.ApplicationByClientID(ctx, clientID)
 	if err != nil {
 		return err

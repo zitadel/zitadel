@@ -10,6 +10,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
+import { PolicyGridType } from 'src/app/modules/policy-grid/policy-grid.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
     Org,
@@ -54,6 +55,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     public totalMemberResult: number = 0;
     public membersSubject: BehaviorSubject<OrgMemberView.AsObject[]>
         = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
+    public PolicyGridType: any = PolicyGridType;
 
     constructor(
         private dialog: MatDialog,
@@ -77,10 +79,12 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         }).catch(error => {
             this.toast.showError(error);
         });
-
         this.loadMembers();
+        this.loadDomains();
+    }
 
-        this.mgmtService.SearchMyOrgDomains(0, 100).then(result => {
+    public loadDomains(): void {
+        this.mgmtService.SearchMyOrgDomains().then(result => {
             this.domains = result.toObject().resultList;
             this.primaryDomain = this.domains.find(domain => domain.primary)?.domain ?? '';
         });
@@ -89,7 +93,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     public setPrimary(domain: OrgDomainView.AsObject): void {
         this.mgmtService.setMyPrimaryOrgDomain(domain.domain).then(() => {
             this.toast.showInfo('ORG.TOAST.SETPRIMARY', true);
-            this.getData();
+            this.loadDomains();
         }).catch((error) => {
             this.toast.showError(error);
         });
@@ -132,6 +136,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
                     newDomainView.setVerified(newDomain.getVerified());
 
                     this.domains.push(newDomainView.toObject());
+
+                    this.verifyDomain(newDomainView.toObject());
                     this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
                 });
             }
@@ -198,10 +204,17 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
 
     public verifyDomain(domain: OrgDomainView.AsObject): void {
-        this.dialog.open(DomainVerificationComponent, {
+        const dialogRef = this.dialog.open(DomainVerificationComponent, {
             data: {
                 domain: domain,
             },
+            width: '500px',
+        });
+
+        dialogRef.afterClosed().subscribe((reload) => {
+            if (reload) {
+                this.loadDomains();
+            }
         });
     }
 

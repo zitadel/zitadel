@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { UserMfaComponent } from './user-mfa.component';
 
@@ -6,7 +6,7 @@ describe('UserMfaComponent', () => {
     let component: UserMfaComponent;
     let fixture: ComponentFixture<UserMfaComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [UserMfaComponent],
         })

@@ -8,6 +8,7 @@ import (
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 )
 
@@ -25,7 +26,7 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 		stmt, err := tx.Prepare(insertStmt)
 		if err != nil {
 			tx.Rollback()
-			logging.Log("SQL-9ctx5").WithError(err).Warn("prepare failed")
+			logging.Log("SQL-9ctx5").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("prepare failed")
 			return caos_errs.ThrowInternal(err, "SQL-juCgA", "prepare failed")
 		}
 

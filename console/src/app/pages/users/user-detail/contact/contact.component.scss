@@ -5,29 +5,58 @@
 
   .method-row {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     padding: .5rem;
+    padding-right: 0;
     border-bottom: 1px solid #ffffff20;
     flex-wrap: wrap;
 
-    .actions {
-      flex: 1;
+    .left {
+      .label {
+        font-size: 13px;
+        margin-bottom: .5rem;
+        min-width: 100px;
+        color: var(--grey);
+        display: block;
+      }
+
+      .name {
+        display: block;
+        margin-bottom: .5rem;
+      }
+
+      .state {
+        font-size: 14px;
+        margin-bottom: .5rem;
+
+        &.verified {
+          color: #85d996;
+          display: block;
+        }
+
+        &.notverified {
+          color: #ff4436;
+          margin-right: 1rem;
+        }
+      }
+
+      .block {
+        display: block;
+      }
+    }
+
+    .right {
+      flex-basis: 70px;
       display: flex;
       justify-content: flex-end;
-      align-items: center;
-      flex-direction: column;
-      min-width: 150px;
     }
 
-    .label {
-      font-size: .9rem;
-      min-width: 100px;
-      color: var(--grey);
-    }
-
-    .icon {
-      margin: .5rem;
+    .verified-icon {
+      font-size: 1.2rem;
+      line-height: 1.2rem;
+      height: 1.2rem;
+      cursor: default;
     }
 
     .verify {
@@ -38,10 +67,15 @@
       cursor: pointer;
       word-wrap: none;
       white-space: nowrap;
+      margin-right: 1rem;
 
       &:hover {
         text-decoration: underline;
       }
     }
   }
+}
+
+.mat-form-field-wrapper {
+  padding-bottom: 0 !important;
 }

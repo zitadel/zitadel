@@ -4,18 +4,18 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/oidc/pkg/oidc"
+	"github.com/caos/oidc/pkg/op"
 	"golang.org/x/text/language"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/caos/oidc/pkg/oidc"
-	"github.com/caos/oidc/pkg/op"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
@@ -153,6 +153,9 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicati
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 			}
+			if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
+				userInfo.AppendClaims(model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
+			}
 		}
 	}
 
@@ -170,22 +173,24 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicati
 	return userInfo, nil
 }
 
-func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (claims map[string]interface{}, err error) {
+func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
 	roles := make([]string, 0)
 	for _, scope := range scopes {
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
+		} else if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
+			claims = appendClaim(claims, model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
 		}
 	}
-	if len(roles) == 0 || applicationID == "" {
-		return nil, nil
+	if len(roles) == 0 || clientID == "" {
+		return claims, nil
 	}
-	projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
+	projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
 	if err != nil {
 		return nil, err
 	}
 	if len(projectRoles) > 0 {
-		claims = map[string]interface{}{ClaimProjectRoles: projectRoles}
+		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
 	return claims, err
 }
@@ -233,4 +238,12 @@ func getGender(gender user_model.Gender) string {
 		return "diverse"
 	}
 	return ""
+}
+
+func appendClaim(claims map[string]interface{}, claim string, value interface{}) map[string]interface{} {
+	if claims == nil {
+		claims = make(map[string]interface{})
+	}
+	claims[claim] = value
+	return claims
 }

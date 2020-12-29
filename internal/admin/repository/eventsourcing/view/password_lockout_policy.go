@@ -2,6 +2,7 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	global_view "github.com/caos/zitadel/internal/view/repository"
@@ -15,28 +16,32 @@ func (v *View) PasswordLockoutPolicyByAggregateID(aggregateID string) (*model.Pa
 	return view.GetPasswordLockoutPolicyByAggregateID(v.Db, passwordLockoutPolicyTable, aggregateID)
 }
 
-func (v *View) PutPasswordLockoutPolicy(policy *model.PasswordLockoutPolicyView, sequence uint64) error {
+func (v *View) PutPasswordLockoutPolicy(policy *model.PasswordLockoutPolicyView, event *models.Event) error {
 	err := view.PutPasswordLockoutPolicy(v.Db, passwordLockoutPolicyTable, policy)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedPasswordLockoutPolicySequence(sequence)
+	return v.ProcessedPasswordLockoutPolicySequence(event)
 }
 
-func (v *View) DeletePasswordLockoutPolicy(aggregateID string, eventSequence uint64) error {
+func (v *View) DeletePasswordLockoutPolicy(aggregateID string, event *models.Event) error {
 	err := view.DeletePasswordLockoutPolicy(v.Db, passwordLockoutPolicyTable, aggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedPasswordLockoutPolicySequence(eventSequence)
+	return v.ProcessedPasswordLockoutPolicySequence(event)
 }
 
-func (v *View) GetLatestPasswordLockoutPolicySequence() (*global_view.CurrentSequence, error) {
-	return v.latestSequence(passwordLockoutPolicyTable)
+func (v *View) GetLatestPasswordLockoutPolicySequence(aggregateType string) (*global_view.CurrentSequence, error) {
+	return v.latestSequence(passwordLockoutPolicyTable, aggregateType)
 }
 
-func (v *View) ProcessedPasswordLockoutPolicySequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(passwordLockoutPolicyTable, eventSequence)
+func (v *View) ProcessedPasswordLockoutPolicySequence(event *models.Event) error {
+	return v.saveCurrentSequence(passwordLockoutPolicyTable, event)
+}
+
+func (v *View) UpdatePasswordLockoutPolicySpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(passwordLockoutPolicyTable)
 }
 
 func (v *View) GetLatestPasswordLockoutPolicyFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {

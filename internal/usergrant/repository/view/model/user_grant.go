@@ -22,6 +22,13 @@ const (
 	UserGrantKeyState         = "state"
 	UserGrantKeyOrgName       = "org_name"
 	UserGrantKeyRole          = "role_keys"
+	UserGrantKeyUserName      = "user_name"
+	UserGrantKeyFirstName     = "first_name"
+	UserGrantKeyLastName      = "last_name"
+	UserGrantKeyEmail         = "email"
+	UserGrantKeyOrgDomain     = "org_primary_domain"
+	UserGrantKeyProjectName   = "project_name"
+	UserGrantKeyDisplayName   = "display_name"
 )
 
 type UserGrantView struct {
@@ -36,6 +43,7 @@ type UserGrantView struct {
 	DisplayName      string         `json:"-" gorm:"column:display_name"`
 	Email            string         `json:"-" gorm:"column:email"`
 	ProjectName      string         `json:"-" gorm:"column:project_name"`
+	ProjectOwner     string         `json:"-" gorm:"column:project_owner"`
 	OrgName          string         `json:"-" gorm:"column:org_name"`
 	OrgPrimaryDomain string         `json:"-" gorm:"column:org_primary_domain"`
 	RoleKeys         pq.StringArray `json:"roleKeys" gorm:"column:role_keys"`

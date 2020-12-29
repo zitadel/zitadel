@@ -5,8 +5,10 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
@@ -15,26 +17,62 @@ import (
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-type ProjectGrantMember struct {
-	handler
-	userEvents *usr_event.UserEventstore
-}
-
 const (
 	projectGrantMemberTable = "management.project_grant_members"
 )
+
+type ProjectGrantMember struct {
+	handler
+	userEvents   *usr_event.UserEventstore
+	subscription *eventstore.Subscription
+}
+
+func newProjectGrantMember(
+	handler handler,
+	userEvents *usr_event.UserEventstore,
+) *ProjectGrantMember {
+	h := &ProjectGrantMember{
+		handler:    handler,
+		userEvents: userEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *ProjectGrantMember) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (p *ProjectGrantMember) ViewModel() string {
 	return projectGrantMemberTable
 }
 
+func (_ *ProjectGrantMember) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{proj_es_model.ProjectAggregate, usr_es_model.UserAggregate}
+}
+
+func (p *ProjectGrantMember) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := p.view.GetLatestProjectGrantMemberSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (p *ProjectGrantMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectGrantMemberSequence()
+	sequence, err := p.view.GetLatestProjectGrantMemberSequence("")
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(proj_es_model.ProjectAggregate, usr_es_model.UserAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -72,16 +110,20 @@ func (p *ProjectGrantMember) processProjectGrantMember(event *models.Event) (err
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectGrantMember(member.GrantID, member.UserID, event.Sequence)
+		return p.view.DeleteProjectGrantMember(member.GrantID, member.UserID, event)
 	case proj_es_model.ProjectRemoved:
-		return p.view.DeleteProjectGrantMembersByProjectID(event.AggregateID)
+		err = p.view.DeleteProjectGrantMembersByProjectID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		return p.view.ProcessedProjectGrantMemberSequence(event)
 	default:
-		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
+		return p.view.ProcessedProjectGrantMemberSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectGrantMember(member, member.Sequence)
+	return p.view.PutProjectGrantMember(member, event)
 }
 
 func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
@@ -96,7 +138,7 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(members) == 0 {
-			return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
+			return p.view.ProcessedProjectGrantMemberSequence(event)
 		}
 		user, err := p.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -105,11 +147,10 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 		for _, member := range members {
 			p.fillUserData(member, user)
 		}
-		return p.view.PutProjectGrantMembers(members, event.Sequence)
+		return p.view.PutProjectGrantMembers(members, event)
 	default:
-		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
+		return p.view.ProcessedProjectGrantMemberSequence(event)
 	}
-	return nil
 }
 
 func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView) (err error) {
@@ -137,4 +178,8 @@ func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberV
 func (p *ProjectGrantMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-kls93", "id", event.AggregateID).WithError(err).Warn("something went wrong in projectmember handler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectGrantMemberFailedEvent, p.view.ProcessedProjectGrantMemberFailedEvent, p.view.ProcessedProjectGrantMemberSequence, p.errorCountUntilSkip)
+}
+
+func (p *ProjectGrantMember) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateProjectGrantMemberSpoolerRunTimestamp)
 }

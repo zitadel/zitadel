@@ -1,5 +1,5 @@
 <div class="view-toggle">
-    <button (click)="changedView.emit(true)" mat-icon-button>
+    <button (click)="changedView.emit(true)" matTooltip="{{'PROJECT.TABLE.SHOWTABLE' | translate}}" mat-icon-button>
         <i class="show list view las la-th-list"></i>
     </button>
 </div>
@@ -22,11 +22,10 @@
                 {{ item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <span class="fill-space"></span>
         </div>
-        <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
-            mat-icon-button>
-            <mat-icon *ngIf="selection.isSelected(item)" svgIcon="mdi_pin"></mat-icon>
-            <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(item)"></mat-icon>
-        </button>
+
+        <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
+
+
     </div>
 
 </div>
@@ -47,8 +46,8 @@
                 {{ item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <span class="fill-space"></span>
         </div>
-        <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
-            mat-icon-button>
+        <button [ngClass]="{ selected: selection.isSelected(item)}"
+            (click)="selection.toggle(item); $event.stopPropagation()" class="edit-button" mat-icon-button>
             <mat-icon *ngIf="selection.isSelected(item)" svgIcon="mdi_pin"></mat-icon>
             <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(item)"></mat-icon>
         </button>
@@ -56,3 +55,11 @@
     <p class="n-items" *ngIf="!loading && items.length === 0 && selection.selected.length === 0">
         {{'PROJECT.PAGES.NOITEMS' | translate}}</p>
 </div>
+
+<ng-template #toggleButton let-key="key">
+    <button matTooltip="{{'ACTIONS.PIN' | translate}}" [ngClass]="{ selected: selection.isSelected(key)}"
+        (click)="selection.toggle(key); $event.stopPropagation()" class="edit-button" mat-icon-button>
+        <mat-icon *ngIf="selection.isSelected(key)" svgIcon="mdi_pin"></mat-icon>
+        <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(key)"></mat-icon>
+    </button>
+</ng-template>

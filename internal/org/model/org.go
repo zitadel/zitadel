@@ -87,13 +87,13 @@ func (o *Org) GetPrimaryDomain() *OrgDomain {
 	return nil
 }
 
-func (o *Org) ContainsMember(userID string) bool {
-	for _, member := range o.Members {
+func (o *Org) MemeberByUserID(userID string) (*OrgMember, int) {
+	for i, member := range o.Members {
 		if member.UserID == userID {
-			return true
+			return member, i
 		}
 	}
-	return false
+	return nil, -1
 }
 
 func (o *Org) nameForDomain(iamDomain string) string {

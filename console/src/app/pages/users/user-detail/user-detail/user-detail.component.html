@@ -6,12 +6,12 @@
             </a>
             <h1>{{user.human ? user.human?.displayName : user.machine?.name}}</h1>
 
-            <span class="fill-space"></span>
-
             <ng-template appHasRole [appHasRole]="['user.delete$', 'user.delete:'+user?.id]">
-                <button mat-raised-button color="warn" (click)="deleteUser()"><i
-                        class="las la-trash"></i>{{'USER.PAGES.DELETE' | translate}}</button>
+                <button mat-icon-button color="warn" matTooltip="{{'USER.PAGES.DELETE' | translate}}"
+                    (click)="deleteUser()"><i class="las la-trash"></i></button>
             </ng-template>
+
+            <span class="fill-space"></span>
 
             <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
                 <button class="state-button" mat-stroked-button color="warn"
@@ -67,35 +67,51 @@
 
         <app-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
-
+            <button card-actions mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
+                <mat-icon>refresh</mat-icon>
+            </button>
             <app-contact disablePhoneCode="true"
                 [canWrite]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async)" *ngIf="user?.human"
-                [human]="user.human" (savedPhone)="savePhone($event)" (savedEmail)="saveEmail($event)"
-                (deletedPhone)="deletePhone()" (resendEmailVerification)="resendEmailVerification()"
+                [human]="user.human" (editType)="openEditDialog($event)" (deletedPhone)="deletePhone()"
+                (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
-                <button phoneAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
+                <button pwdAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
                     mat-stroked-button color="primary"
                     *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
+                <button emailAction class="resendemail" *ngIf="user.state == UserState.USERSTATE_INITIAL"
+                    mat-stroked-button color="primary"
+                    (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' | translate}}</button>
             </app-contact>
         </app-card>
+
+        <app-passwordless *ngIf="user && user.human" [user]="user"></app-passwordless>
 
         <app-user-mfa *ngIf="user && user.human" [user]="user"></app-user-mfa>
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="user.id"
-                [allowWrite]="['user.grant.write$'+ 'user.grant.write:'+user?.id] | hasRole | async"
-                [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
-                [allowDelete]="['user.grant.delete$', 'user.grant.delete'+ user?.id] | hasRole | async">
+            <app-user-grants [userId]="user.id" [context]="USERGRANTCONTEXT"
+                [displayedColumns]="['select', 'projectId', 'dates', 'roleNamesList']"
+                [disableWrite]="((['user.grant.write$'] | hasRole) | async) == false"
+                [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
             </app-user-grants>
         </app-card>
     </div>
 
     <div *ngIf="user" class="side" metainfo>
-        <div class="details">
-            <div class="row" *ngIf="user?.preferredLoginName">
+        <div class="meta-details">
+            <div class="meta-row">
+                <span class="first">{{'RESOURCEID' | translate}}:</span>
+                <span *ngIf="user?.id" class="second">{{ user.id }}</span>
+            </div>
+            <div class="meta-row" *ngIf="user?.preferredLoginName">
                 <span class="first">{{'USER.PREFERRED_LOGINNAME' | translate}}</span>
                 <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
+            </div>
+            <div class="meta-row">
+                <span class="first">{{'ORG.PAGES.STATE'  | translate}}</span>
+                <span *ngIf="user && user.state !== undefined" class="state"
+                    [ngClass]="{'active': user.state === UserState.USERSTATE_ACTIVE, 'inactive': user.state === UserState.USERSTATE_INACTIVE}">{{'USER.DATA.STATE'+user.state | translate}}</span>
             </div>
         </div>
 
@@ -103,6 +119,7 @@
             <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
         </ng-template>
 
-        <app-changes class="changes" [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
+        <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.USER" [id]="user.id">
+        </app-changes>
     </div>
 </app-meta-layout>

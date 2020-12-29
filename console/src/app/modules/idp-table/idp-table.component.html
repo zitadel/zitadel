@@ -1,5 +1,5 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    emitRefreshOnPreviousRoute="/iam/idp/create" [timestamp]="idpResult?.viewTimestamp" [selection]="selection">
+    [emitRefreshOnPreviousRoutes]="['/iam/idp/create']" [timestamp]="idpResult?.viewTimestamp" [selection]="selection">
     <ng-template appHasRole [appHasRole]="['iam.write']" actions>
         <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="icon-button"
             mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">

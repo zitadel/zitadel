@@ -1,0 +1,45 @@
+
+@import '~@angular/material/theming';
+
+@mixin cnsl-form-field-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat-color($primary, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .ng-untouched {
+    .cnsl-error {
+      visibility: hidden;
+      transition: visibility .2 ease;
+    }
+  }
+
+  .cnsl-form-field-wrapper {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  .cnsl-rel {
+    position: relative;
+  }
+
+  [cnslSuffix] {
+    position: absolute;
+    right: .5rem;
+    top: 9px;
+    height: inherit;
+    vertical-align: middle;
+  }
+
+  // Wrapper for the hints and error messages.
+  .cnsl-form-field-subscript-wrapper {
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    overflow: hidden; // prevents multi-line errors from overlapping the control
+  }
+
+  .cnsl-form-field-hint-wrapper,
+  .cnsl-form-field-error-wrapper {
+    display: flex;
+  }
+}

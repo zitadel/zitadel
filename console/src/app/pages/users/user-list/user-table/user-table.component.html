@@ -1,11 +1,10 @@
-<app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
+<app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="userResult?.totalResult"
     [timestamp]="userResult?.viewTimestamp" [selection]="selection"
-    [emitRefreshOnPreviousRoute]="refreshOnPreviousRoute">
-    <mat-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
-        <mat-label>{{'USER.PAGES.FILTER' | translate}}</mat-label>
-        <input matInput (keyup)="applyFilter($event)"
+    [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
+    <cnsl-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
+        <input cnslInput (keyup)="applyFilter($event)"
             [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
-    </mat-form-field>
+    </cnsl-form-field>
 
     <ng-template appHasRole [appHasRole]="['user.write']" actions>
         <button (click)="deactivateSelectedUsers()" matTooltip="{{'USER.TABLE.DEACTIVATE' | translate}}"
@@ -119,15 +118,17 @@
             <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.DATA.STATE' | translate }} </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{ 'USER.DATA.STATE'+user.state | translate }} </td>
+                    <span class="state"
+                        [ngClass]="{'active': user.state === UserState.USERSTATE_ACTIVE, 'inactive': user.state === UserState.USERSTATE_INACTIVE}">{{ 'USER.DATA.STATE'+user.state | translate }}</span>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="actions" stickyEnd>
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let user">
-                    <button [disabled]="(['user.delete$', 'user.delete:'+user.id] | hasRole | async) == false"
-                        color="warn" mat-icon-button matTooltip="{{'USER.PAGES.DELETE' | translate}}"
-                        (click)="deleteUser(user)">
+                    <button class="dlt-button"
+                        [disabled]="(['user.delete$', 'user.delete:'+user.id] | hasRole | async) == false" color="warn"
+                        mat-icon-button matTooltip="{{'USER.PAGES.DELETE' | translate}}" (click)="deleteUser(user)">
                         <i class="las la-trash"></i>
                     </button>
                 </td>
@@ -137,6 +138,10 @@
             <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
 
         </table>
+        <div *ngIf="(loading$ | async) == false && !dataSource?.data?.length" class="no-content-row">
+            <i class="las la-exclamation"></i>
+            <span>{{'USER.TABLE.EMPTY' | translate}}</span>
+        </div>
         <mat-paginator #paginator class="paginator" [length]="userResult?.totalResult || 0" [pageSize]="10"
             [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
     </div>
@@ -144,7 +149,7 @@
 
 <ng-template #templateRef let-key="key">
     <button class="search-button" mat-icon-button (click)="setFilter(key)">
-        <mat-icon *ngIf="this.userSearchKey != key">search</mat-icon>
-        <mat-icon *ngIf="this.userSearchKey == key">search_off</mat-icon>
+        <mat-icon class="icon" *ngIf="this.userSearchKey != key">search</mat-icon>
+        <mat-icon class="icon" *ngIf="this.userSearchKey == key">search_off</mat-icon>
     </button>
 </ng-template>

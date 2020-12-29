@@ -1,0 +1,15 @@
+<div class="sp_wrapper">
+    <mat-spinner diameter="30" *ngIf="loading$ | async"></mat-spinner>
+</div>
+<div class="mfa-list">
+    <div class="mfa" *ngFor="let mfa of mfas">
+        <button [disabled]="disabled" mat-icon-button (click)="removeMfa(mfa)" class="rm">
+            <mat-icon matTooltip="{{'ACTIONS.REMOVE' | translate}}">
+                remove_circle</mat-icon>
+        </button>
+        {{(componentType == LoginMethodComponentType.SecondFactor ? 'MFA.SECONDFACTORTYPES.': LoginMethodComponentType.MultiFactor ? 'MFA.MULTIFACTORTYPES.': '')+mfa | translate}}
+    </div>
+    <div class="mfa" (click)="addMfa()">
+        <mat-icon>add</mat-icon>
+    </div>
+</div>

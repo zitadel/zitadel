@@ -5,6 +5,12 @@ description: ...
 
 > All documentations are under active work and subject to change soon!
 
-### Application Integration
+This Integration guide gives you recommendations on how to integrate different Clients with **ZITADEL**
 
-### Service Integration
+- Single Page Application
+- Server Side Application
+- Mobile App
+- Native App
+- Reverse Proxy
+
+For more details about how **ZITADEL** treats [scopes](documentation#Scopes) and [claims](documentation#Claims) see the [documentations](documentation).

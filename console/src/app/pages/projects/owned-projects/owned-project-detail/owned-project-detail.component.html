@@ -33,12 +33,13 @@
             <div class="full-width">
                 <div class="line">
                     <ng-container *ngIf="editstate">
-                        <mat-form-field *ngIf="editstate && project?.name" class="formfield"
+                        <cnsl-form-field *ngIf="editstate && project?.name" class="formfield"
                             hintLabel="The name is required!">
-                            <mat-label>{{'PROJECT.NAME' | translate}}</mat-label>
-                            <input matInput [(ngModel)]="project.name" name="name" />
-                        </mat-form-field>
-                        <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
+                            <cnsl-label>{{'PROJECT.NAME' | translate}}</cnsl-label>
+                            <input cnslInput [(ngModel)]="project.name" name="name" />
+                        </cnsl-form-field>
+                        <button matTooltip="{{'ACTIONS.SAVE' | translate}}" class="icon-button" *ngIf="editstate"
+                            mat-icon-button (click)="updateName()">
                             <mat-icon>check</mat-icon>
                         </button>
                     </ng-container>
@@ -68,7 +69,8 @@
                     [appHasRole]="['project.grant.read:' + project.projectId, 'project.grant.read']">
                     <app-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
                         description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
-                        <app-project-grants refreshOnPreviousRoute="/projects/{{projectId}}/grants/create"
+                        <app-project-grants
+                            [refreshOnPreviousRoutes]="['/projects/'+projectId+'/grants/create','/projects/'+projectId+'/roles/create']"
                             [disabled]="((['project.grant.write$', 'project.grant.write:'+ project.projectId]| hasRole | async))== false"
                             [projectId]="projectId">
                         </app-project-grants>
@@ -79,10 +81,11 @@
                     <app-card title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
                         description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
                         <p>{{'PROJECT.ROLE.OPTIONS' | translate}}</p>
-                        <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()">
+                        <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()"
+                            color="primary">
                             {{'PROJECT.ROLE.ASSERTION' | translate}}</mat-checkbox>
                         <p class="desc">{{'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate}}</p>
-                        <mat-checkbox [(ngModel)]="project.projectRoleCheck" (change)="saveProject()">
+                        <mat-checkbox [(ngModel)]="project.projectRoleCheck" (change)="saveProject()" color="primary">
                             {{'PROJECT.ROLE.CHECK' | translate}}</mat-checkbox>
                         <p class="desc">{{'PROJECT.ROLE.CHECK_DESCRIPTION' | translate}}</p>
                         <div class="divider"></div>
@@ -97,9 +100,9 @@
                     <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
-                            refreshOnPreviousRoute="/grant-create/project/{{projectId}}"
-                            [allowWrite]="(['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async"
-                            [allowDelete]="(['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async">
+                            [refreshOnPreviousRoutes]="['/grant-create/project/'+projectId]"
+                            [disableWrite]="((['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async) == false"
+                            [disableDelete]="((['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async) == false">
                         </app-user-grants>
                     </app-card>
                 </ng-template>
@@ -107,11 +110,15 @@
         </ng-container>
     </div>
     <div class="side" metainfo>
-        <div class="details">
-            <div class="row">
+        <div class="meta-details">
+            <div class="meta-row">
+                <span class="first">{{'RESOURCEID' | translate}}:</span>
+                <span *ngIf="projectId" class="second">{{ projectId }}</span>
+            </div>
+            <div class="meta-row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
-                <span *ngIf="project && project.state !== undefined"
-                    class="second">{{'PROJECT.STATE.'+project.state | translate}}</span>
+                <span *ngIf="project && project.state !== undefined" class="state"
+                    [ngClass]="{'active': project.state === ProjectState.PROJECTSTATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECTSTATE_INACTIVE}">{{'PROJECT.STATE.'+project.state | translate}}</span>
             </div>
         </div>
 
@@ -124,7 +131,7 @@
                     [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) == false">
                 </app-contributors>
             </mat-tab>
-            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
+            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
                 <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.projectId"></app-changes>
             </mat-tab>
         </mat-tab-group>

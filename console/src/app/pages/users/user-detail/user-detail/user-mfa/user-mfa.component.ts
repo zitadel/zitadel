@@ -1,9 +1,12 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { MFAState, MfaType, MultiFactor, UserView } from 'src/app/proto/generated/management_pb';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { MFAState, MfaType, UserMultiFactor, UserView } from 'src/app/proto/generated/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 
 export interface MFAItem {
@@ -17,24 +20,24 @@ export interface MFAItem {
     styleUrls: ['./user-mfa.component.scss'],
 })
 export class UserMfaComponent implements OnInit, OnDestroy {
-    public displayedColumns: string[] = ['type', 'state'];
+    public displayedColumns: string[] = ['type', 'attr', 'state', 'actions'];
     @Input() private user!: UserView.AsObject;
-    public mfaSubject: BehaviorSubject<MultiFactor.AsObject[]> = new BehaviorSubject<MultiFactor.AsObject[]>([]);
+    public mfaSubject: BehaviorSubject<UserMultiFactor.AsObject[]> = new BehaviorSubject<UserMultiFactor.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    @ViewChild(MatTable) public table!: MatTable<MultiFactor.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<UserMultiFactor.AsObject>;
     @ViewChild(MatSort) public sort!: MatSort;
-    public dataSource!: MatTableDataSource<MultiFactor.AsObject>;
+    public dataSource!: MatTableDataSource<UserMultiFactor.AsObject>;
 
     public MfaType: any = MfaType;
     public MFAState: any = MFAState;
 
     public error: string = '';
-    constructor(private mgmtUserService: ManagementService) { }
+    constructor(private mgmtUserService: ManagementService, private dialog: MatDialog, private toast: ToastService) { }
 
     public ngOnInit(): void {
-        this.getOTP();
+        this.getMFAs();
     }
 
     public ngOnDestroy(): void {
@@ -42,12 +45,57 @@ export class UserMfaComponent implements OnInit, OnDestroy {
         this.loadingSubject.complete();
     }
 
-    public getOTP(): void {
+    public getMFAs(): void {
         this.mgmtUserService.getUserMfas(this.user.id).then(mfas => {
+            console.log(mfas.toObject().mfasList);
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
         }).catch(error => {
             this.error = error.message;
+        });
+    }
+
+    public deleteMFA(type: MfaType, id?: string): void {
+        console.log(type, id);
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'USER.MFA.DIALOG.MFA_DELETE_TITLE',
+                descriptionKey: 'USER.MFA.DIALOG.MFA_DELETE_DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                if (type === MfaType.MFATYPE_OTP) {
+                    this.mgmtUserService.removeMfaOTP(this.user.id).then(() => {
+                        this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
+
+                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
+                        if (index > -1) {
+                            this.dataSource.data.splice(index, 1);
+                        }
+                        this.getMFAs();
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                } else if (type === MfaType.MFATYPE_U2F && id) {
+                    console.log(this.user.id, id);
+                    this.mgmtUserService.RemoveMfaU2F(this.user.id, id).then(() => {
+                        this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+
+                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
+                        if (index > -1) {
+                            this.dataSource.data.splice(index, 1);
+                        }
+                        this.getMFAs();
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
+            }
         });
     }
 }

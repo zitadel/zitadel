@@ -4,6 +4,7 @@ export enum PolicyComponentType {
     COMPLEXITY = 'complexity',
     IAM = 'iam',
     LOGIN = 'login',
+    LABEL = 'label',
 }
 export enum PolicyComponentServiceType {
     MGMT = 'mgmt',

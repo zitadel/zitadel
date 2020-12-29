@@ -76,7 +76,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
     public removePolicy(): void {
         if (this.service instanceof ManagementService) {
             this.service.removePasswordComplexityPolicy().then(() => {
-                this.toast.showInfo('ORG.POLICY.TOAST.RESETSUCCESS', true);
+                this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
                 setTimeout(() => {
                     this.fetchData();
                 }, 1000);
@@ -110,7 +110,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
                         this.complexityData.hasSymbol,
                         this.complexityData.minLength,
                     ).then(() => {
-                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                        this.toast.showInfo('POLICY.TOAST.SET', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
@@ -122,7 +122,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
                         this.complexityData.hasSymbol,
                         this.complexityData.minLength,
                     ).then(() => {
-                        this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                        this.toast.showInfo('POLICY.TOAST.SET', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
@@ -136,7 +136,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
                     this.complexityData.hasSymbol,
                     this.complexityData.minLength,
                 ).then(() => {
-                    this.toast.showInfo('ORG.POLICY.TOAST.SET', true);
+                    this.toast.showInfo('POLICY.TOAST.SET', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });

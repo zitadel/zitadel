@@ -1,4 +1,5 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MachineKeyType } from 'src/app/proto/generated/management_pb';
 
@@ -7,19 +8,20 @@ import { MachineKeyType } from 'src/app/proto/generated/management_pb';
     templateUrl: './add-key-dialog.component.html',
     styleUrls: ['./add-key-dialog.component.scss'],
 })
-export class AddKeyDialogComponent implements OnInit {
+export class AddKeyDialogComponent {
+    public startDate: Date = new Date();
     types: MachineKeyType[] = [
         MachineKeyType.MACHINEKEY_JSON,
     ];
-    date: any;
     public type: MachineKeyType = MachineKeyType.MACHINEKEY_JSON;
+    public dateControl: FormControl = new FormControl('', []);
 
     constructor(
         public dialogRef: MatDialogRef<AddKeyDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-    ) { }
-
-    ngOnInit(): void {
+    ) {
+        const today = new Date();
+        this.startDate.setDate(today.getDate() + 1);
     }
 
     public closeDialog(): void {
@@ -27,6 +29,6 @@ export class AddKeyDialogComponent implements OnInit {
     }
 
     public closeDialogWithSuccess(): void {
-        this.dialogRef.close({ type: this.type, date: this.date });
+        this.dialogRef.close({ type: this.type, date: this.dateControl.value });
     }
 }

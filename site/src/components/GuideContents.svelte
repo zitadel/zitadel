@@ -6,7 +6,7 @@
 	export let sections = [];
 	export let active_section = null;
 	export let show_contents;
-	export let prevent_sidebar_scroll = false;
+    export let prevent_sidebar_scroll = false;
 
 	let ul;
 
@@ -44,7 +44,7 @@
 	.reference-toc li {
 		display: block;
 		line-height: 1.2;
-		margin: 0 0 4rem 0;
+        margin: 0 0 4rem 0;
 	}
 
 	a {
@@ -57,7 +57,7 @@
 
 	.section {
 		display: block;
-		padding: 0 0 .8rem 0;
+		padding: .8rem 0 .8rem 0;
 		font-size: var(--h6);
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
@@ -65,28 +65,41 @@
 	}
 
 	.subsection {
-		display: block;
-		font-size: 1.6rem;
-		font-family: var(--font);
-		padding: 0 0 0.6em 0;
-	}
+        display: block;
+        font-family: var(--font);
+		font-size: 14px;
+        padding: 0.4em 0 0.4em 0;
+        color: #a3acb9;
+    }
+    
+    .section,
+    .subsection {
+        border-top-right-radius: 50vw;
+        border-bottom-right-radius: 50vw;
+        padding-left: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
 	.section:hover,
 	.subsection:hover,
 	.active {
         color: var(--flash);
         font-weight: 500;
+        color: #6c8eef;
+        background-color: rgba(82,130,193,.1);
+        padding-right: 1rem;
 	}
 
 	.subsection[data-level="4"] {
-		padding-left: 1.2rem;
+		padding-left: 3.2rem;
 	}
 
 	.icon-container {
-		position: absolute;
-		top: -.2rem;
-		right: 2.4rem;
-	}
+        margin-left: .5rem;
+        color: white;
+    }
 
 	@media (min-width: 832px) {
 		a {
@@ -97,9 +110,9 @@
 		.section:hover,
 		.subsection:hover,
 		.active {
-			color: #5282c1;
+			color: var(--prime);
 		}
-	}
+    }
 </style>
 
 <ul

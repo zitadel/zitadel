@@ -251,7 +251,7 @@ func idpConfigStylingTypeToModel(stylingType management.IdpStylingType) iam_mode
 }
 
 func idpProviderTypeStringToModel(providerType string) (iam_model.IDPProviderType, error) {
-	i, _ := strconv.Atoi(providerType)
+	i, _ := strconv.ParseInt(providerType, 10, 32)
 	switch management.IdpProviderType(i) {
 	case management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM:
 		return iam_model.IDPProviderTypeSystem, nil

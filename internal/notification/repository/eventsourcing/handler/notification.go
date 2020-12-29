@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -14,25 +14,15 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
-
-type Notification struct {
-	handler
-	eventstore     eventstore.Eventstore
-	userEvents     *usr_event.UserEventstore
-	systemDefaults sd.SystemDefaults
-	AesCrypto      crypto.EncryptionAlgorithm
-	i18n           *i18n.Translator
-	statikDir      http.FileSystem
-}
 
 const (
 	notificationTable         = "notification.notifications"
@@ -50,16 +40,69 @@ const (
 	mailTextTypeVerifyPhone   = "VerifyPhone"
 )
 
+type Notification struct {
+	handler
+	userEvents     *usr_event.UserEventstore
+	systemDefaults sd.SystemDefaults
+	AesCrypto      crypto.EncryptionAlgorithm
+	i18n           *i18n.Translator
+	statikDir      http.FileSystem
+	subscription   *eventstore.Subscription
+}
+
+func newNotification(
+	handler handler,
+	userEvents *usr_event.UserEventstore,
+	defaults sd.SystemDefaults,
+	aesCrypto crypto.EncryptionAlgorithm,
+	translator *i18n.Translator,
+	statikDir http.FileSystem,
+) *Notification {
+	h := &Notification{
+		handler:        handler,
+		userEvents:     userEvents,
+		systemDefaults: defaults,
+		i18n:           translator,
+		statikDir:      statikDir,
+		AesCrypto:      aesCrypto,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *Notification) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
+
 func (n *Notification) ViewModel() string {
 	return notificationTable
 }
 
+func (_ *Notification) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.UserAggregate}
+}
+
+func (n *Notification) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := n.view.GetLatestNotificationSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (n *Notification) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := n.view.GetLatestNotificationSequence()
+	sequence, err := n.view.GetLatestNotificationSequence("")
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.UserQuery(sequence.CurrentSequence), nil
+	return usr_event.UserQuery(sequence.CurrentSequence), nil
 }
 
 func (n *Notification) Reduce(event *models.Event) (err error) {
@@ -78,17 +121,21 @@ func (n *Notification) Reduce(event *models.Event) (err error) {
 		err = n.handlePasswordCode(event)
 	case es_model.DomainClaimed:
 		err = n.handleDomainClaimed(event)
-	default:
-		return n.view.ProcessedNotificationSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return n.view.ProcessedNotificationSequence(event.Sequence)
+	return n.view.ProcessedNotificationSequence(event)
 }
 
 func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
-	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent)
+	initCode := new(es_model.InitUserCode)
+	if err := initCode.SetData(event); err != nil {
+		return err
+	}
+	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(event, initCode.Expiry,
+		es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent,
+		es_model.InitializedHumanCodeAdded, es_model.InitializedHumanCodeSent)
 	if err != nil || alreadyHandled {
 		return err
 	}
@@ -103,8 +150,6 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	initCode := new(es_model.InitUserCode)
-	initCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
@@ -123,7 +168,13 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 }
 
 func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
-	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.UserPasswordCodeAdded, es_model.UserPasswordCodeSent)
+	pwCode := new(es_model.PasswordCode)
+	if err := pwCode.SetData(event); err != nil {
+		return err
+	}
+	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(event, pwCode.Expiry,
+		es_model.UserPasswordCodeAdded, es_model.UserPasswordCodeSent,
+		es_model.HumanPasswordCodeAdded, es_model.HumanPasswordCodeSent)
 	if err != nil || alreadyHandled {
 		return err
 	}
@@ -138,8 +189,6 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	pwCode := new(es_model.PasswordCode)
-	pwCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
@@ -157,7 +206,13 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 }
 
 func (n *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
-	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.UserEmailCodeAdded, es_model.UserEmailCodeSent)
+	emailCode := new(es_model.EmailCode)
+	if err := emailCode.SetData(event); err != nil {
+		return err
+	}
+	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(event, emailCode.Expiry,
+		es_model.UserEmailCodeAdded, es_model.UserEmailCodeSent,
+		es_model.HumanEmailCodeAdded, es_model.HumanEmailCodeSent)
 	if err != nil || alreadyHandled {
 		return nil
 	}
@@ -172,8 +227,6 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	emailCode := new(es_model.EmailCode)
-	emailCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
@@ -192,12 +245,16 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 }
 
 func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
-	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.UserPhoneCodeAdded, es_model.UserPhoneCodeSent)
+	phoneCode := new(es_model.PhoneCode)
+	if err := phoneCode.SetData(event); err != nil {
+		return err
+	}
+	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(event, phoneCode.Expiry,
+		es_model.UserPhoneCodeAdded, es_model.UserPhoneCodeSent,
+		es_model.HumanPhoneCodeAdded, es_model.HumanPhoneCodeSent)
 	if err != nil || alreadyHandled {
 		return nil
 	}
-	phoneCode := new(es_model.PhoneCode)
-	phoneCode.SetData(event)
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
@@ -210,7 +267,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 }
 
 func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
-	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.DomainClaimed, es_model.DomainClaimedSent)
+	alreadyHandled, err := n.checkIfAlreadyHandled(event.AggregateID, event.Sequence, es_model.DomainClaimed, es_model.DomainClaimedSent)
 	if err != nil || alreadyHandled {
 		return nil
 	}
@@ -244,31 +301,44 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	return n.userEvents.DomainClaimedSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
 }
 
-func (n *Notification) checkIfCodeAlreadyHandled(userID string, sequence uint64, addedType, sentType models.EventType) (bool, error) {
+func (n *Notification) checkIfCodeAlreadyHandledOrExpired(event *models.Event, expiry time.Duration, eventTypes ...models.EventType) (bool, error) {
+	if event.CreationDate.Add(expiry).Before(time.Now().UTC()) {
+		return true, nil
+	}
+	return n.checkIfAlreadyHandled(event.AggregateID, event.Sequence, eventTypes...)
+}
+
+func (n *Notification) checkIfAlreadyHandled(userID string, sequence uint64, eventTypes ...models.EventType) (bool, error) {
 	events, err := n.getUserEvents(userID, sequence)
 	if err != nil {
 		return false, err
 	}
 	for _, event := range events {
-		if event.Type == addedType || event.Type == sentType {
-			return true, nil
+		for _, eventType := range eventTypes {
+			if event.Type == eventType {
+				return true, nil
+			}
 		}
 	}
 	return false, nil
 }
 
 func (n *Notification) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
-	query, err := eventsourcing.UserByIDQuery(userID, sequence)
+	query, err := usr_event.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err
 	}
 
-	return n.eventstore.FilterEvents(context.Background(), query)
+	return n.es.FilterEvents(context.Background(), query)
 }
 
 func (n *Notification) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-s9opc", "id", event.AggregateID, "sequence", event.Sequence).WithError(err).Warn("something went wrong in notification handler")
 	return spooler.HandleError(event, err, n.view.GetLatestNotificationFailedEvent, n.view.ProcessedNotificationFailedEvent, n.view.ProcessedNotificationSequence, n.errorCountUntilSkip)
+}
+
+func (n *Notification) OnSuccess() error {
+	return spooler.HandleSuccess(n.view.UpdateNotificationSpoolerRunTimestamp)
 }
 
 func getSetNotifyContextData(orgID string) context.Context {
@@ -279,7 +349,7 @@ func getSetNotifyContextData(orgID string) context.Context {
 func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	// read from Org
 	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg)
-	if errors.IsNotFound(err) {
+	if caos_errs.IsNotFound(err) {
 		// read from default
 		policy, err = n.view.LabelPolicyByAggregateID(n.systemDefaults.IamID, labelPolicyTableDef)
 		if err != nil {

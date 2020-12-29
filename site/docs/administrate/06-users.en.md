@@ -4,32 +4,72 @@ title: Users
 
 ### What are users
 
-In ZITADEL there are different users. Some belong to dedicated organisations other belong to the global org. Some of them are human users others are machines.
-Nonetheless we treat them all the same in regard to roles management and audit trail.
+In **ZITADEL** there are different [users](administrate#Users). Some belong to dedicated [organisations](administrate#Organisations) other belong to the [global organisation](administrate#Global_organisation). Some of them are human [users](administrate#Users) others are machines.
+Nonetheless we treat them all the same in regard to [roles](administrate#Roles) management and audit trail.
 
 #### Human vs. Service Users
 
-The major difference between humane vs. machine users is the type of credentials who can be used.
-With machine users there is only a non interactive login process possible. As such we utilize “JWT as Authorization Grant”.
+The major difference between human vs. machine [users](administrate#Users) is the type of credentials that can be used: With machine [users](administrate#Users) there is only a non-interactive logon process possible. As such we utilize “JWT as Authorization Grant”.
 
 > TODO Link to “JWT as Authorization Grant” explanation.
 
 ### How ZITADEL handles usernames
 
-ZITADEL is built around the concept of organisations. Each organisation has it's own pool of usernames which include human and service users.
-For example a user with the username `alice` can only exist once the org. `ACME`. ZITADEL will automatically generate a "logonname" for each user consisting of `{username}@{domainname}.{zitadeldomain}`. Without verifying the domain name this would result in the logonname `alice@acme.zitadel.ch`. If you use a dedicated ZITADEL replace `zitadel.ch` with your domain name.
+**ZITADEL** is built around the concept of [organisations](administrate#Organisations). Each [organisation](administrate#Organisations) has its own pool of usernames which includes human and service [users](administrate#Users).
 
-If someone verifies a domain name within the org. ZITADEL will generate additional logonames for each user with that domain. For example if the domain is `acme.ch` the resulting logonname would be `alice@acme.ch` and as well the generated one `alice@acme.zitadel.ch`.
+For example a [user](administrate#Users) with the username `road.runner` can only exist once in the [organisation](administrate#Organisations) `ACME`. **ZITADEL** will automatically generate a "logonname" for each [user](administrate#Users) consisting of `{username}@{domainname}.{zitadeldomain}`. Without [verifying the domain name](administrate#Verify_a_domain_name) this would result in the logonname `road.runner@acme.zitadel.ch`. 
 
-> Domain verification also removes the logonname from all users who might have used this combination in the global org.
-> Relating to example with `acme.ch` if a user in the global org, let's call him `bob` used `bob@acme.ch` this logonname will be replaced with `bob@randomvalue.tld`
-> ZITADEL notifies the user about this change
+> If you use a dedicated instance **ZITADEL** replace `zitadel.ch` with your domain name.
+
+If someone [verifies a domain name](administrate#Verify_a_domain_name) within the organisation, **ZITADEL** will generate additional logonames for each [user](administrate#Users) with the verified domain. For example if the domain is `acme.ch` the resulting logonname would be `road.runner@acme.ch` in addition to the already generated `road.runner@acme.zitadel.ch`.
+
+> Domain verification also removes the logonname from all [users](administrate#Users), who might have used this combination in the [global organisation](administrate#Global_organisation).
+> Relating to example with `acme.ch` if a user in the [global organisation](administrate#Global_organisation), let's call him `coyote`, used `coyote@acme.ch` this logonname will be replaced with `coyote@randomvalue.tld`
+> **ZITADEL** notifies the user about this change
 
 ### Manage Users
 
-#### Create User
+#### Search Users
 
-> Screenshot here
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_list_search.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_list_search.png" itemprop="thumbnail" alt="User list Search" />
+        </a>
+        <figcaption itemprop="caption description">User list Search</figcaption>
+    </figure>
+</div>
+
+Image 1: User List Search
+
+#### Create Users
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_list.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_list.png" itemprop="thumbnail" alt="User list" />
+        </a>
+        <figcaption itemprop="caption description">User list</figcaption>
+    </figure>
+</div>
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_create_form.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_create_form.png" itemprop="thumbnail" alt="User Create Form" />
+        </a>
+        <figcaption itemprop="caption description">User Create Form</figcaption>
+    </figure>
+</div>
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_create_done.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_create_done.png" itemprop="thumbnail" alt="User Create Done" />
+        </a>
+        <figcaption itemprop="caption description">User Create Done</figcaption>
+    </figure>
+</div>
 
 #### Set Password
 
@@ -39,9 +79,26 @@ If someone verifies a domain name within the org. ZITADEL will generate addition
 
 > Screenshot here
 
-### Authorizations
+### Manage User Authorisations
 
 > Screenshot here
+
+### Manage User ZITADEL Roles
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_manage_roles_1.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_manage_roles_1.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 1" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 1</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/console_user_manage_roles_2.png" itemprop="contentUrl" data-size="1920x1080">
+            <img src="img/console_user_manage_roles_2.png" itemprop="thumbnail" alt="Manage ZITADEL Roles 2" />
+        </a>
+        <figcaption itemprop="caption description">Manage ZITADEL Roles 2</figcaption>
+    </figure>
+</div>
 
 ### Audit user changes
 

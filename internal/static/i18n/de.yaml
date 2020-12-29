@@ -4,6 +4,8 @@ Errors:
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
+    NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     UserIDMissing: User ID fehlt
     OrgIamPolicyNil: Organisations Policy ist leer
     EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
@@ -12,6 +14,8 @@ Errors:
     AlreadyInactive: Benutzer ist bereits deaktiviert
     NotInactive: Benutzer ist nicht inaktiv
     ShouldBeActiveOrInitial: Benutzer ist nicht aktiv oder initialisiert
+    AlreadyInitialised: Benutzer ist bereits initialisiert
+    NotInitialised: Benutzer ist noch nicht initialisiert
     NotLocked: Benutzer ist nicht gesperrt
     NoChanges: Keine Änderungen gefunden
     InitCodeNotFound: Kein Initialisierungs Code gefunden
@@ -51,12 +55,25 @@ Errors:
       IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
       NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
       MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
-    Mfa:
-      Otp:
+    MFA:
+      OTP:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
         NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
         InvalidCode: Code ist ungültig
+      U2F:
+        NotExisting: U2F existiert nicht
+      Passwordless:
+        NotExisting: Passwortlos existiert nicht
+    WebAuthN:
+      NotFound: WebAuthN Token konnte nicht gefunden werden
+      BeginRegisterFailed: Es ist ein Fehler bei der WebAuthN Registrierung aufgetreten
+      MarshalError: Daten konnten nicht umgewandelt werden
+      ErrorOnParseCredential: Zugangsdaten konnten nicht geparsed werden
+      CreateCredentialFailed: Zugangsdaten konnten nicht gespeichert werden
+      BeginLoginFailed: Es ist ein Fehler beim WebAuthN Login aufgetreten
+      ValidateLoginFailed: Zugangsdaten konnten nicht validiert werden
+      CloneWarning: Authentifizierungsdaten wurden möglicherweise geklont
   Org:
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert
@@ -86,20 +103,28 @@ Errors:
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:
+      NotFound: Login Policy konnte nicht gefunden werden
       Invalid: Login Policy ist ungültig
       NotExisting: Login Policy existiert nicht auf dieser Organisation
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+      MFA:
+        AlreadyExists: Multifaktor existiert bereits
+        NotExisting: Multifaktor existiert nicht
+        Unspecified: Multifaktor ungültig
     PasswordComplexity:
+      NotFound: Password Komplexitäts Policy konnte nicht gefunden werden
       Empty: Passwort Komplexitäts Policy ist leer
       NotExisting: Passwort Komplexitäts Policy existiert nicht
       AlreadyExists: Passwort Komplexitäts Policy existiert bereits
     PasswordLockout:
+      NotFound: Password Lockout Policy konnte nicht gefunden werden
       Empty: Passwort Lockout Policy ist leer
       NotExisting: Passwort Lockout Policy existiert nicht
       AlreadyExists: Passwort Lockout Policy existiert bereits
     PasswordAge:
+      NotFound: Password Age Policy konnte nicht gefunden werden
       Empty: Passwort Age Policy ist leer
       NotExisting: Passwort Age Policy existiert nicht
       AlreadyExists: Passwort Age Policy existiert bereits
@@ -140,7 +165,8 @@ Errors:
     GrantNotExists: Projekt Grant existiert nicht
     GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
     UserIDMisisng: User ID fehlt
-  Iam:
+    OIDCSecretInvalid: Client Secret ist ungültig
+  IAM:
     MemberInvalid: Member ist ungültig
     MemberAlreadyExisting: Member existiert bereits
     MemberNotExisting: Member existiert nicht
@@ -155,23 +181,34 @@ Errors:
     LoginPolicyNotExisting: Login Policy nicht vorhanden
     IdpProviderInvalid: Idp Provider ist ungültig
     LoginPolicy:
+      NotFound: Default Login Policy konnte nicht gefunden
       NotExisting: Default Login Policy existiert nicht
       AlreadyExists: Default Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+      MFA:
+        AlreadyExists: Multifaktor existiert bereits
+        NotExisting: Multifaktor existiert nicht
+        Unspecified: Multifaktor ungültig
+    LabelPolicy:
+      NotFound: Default Private Label Policy konnte nicht gefunden
     PasswordComplexityPolicy:
+      NotFound: Default Password Complexity Policy konnte nicht gefunden werden
       NotExisting: Default Password Complexity Policy existiert nicht
       AlreadyExists: Default Password Complexity Policy existiert bereits
       Empty: Default Password Complexity Policy leer
     PasswordAgePolicy:
+      NotFound: Default Password Age Policy konnte nicht gefunden werden
       NotExisting: Default Password Age Policy existiert nicht
       AlreadyExists: Default Password Age Policy existiert bereits
       Empty: Default Password Age Policy leer
     PasswordLockoutPolicy:
+      NotFound: Default Password Lockout Policy konnte nicht gefunden werden
       NotExisting: Default Password Lockout Policy existiert nicht
       AlreadyExists: Default Password Lockout Policy existiert bereits
       Empty: Default Password Lockout Policy leer
-    OrgIAM:
+    OrgIAMPolicy:
+      NotFound: Default Org IAM Policy konnte nicht gefunden werden
       NotExisting: Default Org IAM Policy existiert nicht
       AlreadyExists: Default Org IAM Policy existiert bereits
       Empty: Default Org IAM Policy leer
@@ -192,6 +229,10 @@ Errors:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:
     ExpireBeforeNow: Das Ablaufdatum liegt in der Vergangenheit
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Multifaktor ist als zwingend konfiguriert, jedoch sind keine möglichen Provider hinterlegt. Bitte melde dich beim Administrator des Systems.
 EventTypes:
   user:
     added: Benutzer hinzugefügt
@@ -269,6 +310,7 @@ EventTypes:
         code:
           added: Telefon Code hinzugefügt
           sent: Telefon Code versendet
+        removed: Telefonnummer gelöscht
       profile:
         changed: Benutzerprofil geändert
       address:
@@ -281,8 +323,32 @@ EventTypes:
           check:
             succeeded: Multifaktor OTP Verifikation erfolgreich
             failed: Multifaktor OTP Verifikation fehlgeschlagen
+        u2f:
+          token:
+            added: Multifaktor U2F Token hinzugefügt
+            verified: Multifaktor U2F Token verifiziert
+            removed: Multifaktor U2F Token entfernt
+            begin:
+              login: Multifaktor U2F Verifikation begonnen
+            check:
+              succeeded: Multifaktor U2F Verifikation erfolgreich
+              failed: Multifaktor U2F Verifikation fehlgeschlagen
+            signcount:
+              changed: Prüfsumme des Multifaktor U2F Tokens wurde verändert
         init:
           skipped: Multifaktor Initialisierung übersprungen
+      passwordless:
+        token:
+          added: Token für Passwortlos Login hinzugefügt
+          verified: Token für Passwortlos Login verifiziert
+          removed: Token für Passwortlos Login entfernt
+          begin:
+            login: Verifikation für Passwortlos Login begonnen
+          check:
+            succeeded: Verifikation für Passwortlos Login erfolgreich
+            failed: Verifikation für Passwortlos Login fehlgeschlagen
+          signcount:
+            changed: Prüfsumme des Tokens für Passwortlos Login wurde verändert
       signed:
         out: Benutzer erfolgreich abgemeldet
     locked: Benutzer gesperrt
@@ -381,9 +447,16 @@ EventTypes:
       login:
         added: Login Richtlinie hinzugefügt
         changed: Login Richtlinie geändert
+        removed: Login Richtline gelöscht
         idpprovider:
           added: Idp Provider zu Login Richtlinie hinzugefügt
           removed: Idp Provider aus Login Richtlinie gelöscht
+        secondfactor:
+          added: Zweitfaktor zu Login Richtlinie hinzugefügt
+          removed: Zweitfaktor aus Login Richtlinie gelöscht
+        multifactor:
+          added: Multifaktor zu Login Richtlinie hinzugefügt
+          removed: Multifaktor aus Login Richtlinie gelöscht
       password:
         complexity:
           added: Passwort Komplexitäts Richtlinie hinzugefügt

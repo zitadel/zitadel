@@ -12,6 +12,8 @@ func loginPolicyRequestToModel(policy *management.LoginPolicyRequest) *iam_model
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
+		ForceMFA:              policy.ForceMfa,
+		PasswordlessType:      passwordlessTypeToModel(policy.PasswordlessType),
 	}
 }
 
@@ -28,6 +30,8 @@ func loginPolicyFromModel(policy *iam_model.LoginPolicy) *management.LoginPolicy
 		AllowRegister:         policy.AllowRegister,
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
+		ForceMfa:              policy.ForceMFA,
+		PasswordlessType:      passwordlessTypeFromModel(policy.PasswordlessType),
 	}
 }
 
@@ -45,6 +49,8 @@ func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *management.Log
 		AllowRegister:         policy.AllowRegister,
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
+		ForceMfa:              policy.ForceMFA,
+		PasswordlessType:      passwordlessTypeFromModel(policy.PasswordlessType),
 	}
 }
 
@@ -138,5 +144,95 @@ func idpProviderTypeFromModel(providerType iam_model.IDPProviderType) management
 		return management.IdpProviderType_IDPPROVIDERTYPE_ORG
 	default:
 		return management.IdpProviderType_IDPPROVIDERTYPE_UNSPECIFIED
+	}
+}
+
+func secondFactorResultFromModel(result *iam_model.SecondFactorsSearchResponse) *management.SecondFactorsResult {
+	converted := make([]management.SecondFactorType, len(result.Result))
+	for i, mfaType := range result.Result {
+		converted[i] = secondFactorTypeFromModel(mfaType)
+	}
+	return &management.SecondFactorsResult{
+		SecondFactors: converted,
+	}
+}
+
+func secondFactorFromModel(mfaType iam_model.SecondFactorType) *management.SecondFactor {
+	return &management.SecondFactor{
+		SecondFactor: secondFactorTypeFromModel(mfaType),
+	}
+}
+
+func secondFactorTypeFromModel(mfaType iam_model.SecondFactorType) management.SecondFactorType {
+	switch mfaType {
+	case iam_model.SecondFactorTypeOTP:
+		return management.SecondFactorType_SECONDFACTORTYPE_OTP
+	case iam_model.SecondFactorTypeU2F:
+		return management.SecondFactorType_SECONDFACTORTYPE_U2F
+	default:
+		return management.SecondFactorType_SECONDFACTORTYPE_UNSPECIFIED
+	}
+}
+
+func secondFactorTypeToModel(mfaType *management.SecondFactor) iam_model.SecondFactorType {
+	switch mfaType.SecondFactor {
+	case management.SecondFactorType_SECONDFACTORTYPE_OTP:
+		return iam_model.SecondFactorTypeOTP
+	case management.SecondFactorType_SECONDFACTORTYPE_U2F:
+		return iam_model.SecondFactorTypeU2F
+	default:
+		return iam_model.SecondFactorTypeUnspecified
+	}
+}
+
+func multiFactorResultFromModel(result *iam_model.MultiFactorsSearchResponse) *management.MultiFactorsResult {
+	converted := make([]management.MultiFactorType, len(result.Result))
+	for i, mfaType := range result.Result {
+		converted[i] = multiFactorTypeFromModel(mfaType)
+	}
+	return &management.MultiFactorsResult{
+		MultiFactors: converted,
+	}
+}
+
+func multiFactorFromModel(mfaType iam_model.MultiFactorType) *management.MultiFactor {
+	return &management.MultiFactor{
+		MultiFactor: multiFactorTypeFromModel(mfaType),
+	}
+}
+
+func multiFactorTypeFromModel(mfaType iam_model.MultiFactorType) management.MultiFactorType {
+	switch mfaType {
+	case iam_model.MultiFactorTypeU2FWithPIN:
+		return management.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN
+	default:
+		return management.MultiFactorType_MULTIFACTORTYPE_UNSPECIFIED
+	}
+}
+
+func multiFactorTypeToModel(mfaType *management.MultiFactor) iam_model.MultiFactorType {
+	switch mfaType.MultiFactor {
+	case management.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN:
+		return iam_model.MultiFactorTypeU2FWithPIN
+	default:
+		return iam_model.MultiFactorTypeUnspecified
+	}
+}
+
+func passwordlessTypeFromModel(passwordlessType iam_model.PasswordlessType) management.PasswordlessType {
+	switch passwordlessType {
+	case iam_model.PasswordlessTypeAllowed:
+		return management.PasswordlessType_PASSWORDLESSTYPE_ALLOWED
+	default:
+		return management.PasswordlessType_PASSWORDLESSTYPE_NOT_ALLOWED
+	}
+}
+
+func passwordlessTypeToModel(passwordlessType management.PasswordlessType) iam_model.PasswordlessType {
+	switch passwordlessType {
+	case management.PasswordlessType_PASSWORDLESSTYPE_ALLOWED:
+		return iam_model.PasswordlessTypeAllowed
+	default:
+		return iam_model.PasswordlessTypeNotAllowed
 	}
 }

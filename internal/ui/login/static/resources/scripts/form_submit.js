@@ -3,6 +3,7 @@ function disableSubmit(checks, button) {
     let inputs = form.getElementsByTagName('input');
     button.disabled = true;
     addRequiredEventListener(inputs, checks, form, button);
+    disableDoubleSubmit(form, button);
 }
 
 function addRequiredEventListener(inputs, checks, form, button) {
@@ -18,6 +19,13 @@ function addRequiredEventListener(inputs, checks, form, button) {
             });
         }
     }
+}
+
+function disableDoubleSubmit(form, button) {
+    form.addEventListener('submit', function() {
+        document.body.classList.add('waiting');
+        button.disabled = true;
+    })
 }
 
 function toggleButton(checks, form, inputs, button) {

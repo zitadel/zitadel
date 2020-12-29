@@ -2,19 +2,20 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+	"time"
+
 	"github.com/caos/logging"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"strings"
-	"time"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type TokenVerifierRepo struct {
@@ -43,7 +44,7 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 	}
 
 	if esErr != nil {
-		logging.Log("EVENT-5Nm9s").WithError(viewErr).Debug("error retrieving new events")
+		logging.Log("EVENT-5Nm9s").WithError(viewErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
 		return model.TokenViewToModel(token), nil
 	}
 	viewToken := *token
@@ -80,8 +81,12 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		return "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
 	}
 
+	projectID, _, err := repo.ProjectIDAndOriginsByClientID(ctx, clientID)
+	if err != nil {
+		return "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-5M9so", "invalid token")
+	}
 	for _, aud := range token.Audience {
-		if clientID == aud {
+		if clientID == aud || projectID == aud {
 			return token.UserID, token.UserAgentID, token.PreferredLanguage, nil
 		}
 	}

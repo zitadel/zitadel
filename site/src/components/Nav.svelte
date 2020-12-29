@@ -1,7 +1,7 @@
 <script>
     import LanguageSwitcher from './LanguageSwitcher.svelte'
     import NavItem from './NavItem.svelte'
-	import { onMount, setContext } from 'svelte';
+	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Icon from './Icon.svelte';
 	export let segment;
@@ -31,7 +31,8 @@
 <style>
 	header {
         box-sizing: border-box;
-		position: fixed;
+        position: fixed;
+        top: 0;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -70,20 +71,16 @@
     }
     
 	.home {
-        width: 200px;
         line-height: 22px;
         font-size: 22px;
-        display: none;
+        display: flex;
+        align-items: center;
     }
 
     .home:hover {
         color: inherit;
         text-decoration:none;
         border: none;
-    }
-
-    .home img {
-        display: block;
     }
     
 	a {
@@ -93,20 +90,15 @@
         padding: 0;
     }
 
-    @media (min-width: 400px) {
-        .home {
-            display: inline-block;
-        }
+    .home span {
+        color: var(--second);
+        margin-left: 3px;
     }
 
     a img {
         width: 160px;
         max-height: 45px;
         padding: 0;
-    }
-
-    .switcher-wrapper {
-        padding: 0 1rem;
     }
 
     button {
@@ -117,22 +109,35 @@
         box-shadow: 0 0 0 0 rgba(0,0,0,.2), 0 0 0 0 rgba(0,0,0,.14), 0 0 0 0 rgba(0,0,0,.12);
         padding: 0 15px;
         height: 36px;
-        color: var(--prime);
+        color: white;
         transition: background-color .2 ease;
         margin: 0 1rem;
         min-width: 120px;
+        /* background: #2a2f45; */
     }
 
     button:hover {
-        background-color: #5282c110;
+        background-color: var(--back-hover);
     }
     button:active {
-        background-color: #5282c120;
+        background-color: var(--back-hover);
     }
 
     button span {
         font-size: 14px;
         line-height: 14px;
+        text-align: center;
+        margin: auto;
+    }
+
+    .show-on-desktop {
+        display: none;
+    }
+
+    @media (min-width: 832px) {
+        .show-on-desktop {
+            display: flex;
+        }
     }
 </style>
 
@@ -151,21 +156,26 @@
             {:else if title}
                 {title}
             {/if}
+            <span>DOCS</span>
         </a>
 
         <span class="fill-space"></span>
+        <div class="show-on-desktop">
+            <NavItem external="https://zitadel.ch" title="GitHub Repo">
+                {$_('moreabout')}
+            </NavItem>
 
-        <a href='https://console.zitadel.ch'><button>
-            <span>{$_('toconsole')}</span>
-        </button>
-        </a>
+            <a href='https://console.zitadel.ch'>
+                <button>
+                    <span>{$_('login')}</span>
+                </button>
+            </a>
 
-        <NavItem external="https://github.com/caos" title="GitHub Repo">
-            <Icon name="lab la-github" size="24px"></Icon>
-        </NavItem>
-
-        <div class="switcher-wrapper">
-            <LanguageSwitcher></LanguageSwitcher>
+            <a href='https://accounts.zitadel.ch/register'>
+                <button style="border-color: var(--second); margin-left: 0;">
+                    <span>{$_('register')}</span>
+                </button>
+            </a>
         </div>
 	</nav>
 </header>

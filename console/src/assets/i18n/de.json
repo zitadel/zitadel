@@ -5,14 +5,26 @@
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
         "SECURITYANDPRIVACY_DESC": "Verwalte Deine Informationen und Sicherheitseinstellungen.",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
+        "CHANGE_PWD":"Password ändern",
         "PROTECTION": "Organisationsrichtlinien",
         "PROTECTION_DESC": "Verwalte Deine Organisationsrichtlinien und entdecke die vorgefertigte Lösungen, die Zeit sparen und Sicherheit gewährleisten.",
         "PROTECTION_BUTTON": "Erkunden",
         "PROJECTS": "Volle Skalierbarkeit und Anpassungsfähigkeit",
         "PROJECTS_DESC": "Autorisiere andere Benutzer, Deine eigenen Projekte zu verwenden, oder erstelle benutzerdefinierte Rollen für berechtigte Projekte",
         "PROJECTS_BUTTON": "Projektübersicht",
+        "PROJECTS_NEW_LINK":"Neues Projekt erstellen",
+        "IAM_CREATE_ORG":"Organisation erstellen",
+        "ORG_POLICY_COMPLEXITY":"Passwort Komplexität",
+        "ORG_POLICY_IAM":"Organisation Zugangseinstellungen",
+        "ORG_POLICY_LOGIN":"Login Richtlinie",
+        "IAM_POLICY_COMPLEXITY":"Systemweite Passwort Komplexität",
+        "IAM_POLICY_IAM":"Systemweite Zugangseinstellungen",
+        "IAN_POLICY_LOGIN":"Systemweite Login Richtlinie",
         "USERS": "Erstelle und verwalte Deine Benutzer.",
         "USERS_DESC": "Überwache Dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
+        "USERS_HUMANS":"Zeige Benutzer",
+        "USERS_MACHINES": "Zeige Service User",
+        "USERS_CREATE":"User erstellen",
         "USERS_BUTTON": "Benutzer anzeigen",
         "IAM": "Identity- und Access-Management",
         "IAM_DESC": "Verwalte Deine Organisationen und Administratoren.",
@@ -24,8 +36,12 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
-        "IAM":"Administration",
+        "DOCUMENTATION":"Dokumentation",
+        "IAMPOLICIES":"IAM",
+        "IAMEVENTSTORE":"Speicher",
         "ORGANIZATION": "Organisation",
+        "ADMINSECTION":"ZITADEL Administration",
+        "ORGSECTION":"Organisation",
         "PROJECTSSECTION":"Projektsektion",
         "PROJECT": "Projekte",
         "GRANTEDPROJECT":"Berechtigte Projekte",
@@ -35,7 +51,20 @@
         "LOGOUT": "Alle Benutzer abmelden",
         "NEWORG":"Neue Organisation",
         "IAMADMIN":"Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
-        "SHOWORGS":"Alle Organisationen anzeigen"
+        "SHOWORGS":"Alle Organisationen anzeigen",
+        "GRANTSECTION":"Berechtigungssektion",
+        "GRANTS":"Berechtigungen",
+        "TOOLTIP": {
+            "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
+            "IAMPOLICIES":"Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",
+            "IAMEVENTSTORE":"Bereinige views und fehlerhafte Events",
+            "ORG":"Verwalte die Zugangsrichtlinien und Domains deiner Organisation ",
+            "SELFPROJECTS":"Verwalte die Projekte deiner Organisation",
+            "GRANTEDPROJECTS":"Verwalte die berechtigten Projekte von anderen Organisationen",
+            "HUMANUSERS":"Verwalte die Menschlichen Benutzer deiner Organisation",
+            "MACHINEUSERS":"Verwalte die  Service Benutzer deiner Organisation",
+            "AUTHZ":"Verwalte die Berechtigungen deiner Organisationsbenutzer"
+        }
     },
     "ACTIONS": {
         "SAVE": "Speichern",
@@ -62,7 +91,13 @@
         "LOGIN":"Einloggen",
         "EDIT":"Bearbeiten",
         "PIN":"Anpinnen",
-        "CONFIGURE":"Konfigurieren"
+        "CONFIGURE":"Konfigurieren",
+        "SEND":"Senden",
+        "NEWVALUE":"Neuer Wert"
+    },
+    "RESOURCEID":"Ressourcen-ID",
+    "TABLE": {
+        "NOROWS":"Keine Daten"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
@@ -97,6 +132,11 @@
             "DELETE_TITLE":"User löschen",
             "DELETE_DESCRIPTION":"Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?"
         },
+        "SENDEMAILDIALOG":{
+            "TITLE":"Email Benachrichtigung senden",
+            "DESCRIPTION":"Klicken Sie den untenstehenden Button um ein verifizierungs Email an die aktuelle Adresse zu versenden oder ändern Sie die Emailadresse in dem Feld.",
+            "NEWEMAIL":"Neue Email"
+        },
         "TABLE":{
             "DEACTIVATE":"Deaktivieren",
             "ACTIVATE":"Aktivieren",
@@ -104,24 +144,32 @@
                 "1":"Nach Username filtern",
                 "2":"Nach Vornamen filtern",
                 "3":"Nach Nachnamen filtern",
+                "4":"Nach rollenschlüssel filtern",
                 "5":"Nach Display Namen filtern",
-                "6":"Nach Email filtern"
-            }
+                "6":"Nach Email filtern",
+                "10":"Nach Organisationsname filtern",
+                "12":"Project Name"
+            },
+            "EMPTY":"Keine Einträge"
         },
-        "MFA": {
+        "PASSWORDLESS": {
             "TABLETYPE":"Typ",
             "TABLESTATE":"Status",
+            "NAME":"Name",
             "TABLEACTIONS":"Aktionen",
-            "TITLE": "Multifaktor-Authentisierung",
-            "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
+            "TITLE": "Passwortlose Authentifizierungsmethoden",
+            "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
             "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
-            "OTP": "OTP konfigurieren",
-            "OTP_DIALOG_TITLE": "OTP hinzufügen",
-            "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+            "U2F":"Authentifikator hinzufügen",
+            "U2F_DIALOG_TITLE": "Authentifikator hinzufügen",
+            "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Login an.",
+            "U2F_SUCCESS":"Passwordless erfolgreich erstellt!",
+            "U2F_ERROR":"Ein Fehler ist aufgetreten!",
+            "U2F_NAME":"Authentifikator Name",
             "TYPE": {
                 "0":"Keine MFA definiert",
-                "1":"SMS",
-                "2":"OTP"
+                "1":"OTP",
+                "2":"U2F"
             },
             "STATE": {
                 "0": "Kein Status",
@@ -130,8 +178,41 @@
                 "3": "Gelöscht"
             },
             "DIALOG": {
-                "OTP_DELETE_TITLE":"OTP Faktor entfernen",
-                "OTP_DELETE_DESCRIPTION":"Sie sind im Begriff OTP als Zweitfaktormethode zu entfernen. Sind sie sicher?"
+                "DELETE_TITLE":"Passwordless entfernen",
+                "DELETE_DESCRIPTION":"Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?"
+            }
+        },
+        "MFA": {
+            "TABLETYPE":"Typ",
+            "TABLESTATE":"Status",
+            "ATTRIBUTE":"Attribut",
+            "TABLEACTIONS":"Aktionen",
+            "TITLE": "Multifaktor-Authentisierung",
+            "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
+            "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
+            "OTP": "OTP konfigurieren",
+            "OTP_DIALOG_TITLE": "OTP hinzufügen",
+            "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+            "U2F":"U2F hinzufügen",
+            "U2F_DIALOG_TITLE": "U2F hinzufügen",
+            "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
+            "U2F_SUCCESS":"U2F erfolgreich erstellt!",
+            "U2F_ERROR":"Ein Fehler ist aufgetreten!",
+            "U2F_NAME":"U2F Name",
+            "TYPE": {
+                "0":"Keine MFA definiert",
+                "1":"OTP",
+                "2":"U2F"
+            },
+            "STATE": {
+                "0": "Kein Status",
+                "1": "Nicht bereit",
+                "2": "Bereit",
+                "3": "Gelöscht"
+            },
+            "DIALOG": {
+                "MFA_DELETE_TITLE":"Zweiten Faktor entfernen",
+                "MFA_DELETE_DESCRIPTION":"Sie sind im Begriff eine Zweitfaktormethode zu entfernen. Sind sie sicher?"
             }
         },
         "EXTERNALIDP": {
@@ -192,7 +273,8 @@
             "KEYSDESC":"Definiere Deine Schlüssel mit einem optionalen Ablaufdatum.",
             "ID":"Schlüssel-ID",
             "TYPE":"Typ",
-            "EXPIRYDATE":"Ablaufdatum",
+            "EXPIRATIONDATE":"Ablaufdatum",
+            "CHOOSEDATEAFTER":"Geben Sie ein valides Ablaufdatum an. Ab",
             "CHOOSEEXPIRY":"Definiere ein Ablaufdatum",
             "CREATIONDATE":"Erstelldatum",
             "KEYDETAILS":"Schlüssel Details",
@@ -223,6 +305,10 @@
         },
         "EMAIL": "E-Mail",
         "PHONE": "Telefonnummer",
+        "PHONEEMPTY":"Keine Telefonnummer hinterlegt",
+        "PHONEVERIFIED":"Telefonnummer bestätigt.",
+        "EMAILVERIFIED":"Email verifiziert",
+        "NOTVERIFIED":"nicht verifiziert",
         "PREFERRED_LOGINNAME":"Bevorzugter Loginname",
         "LOGINMETHODS": {
             "TITLE": "Kontaktinformationen",
@@ -230,12 +316,18 @@
             "EMAIL": {
                 "TITLE": "E-Mail",
                 "VALID": "Validiert",
-                "RESEND": "Verifikationsmail erneut senden"
+                "RESEND": "Verifikationsmail erneut senden",
+                "EDITTITLE":"Email ändern",
+                "EDITDESC":"Geben Sie die neue Email in dem darunterliegenden Feld ein!"
             },
             "PHONE": {
                 "TITLE": "Telefon",
                 "VALID": "Validiert",
-                "RESEND": "Verifikationsnachricht erneut senden"
+                "RESEND": "Verifikationsnachricht erneut senden",
+                "EDITTITLE":"Nummer ändern",
+                "EDITDESC":"Geben Sie die neue Nummer in dem darunterliegenden Feld ein!",
+                "DELETETITLE":"Telefonnummer löschen",
+                "DELETEDESC":"Wollen Sie die Telefonnummer wirklich löschen?"
             },
             "RESENDCODE": "Code erneut senden",
             "ENTERCODE":"Verifizieren",
@@ -251,6 +343,7 @@
         },
         "VALIDATION": {
             "INVALIDPATTERN": "Das Passwort erfüllt nicht die vorgegebenen Regeln.",
+            "NOTANEMAIL":"Der eingegebene Wert ist keine E-Mail Adresse.",
             "REQUIRED": "Das Eingagefeld ist leer.",
             "MINLENGTH":"Das Password muss mindestens {{requiredLength}} Zeichen lang sein.",
             "NOEMAIL":"Benutzername darf keine E-Mail-Adresse sein.",
@@ -276,16 +369,21 @@
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Konto bearbeiten",
         "ADDACCOUNT":"Konto hinzufügen",
+        "RESENDINITIALEMAIL":"Neue Initialisierungsmail senden",
+        "RESENDEMAILNOTIFICATION":"Benachrichtigungsmail senden",
         "TOAST": {
             "CREATED":"Benutzer erfolgreich erstellt.",
             "SAVED":"Profil gespeichert.",
             "EMAILSAVED":"E-Mail gespeichert.",
+            "INITEMAILSENT":"Initialisierung Email gesendet.",
             "PHONESAVED":"Telefonnummer gespeichert.",
             "PHONEREMOVED":"Telefonnummer gelöscht.",
             "PHONEVERIFIED":"Telefonnummer bestätigt.",
             "PHONEVERIFICATIONSENT":"Bestätigungscode per Telefonnummer gesendet.",
             "EMAILVERIFICATIONSENT":"Bestätigungscode per E-Mail gesendet.",
             "OTPREMOVED":"OTP entfernt.",
+            "U2FREMOVED":"U2F entfernt.",
+            "PASSWORDLESSREMOVED":"Passwordless entfernt.",
             "INITIALPASSWORDSET":"Initiales Passwort gesetzt.",
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt.",
             "PASSWORDCHANGED":"Passwort geändert.",
@@ -315,9 +413,13 @@
         }
     },
     "IAM": {
-        "DETAIL": {
-            "TITLE":"Administration Identity- und Access-Management Administration",
-            "DESCRIPTION":"Verwalte die Einstellungen von ZITADEL."
+        "POLICIES": {
+            "TITLE":"IAM Administration",
+            "DESCRIPTION":"Verwalte Richtlinen und Zugangseinstellungen von ZITADEL."
+        },
+        "EVENTSTORE": {
+            "TITLE":"IAM Speicher Administration",
+            "DESCRIPTION":"Verwalte Speicher Einstellungen von ZITADEL."
         },
         "MEMBER": {
             "TITLE":"Manager",
@@ -329,7 +431,8 @@
             "VIEWNAME":"Name",
             "DATABASE":"Datenbank",
             "SEQUENCE":"Sequenz",
-            "TIMESTAMP":"Zeitstempel",
+            "EVENTTIMESTAMP":"Event Zeitstempel",
+            "LASTSPOOL": "Erfolgreicher Durchlauf",
             "ACTIONS":"Aktionen",
             "CLEAR":"Aufräumen",
             "CLEARED":"View wurde erfolgreich zurückgesetzt!",
@@ -349,10 +452,6 @@
             "ACTIONS":"Aktionen",
             "DELETE":"Entfernen",
             "DELETESUCCESS":"Gescheiterte Events entfernt."
-        },
-        "POLICY": {
-            "TITLE":"Standardrichtlinien für ihre Organisationen",
-            "DESCRIPTION":"Diese Einstellungen können von Organisationen erweitert und/oder verändert werden."
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt.",
@@ -376,14 +475,24 @@
             "ACTIVE":"Aktiv",
             "CREATE":"Organisation erstellen",
             "ORGDETAIL_TITLE":"Gebe den Namen und die Domain für die neue Organisation ein.",
-            "ORGDOMAIN_TITLE":"Verifikation der Domain der Organisation",
-            "ORGDOMAIN_VERIFICATION":"Überprüfe den Besitz Deiner Domain, indem Du eine Bestätigungsdatei herunterlädst und unter der angegebenen URL speicherst, oder indem Du sie mit einem DNS-Eintrag verifizierst.",
-            "ORGDOMAIN_VERIFICATION_SKIP":"Du kannst die Überprüfung vorerst überspringen und Deine Organisation erstellen. Um Deine Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein.",
+            "ORGDETAIL_TITLE_WITHOUT_DOMAIN":"Geben Sie den Namen der neuen Organisation ein.",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
-            "ORGDOMAIN_VERIFICATION_VALIDATION_DESC":"Die Tokens werden regelmässig überprüft, um sicherzustellen, dass Du weiterhin im Besitz der Domain bist.",
-            "ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE":"Neues Token anfordern",
-            "ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC":"Wenn Du ein neues Token anfordern willst, klicke auf die gewünschte Methode. Wenn Du ein vorhandenes Token validieren möchtest, klicke auf \"Validieren\".",
-            "ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING":"Ein Token zur Validierung wurde bereits angefragt. Klicke auf \"Validieren\", um dieses Token zu validieren.",
+            "ORGDOMAIN": {
+                "TITLE":"Verifikation der Domain der Organisation",
+                "VERIFICATION":"Überprüfe den Besitz Deiner Domain, indem Du eine Bestätigungsdatei herunterlädst und unter der angegebenen URL speicherst, oder indem Du sie mit einem DNS-Eintrag verifizierst.",
+                "VERIFICATION_SKIP":"Du kannst die Überprüfung vorerst überspringen und Deine Organisation erstellen. Um Deine Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein.",
+                "VERIFICATION_VALIDATION_DESC":"Die Tokens werden regelmässig überprüft, um sicherzustellen, dass Du weiterhin im Besitz der Domain bist.",
+                "VERIFICATION_NEWTOKEN_TITLE":"Neues Token anfordern",
+                "VERIFICATION_NEWTOKEN_DESC":"Wenn Du ein neues Token anfordern willst, klicke auf die gewünschte Methode. Wenn Du ein vorhandenes Token validieren möchtest, klicke auf \"Verifizieren\".",
+                "VERIFICATION_VALIDATION_ONGOING":"Ein Token zur Validierung wurde bereits angefragt. Klicke auf \"Verifizieren\", um dieses Token zu validieren.",
+                "VERIFICATION_VALIDATION_ONGOING_TYPE":"Typ des Tokens:",
+                "VERIFICATION_SUCCESSFUL":"Domain erfolgreich validiert!",
+                "REQUESTNEWTOKEN":"Neues Token anfordern",
+                "TYPES": {
+                    "1":"HTTP",
+                    "2":"DNS"
+                }
+            },
             "DOWNLOAD_FILE":"Datei herunterladen",
             "SELECTORGTOOLTIP":"Diese Organisation auswählen",
             "PRIMARYDOMAIN":"Primäre Domain",
@@ -413,74 +522,6 @@
             "TITLE":"Manager der Organisation verwalten",
             "DESCRIPTION":"Definiere hier die Benutzer, die Operationen auf Deinen Organisationen vornehmen dürfen."
         },
-        "POLICY": {
-            "TITLE":"Richtlinen entdecken",
-            "DESCRIPTION":"Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
-            "PWD_COMPLEXITY": {
-                "TITLE":"Passwortkomplexität",
-                "DESCRIPTION":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
-                "TITLECREATE":"Passwortkomplexitätsrichtlinie erstellen",
-                "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
-                "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
-                "SYMBOLERROR":"Das Password muss ein Symbol/Satzzeichen beinhalten.",
-                "NUMBERERROR":"Das Password muss eine Ziffer beinhalten.",
-                "PATTERNERROR":"Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
-            },
-            "PWD_AGE": {
-                "TITLE":"Gültigkeitsdauer für Passwörter",
-                "DESCRIPTION":"Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus.",
-                "TITLECREATE":"Richtlinie für Gültigkeitsdauer von Passwörtern festlegen",
-                "DESCRIPTIONCREATE":"Du kannst eine Richtlinie für die Gültigkeitsdauer von Passwörtern  festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
-            },
-            "PWD_LOCKOUT": {
-                "TITLE":"Passwortsperre",
-                "DESCRIPTION":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest.",
-                "TITLECREATE":"Richtline zur Passwortsperre festlegen",
-                "DESCRIPTIONCREATE":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie anwenden, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
-            },
-            "IAM_POLICY": {
-                "TITLE":"Zugangseinstellungen IAM",
-                "DESCRIPTION":"Definiere die Zugangseistellungen für Benutzer.",
-                "TITLECREATE":"Zugangseinstellungen für IAM festlegen",
-                "DESCRIPTIONCREATE":"E-Mails als Benutzernamen sind nicht erlaubt, wenn die Eigenschaft \"UserLoginMustBeDomain\" gesetzt ist."
-            },
-            "LOGIN_POLICY": {
-                "TITLE":"Login Richtlinien",
-                "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
-                "TITLECREATE":"Definiere die Loginmethoden für Benutzer",
-                "DESCRIPTIONCREATEADMIN":"Nutzer können sich mit den verfügbaren Idps authentifizieren.",
-                "DESCRIPTIONCREATEMGMT":"Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
-                "SAVED":"Erfolgreich gespeichert."
-            },
-            "DEFAULTLABEL":"Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
-            "BTN_INSTALL":"Installieren",
-            "BTN_EDIT":"Modifizieren",
-            "DATA": {
-                "DESCRIPTION":"Beschreibung",
-                "MINLENGTH":"Mindestlänge",
-                "HASNUMBER": "erfordert Ziffer",
-                "HASSYMBOL": "erfordert Symbol/Satzzeichen",
-                "HASLOWERCASE": "erfordert Kleinbuchstaben",
-                "HASUPPERCASE": "erfordert Grossbuchstaben",
-                "SHOWLOCKOUTFAILURES":"Zeige Anzahl Anmeldeversuche",
-                "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
-                "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
-                "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
-                "USERLOGINMUSTBEDOMAIN":"Benutzer-Login muss eine Domain sein",
-                "ALLOWUSERNAMEPASSWORD":"Benutzername Password erlaubt",
-                "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
-                "ALLOWREGISTER":"Registrieren erlaubt",
-                "ALLOWUSERNAMEPASSWORD_DESC":"Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
-                "ALLOWEXTERNALIDP_DESC":"Der Login wird für die darunter liegenden Identity Provider erlaubt.",
-                "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers."
-            },
-            "RESET":"Richtlinie zurücksetzen",
-            "CREATECUSTOM":"Benutzerdefinierte Richtlinie erstellen",
-            "TOAST":{
-                "SET":"Richtline erfolgreich gesetzt!",
-                "RESETSUCCESS":"Richtline zurückgesetzt!"
-            }
-        },
         "TOAST": {
             "DEACTIVATED":"Organisation deaktiviert.",
             "REACTIVATED":"Organisation reaktiviert.",
@@ -490,6 +531,74 @@
             "MEMBERREMOVED":"Manager entfernt.",
             "MEMBERCHANGED":"Manager geändert.",
             "SETPRIMARY":"Primäre Domain gesetzt."
+        }
+    },
+    "POLICY": {
+        "TITLE":"Richtlinen entdecken",
+        "DESCRIPTION":"Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
+        "PWD_COMPLEXITY": {
+            "TITLE":"Passwortkomplexität",
+            "DESCRIPTION":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
+            "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
+            "SYMBOLERROR":"Das Password muss ein Symbol/Satzzeichen beinhalten.",
+            "NUMBERERROR":"Das Password muss eine Ziffer beinhalten.",
+            "PATTERNERROR":"Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
+        },
+        "PWD_AGE": {
+            "TITLE":"Gültigkeitsdauer für Passwörter",
+            "DESCRIPTION":"Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
+        },
+        "PWD_LOCKOUT": {
+            "TITLE":"Passwortsperre",
+            "DESCRIPTION":"Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
+        },
+        "IAM_POLICY": {
+            "TITLE":"Zugangseinstellungen IAM",
+            "DESCRIPTION":"Definiere die Zugangseistellungen für Benutzer."
+        },
+        "LOGIN_POLICY": {
+            "TITLE":"Login Richtlinien",
+            "DESCRIPTION":"Definiere die Loginmethoden für Benutzer",
+            "DESCRIPTIONCREATEADMIN":"Nutzer können sich mit den verfügbaren Idps authentifizieren.",
+            "DESCRIPTIONCREATEMGMT":"Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
+            "SAVED":"Erfolgreich gespeichert."
+        },
+        "LABEL": {
+            "TITLE":"Email Labelling Einstellungen",
+            "DESCRIPTION":"Definieren Sie das Erscheinungsbild Ihrer Benachrichtigungs-Mails",
+            "PRIMARYCOLOR":"Hintergrundfarbe",
+            "SECONDARYCOLOR":"Schriftfarbe",
+            "SAVED":"Erfolgreich gespeichert."
+        },
+        "DEFAULTLABEL":"Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
+        "BTN_INSTALL":"Installieren",
+        "BTN_EDIT":"Modifizieren",
+        "DATA": {
+            "DESCRIPTION":"Beschreibung",
+            "MINLENGTH":"Mindestlänge",
+            "HASNUMBER": "erfordert Ziffer",
+            "HASSYMBOL": "erfordert Symbol/Satzzeichen",
+            "HASLOWERCASE": "erfordert Kleinbuchstaben",
+            "HASUPPERCASE": "erfordert Grossbuchstaben",
+            "SHOWLOCKOUTFAILURES":"Zeige Anzahl Anmeldeversuche",
+            "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
+            "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
+            "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
+            "USERLOGINMUSTBEDOMAIN":"Benutzer-Login muss eine Domain sein",
+            "ALLOWUSERNAMEPASSWORD":"Benutzername Password erlaubt",
+            "ALLOWEXTERNALIDP":"Externer IDP erlaubt",
+            "ALLOWREGISTER":"Registrieren erlaubt",
+            "ALLOWUSERNAMEPASSWORD_DESC":"Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
+            "ALLOWEXTERNALIDP_DESC":"Der Login wird für die darunter liegenden Identity Provider erlaubt.",
+            "ALLOWREGISTER_DESC":"Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
+            "FORCEMFA":"Mfa erzwingen",
+            "FORCEMFA_DESC":"Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden."
+        },
+        "RESET":"Richtlinie zurücksetzen",
+        "CREATECUSTOM":"Benutzerdefinierte Richtlinie erstellen",
+        "TOAST":{
+            "SET":"Richtline erfolgreich gesetzt!",
+            "RESETSUCCESS":"Richtline zurückgesetzt!"
         }
     },
     "ORG_DETAIL": {
@@ -517,7 +626,7 @@
             "ADDDESCRIPTION": "Gebe die E-Mail-Adressen der hinzuzufügenden Benutzer ein."
         },
         "TABLE": {
-            "TOTAL": "Einträge gesamt:",
+            "TOTAL": "Einträge gesamt",
             "SELECTION": "Ausgewählte Elemente",
             "DEACTIVATE": "Benutzer deaktivieren",
             "ACTIVATE": "Benutzer aktivieren",
@@ -585,6 +694,7 @@
             "USERID": "Benutzer-ID"
         },
         "GRANT": {
+            "EMPTY":"Noch keine Organisation berechtigt",
             "TITLE": "Berechtigte Organisationen",
             "DESCRIPTION": "Gewähre einer anderen Organisation Zugriff auf dieses Projekt.",
             "CREATE": {
@@ -620,6 +730,7 @@
             "GRANTEDORGNAME":"Name der Organisation",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
+            "DATES":"Datum",
             "ROLENAMESLIST": "Rollen",
             "NOROLES":"Keine Rollen",
             "TOAST":{
@@ -638,6 +749,7 @@
             "NAMEREQUIRED":"Der Name ist erforderlich."
         },
         "ROLE": {
+            "EMPTY":"Noch keine Rollen erstellt!",
             "ADDNEWLINE":"Zusätzliche Rolle hinzufügen",
             "KEY":"Key",
             "TITLE": "Rollen",
@@ -671,7 +783,10 @@
             "TYPE":"Typ",
             "CREATIONDATE":"Erstelldatum",
             "CHANGEDATE":"Letzte Änderung",
-            "RESOURCEOWNER":"Besitzer"
+            "RESOURCEOWNER":"Besitzer",
+            "SHOWTABLE":"Tabellendarstellung",
+            "SHOWGRID":"Rasterdarstellung",
+            "EMPTY":"Kein Projekt gefunden"
         },
         "TOAST":{
             "MEMBERREMOVED":"Manager entfernt.",
@@ -689,7 +804,7 @@
     },
     "IDP":{
         "LIST": {
-            "TITLE":"Identitäts Providers",
+            "TITLE":"Identitäts Provider",
             "DESCRIPTION":"Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
         },
         "CREATE": {
@@ -752,6 +867,37 @@
             "DELETED":"Idp erfolgreich gelöscht!"
         }
     },
+    "MFA":{
+        "LIST": {
+            "MULTIFACTORTITLE":"Multifaktoren",
+            "MULTIFACTORDESCRIPTION":"Definieren Sie hier Ihre Multifaktoren, die sie für die Authentifizierung verwenden können.",
+            "SECONDFACTORTITLE":"Zweitfaktoren",
+            "SECONDFACTORDESCRIPTION":"Definieren Sie hier Ihre Zweitfaktoren, die sie für die Authentifizierung verwenden können."
+        },
+        "CREATE": {
+            "TITLE":"Neuer Faktor",
+            "DESCRIPTION":"Definieren Sie hier den gewünschten Typ."
+        },
+        "DELETE": {
+            "TITLE":"Faktor löschen",
+            "DESCRIPTION":"Sie sind im Begriff einen Faktor zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?"
+        },
+        "TOAST": {
+            "ADDED":"Erfolgreich hinzugefügt.",
+            "SAVED": "Erfolgreich gespeichert.",
+            "DELETED":"Mfa erfolgreich gelöscht!"
+        },
+        "TYPE":"Typ",
+        "MULTIFACTORTYPES": {
+            "0":"Unknown",
+            "1":"U2F with Pin"
+        },
+        "SECONDFACTORTYPES": {
+            "0":"Unknown",
+            "1":"OTP",
+            "2":"U2F"
+        }
+    },
     "LOGINPOLICY": {
         "CREATE": {
             "TITLE":"Login Policy",
@@ -762,6 +908,11 @@
             "TITLE":"Identity Provider hinzufügen",
             "DESCRIPTION":"Sie können vordefinierte oder selbsterstellten Provider auswählen",
             "SELECTIDPS":"Identity Provider"
+        },
+        "PASSWORDLESS":"Passwordloser Login",
+        "PASSWORDLESSTYPE": {
+            "0":"Nicht erlaubt",
+            "1":"Erlaubt"
         }
     },
     "APP": {
@@ -795,6 +946,7 @@
             "REDIRECTDESCRIPTIONWEB":"Die Weiterleitung muss mit https:// beginnen. http:// ist nur im Entwicklermodus zulässig.",
             "REDIRECTDESCRIPTIONNATIVE":"Die Weiterleitung muss mit einem eigenen Protokoll oder http://localhost beginnen.",
             "REDIRECTNOTVALID":"Diese Weiterleitung ist nicht zulässig.",
+            "COMMAORENTERSEPERATION":"mit ↵ trennen",
             "POSTREDIRECTTITLE":"Das ist die Weiterleitung nach einem Log-out.",
             "TYPEREQUIRED":"Der Typ ist notwendig.",
             "TITLE": "OIDC-Konfiguration",
@@ -835,8 +987,11 @@
             "OVERVIEWTITLE":"Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen.",
             "ACCESSTOKENROLEASSERTION":"Benutzerrollen dem Access Token hinzufügen",
             "ACCESSTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Access Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
-            "IDTOKENROLEASSERTION":"Benutzerrollen dem Id Token hinzufügen",
-            "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt."
+            "IDTOKENROLEASSERTION":"Benutzerrollen im ID Token",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
+            "IDTOKENUSERINFOASSERTION":"User Info im ID Token",
+            "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
+            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen."
         },
         "TOAST": {
             "REACTIVATED":"Anwendung reaktiviert.",
@@ -868,23 +1023,26 @@
     },
     "ROLESLABEL":"Rollen",
     "GRANTS": {
+        "TITLE":"Berechtigungen",
+        "DESC":"Hier kannst Du die Berechtigungen Deiner Organisation verwalten.",
         "DELETE":"Berechtigung löschen",
+        "EMPTY":"Keine Berechtigungen gefunden",
         "ADD":"Berechtigung erstellen",
         "ADD_BTN":"Neu",
         "PROJECT": {
-            "TITLE": "Authorisierung",
-            "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Authorisierung besitzt."
+            "TITLE": "Autorisierung",
+            "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Autorisierung besitzt."
         },
         "USER": {
-            "TITLE": "Authorisierung",
-            "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Authorisierung besitzt."
+            "TITLE": "Autorisierung",
+            "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Autorisierung besitzt."
         },
         "CREATE": {
-            "TITLE": "Authorisierung erstellen",
+            "TITLE": "Autorisierung erstellen",
             "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
         },
         "DETAIL": {
-            "TITLE":"Authorisierungsdetails",
+            "TITLE":"Autorisierungsdetails",
             "DESCRIPTION":""
         },
         "TOAST": {

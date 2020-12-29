@@ -13,7 +13,7 @@ import (
 )
 
 type Machine struct {
-	*User `json:"-"`
+	user *User `json:"-"`
 
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
@@ -86,11 +86,18 @@ func (key *MachineKey) AppendEvents(events ...*es_models.Event) error {
 	return nil
 }
 
-func (key *MachineKey) AppendEvent(event *es_models.Event) error {
+func (key *MachineKey) AppendEvent(event *es_models.Event) (err error) {
+	key.ObjectRoot.AppendEvent(event)
 	switch event.Type {
 	case MachineKeyAdded:
+		err = json.Unmarshal(event.Data, key)
+		if err != nil {
+			return errors.ThrowInternal(err, "MODEL-SjI4S", "Errors.Internal")
+		}
+	case MachineKeyRemoved:
+		key.ExpirationDate = event.CreationDate
 	}
-	return nil
+	return err
 }
 
 func MachineKeyFromModel(machine *model.MachineKey) *MachineKey {

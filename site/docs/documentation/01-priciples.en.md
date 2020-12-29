@@ -15,9 +15,9 @@ title: Principles
 - Embrace automation
 - Design API first
 - Optimize all components for day-two operations
-- Use only opensource projects with permissive licenses
+- Use only open source projects with permissive licenses
 - Don't roll your own crypto algorithm
 - Embrace (industry) standard as much as possible
 - Make use of platform features
 - Be able to run with a CDN and WAF
-- Releases utilized sematic versioning and release whenever feasible
+- Releases utilized semantic versioning and release whenever feasible

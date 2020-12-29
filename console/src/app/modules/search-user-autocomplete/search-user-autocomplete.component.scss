@@ -2,11 +2,12 @@
   width: 100%;
 }
 
-.target-desc {
-  color: var(--grey);
-  font-size: .8rem;
-  margin: 0;
+.more-space {
   margin-bottom: 1rem;
+}
+
+.target-desc {
+  font-size: 14px;
 
   a {
     color: #4072b4;
@@ -28,7 +29,7 @@
   }
 
   button {
-    margin-top: 1rem;
+    margin-top: 30px;
   }
 }
 
@@ -37,12 +38,35 @@
   font-size: .8rem;
 }
 
-.found-user-row {
-  display: flex;
-  align-items: center;
+.found {
+  margin: .5rem 0;
+  background: #4072b410;
+  border-radius: .5rem;
+  padding: .5rem;
+
+  .found-user-row {
+    padding: .5rem 0;
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+
+    button {
+      visibility: hidden;
+    }
+
+    &:hover {
+      button {
+        visibility: visible;
+      }
+    }
+  }
+
+  .found-label {
+    font-size: .9rem;
+    color: var(--grey);
+  }
 }
 
-.found-label {
-  font-size: .9rem;
-  color: var(--grey);
+.circle {
+  margin-right: .5rem;
 }

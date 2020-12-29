@@ -17,11 +17,11 @@ title: Overview
   - Mobile Clients
     - Android
     - iOS / iPadOS
-- Bearer Tokens to use with APIs
+- Bearer Tokens (JWT and opaque) to use with APIs
   - REST
   - GRPC
   - GraphQL
-- Role Based Access Control
+- Role Based Access Control (RBAC) with delegation to let organisations manage authorisations on their own
 - OpenID Connect 1.0 (OIDC) support
 - OAuth 2.0 support
 - Identity Brokering
@@ -30,6 +30,9 @@ title: Overview
 - Management Console for central management of your data
 - Multi-factor Authentication
   - Support for TOTP/HOTP with any app, like authy, google authenticator, ...
+  - U2F (CTAP1)
+- Passwordless Authentication
+  - WebAuthN (FIDO2 / CTAP2)
 - User self-registration, recover password, email and phone verification, etc.
 - Organisation self-registration, domain verification, policy management
 - API's for easy integration in your application
@@ -37,4 +40,4 @@ title: Overview
 ### Concepts
 
 With ZITADEL there are some key concepts some should be aware of before using it to secure your applications and services.
-You find these definitions in the "What is..." heading of each resource.
+You find these definitions in the "What is/are..." heading of each resource.

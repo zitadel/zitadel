@@ -47,11 +47,10 @@ export class GrantedProjectGridComponent implements OnChanges {
             this.setPrefixedItem('pinned-granted-projects', JSON.stringify(
                 this.selection.selected.map(item => item.projectId),
             )).then(() => {
-                const filtered = this.notPinned.filter(item => item === selection.added.find(i => i === item));
-                filtered.forEach((f, i) => {
-                    this.notPinned.splice(i, 1);
+                selection.added.forEach(item => {
+                    const index = this.notPinned.findIndex(i => i.projectId === item.projectId);
+                    this.notPinned.splice(index, 1);
                 });
-
                 this.notPinned.push(...selection.removed);
             });
         });
@@ -74,18 +73,10 @@ export class GrantedProjectGridComponent implements OnChanges {
                 const array: string[] = JSON.parse(storageEntry);
                 const toSelect: ProjectGrantView.AsObject[] = this.items.filter((item, index) => {
                     if (array.includes(item.projectId)) {
-                        // this.notPinned.splice(index, 1);
                         return true;
                     }
                 });
                 this.selection.select(...toSelect);
-
-                const toNotPinned: ProjectGrantView.AsObject[] = this.items.filter((item, index) => {
-                    if (!array.includes(item.projectId)) {
-                        return true;
-                    }
-                });
-                this.notPinned = toNotPinned;
             }
         });
     }

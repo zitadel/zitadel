@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/lib/pq"
 	"time"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -23,10 +24,14 @@ type LoginPolicyView struct {
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 	State        int32     `json:"-" gorm:"column:login_policy_state"`
 
-	AllowRegister         bool `json:"allowRegister" gorm:"column:allow_register"`
-	AllowUsernamePassword bool `json:"allowUsernamePassword" gorm:"column:allow_username_password"`
-	AllowExternalIDP      bool `json:"allowExternalIdp" gorm:"column:allow_external_idp"`
-	Default               bool `json:"-" gorm:"-"`
+	AllowRegister         bool          `json:"allowRegister" gorm:"column:allow_register"`
+	AllowUsernamePassword bool          `json:"allowUsernamePassword" gorm:"column:allow_username_password"`
+	AllowExternalIDP      bool          `json:"allowExternalIdp" gorm:"column:allow_external_idp"`
+	ForceMFA              bool          `json:"forceMFA" gorm:"column:force_mfa"`
+	PasswordlessType      int32         `json:"passwordlessType" gorm:"column:passwordless_type"`
+	SecondFactors         pq.Int64Array `json:"-" gorm:"column:second_factors"`
+	MultiFactors          pq.Int64Array `json:"-" gorm:"column:multi_factors"`
+	Default               bool          `json:"-" gorm:"-"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
@@ -40,8 +45,28 @@ func LoginPolicyViewFromModel(policy *model.LoginPolicyView) *LoginPolicyView {
 		AllowRegister:         policy.AllowRegister,
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
+		ForceMFA:              policy.ForceMFA,
+		PasswordlessType:      int32(policy.PasswordlessType),
+		SecondFactors:         secondFactorsFromModel(policy.SecondFactors),
+		MultiFactors:          multiFactorsFromModel(policy.MultiFactors),
 		Default:               policy.Default,
 	}
+}
+
+func secondFactorsFromModel(mfas []model.SecondFactorType) []int64 {
+	convertedMFAs := make([]int64, len(mfas))
+	for i, m := range mfas {
+		convertedMFAs[i] = int64(m)
+	}
+	return convertedMFAs
+}
+
+func multiFactorsFromModel(mfas []model.MultiFactorType) []int64 {
+	convertedMFAs := make([]int64, len(mfas))
+	for i, m := range mfas {
+		convertedMFAs[i] = int64(m)
+	}
+	return convertedMFAs
 }
 
 func LoginPolicyViewToModel(policy *LoginPolicyView) *model.LoginPolicyView {
@@ -53,20 +78,58 @@ func LoginPolicyViewToModel(policy *LoginPolicyView) *model.LoginPolicyView {
 		AllowRegister:         policy.AllowRegister,
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
+		ForceMFA:              policy.ForceMFA,
+		PasswordlessType:      model.PasswordlessType(policy.PasswordlessType),
+		SecondFactors:         secondFactorsToModel(policy.SecondFactors),
+		MultiFactors:          multiFactorsToToModel(policy.MultiFactors),
 		Default:               policy.Default,
 	}
 }
 
-func (i *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
-	i.Sequence = event.Sequence
-	i.ChangeDate = event.CreationDate
+func secondFactorsToModel(mfas []int64) []model.SecondFactorType {
+	convertedMFAs := make([]model.SecondFactorType, len(mfas))
+	for i, m := range mfas {
+		convertedMFAs[i] = model.SecondFactorType(m)
+	}
+	return convertedMFAs
+}
+
+func multiFactorsToToModel(mfas []int64) []model.MultiFactorType {
+	convertedMFAs := make([]model.MultiFactorType, len(mfas))
+	for i, m := range mfas {
+		convertedMFAs[i] = model.MultiFactorType(m)
+	}
+	return convertedMFAs
+}
+
+func (p *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
+	p.Sequence = event.Sequence
+	p.ChangeDate = event.CreationDate
 	switch event.Type {
 	case es_model.LoginPolicyAdded, org_es_model.LoginPolicyAdded:
-		i.setRootData(event)
-		i.CreationDate = event.CreationDate
-		err = i.SetData(event)
+		p.setRootData(event)
+		p.CreationDate = event.CreationDate
+		err = p.SetData(event)
 	case es_model.LoginPolicyChanged, org_es_model.LoginPolicyChanged:
-		err = i.SetData(event)
+		err = p.SetData(event)
+	case es_model.LoginPolicySecondFactorAdded, org_es_model.LoginPolicySecondFactorAdded:
+		mfa := new(es_model.MFA)
+		err := mfa.SetData(event)
+		if err != nil {
+			return err
+		}
+		p.SecondFactors = append(p.SecondFactors, int64(mfa.MFAType))
+	case es_model.LoginPolicySecondFactorRemoved, org_es_model.LoginPolicySecondFactorRemoved:
+		err = p.removeSecondFactor(event)
+	case es_model.LoginPolicyMultiFactorAdded, org_es_model.LoginPolicyMultiFactorAdded:
+		mfa := new(es_model.MFA)
+		err := mfa.SetData(event)
+		if err != nil {
+			return err
+		}
+		p.MultiFactors = append(p.MultiFactors, int64(mfa.MFAType))
+	case es_model.LoginPolicyMultiFactorRemoved, org_es_model.LoginPolicyMultiFactorRemoved:
+		err = p.removeMultiFactor(event)
 	}
 	return err
 }
@@ -79,6 +142,40 @@ func (r *LoginPolicyView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-Kn7ds").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
+	}
+	return nil
+}
+
+func (p *LoginPolicyView) removeSecondFactor(event *models.Event) error {
+	mfa := new(es_model.MFA)
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	for i := len(p.SecondFactors) - 1; i >= 0; i-- {
+		if p.SecondFactors[i] == int64(mfa.MFAType) {
+			copy(p.SecondFactors[i:], p.SecondFactors[i+1:])
+			p.SecondFactors[len(p.SecondFactors)-1] = 0
+			p.SecondFactors = p.SecondFactors[:len(p.SecondFactors)-1]
+			return nil
+		}
+	}
+	return nil
+}
+
+func (p *LoginPolicyView) removeMultiFactor(event *models.Event) error {
+	mfa := new(es_model.MFA)
+	err := mfa.SetData(event)
+	if err != nil {
+		return err
+	}
+	for i := len(p.MultiFactors) - 1; i >= 0; i-- {
+		if p.MultiFactors[i] == int64(mfa.MFAType) {
+			copy(p.MultiFactors[i:], p.MultiFactors[i+1:])
+			p.MultiFactors[len(p.MultiFactors)-1] = 0
+			p.MultiFactors = p.MultiFactors[:len(p.MultiFactors)-1]
+			return nil
+		}
 	}
 	return nil
 }

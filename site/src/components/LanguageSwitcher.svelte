@@ -1,5 +1,5 @@
 <script context="module">
-    import { setCookie } from '../modules/cookie.js';
+    import { goto } from '@sapper/app';
     import { docLanguages } from '../modules/language-store.js'
     import {LANGUAGES} from '../../config.js';
 </script>
@@ -10,56 +10,48 @@
 
     let group= $locale;
 
-    $:setLocale(group);
-    function setLocale(language) {
+    function reload(language) {
         if (typeof window !== 'undefined') {
             locale.set(language);
+            location.reload();
         }
     }
 </script>
 
 <style>
     :root {
-        --deep-blue: #1e3470;
         --speed3: cubic-bezier(0.26, 0.48, 0.08, 0.9);
         --height: 30px;
     }
 
     .language-switcher {
+        position: fixed;
+        left: 0;
+        bottom: 0;
         display: flex;
         align-items: center;
-        position: relative;
-    }
-    
-    .language-switcher input {
-        appearance: none;
-        display: none;
+        z-index: 1;
+        justify-content: center;
     }
 
-    .language-switcher .select {
+    button {
         height: var(--height);
-        width: var(--height);
-        border-radius: 50vw;
-        font-size: calc(var(--height) / 2.5);
-        color: #fff;
-        mix-blend-mode: difference;    
+        margin: .5rem 1rem;
+        font-size: 12px;
         display: flex;
         align-items: center;
         cursor: pointer;
         justify-content: center;
+        border: none;
     }
 
-    .language-switcher .current {
-        background-color: white;
-        color: black;
+    button.current {
+        color: var(--grey-text);
     }
 </style>
 
 <div class="language-switcher">
 	{#each LANGUAGES as lang}
-		<label class="select {lang == group ? 'current' : 'notcurrent'}">
-            <input type=radio bind:group value={lang}>
-            {lang.toUpperCase()}
-        </label>
+        <button on:click="{() => reload(lang)}" disabled="{lang == group}" class="{lang == group ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</button>
 	{/each}
 </div>

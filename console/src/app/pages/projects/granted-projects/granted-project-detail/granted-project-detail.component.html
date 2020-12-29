@@ -17,34 +17,38 @@
                 description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                 <app-user-grants *ngIf="projectId && grantId" [context]="UserGrantContext.GRANTED_PROJECT"
                     [projectId]="projectId" [grantId]="grantId"
-                    [displayedColumns]="['select','user', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
-                    [allowWrite]="['user.grant.write$','user.grant.write:'+grantId] | hasRole | async"
-                    [allowDelete]="['user.grant.delete$','user.grant.delete:'+grantId] | hasRole | async"
-                    refreshOnPreviousRoute="/grant-create/project/{{projectId}}/grant/{{grantId}}">
+                    [displayedColumns]="['select','user', 'projectId', 'dates', 'roleNamesList']"
+                    [disableWrite]="(['user.grant.write$','user.grant.write:'+grantId] | hasRole | async) == false"
+                    [disableDelete]="(['user.grant.delete$','user.grant.delete:'+grantId] | hasRole | async) == false"
+                    refreshOnPreviousRoutes="['/grant-create/project/{{projectId}}/grant/{{grantId}}']">
                 </app-user-grants>
             </app-card>
         </ng-template>
     </div>
     <div class="side" metainfo>
-        <div class="details">
-            <div class="row">
+        <div class="meta-details">
+            <div class="meta-row">
+                <span class="first">{{'RESOURCEID' | translate}}:</span>
+                <span *ngIf="projectId" class="second">{{ projectId }}</span>
+            </div>
+            <div class="meta-row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
-                <span *ngIf="project && project.state !== undefined"
-                    class="second">{{'PROJECT.STATE.'+project.state | translate}}</span>
+                <span *ngIf="project && project.state !== undefined" class="state"
+                    [ngClass]="{'active': project.state === ProjectState.PROJECTSTATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECTSTATE_INACTIVE}">{{'PROJECT.STATE.'+project.state | translate}}</span>
             </div>
         </div>
 
         <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
             <mat-tab label="Details">
-                <app-contributors *ngIf="project" [totalResult]="totalMemberResult" [loading]="loading$ | async"
+                <app-contributors *ngIf="project" [loading]="loading$ | async" [totalResult]="totalMemberResult"
                     [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
                     description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
                     (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
-                    [disabled]="(['project.grant.member.write$', 'project.grant.member.write:'+ project.projectId]| hasRole | async) == false">
+                    [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) == false">
                 </app-contributors>
             </mat-tab>
-            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
-                <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
+            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
+                <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.projectId"></app-changes>
             </mat-tab>
         </mat-tab-group>
     </div>

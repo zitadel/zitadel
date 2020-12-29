@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"encoding/json"
+	model2 "github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/id"
@@ -115,6 +116,25 @@ func GetMockManipulateIAMWithLoginPolicy(ctrl *gomock.Controller) *IAMEventstore
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyAdded, Data: policyData},
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIDPProviderAdded, Data: idpProviderData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateIAMWithLoginPolicyWithMFAs(ctrl *gomock.Controller) *IAMEventstore {
+	policyData, _ := json.Marshal(model.LoginPolicy{AllowRegister: true, AllowUsernamePassword: true, AllowExternalIdp: true})
+	idpProviderData, _ := json.Marshal(model.IDPProvider{IDPConfigID: "IDPConfigID", Type: 1})
+	secondFactor, _ := json.Marshal(model.MFA{MFAType: int32(model2.SecondFactorTypeOTP)})
+	multiFactor, _ := json.Marshal(model.MFA{MFAType: int32(model2.MultiFactorTypeU2FWithPIN)})
+	events := []*es_models.Event{
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyAdded, Data: policyData},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIDPProviderAdded, Data: idpProviderData},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicySecondFactorAdded, Data: secondFactor},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyMultiFactorAdded, Data: multiFactor},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

@@ -34,6 +34,14 @@
     flex: 1;
   }
 
+  .doc-link {
+    margin-right: 1rem;
+
+    @media only screen and (max-width: 500px) {
+      display: none;
+    }
+  }
+
   .icon-container {
     display: flex;
     justify-content: space-between;
@@ -64,13 +72,6 @@
       border-radius: .5rem;
     }
   }
-}
-
-.admin-line {
-  font-size: 12px;
-  padding: 4px 2rem;
-  position: relative;
-  overflow: hidden;
 }
 
 .main-container {
@@ -110,8 +111,10 @@
           align-items: center;
           text-decoration: none;
           cursor: pointer;
-          padding: .2rem 1rem;
+          padding: 0 1rem;
           margin-right: .5rem;
+          border-top-right-radius: 1.5rem;
+          border-bottom-right-radius: 1.5rem;
 
           .icon {
             margin: .5rem 1rem;
@@ -119,8 +122,8 @@
 
           .label {
             margin-bottom: 0;
-            font-weight: 500;
-            font-size: .9rem;
+            font-size: 14px;
+            letter-spacing: .05em;
           }
 
           .c_label {
@@ -128,7 +131,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: .9rem;
+            font-size: 14px;
+            letter-spacing: .03em;
 
             .count {
               font-size: 12px;
@@ -205,14 +209,14 @@
   display: flex;
   align-items: center;
   width: 100%;
-  margin: .5rem 0;
+  margin: 5px 0;
 
   span {
     border: 1px solid #81868a40;
     padding: 2px 1rem;
     border-radius: 50vw;
     color: var(--grey);
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .line {
@@ -221,6 +225,13 @@
     height: 1px;
     margin: .5rem 0;
     flex: 1;
+    min-width: 10px;
+  }
+
+  .hiddenline {
+    display: block;
+    visibility: hidden;
+    width: 4rem;
   }
 }
 
@@ -228,7 +239,6 @@
   .filter-form {
     margin: 0 .5rem;
     /* stylelint-disable */
-
     $foreground: map-get($theme, foreground);
     color: mat-color($foreground, text) !important;
   }
@@ -245,6 +255,10 @@
 .menu {
   position: relative;
 
+  .filter-wrapper {
+    padding: 4px;
+  }
+
   .spinner-w {
     top: 1rem;
     left: 0;
@@ -254,4 +268,9 @@
     justify-content: center;
     align-items: center;
   }
+}
+
+.org-wrapper {
+  max-height: 350px;
+  overflow-y: auto;
 }

@@ -1,6 +1,8 @@
 package oidc
 
 import (
+	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
+	"strings"
 	"time"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -63,16 +65,22 @@ func (c *Client) DevMode() bool {
 	return c.ApplicationView.DevMode
 }
 
-func (c *Client) AllowedScopes() []string {
-	return c.allowedScopes
+func (c *Client) RestrictAdditionalIdTokenScopes() func(scopes []string) []string {
+	return func(scopes []string) []string {
+		if c.IDTokenRoleAssertion {
+			return scopes
+		}
+		return removeScopeWithPrefix(scopes, ScopeProjectRolePrefix)
+	}
 }
 
-func (c *Client) AssertAdditionalIdTokenScopes() bool {
-	return c.IDTokenRoleAssertion
-}
-
-func (c *Client) AssertAdditionalAccessTokenScopes() bool {
-	return c.AccessTokenRoleAssertion
+func (c *Client) RestrictAdditionalAccessTokenScopes() func(scopes []string) []string {
+	return func(scopes []string) []string {
+		if c.AccessTokenRoleAssertion {
+			return scopes
+		}
+		return removeScopeWithPrefix(scopes, ScopeProjectRolePrefix)
+	}
 }
 
 func (c *Client) AccessTokenLifetime() time.Duration {
@@ -85,6 +93,29 @@ func (c *Client) IDTokenLifetime() time.Duration {
 
 func (c *Client) AccessTokenType() op.AccessTokenType {
 	return accessTokenTypeToOIDC(c.ApplicationView.AccessTokenType)
+}
+
+func (c *Client) IsScopeAllowed(scope string) bool {
+	if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, authreq_model.ProjectIDScope) {
+		return true
+	}
+	for _, allowedScope := range c.allowedScopes {
+		if scope == allowedScope {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Client) ClockSkew() time.Duration {
+	return c.ApplicationView.ClockSkew
+}
+
+func (c *Client) IDTokenUserinfoClaimsAssertion() bool {
+	return c.ApplicationView.IDTokenUserinfoAssertion
 }
 
 func accessTokenTypeToOIDC(tokenType model.OIDCTokenType) op.AccessTokenType {
@@ -130,4 +161,21 @@ func responseTypeToOIDC(responseType model.OIDCResponseType) oidc.ResponseType {
 	default:
 		return oidc.ResponseTypeCode
 	}
+}
+
+func removeScopeWithPrefix(scopes []string, scopePrefix ...string) []string {
+	newScopeList := make([]string, 0)
+	for _, scope := range scopes {
+		hasPrefix := false
+		for _, prefix := range scopePrefix {
+			if strings.HasPrefix(scope, prefix) {
+				hasPrefix = true
+				continue
+			}
+		}
+		if !hasPrefix {
+			newScopeList = append(newScopeList, scope)
+		}
+	}
+	return newScopeList
 }

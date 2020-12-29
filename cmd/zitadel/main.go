@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 
 	"github.com/caos/logging"
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
@@ -21,7 +22,7 @@ import (
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/setup"
-	tracing "github.com/caos/zitadel/internal/tracing/config"
+	tracing "github.com/caos/zitadel/internal/telemetry/tracing/config"
 	"github.com/caos/zitadel/internal/ui"
 	"github.com/caos/zitadel/internal/ui/console"
 	"github.com/caos/zitadel/internal/ui/login"
@@ -30,6 +31,7 @@ import (
 type Config struct {
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
+	Metrics        metrics.MetricsConfig
 	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
 
@@ -125,14 +127,16 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) 
 }
 
 func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository) {
-	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, conf.SystemDefaults)
 	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
 	}
+	adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, roles)
+	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
+
+	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, adminRepo, conf.SystemDefaults)
+
 	if *adminEnabled {
-		adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, roles)
-		logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 		apis.RegisterServer(ctx, admin.CreateServer(adminRepo))
 	}
 	if *managementEnabled {

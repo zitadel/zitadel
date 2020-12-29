@@ -180,6 +180,14 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddIDPProviderToLoginPolicyEvent(event)
 	case LoginPolicyIDPProviderRemoved:
 		return i.appendRemoveIDPProviderFromLoginPolicyEvent(event)
+	case LoginPolicySecondFactorAdded:
+		return i.appendAddSecondFactorToLoginPolicyEvent(event)
+	case LoginPolicySecondFactorRemoved:
+		return i.appendRemoveSecondFactorFromLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorAdded:
+		return i.appendAddMultiFactorToLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorRemoved:
+		return i.appendRemoveMultiFactorFromLoginPolicyEvent(event)
 	case LabelPolicyAdded:
 		return i.appendAddLabelPolicyEvent(event)
 	case LabelPolicyChanged:

@@ -4,14 +4,16 @@ title: Policies
 
 ### What are policies
 
-Polices are a means of enforcing certain behavior of ZITADEL.
-ZITADEL defines a default policy on the system level. However a org. owner can change these aspects within his own org.
+Policies are a means of enforcing certain behaviour of ZITADEL.
+ZITADEL defines a default policy on the system level. However an organisation owner can change these aspects within his own organisation.
+
+### Available policies
 
 Below is a list of available policies
 
-### Password complexity
+#### Password complexity
 
-This policy enforces passwords of users within the org. to be compliant.
+This policy enforces passwords of users within the organization to be compliant.
 
 - min length
 - has number
@@ -21,17 +23,18 @@ This policy enforces passwords of users within the org. to be compliant.
 
 > Screenshot here
 
-### IAM Access Preference
+#### IAM Access Preference
 
-This policy enforces, when set to true, that usernames are suffixed with the organisations domain.
-Under normal operation this policy is only false on the `global` org. so that users can choose there email as username.
-Only available for the `IAM Administrator`
+If enabled, this policy enforces that usernames are suffixed with the organisations domain.
+Under normal operation this policy is only false on the `global` organisation, so that users can choose their email as their username.
+
+Only available for the [IAM Administrator](administrate#ZITADEL_Administrators).
 
 > Screenshot here
 
-### Login Options
+#### Login Options
 
-With this policy it is possible to define what options a user sees in the login process.
+With this policy it is possible to define what options a user sees in the login process:
 
 - Username Password allowed
 - Self Register allowed
@@ -40,7 +43,7 @@ With this policy it is possible to define what options a user sees in the login 
 
 > Screenshot here
 
-### Audit policy changes
+#### Audit policy changes
 
 > Screenshot here
 

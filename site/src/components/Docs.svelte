@@ -4,16 +4,32 @@
   import Icon from "./Icon.svelte";
   import manifest from '../../static/manifest.json';
   export let owner = "caos";
-  export let project = "zitadel";
-  export let path = "site/docs";
+  export let path = "docs";
+  export let project = "zitadel";	
   export let dir = "";
   export let edit_title = "edit this section";
   export let sections;
+  import SearchSelector from './SearchSelector.svelte';
+  import SearchTrigger from './SearchTrigger.svelte';
+  import LanguageSwitcher from './LanguageSwitcher.svelte';
+  let searchEnabled = false;
   let active_section;
 
   let container;
   let aside;
   let show_contents = false;
+
+  function handleSearch(event) {
+    searchEnabled = !event.detail.closed;
+  }
+
+  function handleKeydown(event) {
+      const isCtrlKey = navigator.platform.indexOf('Mac') > -1 ? event.metaKey : event.ctrlKey
+    if ((event.keyCode == 114) || (isCtrlKey && event.keyCode == 70)) {
+        event.preventDefault();
+        searchEnabled = !searchEnabled;
+    }
+  }
 
   onMount(() => {
     // don't update `active_section` for headings above level 4, see _sections.js
@@ -68,13 +84,28 @@
 </script>
 
 <style>
+  .overlay {
+      position: fixed;
+      top: var(--nav-h);
+      right: 0;
+      left: 0;
+      bottom: 0;
+      background: #00000050;
+      backdrop-filter: blur(10px);
+      visibility: hidden;
+  }
+
+  .overlay.visible {
+      visibility: visible;
+  }
+
   aside {
     position: fixed;
     background-color: var(--side-nav-back);
     left: 0.8rem;
     bottom: 0.8rem;
-    width: 2em;
-    height: 2em;
+    width: 3.4rem; /* size to match button */
+    height: 3.4rem; /* size to match button */
     border-radius: .5rem;
     overflow: hidden;
     border: 1px solid #8795a1;
@@ -91,8 +122,8 @@
   }
 
   aside.open {
-    width: calc(100vw - 3rem);
-    height: calc(100vh - var(--nav-h) - 3rem);
+    width: calc(100vw - 1.5rem);
+    height: calc(100vh - var(--nav-h) - 15rem);
   }
 
   aside.open::before {
@@ -100,7 +131,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: calc(100% - 2rem);
+    width: 100%;
     height: 2em;
     pointer-events: none;
     z-index: 2;
@@ -110,15 +141,15 @@
     content: "";
     position: absolute;
     left: 0;
-    bottom: 1.9em;
-    width: calc(100% - 2rem);
-    height: 2em;
-    /* background: linear-gradient(
+    bottom: 0;
+    width: 100%;
+    height: 3em;
+    background: linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.7) 50%,
-      rgba(255, 255, 255, 1) 100%
-    ); */
+       #1a1f3600 0%,
+       #1a1f3680 50%,
+      #1a1f36 100%
+    );
     pointer-events: none;
   }
 
@@ -128,8 +159,43 @@
     overflow-y: auto;
     width: 100%;
     height: 100%;
-    padding: 4em 1.6rem 2em 3.2rem;
+    padding: 4em 1.6rem 2em 0;
     bottom: 2em;
+  }
+
+  .sidebar :global(.language-switcher) {
+        position: relative;
+  }
+
+  aside.open .sidebar .home {
+      display: none;
+  }
+
+  aside .sidebar :global(.search-trigger) {
+      visibility: hidden;
+  }
+
+  aside.open .sidebar :global(.search-trigger) {
+      visibility: visible;
+  }
+
+  .sidebar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #00000010;
+    border-radius: 8px;
+  }
+
+  .sidebar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #00000010;
+  }
+
+  .sidebar::-webkit-scrollbar-thumb {
+    background-color: #6c8eef30;
+    border-radius: 8px;
+    cursor: pointer;
   }
 
   .content {
@@ -145,8 +211,8 @@
     aside {
       display: block;
       width: var(--sidebar-w);
-      height: 100vh;
-      top: 0;
+      height: calc(100vh - var(--searchbar-space));
+      top: var(--searchbar-space); /* space for searchbar */
       left: 0;
       overflow: hidden;
       box-shadow: none;
@@ -164,25 +230,54 @@
       content: "";
       bottom: 0;
       height: var(--top-offset);
-      /* background: linear-gradient(
-        to bottom,
-        rgba(103, 103, 120, 0) 0%,
-        rgba(103, 103, 120, 0.7) 50%,
-        rgba(103, 103, 120, 1) 100%
-      ); */
     }
 
     aside button {
       display: none;
     }
 
+    aside .sidebar :global(.search-trigger) {
+      visibility: visible;
+    }
+
     .sidebar {
-      padding: var(--top-offset) 0 6.4rem 3.2rem;
+      padding: 1em .5rem 6.4rem 0;
       font-family: var(--font);
       overflow-y: auto;
       height: 100%;
       bottom: auto;
       width: 100%;
+    }
+
+    .sidebar .home {
+      position: fixed;
+      top: 0;
+      left: calc(var(--sidebar-w)/2);
+      margin: 2rem 0;
+      transform: translateX(-50%);
+      border-bottom: none;
+      display: flex;
+      align-items: center;
+      font-size: 22px;
+      padding: 0;
+    }
+
+    .sidebar .home img {
+        width: 170px;
+    }
+
+    .sidebar .home span {
+        margin-left: 3px;
+        color: var(--second);
+    }
+
+    .sidebar :global(.language-switcher) {
+        display: flex;
+        position: fixed;
+    }
+
+    .sidebar :global(.search-trigger) {
+      visibility: visible;
     }
 
     .content {
@@ -204,7 +299,7 @@
     margin-top: 4rem;
     padding: 2rem 1.6rem 4rem 0.2rem;
     border-top: var(--border-w) solid #6767785b; /* based on --second */
-    color: var(--text);
+    color: var(--heading);
     line-height: 1;
     font-size: var(--h3);
     letter-spacing: 0.05em;
@@ -233,9 +328,9 @@
     display: block;
     /* TODO replace link icon */
     /* background: url(../icons/link.svg) 0 50% no-repeat; */
-    background-size: 1em 1em;
-    width: 1.4em;
-    height: 1em;
+    background-size: 30px 30px;
+    width: 30px;
+    height: 30px;
     left: -1.3em;
     opacity: 0;
     color: white;
@@ -245,7 +340,7 @@
 
   .content :global(.anchor) :global(i) {
     color: #8795a1;
-    font-size: 24px;
+    /* font-size: 24px; */
   }
 
   @media (min-width: 768px) {
@@ -267,7 +362,7 @@
   .content :global(h3 > code) {
     margin: 2.0rem 0 0 0;
     padding: 2rem 1.6rem 2.0rem 0.2rem;
-    color: var(--text);
+    color: var(--heading);
     border-top: var(--border-w) solid #6767781f; /* based on --second */
     background: transparent;
     line-height: 1;
@@ -291,7 +386,7 @@
     font-family: inherit;
     font-weight: 500;
     font-size: 2.4rem;
-    color: var(--text);
+    color: var(--heading);
     margin: 2.0rem 0 1.6rem 0;
     padding-left: 0;
     background: transparent;
@@ -383,15 +478,18 @@
   }
 
   section :global(blockquote) {
-    color: #e91e63;
-    border: 2px solid var(--flash);
+    color: #85d996;
+    border: 2px solid var(--grey-text);
+    background: #2a2f45;
   }
 
   section :global(blockquote) :global(code) {
-    background: hsl(204, 100%, 95%) !important;
-    color: #e91e63;
+    /* background: hsl(204, 100%, 95%) !important; */
+    color: var(--prime);
   }
 </style>
+
+<svelte:window on:keydown={handleKeydown}/>
 
 <div bind:this={container} class="content listify">
   {#each sections as section}
@@ -404,7 +502,7 @@
         {@html section.metadata.title}
         <small>
           <a
-            href="https://github.com/{owner}/{project}/edit/master{path}/{dir}/{section.file}"
+            href="https://github.com/{owner}/{project}/edit/master/site/{path}/{dir}/{section.file}"
             title={edit_title}>
             <Icon name="las la-external-link-alt" size="24px" />
           </a>
@@ -416,13 +514,29 @@
   {/each}
 </div>
 
+<div class="overlay {show_contents ? 'visible' : ''}"></div>
+
 <aside bind:this={aside} class="sidebar-container" class:open={show_contents}>
   <div class="sidebar" on:click={() => (show_contents = false)}>
+    <a rel="prefetch" href="." class="home" title="Zitadel Docs">
+      <img src="logos/zitadel-logo-light.svg" alt="zitadel-logo" />
+      <span>DOCS</span>
+    </a>
+
+    <SearchTrigger on:click={handleSearch}/>
+
     <!-- scroll container -->
     <GuideContents {dir} {sections} {active_section} {show_contents} />
+
+    <LanguageSwitcher></LanguageSwitcher>
   </div>
 
   <button on:click={() => (show_contents = !show_contents)}>
-    <Icon name={show_contents ? 'las la-window-close' : 'las la-bars'} />
+    <Icon name={show_contents ? 'las la-times' : 'las la-bars'} />
   </button>
+
 </aside>
+
+{#if searchEnabled == true}
+    <SearchSelector on:close={handleSearch} {sections} slug={dir}></SearchSelector>
+{/if}

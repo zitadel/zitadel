@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
@@ -15,26 +16,62 @@ import (
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-type OrgMember struct {
-	handler
-	userEvents *usr_event.UserEventstore
-}
-
 const (
 	orgMemberTable = "management.org_members"
 )
+
+type OrgMember struct {
+	handler
+	userEvents   *usr_event.UserEventstore
+	subscription *eventstore.Subscription
+}
+
+func newOrgMember(
+	handler handler,
+	userEvents *usr_event.UserEventstore,
+) *OrgMember {
+	h := &OrgMember{
+		handler:    handler,
+		userEvents: userEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *OrgMember) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
 
 func (m *OrgMember) ViewModel() string {
 	return orgMemberTable
 }
 
+func (_ *OrgMember) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, usr_es_model.UserAggregate}
+}
+
+func (p *OrgMember) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := p.view.GetLatestOrgMemberSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (m *OrgMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestOrgMemberSequence()
+	sequence, err := m.view.GetLatestOrgMemberSequence("")
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, usr_es_model.UserAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -72,14 +109,14 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteOrgMember(event.AggregateID, member.UserID, event.Sequence)
+		return m.view.DeleteOrgMember(event.AggregateID, member.UserID, event)
 	default:
-		return m.view.ProcessedOrgMemberSequence(event.Sequence)
+		return m.view.ProcessedOrgMemberSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutOrgMember(member, member.Sequence)
+	return m.view.PutOrgMember(member, event)
 }
 
 func (m *OrgMember) processUser(event *models.Event) (err error) {
@@ -94,7 +131,7 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(members) == 0 {
-			return m.view.ProcessedOrgMemberSequence(event.Sequence)
+			return m.view.ProcessedOrgMemberSequence(event)
 		}
 		user, err := m.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -103,13 +140,12 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 		for _, member := range members {
 			m.fillUserData(member, user)
 		}
-		return m.view.PutOrgMembers(members, event.Sequence)
+		return m.view.PutOrgMembers(members, event)
 	case usr_es_model.UserRemoved:
-		return m.view.DeleteOrgMembersByUserID(event.AggregateID, event.Sequence)
+		return m.view.DeleteOrgMembersByUserID(event.AggregateID, event)
 	default:
-		return m.view.ProcessedOrgMemberSequence(event.Sequence)
+		return m.view.ProcessedOrgMemberSequence(event)
 	}
-	return nil
 }
 
 func (m *OrgMember) fillData(member *org_model.OrgMemberView) (err error) {
@@ -136,4 +172,8 @@ func (m *OrgMember) fillUserData(member *org_model.OrgMemberView, user *usr_mode
 func (m *OrgMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgmember handler")
 	return spooler.HandleError(event, err, m.view.GetLatestOrgMemberFailedEvent, m.view.ProcessedOrgMemberFailedEvent, m.view.ProcessedOrgMemberSequence, m.errorCountUntilSkip)
+}
+
+func (o *OrgMember) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateOrgMemberSpoolerRunTimestamp)
 }

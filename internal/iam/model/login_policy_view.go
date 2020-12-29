@@ -10,6 +10,10 @@ type LoginPolicyView struct {
 	AllowUsernamePassword bool
 	AllowRegister         bool
 	AllowExternalIDP      bool
+	ForceMFA              bool
+	PasswordlessType      PasswordlessType
+	SecondFactors         []SecondFactorType
+	MultiFactors          []MultiFactorType
 	Default               bool
 
 	CreationDate time.Time
@@ -45,4 +49,18 @@ type LoginPolicySearchResponse struct {
 	Result      []*LoginPolicyView
 	Sequence    uint64
 	Timestamp   time.Time
+}
+
+func (p *LoginPolicyView) HasSecondFactors() bool {
+	if p.SecondFactors == nil || len(p.SecondFactors) == 0 {
+		return false
+	}
+	return true
+}
+
+func (p *LoginPolicyView) HasMultiFactors() bool {
+	if p.MultiFactors == nil || len(p.MultiFactors) == 0 {
+		return false
+	}
+	return true
 }

@@ -4,12 +4,21 @@ import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
+import { EventstoreComponent } from './eventstore/eventstore.component';
 import { IamComponent } from './iam.component';
 
 const routes: Routes = [
     {
-        path: '',
+        path: 'policies',
         component: IamComponent,
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['iam.read'],
+        },
+    },
+    {
+        path: 'eventstore',
+        component: EventstoreComponent,
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['iam.read'],
@@ -88,6 +97,14 @@ const routes: Routes = [
                 },
                 loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
                     .then(m => m.LoginPolicyModule),
+            },
+            {
+                path: PolicyComponentType.LABEL,
+                data: {
+                    serviceType: PolicyComponentServiceType.ADMIN,
+                },
+                loadChildren: () => import('src/app/modules/policies/label-policy/label-policy.module')
+                    .then(m => m.LabelPolicyModule),
             },
         ],
     },

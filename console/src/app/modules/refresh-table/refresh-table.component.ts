@@ -33,7 +33,7 @@ export class RefreshTableComponent implements OnInit {
     @Input() public dataSize: number = 0;
     @Input() public emitRefreshAfterTimeoutInMs: number = 0;
     @Input() public loading: boolean = false;
-    @Input() public emitRefreshOnPreviousRoute: string = '';
+    @Input() public emitRefreshOnPreviousRoutes: string[] = [];
     @Output() public refreshed: EventEmitter<void> = new EventEmitter();
 
     constructor(private refreshService: RefreshService) { }
@@ -45,9 +45,9 @@ export class RefreshTableComponent implements OnInit {
             }, this.emitRefreshAfterTimeoutInMs);
         }
 
-        if (this.emitRefreshOnPreviousRoute && this.refreshService.previousUrls.includes(this.emitRefreshOnPreviousRoute)) {
+        if (this.emitRefreshOnPreviousRoutes.length && this.refreshService.previousUrls
+            .some(url => this.emitRefreshOnPreviousRoutes.includes(url))) {
             setTimeout(() => {
-                console.log('refresh now');
                 this.emitRefresh();
             }, 1000);
         }

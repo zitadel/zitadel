@@ -179,7 +179,7 @@ func TestOrgEventstore_OrgByID(t *testing.T) {
 		{
 			name: "new events found and added success",
 			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{
-				{Sequence: 6},
+				{Sequence: 6, AggregateID: "hodor-org"},
 			}, nil)},
 			args: args{
 				ctx: authz.NewMockContext("user", "org"),
@@ -2721,6 +2721,344 @@ func TestRemoveIdpProviderFromLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.args.es.RemoveIDPProviderFromLoginPolicy(tt.args.ctx, tt.args.provider)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err: %v ", err)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddSecondFactorToLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *OrgEventstore
+		ctx         context.Context
+		aggregateID string
+		mfa         iam_model.SecondFactorType
+	}
+	type res struct {
+		result  iam_model.SecondFactorType
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add second factor to login policy, ok",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicy(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SecondFactorTypeOTP,
+			},
+			res: res{
+				result: iam_model.SecondFactorTypeOTP,
+			},
+		},
+		{
+			name: "add second factor to login policy, already existing",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SecondFactorTypeOTP,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "invalid mfa",
+			args: args{
+				es:          GetMockChangesOrgOK(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SecondFactorTypeUnspecified,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:          GetMockChangesOrgNoEvents(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "Test",
+				mfa:         iam_model.SecondFactorTypeOTP,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddSecondFactorToLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result != tt.res.result {
+				t.Errorf("got wrong result : expected: %v, actual: %v ", tt.res.result, result)
+			}
+		})
+	}
+}
+
+func TestRemoveSecondFactorFromLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *OrgEventstore
+		ctx         context.Context
+		aggregateID string
+		mfa         iam_model.SecondFactorType
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove second factor from login policy, ok",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SecondFactorTypeOTP,
+			},
+			res: res{},
+		},
+		{
+			name: "remove second factor from  login policy, not existing",
+			args: args{
+				es:  GetMockChangesOrgWithLoginPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SecondFactorTypeOTP,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid provider",
+			args: args{
+				es:          GetMockChangesOrgOK(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.SecondFactorTypeUnspecified,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:          GetMockChangesOrgNoEvents(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "Test",
+				mfa:         iam_model.SecondFactorTypeOTP,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveSecondFactorFromLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err: %v ", err)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddMultiFactorToLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *OrgEventstore
+		ctx         context.Context
+		aggregateID string
+		mfa         iam_model.MultiFactorType
+	}
+	type res struct {
+		result  iam_model.MultiFactorType
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add mfa to login policy, ok",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicy(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
+			},
+			res: res{
+				result: iam_model.MultiFactorTypeU2FWithPIN,
+			},
+		},
+		{
+			name: "add mfa to login policy, already existing",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "invalid mfa",
+			args: args{
+				es:          GetMockChangesOrgOK(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.MultiFactorTypeUnspecified,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:          GetMockChangesOrgNoEvents(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "Test",
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddMultiFactorToLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if result != tt.res.result {
+				t.Errorf("got wrong result : expected: %v, actual: %v ", tt.res.result, result)
+			}
+		})
+	}
+}
+
+func TestRemoveMultiFactorFromLoginPolicy(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *OrgEventstore
+		ctx         context.Context
+		aggregateID string
+		mfa         iam_model.MultiFactorType
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove mfa from login policy, ok",
+			args: args{
+				es:          GetMockChangesOrgWithLoginPolicyWithMFA(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
+			},
+			res: res{},
+		},
+		{
+			name: "remove mfa from  login policy, not existing",
+			args: args{
+				es:  GetMockChangesOrgWithLoginPolicy(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+
+				aggregateID: "AggregateID",
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid provider",
+			args: args{
+				es:          GetMockChangesOrgOK(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "AggregateID",
+				mfa:         iam_model.MultiFactorTypeUnspecified,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:          GetMockChangesOrgNoEvents(ctrl),
+				ctx:         authz.NewMockContext("orgID", "userID"),
+				aggregateID: "Test",
+				mfa:         iam_model.MultiFactorTypeU2FWithPIN,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveMultiFactorFromLoginPolicy(tt.args.ctx, tt.args.aggregateID, tt.args.mfa)
 
 			if !tt.res.wantErr && err != nil {
 				t.Errorf("should not get err: %v ", err)

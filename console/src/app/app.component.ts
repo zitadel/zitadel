@@ -11,7 +11,7 @@ import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take } from 'rxjs/operators';
 
-import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
+import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import {
     MyProjectOrgSearchKey,
     MyProjectOrgSearchQuery,
@@ -23,7 +23,6 @@ import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
-import { ToastService } from './services/toast.service';
 import { UpdateService } from './services/update.service';
 
 @Component({
@@ -35,6 +34,7 @@ import { UpdateService } from './services/update.service';
         ...navAnimations,
         accountCard,
         routeAnimations,
+        adminLineAnimation,
     ],
 })
 export class AppComponent implements OnDestroy {
@@ -57,13 +57,11 @@ export class AppComponent implements OnDestroy {
 
     public showProjectSection: boolean = false;
 
-    public grantedProjectsCount: number = 0;
-    public ownedProjectsCount: number = 0;
-
     public filterControl: FormControl = new FormControl('');
     private authSub: Subscription = new Subscription();
     private orgSub: Subscription = new Subscription();
 
+    public hideAdminWarn: boolean = true;
     constructor(
         public viewPortScroller: ViewportScroller,
         @Inject('windowObject') public window: Window,
@@ -73,15 +71,14 @@ export class AppComponent implements OnDestroy {
         private breakpointObserver: BreakpointObserver,
         public overlayContainer: OverlayContainer,
         private themeService: ThemeService,
-        private mgmtService: ManagementService,
+        public mgmtService: ManagementService,
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,
-        private toast: ToastService,
         private router: Router,
         update: UpdateService,
         @Inject(DOCUMENT) private document: Document,
     ) {
-        console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5282c1; font-size: 50px');
+        console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px');
         console.log('%cInserting something here could give attackers access to your zitadel account.', 'color: red; font-size: 18px');
         console.log('%cIf you don\'t know exactly what you\'re doing, close the window and stay on the safe side', 'font-size: 16px');
         console.log('%cIf you know exactly what you are doing, you should work for us', 'font-size: 16px');
@@ -179,11 +176,18 @@ export class AppComponent implements OnDestroy {
                 value.trim().toLowerCase(),
             );
         });
+
+        this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
     }
 
     public ngOnDestroy(): void {
         this.authSub.unsubscribe();
         this.orgSub.unsubscribe();
+    }
+
+    public toggleAdminHide(): void {
+        this.hideAdminWarn = !this.hideAdminWarn;
+        localStorage.setItem('hideAdministratorWarning', this.hideAdminWarn.toString());
     }
 
     public loadOrgs(filter?: string): void {
@@ -249,13 +253,9 @@ export class AppComponent implements OnDestroy {
     private getProjectCount(): void {
         this.authService.isAllowed(['project.read$']).subscribe((allowed) => {
             if (allowed) {
-                this.mgmtService.SearchProjects(0, 0).then(res => {
-                    this.ownedProjectsCount = res.toObject().totalResult;
-                });
+                this.mgmtService.SearchProjects(0, 0);
 
-                this.mgmtService.SearchGrantedProjects(0, 0).then(res => {
-                    this.grantedProjectsCount = res.toObject().totalResult;
-                });
+                this.mgmtService.SearchGrantedProjects(0, 0);
             }
         });
     }

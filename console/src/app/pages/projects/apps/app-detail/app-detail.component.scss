@@ -37,6 +37,46 @@
   font-size: 14px;
 }
 
+.name-content {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .toggle {
+    outline: none;
+    align-self: flex-start;
+    margin-top: 1rem;
+    margin-right: 1rem;
+    border-radius: .5rem;
+
+    * {
+      outline: none;
+    }
+
+    i {
+      margin-right: 1rem;
+    }
+  }
+
+  .name-field {
+    flex: 1;
+  }
+}
+
+.docs-line {
+  flex-basis: 100%;
+  margin: .5rem 0;
+
+  p {
+    margin: 0;
+    margin-bottom: .5rem;
+  }
+
+  p:last-child {
+    margin: 0;
+  }
+}
+
 .content {
   display: flex;
   flex-direction: row;
@@ -60,6 +100,24 @@
     }
   }
 
+  .chiplist {
+    margin-bottom: 1rem;
+  }
+
+  .chip-form {
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    .formfield {
+      flex: 1;
+    }
+
+    button {
+      margin-top: 1rem;
+    }
+  }
+
   .section-title {
     margin-bottom: 1.5rem;
   }
@@ -70,9 +128,21 @@
     margin-right: .5rem;
   }
 
+  .clockskew-title {
+    font-size: 14px;
+    color: var(--grey);
+    margin: 1rem .5rem 0 .5rem;
+  }
+
+  .clockskew-slider {
+    width: 100%;
+    margin: 0 .5rem;
+  }
+
   .desc {
     color: var(--grey);
     font-size: 14px;
+    margin-bottom: 1rem;
   }
 
   .devmode {
@@ -92,39 +162,17 @@
     color: #f44336;
     margin: 0 .5rem 1.5rem .5rem;
   }
-
-  .docs-line {
-    flex-basis: 100%;
-    font-size: 14px;
-    color: var(--grey);
-    margin-top: 0;
-  }
-
-  .toggle {
-    outline: none;
-    align-self: flex-start;
-    margin-bottom: 1rem;
-    margin-right: 1rem;
-    border-radius: .5rem;
-
-    * {
-      outline: none;
-    }
-
-    i {
-      margin-right: 1rem;
-    }
-  }
 }
 
 .btn-container {
   display: flex;
   justify-content: flex-end;
-  margin: 0 -.5rem;
+  margin-top: 1rem;
+}
 
-  .submit-button {
-    margin: 0 .5rem;
-  }
+.chip {
+  border-radius: 4px;
+  height: 40px;
 }
 
 .chip[color='green'] {
@@ -135,5 +183,5 @@
   flex-basis: 100%;
   margin: 1.5rem .5rem;
   height: 1px;
-  background-color: var(--grey);
+  background-color: rgba(#8795a1, .2);
 }

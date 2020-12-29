@@ -2,6 +2,12 @@ package api
 
 import (
 	"context"
+	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
+	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
+	view_model "github.com/caos/zitadel/internal/view/model"
+	"go.opentelemetry.io/otel/api/metric"
 	"net/http"
 
 	"github.com/caos/logging"
@@ -16,6 +22,7 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type Config struct {
@@ -29,19 +36,33 @@ type API struct {
 	verifier       *authz.TokenVerifier
 	serverPort     string
 	health         health
+	auth           auth
+	admin          admin
 }
+
 type health interface {
 	Health(ctx context.Context) error
 	IamByID(ctx context.Context) (*iam_model.IAM, error)
 	VerifierClientID(ctx context.Context, appName string) (string, error)
 }
 
-func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+type auth interface {
+	ActiveUserSessionCount() int64
+}
+
+type admin interface {
+	GetViews() ([]*view_model.View, error)
+	GetSpoolerDiv(database, viewName string) int64
+}
+
+func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
 	api.verifier = authz.Start(authZRepo)
 	api.health = authZRepo
+	api.auth = authRepo
+	api.admin = adminRepo
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
 	api.gatewayHandler = server.CreateGatewayHandler(config.GRPC)
 	api.RegisterHandler("", api.healthHandler())
@@ -89,24 +110,37 @@ func (a *API) healthHandler() http.Handler {
 	handler := http.NewServeMux()
 	handler.HandleFunc("/healthz", handleHealth)
 	handler.HandleFunc("/ready", handleReadiness(checks))
+	handler.HandleFunc("/validate", handleValidate(checks))
 	handler.HandleFunc("/clientID", a.handleClientID)
+	handler.Handle("/metrics", a.handleMetrics())
 
 	return handler
 }
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte("ok"))
-	logging.Log("API-Hfss2").OnError(err).Error("error writing ok for health")
+	logging.Log("API-Hfss2").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(r.Context())).Error("error writing ok for health")
 }
 
 func handleReadiness(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := validate(r.Context(), checks)
-		if err == nil {
+		errors := validate(r.Context(), checks)
+		if len(errors) == 0 {
 			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
 			return
 		}
-		http_util.MarshalJSON(w, nil, err, http.StatusPreconditionFailed)
+		http_util.MarshalJSON(w, nil, errors[0], http.StatusPreconditionFailed)
+	}
+}
+
+func handleValidate(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		errors := validate(r.Context(), checks)
+		if len(errors) == 0 {
+			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
+			return
+		}
+		http_util.MarshalJSON(w, errors, nil, http.StatusOK)
 	}
 }
 
@@ -119,14 +153,57 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 	http_util.MarshalJSON(w, id, nil, http.StatusOK)
 }
 
+func (a *API) handleMetrics() http.Handler {
+	a.registerActiveSessionCounters()
+	a.registerSpoolerDivCounters()
+	return metrics.GetExporter()
+}
+
+func (a *API) registerActiveSessionCounters() {
+	metrics.RegisterValueObserver(
+		metrics.ActiveSessionCounter,
+		metrics.ActiveSessionCounterDescription,
+		func(ctx context.Context, result metric.Int64ObserverResult) {
+			result.Observe(
+				a.auth.ActiveUserSessionCount(),
+			)
+		},
+	)
+}
+
+func (a *API) registerSpoolerDivCounters() {
+	views, err := a.admin.GetViews()
+	if err != nil {
+		logging.Log("API-3M8sd").WithError(err).Error("could not read views for metrics")
+		return
+	}
+	metrics.RegisterValueObserver(
+		metrics.SpoolerDivCounter,
+		metrics.SpoolerDivCounterDescription,
+		func(ctx context.Context, result metric.Int64ObserverResult) {
+			for _, view := range views {
+				labels := map[string]interface{}{
+					metrics.Database: view.Database,
+					metrics.ViewName: view.ViewName,
+				}
+				result.Observe(
+					a.admin.GetSpoolerDiv(view.Database, view.ViewName),
+					otel.MapToKeyValue(labels)...,
+				)
+			}
+		},
+	)
+}
+
 type ValidationFunction func(ctx context.Context) error
 
-func validate(ctx context.Context, validations []ValidationFunction) error {
+func validate(ctx context.Context, validations []ValidationFunction) []error {
+	errors := make([]error, 0)
 	for _, validation := range validations {
 		if err := validation(ctx); err != nil {
-			logging.Log("API-vf823").WithError(err).Error("validation failed")
-			return err
+			logging.Log("API-vf823").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Error("validation failed")
+			errors = append(errors, err)
 		}
 	}
-	return nil
+	return errors
 }

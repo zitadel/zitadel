@@ -12,6 +12,8 @@ func loginPolicyToModel(policy *admin.DefaultLoginPolicyRequest) *iam_model.Logi
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
+		ForceMFA:              policy.ForceMfa,
+		PasswordlessType:      passwordlessTypeToModel(policy.PasswordlessType),
 	}
 }
 
@@ -26,6 +28,8 @@ func loginPolicyFromModel(policy *iam_model.LoginPolicy) *admin.DefaultLoginPoli
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
+		ForceMfa:              policy.ForceMFA,
+		PasswordlessType:      passwordlessTypeFromModel(policy.PasswordlessType),
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
 	}
@@ -42,6 +46,8 @@ func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *admin.DefaultL
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
+		ForceMfa:              policy.ForceMFA,
+		PasswordlessType:      passwordlessTypeFromModel(policy.PasswordlessType),
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
 	}
@@ -101,5 +107,95 @@ func idpConfigTypeToModel(providerType iam_model.IdpConfigType) admin.IdpType {
 		return admin.IdpType_IDPTYPE_SAML
 	default:
 		return admin.IdpType_IDPTYPE_UNSPECIFIED
+	}
+}
+
+func secondFactorsResultFromModel(result *iam_model.SecondFactorsSearchResponse) *admin.SecondFactorsResult {
+	converted := make([]admin.SecondFactorType, len(result.Result))
+	for i, mfaType := range result.Result {
+		converted[i] = secondFactorTypeFromModel(mfaType)
+	}
+	return &admin.SecondFactorsResult{
+		SecondFactors: converted,
+	}
+}
+
+func secondFactorFromModel(mfaType iam_model.SecondFactorType) *admin.SecondFactor {
+	return &admin.SecondFactor{
+		SecondFactor: secondFactorTypeFromModel(mfaType),
+	}
+}
+
+func secondFactorTypeFromModel(mfaType iam_model.SecondFactorType) admin.SecondFactorType {
+	switch mfaType {
+	case iam_model.SecondFactorTypeOTP:
+		return admin.SecondFactorType_SECONDFACTORTYPE_OTP
+	case iam_model.SecondFactorTypeU2F:
+		return admin.SecondFactorType_SECONDFACTORTYPE_U2F
+	default:
+		return admin.SecondFactorType_SECONDFACTORTYPE_UNSPECIFIED
+	}
+}
+
+func secondFactorTypeToModel(mfaType *admin.SecondFactor) iam_model.SecondFactorType {
+	switch mfaType.SecondFactor {
+	case admin.SecondFactorType_SECONDFACTORTYPE_OTP:
+		return iam_model.SecondFactorTypeOTP
+	case admin.SecondFactorType_SECONDFACTORTYPE_U2F:
+		return iam_model.SecondFactorTypeU2F
+	default:
+		return iam_model.SecondFactorTypeUnspecified
+	}
+}
+
+func passwordlessTypeFromModel(passwordlessType iam_model.PasswordlessType) admin.PasswordlessType {
+	switch passwordlessType {
+	case iam_model.PasswordlessTypeAllowed:
+		return admin.PasswordlessType_PASSWORDLESSTYPE_ALLOWED
+	default:
+		return admin.PasswordlessType_PASSWORDLESSTYPE_NOT_ALLOWED
+	}
+}
+
+func passwordlessTypeToModel(passwordlessType admin.PasswordlessType) iam_model.PasswordlessType {
+	switch passwordlessType {
+	case admin.PasswordlessType_PASSWORDLESSTYPE_ALLOWED:
+		return iam_model.PasswordlessTypeAllowed
+	default:
+		return iam_model.PasswordlessTypeNotAllowed
+	}
+}
+
+func multiFactorResultFromModel(result *iam_model.MultiFactorsSearchResponse) *admin.MultiFactorsResult {
+	converted := make([]admin.MultiFactorType, len(result.Result))
+	for i, mfaType := range result.Result {
+		converted[i] = multiFactorTypeFromModel(mfaType)
+	}
+	return &admin.MultiFactorsResult{
+		MultiFactors: converted,
+	}
+}
+
+func multiFactorFromModel(mfaType iam_model.MultiFactorType) *admin.MultiFactor {
+	return &admin.MultiFactor{
+		MultiFactor: multiFactorTypeFromModel(mfaType),
+	}
+}
+
+func multiFactorTypeFromModel(mfaType iam_model.MultiFactorType) admin.MultiFactorType {
+	switch mfaType {
+	case iam_model.MultiFactorTypeU2FWithPIN:
+		return admin.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN
+	default:
+		return admin.MultiFactorType_MULTIFACTORTYPE_UNSPECIFIED
+	}
+}
+
+func multiFactorTypeToModel(mfaType *admin.MultiFactor) iam_model.MultiFactorType {
+	switch mfaType.MultiFactor {
+	case admin.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN:
+		return iam_model.MultiFactorTypeU2FWithPIN
+	default:
+		return iam_model.MultiFactorTypeUnspecified
 	}
 }

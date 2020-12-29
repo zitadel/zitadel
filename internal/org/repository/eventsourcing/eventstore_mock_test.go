@@ -42,7 +42,7 @@ func GetMockChangesOrgOK(ctrl *gomock.Controller) *OrgEventstore {
 
 	}
 	events := []*es_models.Event{
-		{AggregateID: "AggregateIDApp", Sequence: 1, AggregateType: repo_model.OrgAggregate, Data: data},
+		{AggregateID: "AggregateID", Sequence: 1, AggregateType: repo_model.OrgAggregate, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -97,6 +97,26 @@ func GetMockChangesOrgWithLoginPolicy(ctrl *gomock.Controller) *OrgEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyAdded, Data: loginPolicy},
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIDPProviderAdded, Data: idpData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockChangesOrgWithLoginPolicyWithMFA(ctrl *gomock.Controller) *OrgEventstore {
+	orgData, _ := json.Marshal(model.Org{Name: "MusterOrg"})
+	loginPolicy, _ := json.Marshal(iam_es_model.LoginPolicy{AllowRegister: true, AllowExternalIdp: true, AllowUsernamePassword: true})
+	idpData, _ := json.Marshal(iam_es_model.IDPProvider{IDPConfigID: "IDPConfigID", Type: int32(iam_model.IDPProviderTypeSystem)})
+	secondFactor, _ := json.Marshal(iam_es_model.MFA{MFAType: int32(iam_model.SecondFactorTypeOTP)})
+	multiFactor, _ := json.Marshal(iam_es_model.MFA{MFAType: int32(iam_model.MultiFactorTypeU2FWithPIN)})
+	events := []*es_models.Event{
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: orgData},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyAdded, Data: loginPolicy},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIDPProviderAdded, Data: idpData},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicySecondFactorAdded, Data: secondFactor},
+		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyMultiFactorAdded, Data: multiFactor},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

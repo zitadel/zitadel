@@ -2,10 +2,10 @@
 <div mat-dialog-content>
     <p class="desc"> {{'ORG.DOMAINS.ADD.DESCRIPTION' | translate}}</p>
 
-    <mat-form-field label="Domain" required="true" class="form-field" appearance="outline">
-        <mat-label>Domain</mat-label>
-        <input matInput [(ngModel)]="newdomain" />
-    </mat-form-field>
+    <cnsl-form-field label="Domain" required="true" class="form-field" appearance="outline">
+        <cnsl-label>Domain</cnsl-label>
+        <input cnslInput [(ngModel)]="newdomain" />
+    </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button (click)="closeDialog()">

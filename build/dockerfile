@@ -1,0 +1,129 @@
+#######################
+## By default we build the prod enviroment
+ARG ENV=prod
+
+#######################
+## This step downloads the protofiles, protoc and protoc-gen-grpc-web for later use
+#######################
+FROM alpine as base
+RUN apk add tar curl
+WORKDIR /.tmp
+RUN wget -O protoc https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-x86_64.zip \
+    && unzip protoc \
+    && wget -O bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64 \
+    && chmod +x bin/protoc-gen-grpc-web
+RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1/validate/validate.proto --create-dirs -o validate/validate.proto  \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o protoc-gen-swagger/options/annotations.proto \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto --create-dirs -o protoc-gen-swagger/options/openapiv2.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto --create-dirs -o google/api/annotations.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto --create-dirs -o google/api/http.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/empty.proto --create-dirs -o google/protobuf/empty.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/timestamp.proto --create-dirs -o google/protobuf/timestamp.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/descriptor.proto --create-dirs -o google/protobuf/descriptor.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/duration.proto --create-dirs -o google/protobuf/duration.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/any.proto --create-dirs -o google/protobuf/any.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/struct.proto --create-dirs -o google/protobuf/struct.proto
+
+COPY pkg/grpc/admin/proto/admin.proto admin/proto/admin.proto
+COPY pkg/grpc/auth/proto/auth.proto auth/proto/auth.proto
+COPY pkg/grpc/management/proto/management.proto management/proto/management.proto
+COPY pkg/grpc/message/proto/message.proto message/proto/message.proto
+COPY internal/protoc/protoc-gen-authoption/authoption/options.proto authoption/options.proto
+
+#######################
+## With this step we prepare all node_modules, this helps caching the build
+## Speed up this step by mounting your local node_modules directory
+#######################
+FROM node:15 as npm-base
+WORKDIR console
+COPY console/package.json console/package-lock.json ./
+RUN npm install \
+    && mkdir .tmp
+COPY console .
+COPY --from=base /.tmp/bin /usr/local/bin/
+COPY --from=base /.tmp .tmp/protos/
+COPY build/console build/console/
+RUN build/console/generate-grpc.sh
+
+FROM scratch as npm-copy
+COPY --from=npm-base /console/src/app/proto/generated .
+
+## anular dev build
+FROM npm-base as dev-angular-build
+RUN npm install -g @angular/cli
+
+## anular prod build
+FROM npm-base as prod-angular-build
+RUN npm run prodbuild
+
+#######################
+## Go base build
+## Speed up this step by mounting your local go mod pkg directory
+#######################
+FROM golang:1.15 as go-base
+WORKDIR src/github.com/caos/zitadel/
+COPY go.mod go.sum ./
+RUN go mod download
+COPY --from=base /.tmp .tmp/protos/
+COPY --from=base /.tmp/bin /usr/local/bin/
+COPY internal/protoc/protoc-base internal/protoc/protoc-base/
+COPY internal/protoc/protoc-gen-authoption internal/protoc/protoc-gen-authoption/
+
+RUN go install \
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
+    github.com/golang/protobuf/protoc-gen-go \
+    github.com/envoyproxy/protoc-gen-validate
+
+RUN go get -u github.com/go-bindata/go-bindata/...
+
+RUN go-bindata ./internal/protoc/protoc-gen-authoption/templates \
+    && go install ./internal/protoc/protoc-gen-authoption
+    
+COPY build/zitadel build/zitadel/
+RUN build/zitadel/generate-grpc.sh
+
+FROM scratch as go-copy
+COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
+
+## Go test
+FROM go-base as go-test
+COPY . .
+RUN go test -race -v -coverprofile=profile.cov ./...
+
+## Go test
+FROM scratch as go-codecov
+COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
+
+## Go prod build
+FROM go-test as prod-go-build
+COPY --from=prod-angular-build console/dist/console console/dist/console/
+RUN go get github.com/rakyll/statik \
+    && ./build/console/generate-static.sh \
+    && ./build/login/generate-static.sh \
+    && ./build/notification/generate-static.sh \
+    && ./build/zitadel/generate-static.sh
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-amd64 cmd/zitadel/main.go
+
+## Go dev build
+FROM go-base as dev-go-build
+RUN go get github.com/go-delve/delve/cmd/dlv
+
+#######################
+## Final Production Image
+#######################
+FROM alpine:latest as artifact
+RUN adduser -D zitadel
+COPY cmd/zitadel/*.yaml /
+COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-amd64 /zitadel
+RUN chmod a+x zitadel
+RUN ls -la /
+
+## Scratch Image
+FROM  scratch as final
+COPY --from=artifact /etc/passwd /etc/passwd
+## TODO copy should be removed once the operator branch is merged
+COPY --from=artifact / /
+USER zitadel
+HEALTHCHECK NONE
+ENTRYPOINT ["/zitadel"]

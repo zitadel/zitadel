@@ -15,14 +15,15 @@ const (
 	NextStepChangePassword
 	NextStepInitPassword
 	NextStepVerifyEmail
-	NextStepMfaPrompt
-	NextStepMfaVerify
+	NextStepMFAPrompt
+	NextStepMFAVerify
 	NextStepRedirectToCallback
 	NextStepChangeUsername
 	NextStepLinkUsers
 	NextStepExternalNotFoundOption
 	NextStepExternalLogin
 	NextStepGrantRequired
+	NextStepPasswordless
 )
 
 type UserSessionState int32
@@ -47,10 +48,11 @@ func (s *SelectUserStep) Type() NextStepType {
 }
 
 type UserSelection struct {
-	UserID           string
-	DisplayName      string
-	LoginName        string
-	UserSessionState UserSessionState
+	UserID            string
+	DisplayName       string
+	LoginName         string
+	UserSessionState  UserSessionState
+	SelectionPossible bool
 }
 
 type InitUserStep struct {
@@ -81,6 +83,12 @@ func (s *ExternalLoginStep) Type() NextStepType {
 	return NextStepExternalLogin
 }
 
+type PasswordlessStep struct{}
+
+func (s *PasswordlessStep) Type() NextStepType {
+	return NextStepPasswordless
+}
+
 type ChangePasswordStep struct{}
 
 func (s *ChangePasswordStep) Type() NextStepType {
@@ -105,21 +113,21 @@ func (s *VerifyEMailStep) Type() NextStepType {
 	return NextStepVerifyEmail
 }
 
-type MfaPromptStep struct {
+type MFAPromptStep struct {
 	Required     bool
-	MfaProviders []MfaType
+	MFAProviders []MFAType
 }
 
-func (s *MfaPromptStep) Type() NextStepType {
-	return NextStepMfaPrompt
+func (s *MFAPromptStep) Type() NextStepType {
+	return NextStepMFAPrompt
 }
 
-type MfaVerificationStep struct {
-	MfaProviders []MfaType
+type MFAVerificationStep struct {
+	MFAProviders []MFAType
 }
 
-func (s *MfaVerificationStep) Type() NextStepType {
-	return NextStepMfaVerify
+func (s *MFAVerificationStep) Type() NextStepType {
+	return NextStepMFAVerify
 }
 
 type LinkUsersStep struct{}
@@ -140,17 +148,19 @@ func (s *RedirectToCallbackStep) Type() NextStepType {
 	return NextStepRedirectToCallback
 }
 
-type MfaType int
+type MFAType int
 
 const (
-	MfaTypeOTP MfaType = iota
+	MFATypeOTP MFAType = iota
+	MFATypeU2F
+	MFATypeU2FUserVerification
 )
 
-type MfaLevel int
+type MFALevel int
 
 const (
-	MfaLevelNotSetUp MfaLevel = iota
-	MfaLevelSoftware
-	MfaLevelHardware
-	MfaLevelHardwareCertified
+	MFALevelNotSetUp MFALevel = iota
+	MFALevelSecondFactor
+	MFALevelMultiFactor
+	MFALevelMultiFactorCertified
 )

@@ -1,18 +1,18 @@
 package model
 
 import (
+	"database/sql/driver"
 	"encoding/json"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
 
-	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/lib/pq"
-
 	"github.com/caos/logging"
+	"github.com/lib/pq"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -67,30 +67,57 @@ const (
 )
 
 type HumanView struct {
-	FirstName         string    `json:"firstName" gorm:"column:first_name"`
-	LastName          string    `json:"lastName" gorm:"column:last_name"`
-	NickName          string    `json:"nickName" gorm:"column:nick_name"`
-	DisplayName       string    `json:"displayName" gorm:"column:display_name"`
-	PreferredLanguage string    `json:"preferredLanguage" gorm:"column:preferred_language"`
-	Gender            int32     `json:"gender" gorm:"column:gender"`
-	Email             string    `json:"email" gorm:"column:email"`
-	IsEmailVerified   bool      `json:"-" gorm:"column:is_email_verified"`
-	Phone             string    `json:"phone" gorm:"column:phone"`
-	IsPhoneVerified   bool      `json:"-" gorm:"column:is_phone_verified"`
-	Country           string    `json:"country" gorm:"column:country"`
-	Locality          string    `json:"locality" gorm:"column:locality"`
-	PostalCode        string    `json:"postalCode" gorm:"column:postal_code"`
-	Region            string    `json:"region" gorm:"column:region"`
-	StreetAddress     string    `json:"streetAddress" gorm:"column:street_address"`
-	OTPState          int32     `json:"-" gorm:"column:otp_state"`
-	MfaMaxSetUp       int32     `json:"-" gorm:"column:mfa_max_set_up"`
-	MfaInitSkipped    time.Time `json:"-" gorm:"column:mfa_init_skipped"`
-	InitRequired      bool      `json:"-" gorm:"column:init_required"`
+	FirstName         string         `json:"firstName" gorm:"column:first_name"`
+	LastName          string         `json:"lastName" gorm:"column:last_name"`
+	NickName          string         `json:"nickName" gorm:"column:nick_name"`
+	DisplayName       string         `json:"displayName" gorm:"column:display_name"`
+	PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
+	Gender            int32          `json:"gender" gorm:"column:gender"`
+	Email             string         `json:"email" gorm:"column:email"`
+	IsEmailVerified   bool           `json:"-" gorm:"column:is_email_verified"`
+	Phone             string         `json:"phone" gorm:"column:phone"`
+	IsPhoneVerified   bool           `json:"-" gorm:"column:is_phone_verified"`
+	Country           string         `json:"country" gorm:"column:country"`
+	Locality          string         `json:"locality" gorm:"column:locality"`
+	PostalCode        string         `json:"postalCode" gorm:"column:postal_code"`
+	Region            string         `json:"region" gorm:"column:region"`
+	StreetAddress     string         `json:"streetAddress" gorm:"column:street_address"`
+	OTPState          int32          `json:"-" gorm:"column:otp_state"`
+	U2FTokens         WebAuthNTokens `json:"-" gorm:"column:u2f_tokens"`
+	MFAMaxSetUp       int32          `json:"-" gorm:"column:mfa_max_set_up"`
+	MFAInitSkipped    time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
+	InitRequired      bool           `json:"-" gorm:"column:init_required"`
 
-	PasswordSet            bool      `json:"-" gorm:"column:password_set"`
-	PasswordChangeRequired bool      `json:"-" gorm:"column:password_change_required"`
-	UsernameChangeRequired bool      `json:"-" gorm:"column:username_change_required"`
-	PasswordChanged        time.Time `json:"-" gorm:"column:password_change"`
+	PasswordSet            bool           `json:"-" gorm:"column:password_set"`
+	PasswordChangeRequired bool           `json:"-" gorm:"column:password_change_required"`
+	UsernameChangeRequired bool           `json:"-" gorm:"column:username_change_required"`
+	PasswordChanged        time.Time      `json:"-" gorm:"column:password_change"`
+	PasswordlessTokens     WebAuthNTokens `json:"-" gorm:"column:passwordless_tokens"`
+}
+
+type WebAuthNTokens []*WebAuthNView
+
+type WebAuthNView struct {
+	ID    string `json:"webAuthNTokenId"`
+	Name  string `json:"webAuthNTokenName,omitempty"`
+	State int32  `json:"state,omitempty"`
+}
+
+func (t WebAuthNTokens) Value() (driver.Value, error) {
+	if t == nil {
+		return nil, nil
+	}
+	return json.Marshal(&t)
+}
+
+func (t *WebAuthNTokens) Scan(src interface{}) error {
+	if b, ok := src.([]byte); ok {
+		return json.Unmarshal(b, t)
+	}
+	if s, ok := src.(string); ok {
+		return json.Unmarshal([]byte(s), t)
+	}
+	return nil
 }
 
 func (h *HumanView) IsZero() bool {
@@ -124,6 +151,8 @@ func UserToModel(user *UserView) *model.UserView {
 			PasswordSet:            user.PasswordSet,
 			PasswordChangeRequired: user.PasswordChangeRequired,
 			PasswordChanged:        user.PasswordChanged,
+			PasswordlessTokens:     WebauthnTokensToModel(user.PasswordlessTokens),
+			U2FTokens:              WebauthnTokensToModel(user.U2FTokens),
 			FirstName:              user.FirstName,
 			LastName:               user.LastName,
 			NickName:               user.NickName,
@@ -139,9 +168,9 @@ func UserToModel(user *UserView) *model.UserView {
 			PostalCode:             user.PostalCode,
 			Region:                 user.Region,
 			StreetAddress:          user.StreetAddress,
-			OTPState:               model.MfaState(user.OTPState),
-			MfaMaxSetUp:            req_model.MfaLevel(user.MfaMaxSetUp),
-			MfaInitSkipped:         user.MfaInitSkipped,
+			OTPState:               model.MFAState(user.OTPState),
+			MFAMaxSetUp:            req_model.MFALevel(user.MFAMaxSetUp),
+			MFAInitSkipped:         user.MFAInitSkipped,
 			InitRequired:           user.InitRequired,
 		}
 	}
@@ -161,6 +190,25 @@ func UsersToModel(users []*UserView) []*model.UserView {
 		result[i] = UserToModel(p)
 	}
 	return result
+}
+
+func WebauthnTokensToModel(tokens []*WebAuthNView) []*model.WebAuthNView {
+	if tokens == nil {
+		return nil
+	}
+	result := make([]*model.WebAuthNView, len(tokens))
+	for i, t := range tokens {
+		result[i] = WebauthnTokenToModel(t)
+	}
+	return result
+}
+
+func WebauthnTokenToModel(token *WebAuthNView) *model.WebAuthNView {
+	return &model.WebAuthNView{
+		TokenID: token.ID,
+		Name:    token.Name,
+		State:   model.MFAState(token.State),
+	}
 }
 
 func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
@@ -212,6 +260,12 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserPasswordChanged,
 		es_model.HumanPasswordChanged:
 		err = u.setPasswordData(event)
+	case es_model.HumanPasswordlessTokenAdded:
+		err = u.addPasswordlessToken(event)
+	case es_model.HumanPasswordlessTokenVerified:
+		err = u.updatePasswordlessToken(event)
+	case es_model.HumanPasswordlessTokenRemoved:
+		err = u.removePasswordlessToken(event)
 	case es_model.UserProfileChanged,
 		es_model.HumanProfileChanged,
 		es_model.UserAddressChanged,
@@ -251,17 +305,27 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		u.State = int32(model.UserStateLocked)
 	case es_model.MFAOTPAdded,
 		es_model.HumanMFAOTPAdded:
-		u.OTPState = int32(model.MfaStateNotReady)
+		u.OTPState = int32(model.MFAStateNotReady)
 	case es_model.MFAOTPVerified,
 		es_model.HumanMFAOTPVerified:
-		u.OTPState = int32(model.MfaStateReady)
-		u.MfaInitSkipped = time.Time{}
+		u.OTPState = int32(model.MFAStateReady)
+		u.MFAInitSkipped = time.Time{}
 	case es_model.MFAOTPRemoved,
 		es_model.HumanMFAOTPRemoved:
-		u.OTPState = int32(model.MfaStateUnspecified)
+		u.OTPState = int32(model.MFAStateUnspecified)
+	case es_model.HumanMFAU2FTokenAdded:
+		err = u.addU2FToken(event)
+	case es_model.HumanMFAU2FTokenVerified:
+		err = u.updateU2FToken(event)
+		if err != nil {
+			return err
+		}
+		u.MFAInitSkipped = time.Time{}
+	case es_model.HumanMFAU2FTokenRemoved:
+		err = u.removeU2FToken(event)
 	case es_model.MFAInitSkipped,
 		es_model.HumanMFAInitSkipped:
-		u.MfaInitSkipped = event.CreationDate
+		u.MFAInitSkipped = event.CreationDate
 	case es_model.InitializedUserCodeAdded,
 		es_model.InitializedHumanCodeAdded:
 		u.InitRequired = true
@@ -298,6 +362,108 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 	return nil
 }
 
+func (u *UserView) addPasswordlessToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for i, t := range u.PasswordlessTokens {
+		if t.State == int32(model.MFAStateNotReady) {
+			u.PasswordlessTokens[i].ID = token.ID
+			return nil
+		}
+	}
+	token.State = int32(model.MFAStateNotReady)
+	u.PasswordlessTokens = append(u.PasswordlessTokens, token)
+	return nil
+}
+
+func (u *UserView) updatePasswordlessToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for i, t := range u.PasswordlessTokens {
+		if t.ID == token.ID {
+			u.PasswordlessTokens[i].Name = token.Name
+			u.PasswordlessTokens[i].State = int32(model.MFAStateReady)
+			return nil
+		}
+	}
+	return nil
+}
+
+func (u *UserView) removePasswordlessToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for i, t := range u.PasswordlessTokens {
+		if t.ID == token.ID {
+			u.PasswordlessTokens[i] = u.PasswordlessTokens[len(u.PasswordlessTokens)-1]
+			u.PasswordlessTokens[len(u.PasswordlessTokens)-1] = nil
+			u.PasswordlessTokens = u.PasswordlessTokens[:len(u.PasswordlessTokens)-1]
+			return nil
+		}
+	}
+	return nil
+}
+
+func (u *UserView) addU2FToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for i, t := range u.U2FTokens {
+		if t.State == int32(model.MFAStateNotReady) {
+			u.U2FTokens[i].ID = token.ID
+			return nil
+		}
+	}
+	token.State = int32(model.MFAStateNotReady)
+	u.U2FTokens = append(u.U2FTokens, token)
+	return nil
+}
+
+func (u *UserView) updateU2FToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for i, t := range u.U2FTokens {
+		if t.ID == token.ID {
+			u.U2FTokens[i].Name = token.Name
+			u.U2FTokens[i].State = int32(model.MFAStateReady)
+			return nil
+		}
+	}
+	return nil
+}
+
+func (u *UserView) removeU2FToken(event *models.Event) error {
+	token, err := webAuthNViewFromEvent(event)
+	if err != nil {
+		return err
+	}
+	for i := len(u.U2FTokens) - 1; i >= 0; i-- {
+		if u.U2FTokens[i].ID == token.ID {
+			u.U2FTokens[i] = u.U2FTokens[len(u.U2FTokens)-1]
+			u.U2FTokens[len(u.U2FTokens)-1] = nil
+			u.U2FTokens = u.U2FTokens[:len(u.U2FTokens)-1]
+		}
+	}
+	return nil
+}
+
+func webAuthNViewFromEvent(event *models.Event) (*WebAuthNView, error) {
+	token := new(WebAuthNView)
+	err := json.Unmarshal(event.Data, token)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
+	}
+	return token, err
+}
+
 func (u *UserView) ComputeObject() {
 	if !u.MachineView.IsZero() {
 		if u.State == int32(model.UserStateUnspecified) {
@@ -312,10 +478,25 @@ func (u *UserView) ComputeObject() {
 			u.State = int32(model.UserStateInitial)
 		}
 	}
-	if u.OTPState != int32(model.MfaStateReady) {
-		u.MfaMaxSetUp = int32(req_model.MfaLevelNotSetUp)
+	u.ComputeMFAMaxSetUp()
+}
+
+func (u *UserView) ComputeMFAMaxSetUp() {
+	for _, token := range u.PasswordlessTokens {
+		if token.State == int32(model.MFAStateReady) {
+			u.MFAMaxSetUp = int32(req_model.MFALevelMultiFactor)
+			return
+		}
 	}
-	if u.OTPState == int32(model.MfaStateReady) {
-		u.MfaMaxSetUp = int32(req_model.MfaLevelSoftware)
+	for _, token := range u.U2FTokens {
+		if token.State == int32(model.MFAStateReady) {
+			u.MFAMaxSetUp = int32(req_model.MFALevelSecondFactor)
+			return
+		}
 	}
+	if u.OTPState == int32(model.MFAStateReady) {
+		u.MFAMaxSetUp = int32(req_model.MFALevelSecondFactor)
+		return
+	}
+	u.MFAMaxSetUp = int32(req_model.MFALevelNotSetUp)
 }

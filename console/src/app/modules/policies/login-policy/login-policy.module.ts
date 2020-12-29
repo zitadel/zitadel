@@ -2,10 +2,9 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
@@ -13,6 +12,8 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { IdpTableModule } from 'src/app/modules/idp-table/idp-table.module';
+import { InputModule } from 'src/app/modules/input/input.module';
+import { MfaTableModule } from 'src/app/modules/mfa-table/mfa-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { AddIdpDialogModule } from './add-idp-dialog/add-idp-dialog.module';
@@ -26,8 +27,7 @@ import { LoginPolicyComponent } from './login-policy.component';
         CommonModule,
         FormsModule,
         CardModule,
-        MatInputModule,
-        MatFormFieldModule,
+        InputModule,
         MatButtonModule,
         MatSlideToggleModule,
         MatIconModule,
@@ -38,7 +38,9 @@ import { LoginPolicyComponent } from './login-policy.component';
         DetailLayoutModule,
         AddIdpDialogModule,
         IdpTableModule,
+        MfaTableModule,
         MatProgressSpinnerModule,
+        MatSelectModule,
     ],
 })
 export class LoginPolicyModule { }

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { MachineKeysComponent } from './machine-keys.component';
 
@@ -6,7 +6,7 @@ describe('MachineKeysComponent', () => {
     let component: MachineKeysComponent;
     let fixture: ComponentFixture<MachineKeysComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [MachineKeysComponent],
         })

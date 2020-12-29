@@ -66,6 +66,14 @@ const routes: Routes = [
         },
     },
     {
+        path: 'grants',
+        loadChildren: () => import('./pages/grants/grants.module').then(m => m.GrantsModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['user.grant.read'],
+        },
+    },
+    {
         path: 'grant-create',
         canActivate: [AuthGuard],
         children: [
@@ -80,6 +88,24 @@ const routes: Routes = [
             },
             {
                 path: 'project/:projectid',
+                loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+                    .then(m => m.UserGrantCreateModule),
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['user.grant.write'],
+                },
+            },
+            {
+                path: 'user/:userid',
+                loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+                    .then(m => m.UserGrantCreateModule),
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['user.grant.write'],
+                },
+            },
+            {
+                path: '',
                 loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
                     .then(m => m.UserGrantCreateModule),
                 canActivate: [RoleGuard],
@@ -105,6 +131,7 @@ const routes: Routes = [
             routes,
             {
                 preloadingStrategy: QuicklinkStrategy,
+                relativeLinkResolution: 'legacy',
             },
         ),
     ],

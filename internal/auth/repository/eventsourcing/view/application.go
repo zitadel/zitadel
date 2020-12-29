@@ -2,7 +2,9 @@ package view
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
@@ -26,28 +28,28 @@ func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) 
 	return view.SearchApplications(v.Db, applicationTable, request)
 }
 
-func (v *View) PutApplication(app *model.ApplicationView) error {
+func (v *View) PutApplication(app *model.ApplicationView, event *models.Event) error {
 	err := view.PutApplication(v.Db, applicationTable, app)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedApplicationSequence(app.Sequence)
+	return v.ProcessedApplicationSequence(event)
 }
 
-func (v *View) PutApplications(apps []*model.ApplicationView, sequence uint64) error {
+func (v *View) PutApplications(apps []*model.ApplicationView, event *models.Event) error {
 	err := view.PutApplications(v.Db, applicationTable, apps...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedApplicationSequence(sequence)
+	return v.ProcessedApplicationSequence(event)
 }
 
-func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
+func (v *View) DeleteApplication(appID string, event *models.Event) error {
 	err := view.DeleteApplication(v.Db, applicationTable, appID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedApplicationSequence(eventSequence)
+	return v.ProcessedApplicationSequence(event)
 }
 
 func (v *View) DeleteApplicationsByProjectID(projectID string) error {
@@ -55,11 +57,15 @@ func (v *View) DeleteApplicationsByProjectID(projectID string) error {
 }
 
 func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(applicationTable)
+	return v.latestSequence(applicationTable, "")
 }
 
-func (v *View) ProcessedApplicationSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(applicationTable, eventSequence)
+func (v *View) ProcessedApplicationSequence(event *models.Event) error {
+	return v.saveCurrentSequence(applicationTable, event)
+}
+
+func (v *View) UpdateApplicationSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(applicationTable)
 }
 
 func (v *View) GetLatestApplicationFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

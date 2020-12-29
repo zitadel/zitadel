@@ -4,7 +4,6 @@ syntax = "proto3";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/struct.proto";
 import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "authoption/options.proto";
@@ -40,19 +39,6 @@ service AdminService {
     rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty) {
         option (google.api.http) = {
            get: "/healthz"
-        };
-    }
-
-    // Ready returns status OK as soon as all dependent services are available
-    rpc Ready(google.protobuf.Empty) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-           get: "/ready"
-        };
-    }
-
-    rpc Validate(google.protobuf.Empty) returns (google.protobuf.Struct) {
-        option (google.api.http) = {
-            get: "/validate"
         };
     }
 
@@ -458,6 +444,68 @@ service AdminService {
         };
     }
 
+    rpc GetDefaultLoginPolicySecondFactors(google.protobuf.Empty) returns (SecondFactorsResult) {
+        option (google.api.http) = {
+            get: "/policies/login/secondfactors/_search"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc AddSecondFactorToDefaultLoginPolicy(SecondFactor) returns (SecondFactor) {
+        option (google.api.http) = {
+            post: "/policies/login/secondfactors"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc RemoveSecondFactorFromDefaultLoginPolicy(SecondFactor) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/policies/login/secondfactors/{second_factor}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetDefaultLoginPolicyMultiFactors(google.protobuf.Empty) returns (MultiFactorsResult) {
+        option (google.api.http) = {
+            get: "/policies/login/multifactors/_search"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc AddMultiFactorToDefaultLoginPolicy(MultiFactor) returns (MultiFactor) {
+        option (google.api.http) = {
+            post: "/policies/login/multifactors"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc RemoveMultiFactorFromDefaultLoginPolicy(MultiFactor) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/policies/login/multifactors/{multi_factor}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
     rpc GetDefaultPasswordComplexityPolicy(google.protobuf.Empty) returns (DefaultPasswordComplexityPolicyView) {
         option (google.api.http) = {
             get: "/policies/password/complexity"
@@ -847,7 +895,8 @@ message View {
     string database = 1;
     string view_name = 2;
     uint64 processed_sequence = 3;
-    google.protobuf.Timestamp view_timestamp = 4;
+    google.protobuf.Timestamp event_timestamp = 4;
+    google.protobuf.Timestamp last_successful_spooler_run = 5;
 }
 
 message IdpID {
@@ -1048,12 +1097,21 @@ message DefaultLoginPolicy {
     bool allow_external_idp = 3;
     google.protobuf.Timestamp creation_date = 4;
     google.protobuf.Timestamp change_date = 5;
+    bool force_mfa = 6;
+    PasswordlessType passwordless_type = 7;
 }
 
 message DefaultLoginPolicyRequest {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
+    bool force_mfa = 4;
+    PasswordlessType passwordless_type = 5;
+}
+
+enum PasswordlessType {
+    PASSWORDLESSTYPE_NOT_ALLOWED = 0;
+    PASSWORDLESSTYPE_ALLOWED = 1;
 }
 
 message IdpProviderID {
@@ -1066,6 +1124,8 @@ message DefaultLoginPolicyView {
     bool allow_external_idp = 3;
     google.protobuf.Timestamp creation_date = 4;
     google.protobuf.Timestamp change_date = 5;
+    bool force_mfa = 6;
+    PasswordlessType passwordless_type = 7;
 }
 
 message IdpProviderView {
@@ -1092,6 +1152,33 @@ message IdpProviderSearchResponse {
 message IdpProviderSearchRequest {
     uint64 offset = 1;
     uint64 limit = 2;
+}
+
+message SecondFactorsResult {
+    repeated SecondFactorType second_factors = 1;
+}
+
+message SecondFactor {
+    SecondFactorType second_factor = 1;
+}
+
+enum SecondFactorType {
+    SECONDFACTORTYPE_UNSPECIFIED = 0;
+    SECONDFACTORTYPE_OTP = 1;
+    SECONDFACTORTYPE_U2F = 2;
+}
+
+message MultiFactorsResult {
+    repeated MultiFactorType multi_factors = 1;
+}
+
+message MultiFactor {
+    MultiFactorType multi_factor = 1;
+}
+
+enum MultiFactorType {
+    MULTIFACTORTYPE_UNSPECIFIED = 0;
+    MULTIFACTORTYPE_U2F_WITH_PIN = 1;
 }
 
 message DefaultPasswordComplexityPolicy {

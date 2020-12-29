@@ -2,9 +2,11 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view/model"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	"github.com/caos/logging"
 	admin_model "github.com/caos/zitadel/internal/admin/model"
@@ -85,8 +87,8 @@ func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.Org, er
 
 func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error) {
 	query.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestOrgSequence()
-	logging.Log("EVENT-LXo9w").OnError(err).Warn("could not read latest iam sequence")
+	sequence, err := repo.View.GetLatestOrgSequence("")
+	logging.Log("EVENT-LXo9w").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
 	orgs, count, err := repo.View.SearchOrgs(query)
 	if err != nil {
 		return nil, err
@@ -99,7 +101,7 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchR
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }

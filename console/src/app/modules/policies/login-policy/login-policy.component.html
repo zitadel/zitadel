@@ -1,23 +1,23 @@
-<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam' : '/org']"
-    [title]="'ORG.POLICY.LOGIN_POLICY.TITLECREATE' | translate"
-    [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'ORG.POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
-    <p class="default" *ngIf="isDefault"> {{'ORG.POLICY.DEFAULTLABEL' | translate}}</p>
+<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+    [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
+    [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
+    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
 
     <div class="spinner-wr">
         <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
     </div>
     <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
         <ng-template appHasRole [appHasRole]="['policy.delete']">
-            <button *ngIf="!isDefault" matTooltip="{{'ORG.POLICY.RESET' | translate}}" color="warn"
-                (click)="removePolicy()" mat-stroked-button>
-                {{'ORG.POLICY.RESET' | translate}}
+            <button *ngIf="!isDefault" matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()"
+                mat-stroked-button>
+                {{'POLICY.RESET' | translate}}
             </button>
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['policy.write']">
-            <button *ngIf="isDefault" matTooltip="{{'ORG.POLICY.CREATECUSTOM' | translate}}" (click)="savePolicy()"
+            <button *ngIf="isDefault" matTooltip="{{'POLICY.CREATECUSTOM' | translate}}" (click)="savePolicy()"
                 mat-raised-button>
-                {{'ORG.POLICY.CREATECUSTOM' | translate}}
+                {{'POLICY.CREATECUSTOM' | translate}}
             </button>
         </ng-template>
     </ng-container>
@@ -26,25 +26,63 @@
         <div class="row">
             <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.allowUsernamePassword">
-                {{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
+                {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
             </mat-slide-toggle>
-            <p>{{'ORG.POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate}}</p>
+            <p>{{'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate}}</p>
         </div>
         <div class="row">
             <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.allowRegister">
-                {{'ORG.POLICY.DATA.ALLOWREGISTER' | translate}}
+                {{'POLICY.DATA.ALLOWREGISTER' | translate}}
             </mat-slide-toggle>
-            <p> {{'ORG.POLICY.DATA.ALLOWREGISTER_DESC' | translate}} </p>
+            <p> {{'POLICY.DATA.ALLOWREGISTER_DESC' | translate}} </p>
         </div>
         <div class="row">
             <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.allowExternalIdp">
-                {{'ORG.POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
+                {{'POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
             </mat-slide-toggle>
-            <p> {{'ORG.POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}} </p>
+            <p> {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}} </p>
+        </div>
+        <div class="row">
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+                [(ngModel)]="loginData.forceMfa">
+                {{'POLICY.DATA.FORCEMFA' | translate}}
+            </mat-slide-toggle>
+            <p> {{'POLICY.DATA.FORCEMFA_DESC' | translate}} </p>
+        </div>
+        <div class="row">
+            <cnsl-form-field class="form-field" label="Access Code" required="true">
+                <cnsl-label>{{'LOGINPOLICY.PASSWORDLESS' | translate}}</cnsl-label>
+                <mat-select [(ngModel)]="loginData.passwordlessType">
+                    <mat-option *ngFor="let pt of passwordlessTypes" [value]="pt">
+                        {{'LOGINPOLICY.PASSWORDLESSTYPE.'+pt | translate}}
+                    </mat-option>
+                </mat-select>
+            </cnsl-form-field>
         </div>
     </div>
+
+    <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
+        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+
+    <div class="divider"></div>
+
+    <ng-container *ngIf="!isDefault">
+        <h3 class="subheader">{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
+        <p class="subdesc">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
+        <app-mfa-table [service]="service" [serviceType]="serviceType"
+            [componentType]="LoginMethodComponentType.MultiFactor"
+            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'iam.policy.write' : ''] | hasRole | async) == false">
+        </app-mfa-table>
+
+        <h3 class="subheader">{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
+        <p class="subdesc">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
+        <app-mfa-table [service]="service" [serviceType]="serviceType"
+            [componentType]="LoginMethodComponentType.SecondFactor"
+            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'iam.policy.write' : ''] | hasRole | async) == false">
+        </app-mfa-table>
+    </ng-container>
 
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>
 
@@ -62,9 +100,6 @@
             <mat-icon>add</mat-icon>
         </div>
     </div>
-
-    <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
-        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
 
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
         <h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>

@@ -32,7 +32,8 @@ const (
 )
 
 var (
-	paths = []string{
+	shortCacheFiles = []string{
+		"/",
 		"/index.html",
 		"/manifest.webmanifest",
 		"/ngsw.json",
@@ -91,14 +92,14 @@ func csp(zitadelDomain string) *middleware.CSP {
 func AssetsCacheInterceptorIgnoreManifest(shortMaxAge, shortSharedMaxAge, longMaxAge, longSharedMaxAge time.Duration) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			for _, path := range paths {
-				if r.URL.Path == path {
+			for _, file := range shortCacheFiles {
+				if r.URL.Path == file {
 					middleware.AssetsCacheInterceptor(shortMaxAge, shortSharedMaxAge, handler).ServeHTTP(w, r)
 					return
 				}
-				middleware.AssetsCacheInterceptor(longMaxAge, longSharedMaxAge, handler).ServeHTTP(w, r)
-				return
 			}
+			middleware.AssetsCacheInterceptor(longMaxAge, longSharedMaxAge, handler).ServeHTTP(w, r)
+			return
 		})
 	}
 }

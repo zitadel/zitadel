@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	amrPassword = "password"
-	amrMFA      = "mfa"
-	amrOTP      = "otp"
+	amrPassword     = "password"
+	amrMFA          = "mfa"
+	amrOTP          = "otp"
+	amrUserPresence = "user"
 )
 
 type AuthRequest struct {
@@ -38,11 +39,11 @@ func (a *AuthRequest) GetAMR() []string {
 	if a.PasswordVerified {
 		amr = append(amr, amrPassword)
 	}
-	if len(a.MfasVerified) > 0 {
+	if len(a.MFAsVerified) > 0 {
 		amr = append(amr, amrMFA)
-		for _, mfa := range a.MfasVerified {
-			if amrMfa := AMRFromMFAType(mfa); amrMfa != "" {
-				amr = append(amr, amrMfa)
+		for _, mfa := range a.MFAsVerified {
+			if amrMFA := AMRFromMFAType(mfa); amrMFA != "" {
+				amr = append(amr, amrMFA)
 			}
 		}
 	}
@@ -243,10 +244,13 @@ func CodeChallengeToOIDC(challenge *model.OIDCCodeChallenge) *oidc.CodeChallenge
 	}
 }
 
-func AMRFromMFAType(mfaType model.MfaType) string {
+func AMRFromMFAType(mfaType model.MFAType) string {
 	switch mfaType {
-	case model.MfaTypeOTP:
+	case model.MFATypeOTP:
 		return amrOTP
+	case model.MFATypeU2F,
+		model.MFATypeU2FUserVerification:
+		return amrUserPresence
 	default:
 		return ""
 	}

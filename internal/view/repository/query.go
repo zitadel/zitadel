@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/model"
 	"github.com/jinzhu/gorm"
@@ -37,6 +38,7 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 			}
 			query = query.Order(fmt.Sprintf("%s %s", column.ToColumnName(), order))
 		}
+
 		for _, q := range request.GetQueries() {
 			var err error
 			query, err = SetQuery(query, q.GetKey(), q.GetValue(), q.GetMethod())

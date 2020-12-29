@@ -2,34 +2,67 @@ package handler
 
 import (
 	"github.com/caos/logging"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
-
-type OrgIAMPolicy struct {
-	handler
-}
 
 const (
 	orgIAMPolicyTable = "management.org_iam_policies"
 )
 
+type OrgIAMPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newOrgIAMPolicy(handler handler) *OrgIAMPolicy {
+	h := &OrgIAMPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *OrgIAMPolicy) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
+
 func (m *OrgIAMPolicy) ViewModel() string {
 	return orgIAMPolicyTable
 }
 
+func (_ *OrgIAMPolicy) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (p *OrgIAMPolicy) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (m *OrgIAMPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestOrgIAMPolicySequence()
+	sequence, err := m.view.GetLatestOrgIAMPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -53,17 +86,21 @@ func (m *OrgIAMPolicy) processOrgIAMPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	case model.OrgIAMPolicyRemoved:
-		return m.view.DeleteOrgIAMPolicy(event.AggregateID, event.Sequence)
+		return m.view.DeleteOrgIAMPolicy(event.AggregateID, event)
 	default:
-		return m.view.ProcessedOrgIAMPolicySequence(event.Sequence)
+		return m.view.ProcessedOrgIAMPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutOrgIAMPolicy(policy, policy.Sequence)
+	return m.view.PutOrgIAMPolicy(policy, event)
 }
 
 func (m *OrgIAMPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-3Gf9s", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgIAM policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestOrgIAMPolicyFailedEvent, m.view.ProcessedOrgIAMPolicyFailedEvent, m.view.ProcessedOrgIAMPolicySequence, m.errorCountUntilSkip)
+}
+
+func (o *OrgIAMPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateOrgIAMPolicySpoolerRunTimestamp)
 }

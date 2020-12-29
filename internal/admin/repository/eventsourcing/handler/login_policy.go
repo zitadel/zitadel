@@ -2,65 +2,106 @@ package handler
 
 import (
 	"github.com/caos/logging"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 )
 
-type LoginPolicy struct {
-	handler
-}
-
 const (
 	loginPolicyTable = "adminapi.login_policies"
 )
 
-func (m *LoginPolicy) ViewModel() string {
+type LoginPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newLoginPolicy(handler handler) *LoginPolicy {
+	h := &LoginPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (p *LoginPolicy) subscribe() {
+	p.subscription = p.es.Subscribe(p.AggregateTypes()...)
+	go func() {
+		for event := range p.subscription.Events {
+			query.ReduceEvent(p, event)
+		}
+	}()
+}
+
+func (p *LoginPolicy) ViewModel() string {
 	return loginPolicyTable
 }
 
-func (m *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestLoginPolicySequence()
+func (p *LoginPolicy) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.IAMAggregate}
+}
+
+func (p *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := p.view.GetLatestLoginPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IAMAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *LoginPolicy) Reduce(event *models.Event) (err error) {
+func (p *LoginPolicy) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := p.view.GetLatestLoginPolicySequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
+func (p *LoginPolicy) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IAMAggregate:
-		err = m.processLoginPolicy(event)
+		err = p.processLoginPolicy(event)
 	}
 	return err
 }
 
-func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
+func (p *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 	policy := new(iam_model.LoginPolicyView)
 	switch event.Type {
 	case model.LoginPolicyAdded:
 		err = policy.AppendEvent(event)
-	case model.LoginPolicyChanged:
-		policy, err = m.view.LoginPolicyByAggregateID(event.AggregateID)
+	case model.LoginPolicyChanged,
+		model.LoginPolicySecondFactorAdded,
+		model.LoginPolicySecondFactorRemoved,
+		model.LoginPolicyMultiFactorAdded,
+		model.LoginPolicyMultiFactorRemoved:
+		policy, err = p.view.LoginPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
 	default:
-		return m.view.ProcessedLoginPolicySequence(event.Sequence)
+		return p.view.ProcessedLoginPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutLoginPolicy(policy, policy.Sequence)
+	return p.view.PutLoginPolicy(policy, event)
 }
 
-func (m *LoginPolicy) OnError(event *models.Event, err error) error {
+func (p *LoginPolicy) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Wj8sf", "id", event.AggregateID).WithError(err).Warn("something went wrong in login policy handler")
-	return spooler.HandleError(event, err, m.view.GetLatestLoginPolicyFailedEvent, m.view.ProcessedLoginPolicyFailedEvent, m.view.ProcessedLoginPolicySequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestLoginPolicyFailedEvent, p.view.ProcessedLoginPolicyFailedEvent, p.view.ProcessedLoginPolicySequence, p.errorCountUntilSkip)
+}
+
+func (p *LoginPolicy) OnSuccess() error {
+	return spooler.HandleSuccess(p.view.UpdateLoginPolicySpoolerRunTimestamp)
 }

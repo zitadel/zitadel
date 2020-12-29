@@ -9,7 +9,8 @@
 */
 :root {
 	--nav-h: 6rem;
-	--top-offset: 6rem;
+    --top-offset: 10rem;
+    --searchbar-space: 140px;
 	--sidebar-w: 30rem;
 	--sidebar-mid-w: 36rem;
 	--sidebar-large-w: 48rem;
@@ -31,18 +32,20 @@
 
 /*	theme vars */
 .theme-default {
-    --back: #212224;
+    --back: #1a1f36;
+    --back-hover: #242b4b;
 	--back-light: transparent;
-	--back-api: #212224;
-	--prime: #5282c1;
-    --second: #e91e63;
-    --flash: #72a2e0;
+	--back-api: #1a1f36;
+	--prime: #6c8eef;
+    --second: #ff2069;
+    --flash:  #8fa6e7;
 
-    --nav-back: #212224;
-    --side-nav-back: #212224;
+    --nav-back: #1a1f36;
+    --side-nav-back: #1a1f36;
 
-	--heading: #e8eaed;
-    --text: #eff8ff;
+	--heading: #f7fafc;
+    --text: #c1c9d2;
+    --grey-text: #a3acb9;
     --dark-text: #8795a1;
 	--sidebar-text: #eff8ff;
 	--border-w: .3rem; /* border-width  */
@@ -52,13 +55,13 @@
 /*	typo vars */
 .typo-default {
 	--code-fs: 1.3rem;
-	--h6: 1.4rem;
+	--h6: 1.3rem;
 	--h5: 1.6rem;
-	--h4: 1.8rem; /* default font-size */
-	--h3: 2.6rem;
+	--h4: 1.6rem; /* default font-size */
+	--h3: 2.5rem;
 	--h2: 3rem;
-	--h1: 3.2rem;
-	--linemax: 42em; /* max line-length */
+	--h1: 3rem;
+	--linemax: 50em; /* max line-length */
 	--lh: 1.5; /* base line-height */
 }
 
@@ -135,7 +138,7 @@ h6,
 blockquote {
 	position: relative;
 	margin: 0;
-	color: var(--heading);
+    color: var(--heading);
 }
 
 /* h1, h2, h3, h4, h5, h6 { font-weight: 600 } */
@@ -181,7 +184,7 @@ strong {
 }
 
 tt,
-code,
+/* code, */
 kbd,
 samp {
 	font: 400 var(--code-fs)/1.7 var(--font-mono);
@@ -192,7 +195,8 @@ code {
 	border-radius: .3em;
 	white-space: nowrap;
 	color: var(--text);
-	-webkit-font-smoothing: initial;
+    -webkit-font-smoothing: initial;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 pre code {
@@ -315,7 +319,7 @@ a {
 	border-bottom: 1px solid currentColor;
 	user-select: none;
 	color: var(--prime);
-	transition: color .2s, border .2s, padding .2s;
+	transition: color .2s,
 }
 
 a:hover {
@@ -354,7 +358,7 @@ a.no-underline {
 .listify ul > li:before {
 	content: '';
 	position: absolute;
-	margin-top: 1.1rem;
+	margin-top: .9rem;
 	margin-left: -1.8rem;
 	background-color: var(--second);
 	width: .6rem;
@@ -368,9 +372,33 @@ a.no-underline {
 }
 
 /*  tables --------------------------------- */
+.table-wrapper {
+    max-width: var(--linemax);
+    overflow-x: auto;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #00000010;
+    border-radius: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #00000010;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #6c8eef30;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
 table {
 	width: 100%;
-	font-size: var(--h5);
+    font-size: var(--h5);
 }
 
 td,
@@ -554,4 +582,22 @@ input[type="checkbox"]::after {
 
 input[type="checkbox"]:checked::after {
 	left: calc(100% - 9px);
+}
+
+.zitadel-gallery {
+    display: flex;
+    width: 100%;
+    max-width: 56em;
+    flex-wrap: wrap;
+}
+
+.zitadel-gallery img {
+    width: 100%;
+    object-fit: contain;
+}
+.zitadel-gallery figure {
+    flex-basis: 30%;
+    object-fit: contain;
+    margin: 5px 5px 5px 0;
+    width: 150px;
 }

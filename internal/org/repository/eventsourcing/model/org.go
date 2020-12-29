@@ -222,6 +222,14 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendChangeMailTextEvent(event)
 	case MailTextRemoved:
 		o.appendRemoveMailTextEvent(event)
+	case LoginPolicySecondFactorAdded:
+		err = o.appendAddSecondFactorToLoginPolicyEvent(event)
+	case LoginPolicySecondFactorRemoved:
+		err = o.appendRemoveSecondFactorFromLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorAdded:
+		err = o.appendAddMultiFactorToLoginPolicyEvent(event)
+	case LoginPolicyMultiFactorRemoved:
+		err = o.appendRemoveMultiFactorFromLoginPolicyEvent(event)
 	case PasswordComplexityPolicyAdded:
 		err = o.appendAddPasswordComplexityPolicyEvent(event)
 	case PasswordComplexityPolicyChanged:

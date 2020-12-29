@@ -3,15 +3,38 @@ package handler
 import (
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 )
 
 type MailTemplate struct {
 	handler
+	subscription *eventstore.Subscription
+}
+
+func newMailTemplate(handler handler) *MailTemplate {
+	h := &MailTemplate{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *MailTemplate) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
 }
 
 const (
@@ -22,13 +45,25 @@ func (m *MailTemplate) ViewModel() string {
 	return mailTemplateTable
 }
 
+func (_ *MailTemplate) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (p *MailTemplate) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := p.view.GetLatestMailTemplateSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (m *MailTemplate) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestMailTemplateSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.IAMAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 

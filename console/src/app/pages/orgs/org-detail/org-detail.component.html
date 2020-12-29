@@ -21,7 +21,7 @@
                         color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
                             class="las la-trash"></i></button>
                 </div>
-                <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate}}</p>
+                <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>
                 <button [disabled]="(canwrite$ | async) == false" matTooltip="Add domain" mat-raised-button
                     color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}}
                 </button>
@@ -29,17 +29,21 @@
         </ng-container>
 
         <ng-template appHasRole [appHasRole]="['policy.read']">
-            <app-policy-grid></app-policy-grid>
+            <app-policy-grid [type]="PolicyGridType.ORG"></app-policy-grid>
         </ng-template>
     </div>
 
     <div class="side" metainfo>
-        <div class="details">
-            <div class="row">
+        <div class="meta-details">
+            <div class="meta-row">
+                <span class="first">{{'RESOURCEID' | translate}}:</span>
+                <span *ngIf="org?.id" class="second">{{ org.id }}</span>
+            </div>
+            <div class="meta-row">
                 <span class="first">{{'ORG.PAGES.PRIMARYDOMAIN'  | translate}}</span>
                 <span class="second"><span style="display: block;">{{primaryDomain}}</span></span>
             </div>
-            <div class="row">
+            <div class="meta-row">
                 <span class="first">{{'ORG.PAGES.STATE'  | translate}}</span>
                 <span *ngIf="org && org.state !== undefined"
                     class="second">{{'ORG.STATE.'+org.state | translate}}</span>
@@ -54,7 +58,7 @@
                     (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
                 </app-contributors>
             </mat-tab>
-            <mat-tab label="{{ 'CHANGES.ORG.TITLE' | translate }}" class="flex-col">
+            <mat-tab label="{{ 'CHANGES.ORG.TITLE' | translate }}" class="meta-flex-col">
                 <app-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></app-changes>
             </mat-tab>
         </mat-tab-group>

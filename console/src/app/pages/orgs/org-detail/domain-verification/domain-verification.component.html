@@ -1,47 +1,65 @@
-<span class="title" mat-dialog-title>{{domain.domain}} {{'ORG.PAGES.ORGDOMAIN_TITLE' | translate}} </span>
+<span class="title" mat-dialog-title>{{'ORG.PAGES.ORGDOMAIN.TITLE' | translate}} {{domain.domain}}</span>
 <div mat-dialog-content>
-    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate }}</p>
+    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate }}</p>
 
-    <p class="desc warn">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_VALIDATION_DESC' | translate }}</p>
+    <p class="desc warn">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_DESC' | translate }}</p>
 
 
-    <p *ngIf="domain.validationType !== OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_UNSPECIFIED" class="desc">
-        {{'ORG.PAGES.ORGDOMAIN_VERIFICATION_VALIDATION_ONGOING' | translate: domain }}</p>
+    <p *ngIf="domain.validationType !== OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_UNSPECIFIED && !(dns || http)"
+        class="desc">
+        {{'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING' | translate: domain }}
+        {{'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING_TYPE' | translate}}
+        {{'ORG.PAGES.ORGDOMAIN.TYPES.'+ domain.validationType | translate}}</p>
     <div *ngIf="domain.validationType !== OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_UNSPECIFIED"
         class="btn-container">
-        <button color="primary" type="submit" mat-raised-button
-            (click)="validate()">{{ 'ACTIONS.VERIFY' | translate }}</button>
+        <button color="primary" type="submit" mat-raised-button *ngIf="!(dns || http)" (click)="validate()">
+            {{ 'ACTIONS.VERIFY' | translate }}
+        </button>
+        <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
+
+        <button *ngIf="!showNew" mat-stroked-button color="primary"
+            (click)="showNew = true">{{'ORG.PAGES.ORGDOMAIN.REQUESTNEWTOKEN' | translate}}</button>
     </div>
 
-    <p>{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_NEWTOKEN_TITLE' | translate }}</p>
-    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_NEWTOKEN_DESC' | translate }}</p>
+    <ng-container *ngIf="showNew">
+        <p>{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_NEWTOKEN_TITLE' | translate }}</p>
+        <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_NEWTOKEN_DESC' | translate }}</p>
 
-    <div class="btn-container" *ngIf="!(http || dns)">
-        <button color="primary" mat-raised-button (click)="loadHttpToken()">HTTP</button>
-        <button color="primary" mat-raised-button (click)="loadDnsToken()">DNS</button>
-    </div>
-    <div *ngIf="http">
-        <p>HTTP TOKEN</p>
-        <p class="entry">{{http?.url}}.txt</p>
-
-        <div class="btn-container">
-            <button mat-stroked-button (click)="saveFile()"
-                color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
+        <div class="btn-container" *ngIf="!(http || dns)">
+            <button color="primary" mat-raised-button (click)="loadHttpToken()">HTTP</button>
+            <button color="primary" mat-raised-button (click)="loadDnsToken()">DNS</button>
         </div>
-    </div>
+        <div *ngIf="http">
+            <p>HTTP TOKEN</p>
+            <p class="entry">{{http?.url}}.txt</p>
 
-    <div *ngIf="dns">
-        <p>DNS TOKEN</p>
-        <div class="line" *ngIf="dns?.token">
-            <p class="entry">{{dns?.token}}</p>
-            <button color="primary" [disabled]="copied == data.clientSecret" matTooltip="copy to clipboard"
-                appCopyToClipboard [valueToCopy]="dns.token" (copiedValue)="copied = $event" mat-icon-button>
-                <i *ngIf="copied != dns.token" class="las la-clipboard"></i>
-                <i *ngIf="copied == dns.token" class="las la-clipboard-check"></i>
-            </button>
+            <div class="btn-container">
+                <button mat-stroked-button (click)="saveFile()"
+                    color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
+                <button color="primary" class="verify-button" type="submit" mat-raised-button (click)="validate()">
+                    <span>{{ 'ACTIONS.VERIFY' | translate }}</span>
+                </button>
+                <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
+            </div>
         </div>
-        <p class="entry">{{dns?.url}}</p>
-    </div>
+
+        <div *ngIf="dns">
+            <p>DNS TOKEN</p>
+            <div class="line" *ngIf="dns?.token">
+                <p class="entry">{{dns?.token}}</p>
+                <button color="primary" [disabled]="copied == data.clientSecret" matTooltip="copy to clipboard"
+                    appCopyToClipboard [valueToCopy]="dns.token" (copiedValue)="copied = $event" mat-icon-button>
+                    <i *ngIf="copied != dns.token" class="las la-clipboard"></i>
+                    <i *ngIf="copied == dns.token" class="las la-clipboard-check"></i>
+                </button>
+                <button color="primary" type="submit" mat-raised-button class="verify-button" (click)="validate()">
+                    {{ 'ACTIONS.VERIFY' | translate }}
+                </button>
+                <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
+            </div>
+            <p class="entry">{{dns?.url}}</p>
+        </div>
+    </ng-container>
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button class="ok-button" (click)="closeDialog()">

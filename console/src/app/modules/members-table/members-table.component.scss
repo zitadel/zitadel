@@ -26,11 +26,6 @@
     .action {
       width: 40px;
     }
-
-    .selection {
-      width: 50px;
-      max-width: 50px;
-    }
   }
 
   tr {
@@ -59,4 +54,8 @@
 .pointer {
   outline: none;
   cursor: pointer;
+}
+
+.role-row {
+  min-width: 200px;
 }
