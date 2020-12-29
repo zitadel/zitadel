@@ -31,6 +31,8 @@ type UserSessionState int32
 const (
 	UserSessionStateActive UserSessionState = iota
 	UserSessionStateTerminated
+	UserSessionStateInitiated
+	UserSessionStateDeleted //TODO: implement delete => special case of terminated
 )
 
 type LoginStep struct{}

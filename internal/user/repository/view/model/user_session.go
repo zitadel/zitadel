@@ -107,9 +107,11 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		es_model.HumanPasswordlessTokenRemoved:
 		v.PasswordlessVerification = time.Time{}
 		v.MultiFactorVerification = time.Time{}
+		v.State = int32(req_model.UserSessionStateInitiated)
 	case es_model.UserPasswordCheckFailed,
 		es_model.HumanPasswordCheckFailed:
 		v.PasswordVerification = time.Time{}
+		v.State = int32(req_model.UserSessionStateInitiated)
 	case es_model.UserPasswordChanged,
 		es_model.HumanPasswordChanged:
 		data := new(es_model.PasswordChange)
@@ -119,6 +121,7 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		}
 		if v.UserAgentID != data.UserAgentID {
 			v.PasswordVerification = time.Time{}
+			v.State = int32(req_model.UserSessionStateInitiated)
 		}
 	case es_model.MFAOTPVerified,
 		es_model.HumanMFAOTPVerified:
@@ -140,6 +143,7 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		es_model.HumanMFAU2FTokenCheckFailed,
 		es_model.HumanMFAU2FTokenRemoved:
 		v.SecondFactorVerification = time.Time{}
+		v.State = int32(req_model.UserSessionStateInitiated)
 	case es_model.HumanMFAU2FTokenVerified:
 		data := new(es_model.WebAuthNVerify)
 		err := data.SetData(event)
@@ -154,7 +158,8 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 	case es_model.SignedOut,
 		es_model.HumanSignedOut,
 		es_model.UserLocked,
-		es_model.UserDeactivated:
+		es_model.UserDeactivated,
+		es_model.UserRemoved:
 		v.PasswordlessVerification = time.Time{}
 		v.PasswordVerification = time.Time{}
 		v.SecondFactorVerification = time.Time{}
@@ -163,9 +168,11 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		v.MultiFactorVerificationType = int32(req_model.MFALevelNotSetUp)
 		v.ExternalLoginVerification = time.Time{}
 		v.State = int32(req_model.UserSessionStateTerminated)
-	case es_model.HumanExternalIDPRemoved, es_model.HumanExternalIDPCascadeRemoved:
+	case es_model.HumanExternalIDPRemoved,
+		es_model.HumanExternalIDPCascadeRemoved:
 		v.ExternalLoginVerification = time.Time{}
 		v.SelectedIDPConfigID = ""
+		v.State = int32(req_model.UserSessionStateTerminated)
 	}
 	return nil
 }

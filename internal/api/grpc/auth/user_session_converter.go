@@ -32,6 +32,8 @@ func userSessionStateFromModel(state auth_req_model.UserSessionState) auth.UserS
 		return auth.UserSessionState_USERSESSIONSTATE_ACTIVE
 	case auth_req_model.UserSessionStateTerminated:
 		return auth.UserSessionState_USERSESSIONSTATE_TERMINATED
+	case auth_req_model.UserSessionStateInitiated:
+		return auth.UserSessionState_USERSESSIONSTATE_INITIATED
 	default:
 		return auth.UserSessionState_USERSESSIONSTATE_UNSPECIFIED
 	}

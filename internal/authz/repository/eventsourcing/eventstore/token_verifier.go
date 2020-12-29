@@ -6,16 +6,15 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
-
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type TokenVerifierRepo struct {

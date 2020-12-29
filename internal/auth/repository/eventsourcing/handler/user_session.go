@@ -72,76 +72,99 @@ func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
 }
 
 func (u *UserSession) Reduce(event *models.Event) (err error) {
-	var session *view_model.UserSessionView
+	var sessions []*view_model.UserSessionView
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded,
-		es_model.UserPasswordCheckFailed,
-		es_model.MFAOTPCheckSucceeded,
-		es_model.MFAOTPCheckFailed,
-		es_model.SignedOut,
 		es_model.HumanPasswordCheckSucceeded,
-		es_model.HumanPasswordCheckFailed,
 		es_model.HumanExternalLoginCheckSucceeded,
+		es_model.MFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded,
-		es_model.HumanMFAOTPCheckFailed,
 		es_model.HumanMFAU2FTokenCheckSucceeded,
-		es_model.HumanMFAU2FTokenCheckFailed,
 		es_model.HumanPasswordlessTokenCheckSucceeded,
+		es_model.UserPasswordCheckFailed,
+		es_model.HumanPasswordCheckFailed,
+		es_model.MFAOTPCheckFailed,
+		es_model.HumanMFAOTPCheckFailed,
+		es_model.HumanMFAU2FTokenCheckFailed,
 		es_model.HumanPasswordlessTokenCheckFailed,
-		es_model.HumanSignedOut:
-		eventData, err := view_model.UserSessionFromEvent(event)
-		if err != nil {
-			return err
-		}
-		session, err = u.view.UserSessionByIDs(eventData.UserAgentID, event.AggregateID)
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				return err
-			}
-			session = &view_model.UserSessionView{
-				CreationDate:  event.CreationDate,
-				ResourceOwner: event.ResourceOwner,
-				UserAgentID:   eventData.UserAgentID,
-				UserID:        event.AggregateID,
-				State:         int32(req_model.UserSessionStateActive),
-			}
-		}
-		return u.updateSession(session, event)
-	case es_model.UserPasswordChanged,
-		es_model.MFAOTPRemoved,
-		es_model.UserProfileChanged,
+		es_model.SignedOut,
+		es_model.HumanSignedOut,
 		es_model.UserLocked,
-		es_model.UserDeactivated,
-		es_model.HumanPasswordChanged,
-		es_model.HumanMFAOTPRemoved,
+		es_model.UserDeactivated:
+
+		var session *view_model.UserSessionView
+		session, err = u.sessionFromEvent(event)
+		sessions = append(sessions, session)
+	case es_model.UserProfileChanged,
 		es_model.HumanProfileChanged,
-		es_model.DomainClaimed,
 		es_model.UserUserNameChanged,
-		es_model.HumanExternalIDPRemoved,
-		es_model.HumanExternalIDPCascadeRemoved,
-		es_model.HumanPasswordlessTokenRemoved,
-		es_model.HumanMFAU2FTokenRemoved:
-		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
-		if err != nil {
-			return err
-		}
-		if len(sessions) == 0 {
-			return u.view.ProcessedUserSessionSequence(event)
-		}
-		for _, session := range sessions {
-			if err := session.AppendEvent(event); err != nil {
-				return err
-			}
-			if err := u.fillUserInfo(session, event.AggregateID); err != nil {
-				return err
-			}
-		}
-		return u.view.PutUserSessions(sessions, event)
+		es_model.DomainClaimed:
+
+		sessions, err = u.UserDataChanged(event)
 	case es_model.UserRemoved:
 		return u.view.DeleteUserSessions(event.AggregateID, event)
 	default:
 		return u.view.ProcessedUserSessionSequence(event)
 	}
+	if err != nil {
+		return err
+	}
+	return u.view.PutUserSessions(sessions, event)
+}
+
+func (u *UserSession) UserDataChanged(event *models.Event) ([]*view_model.UserSessionView, error) {
+	sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if len(sessions) == 0 {
+		return nil, u.view.ProcessedUserSessionSequence(event)
+	}
+	for i := len(sessions) - 1; i > 0; i-- {
+		if sessions[i].State != int32(req_model.UserSessionStateActive) {
+			copy(sessions[i:], sessions[i+1:])
+			sessions[len(sessions)-1] = nil
+			sessions = sessions[:len(sessions)-1]
+			continue
+		}
+		if err := sessions[i].AppendEvent(event); err != nil {
+			return nil, err
+		}
+		if err := u.fillUserInfo(sessions[i], event.AggregateID); err != nil {
+			return nil, err
+		}
+	}
+	return sessions, nil
+}
+
+func (u *UserSession) sessionFromEvent(event *models.Event) (*view_model.UserSessionView, error) {
+	eventData, err := view_model.UserSessionFromEvent(event)
+	if err != nil {
+		return nil, err
+	}
+	session, err := u.view.UserSessionByIDs(eventData.UserAgentID, event.AggregateID)
+	if err != nil {
+		if !errors.IsNotFound(err) {
+			return nil, err
+		}
+		session = &view_model.UserSessionView{
+			CreationDate:  event.CreationDate,
+			ResourceOwner: event.ResourceOwner,
+			UserAgentID:   eventData.UserAgentID,
+			UserID:        event.AggregateID,
+			State:         int32(req_model.UserSessionStateInitiated),
+		}
+	}
+
+	if err = session.AppendEvent(event); err != nil {
+		return nil, err
+	}
+
+	if err = u.fillUserInfo(session, event.AggregateID); err != nil {
+		return nil, err
+	}
+
+	return session, nil
 }
 
 func (u *UserSession) OnError(event *models.Event, err error) error {
@@ -164,6 +187,9 @@ func (u *UserSession) updateSession(session *view_model.UserSessionView, event *
 }
 
 func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id string) error {
+	if session.State != int32(req_model.UserSessionStateActive) {
+		return nil
+	}
 	user, err := u.view.UserByID(id)
 	if err != nil {
 		return err
