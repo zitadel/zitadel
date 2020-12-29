@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func now() time.Time {
@@ -48,7 +48,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.UserPasswordCheckFailed},
 				userView: &UserSessionView{PasswordVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, State: int32(model.UserSessionStateInitiated)},
 		},
 		{
 			name: "append human password check failed event",
@@ -56,7 +56,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanPasswordCheckFailed},
 				userView: &UserSessionView{PasswordVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, State: int32(model.UserSessionStateInitiated)},
 		},
 		{
 			name: "append user password changed event",
@@ -73,7 +73,7 @@ func TestAppendEvent(t *testing.T) {
 				},
 				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: now()},
 			},
-			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: time.Time{}},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: time.Time{}, State: int32(model.UserSessionStateInitiated)},
 		},
 		{
 			name: "append human password changed event",
@@ -92,7 +92,7 @@ func TestAppendEvent(t *testing.T) {
 				},
 				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: now()},
 			},
-			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: time.Time{}},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: time.Time{}, State: int32(model.UserSessionStateInitiated)},
 		},
 		{
 			name: "append human password changed event same user agent",
@@ -165,7 +165,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.MFAOTPCheckFailed},
 				userView: &UserSessionView{SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}, State: int32(model.UserSessionStateInitiated)},
 		},
 		{
 			name: "append human otp check failed event",
@@ -173,7 +173,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanMFAOTPCheckFailed},
 				userView: &UserSessionView{SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}, State: int32(model.UserSessionStateInitiated)},
 		},
 		{
 			name: "append user otp removed event",
@@ -181,7 +181,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.MFAOTPRemoved},
 				userView: &UserSessionView{SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}, State: int32(model.UserSessionStateInitiated)},
 		},
 		{
 			name: "append human otp removed event",
@@ -189,7 +189,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanMFAOTPRemoved},
 				userView: &UserSessionView{SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}, State: int32(model.UserSessionStateInitiated)},
 		},
 		{
 			name: "append user signed out event",
@@ -197,7 +197,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.SignedOut},
 				userView: &UserSessionView{PasswordVerification: now(), SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, SecondFactorVerification: time.Time{}, State: 1},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, SecondFactorVerification: time.Time{}, State: int32(model.UserSessionStateTerminated)},
 		},
 		{
 			name: "append human signed out event",
@@ -205,7 +205,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Type: es_model.HumanSignedOut},
 				userView: &UserSessionView{PasswordVerification: now(), SecondFactorVerification: now()},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, SecondFactorVerification: time.Time{}, State: 1},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, SecondFactorVerification: time.Time{}, State: int32(model.UserSessionStateTerminated)},
 		},
 	}
 	for _, tt := range tests {
