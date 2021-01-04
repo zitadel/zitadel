@@ -24,10 +24,6 @@ func (r *CommandSide) AddDefaultLoginPolicy(ctx context.Context, policy *iam_mod
 }
 
 func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, addedPolicy *IAMLoginPolicyWriteModel, policy *iam_model.LoginPolicy) (*iam_repo.Aggregate, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mv0s", "Errors.IAM.LoginPolicyInvalid")
-	}
-
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
