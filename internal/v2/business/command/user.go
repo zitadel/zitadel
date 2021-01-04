@@ -15,7 +15,11 @@ func (r *CommandSide) AddUser(ctx context.Context, user *usr_model.User) (*usr_m
 	}
 
 	if user.Human != nil {
-
+		human, err := r.AddHuman(ctx, user.ResourceOwner, user.UserName, user.Human)
+		if err != nil {
+			return nil, err
+		}
+		return &usr_model.User{UserName: user.UserName, Human: human}, nil
 	} else if user.Machine != nil {
 
 	}
