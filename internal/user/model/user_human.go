@@ -2,6 +2,8 @@ package model
 
 import (
 	"bytes"
+	caos_errors "github.com/caos/zitadel/internal/errors"
+	"strings"
 	"time"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -11,6 +13,8 @@ import (
 )
 
 type Human struct {
+	es_models.ObjectRoot
+
 	*Password
 	*Profile
 	*Email
@@ -43,6 +47,19 @@ const (
 	GenderMale
 	GenderDiverse
 )
+
+func (u *Human) CheckOrgIAMPolicy(userName string, policy *iam_model.OrgIAMPolicy) error {
+	if policy == nil {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
+	}
+	if policy.UserLoginMustBeDomain && strings.Contains(userName, "@") {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-se4sJ", "Errors.User.EmailAsUsernameNotAllowed")
+	}
+	if !policy.UserLoginMustBeDomain && u.Profile != nil && userName == "" && u.Email != nil {
+		userName = u.EmailAddress
+	}
+	return nil
+}
 
 func (u *Human) SetNamesAsDisplayname() {
 	if u.Profile != nil && u.DisplayName == "" && u.FirstName != "" && u.LastName != "" {

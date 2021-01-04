@@ -15,9 +15,9 @@ func (rm *IAMMembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 		case *iam.MemberAddedEvent:
 			rm.MembersReadModel.AppendEvents(&e.MemberAddedEvent)
 		case *iam.MemberChangedEvent:
-			rm.MembersReadModel.AppendEvents(&e.ChangedEvent)
+			rm.MembersReadModel.AppendEvents(&e.MemberChangedEvent)
 		case *iam.MemberRemovedEvent:
-			rm.MembersReadModel.AppendEvents(&e.RemovedEvent)
+			rm.MembersReadModel.AppendEvents(&e.MemberRemovedEvent)
 		}
 	}
 }

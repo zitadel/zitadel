@@ -27,7 +27,7 @@ func (rm *MemberReadModel) Reduce() error {
 		switch e := event.(type) {
 		case *member.MemberAddedEvent:
 			rm.Roles = e.Roles
-		case *member.ChangedEvent:
+		case *member.MemberChangedEvent:
 			rm.Roles = e.Roles
 		}
 	}

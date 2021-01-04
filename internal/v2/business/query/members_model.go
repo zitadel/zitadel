@@ -27,10 +27,10 @@ func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 			m := NewMemberReadModel(e.UserID)
 			rm.Members = append(rm.Members, m)
 			m.AppendEvents(e)
-		case *member.ChangedEvent:
+		case *member.MemberChangedEvent:
 			_, m := rm.MemberByUserID(e.UserID)
 			m.AppendEvents(e)
-		case *member.RemovedEvent:
+		case *member.MemberRemovedEvent:
 			idx, _ := rm.MemberByUserID(e.UserID)
 			if idx < 0 {
 				continue

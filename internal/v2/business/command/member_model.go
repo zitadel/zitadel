@@ -26,9 +26,9 @@ func (wm *MemberWriteModel) Reduce() error {
 			wm.UserID = e.UserID
 			wm.Roles = e.Roles
 			wm.IsActive = true
-		case *member.ChangedEvent:
+		case *member.MemberChangedEvent:
 			wm.Roles = e.Roles
-		case *member.RemovedEvent:
+		case *member.MemberRemovedEvent:
 			wm.Roles = nil
 			wm.IsActive = false
 		}

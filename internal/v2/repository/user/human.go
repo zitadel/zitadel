@@ -44,13 +44,16 @@ type HumanAddedEvent struct {
 	PostalCode    string `json:"postalCode,omitempty"`
 	Region        string `json:"region,omitempty"`
 	StreetAddress string `json:"streetAddress,omitempty"`
+
+	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
+	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
 func (e *HumanAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewAddedEvent(
+func NewHumanAddedEvent(
 	ctx context.Context,
 	userName,
 	firstName,

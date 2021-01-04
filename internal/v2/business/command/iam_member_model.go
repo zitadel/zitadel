@@ -32,12 +32,12 @@ func (wm *IAMMemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
 			if e.UserID != wm.MemberWriteModel.UserID {
 				continue
 			}
-			wm.MemberWriteModel.AppendEvents(&e.ChangedEvent)
+			wm.MemberWriteModel.AppendEvents(&e.MemberChangedEvent)
 		case *iam.MemberRemovedEvent:
 			if e.UserID != wm.MemberWriteModel.UserID {
 				continue
 			}
-			wm.MemberWriteModel.AppendEvents(&e.RemovedEvent)
+			wm.MemberWriteModel.AppendEvents(&e.MemberRemovedEvent)
 		}
 	}
 }

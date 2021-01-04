@@ -45,16 +45,16 @@ func MemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, er
 }
 
 type MemberChangedEvent struct {
-	member.ChangedEvent
+	member.MemberChangedEvent
 }
 
 func NewMemberChangedEvent(
 	ctx context.Context,
 	userID string,
 	roles ...string,
-) *MemberAddedEvent {
-	return &MemberAddedEvent{
-		MemberAddedEvent: *member.NewMemberChangedEvent(
+) *MemberChangedEvent {
+	return &MemberChangedEvent{
+		MemberChangedEvent: *member.NewMemberChangedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				MemberChangedEventType,
@@ -71,11 +71,11 @@ func MemberChangedEventMapper(event *repository.Event) (eventstore.EventReader, 
 		return nil, err
 	}
 
-	return &MemberChangedEvent{ChangedEvent: *e.(*member.ChangedEvent)}, nil
+	return &MemberChangedEvent{MemberChangedEvent: *e.(*member.MemberChangedEvent)}, nil
 }
 
 type MemberRemovedEvent struct {
-	member.RemovedEvent
+	member.MemberRemovedEvent
 }
 
 func NewMemberRemovedEvent(
@@ -84,7 +84,7 @@ func NewMemberRemovedEvent(
 ) *MemberRemovedEvent {
 
 	return &MemberRemovedEvent{
-		RemovedEvent: *member.NewRemovedEvent(
+		MemberRemovedEvent: *member.NewRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				MemberRemovedEventType,
@@ -100,5 +100,5 @@ func MemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, 
 		return nil, err
 	}
 
-	return &MemberRemovedEvent{RemovedEvent: *e.(*member.RemovedEvent)}, nil
+	return &MemberRemovedEvent{MemberRemovedEvent: *e.(*member.MemberRemovedEvent)}, nil
 }

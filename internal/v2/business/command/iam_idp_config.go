@@ -25,7 +25,7 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *iam_model
 	//TODO: check name unique on aggregate
 	addedConfig := NewIAMIDPConfigWriteModel(config.AggregateID, idpConfigID)
 
-	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), r.secretCrypto)
+	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), r.idpConfigSecretCrypto)
 	if err != nil {
 		return nil, err
 	}

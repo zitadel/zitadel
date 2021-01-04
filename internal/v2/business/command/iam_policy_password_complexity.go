@@ -8,6 +8,17 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
+func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context, aggregateID string) (*iam_model.PasswordComplexityPolicy, error) {
+	policyWriteModel := NewIAMPasswordComplexityPolicyWriteModel(aggregateID)
+	err := r.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	policy := writeModelToPasswordComplexityPolicy(policyWriteModel)
+	policy.Default = true
+	return policy, nil
+}
+
 func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err

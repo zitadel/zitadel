@@ -50,14 +50,14 @@ func MemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, er
 	return e, nil
 }
 
-type ChangedEvent struct {
+type MemberChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Roles  []string `json:"roles,omitempty"`
 	UserID string   `json:"userId,omitempty"`
 }
 
-func (e *ChangedEvent) Data() interface{} {
+func (e *MemberChangedEvent) Data() interface{} {
 	return e
 }
 
@@ -65,8 +65,8 @@ func NewMemberChangedEvent(
 	base *eventstore.BaseEvent,
 	userID string,
 	roles ...string,
-) *MemberAddedEvent {
-	return &MemberAddedEvent{
+) *MemberChangedEvent {
+	return &MemberChangedEvent{
 		BaseEvent: *base,
 		Roles:     roles,
 		UserID:    userID,
@@ -74,7 +74,7 @@ func NewMemberChangedEvent(
 }
 
 func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &ChangedEvent{
+	e := &MemberChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -86,29 +86,29 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 	return e, nil
 }
 
-type RemovedEvent struct {
+type MemberRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserID string `json:"userId"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *MemberRemovedEvent) Data() interface{} {
 	return e
 }
 
 func NewRemovedEvent(
 	base *eventstore.BaseEvent,
 	userID string,
-) *RemovedEvent {
+) *MemberRemovedEvent {
 
-	return &RemovedEvent{
+	return &MemberRemovedEvent{
 		BaseEvent: *base,
 		UserID:    userID,
 	}
 }
 
 func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &RemovedEvent{
+	e := &MemberRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

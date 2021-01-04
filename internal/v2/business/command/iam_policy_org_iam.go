@@ -8,6 +8,17 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
+func (r *CommandSide) GetDefaultOrgIAMPolicy(ctx context.Context, aggregateID string) (*iam_model.OrgIAMPolicy, error) {
+	policyWriteModel := NewIAMOrgIAMPolicyWriteModel(aggregateID)
+	err := r.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	policy := writeModelToOrgIAMPolicy(policyWriteModel)
+	policy.Default = true
+	return policy, nil
+}
+
 func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	addedPolicy := NewIAMOrgIAMPolicyWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)

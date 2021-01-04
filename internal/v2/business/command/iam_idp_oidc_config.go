@@ -24,7 +24,7 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *ia
 		config.ClientID,
 		config.Issuer,
 		config.ClientSecretString,
-		r.secretCrypto,
+		r.idpConfigSecretCrypto,
 		domain.OIDCMappingField(config.IDPDisplayNameMapping),
 		domain.OIDCMappingField(config.UsernameMapping),
 		config.Scopes...)

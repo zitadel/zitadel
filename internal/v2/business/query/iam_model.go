@@ -48,8 +48,8 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch event.(type) {
 		case *member.MemberAddedEvent,
-			*member.ChangedEvent,
-			*member.RemovedEvent:
+			*member.MemberChangedEvent,
+			*member.MemberRemovedEvent:
 
 			rm.Members.AppendEvents(event)
 		case *iam.IDPConfigAddedEvent,
