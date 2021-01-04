@@ -20,11 +20,25 @@ func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context, ag
 }
 
 func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+	addedPolicy := NewIAMPasswordComplexityPolicyWriteModel(policy.AggregateID)
+	iamAgg, err := r.addDefaultPasswordComplexityPolicy(ctx, addedPolicy, policy)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToPasswordComplexityPolicy(addedPolicy), nil
+}
+
+func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, addedPolicy *IAMPasswordComplexityPolicyWriteModel, policy *iam_model.PasswordComplexityPolicy) (*iam_repo.Aggregate, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
 
-	addedPolicy := NewIAMPasswordComplexityPolicyWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -36,12 +50,7 @@ func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, po
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewPasswordComplexityPolicyAddedEvent(ctx, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol))
 
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToPasswordComplexityPolicy(addedPolicy), nil
+	return iamAgg, nil
 }
 
 func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {

@@ -2,6 +2,7 @@ package management
 
 import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -14,11 +15,11 @@ func iamFromModel(iam *iam_model.IAM) *management.Iam {
 	}
 }
 
-func iamSetupStepFromModel(step iam_model.Step) management.IamSetupStep {
+func iamSetupStepFromModel(step domain.Step) management.IamSetupStep {
 	switch step {
-	case iam_model.Step1:
+	case domain.Step1:
 		return management.IamSetupStep_iam_setup_step_1
-	case iam_model.Step2:
+	case domain.Step2:
 		return management.IamSetupStep_iam_setup_step_2
 	// case iam_model.Step3:
 	// 	return management.IamSetupStep_iam_setup_step_3

@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/business/query"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -59,15 +58,15 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	return repo, nil
 }
 
-func (r *CommandSide) iamByID(ctx context.Context, id string) (_ *query.ReadModel, err error) {
+func (r *CommandSide) iamByID(ctx context.Context, id string) (_ *IAMWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	readModel := query.NewReadModel(id)
-	err = r.eventstore.FilterToQueryReducer(ctx, readModel)
+	writeModel := NewIAMriteModel(id)
+	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
 
-	return readModel, nil
+	return writeModel, nil
 }

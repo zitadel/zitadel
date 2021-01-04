@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 )
 
 const (
@@ -14,13 +15,11 @@ const (
 	SetupStartedEventType eventstore.EventType = "iam.setup.started"
 )
 
-type Step int8
-
 type SetupStepEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Step Step `json:"Step"`
-	Done bool `json:"-"`
+	Step domain.Step `json:"Step"`
+	Done bool        `json:"-"`
 }
 
 func (e *SetupStepEvent) Data() interface{} {
@@ -42,7 +41,7 @@ func SetupStepMapper(event *repository.Event) (eventstore.EventReader, error) {
 
 func NewSetupStepDoneEvent(
 	ctx context.Context,
-	step Step,
+	step domain.Step,
 ) *SetupStepEvent {
 
 	return &SetupStepEvent{
@@ -56,7 +55,7 @@ func NewSetupStepDoneEvent(
 
 func NewSetupStepStartedEvent(
 	ctx context.Context,
-	step Step,
+	step domain.Step,
 ) *SetupStepEvent {
 
 	return &SetupStepEvent{

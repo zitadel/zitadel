@@ -73,49 +73,49 @@ func (es *IAMEventstore) IAMEventsByID(ctx context.Context, id string, sequence 
 	return es.FilterEvents(ctx, query)
 }
 
-func (es *IAMEventstore) StartSetup(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
-	iam, err := es.IAMByID(ctx, iamID)
-	if err != nil && !caos_errs.IsNotFound(err) {
-		return nil, err
-	}
-
-	if iam != nil && (iam.SetUpStarted >= step || iam.SetUpStarted != iam.SetUpDone) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "Setup already started")
-	}
-
-	if iam == nil {
-		iam = &iam_model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}}
-	}
-	iam.SetUpStarted = step
-	repoIAM := model.IAMFromModel(iam)
-
-	createAggregate := IAMSetupStartedAggregate(es.AggregateCreator(), repoIAM)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIAM.AppendEvents, createAggregate)
-	if err != nil {
-		return nil, err
-	}
-
-	es.iamCache.cacheIAM(repoIAM)
-	return model.IAMToModel(repoIAM), nil
-}
-
-func (es *IAMEventstore) SetupDone(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
-	iam, err := es.IAMByID(ctx, iamID)
-	if err != nil {
-		return nil, err
-	}
-	iam.SetUpDone = step
-
-	repoIam := model.IAMFromModel(iam)
-	createAggregate := IAMSetupDoneAggregate(es.AggregateCreator(), repoIam)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, createAggregate)
-	if err != nil {
-		return nil, err
-	}
-
-	es.iamCache.cacheIAM(repoIam)
-	return model.IAMToModel(repoIam), nil
-}
+//func (es *IAMEventstore) StartSetup(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
+//	iam, err := es.IAMByID(ctx, iamID)
+//	if err != nil && !caos_errs.IsNotFound(err) {
+//		return nil, err
+//	}
+//
+//	if iam != nil && (iam.SetUpStarted >= step || iam.SetUpStarted != iam.SetUpDone) {
+//		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "Setup already started")
+//	}
+//
+//	if iam == nil {
+//		iam = &iam_model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}}
+//	}
+//	iam.SetUpStarted = step
+//	repoIAM := model.IAMFromModel(iam)
+//
+//	createAggregate := IAMSetupStartedAggregate(es.AggregateCreator(), repoIAM)
+//	err = es_sdk.Push(ctx, es.PushAggregates, repoIAM.AppendEvents, createAggregate)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	es.iamCache.cacheIAM(repoIAM)
+//	return model.IAMToModel(repoIAM), nil
+//}
+//
+//func (es *IAMEventstore) SetupDone(ctx context.Context, iamID string, step iam_model.Step) (*iam_model.IAM, error) {
+//	iam, err := es.IAMByID(ctx, iamID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	iam.SetUpDone = step
+//
+//	repoIam := model.IAMFromModel(iam)
+//	createAggregate := IAMSetupDoneAggregate(es.AggregateCreator(), repoIam)
+//	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, createAggregate)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	es.iamCache.cacheIAM(repoIam)
+//	return model.IAMToModel(repoIam), nil
+//}
 
 func (es *IAMEventstore) PrepareSetupDone(ctx context.Context, iam *model.IAM, aggregate *models.Aggregate, step iam_model.Step) (*model.IAM, *models.Aggregate, func(ctx context.Context, aggregates ...*models.Aggregate) error, error) {
 	iam.SetUpDone = model.Step(step)

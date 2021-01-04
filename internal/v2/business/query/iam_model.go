@@ -2,6 +2,7 @@ package query
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/business/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
@@ -10,8 +11,8 @@ import (
 type ReadModel struct {
 	eventstore.ReadModel
 
-	SetUpStarted iam.Step
-	SetUpDone    iam.Step
+	SetUpStarted domain.Step
+	SetUpDone    domain.Step
 
 	Members IAMMembersReadModel
 	IDPs    IAMIDPConfigsReadModel
