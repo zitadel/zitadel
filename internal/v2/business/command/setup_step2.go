@@ -5,6 +5,8 @@ import (
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/business/domain"
+	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 type Step2 struct {
@@ -16,24 +18,21 @@ func (r *CommandSide) SetupStep2(ctx context.Context, iamID string, step Step2) 
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
-	return nil
-}
-
-//
-func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, iam *IAMWriteModel, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mv0s", "Errors.IAM.LoginPolicyInvalid")
-	}
-
-	addedPolicy := NewIAMLoginPolicyWriteModel(policy.AggregateID)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	iamAgg, err := r.addDefaultPasswordComplexityPolicy(ctx, NewIAMPasswordComplexityPolicyWriteModel(iam.AggregateID), &iam_model.PasswordComplexityPolicy{
+		MinLength:    step.DefaultPasswordComplexityPolicy.MinLength,
+		HasLowercase: step.DefaultPasswordComplexityPolicy.HasLowercase,
+		HasUppercase: step.DefaultPasswordComplexityPolicy.HasUppercase,
+		HasNumber:    step.DefaultPasswordComplexityPolicy.HasNumber,
+		HasSymbol:    step.DefaultPasswordComplexityPolicy.HasSymbol,
+	})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if addedPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LoginPolicy.AlreadyExists")
-	}
+	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
 
-	//iamAgg.PushEvents(iam_repo.NewLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType)))
-	return nil, nil
+	_, err = r.eventstore.PushAggregates(ctx, iamAgg)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-HR2na", "Setup Step2 failed")
+	}
+	return nil
 }
