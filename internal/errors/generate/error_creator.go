@@ -59,7 +59,7 @@ func (data *Data) createTemplate(templateName string, file *os.File) {
 }
 
 func readErrorName() (errorName string) {
-	flag.StringVar(&errorName, "Name", "", "Type of the error (e.g. Internal)")
+	flag.StringVar(&errorName, "Name", "", "KeyType of the error (e.g. Internal)")
 	flag.Parse()
 	return errorName
 }

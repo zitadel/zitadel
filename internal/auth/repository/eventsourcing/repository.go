@@ -20,7 +20,7 @@ import (
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
+	"github.com/caos/zitadel/internal/v2/query"
 )
 
 type Config struct {
@@ -110,7 +110,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 		return nil, err
 	}
 
-	iamV2, err := iam_business.StartRepository(&iam_business.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
+	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
@@ -182,8 +182,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			SystemDefaults: systemDefaults,
 		},
 		eventstore.IAMRepository{
-			IAMID: systemDefaults.IamID,
-			IAMV2: iamV2,
+			IAMID:          systemDefaults.IamID,
+			IAMV2QuerySide: iamV2Query,
 		},
 	}, nil
 }

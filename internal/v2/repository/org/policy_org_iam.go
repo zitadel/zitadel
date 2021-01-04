@@ -1,27 +1,40 @@
 package org
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/policy/org_iam"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 var (
-	OrgIAMPolicyAddedEventType = orgEventTypePrefix + org_iam.OrgIAMPolicyAddedEventType
+	OrgIAMPolicyAddedEventType   = orgEventTypePrefix + policy.OrgIAMPolicyAddedEventType
+	OrgIAMPolicyChangedEventType = orgEventTypePrefix + policy.OrgIAMPolicyChangedEventType
 )
 
-type OrgIAMPolicyReadModel struct{ org_iam.ReadModel }
+type OrgIAMPolicyAddedEvent struct {
+	policy.OrgIAMPolicyAddedEvent
+}
 
-func (rm *OrgIAMPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *OrgIAMPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.AddedEvent)
-		case *org_iam.AddedEvent:
-			rm.ReadModel.AppendEvents(e)
-		}
+type OrgIAMPolicyChangedEvent struct {
+	policy.OrgIAMPolicyChangedEvent
+}
+
+func NewOrgIAMPolicyChangedEvent(
+	ctx context.Context,
+) *OrgIAMPolicyChangedEvent {
+	return &OrgIAMPolicyChangedEvent{
+		OrgIAMPolicyChangedEvent: *policy.NewOrgIAMPolicyChangedEvent(
+			eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyChangedEventType),
+		),
 	}
 }
 
-type OrgIAMPolicyAddedEvent struct {
-	org_iam.AddedEvent
+func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.OrgIAMPolicyChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OrgIAMPolicyChangedEvent{OrgIAMPolicyChangedEvent: *e.(*policy.OrgIAMPolicyChangedEvent)}, nil
 }

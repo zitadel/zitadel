@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-//ReadModel is the minimum representation of a View model.
+//MemberReadModel is the minimum representation of a View model.
 // it might be saved in a database or in memory
 type ReadModel struct {
 	ProcessedSequence uint64

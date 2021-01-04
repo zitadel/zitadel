@@ -7,6 +7,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 const (
@@ -75,8 +76,8 @@ func IAMToModel(iam *IAM) *model.IAM {
 	idps := IDPConfigsToModel(iam.IDPs)
 	converted := &model.IAM{
 		ObjectRoot:   iam.ObjectRoot,
-		SetUpStarted: model.Step(iam.SetUpStarted),
-		SetUpDone:    model.Step(iam.SetUpDone),
+		SetUpStarted: domain.Step(iam.SetUpStarted),
+		SetUpDone:    domain.Step(iam.SetUpDone),
 		GlobalOrgID:  iam.GlobalOrgID,
 		IAMProjectID: iam.IAMProjectID,
 		Members:      members,

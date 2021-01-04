@@ -17,15 +17,21 @@ Errors:
     NotLocked: Benutzer ist nicht gesperrt
     NoChanges: Keine Änderungen gefunden
     InitCodeNotFound: Kein Initialisierungs Code gefunden
-    ProfileNotFound: Profil nicht gefunden
-    ProfileInvalid: Profildaten sind ungültig
-    EmailNotFound: Email nicht gefunden
-    EmailInvalid: Email ist ungültig
-    EmailAlreadyVerified: Email ist bereits verifiziert
+    Profile:
+      NotFound: Profil nicht gefunden
+      NotChanged: Profile nicht verändert
+      Invalid: Profildaten sind ungültig
+    Email:
+      NotFound: Email nicht gefunden
+      Invalid: Email ist ungültig
+      AlreadyVerified: Email ist bereits verifiziert
+      NotChanged: Email wurde nicht geändert
     PhoneNotFound: Telfonnummer nicht gefunden
     PhoneInvalid: Telefonnummer ist ungültig
     PhoneAlreadyVerified: Telefonnummer bereits verifiziert
-    AddressNotFound: Addresse nicht gefunden
+    Address:
+      NotFound: Addresse nicht gefunden
+      NotChanged: Addresse wurde nicht geändert
     NotHuman: Der Benutzer muss eine Person sein
     NotMachine: Der Benutzer muss technisch sein
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
@@ -164,6 +170,8 @@ Errors:
     GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
     UserIDMisisng: User ID fehlt
   IAM:
+    Member:
+      RolesNotChanged: Rollen wurden nicht verändert
     MemberInvalid: Member ist ungültig
     MemberAlreadyExisting: Member existiert bereits
     MemberNotExisting: Member existiert nicht
@@ -179,6 +187,7 @@ Errors:
     IdpProviderInvalid: Idp Provider ist ungültig
     LoginPolicy:
       NotFound: Default Login Policy konnte nicht gefunden
+      NotChanged: Default Login Policy wurde nicht verändert
       NotExisting: Default Login Policy existiert nicht
       AlreadyExists: Default Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
@@ -187,28 +196,41 @@ Errors:
         AlreadyExists: Multifaktor existiert bereits
         NotExisting: Multifaktor existiert nicht
         Unspecified: Multifaktor ungültig
+      IDP:
+        AlreadyExists: Identitäts Provider existiert bereits
+        NotExisting: Identitäts Provider existiert nicht
+      IDPConfig:
+        AlreadyExists: Identitäts Provider Konfiguration existiert bereits
+        NotExisting: Identitäts Provider Konfiguration existiert nicht
+        NotInactive: Identitäts Provider Konfiguration nicht inaktive
+        NotActive: Identitäts Provider Konfiguration nicht aktive
     LabelPolicy:
       NotFound: Default Private Label Policy konnte nicht gefunden
+      NotChanged: Default Private Label Policy wurde nicht verändert
     PasswordComplexityPolicy:
       NotFound: Default Password Complexity Policy konnte nicht gefunden werden
       NotExisting: Default Password Complexity Policy existiert nicht
       AlreadyExists: Default Password Complexity Policy existiert bereits
       Empty: Default Password Complexity Policy leer
+      NotChanged: Default Password Complexity Policy wurde nicht verändert
     PasswordAgePolicy:
       NotFound: Default Password Age Policy konnte nicht gefunden werden
       NotExisting: Default Password Age Policy existiert nicht
       AlreadyExists: Default Password Age Policy existiert bereits
       Empty: Default Password Age Policy leer
+      NotChanged: Default Password Age Policy wurde nicht verändert
     PasswordLockoutPolicy:
       NotFound: Default Password Lockout Policy konnte nicht gefunden werden
       NotExisting: Default Password Lockout Policy existiert nicht
       AlreadyExists: Default Password Lockout Policy existiert bereits
       Empty: Default Password Lockout Policy leer
+      NotChanged: Default Password Lockout Policy wurde nicht verändert
     OrgIAMPolicy:
       NotFound: Default Org IAM Policy konnte nicht gefunden werden
       NotExisting: Default Org IAM Policy existiert nicht
       AlreadyExists: Default Org IAM Policy existiert bereits
       Empty: Default Org IAM Policy leer
+      NotChanged: Default Org IAM Policy wurde nicht verändert
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:

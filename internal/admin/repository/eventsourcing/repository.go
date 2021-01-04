@@ -2,6 +2,8 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/query"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/handler"
@@ -14,7 +16,6 @@ import (
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	iam_business "github.com/caos/zitadel/internal/v2/business/iam"
 )
 
 type Config struct {
@@ -65,7 +66,11 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	if err != nil {
 		return nil, err
 	}
-	iamV2, err := iam_business.StartRepository(&iam_business.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
+	iamV2Command, err := command.StartCommandSide(&command.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
+	if err != nil {
+		return nil, err
+	}
+	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +95,8 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,
 			Roles:          roles,
-			IAMV2:          iamV2,
+			IAMV2Command:   iamV2Command,
+			IAMV2Query:     iamV2Query,
 		},
 		AdministratorRepo: eventstore.AdministratorRepo{
 			View: view,

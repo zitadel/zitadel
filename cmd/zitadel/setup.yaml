@@ -26,53 +26,53 @@ SetUp:
   Step1:
     GlobalOrg: 'Global'
     IAMProject: 'Zitadel'
-    DefaultLoginPolicy:
-      AllowUsernamePassword: true
-      AllowRegister: true
-      AllowExternalIdp: true  
-    Orgs:
-      - Name: 'Global'
-        Domain: 'global.caos.ch'
-        Default: true
-        OrgIamPolicy: true
-        Users:
-          - FirstName: 'Global Org'
-            LastName: 'Administrator'
-            UserName: 'zitadel-global-org-admin@caos.ch'
-            Email: 'zitadel-global-org-admin@caos.ch'
-            Password: 'Password1!'
-        Owners:
-          - 'zitadel-global-org-admin@caos.ch'
-      - Name: 'CAOS AG'
-        Domain: 'caos.ch'
-        Users:
-          - FirstName: 'Zitadel'
-            LastName: 'Administrator'
-            UserName: 'zitadel-admin'
-            Email: 'zitadel-admin@caos.ch'
-            Password: 'Password1!'
-        Owners:
-          - 'zitadel-admin@caos.ch'
-        Projects:
-          - Name: 'Zitadel'
-            OIDCApps:
-              - Name: 'Management-API'
-              - Name: 'Auth-API'
-              - Name: 'Admin-API'
-              - Name: 'Zitadel Console'
-                RedirectUris:
-                  - '$ZITADEL_CONSOLE/auth/callback'
-                PostLogoutRedirectUris:
-                  - '$ZITADEL_CONSOLE/signedout'
-                ResponseTypes:
-                  - $ZITADEL_CONSOLE_RESPONSE_TYPE
-                GrantTypes:
-                  - $ZITADEL_CONSOLE_GRANT_TYPE
-                ApplicationType: 'USER_AGENT'
-                AuthMethodType: 'NONE'
-                DevMode: $ZITADEL_CONSOLE_DEV_MODE
-    Owners:
-      - 'zitadel-admin@caos.ch'
+#    DefaultLoginPolicy:
+#      AllowUsernamePassword: true
+#      AllowRegister: true
+#      AllowExternalIdp: true
+#    Orgs:
+#      - Name: 'Global'
+#        Domain: 'global.caos.ch'
+#        Default: true
+#        OrgIamPolicy: true
+#        Users:
+#          - FirstName: 'Global Org'
+#            LastName: 'Administrator'
+#            UserName: 'zitadel-global-org-admin@caos.ch'
+#            Email: 'zitadel-global-org-admin@caos.ch'
+#            Password: 'Password1!'
+#        Owners:
+#          - 'zitadel-global-org-admin@caos.ch'
+#      - Name: 'CAOS AG'
+#        Domain: 'caos.ch'
+#        Users:
+#          - FirstName: 'Zitadel'
+#            LastName: 'Administrator'
+#            UserName: 'zitadel-admin'
+#            Email: 'zitadel-admin@caos.ch'
+#            Password: 'Password1!'
+#        Owners:
+#          - 'zitadel-admin@caos.ch'
+#        Projects:
+#          - Name: 'Zitadel'
+#            OIDCApps:
+#              - Name: 'Management-API'
+#              - Name: 'Auth-API'
+#              - Name: 'Admin-API'
+#              - Name: 'Zitadel Console'
+#                RedirectUris:
+#                  - '$ZITADEL_CONSOLE/auth/callback'
+#                PostLogoutRedirectUris:
+#                  - '$ZITADEL_CONSOLE/signedout'
+#                ResponseTypes:
+#                  - $ZITADEL_CONSOLE_RESPONSE_TYPE
+#                GrantTypes:
+#                  - $ZITADEL_CONSOLE_GRANT_TYPE
+#                ApplicationType: 'USER_AGENT'
+#                AuthMethodType: 'NONE'
+#                DevMode: $ZITADEL_CONSOLE_DEV_MODE
+#    Owners:
+#      - 'zitadel-admin@caos.ch'
   Step2:
     DefaultPasswordComplexityPolicy:
       MinLength: 8

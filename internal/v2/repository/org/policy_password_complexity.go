@@ -1,36 +1,68 @@
 package org
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/policy/password_complexity"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 var (
-	PasswordComplexityPolicyAddedEventType   = orgEventTypePrefix + password_complexity.PasswordComplexityPolicyAddedEventType
-	PasswordComplexityPolicyChangedEventType = orgEventTypePrefix + password_complexity.PasswordComplexityPolicyChangedEventType
+	PasswordComplexityPolicyAddedEventType   = orgEventTypePrefix + policy.PasswordComplexityPolicyAddedEventType
+	PasswordComplexityPolicyChangedEventType = orgEventTypePrefix + policy.PasswordComplexityPolicyChangedEventType
 )
 
-type PasswordComplexityPolicyReadModel struct {
-	password_complexity.ReadModel
+type PasswordComplexityPolicyAddedEvent struct {
+	policy.PasswordComplexityPolicyAddedEvent
 }
 
-func (rm *PasswordComplexityPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *PasswordComplexityPolicyAddedEvent:
-			rm.ReadModel.AppendEvents(&e.AddedEvent)
-		case *PasswordComplexityPolicyChangedEvent:
-			rm.ReadModel.AppendEvents(&e.ChangedEvent)
-		case *password_complexity.AddedEvent, *password_complexity.ChangedEvent:
-			rm.ReadModel.AppendEvents(e)
-		}
+func NewPasswordComplexityPolicyAddedEvent(
+	ctx context.Context,
+	minLength uint64,
+	hasLowercase,
+	hasUppercase,
+	hasNumber,
+	hasSymbol bool,
+) *PasswordComplexityPolicyAddedEvent {
+	return &PasswordComplexityPolicyAddedEvent{
+		PasswordComplexityPolicyAddedEvent: *policy.NewPasswordComplexityPolicyAddedEvent(
+			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
+			minLength,
+			hasLowercase,
+			hasUppercase,
+			hasNumber,
+			hasSymbol),
 	}
 }
 
-type PasswordComplexityPolicyAddedEvent struct {
-	password_complexity.AddedEvent
+func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.PasswordComplexityPolicyAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PasswordComplexityPolicyAddedEvent{PasswordComplexityPolicyAddedEvent: *e.(*policy.PasswordComplexityPolicyAddedEvent)}, nil
 }
 
 type PasswordComplexityPolicyChangedEvent struct {
-	password_complexity.ChangedEvent
+	policy.PasswordComplexityPolicyChangedEvent
+}
+
+func NewPasswordComplexityPolicyChangedEvent(
+	ctx context.Context,
+) *PasswordComplexityPolicyChangedEvent {
+	return &PasswordComplexityPolicyChangedEvent{
+		PasswordComplexityPolicyChangedEvent: *policy.NewPasswordComplexityPolicyChangedEvent(
+			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
+		),
+	}
+}
+
+func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.PasswordComplexityPolicyChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PasswordComplexityPolicyChangedEvent{PasswordComplexityPolicyChangedEvent: *e.(*policy.PasswordComplexityPolicyChangedEvent)}, nil
 }

@@ -12,12 +12,12 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 type UserGrant struct {
@@ -224,7 +224,7 @@ func (u *UserGrant) setIamProjectID() error {
 	if err != nil {
 		return err
 	}
-	if iam.SetUpDone < iam_model.StepCount-1 {
+	if iam.SetUpDone < domain.StepCount-1 {
 		return caos_errs.ThrowPreconditionFailed(nil, "HANDL-s5DTs", "Setup not done")
 	}
 	u.iamProjectID = iam.IAMProjectID

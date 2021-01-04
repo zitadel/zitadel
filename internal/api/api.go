@@ -6,6 +6,7 @@ import (
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
+	"github.com/caos/zitadel/internal/v2/domain"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"go.opentelemetry.io/otel/api/metric"
 	"net/http"
@@ -98,10 +99,10 @@ func (a *API) healthHandler() http.Handler {
 			if err != nil && !errors.IsNotFound(err) {
 				return errors.ThrowPreconditionFailed(err, "API-dsgT2", "IAM SETUP CHECK FAILED")
 			}
-			if iam == nil || iam.SetUpStarted < iam_model.StepCount-1 {
+			if iam == nil || iam.SetUpStarted < domain.StepCount-1 {
 				return errors.ThrowPreconditionFailed(nil, "API-HBfs3", "IAM NOT SET UP")
 			}
-			if iam.SetUpDone < iam_model.StepCount-1 {
+			if iam.SetUpDone < domain.StepCount-1 {
 				return errors.ThrowPreconditionFailed(nil, "API-DASs2", "IAM SETUP RUNNING")
 			}
 			return nil

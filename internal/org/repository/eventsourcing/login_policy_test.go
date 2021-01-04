@@ -314,7 +314,7 @@ func TestLoginPolicyIdpProviderAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyIDPProviderAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "IAMID")(tt.args.ctx)
+			agg, err := LoginPolicyIDPProviderAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "iamID")(tt.args.ctx)
 			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
 				return
@@ -509,7 +509,7 @@ func TestLoginPolicySecondFactorAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicySecondFactorAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "IAMID")(tt.args.ctx)
+			agg, err := LoginPolicySecondFactorAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "iamID")(tt.args.ctx)
 			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
 				return
@@ -682,7 +682,7 @@ func TestLoginPolicyMultiFactorAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := LoginPolicyMultiFactorAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "IAMID")(tt.args.ctx)
+			agg, err := LoginPolicyMultiFactorAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, "iamID")(tt.args.ctx)
 			if tt.res.wantErr && !tt.res.errFunc(err) || (err != nil && !tt.res.wantErr) {
 				t.Errorf("got wrong err: %v ", err)
 				return

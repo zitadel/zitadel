@@ -17,15 +17,21 @@ Errors:
     NotLocked: User is not locked
     NoChanges: No changes found
     InitCodeNotFound: Initialization Code not found
-    ProfileNotFound: Profile not found
-    ProfileInvalid: Profildata invalid
-    EmailNotFound: Email not found
-    EmailInvalid: Email is invalid
-    EmailAlreadyVerified: Email is alredy verified
+    Profile:
+      NotFound: Profile not found
+      NotChanged: Profile not changed
+      Invalid: Profildata invalid
+    Email:
+      NotFound: Email not found
+      Invalid: Email is invalid
+      AlreadyVerified: Email is alredy verified
+      NotChanged: Email not changed
     PhoneNotFound: Phone not found
     PhoneInvalid: Phone is invalid
     PhoneAlreadyVerified: Phone already verified
-    AddressNotFound: Address not found
+    Address:
+      NotFound: Address not found
+      NotChanged: Address not changed
     NotHuman: The User must be personal
     NotMachine: The User must be technical
     NotAllowedToLink: User is not allowed to link with external login provider
@@ -164,6 +170,8 @@ Errors:
     GrantHasNotExistingRole: One role doesn't exist on project
     UserIDMisisng: User ID missing
   IAM:
+    Member:
+      RolesNotChanged: Roles habe not been changed
     MemberInvalid: Member is invalid
     MemberAlreadyExisting: Member already exists
     MemberNotExisting: Member does not exist
@@ -179,6 +187,7 @@ Errors:
     IdpProviderInvalid: Idp Provider is invalid
     LoginPolicy:
       NotFound: Default Login Policy not found
+      NotChanged: Default Login Policy has not been changed
       NotExisting: Default Login Policy not existig
       AlreadyExists: Default Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
@@ -187,28 +196,38 @@ Errors:
         AlreadyExists: Multifactor already exists
         NotExisting: Multifactor not existing
         Unspecified: Multifactor invalid
+      IDPConfig:
+        AlreadyExists: Identity Provider Configuration already exists
+        NotExisting: Identity Provider Configuration doesn't exist
+        NotInactive: Identity Provider Configuration not inactive
+        NotActive: Identity Provider Configuration not active
     LabelPolicy:
       NotFound: Default Private Label Policy not found
+      NotChanged: Default Private Label Policy has not been changed
     PasswordComplexityPolicy:
       NotFound: Default Private Label Policy not found
       NotExisting: Default Password Complexity Policy not existing
       AlreadyExists: Default Password Complexity Policy already existing
       Empty: Default Password Complexity Policy empty
+      NotChanged: Default Password Complexity Policy has not been changed
     PasswordAgePolicy:
       NotFound: Default Password Age Policy not found
       NotExisting: Default Password Age Policy not existing
       AlreadyExists: Default Password Age Policy already existing
       Empty: Default Password Age Policy empty
+      NotChanged: Default Password Age Policy has not been changed
     PasswordLockoutPolicy:
       NotFound: Default Password Lockout Policy not found
       NotExisting: Default Password Lockout Policy not existing
       AlreadyExists: Default Password Lockout Policy already existing
       Empty: Default Password Lockout Policy empty
+      NotChanged: Default Password Lockout Policy has not been changed
     OrgIAMPolicy:
       NotFound: Org IAM Policy not found
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy not existing
       AlreadyExists: Org IAM Policy already exists
+      NotChanged: Org IAM Policy has not been changed
   Policy:
     AlreadyExists: Policy already exists
   UserGrant:

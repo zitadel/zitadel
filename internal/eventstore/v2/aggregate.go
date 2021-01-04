@@ -3,7 +3,7 @@ package eventstore
 type aggregater interface {
 	//ID returns the aggreagte id
 	ID() string
-	//Type returns the aggregate type
+	//KeyType returns the aggregate type
 	Type() AggregateType
 	//Events returns the events which will be pushed
 	Events() []EventPusher
@@ -74,7 +74,7 @@ func (a *Aggregate) ID() string {
 	return a.id
 }
 
-//Type implements aggregater
+//KeyType implements aggregater
 func (a *Aggregate) Type() AggregateType {
 	return a.typ
 }

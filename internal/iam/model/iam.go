@@ -2,6 +2,7 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 type Step int
@@ -23,8 +24,8 @@ type IAM struct {
 	es_models.ObjectRoot
 	GlobalOrgID                     string
 	IAMProjectID                    string
-	SetUpDone                       Step
-	SetUpStarted                    Step
+	SetUpDone                       domain.Step
+	SetUpStarted                    domain.Step
 	Members                         []*IAMMember
 	IDPs                            []*IDPConfig
 	DefaultLoginPolicy              *LoginPolicy
