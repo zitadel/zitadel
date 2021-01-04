@@ -2,7 +2,7 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 type Step int

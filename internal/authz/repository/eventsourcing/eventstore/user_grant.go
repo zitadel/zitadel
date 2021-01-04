@@ -9,7 +9,7 @@ import (
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 type UserGrantRepo struct {

@@ -17,7 +17,7 @@ import (
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 type UserGrant struct {

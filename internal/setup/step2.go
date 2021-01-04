@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/v2/business/command"
+	"github.com/caos/zitadel/internal/v2/command"
 )
 
 type Step2 struct {

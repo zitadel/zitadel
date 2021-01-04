@@ -6,7 +6,7 @@ import (
 	"github.com/caos/logging"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/v2/business/command"
+	"github.com/caos/zitadel/internal/v2/command"
 )
 
 type Step1 struct {

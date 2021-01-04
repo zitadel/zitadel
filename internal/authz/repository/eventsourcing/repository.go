@@ -2,7 +2,7 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/business/query"
+	"github.com/caos/zitadel/internal/v2/query"
 
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 

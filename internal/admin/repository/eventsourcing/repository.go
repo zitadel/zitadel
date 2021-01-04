@@ -2,8 +2,8 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/business/command"
-	"github.com/caos/zitadel/internal/v2/business/query"
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/query"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/handler"

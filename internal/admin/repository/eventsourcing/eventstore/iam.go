@@ -2,7 +2,7 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/business/query"
+	"github.com/caos/zitadel/internal/v2/query"
 	"strings"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -19,7 +19,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/v2/business/command"
+	"github.com/caos/zitadel/internal/v2/command"
 )
 
 type IAMRepository struct {

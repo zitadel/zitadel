@@ -2,26 +2,47 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
+	"golang.org/x/text/language"
 )
 
-type UserWriteModel struct {
+type HumanWriteModel struct {
 	eventstore.WriteModel
 
-	UserName  string
+	UserName string
+
+	FirstName         string
+	LastName          string
+	NickName          string
+	DisplayName       string
+	PreferredLanguage language.Tag
+	Gender            domain.Gender
+
+	Email           string
+	IsEmailVerified bool
+
+	Phone           string
+	IsPhoneVerified bool
+
+	Country       string
+	Locality      string
+	PostalCode    string
+	Region        string
+	StreetAddress string
+
 	UserState domain.UserState
 }
 
-func NewUserWriteModel(userID string) *UserWriteModel {
-	return &UserWriteModel{
+func NewHumanWriteModel(userID string) *HumanWriteModel {
+	return &HumanWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID: userID,
 		},
 	}
 }
 
-func (wm *UserWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *HumanWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanEmailChangedEvent:
@@ -29,8 +50,6 @@ func (wm *UserWriteModel) AppendEvents(events ...eventstore.EventReader) {
 		case *user.HumanEmailVerifiedEvent:
 			wm.AppendEvents(e)
 		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.AppendEvents(e)
-		case *user.MachineAddedEvent:
 			wm.AppendEvents(e)
 		case *user.UserDeactivatedEvent:
 			wm.AppendEvents(e)
@@ -47,7 +66,7 @@ func (wm *UserWriteModel) AppendEvents(events ...eventstore.EventReader) {
 }
 
 //TODO: Compute State? initial/active
-func (wm *UserWriteModel) Reduce() error {
+func (wm *HumanWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
@@ -56,10 +75,6 @@ func (wm *UserWriteModel) Reduce() error {
 		case *user.HumanRegisteredEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateInitial
-
-		case *user.MachineAddedEvent:
-			wm.UserName = e.UserName
-			wm.UserState = domain.UserStateActive
 		case *user.UserLockedEvent:
 			if wm.UserState != domain.UserStateDeleted {
 				wm.UserState = domain.UserStateLocked
@@ -83,13 +98,7 @@ func (wm *UserWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID)
-}
-
-func UserAggregateFromWriteModel(wm *eventstore.WriteModel) *user.Aggregate {
-	return &user.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, user.AggregateType, user.AggregateVersion),
-	}
 }

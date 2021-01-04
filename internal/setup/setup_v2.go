@@ -11,8 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/v2/business/command"
-	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 func StartSetupV2(esConfig es_int.Config, sd systemdefaults.SystemDefaults) (*Setup, error) {

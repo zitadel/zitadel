@@ -4,7 +4,7 @@ import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 

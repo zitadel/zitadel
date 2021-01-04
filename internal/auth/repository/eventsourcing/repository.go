@@ -20,7 +20,7 @@ import (
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/v2/business/query"
+	"github.com/caos/zitadel/internal/v2/query"
 )
 
 type Config struct {

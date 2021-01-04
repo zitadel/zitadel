@@ -4,7 +4,7 @@ import (
 	"context"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/v2/business/command"
+	"github.com/caos/zitadel/internal/v2/command"
 )
 
 type step interface {

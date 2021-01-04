@@ -8,7 +8,7 @@ import (
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/v2/business/command"
+	"github.com/caos/zitadel/internal/v2/command"
 )
 
 type Setup struct {

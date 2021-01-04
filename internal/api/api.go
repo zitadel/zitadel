@@ -6,7 +6,7 @@ import (
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
-	"github.com/caos/zitadel/internal/v2/business/domain"
+	"github.com/caos/zitadel/internal/v2/domain"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"go.opentelemetry.io/otel/api/metric"
 	"net/http"
