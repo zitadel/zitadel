@@ -1,9 +1,9 @@
 package handler
 
 import (
-	auth_model "github.com/caos/zitadel/internal/auth/model"
 	"net/http"
 
+	auth_model "github.com/caos/zitadel/internal/auth/model"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -15,14 +15,14 @@ const (
 )
 
 type registerOrgFormData struct {
-	OrgName      string `schema:"orgname"`
-	Email        string `schema:"email"`
-	Username     string `schema:"username"`
-	Firstname    string `schema:"firstname"`
-	Lastname     string `schema:"lastname"`
-	Password     string `schema:"register-password"`
-	Password2    string `schema:"register-password-confirmation"`
-	TermsConfirm bool   `schema:"terms-confirm"`
+	RegisterOrgName string `schema:"orgname"`
+	Email           string `schema:"email"`
+	Username        string `schema:"username"`
+	Firstname       string `schema:"firstname"`
+	Lastname        string `schema:"lastname"`
+	Password        string `schema:"register-password"`
+	Password2       string `schema:"register-password-confirmation"`
+	TermsConfirm    bool   `schema:"terms-confirm"`
 }
 
 type registerOrgData struct {
@@ -140,6 +140,6 @@ func (d registerOrgFormData) toUserModel() *usr_model.User {
 
 func (d registerOrgFormData) toOrgModel() *org_model.Org {
 	return &org_model.Org{
-		Name: d.OrgName,
+		Name: d.RegisterOrgName,
 	}
 }

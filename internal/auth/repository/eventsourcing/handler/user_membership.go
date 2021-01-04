@@ -3,23 +3,20 @@ package handler
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-
 	"github.com/caos/logging"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -88,7 +85,7 @@ func (m *UserMembership) EventQuery() (*models.SearchQuery, error) {
 func (m *UserMembership) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case iam_es_model.IAMAggregate:
-		err = m.processIam(event)
+		err = m.processIAM(event)
 	case org_es_model.OrgAggregate:
 		err = m.processOrg(event)
 	case proj_es_model.ProjectAggregate:
@@ -99,7 +96,7 @@ func (m *UserMembership) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (m *UserMembership) processIam(event *models.Event) (err error) {
+func (m *UserMembership) processIAM(event *models.Event) (err error) {
 	member := new(usr_es_model.UserMembershipView)
 	err = member.AppendEvent(event)
 	if err != nil {

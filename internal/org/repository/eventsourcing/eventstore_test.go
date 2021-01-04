@@ -179,7 +179,7 @@ func TestOrgEventstore_OrgByID(t *testing.T) {
 		{
 			name: "new events found and added success",
 			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{
-				{Sequence: 6},
+				{Sequence: 6, AggregateID: "hodor-org"},
 			}, nil)},
 			args: args{
 				ctx: authz.NewMockContext("user", "org"),

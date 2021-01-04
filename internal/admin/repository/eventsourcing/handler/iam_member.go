@@ -74,14 +74,14 @@ func (m *IAMMember) EventQuery() (*es_models.SearchQuery, error) {
 func (m *IAMMember) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IAMAggregate:
-		err = m.processIamMember(event)
+		err = m.processIAMMember(event)
 	case usr_es_model.UserAggregate:
 		err = m.processUser(event)
 	}
 	return err
 }
 
-func (m *IAMMember) processIamMember(event *es_models.Event) (err error) {
+func (m *IAMMember) processIAMMember(event *es_models.Event) (err error) {
 	member := new(iam_model.IAMMemberView)
 	switch event.Type {
 	case model.IAMMemberAdded:

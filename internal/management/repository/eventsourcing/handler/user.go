@@ -214,7 +214,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 		}
 	}
 	if !policy.UserLoginMustBeDomain {
-		return nil
+		return u.view.ProcessedUserSequence(event)
 	}
 	users, err := u.view.UsersByOrgID(event.AggregateID)
 	if err != nil {

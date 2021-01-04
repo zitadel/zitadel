@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
@@ -42,16 +43,16 @@ func (v *View) PutOrgMembers(members []*model.OrgMemberView, event *models.Event
 
 func (v *View) DeleteOrgMember(orgID, userID string, event *models.Event) error {
 	err := view.DeleteOrgMember(v.Db, orgMemberTable, orgID, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedOrgMemberSequence(event)
 }
 
 func (v *View) DeleteOrgMembersByUserID(userID string, event *models.Event) error {
 	err := view.DeleteOrgMembersByUserID(v.Db, orgMemberTable, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedOrgMemberSequence(event)
 }

@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/key/repository/view"
@@ -42,16 +43,16 @@ func (v *View) PutKeys(privateKey, publicKey *model.KeyView, event *models.Event
 
 func (v *View) DeleteKey(keyID string, private bool, event *models.Event) error {
 	err := view.DeleteKey(v.Db, keyTable, keyID, private)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedKeySequence(event)
 }
 
 func (v *View) DeleteKeyPair(keyID string, event *models.Event) error {
 	err := view.DeleteKeyPair(v.Db, keyTable, keyID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedKeySequence(event)
 }

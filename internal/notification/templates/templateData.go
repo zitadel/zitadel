@@ -24,6 +24,8 @@ func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]inter
 	data.Subject = i18n.Localize(data.Subject, nil, langs...)
 	data.Greeting = i18n.Localize(data.Greeting, args, langs...)
 	data.Text = html.UnescapeString(i18n.Localize(data.Text, args, langs...))
-	data.Href = i18n.Localize(data.Href, nil, langs...)
+	if data.Href != "" {
+		data.Href = i18n.Localize(data.Href, nil, langs...)
+	}
 	data.ButtonText = i18n.Localize(data.ButtonText, nil, langs...)
 }

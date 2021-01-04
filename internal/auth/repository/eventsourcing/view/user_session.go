@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
@@ -45,8 +46,8 @@ func (v *View) PutUserSessions(userSession []*model.UserSessionView, event *mode
 
 func (v *View) DeleteUserSessions(userID string, event *models.Event) error {
 	err := view.DeleteUserSessions(v.Db, userSessionTable, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedUserSessionSequence(event)
 }
