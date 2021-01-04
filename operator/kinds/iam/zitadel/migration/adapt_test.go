@@ -77,9 +77,6 @@ func TestMigration_AdaptFunc(t *testing.T) {
 
 	allScripts := getMigrationFiles(localMigrationsPath)
 
-	initContainers := getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName)
-	initContainers = append(initContainers, getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users))
-
 	componentLabels := mocklabels.Component
 	jobName := labels.MustForName(componentLabels, jobNamePrefix+reason)
 
@@ -99,9 +96,10 @@ func TestMigration_AdaptFunc(t *testing.T) {
 					NodeSelector:    nodeselector,
 					Tolerations:     tolerations,
 					SecurityContext: &corev1.PodSecurityContext{},
-					InitContainers:  initContainers,
-					Containers:      getPostContainers(dbHost, dbPort, migrationUser, secretPasswordName),
-
+					InitContainers:  getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName),
+					Containers: []corev1.Container{
+						getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users),
+					},
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",
 					SchedulerName:                 "default-scheduler",
