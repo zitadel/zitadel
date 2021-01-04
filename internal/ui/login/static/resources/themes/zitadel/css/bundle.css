@@ -98,7 +98,7 @@ footer a {
   vertical-align: middle;
 }
 
-input:not([type=radio]), .lgn-input {
+input:not([type=radio]):not([type=checkbox]), .lgn-input {
   display: block;
   box-sizing: border-box;
   padding-inline-start: 10px;
@@ -117,7 +117,7 @@ input:not([type=radio]), .lgn-input {
   width: 100%;
   margin: 0 0 2px 0;
 }
-input:not([type=radio])::placeholder, .lgn-input::placeholder {
+input:not([type=radio]):not([type=checkbox])::placeholder, .lgn-input::placeholder {
   font-size: 14px;
   font-style: italic;
 }
@@ -152,6 +152,82 @@ select::placeholder, .lgn-select::placeholder {
   transition: color 0.2s ease;
   margin: 0 0 2px 0;
   font-weight: 400;
+}
+
+.lgn-checkbox {
+  /* Input */
+  /* Span */
+  /* Box */
+  /* Checkmark */
+  /* Checked, Indeterminate */
+  /* Active */
+}
+.lgn-checkbox .lgn-checkbox {
+  z-index: 0;
+  position: relative;
+  display: block;
+  font-size: 16px;
+  line-height: 28px;
+}
+.lgn-checkbox .lgn-checkbox > input {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  z-index: -1;
+  position: absolute;
+  left: -10px;
+  top: -8px;
+  display: block;
+  margin: 0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: none;
+  outline: none;
+  transform: scale(1);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+}
+.lgn-checkbox .lgn-checkbox > span::before {
+  content: "";
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 3px 11px 3px 1px;
+  border: solid 2px;
+  /* Safari */
+  border-radius: 2px;
+  width: 18px;
+  height: 18px;
+  vertical-align: top;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 1px;
+  width: 10px;
+  height: 5px;
+  border: solid 2px transparent;
+  border-right: none;
+  border-top: none;
+  transform: translate(3px, 4px) rotate(-45deg);
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 
 @keyframes ripple {
@@ -367,6 +443,82 @@ i {
   font-size: 14px;
   outline: none;
   font-weight: bold;
+}
+
+.lgn-checkbox {
+  /* Input */
+  /* Span */
+  /* Box */
+  /* Checkmark */
+  /* Checked, Indeterminate */
+  /* Active */
+}
+.lgn-checkbox .lgn-checkbox {
+  z-index: 0;
+  position: relative;
+  display: block;
+  font-size: 16px;
+  line-height: 28px;
+}
+.lgn-checkbox .lgn-checkbox > input {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  z-index: -1;
+  position: absolute;
+  left: -10px;
+  top: -8px;
+  display: block;
+  margin: 0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: none;
+  outline: none;
+  transform: scale(1);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+}
+.lgn-checkbox .lgn-checkbox > span::before {
+  content: "";
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 3px 11px 3px 1px;
+  border: solid 2px;
+  /* Safari */
+  border-radius: 2px;
+  width: 18px;
+  height: 18px;
+  vertical-align: top;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 1px;
+  width: 10px;
+  height: 5px;
+  border: solid 2px transparent;
+  border-right: none;
+  border-top: none;
+  transform: translate(3px, 4px) rotate(-45deg);
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 
 @font-face {
@@ -540,7 +692,7 @@ footer a {
   vertical-align: middle;
 }
 
-input:not([type=radio]), .lgn-input {
+input:not([type=radio]):not([type=checkbox]), .lgn-input {
   display: block;
   box-sizing: border-box;
   padding-inline-start: 10px;
@@ -559,7 +711,7 @@ input:not([type=radio]), .lgn-input {
   width: 100%;
   margin: 0 0 2px 0;
 }
-input:not([type=radio])::placeholder, .lgn-input::placeholder {
+input:not([type=radio]):not([type=checkbox])::placeholder, .lgn-input::placeholder {
   font-size: 14px;
   font-style: italic;
 }
@@ -594,6 +746,82 @@ select::placeholder, .lgn-select::placeholder {
   transition: color 0.2s ease;
   margin: 0 0 2px 0;
   font-weight: 400;
+}
+
+.lgn-checkbox {
+  /* Input */
+  /* Span */
+  /* Box */
+  /* Checkmark */
+  /* Checked, Indeterminate */
+  /* Active */
+}
+.lgn-checkbox .lgn-checkbox {
+  z-index: 0;
+  position: relative;
+  display: block;
+  font-size: 16px;
+  line-height: 28px;
+}
+.lgn-checkbox .lgn-checkbox > input {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  z-index: -1;
+  position: absolute;
+  left: -10px;
+  top: -8px;
+  display: block;
+  margin: 0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: none;
+  outline: none;
+  transform: scale(1);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+}
+.lgn-checkbox .lgn-checkbox > span::before {
+  content: "";
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 3px 11px 3px 1px;
+  border: solid 2px;
+  /* Safari */
+  border-radius: 2px;
+  width: 18px;
+  height: 18px;
+  vertical-align: top;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 1px;
+  width: 10px;
+  height: 5px;
+  border: solid 2px transparent;
+  border-right: none;
+  border-top: none;
+  transform: translate(3px, 4px) rotate(-45deg);
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 
 @keyframes ripple {
@@ -809,6 +1037,82 @@ i {
   font-size: 14px;
   outline: none;
   font-weight: bold;
+}
+
+.lgn-checkbox {
+  /* Input */
+  /* Span */
+  /* Box */
+  /* Checkmark */
+  /* Checked, Indeterminate */
+  /* Active */
+}
+.lgn-checkbox .lgn-checkbox {
+  z-index: 0;
+  position: relative;
+  display: block;
+  font-size: 16px;
+  line-height: 28px;
+}
+.lgn-checkbox .lgn-checkbox > input {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  z-index: -1;
+  position: absolute;
+  left: -10px;
+  top: -8px;
+  display: block;
+  margin: 0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: none;
+  outline: none;
+  transform: scale(1);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+}
+.lgn-checkbox .lgn-checkbox > span::before {
+  content: "";
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 3px 11px 3px 1px;
+  border: solid 2px;
+  /* Safari */
+  border-radius: 2px;
+  width: 18px;
+  height: 18px;
+  vertical-align: top;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 1px;
+  width: 10px;
+  height: 5px;
+  border: solid 2px transparent;
+  border-right: none;
+  border-top: none;
+  transform: translate(3px, 4px) rotate(-45deg);
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 
 @font-face {

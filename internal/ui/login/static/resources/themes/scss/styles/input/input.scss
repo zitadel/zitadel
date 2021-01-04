@@ -1,6 +1,6 @@
 @import './input_base.scss';
 
-input:not([type='radio']), .lgn-input {
+input:not([type='radio']):not([type='checkbox']), .lgn-input {
   @include lgn-input-base;
 }
 

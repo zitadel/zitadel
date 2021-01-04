@@ -1,0 +1,84 @@
+$lgn-checkbox-font-size: 16px !default;
+
+@mixin lgn-checkbox-base {
+    .lgn-checkbox {
+        z-index: 0;
+        position: relative;
+        display: block;
+        font-size: $lgn-checkbox-font-size;
+        line-height: 28px;
+    }
+
+    /* Input */
+    .lgn-checkbox > input {
+        appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        z-index: -1;
+        position: absolute;
+        left: -10px;
+        top: -8px;
+        display: block;
+        margin: 0;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        box-shadow: none;
+        outline: none;
+        // opacity: 0;
+        transform: scale(1);
+        pointer-events: none;
+        transition: opacity 0.3s, transform 0.2s;
+    }
+
+    /* Span */
+    .lgn-checkbox > span {
+        display: inline-block;
+        width: 100%;
+        cursor: pointer;
+    }
+
+    /* Box */
+    .lgn-checkbox > span::before {
+        content: "";
+        display: inline-block;
+        box-sizing: border-box;
+        margin: 3px 11px 3px 1px;
+        border: solid 2px; /* Safari */
+        border-radius: 2px;
+        width: 18px;
+        height: 18px;
+        vertical-align: top;
+        transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    /* Checkmark */
+    .lgn-checkbox > span::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 3px;
+        left: 1px;
+        width: 10px;
+        height: 5px;
+        border: solid 2px transparent;
+        border-right: none;
+        border-top: none;
+        transform: translate(3px, 4px) rotate(-45deg);
+    }
+
+    /* Checked, Indeterminate */
+    .lgn-checkbox > input:indeterminate + span::after {
+        border-left: none;
+        transform: translate(4px, 3px);
+    }
+
+    /* Active */
+    .lgn-checkbox > input:active {
+        transition: transform 0s, opacity 0s;
+    }
+
+    .lgn-checkbox > input:disabled + span {
+        cursor: initial;
+    }
+}

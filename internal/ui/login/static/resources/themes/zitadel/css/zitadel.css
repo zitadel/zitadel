@@ -98,7 +98,7 @@ footer a {
   vertical-align: middle;
 }
 
-input:not([type=radio]), .lgn-input {
+input:not([type=radio]):not([type=checkbox]), .lgn-input {
   display: block;
   box-sizing: border-box;
   padding-inline-start: 10px;
@@ -117,7 +117,7 @@ input:not([type=radio]), .lgn-input {
   width: 100%;
   margin: 0 0 2px 0;
 }
-input:not([type=radio])::placeholder, .lgn-input::placeholder {
+input:not([type=radio]):not([type=checkbox])::placeholder, .lgn-input::placeholder {
   font-size: 14px;
   font-style: italic;
 }
@@ -152,6 +152,82 @@ select::placeholder, .lgn-select::placeholder {
   transition: color 0.2s ease;
   margin: 0 0 2px 0;
   font-weight: 400;
+}
+
+.lgn-checkbox {
+  /* Input */
+  /* Span */
+  /* Box */
+  /* Checkmark */
+  /* Checked, Indeterminate */
+  /* Active */
+}
+.lgn-checkbox .lgn-checkbox {
+  z-index: 0;
+  position: relative;
+  display: block;
+  font-size: 16px;
+  line-height: 28px;
+}
+.lgn-checkbox .lgn-checkbox > input {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  z-index: -1;
+  position: absolute;
+  left: -10px;
+  top: -8px;
+  display: block;
+  margin: 0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: none;
+  outline: none;
+  transform: scale(1);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+}
+.lgn-checkbox .lgn-checkbox > span::before {
+  content: "";
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 3px 11px 3px 1px;
+  border: solid 2px;
+  /* Safari */
+  border-radius: 2px;
+  width: 18px;
+  height: 18px;
+  vertical-align: top;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 1px;
+  width: 10px;
+  height: 5px;
+  border: solid 2px transparent;
+  border-right: none;
+  border-top: none;
+  transform: translate(3px, 4px) rotate(-45deg);
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 
 @keyframes ripple {
@@ -367,6 +443,82 @@ i {
   font-size: 14px;
   outline: none;
   font-weight: bold;
+}
+
+.lgn-checkbox {
+  /* Input */
+  /* Span */
+  /* Box */
+  /* Checkmark */
+  /* Checked, Indeterminate */
+  /* Active */
+}
+.lgn-checkbox .lgn-checkbox {
+  z-index: 0;
+  position: relative;
+  display: block;
+  font-size: 16px;
+  line-height: 28px;
+}
+.lgn-checkbox .lgn-checkbox > input {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  z-index: -1;
+  position: absolute;
+  left: -10px;
+  top: -8px;
+  display: block;
+  margin: 0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: none;
+  outline: none;
+  transform: scale(1);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+}
+.lgn-checkbox .lgn-checkbox > span::before {
+  content: "";
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 3px 11px 3px 1px;
+  border: solid 2px;
+  /* Safari */
+  border-radius: 2px;
+  width: 18px;
+  height: 18px;
+  vertical-align: top;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > span::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 1px;
+  width: 10px;
+  height: 5px;
+  border: solid 2px transparent;
+  border-right: none;
+  border-top: none;
+  transform: translate(3px, 4px) rotate(-45deg);
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 
 @font-face {
@@ -697,6 +849,97 @@ input[type=radio]:disabled:focus {
   opacity: 0;
 }
 
+.lgn-checkbox {
+  color: #5282c1;
+  font-size: 16px;
+  line-height: 28px;
+}
+
+/* Input */
+.lgn-checkbox > input {
+  background-color: #5282c1;
+  box-shadow: none;
+  outline: none;
+  opacity: 0;
+}
+
+/* Span */
+.lgn-checkbox > span {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+  color: white;
+}
+
+/* Box */
+.lgn-checkbox > span::before {
+  border-color: #5282c1;
+}
+
+/* Checked, Indeterminate */
+.lgn-checkbox > input:checked,
+.lgn-checkbox > input:indeterminate {
+  background-color: #5282c1;
+}
+
+.lgn-checkbox > input:checked + span::before,
+.lgn-checkbox > input:indeterminate + span::before {
+  border-color: #5282c1;
+  background-color: #5282c1;
+}
+
+.lgn-checkbox > input:checked + span::after,
+.lgn-checkbox > input:indeterminate + span::after {
+  border-color: black;
+}
+
+/* Hover, Focus */
+.lgn-checkbox:hover > input {
+  opacity: 0.04;
+}
+
+.lgn-checkbox > input:focus {
+  opacity: 0.12;
+}
+
+.lgn-checkbox:hover > input:focus {
+  opacity: 0.16;
+}
+
+/* Active */
+.lgn-checkbox > input:active {
+  opacity: 1;
+  transform: scale(0);
+}
+
+.lgn-checkbox > input:active + span::before {
+  border-color: #6992c9;
+}
+
+.lgn-checkbox > input:checked:active + span::before {
+  border-color: transparent;
+  background-color: #6992c9;
+}
+
+/* Disabled */
+.lgn-checkbox > input:disabled {
+  opacity: 0;
+}
+
+.lgn-checkbox > input:disabled + span {
+  color: #6992c9;
+}
+
+.lgn-checkbox > input:disabled + span::before {
+  border-color: currentColor;
+}
+
+.lgn-checkbox > input:checked:disabled + span::before,
+.lgn-checkbox > input:indeterminate:disabled + span::before {
+  border-color: transparent;
+  background-color: currentColor;
+}
+
 .lgn-label {
   color: #757575;
 }
@@ -777,6 +1020,15 @@ ul li i.lgn-valid {
   color: white;
 }
 
+.lgn-dark-theme {
+  /* Input */
+  /* Span */
+  /* Box */
+  /* Checked, Indeterminate */
+  /* Hover, Focus */
+  /* Active */
+  /* Disabled */
+}
 .lgn-dark-theme .lgn-app-background, .lgn-dark-theme.lgn-app-background {
   background-color: #212224;
   color: white;
@@ -939,6 +1191,73 @@ ul li i.lgn-valid {
 .lgn-dark-theme input[type=radio]:disabled:focus {
   opacity: 0;
 }
+.lgn-dark-theme .lgn-checkbox {
+  color: #5282c1;
+  font-size: 16px;
+  line-height: 28px;
+}
+.lgn-dark-theme .lgn-checkbox > input {
+  background-color: #5282c1;
+  box-shadow: none;
+  outline: none;
+  opacity: 0;
+}
+.lgn-dark-theme .lgn-checkbox > span {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+  color: white;
+}
+.lgn-dark-theme .lgn-checkbox > span::before {
+  border-color: #5282c1;
+}
+.lgn-dark-theme .lgn-checkbox > input:checked,
+.lgn-dark-theme .lgn-checkbox > input:indeterminate {
+  background-color: #5282c1;
+}
+.lgn-dark-theme .lgn-checkbox > input:checked + span::before,
+.lgn-dark-theme .lgn-checkbox > input:indeterminate + span::before {
+  border-color: #5282c1;
+  background-color: #5282c1;
+}
+.lgn-dark-theme .lgn-checkbox > input:checked + span::after,
+.lgn-dark-theme .lgn-checkbox > input:indeterminate + span::after {
+  border-color: black;
+}
+.lgn-dark-theme .lgn-checkbox:hover > input {
+  opacity: 0.04;
+}
+.lgn-dark-theme .lgn-checkbox > input:focus {
+  opacity: 0.12;
+}
+.lgn-dark-theme .lgn-checkbox:hover > input:focus {
+  opacity: 0.16;
+}
+.lgn-dark-theme .lgn-checkbox > input:active {
+  opacity: 1;
+  transform: scale(0);
+}
+.lgn-dark-theme .lgn-checkbox > input:active + span::before {
+  border-color: #6992c9;
+}
+.lgn-dark-theme .lgn-checkbox > input:checked:active + span::before {
+  border-color: transparent;
+  background-color: #6992c9;
+}
+.lgn-dark-theme .lgn-checkbox > input:disabled {
+  opacity: 0;
+}
+.lgn-dark-theme .lgn-checkbox > input:disabled + span {
+  color: #6992c9;
+}
+.lgn-dark-theme .lgn-checkbox > input:disabled + span::before {
+  border-color: currentColor;
+}
+.lgn-dark-theme .lgn-checkbox > input:checked:disabled + span::before,
+.lgn-dark-theme .lgn-checkbox > input:indeterminate:disabled + span::before {
+  border-color: transparent;
+  background-color: currentColor;
+}
 .lgn-dark-theme .lgn-label {
   color: #757575;
 }
@@ -1009,6 +1328,15 @@ ul li i.lgn-valid {
   color: white;
 }
 
+.lgn-light-theme {
+  /* Input */
+  /* Span */
+  /* Box */
+  /* Checked, Indeterminate */
+  /* Hover, Focus */
+  /* Active */
+  /* Disabled */
+}
 .lgn-light-theme .lgn-app-background, .lgn-light-theme.lgn-app-background {
   background-color: #fafafa;
   color: rgba(0, 0, 0, 0.87);
@@ -1170,6 +1498,73 @@ ul li i.lgn-valid {
 }
 .lgn-light-theme input[type=radio]:disabled:focus {
   opacity: 0;
+}
+.lgn-light-theme .lgn-checkbox {
+  color: #5469d4;
+  font-size: 16px;
+  line-height: 28px;
+}
+.lgn-light-theme .lgn-checkbox > input {
+  background-color: #5469d4;
+  box-shadow: none;
+  outline: none;
+  opacity: 0;
+}
+.lgn-light-theme .lgn-checkbox > span {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.87);
+}
+.lgn-light-theme .lgn-checkbox > span::before {
+  border-color: #5469d4;
+}
+.lgn-light-theme .lgn-checkbox > input:checked,
+.lgn-light-theme .lgn-checkbox > input:indeterminate {
+  background-color: #5469d4;
+}
+.lgn-light-theme .lgn-checkbox > input:checked + span::before,
+.lgn-light-theme .lgn-checkbox > input:indeterminate + span::before {
+  border-color: #5469d4;
+  background-color: #5469d4;
+}
+.lgn-light-theme .lgn-checkbox > input:checked + span::after,
+.lgn-light-theme .lgn-checkbox > input:indeterminate + span::after {
+  border-color: black;
+}
+.lgn-light-theme .lgn-checkbox:hover > input {
+  opacity: 0.04;
+}
+.lgn-light-theme .lgn-checkbox > input:focus {
+  opacity: 0.12;
+}
+.lgn-light-theme .lgn-checkbox:hover > input:focus {
+  opacity: 0.16;
+}
+.lgn-light-theme .lgn-checkbox > input:active {
+  opacity: 1;
+  transform: scale(0);
+}
+.lgn-light-theme .lgn-checkbox > input:active + span::before {
+  border-color: #6e80da;
+}
+.lgn-light-theme .lgn-checkbox > input:checked:active + span::before {
+  border-color: transparent;
+  background-color: #6e80da;
+}
+.lgn-light-theme .lgn-checkbox > input:disabled {
+  opacity: 0;
+}
+.lgn-light-theme .lgn-checkbox > input:disabled + span {
+  color: #6e80da;
+}
+.lgn-light-theme .lgn-checkbox > input:disabled + span::before {
+  border-color: currentColor;
+}
+.lgn-light-theme .lgn-checkbox > input:checked:disabled + span::before,
+.lgn-light-theme .lgn-checkbox > input:indeterminate:disabled + span::before {
+  border-color: transparent;
+  background-color: currentColor;
 }
 .lgn-light-theme .lgn-label {
   color: #757575;
