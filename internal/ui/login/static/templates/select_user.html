@@ -3,12 +3,14 @@
 <div class="lgn-head">
     {{if .Linking}}
     <h1>{{t "UserSelection.TitleLinking"}}</h1>
-    <p>{{t "UserSelection.DescriptionLinking"}}{{if .OrgName}} {{t "UserSelection.MustBeMemberOfOrg" "OrgName"
-        .OrgName}}{{end}}</p>
+    <p>{{t "UserSelection.DescriptionLinking"}}{{if .OrgName}} 
+        {{t "UserSelection.MustBeMemberOfOrg" "OrgName" .OrgName}}{{end}}</p>
     {{else}}
     <h1>{{t "UserSelection.Title"}}</h1>
-    <p>{{t "UserSelection.Description"}}{{if .OrgName}} {{t "UserSelection.MustBeMemberOfOrg" "OrgName"
-        .OrgName}}{{end}}</p>
+    <p>{{t "UserSelection.Description"}}{{if .OrgName}} 
+        {{t "UserSelection.MustBeMemberOfOrg" "OrgName" .OrgName}}
+        {{end}}
+    </p>
     {{end}}
 </div>
 
@@ -23,8 +25,8 @@
         {{ if .Users }}
         {{ range $user := .Users }}
         {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
-        <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" {{if not
-            $user.SelectionPossible}}disabled title="{{t " Errors.User.NotAllowedOrg"}}"{{end}}>
+        <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" 
+        {{if not $user.SelectionPossible}}disabled title="{{t " Errors.User.NotAllowedOrg"}}"{{end}}>
             <div class="left">
                 <div class="lgn-avatar">
                     <span>A</span>

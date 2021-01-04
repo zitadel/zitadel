@@ -13,12 +13,12 @@
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="fields">
-        {{ range $provider := .MfaProviders}}
-        {{ $providerName := (t (printf "MfaPrompt.Provider%v" $provider)) }}
-        <div class="lgn-radio block">
-            <input id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
-            <label for="{{ $provider }}">{{ $providerName }}</label>
-        </div>
+        {{ range $provider := .MFAProviders}}
+        {{ $providerName := (t (printf "MFAPrompt.Provider%v" $provider)) }}
+            <div class="lgn-radio block">
+                <input id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
+                <label for="{{ $provider }}">{{ $providerName }}</label>
+            </div>
         {{ end }}
     </div>
 
@@ -29,9 +29,8 @@
             <i class="las la-arrow-left"></i>
         </a>
 
-        {{if not .MfaRequired}}
-        <button class="lgn-stroked-button lgn-primary" name="skip" value="true" type="submit" formnovalidate>{{t
-            "Actions.Skip"}}</button>
+        {{if not .MFARequired}}
+        <button class="lgn-stroked-button lgn-primary" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
         {{end}}
         <span class="fill-space"></span>
         <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>

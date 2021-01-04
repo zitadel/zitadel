@@ -20,8 +20,8 @@
     {{if .LoginPolicy.AllowUsernamePassword }}
     <div class="fields">
         <label class="lgb-label" for="loginName">{{t "Login.Loginname"}}</label>
-        <input class="lgn-input" type="text" id="loginName" name="loginName" placeholder="{{t "
-            Login.LoginnamePlaceHolder"}}" value="{{ .LoginName }}" autocomplete="username" autofocus required>
+        <input class="lgn-input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}"
+         value="{{ .LoginName }}" autocomplete="username" autofocus required>
     </div>
     {{end}}
 
@@ -29,8 +29,7 @@
 
     <div class="lgn-actions">
         {{if .LoginPolicy.AllowRegister}}
-        <button class="lgn-stroked-button lgn-primary" name="register" value="true" formnovalidate>{{t
-            "Actions.Register"}}</button>
+        <button class="lgn-stroked-button lgn-primary" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
         {{end}}
         <span class="fill-space"></span>
         <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
