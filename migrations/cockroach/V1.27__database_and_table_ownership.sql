@@ -4,7 +4,6 @@ ALTER DATABASE authz OWNER TO authz;
 ALTER DATABASE eventstore OWNER TO eventstore;
 ALTER DATABASE management OWNER TO management;
 ALTER DATABASE notification OWNER TO notification;
-ALTER TABLE eventstore.event_seq OWNER TO eventstore;
 ALTER TABLE eventstore.events OWNER TO eventstore;
 ALTER TABLE management.locks OWNER TO management;
 ALTER TABLE management.current_sequences OWNER TO management;
