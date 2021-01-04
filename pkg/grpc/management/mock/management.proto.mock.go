@@ -6,12 +6,11 @@ package api
 
 import (
 	context "context"
-	reflect "reflect"
-
 	management "github.com/caos/zitadel/pkg/grpc/management"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	reflect "reflect"
 )
 
 // MockManagementServiceClient is a mock of ManagementServiceClient interface
@@ -1217,6 +1216,26 @@ func (mr *MockManagementServiceClientMockRecorder) GetPasswordLockoutPolicy(arg0
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordLockoutPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).GetPasswordLockoutPolicy), varargs...)
 }
 
+// GetPasswordless mocks base method
+func (m *MockManagementServiceClient) GetPasswordless(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.WebAuthNTokens, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetPasswordless", varargs...)
+	ret0, _ := ret[0].(*management.WebAuthNTokens)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPasswordless indicates an expected call of GetPasswordless
+func (mr *MockManagementServiceClientMockRecorder) GetPasswordless(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordless", reflect.TypeOf((*MockManagementServiceClient)(nil).GetPasswordless), varargs...)
+}
+
 // GetProjectGrantMemberRoles mocks base method
 func (m *MockManagementServiceClient) GetProjectGrantMemberRoles(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.ProjectGrantMemberRoles, error) {
 	m.ctrl.T.Helper()
@@ -1995,6 +2014,26 @@ func (mr *MockManagementServiceClientMockRecorder) RemovePasswordLockoutPolicy(a
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePasswordLockoutPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).RemovePasswordLockoutPolicy), varargs...)
+}
+
+// RemovePasswordless mocks base method
+func (m *MockManagementServiceClient) RemovePasswordless(arg0 context.Context, arg1 *management.WebAuthNTokenID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemovePasswordless", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemovePasswordless indicates an expected call of RemovePasswordless
+func (mr *MockManagementServiceClientMockRecorder) RemovePasswordless(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePasswordless", reflect.TypeOf((*MockManagementServiceClient)(nil).RemovePasswordless), varargs...)
 }
 
 // RemoveProject mocks base method
