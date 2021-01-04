@@ -1,6 +1,8 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
@@ -39,36 +41,40 @@ func (v *View) UserGrantsByOrgIDAndProjectID(orgID, projectID string) ([]*model.
 	return view.UserGrantsByOrgIDAndProjectID(v.Db, userGrantTable, orgID, projectID)
 }
 
-func (v *View) PutUserGrant(grant *model.UserGrantView, sequence uint64) error {
+func (v *View) PutUserGrant(grant *model.UserGrantView, event *models.Event) error {
 	err := view.PutUserGrant(v.Db, userGrantTable, grant)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserGrantSequence(sequence)
+	return v.ProcessedUserGrantSequence(event)
 }
 
-func (v *View) PutUserGrants(grants []*model.UserGrantView, sequence uint64) error {
+func (v *View) PutUserGrants(grants []*model.UserGrantView, event *models.Event) error {
 	err := view.PutUserGrants(v.Db, userGrantTable, grants...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserGrantSequence(sequence)
+	return v.ProcessedUserGrantSequence(event)
 }
 
-func (v *View) DeleteUserGrant(grantID string, eventSequence uint64) error {
+func (v *View) DeleteUserGrant(grantID string, event *models.Event) error {
 	err := view.DeleteUserGrant(v.Db, userGrantTable, grantID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedUserGrantSequence(eventSequence)
+	return v.ProcessedUserGrantSequence(event)
 }
 
-func (v *View) GetLatestUserGrantSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(userGrantTable)
+func (v *View) GetLatestUserGrantSequence(aggregateType string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(userGrantTable, aggregateType)
 }
 
-func (v *View) ProcessedUserGrantSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(userGrantTable, eventSequence)
+func (v *View) ProcessedUserGrantSequence(event *models.Event) error {
+	return v.saveCurrentSequence(userGrantTable, event)
+}
+
+func (v *View) UpdateUserGrantSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(userGrantTable)
 }
 
 func (v *View) GetLatestUserGrantFailedEvent(sequence uint64) (*repository.FailedEvent, error) {

@@ -2,6 +2,7 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -24,36 +25,40 @@ func (v *View) SearchIDPProviders(request *iam_model.IDPProviderSearchRequest) (
 	return view.SearchIDPProviders(v.Db, idpProviderTable, request)
 }
 
-func (v *View) PutIDPProvider(provider *model.IDPProviderView, sequence uint64) error {
+func (v *View) PutIDPProvider(provider *model.IDPProviderView, event *models.Event) error {
 	err := view.PutIDPProvider(v.Db, idpProviderTable, provider)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedIDPProviderSequence(sequence)
+	return v.ProcessedIDPProviderSequence(event)
 }
 
-func (v *View) PutIDPProviders(sequence uint64, providers ...*model.IDPProviderView) error {
+func (v *View) PutIDPProviders(event *models.Event, providers ...*model.IDPProviderView) error {
 	err := view.PutIDPProviders(v.Db, idpProviderTable, providers...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedIDPProviderSequence(sequence)
+	return v.ProcessedIDPProviderSequence(event)
 }
 
-func (v *View) DeleteIDPProvider(aggregateID, idpConfigID string, eventSequence uint64) error {
+func (v *View) DeleteIDPProvider(aggregateID, idpConfigID string, event *models.Event) error {
 	err := view.DeleteIDPProvider(v.Db, idpProviderTable, aggregateID, idpConfigID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedIDPProviderSequence(eventSequence)
+	return v.ProcessedIDPProviderSequence(event)
 }
 
-func (v *View) GetLatestIDPProviderSequence() (*global_view.CurrentSequence, error) {
-	return v.latestSequence(idpProviderTable)
+func (v *View) GetLatestIDPProviderSequence(aggregateType string) (*global_view.CurrentSequence, error) {
+	return v.latestSequence(idpProviderTable, aggregateType)
 }
 
-func (v *View) ProcessedIDPProviderSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(idpProviderTable, eventSequence)
+func (v *View) ProcessedIDPProviderSequence(event *models.Event) error {
+	return v.saveCurrentSequence(idpProviderTable, event)
+}
+
+func (v *View) UpdateIDPProviderSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(idpProviderTable)
 }
 
 func (v *View) GetLatestIDPProviderFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {

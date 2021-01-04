@@ -3,7 +3,7 @@
 <div class="lgn-head">
     {{ template "user-profile" . }}
 
-    <p>{{t "MfaPrompt.Description"}}</p>
+    <p>{{t "MFAPrompt.Description"}}</p>
 </div>
 
 <form action="{{ mfaPromptUrl }}" method="POST">
@@ -30,8 +30,8 @@
         </a>
 
         {{if not .MfaRequired}}
-        <button class="lgn-stroked-button lgn-primary" name="skip" value="true" type="submit"
-            formnovalidate>{{t "Actions.Skip"}}</button>
+        <button class="lgn-stroked-button lgn-primary" name="skip" value="true" type="submit" formnovalidate>{{t
+            "Actions.Skip"}}</button>
         {{end}}
         <span class="fill-space"></span>
         <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>

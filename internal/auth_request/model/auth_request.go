@@ -1,10 +1,12 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/iam/model"
-	"golang.org/x/text/language"
 	"strings"
 	"time"
+
+	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/caos/zitadel/internal/errors"
 )
@@ -30,11 +32,13 @@ type AuthRequest struct {
 	LoginName           string
 	DisplayName         string
 	UserOrgID           string
+	RequestedOrgID      string
+	RequestedOrgName    string
 	SelectedIDPConfigID string
 	LinkingUsers        []*ExternalUser
 	PossibleSteps       []NextStep
 	PasswordVerified    bool
-	MfasVerified        []MFAType
+	MFAsVerified        []MFAType
 	Audience            []string
 	AuthTime            time.Time
 	Code                string
@@ -109,7 +113,7 @@ func (a *AuthRequest) IsValid() bool {
 		a.Request != nil && a.Request.IsValid()
 }
 
-func (a *AuthRequest) MfaLevel() MFALevel {
+func (a *AuthRequest) MFALevel() MFALevel {
 	return -1
 	//PLANNED: check a.PossibleLOAs (and Prompt Login?)
 }

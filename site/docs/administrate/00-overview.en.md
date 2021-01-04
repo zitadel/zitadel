@@ -40,4 +40,4 @@ title: Overview
 ### Concepts
 
 With ZITADEL there are some key concepts some should be aware of before using it to secure your applications and services.
-You find these definitions in the "What is..." heading of each resource.
+You find these definitions in the "What is/are..." heading of each resource.

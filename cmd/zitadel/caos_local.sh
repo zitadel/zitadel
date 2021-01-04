@@ -11,6 +11,8 @@ export ZITADEL_TRACING_FRACTION=0.1
 export ZITADEL_TRACING_ENDPOINT=localhost:9096
 export ZITADEL_TRACING_TYPE=google
 
+export ZITADEL_METRICS_TYPE=otel
+
 # Log
 export ZITADEL_LOG_LEVEL=debug
 
@@ -65,7 +67,7 @@ export ZITADEL_SHORT_CACHE_SHARED_MAXAGE=15m
 export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/
 
 #Org
-export ZITADEL_DEFAULT_DOMAIN=zitadel.ch
+export ZITADEL_DEFAULT_DOMAIN=localhost
 
 
 #Setup

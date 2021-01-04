@@ -14,7 +14,7 @@ import (
 	client_middleware "github.com/caos/zitadel/internal/api/grpc/client/middleware"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -129,7 +129,8 @@ func createDialOptions(g Gateway) []grpc.DialOption {
 }
 
 func addInterceptors(handler http.Handler, g Gateway) http.Handler {
-	handler = http_mw.DefaultTraceHandler(handler)
+	handler = http_mw.DefaultMetricsHandler(handler)
+	handler = http_mw.DefaultTelemetryHandler(handler)
 	handler = http_mw.NoCacheInterceptor(handler)
 	if interceptor, ok := g.(grpcGatewayCustomInterceptor); ok {
 		handler = interceptor.GatewayHTTPInterceptor(handler)

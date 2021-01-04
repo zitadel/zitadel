@@ -5,8 +5,10 @@ import (
 )
 
 type View struct {
-	Database         string
-	ViewName         string
-	CurrentSequence  uint64
-	CurrentTimestamp time.Time
+	Database                 string
+	ViewName                 string
+	CurrentSequence          uint64
+	EventTimestamp           time.Time
+	LastSuccessfulSpoolerRun time.Time
+	AggregateType            string
 }

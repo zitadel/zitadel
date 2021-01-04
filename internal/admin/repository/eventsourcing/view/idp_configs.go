@@ -2,6 +2,7 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -20,28 +21,32 @@ func (v *View) SearchIDPConfigs(request *iam_model.IDPConfigSearchRequest) ([]*m
 	return view.SearchIDPs(v.Db, idpConfigTable, request)
 }
 
-func (v *View) PutIDPConfig(idp *model.IDPConfigView, sequence uint64) error {
+func (v *View) PutIDPConfig(idp *model.IDPConfigView, event *models.Event) error {
 	err := view.PutIDP(v.Db, idpConfigTable, idp)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedIDPConfigSequence(sequence)
+	return v.ProcessedIDPConfigSequence(event)
 }
 
-func (v *View) DeleteIDPConfig(idpID string, eventSequence uint64) error {
+func (v *View) DeleteIDPConfig(idpID string, event *models.Event) error {
 	err := view.DeleteIDP(v.Db, idpConfigTable, idpID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedIDPConfigSequence(eventSequence)
+	return v.ProcessedIDPConfigSequence(event)
 }
 
-func (v *View) GetLatestIDPConfigSequence() (*global_view.CurrentSequence, error) {
-	return v.latestSequence(idpConfigTable)
+func (v *View) GetLatestIDPConfigSequence(aggregateType string) (*global_view.CurrentSequence, error) {
+	return v.latestSequence(idpConfigTable, aggregateType)
 }
 
-func (v *View) ProcessedIDPConfigSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(idpConfigTable, eventSequence)
+func (v *View) ProcessedIDPConfigSequence(event *models.Event) error {
+	return v.saveCurrentSequence(idpConfigTable, event)
+}
+
+func (v *View) UpdateIDPConfigSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(idpConfigTable)
 }
 
 func (v *View) GetLatestIDPConfigFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {

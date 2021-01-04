@@ -22,7 +22,7 @@ import (
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	"github.com/caos/zitadel/internal/tracing"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
@@ -108,7 +108,7 @@ func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.Or
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
-	sequence, sequenceErr := repo.View.GetLatestOrgDomainSequence()
+	sequence, sequenceErr := repo.View.GetLatestOrgDomainSequence("")
 	logging.Log("EVENT-SLowp").OnError(sequenceErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest org domain sequence")
 	domains, count, err := repo.View.SearchOrgDomains(request)
 	if err != nil {
@@ -122,7 +122,7 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -205,7 +205,7 @@ func (repo *OrgRepository) RemoveMyOrgMember(ctx context.Context, userID string)
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID}
-	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence()
+	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence("")
 	logging.Log("EVENT-Smu3d").OnError(sequenceErr).Warn("could not read latest org member sequence")
 	members, count, err := repo.View.SearchOrgMembers(request)
 	if err != nil {
@@ -219,7 +219,7 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -292,7 +292,7 @@ func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID, repo.SystemDefaults.IamID)
 
-	sequence, sequenceErr := repo.View.GetLatestIDPConfigSequence()
+	sequence, sequenceErr := repo.View.GetLatestIDPConfigSequence("")
 	logging.Log("EVENT-Dk8si").OnError(sequenceErr).Warn("could not read latest idp config sequence")
 	idps, count, err := repo.View.SearchIDPConfigs(request)
 	if err != nil {
@@ -306,7 +306,7 @@ func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }
@@ -414,9 +414,9 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 		request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
 	}
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, sequenceErr := repo.View.GetLatestIdpProviderSequence()
+	sequence, sequenceErr := repo.View.GetLatestIDPProviderSequence("")
 	logging.Log("EVENT-Tuiks").OnError(sequenceErr).Warn("could not read latest iam sequence")
-	providers, count, err := repo.View.SearchIdpProviders(request)
+	providers, count, err := repo.View.SearchIDPProviders(request)
 	if err != nil {
 		return nil, err
 	}
@@ -428,7 +428,7 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.CurrentTimestamp
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
 }

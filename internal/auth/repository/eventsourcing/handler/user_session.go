@@ -1,34 +1,70 @@
 package handler
 
 import (
+	"github.com/caos/logging"
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-
-	"github.com/caos/logging"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	user_events "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
-
-type UserSession struct {
-	handler
-	userEvents *user_events.UserEventstore
-}
 
 const (
 	userSessionTable = "auth.user_sessions"
 )
 
+type UserSession struct {
+	handler
+	userEvents   *user_events.UserEventstore
+	subscription *eventstore.Subscription
+}
+
+func newUserSession(
+	handler handler,
+	userEvents *user_events.UserEventstore,
+) *UserSession {
+	h := &UserSession{
+		handler:    handler,
+		userEvents: userEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *UserSession) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
+
 func (u *UserSession) ViewModel() string {
 	return userSessionTable
 }
 
+func (_ *UserSession) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.UserAggregate}
+}
+
+func (u *UserSession) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := u.view.GetLatestUserSessionSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserSessionSequence()
+	sequence, err := u.view.GetLatestUserSessionSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +84,10 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.HumanExternalLoginCheckSucceeded,
 		es_model.HumanMFAOTPCheckSucceeded,
 		es_model.HumanMFAOTPCheckFailed,
+		es_model.HumanMFAU2FTokenCheckSucceeded,
+		es_model.HumanMFAU2FTokenCheckFailed,
+		es_model.HumanPasswordlessTokenCheckSucceeded,
+		es_model.HumanPasswordlessTokenCheckFailed,
 		es_model.HumanSignedOut:
 		eventData, err := view_model.UserSessionFromEvent(event)
 		if err != nil {
@@ -78,25 +118,29 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.DomainClaimed,
 		es_model.UserUserNameChanged,
 		es_model.HumanExternalIDPRemoved,
-		es_model.HumanExternalIDPCascadeRemoved:
+		es_model.HumanExternalIDPCascadeRemoved,
+		es_model.HumanPasswordlessTokenRemoved,
+		es_model.HumanMFAU2FTokenRemoved:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		if len(sessions) == 0 {
-			return u.view.ProcessedUserSessionSequence(event.Sequence)
+			return u.view.ProcessedUserSessionSequence(event)
 		}
 		for _, session := range sessions {
-			session.AppendEvent(event)
+			if err := session.AppendEvent(event); err != nil {
+				return err
+			}
 			if err := u.fillUserInfo(session, event.AggregateID); err != nil {
 				return err
 			}
 		}
-		return u.view.PutUserSessions(sessions, event.Sequence)
+		return u.view.PutUserSessions(sessions, event)
 	case es_model.UserRemoved:
-		return u.view.DeleteUserSessions(event.AggregateID, event.Sequence)
+		return u.view.DeleteUserSessions(event.AggregateID, event)
 	default:
-		return u.view.ProcessedUserSessionSequence(event.Sequence)
+		return u.view.ProcessedUserSessionSequence(event)
 	}
 }
 
@@ -105,12 +149,18 @@ func (u *UserSession) OnError(event *models.Event, err error) error {
 	return spooler.HandleError(event, err, u.view.GetLatestUserSessionFailedEvent, u.view.ProcessedUserSessionFailedEvent, u.view.ProcessedUserSessionSequence, u.errorCountUntilSkip)
 }
 
+func (u *UserSession) OnSuccess() error {
+	return spooler.HandleSuccess(u.view.UpdateUserSessionSpoolerRunTimestamp)
+}
+
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event *models.Event) error {
-	session.AppendEvent(event)
+	if err := session.AppendEvent(event); err != nil {
+		return err
+	}
 	if err := u.fillUserInfo(session, event.AggregateID); err != nil {
 		return err
 	}
-	return u.view.PutUserSession(session)
+	return u.view.PutUserSession(session, event)
 }
 
 func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id string) error {

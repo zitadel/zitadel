@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{'USER.MFA.OTP_DIALOG_TITLE' | translate}}</h1>
 <div mat-dialog-content>
-    <p translate>{{'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate}}</p>
+    <p>{{'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate}}</p>
     <div class="qrcode-wrapper">
         <qrcode *ngIf="data" class="qrcode" [qrdata]="data" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
     </div>

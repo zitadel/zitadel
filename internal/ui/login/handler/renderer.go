@@ -8,7 +8,6 @@ import (
 	"path"
 
 	"github.com/caos/logging"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/gorilla/csrf"
 	"golang.org/x/text/language"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/renderer"
 )
 
@@ -33,31 +33,34 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		pathPrefix: pathPrefix,
 	}
 	tmplMapping := map[string]string{
-		tmplError:                  "error.html",
-		tmplLogin:                  "login.html",
-		tmplUserSelection:          "select_user.html",
-		tmplPassword:               "password.html",
-		tmplMfaVerify:              "mfa_verify.html",
-		tmplMfaPrompt:              "mfa_prompt.html",
-		tmplMfaInitVerify:          "mfa_init_verify.html",
-		tmplMfaInitDone:            "mfa_init_done.html",
-		tmplMailVerification:       "mail_verification.html",
-		tmplMailVerified:           "mail_verified.html",
-		tmplInitPassword:           "init_password.html",
-		tmplInitPasswordDone:       "init_password_done.html",
-		tmplInitUser:               "init_user.html",
-		tmplInitUserDone:           "init_user_done.html",
-		tmplPasswordResetDone:      "password_reset_done.html",
-		tmplChangePassword:         "change_password.html",
-		tmplChangePasswordDone:     "change_password_done.html",
-		tmplRegisterOption:         "register_option.html",
-		tmplRegister:               "register.html",
-		tmplLogoutDone:             "logout_done.html",
-		tmplRegisterOrg:            "register_org.html",
-		tmplChangeUsername:         "change_username.html",
-		tmplChangeUsernameDone:     "change_username_done.html",
-		tmplLinkUsersDone:          "link_users_done.html",
-		tmplExternalNotFoundOption: "external_not_found_option.html",
+		tmplError:                    "error.html",
+		tmplLogin:                    "login.html",
+		tmplUserSelection:            "select_user.html",
+		tmplPassword:                 "password.html",
+		tmplPasswordlessVerification: "passwordless.html",
+		tmplMFAVerify:                "mfa_verify.html",
+		tmplMFAPrompt:                "mfa_prompt.html",
+		tmplMFAInitVerify:            "mfa_init_verify.html",
+		tmplMFAU2FInit:               "mfa_init_u2f.html",
+		tmplU2FVerification:          "mfa_verification_u2f.html",
+		tmplMFAInitDone:              "mfa_init_done.html",
+		tmplMailVerification:         "mail_verification.html",
+		tmplMailVerified:             "mail_verified.html",
+		tmplInitPassword:             "init_password.html",
+		tmplInitPasswordDone:         "init_password_done.html",
+		tmplInitUser:                 "init_user.html",
+		tmplInitUserDone:             "init_user_done.html",
+		tmplPasswordResetDone:        "password_reset_done.html",
+		tmplChangePassword:           "change_password.html",
+		tmplChangePasswordDone:       "change_password_done.html",
+		tmplRegisterOption:           "register_option.html",
+		tmplRegister:                 "register.html",
+		tmplLogoutDone:               "logout_done.html",
+		tmplRegisterOrg:              "register_org.html",
+		tmplChangeUsername:           "change_username.html",
+		tmplChangeUsernameDone:       "change_username_done.html",
+		tmplLinkUsersDone:            "link_users_done.html",
+		tmplExternalNotFoundOption:   "external_not_found_option.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -87,6 +90,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"userSelectionUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointUserSelection)
 		},
+		"passwordLessVerificationUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointPasswordlessLogin)
+		},
 		"passwordResetUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthRequestID, id))
 		},
@@ -94,16 +100,22 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 			return path.Join(r.pathPrefix, EndpointPassword)
 		},
 		"mfaVerifyUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointMfaVerify)
+			return path.Join(r.pathPrefix, EndpointMFAVerify)
 		},
 		"mfaPromptUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointMfaPrompt)
+			return path.Join(r.pathPrefix, EndpointMFAPrompt)
 		},
 		"mfaPromptChangeUrl": func(id string, provider model.MFAType) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMfaPrompt, queryAuthRequestID, id, "provider", provider))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, queryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointMfaInitVerify)
+			return path.Join(r.pathPrefix, EndpointMFAInitVerify)
+		},
+		"mfaInitU2FVerifyUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointMFAInitU2FVerify)
+		},
+		"mfaInitU2FLoginUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointU2FVerification)
 		},
 		"mailVerificationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMailVerification)
@@ -191,8 +203,10 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 	case *model.PasswordStep:
 		l.renderPassword(w, r, authReq, nil)
-	case *model.MfaVerificationStep:
-		l.renderMfaVerify(w, r, authReq, step, err)
+	case *model.PasswordlessStep:
+		l.renderPasswordlessVerification(w, r, authReq, nil)
+	case *model.MFAVerificationStep:
+		l.renderMFAVerify(w, r, authReq, step, err)
 	case *model.RedirectToCallbackStep:
 		if len(authReq.PossibleSteps) > 1 {
 			l.chooseNextStep(w, r, authReq, 1, err)
@@ -203,8 +217,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderChangePassword(w, r, authReq, err)
 	case *model.VerifyEMailStep:
 		l.renderMailVerification(w, r, authReq, "", err)
-	case *model.MfaPromptStep:
-		l.renderMfaPrompt(w, r, authReq, step, err)
+	case *model.MFAPromptStep:
+		l.renderMFAPrompt(w, r, authReq, step, err)
 	case *model.InitUserStep:
 		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
 	case *model.ChangeUsernameStep:
@@ -253,6 +267,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		Theme:     l.getTheme(r),
 		ThemeMode: l.getThemeMode(r),
 		OrgID:     l.getOrgID(authReq),
+		OrgName:   l.getOrgName(authReq),
 		AuthReqID: getRequestID(authReq, r),
 		CSRF:      csrf.TemplateField(r),
 		Nonce:     http_mw.GetNonce(r),
@@ -298,20 +313,17 @@ func (l *Login) getOrgID(authReq *model.AuthRequest) string {
 	if authReq == nil {
 		return ""
 	}
-	if authReq.UserOrgID != "" {
-		return authReq.UserOrgID
+	if authReq.RequestedOrgID != "" {
+		return authReq.RequestedOrgID
 	}
-	if authReq.Request == nil {
+	return authReq.UserOrgID
+}
+
+func (l *Login) getOrgName(authReq *model.AuthRequest) string {
+	if authReq == nil {
 		return ""
 	}
-	primaryDomain := authReq.GetScopeOrgPrimaryDomain()
-	if primaryDomain != "" {
-		org, _ := l.authRepo.GetOrgByPrimaryDomain(primaryDomain)
-		if org != nil {
-			return org.ID
-		}
-	}
-	return ""
+	return authReq.RequestedOrgName
 }
 
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
@@ -341,6 +353,7 @@ type baseData struct {
 	Theme        string
 	ThemeMode    string
 	OrgID        string
+	OrgName      string
 	AuthReqID    string
 	CSRF         template.HTML
 	Nonce        string
@@ -357,8 +370,8 @@ type userData struct {
 	baseData
 	profileData
 	PasswordChecked     string
-	MfaProviders        []model.MFAType
-	SelectedMfaProvider model.MFAType
+	MFAProviders        []model.MFAType
+	SelectedMFAProvider model.MFAType
 	Linking             bool
 }
 
@@ -387,21 +400,21 @@ type userSelectionData struct {
 type mfaData struct {
 	baseData
 	profileData
-	MfaProviders []model.MFAType
-	MfaRequired  bool
+	MFAProviders []model.MFAType
+	MFARequired  bool
 }
 
 type mfaVerifyData struct {
 	baseData
 	profileData
-	MfaType model.MFAType
+	MFAType model.MFAType
 	otpData
 }
 
 type mfaDoneData struct {
 	baseData
 	profileData
-	MfaType model.MFAType
+	MFAType model.MFAType
 }
 
 type otpData struct {

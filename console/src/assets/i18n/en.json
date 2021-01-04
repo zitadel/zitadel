@@ -152,20 +152,24 @@
             },
             "EMPTY":"No entries"
         },
-        "MFA": {
+        "PASSWORDLESS": {
             "TABLETYPE":"Type",
             "TABLESTATE":"Status",
+            "NAME":"Name",
             "TABLEACTIONS":"Actions",
-            "TITLE": "Multifactor Authentication",
-            "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
+            "TITLE": "Passwordless Authentication",
+            "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL passwordless.",
             "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
-            "OTP": "Configure OTP",
-            "OTP_DIALOG_TITLE": "Add OTP",
-            "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
+            "U2F":"Add authenticator",
+            "U2F_DIALOG_TITLE": "Verify authenticator",
+            "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
+            "U2F_SUCCESS":"Passwordless Auth created successfully!",
+            "U2F_ERROR":"An error during U2F setup occurred!",
+            "U2F_NAME":"Authenticator Name",
             "TYPE": {
                 "0": "No MFA defined",
-                "1": "SMS",
-                "2": "OTP"
+                "1": "OTP",
+                "2": "U2F"
             },
             "STATE": {
                 "0": "No State",
@@ -174,8 +178,41 @@
                 "3": "Deleted"
             },
             "DIALOG": {
-                "OTP_DELETE_TITLE":"Remove OTP Factor",
-                "OTP_DELETE_DESCRIPTION":"You are about to delete OTP as second factor. Are you sure?"
+                "DELETE_TITLE":"Remove Passwordless Authentication Method",
+                "DELETE_DESCRIPTION":"You are about to delete a passwordless Authentication method. Are you sure?"
+            }
+        },
+        "MFA": {
+            "TABLETYPE":"Type",
+            "TABLESTATE":"Status",
+            "ATTRIBUTE":"Attribut",
+            "TABLEACTIONS":"Actions",
+            "TITLE": "Multifactor Authentication",
+            "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
+            "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
+            "OTP": "Configure OTP",
+            "OTP_DIALOG_TITLE": "Add OTP",
+            "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
+            "U2F":"Add U2F",
+            "U2F_DIALOG_TITLE": "Verify U2F",
+            "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
+            "U2F_SUCCESS":"U2F created successfully!",
+            "U2F_ERROR":"An error during U2F setup occurred!",
+            "U2F_NAME":"U2F Name",
+            "TYPE": {
+                "0": "No MFA defined",
+                "1": "OTP",
+                "2": "U2F"
+            },
+            "STATE": {
+                "0": "No State",
+                "1": "Not Ready",
+                "2": "Ready",
+                "3": "Deleted"
+            },
+            "DIALOG": {
+                "MFA_DELETE_TITLE":"Remove Secondfactor",
+                "MFA_DELETE_DESCRIPTION":"You are about to delete a second factor. Are you sure?"
             }
         },
         "EXTERNALIDP": {
@@ -345,6 +382,8 @@
             "PHONEVERIFICATIONSENT":"Phone verification code sent.",
             "EMAILVERIFICATIONSENT":"E-mail verification code sent.",
             "OTPREMOVED":"OTP removed.",
+            "U2FREMOVED":"U2F removed.",
+            "PASSWORDLESSREMOVED":"Passwordless removed.",
             "INITIALPASSWORDSET":"Initial password set.",
             "PASSWORDNOTIFICATIONSENT":"Password change notification sent.",
             "PASSWORDCHANGED":"Password changed successfully.",
@@ -392,7 +431,8 @@
             "VIEWNAME":"Name",
             "DATABASE":"Database",
             "SEQUENCE":"Sequence",
-            "TIMESTAMP":"Timestamp",
+            "EVENTTIMESTAMP":"Timestamp",
+            "LASTSPOOL": "Successful spool",
             "ACTIONS":"Actions",
             "CLEAR":"Clear",
             "CLEARED":"View was successfully cleared!",
@@ -550,7 +590,9 @@
             "ALLOWREGISTER":"Register allowed",
             "ALLOWUSERNAMEPASSWORD_DESC":"The conventional login with user name and password is allowed.",
             "ALLOWEXTERNALIDP_DESC":"The login is allowed for the underlying identity providers",
-            "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login."
+            "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login.",
+            "FORCEMFA":"Force MFA",
+            "FORCEMFA_DESC":"If the option is selected, users have to configure a second factor for login."
         },
         "RESET":"Reset Policy",
         "CREATECUSTOM":"Create Custom Policy",
@@ -825,6 +867,37 @@
             "DELETED":"Idp removed successfully!"
         }
     },
+    "MFA":{
+        "LIST": {
+            "MULTIFACTORTITLE":"Multifactors",
+            "MULTIFACTORDESCRIPTION":"Define your Multifactors for Authentication here.",
+            "SECONDFACTORTITLE":"Secondfactors",
+            "SECONDFACTORDESCRIPTION":"Define your Secondfactors for Authentication here."
+        },
+        "CREATE": {
+            "TITLE":"New Factor",
+            "DESCRIPTION":"Select your new Factor type."
+        },
+        "DELETE": {
+            "TITLE":"Delete Factor",
+            "DESCRIPTION":"You are about to delete a Factor from Login Policy. Are you sure?"
+        },
+        "TOAST": {
+            "ADDED":"Added successfully.",
+            "SAVED": "Saved successfully.",
+            "DELETED":"Removed successfully"
+        },
+        "TYPE":"Type",
+        "MULTIFACTORTYPES": {
+            "0":"Unknown",
+            "1":"U2F with Pin"
+        },
+        "SECONDFACTORTYPES": {
+            "0":"Unknown",
+            "1":"OTP",
+            "2":"U2F"
+        }
+    },
     "LOGINPOLICY": {
         "CREATE": {
             "TITLE":"Login Policy",
@@ -835,6 +908,11 @@
             "TITLE":"Add Identity Provider",
             "DESCRIPTION":"You can select predefined or selfcreated providers for authentication.",
             "SELECTIDPS":"Identity providers"
+        },
+        "PASSWORDLESS":"Passwordless Login",
+        "PASSWORDLESSTYPE": {
+            "0":"Not allowed",
+            "1":"Allowed"
         }
     },
     "APP": {
@@ -909,8 +987,11 @@
             "OVERVIEWTITLE":"You are now done. Review your configuration.",
             "ACCESSTOKENROLEASSERTION":"Add user roles to the access token",
             "ACCESSTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the access token.",
-            "IDTOKENROLEASSERTION":"Add user roles to the id token",
-            "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the id token."
+            "IDTOKENROLEASSERTION":"User roles inside ID Token",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the ID token.",
+            "IDTOKENUSERINFOASSERTION":"User Info inside ID Token",
+            "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Enables clients to retrieve profile, email, phone and address claims from ID token.",
+            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf."
         },
         "TOAST": {
             "REACTIVATED":"Application reactivated.",

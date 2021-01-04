@@ -13,6 +13,7 @@ func loginPolicyToModel(policy *admin.DefaultLoginPolicyRequest) *iam_model.Logi
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
 		ForceMFA:              policy.ForceMfa,
+		PasswordlessType:      passwordlessTypeToModel(policy.PasswordlessType),
 	}
 }
 
@@ -28,6 +29,7 @@ func loginPolicyFromModel(policy *iam_model.LoginPolicy) *admin.DefaultLoginPoli
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
 		ForceMfa:              policy.ForceMFA,
+		PasswordlessType:      passwordlessTypeFromModel(policy.PasswordlessType),
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
 	}
@@ -45,6 +47,7 @@ func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *admin.DefaultL
 		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
 		ForceMfa:              policy.ForceMFA,
+		PasswordlessType:      passwordlessTypeFromModel(policy.PasswordlessType),
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
 	}
@@ -142,6 +145,24 @@ func secondFactorTypeToModel(mfaType *admin.SecondFactor) iam_model.SecondFactor
 		return iam_model.SecondFactorTypeU2F
 	default:
 		return iam_model.SecondFactorTypeUnspecified
+	}
+}
+
+func passwordlessTypeFromModel(passwordlessType iam_model.PasswordlessType) admin.PasswordlessType {
+	switch passwordlessType {
+	case iam_model.PasswordlessTypeAllowed:
+		return admin.PasswordlessType_PASSWORDLESSTYPE_ALLOWED
+	default:
+		return admin.PasswordlessType_PASSWORDLESSTYPE_NOT_ALLOWED
+	}
+}
+
+func passwordlessTypeToModel(passwordlessType admin.PasswordlessType) iam_model.PasswordlessType {
+	switch passwordlessType {
+	case admin.PasswordlessType_PASSWORDLESSTYPE_ALLOWED:
+		return iam_model.PasswordlessTypeAllowed
+	default:
+		return iam_model.PasswordlessTypeNotAllowed
 	}
 }
 

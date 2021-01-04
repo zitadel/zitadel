@@ -15,7 +15,8 @@
     <div class="fields">
         <div class="field">
             <label class="lgn-label" for="orgname">{{t "RegistrationOrg.OrgName"}}</label>
-            <input class="lgn-input" type="text" id="orgname" name="orgname" value="{{ .OrgName }}" autofocus required>
+            <input class="lgn-input" type="text" id="orgname" name="orgname" value="{{ .RegisterOrgName }}" autofocus
+                required>
         </div>
 
         {{if .UserLoginMustBeDomain}}
@@ -65,8 +66,8 @@
                     name="register-term-confirmation" required>
                 <label class="lgn-label" for="register-term-confirmation">
                     {{t "RegistrationOrg.TosConfirm"}}
-                    <a class="tos-link" target="_blank"
-                        href="{{t "RegistrationOrg.TosLink"}}">{{t "RegistrationOrg.TosLinkText"}}</a>
+                    <a class="tos-link" target="_blank" href="{{t " RegistrationOrg.TosLink"}}">{{t
+                        "RegistrationOrg.TosLinkText"}}</a>
                 </label>
             </div>
         </div>
@@ -81,9 +82,9 @@
 </form>
 
 
-<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
-<script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
-<script src="{{ resourceUrl "scripts/register_check.js" }}"></script>
-<script src="{{ resourceUrl "scripts/loginname_suffix.js" }}"></script>
+<script src="{{ resourceUrl " scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl " scripts/password_policy_check.js" }}"></script>
+<script src="{{ resourceUrl " scripts/register_check.js" }}"></script>
+<script src="{{ resourceUrl " scripts/loginname_suffix.js" }}"></script>
 
 {{template "main-bottom" .}}

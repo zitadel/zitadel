@@ -244,12 +244,12 @@ service AuthService {
 
   rpc GetMyPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicy) {
     option (google.api.http) = {
-            get: "/policies/passwords/complexity"
-        };
+      get: "/policies/passwords/complexity"
+    };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "authenticated"
-        };
+      permission: "authenticated"
+    };
   }
 
   //ExternalIDP
@@ -299,6 +299,77 @@ service AuthService {
   rpc RemoveMfaOTP(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/users/me/mfas/otp"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc AddMyMfaU2F(google.protobuf.Empty) returns (WebAuthNResponse) {
+    option (google.api.http) = {
+      post: "/users/me/mfas/u2f"
+      body: "*"
+    };
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc VerifyMyMfaU2F(VerifyWebAuthN) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/users/me/mfas/u2f/_verify"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc RemoveMyMfaU2F(WebAuthNTokenID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/me/mfas/u2f/{id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc GetMyPasswordless(google.protobuf.Empty) returns (WebAuthNTokens) {
+    option (google.api.http) = {
+      get: "/users/me/passwordless"
+    };
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc AddMyPasswordless(google.protobuf.Empty) returns (WebAuthNResponse) {
+    option (google.api.http) = {
+      post: "/users/me/passwordless"
+      body: "*"
+    };
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc VerifyMyPasswordless(VerifyWebAuthN) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/users/me/passwordless/_verify"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc RemoveMyPasswordless(WebAuthNTokenID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/me/passwordless/{id}"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -578,8 +649,8 @@ message PasswordChange {
 
 enum MfaType {
   MFATYPE_UNSPECIFIED = 0;
-  MFATYPE_SMS = 1;
-  MFATYPE_OTP = 2;
+  MFATYPE_OTP = 1;
+  MFATYPE_U2F = 2;
 }
 
 message VerifyMfaOtp {
@@ -593,6 +664,8 @@ message MultiFactors {
 message MultiFactor {
   MfaType type = 1;
   MFAState state = 2;
+  string attribute = 3;
+  string id = 4;
 }
 
 message MfaOtpResponse {
@@ -600,6 +673,31 @@ message MfaOtpResponse {
   string url = 2;
   string secret = 3;
   MFAState state = 4;
+}
+
+message WebAuthNTokens {
+  repeated WebAuthNToken tokens = 1;
+}
+
+message WebAuthNToken {
+  string id = 1;
+  string name = 2;
+  MFAState state = 3;
+}
+
+message WebAuthNResponse {
+  string id = 1;
+  bytes public_key = 2;
+  MFAState state = 3;
+}
+
+message VerifyWebAuthN {
+  bytes public_key_credential = 1;
+  string token_name = 2;
+}
+
+message WebAuthNTokenID {
+  string id = 1;
 }
 
 enum MFAState {
@@ -691,7 +789,7 @@ enum SearchMethod {
 }
 
 message ChangesRequest {
-  uint64 limit= 1;
+  uint64 limit = 1;
   uint64 sequence_offset = 2;
   bool asc = 3;
 }

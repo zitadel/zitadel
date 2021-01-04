@@ -7,33 +7,21 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
-
-type Notification struct {
-	handler
-	eventstore     eventstore.Eventstore
-	userEvents     *usr_event.UserEventstore
-	systemDefaults sd.SystemDefaults
-	AesCrypto      crypto.EncryptionAlgorithm
-	i18n           *i18n.Translator
-	statikDir      http.FileSystem
-}
 
 const (
 	notificationTable   = "notification.notifications"
@@ -42,16 +30,69 @@ const (
 	labelPolicyTableDef = "adminapi.label_policies"
 )
 
+type Notification struct {
+	handler
+	userEvents     *usr_event.UserEventstore
+	systemDefaults sd.SystemDefaults
+	AesCrypto      crypto.EncryptionAlgorithm
+	i18n           *i18n.Translator
+	statikDir      http.FileSystem
+	subscription   *eventstore.Subscription
+}
+
+func newNotification(
+	handler handler,
+	userEvents *usr_event.UserEventstore,
+	defaults sd.SystemDefaults,
+	aesCrypto crypto.EncryptionAlgorithm,
+	translator *i18n.Translator,
+	statikDir http.FileSystem,
+) *Notification {
+	h := &Notification{
+		handler:        handler,
+		userEvents:     userEvents,
+		systemDefaults: defaults,
+		i18n:           translator,
+		statikDir:      statikDir,
+		AesCrypto:      aesCrypto,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *Notification) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
+
 func (n *Notification) ViewModel() string {
 	return notificationTable
 }
 
+func (_ *Notification) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.UserAggregate}
+}
+
+func (n *Notification) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := n.view.GetLatestNotificationSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (n *Notification) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := n.view.GetLatestNotificationSequence()
+	sequence, err := n.view.GetLatestNotificationSequence("")
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.UserQuery(sequence.CurrentSequence), nil
+	return usr_event.UserQuery(sequence.CurrentSequence), nil
 }
 
 func (n *Notification) Reduce(event *models.Event) (err error) {
@@ -70,13 +111,11 @@ func (n *Notification) Reduce(event *models.Event) (err error) {
 		err = n.handlePasswordCode(event)
 	case es_model.DomainClaimed:
 		err = n.handleDomainClaimed(event)
-	default:
-		return n.view.ProcessedNotificationSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return n.view.ProcessedNotificationSequence(event.Sequence)
+	return n.view.ProcessedNotificationSequence(event)
 }
 
 func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
@@ -229,17 +268,21 @@ func (n *Notification) checkIfAlreadyHandled(userID string, sequence uint64, eve
 }
 
 func (n *Notification) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
-	query, err := eventsourcing.UserByIDQuery(userID, sequence)
+	query, err := usr_event.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err
 	}
 
-	return n.eventstore.FilterEvents(context.Background(), query)
+	return n.es.FilterEvents(context.Background(), query)
 }
 
 func (n *Notification) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-s9opc", "id", event.AggregateID, "sequence", event.Sequence).WithError(err).Warn("something went wrong in notification handler")
 	return spooler.HandleError(event, err, n.view.GetLatestNotificationFailedEvent, n.view.ProcessedNotificationFailedEvent, n.view.ProcessedNotificationSequence, n.errorCountUntilSkip)
+}
+
+func (n *Notification) OnSuccess() error {
+	return spooler.HandleSuccess(n.view.UpdateNotificationSpoolerRunTimestamp)
 }
 
 func getSetNotifyContextData(orgID string) context.Context {
@@ -250,7 +293,7 @@ func getSetNotifyContextData(orgID string) context.Context {
 func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	// read from Org
 	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg)
-	if errors.IsNotFound(err) {
+	if caos_errs.IsNotFound(err) {
 		// read from default
 		policy, err = n.view.LabelPolicyByAggregateID(n.systemDefaults.IamID, labelPolicyTableDef)
 		if err != nil {

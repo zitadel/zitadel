@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -18,29 +20,69 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
+const (
+	userTable = "adminapi.users"
+)
+
 type User struct {
 	handler
 	eventstore     eventstore.Eventstore
 	orgEvents      *org_events.OrgEventstore
 	iamEvents      *iam_es.IAMEventstore
 	systemDefaults systemdefaults.SystemDefaults
+	subscription   *eventstore.Subscription
 }
 
-const (
-	userTable = "adminapi.users"
-)
+func newUser(
+	handler handler,
+	orgEvents *org_events.OrgEventstore,
+	iamEvents *iam_es.IAMEventstore,
+	systemDefaults systemdefaults.SystemDefaults,
+) *User {
+	h := &User{
+		handler:        handler,
+		orgEvents:      orgEvents,
+		iamEvents:      iamEvents,
+		systemDefaults: systemDefaults,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (u *User) subscribe() {
+	u.subscription = u.es.Subscribe(u.AggregateTypes()...)
+	go func() {
+		for event := range u.subscription.Events {
+			query.ReduceEvent(u, event)
+		}
+	}()
+}
 
 func (u *User) ViewModel() string {
 	return userTable
 }
 
+func (u *User) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
+}
+
+func (u *User) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := u.view.GetLatestUserSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (u *User) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserSequence()
+	sequence, err := u.view.GetLatestUserSequence("")
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(es_model.UserAggregate, org_es_model.OrgAggregate).
+		AggregateTypeFilter(u.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -92,6 +134,12 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		es_model.HumanMFAOTPAdded,
 		es_model.HumanMFAOTPVerified,
 		es_model.HumanMFAOTPRemoved,
+		es_model.HumanMFAU2FTokenAdded,
+		es_model.HumanMFAU2FTokenVerified,
+		es_model.HumanMFAU2FTokenRemoved,
+		es_model.HumanPasswordlessTokenAdded,
+		es_model.HumanPasswordlessTokenVerified,
+		es_model.HumanPasswordlessTokenRemoved,
 		es_model.MachineChanged:
 		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
@@ -110,14 +158,14 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 		}
 		err = u.fillLoginNames(user)
 	case es_model.UserRemoved:
-		return u.view.DeleteUser(event.AggregateID, event.Sequence)
+		return u.view.DeleteUser(event.AggregateID, event)
 	default:
-		return u.view.ProcessedUserSequence(event.Sequence)
+		return u.view.ProcessedUserSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return u.view.PutUser(user, user.Sequence)
+	return u.view.PutUser(user, event)
 }
 
 func (u *User) ProcessOrg(event *models.Event) (err error) {
@@ -131,7 +179,7 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 	case org_es_model.OrgDomainPrimarySet:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
 	default:
-		return u.view.ProcessedUserSequence(event.Sequence)
+		return u.view.ProcessedUserSequence(event)
 	}
 }
 
@@ -154,7 +202,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	for _, user := range users {
 		user.SetLoginNames(policy, org.Domains)
 	}
-	return u.view.PutUsers(users, event.Sequence)
+	return u.view.PutUsers(users, event)
 }
 
 func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
@@ -179,7 +227,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	for _, user := range users {
 		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
 	}
-	return u.view.PutUsers(users, event.Sequence)
+	return u.view.PutUsers(users, event)
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
@@ -202,4 +250,8 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 func (u *User) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-vLmwQ", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
+}
+
+func (u *User) OnSuccess() error {
+	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp)
 }

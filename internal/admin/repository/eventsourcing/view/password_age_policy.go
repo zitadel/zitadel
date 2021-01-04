@@ -2,6 +2,7 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	global_view "github.com/caos/zitadel/internal/view/repository"
@@ -15,28 +16,32 @@ func (v *View) PasswordAgePolicyByAggregateID(aggregateID string) (*model.Passwo
 	return view.GetPasswordAgePolicyByAggregateID(v.Db, passwordAgePolicyTable, aggregateID)
 }
 
-func (v *View) PutPasswordAgePolicy(policy *model.PasswordAgePolicyView, sequence uint64) error {
+func (v *View) PutPasswordAgePolicy(policy *model.PasswordAgePolicyView, event *models.Event) error {
 	err := view.PutPasswordAgePolicy(v.Db, passwordAgePolicyTable, policy)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedPasswordAgePolicySequence(sequence)
+	return v.ProcessedPasswordAgePolicySequence(event)
 }
 
-func (v *View) DeletePasswordAgePolicy(aggregateID string, eventSequence uint64) error {
+func (v *View) DeletePasswordAgePolicy(aggregateID string, event *models.Event) error {
 	err := view.DeletePasswordAgePolicy(v.Db, passwordAgePolicyTable, aggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedPasswordAgePolicySequence(eventSequence)
+	return v.ProcessedPasswordAgePolicySequence(event)
 }
 
-func (v *View) GetLatestPasswordAgePolicySequence() (*global_view.CurrentSequence, error) {
-	return v.latestSequence(passwordAgePolicyTable)
+func (v *View) GetLatestPasswordAgePolicySequence(aggregateType string) (*global_view.CurrentSequence, error) {
+	return v.latestSequence(passwordAgePolicyTable, aggregateType)
 }
 
-func (v *View) ProcessedPasswordAgePolicySequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(passwordAgePolicyTable, eventSequence)
+func (v *View) ProcessedPasswordAgePolicySequence(event *models.Event) error {
+	return v.saveCurrentSequence(passwordAgePolicyTable, event)
+}
+
+func (v *View) UpdateProcessedPasswordAgePolicySpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(passwordAgePolicyTable)
 }
 
 func (v *View) GetLatestPasswordAgePolicyFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {

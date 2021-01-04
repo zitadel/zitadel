@@ -3,7 +3,7 @@
 <div class="lgn-head">
     {{ template "user-profile" . }}
 
-    <p>{{t "MfaInitVerify.Description"}}</p>
+    <p>{{t "MFAInitVerify.Description"}}</p>
 </div>
 
 <form action="{{ mfaInitVerifyUrl }}" method="POST">
@@ -11,7 +11,7 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
-    <input type="hidden" name="mfaType" value="{{ .MfaType }}" />
+    <input type="hidden" name="mfaType" value="{{ .MFAType }}" />
     <input type="hidden" name="url" value="{{ .Url }}" />
     <input type="hidden" name="secret" value="{{ .Secret }}" />
 
@@ -52,8 +52,8 @@
     </div>
 </form>
 
-<script src="{{ resourceUrl "scripts/copy_to_clipboard.js" }}"></script>
-<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
-<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+<script src="{{ resourceUrl " scripts/copy_to_clipboard.js" }}"></script>
+<script src="{{ resourceUrl " scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl " scripts/default_form_validation.js" }}"></script>
 
 {{template "main-bottom" .}}
