@@ -3,21 +3,22 @@ package admin
 import (
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
 )
 
-func loginPolicyToModel(policy *admin.DefaultLoginPolicyRequest) *iam_model.LoginPolicy {
-	return &iam_model.LoginPolicy{
+func loginPolicyToDomain(policy *admin.DefaultLoginPolicyRequest) *domain.LoginPolicy {
+	return &domain.LoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
 		ForceMFA:              policy.ForceMfa,
-		PasswordlessType:      passwordlessTypeToModel(policy.PasswordlessType),
+		PasswordlessType:      passwordlessTypeToDomain(policy.PasswordlessType),
 	}
 }
 
-func loginPolicyFromModel(policy *iam_model.LoginPolicy) *admin.DefaultLoginPolicy {
+func loginPolicyFromDomain(policy *domain.LoginPolicy) *admin.DefaultLoginPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-3Fsm9").OnError(err).Debug("date parse failed")
 
@@ -29,7 +30,7 @@ func loginPolicyFromModel(policy *iam_model.LoginPolicy) *admin.DefaultLoginPoli
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
 		ForceMfa:              policy.ForceMFA,
-		PasswordlessType:      passwordlessTypeFromModel(policy.PasswordlessType),
+		PasswordlessType:      passwordlessTypeFromDomain(policy.PasswordlessType),
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
 	}
@@ -47,7 +48,7 @@ func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *admin.DefaultL
 		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
 		ForceMfa:              policy.ForceMFA,
-		PasswordlessType:      passwordlessTypeFromModel(policy.PasswordlessType),
+		PasswordlessType:      admin.PasswordlessType(policy.PasswordlessType),
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
 	}
@@ -69,6 +70,13 @@ func idpProviderSearchResponseFromModel(response *iam_model.IDPProviderSearchRes
 	}
 }
 
+func idpProviderToDomain(provider *admin.IdpProviderID) *domain.IDPProvider {
+	return &domain.IDPProvider{
+		IDPConfigID: provider.IdpConfigId,
+		Type:        domain.IdentityProviderTypeSystem,
+	}
+}
+
 func idpProviderToModel(provider *admin.IdpProviderID) *iam_model.IDPProvider {
 	return &iam_model.IDPProvider{
 		IDPConfigID: provider.IdpConfigId,
@@ -76,7 +84,7 @@ func idpProviderToModel(provider *admin.IdpProviderID) *iam_model.IDPProvider {
 	}
 }
 
-func idpProviderFromModel(provider *iam_model.IDPProvider) *admin.IdpProviderID {
+func idpProviderFromDomain(provider *domain.IDPProvider) *admin.IdpProviderID {
 	return &admin.IdpProviderID{
 		IdpConfigId: provider.IDPConfigID,
 	}
@@ -148,21 +156,21 @@ func secondFactorTypeToModel(mfaType *admin.SecondFactor) iam_model.SecondFactor
 	}
 }
 
-func passwordlessTypeFromModel(passwordlessType iam_model.PasswordlessType) admin.PasswordlessType {
+func passwordlessTypeFromDomain(passwordlessType domain.PasswordlessType) admin.PasswordlessType {
 	switch passwordlessType {
-	case iam_model.PasswordlessTypeAllowed:
+	case domain.PasswordlessTypeAllowed:
 		return admin.PasswordlessType_PASSWORDLESSTYPE_ALLOWED
 	default:
 		return admin.PasswordlessType_PASSWORDLESSTYPE_NOT_ALLOWED
 	}
 }
 
-func passwordlessTypeToModel(passwordlessType admin.PasswordlessType) iam_model.PasswordlessType {
+func passwordlessTypeToDomain(passwordlessType admin.PasswordlessType) domain.PasswordlessType {
 	switch passwordlessType {
 	case admin.PasswordlessType_PASSWORDLESSTYPE_ALLOWED:
-		return iam_model.PasswordlessTypeAllowed
+		return domain.PasswordlessTypeAllowed
 	default:
-		return iam_model.PasswordlessTypeNotAllowed
+		return domain.PasswordlessTypeNotAllowed
 	}
 }
 

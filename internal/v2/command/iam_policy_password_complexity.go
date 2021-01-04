@@ -3,13 +3,13 @@ package command
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context, aggregateID string) (*iam_model.PasswordComplexityPolicy, error) {
-	policyWriteModel := NewIAMPasswordComplexityPolicyWriteModel(aggregateID)
+func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*domain.PasswordComplexityPolicy, error) {
+	policyWriteModel := NewIAMPasswordComplexityPolicyWriteModel(r.iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
@@ -19,7 +19,8 @@ func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context, ag
 	return policy, nil
 }
 
-func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMPasswordComplexityPolicyWriteModel(policy.AggregateID)
 	iamAgg, err := r.addDefaultPasswordComplexityPolicy(ctx, addedPolicy, policy)
 	if err != nil {
@@ -34,7 +35,7 @@ func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, po
 	return writeModelToPasswordComplexityPolicy(addedPolicy), nil
 }
 
-func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, addedPolicy *IAMPasswordComplexityPolicyWriteModel, policy *iam_model.PasswordComplexityPolicy) (*iam_repo.Aggregate, error) {
+func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, addedPolicy *IAMPasswordComplexityPolicyWriteModel, policy *domain.PasswordComplexityPolicy) (*iam_repo.Aggregate, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
@@ -53,7 +54,8 @@ func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, ad
 	return iamAgg, nil
 }
 
-func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
+func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+	policy.AggregateID = r.iamID
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}

@@ -4,6 +4,8 @@ import (
 	"context"
 	"flag"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/query"
 
 	"github.com/caos/logging"
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
@@ -93,6 +95,19 @@ func startZitadel(configPaths []string) {
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
+	es, err := es_int.Start(conf.Admin.Eventstore)
+	if err != nil {
+		return
+	}
+	esV2 := es.V2()
+	command, err := command.StartCommandSide(&command.Config{Eventstore: esV2, SystemDefaults: conf.SystemDefaults})
+	if err != nil {
+		return
+	}
+	query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: conf.SystemDefaults})
+	if err != nil {
+		return
+	}
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 	var authRepo *auth_es.EsRepository
@@ -101,7 +116,7 @@ func startZitadel(configPaths []string) {
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
-	startAPI(ctx, conf, authZRepo, authRepo)
+	startAPI(ctx, conf, authZRepo, authRepo, command, query)
 	startUI(ctx, conf, authRepo)
 
 	if *notificationEnabled {
@@ -126,18 +141,18 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) 
 	uis.Start(ctx)
 }
 
-func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository) {
+func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.CommandSide, query *query.QuerySide) {
 	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
 	}
-	adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, roles)
+	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, roles)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
-	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, adminRepo, conf.SystemDefaults)
+	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)
 
 	if *adminEnabled {
-		apis.RegisterServer(ctx, admin.CreateServer(adminRepo))
+		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo))
 	}
 	if *managementEnabled {
 		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles)

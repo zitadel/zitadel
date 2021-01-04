@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/query"
 	"strings"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -19,7 +18,6 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/v2/command"
 )
 
 type IAMRepository struct {
@@ -30,9 +28,6 @@ type IAMRepository struct {
 	View           *admin_view.View
 	SystemDefaults systemdefaults.SystemDefaults
 	Roles          []string
-
-	IAMV2Command *command.CommandSide
-	IAMV2Query   *query.QuerySide
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
@@ -41,30 +36,6 @@ func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID stri
 		return nil, err
 	}
 	return iam_es_model.IAMMemberToModel(member), nil
-}
-
-func (repo *IAMRepository) AddIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
-	member.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddIAMMember(ctx, member)
-	}
-	return repo.IAMEventstore.AddIAMMember(ctx, member)
-}
-
-func (repo *IAMRepository) ChangeIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
-	member.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ChangeIAMMember(ctx, member)
-	}
-	return repo.IAMEventstore.ChangeIAMMember(ctx, member)
-}
-
-func (repo *IAMRepository) RemoveIAMMember(ctx context.Context, userID string) error {
-	member := iam_model.NewIAMMember(repo.SystemDefaults.IamID, userID)
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.RemoveIAMMember(ctx, member)
-	}
-	return repo.IAMEventstore.RemoveIAMMember(ctx, member)
 }
 
 func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
@@ -96,48 +67,6 @@ func (repo *IAMRepository) GetIAMMemberRoles() []string {
 		}
 	}
 	return roles
-}
-
-func (repo *IAMRepository) IDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Query.DefaultIDPConfigByID(ctx, repo.SystemDefaults.IamID, idpConfigID)
-	}
-
-	idp, err := repo.View.IDPConfigByID(idpConfigID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.IDPConfigViewToModel(idp), nil
-}
-
-func (repo *IAMRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
-	idp.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddDefaultIDPConfig(ctx, idp)
-	}
-	return repo.IAMEventstore.AddIDPConfig(ctx, idp)
-}
-
-func (repo *IAMRepository) ChangeIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
-	idp.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ChangeDefaultIDPConfig(ctx, idp)
-	}
-	return repo.IAMEventstore.ChangeIDPConfig(ctx, idp)
-}
-
-func (repo *IAMRepository) DeactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.DeactivateDefaultIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
-	}
-	return repo.IAMEventstore.DeactivateIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
-}
-
-func (repo *IAMRepository) ReactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ReactivateDefaultIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
-	}
-	return repo.IAMEventstore.ReactivateIDPConfig(ctx, repo.SystemDefaults.IamID, idpConfigID)
 }
 
 func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID string) error {
@@ -182,14 +111,6 @@ func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID stri
 		aggregates = append(aggregates, idpAgg...)
 	}
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
-}
-
-func (repo *IAMRepository) ChangeOidcIDPConfig(ctx context.Context, oidcConfig *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
-	oidcConfig.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ChangeDefaultIDPOIDCConfig(ctx, oidcConfig)
-	}
-	return repo.IAMEventstore.ChangeIDPOIDCConfig(ctx, oidcConfig)
 }
 
 func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
@@ -238,22 +159,6 @@ func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_mode
 	return iam_es_model.LabelPolicyViewToModel(policy), nil
 }
 
-func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddDefaultLabelPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.AddLabelPolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ChangeDefaultLabelPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.ChangeLabelPolicy(ctx, policy)
-}
-
 func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
 	policy, viewErr := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
@@ -279,22 +184,6 @@ func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 	return iam_es_model.LoginPolicyViewToModel(policy), nil
 }
 
-func (repo *IAMRepository) AddDefaultLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddDefaultLoginPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.AddLoginPolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ChangeDefaultLoginPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.ChangeLoginPolicy(ctx, policy)
-}
-
 func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
@@ -315,14 +204,6 @@ func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, reques
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
-}
-
-func (repo *IAMRepository) AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error) {
-	provider.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddIDPProviderToDefaultLoginPolicy(ctx, provider)
-	}
-	return repo.IAMEventstore.AddIDPProviderToLoginPolicy(ctx, provider)
 }
 
 func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error {
@@ -361,20 +242,6 @@ func (repo *IAMRepository) SearchDefaultSecondFactors(ctx context.Context) (*iam
 	}, nil
 }
 
-func (repo *IAMRepository) AddSecondFactorToLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddSecondFactorToDefaultLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
-	}
-	return repo.IAMEventstore.AddSecondFactorToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
-}
-
-func (repo *IAMRepository) RemoveSecondFactorFromLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) error {
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
-	}
-	return repo.IAMEventstore.RemoveSecondFactorFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
-}
-
 func (repo *IAMRepository) SearchDefaultMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error) {
 	policy, err := repo.GetDefaultLoginPolicy(ctx)
 	if err != nil {
@@ -384,20 +251,6 @@ func (repo *IAMRepository) SearchDefaultMultiFactors(ctx context.Context) (*iam_
 		TotalResult: uint64(len(policy.MultiFactors)),
 		Result:      policy.MultiFactors,
 	}, nil
-}
-
-func (repo *IAMRepository) AddMultiFactorToLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddMultiFactorToDefaultLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
-	}
-	return repo.IAMEventstore.AddMultiFactorToLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
-}
-
-func (repo *IAMRepository) RemoveMultiFactorFromLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) error {
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
-	}
-	return repo.IAMEventstore.RemoveMultiFactorFromLoginPolicy(ctx, repo.SystemDefaults.IamID, mfa)
 }
 
 func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
@@ -425,22 +278,6 @@ func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 	return iam_es_model.PasswordComplexityViewToModel(policy), nil
 }
 
-func (repo *IAMRepository) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddDefaultPasswordComplexityPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.AddPasswordComplexityPolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ChangeDefaultPasswordComplexityPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.ChangePasswordComplexityPolicy(ctx, policy)
-}
-
 func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
 	policy, viewErr := repo.View.PasswordAgePolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
@@ -464,22 +301,6 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 		}
 	}
 	return iam_es_model.PasswordAgeViewToModel(policy), nil
-}
-
-func (repo *IAMRepository) AddDefaultPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddDefaultPasswordAgePolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.AddPasswordAgePolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ChangeDefaultPasswordAgePolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.ChangePasswordAgePolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error) {
@@ -507,22 +328,6 @@ func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 	return iam_es_model.PasswordLockoutViewToModel(policy), nil
 }
 
-func (repo *IAMRepository) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddDefaultPasswordLockoutPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.AddPasswordLockoutPolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ChangeDefaultPasswordLockoutPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.ChangePasswordLockoutPolicy(ctx, policy)
-}
-
 func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
 	policy, viewErr := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
@@ -546,20 +351,4 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 		}
 	}
 	return iam_es_model.OrgIAMViewToModel(policy), nil
-}
-
-func (repo *IAMRepository) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.AddDefaultOrgIAMPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.AddOrgIAMPolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	if repo.IAMV2Command != nil {
-		return repo.IAMV2Command.ChangeDefaultOrgIAMPolicy(ctx, policy)
-	}
-	return repo.IAMEventstore.ChangeOrgIAMPolicy(ctx, policy)
 }

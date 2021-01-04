@@ -3,18 +3,19 @@ package admin
 import (
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
 )
 
-func labelPolicyToModel(policy *admin.DefaultLabelPolicyUpdate) *iam_model.LabelPolicy {
-	return &iam_model.LabelPolicy{
+func labelPolicyToDomain(policy *admin.DefaultLabelPolicyUpdate) *domain.LabelPolicy {
+	return &domain.LabelPolicy{
 		PrimaryColor:   policy.PrimaryColor,
 		SecondaryColor: policy.SecondaryColor,
 	}
 }
 
-func labelPolicyFromModel(policy *iam_model.LabelPolicy) *admin.DefaultLabelPolicy {
+func labelPolicyFromDomain(policy *domain.LabelPolicy) *admin.DefaultLabelPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("ADMIN-QwQG9").OnError(err).Debug("date parse failed")
 

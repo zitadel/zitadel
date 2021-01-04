@@ -4,7 +4,6 @@ import (
 	"context"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -72,7 +71,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 Step1)
 	//create default login policy
 	iamAgg, err := r.addDefaultLoginPolicy(ctx,
 		NewIAMLoginPolicyWriteModel(iam.AggregateID),
-		&iam_model.LoginPolicy{
+		&domain.LoginPolicy{
 			AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
 			AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
 			AllowExternalIdp:      step1.DefaultLoginPolicy.AllowExternalIdp,

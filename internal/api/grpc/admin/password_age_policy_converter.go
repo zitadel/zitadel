@@ -3,18 +3,19 @@ package admin
 import (
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
 )
 
-func passwordAgePolicyToModel(policy *admin.DefaultPasswordAgePolicyRequest) *iam_model.PasswordAgePolicy {
-	return &iam_model.PasswordAgePolicy{
+func passwordAgePolicyToDomain(policy *admin.DefaultPasswordAgePolicyRequest) *domain.PasswordAgePolicy {
+	return &domain.PasswordAgePolicy{
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
 	}
 }
 
-func passwordAgePolicyFromModel(policy *iam_model.PasswordAgePolicy) *admin.DefaultPasswordAgePolicy {
+func passwordAgePolicyFromDomain(policy *domain.PasswordAgePolicy) *admin.DefaultPasswordAgePolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-mH9os").OnError(err).Debug("date parse failed")
 

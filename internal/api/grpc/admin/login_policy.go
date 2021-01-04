@@ -15,11 +15,11 @@ func (s *Server) GetDefaultLoginPolicy(ctx context.Context, _ *empty.Empty) (*ad
 }
 
 func (s *Server) UpdateDefaultLoginPolicy(ctx context.Context, policy *admin.DefaultLoginPolicyRequest) (*admin.DefaultLoginPolicy, error) {
-	result, err := s.iam.ChangeDefaultLoginPolicy(ctx, loginPolicyToModel(policy))
+	result, err := s.command.ChangeDefaultLoginPolicy(ctx, loginPolicyToDomain(policy))
 	if err != nil {
 		return nil, err
 	}
-	return loginPolicyFromModel(result), nil
+	return loginPolicyFromDomain(result), nil
 }
 
 func (s *Server) GetDefaultLoginPolicyIdpProviders(ctx context.Context, request *admin.IdpProviderSearchRequest) (*admin.IdpProviderSearchResponse, error) {
@@ -31,13 +31,14 @@ func (s *Server) GetDefaultLoginPolicyIdpProviders(ctx context.Context, request 
 }
 
 func (s *Server) AddIdpProviderToDefaultLoginPolicy(ctx context.Context, provider *admin.IdpProviderID) (*admin.IdpProviderID, error) {
-	result, err := s.iam.AddIDPProviderToLoginPolicy(ctx, idpProviderToModel(provider))
+	result, err := s.command.AddIDPProviderToDefaultLoginPolicy(ctx, idpProviderToDomain(provider))
 	if err != nil {
 		return nil, err
 	}
-	return idpProviderFromModel(result), nil
+	return idpProviderFromDomain(result), nil
 }
 
+//TODO: Change to v2
 func (s *Server) RemoveIdpProviderFromDefaultLoginPolicy(ctx context.Context, provider *admin.IdpProviderID) (*empty.Empty, error) {
 	err := s.iam.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
 	return &empty.Empty{}, err
@@ -52,7 +53,7 @@ func (s *Server) GetDefaultLoginPolicySecondFactors(ctx context.Context, _ *empt
 }
 
 func (s *Server) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, mfa *admin.SecondFactor) (*admin.SecondFactor, error) {
-	result, err := s.iam.AddSecondFactorToLoginPolicy(ctx, secondFactorTypeToModel(mfa))
+	result, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, secondFactorTypeToModel(mfa))
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +61,7 @@ func (s *Server) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, mfa *a
 }
 
 func (s *Server) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, mfa *admin.SecondFactor) (*empty.Empty, error) {
-	err := s.iam.RemoveSecondFactorFromLoginPolicy(ctx, secondFactorTypeToModel(mfa))
+	err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, secondFactorTypeToModel(mfa))
 	return &empty.Empty{}, err
 }
 
@@ -73,7 +74,7 @@ func (s *Server) GetDefaultLoginPolicyMultiFactors(ctx context.Context, _ *empty
 }
 
 func (s *Server) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, mfa *admin.MultiFactor) (*admin.MultiFactor, error) {
-	result, err := s.iam.AddMultiFactorToLoginPolicy(ctx, multiFactorTypeToModel(mfa))
+	result, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, multiFactorTypeToModel(mfa))
 	if err != nil {
 		return nil, err
 	}
@@ -81,6 +82,6 @@ func (s *Server) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, mfa *ad
 }
 
 func (s *Server) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, mfa *admin.MultiFactor) (*empty.Empty, error) {
-	err := s.iam.RemoveMultiFactorFromLoginPolicy(ctx, multiFactorTypeToModel(mfa))
+	err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, multiFactorTypeToModel(mfa))
 	return &empty.Empty{}, err
 }

@@ -2,16 +2,16 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"reflect"
 
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) AddIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.IAMMember) (*domain.IAMMember, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
@@ -39,7 +39,7 @@ func (r *CommandSide) AddIAMMember(ctx context.Context, member *iam_model.IAMMem
 }
 
 //ChangeIAMMember updates an existing member
-func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *iam_model.IAMMember) (*iam_model.IAMMember, error) {
+func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *domain.IAMMember) (*domain.IAMMember, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
@@ -70,8 +70,8 @@ func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *iam_model.IAM
 	return writeModelToMember(existingMember), nil
 }
 
-func (r *CommandSide) RemoveIAMMember(ctx context.Context, member *iam_model.IAMMember) error {
-	m, err := r.iamMemberWriteModelByID(ctx, member.AggregateID, member.UserID)
+func (r *CommandSide) RemoveIAMMember(ctx context.Context, userID string) error {
+	m, err := r.iamMemberWriteModelByID(ctx, r.iamID, userID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
@@ -80,7 +80,7 @@ func (r *CommandSide) RemoveIAMMember(ctx context.Context, member *iam_model.IAM
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewMemberRemovedEvent(ctx, member.UserID))
+	iamAgg.PushEvents(iam_repo.NewMemberRemovedEvent(ctx, userID))
 
 	return r.eventstore.PushAggregate(ctx, m, iamAgg)
 }
