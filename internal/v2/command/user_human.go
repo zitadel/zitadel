@@ -3,12 +3,11 @@ package command
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
-func (r *CommandSide) AddHuman(ctx context.Context, orgID, username string, human *usr_model.Human) (*usr_model.Human, error) {
+func (r *CommandSide) AddHuman(ctx context.Context, orgID, username string, human *domain.Human) (*domain.Human, error) {
 	if !human.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
@@ -21,16 +20,16 @@ func (r *CommandSide) AddHuman(ctx context.Context, orgID, username string, huma
 	if err != nil {
 		return nil, err
 	}
-	//pwPolicy, err := r.GetOrgPasswordComplexityPolicy(ctx, orgID)
-	//if err != nil {
-	//	return nil, err
-	//}
+	pwPolicy, err := r.GetOrgPasswordComplexityPolicy(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
 
 	addedHuman := NewHumanWriteModel(human.AggregateID)
 	//TODO: Check Unique Username
 	human.CheckOrgIAMPolicy(username, orgIAMPolicy)
 	human.SetNamesAsDisplayname()
-	//human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true)
+	human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true)
 
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
 	userAgg.PushEvents(
@@ -42,7 +41,7 @@ func (r *CommandSide) AddHuman(ctx context.Context, orgID, username string, huma
 			human.NickName,
 			human.DisplayName,
 			human.PreferredLanguage,
-			domain.Gender(human.Gender),
+			human.Gender,
 			human.EmailAddress,
 			human.PhoneNumber,
 			human.Country,

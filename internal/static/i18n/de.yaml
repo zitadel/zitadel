@@ -26,9 +26,10 @@ Errors:
       Invalid: Email ist ungültig
       AlreadyVerified: Email ist bereits verifiziert
       NotChanged: Email wurde nicht geändert
-    PhoneNotFound: Telfonnummer nicht gefunden
-    PhoneInvalid: Telefonnummer ist ungültig
-    PhoneAlreadyVerified: Telefonnummer bereits verifiziert
+    Phone:
+      NotFound: Telfonnummer nicht gefunden
+      Invalid: Telefonnummer ist ungültig
+      AlreadyVerified: Telefonnummer bereits verifiziert
     Address:
       NotFound: Addresse nicht gefunden
       NotChanged: Addresse wurde nicht geändert

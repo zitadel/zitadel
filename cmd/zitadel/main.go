@@ -157,7 +157,7 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 	if *managementEnabled {
 		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles)
 		logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
-		apis.RegisterServer(ctx, management.CreateServer(managementRepo, conf.SystemDefaults))
+		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
 	}
 	if *authEnabled {
 		apis.RegisterServer(ctx, auth.CreateServer(authRepo))
