@@ -26,24 +26,27 @@ func readModelToIAM(readModel *ReadModel) *model.IAM {
 }
 
 func readModelToIDPConfigView(rm *IAMIDPConfigReadModel) *domain.IDPConfigView {
-	return &domain.IDPConfigView{
-		AggregateID:               rm.AggregateID,
-		ChangeDate:                rm.ChangeDate,
-		CreationDate:              rm.CreationDate,
-		IDPConfigID:               rm.ConfigID,
-		IDPProviderType:           rm.ProviderType,
-		IsOIDC:                    rm.OIDCConfig != nil,
-		Name:                      rm.Name,
-		OIDCClientID:              rm.OIDCConfig.ClientID,
-		OIDCClientSecret:          rm.OIDCConfig.ClientSecret,
-		OIDCIDPDisplayNameMapping: rm.OIDCConfig.IDPDisplayNameMapping,
-		OIDCIssuer:                rm.OIDCConfig.Issuer,
-		OIDCScopes:                rm.OIDCConfig.Scopes,
-		OIDCUsernameMapping:       rm.OIDCConfig.UserNameMapping,
-		Sequence:                  rm.ProcessedSequence,
-		State:                     rm.State,
-		StylingType:               rm.StylingType,
+	converted := &domain.IDPConfigView{
+		AggregateID:     rm.AggregateID,
+		ChangeDate:      rm.ChangeDate,
+		CreationDate:    rm.CreationDate,
+		IDPConfigID:     rm.ConfigID,
+		IDPProviderType: rm.ProviderType,
+		IsOIDC:          rm.OIDCConfig != nil,
+		Name:            rm.Name,
+		Sequence:        rm.ProcessedSequence,
+		State:           rm.State,
+		StylingType:     rm.StylingType,
 	}
+	if rm.OIDCConfig != nil {
+		converted.OIDCClientID = rm.OIDCConfig.ClientID
+		converted.OIDCClientSecret = rm.OIDCConfig.ClientSecret
+		converted.OIDCIDPDisplayNameMapping = rm.OIDCConfig.IDPDisplayNameMapping
+		converted.OIDCIssuer = rm.OIDCConfig.Issuer
+		converted.OIDCScopes = rm.OIDCConfig.Scopes
+		converted.OIDCUsernameMapping = rm.OIDCConfig.UserNameMapping
+	}
+	return converted
 }
 
 func readModelToMember(readModel *MemberReadModel) *model.IAMMember {
