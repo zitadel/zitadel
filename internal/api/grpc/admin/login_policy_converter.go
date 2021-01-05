@@ -48,7 +48,7 @@ func loginPolicyViewFromModel(policy *iam_model.LoginPolicyView) *admin.DefaultL
 		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
 		ForceMfa:              policy.ForceMFA,
-		PasswordlessType:      admin.PasswordlessType(policy.PasswordlessType),
+		PasswordlessType:      passwordlessTypeFromDomain(policy.PasswordlessType),
 		CreationDate:          creationDate,
 		ChangeDate:            changeDate,
 	}
