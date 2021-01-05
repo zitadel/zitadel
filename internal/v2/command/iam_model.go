@@ -16,7 +16,7 @@ type IAMWriteModel struct {
 	ProjectID   string
 }
 
-func NewIAMriteModel(iamID string) *IAMWriteModel {
+func NewIAMWriteModel(iamID string) *IAMWriteModel {
 	return &IAMWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID: iamID,

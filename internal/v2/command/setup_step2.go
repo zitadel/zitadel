@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
@@ -13,26 +12,23 @@ type Step2 struct {
 	DefaultPasswordComplexityPolicy iam_model.PasswordComplexityPolicy
 }
 
-func (r *CommandSide) SetupStep2(ctx context.Context, iamID string, step Step2) error {
-	iam, err := r.iamByID(ctx, iamID)
-	if err != nil && !caos_errs.IsNotFound(err) {
-		return err
-	}
-	iamAgg, err := r.addDefaultPasswordComplexityPolicy(ctx, NewIAMPasswordComplexityPolicyWriteModel(iam.AggregateID), &iam_model.PasswordComplexityPolicy{
-		MinLength:    step.DefaultPasswordComplexityPolicy.MinLength,
-		HasLowercase: step.DefaultPasswordComplexityPolicy.HasLowercase,
-		HasUppercase: step.DefaultPasswordComplexityPolicy.HasUppercase,
-		HasNumber:    step.DefaultPasswordComplexityPolicy.HasNumber,
-		HasSymbol:    step.DefaultPasswordComplexityPolicy.HasSymbol,
-	})
-	if err != nil {
-		return err
-	}
-	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
+func (s *Step2) Step() domain.Step {
+	return domain.Step2
+}
 
-	_, err = r.eventstore.PushAggregates(ctx, iamAgg)
-	if err != nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-HR2na", "Setup Step2 failed")
+func (s *Step2) execute(ctx context.Context, commandSide *CommandSide) error {
+	return commandSide.SetupStep2(ctx, commandSide.iamID, s)
+}
+
+func (r *CommandSide) SetupStep2(ctx context.Context, iamID string, step *Step2) error {
+	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
+		return r.addDefaultPasswordComplexityPolicy(ctx, NewIAMPasswordComplexityPolicyWriteModel(iam.AggregateID), &iam_model.PasswordComplexityPolicy{
+			MinLength:    step.DefaultPasswordComplexityPolicy.MinLength,
+			HasLowercase: step.DefaultPasswordComplexityPolicy.HasLowercase,
+			HasUppercase: step.DefaultPasswordComplexityPolicy.HasUppercase,
+			HasNumber:    step.DefaultPasswordComplexityPolicy.HasNumber,
+			HasSymbol:    step.DefaultPasswordComplexityPolicy.HasSymbol,
+		})
 	}
-	return nil
+	return r.setup(ctx, iamID, step, fn)
 }

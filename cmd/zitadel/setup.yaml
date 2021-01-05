@@ -96,6 +96,6 @@ SetUp:
       PrimaryColor: '#222324'
       SecondaryColor: '#ffffff'
   Step7:
-    DefaultSecondFactor: 1 #SecondFactorTypeOTP
+    OTP: true
   Step8:
-    DefaultSecondFactor: 2 #SecondFactorTypeU2F
+    U2F: true

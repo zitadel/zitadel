@@ -14,6 +14,20 @@ func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *iam_mod
 	}
 
 	addedPolicy := NewIAMLabelPolicyWriteModel(policy.AggregateID)
+	iamAgg, err := r.addDefaultLabelPolicy(ctx, addedPolicy, policy)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToLabelPolicy(addedPolicy), nil
+}
+
+func (r *CommandSide) addDefaultLabelPolicy(ctx context.Context, addedPolicy *IAMLabelPolicyWriteModel, policy *iam_model.LabelPolicy) (*iam_repo.Aggregate, error) {
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -25,12 +39,7 @@ func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *iam_mod
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewLabelPolicyAddedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor))
 
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToLabelPolicy(addedPolicy), nil
+	return iamAgg, nil
 }
 
 func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {

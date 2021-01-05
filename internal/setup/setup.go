@@ -1,9 +1,6 @@
 package setup
 
 import (
-	"context"
-
-	"github.com/caos/zitadel/internal/api/authz"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -201,6 +198,6 @@ const (
 //	return proj_model.OIDCAuthMethodTypeBasic
 //}
 //
-func setSetUpContextData(ctx context.Context, orgID string) context.Context {
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: SetupUser, OrgID: orgID})
-}
+//func setSetUpContextData(ctx context.Context, orgID string) context.Context {
+//	return authz.SetCtxData(ctx, authz.CtxData{UserID: SetupUser, OrgID: orgID})
+//}

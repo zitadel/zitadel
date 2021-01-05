@@ -102,23 +102,32 @@ func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Contex
 
 func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
 	secondFactorModel := NewIAMSecondFactorWriteModel(iamID)
-	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	iamAgg, err := r.addSecondFactorToDefaultLoginPolicy(ctx, secondFactorModel, secondFactor)
 	if err != nil {
 		return iam_model.SecondFactorTypeUnspecified, err
 	}
-
-	if secondFactorModel.IsActive {
-		return iam_model.SecondFactorTypeUnspecified, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
-	}
-
-	iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewLoginPolicySecondFactorAddedEvent(ctx, domain.SecondFactorType(secondFactor)))
 
 	if err = r.eventstore.PushAggregate(ctx, secondFactorModel, iamAgg); err != nil {
 		return iam_model.SecondFactorTypeUnspecified, err
 	}
 
 	return iam_model.SecondFactorType(secondFactorModel.MFAType), nil
+}
+
+func (r *CommandSide) addSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactorModel *IAMSecondFactorWriteModel, secondFactor iam_model.SecondFactorType) (*iam_repo.Aggregate, error) {
+	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	if err != nil {
+		return nil, err
+	}
+
+	if secondFactorModel.IsActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
+	}
+
+	iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewLoginPolicySecondFactorAddedEvent(ctx, domain.SecondFactorType(secondFactor)))
+
+	return iamAgg, nil
 }
 
 func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.SecondFactorType) error {

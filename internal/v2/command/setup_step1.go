@@ -23,6 +23,14 @@ type Step1 struct {
 	//pwComplexityPolicy *iam_model.PasswordComplexityPolicyView
 }
 
+func (s *Step1) Step() domain.Step {
+	return domain.Step1
+}
+
+func (s *Step1) execute(ctx context.Context, commandSide *CommandSide) error {
+	return commandSide.SetupStep1(ctx, commandSide.iamID, s)
+}
+
 type LoginPolicy struct {
 	AllowRegister         bool
 	AllowUsernamePassword bool
@@ -64,7 +72,7 @@ type OIDCApp struct {
 	DevMode                bool
 }
 
-func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 Step1) error {
+func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1) error {
 	iam, err := r.iamByID(ctx, iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err

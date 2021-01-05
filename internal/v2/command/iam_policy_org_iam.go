@@ -21,6 +21,20 @@ func (r *CommandSide) GetDefaultOrgIAMPolicy(ctx context.Context, aggregateID st
 
 func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
 	addedPolicy := NewIAMOrgIAMPolicyWriteModel(policy.AggregateID)
+	iamAgg, err := r.addDefaultOrgIAMPolicy(ctx, addedPolicy, policy)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToOrgIAMPolicy(addedPolicy), nil
+}
+
+func (r *CommandSide) addDefaultOrgIAMPolicy(ctx context.Context, addedPolicy *IAMOrgIAMPolicyWriteModel, policy *iam_model.OrgIAMPolicy) (*iam_repo.Aggregate, error) {
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -31,12 +45,7 @@ func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_mo
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain))
 
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToOrgIAMPolicy(addedPolicy), nil
+	return iamAgg, nil
 }
 
 func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {

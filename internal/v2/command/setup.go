@@ -3,11 +3,69 @@ package command
 import (
 	"context"
 
+	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
+
+type IAMSetUp struct {
+	Step1 *Step1
+	//Step2 *Step2
+	//Step3 *Step3
+	//Step4 *Step4
+	//Step5 *Step5
+	//Step6 *Step6
+	//Step7 *Step7
+	//Step8 *Step8
+}
+
+type Step interface {
+	Step() domain.Step
+	execute(context.Context, *CommandSide) error
+}
+
+const (
+	SetupUser = "SETUP"
+)
+
+func (r *CommandSide) ExecuteSetupSteps(ctx context.Context, steps []Step) error {
+	iam, err := r.GetIAM(ctx, r.iamID)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return err
+	}
+	if iam != nil && (iam.SetUpDone == domain.StepCount-1 || iam.SetUpStarted != iam.SetUpDone) {
+		logging.Log("COMMA-dgd2z").Info("all steps done")
+		return nil
+	}
+
+	if iam == nil {
+		iam = &iam_model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: r.iamID}}
+	}
+
+	ctx = setSetUpContextData(ctx, r.iamID)
+
+	for _, step := range steps {
+		iam, err = r.StartSetup(ctx, r.iamID, step.Step())
+		if err != nil {
+			return err
+		}
+
+		err = step.execute(ctx, r)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func setSetUpContextData(ctx context.Context, orgID string) context.Context {
+	return authz.SetCtxData(ctx, authz.CtxData{UserID: SetupUser, OrgID: orgID})
+}
 
 func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.Step) (*iam_model.IAM, error) {
 	iamWriteModel, err := r.iamByID(ctx, iamID)

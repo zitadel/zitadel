@@ -10,6 +10,20 @@ import (
 
 func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
 	addedPolicy := NewIAMPasswordLockoutPolicyWriteModel(policy.AggregateID)
+	iamAgg, err := r.addDefaultPasswordLockoutPolicy(ctx, addedPolicy, policy)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToPasswordLockoutPolicy(addedPolicy), nil
+}
+
+func (r *CommandSide) addDefaultPasswordLockoutPolicy(ctx context.Context, addedPolicy *IAMPasswordLockoutPolicyWriteModel, policy *iam_model.PasswordLockoutPolicy) (*iam_repo.Aggregate, error) {
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -21,12 +35,7 @@ func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, polic
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.PasswordLockoutPolicyWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewPasswordLockoutPolicyAddedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures))
 
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToPasswordLockoutPolicy(addedPolicy), nil
+	return iamAgg, nil
 }
 
 func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
