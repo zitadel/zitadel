@@ -1,82 +1,64 @@
-$lgn-checkbox-font-size: 16px !default;
+$lgn-checkbox-font-size: 14px !default;
 
 @mixin lgn-checkbox-base {
-    .lgn-checkbox {
+    display: inline-block;
+    position: relative;
+    margin: 0 0 10px;
+    font-size: $lgn-checkbox-font-size;
+    line-height: 24px;
+    box-sizing: inherit;
+    
+    input[type='checkbox'] {
+        position: absolute;
+        top: 4px;
+        left: 0;
+        width: 16px;
+        height: 16px;
+        opacity: 0;    
         z-index: 0;
-        position: relative;
+        box-sizing: inherit;
+    }
+    
+    // Unchecked
+    label {
         display: block;
+        padding: 0 0 0 24px;
+        cursor: pointer;
+        box-sizing: inherit;
         font-size: $lgn-checkbox-font-size;
-        line-height: 28px;
-        >input {
-            appearance: none;
-            -moz-appearance: none;
-            -webkit-appearance: none;
-            z-index: -1;
+        line-height: 26px;
+        
+        &:before {
+            content: '';
             position: absolute;
-            left: -10px;
-            top: -8px;
-            display: block;
-            margin: 0;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            box-shadow: none;
-            outline: none;
-            opacity: 0;
-            transform: scale(1);
-            pointer-events: none;
-            transition: opacity 0.3s, transform 0.2s;
-
-            &:indeterminate {
-                + {
-                    span {
-                        &::after {
-                            border-left: none;
-                            transform: translate(4px, 3px);
-                        }
-                    }
-                }
-            }
-            &:active {
-                transition: transform 0s, opacity 0s;
-            }
-            &:disabled {
-                + {
-                    span {
-                        cursor: initial;
-                    }
-                }
-            }
+            top: 4px;
+            left: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+            z-index: 1;
+            transition: all .28s cubic-bezier(.4, 0, .2, 1);
+            transition-property: background-color, border-color;
         }
-        >span {
-            display: inline-block;
-            width: 100%;
-            cursor: pointer;
-            &::before {
-                content: "";
-                display: inline-block;
-                box-sizing: border-box;
-                margin: 3px 11px 3px 1px;
-                border: solid 2px;
-                border-radius: 2px;
-                width: 18px;
-                height: 18px;
-                vertical-align: top;
-                transition: border-color 0.2s, background-color 0.2s;
-            }
-            &::after {
-                content: "";
-                display: block;
-                position: absolute;
-                top: 3px;
-                left: 1px;
-                width: 10px;
-                height: 5px;
-                border: solid 2px transparent;
-                border-right: none;
-                border-top: none;
-                transform: translate(3px, 4px) rotate(-45deg);
-            }
+        
+        &:after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 6px;
+            height: 12px;
+            transform: rotate(45deg);
+            z-index: 2;
+            transition: border-color .28s cubic-bezier(.4, 0, .2, 1);
         }
     }
+    
+    // Focused
+    // Uncomment for accessible outline
+    // &__input:focus + &__label {
+    //     &:before {
+    //         outline: 1px dotted currentColor;
+    //     }
+    // }    
 }
