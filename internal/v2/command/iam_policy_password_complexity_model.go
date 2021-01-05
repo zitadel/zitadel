@@ -53,23 +53,23 @@ func (wm *IAMPasswordComplexityPolicyWriteModel) NewChangedEvent(
 	changedEvent := iam.NewPasswordComplexityPolicyChangedEvent(ctx)
 	if wm.MinLength != minLength {
 		hasChanged = true
-		changedEvent.MinLength = minLength
+		changedEvent.MinLength = &minLength
 	}
 	if wm.HasLowercase != hasLowercase {
 		hasChanged = true
-		changedEvent.HasLowercase = hasLowercase
+		changedEvent.HasLowercase = &hasLowercase
 	}
 	if wm.HasUpperCase != hasUppercase {
 		hasChanged = true
-		changedEvent.HasUpperCase = hasUppercase
+		changedEvent.HasUpperCase = &hasUppercase
 	}
 	if wm.HasNumber != hasNumber {
 		hasChanged = true
-		changedEvent.HasNumber = hasNumber
+		changedEvent.HasNumber = &hasNumber
 	}
 	if wm.HasSymbol != hasSymbol {
 		hasChanged = true
-		changedEvent.HasSymbol = hasSymbol
+		changedEvent.HasSymbol = &hasSymbol
 	}
 	return changedEvent, hasChanged
 }

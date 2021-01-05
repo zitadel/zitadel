@@ -25,11 +25,21 @@ func (rm *PasswordComplexityPolicyReadModel) Reduce() error {
 			rm.HasNumber = e.HasNumber
 			rm.HasSymbol = e.HasSymbol
 		case *policy.PasswordComplexityPolicyChangedEvent:
-			rm.MinLength = e.MinLength
-			rm.HasLowercase = e.HasLowercase
-			rm.HasUpperCase = e.HasUpperCase
-			rm.HasNumber = e.HasNumber
-			rm.HasSymbol = e.HasSymbol
+			if e.MinLength != nil {
+				rm.MinLength = *e.MinLength
+			}
+			if e.HasLowercase != nil {
+				rm.HasLowercase = *e.HasLowercase
+			}
+			if e.HasUpperCase != nil {
+				rm.HasUpperCase = *e.HasUpperCase
+			}
+			if e.HasNumber != nil {
+				rm.HasNumber = *e.HasNumber
+			}
+			if e.HasSymbol != nil {
+				rm.HasSymbol = *e.HasSymbol
+			}
 		}
 	}
 	return rm.ReadModel.Reduce()

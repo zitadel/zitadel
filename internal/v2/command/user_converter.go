@@ -68,3 +68,11 @@ func writeModelToAddress(wm *HumanAddressWriteModel) *model.Address {
 		StreetAddress: wm.StreetAddress,
 	}
 }
+
+func writeModelToMachine(wm *MachineWriteModel) *domain.Machine {
+	return &domain.Machine{
+		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
+		Name:        wm.Name,
+		Description: wm.Description,
+	}
+}

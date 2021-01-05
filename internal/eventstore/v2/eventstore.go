@@ -207,7 +207,7 @@ func eventData(event EventPusher) ([]byte, error) {
 	if dataType.Kind() == reflect.Struct {
 		dataBytes, err := json.Marshal(event.Data())
 		if err != nil {
-			return nil, errors.ThrowInvalidArgument(err, "V2-xG87M", "could  not marhsal data")
+			return nil, errors.ThrowInvalidArgument(err, "V2-xG87M", "could  not marshal data")
 		}
 		return dataBytes, nil
 	}

@@ -53,8 +53,8 @@ func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.Even
 type PasswordAgePolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ExpireWarnDays uint64 `json:"expireWarnDays,omitempty"`
-	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
+	ExpireWarnDays *uint64 `json:"expireWarnDays,omitempty"`
+	MaxAgeDays     *uint64 `json:"maxAgeDays,omitempty"`
 }
 
 func (e *PasswordAgePolicyChangedEvent) Data() interface{} {

@@ -60,39 +60,39 @@ func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserReques
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.user.DeactivateUser(ctx, in.Id)
+	user, err := s.command.DeactivateUser(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return userFromModel(user), nil
+	return userFromDomain(user), nil
 }
 
 func (s *Server) ReactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.user.ReactivateUser(ctx, in.Id)
+	user, err := s.command.ReactivateUser(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return userFromModel(user), nil
+	return userFromDomain(user), nil
 }
 
 func (s *Server) LockUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.user.LockUser(ctx, in.Id)
+	user, err := s.command.LockUser(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return userFromModel(user), nil
+	return userFromDomain(user), nil
 }
 
 func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.user.UnlockUser(ctx, in.Id)
+	user, err := s.command.UnlockUser(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return userFromModel(user), nil
+	return userFromDomain(user), nil
 }
 
 func (s *Server) DeleteUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
-	err := s.user.RemoveUser(ctx, in.Id)
+	err := s.command.RemoveUser(ctx, in.Id)
 	return &empty.Empty{}, err
 }
 

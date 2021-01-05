@@ -27,11 +27,21 @@ func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
 			wm.HasSymbol = e.HasSymbol
 			wm.IsActive = true
 		case *policy.PasswordComplexityPolicyChangedEvent:
-			wm.MinLength = e.MinLength
-			wm.HasLowercase = e.HasLowercase
-			wm.HasUpperCase = e.HasUpperCase
-			wm.HasNumber = e.HasNumber
-			wm.HasSymbol = e.HasSymbol
+			if e.MinLength != nil {
+				wm.MinLength = *e.MinLength
+			}
+			if e.HasLowercase != nil {
+				wm.HasLowercase = *e.HasLowercase
+			}
+			if e.HasUpperCase != nil {
+				wm.HasUpperCase = *e.HasUpperCase
+			}
+			if e.HasNumber != nil {
+				wm.HasNumber = *e.HasNumber
+			}
+			if e.HasSymbol != nil {
+				wm.HasSymbol = *e.HasSymbol
+			}
 		case *policy.PasswordComplexityPolicyRemovedEvent:
 			wm.IsActive = false
 		}

@@ -21,8 +21,12 @@ func (rm *LabelPolicyReadModel) Reduce() error {
 			rm.SecondaryColor = e.SecondaryColor
 			rm.IsActive = true
 		case *policy.LabelPolicyChangedEvent:
-			rm.PrimaryColor = e.PrimaryColor
-			rm.SecondaryColor = e.SecondaryColor
+			if e.PrimaryColor != nil {
+				rm.PrimaryColor = *e.PrimaryColor
+			}
+			if e.SecondaryColor != nil {
+				rm.SecondaryColor = *e.SecondaryColor
+			}
 		case *policy.LabelPolicyRemovedEvent:
 			rm.IsActive = false
 		}

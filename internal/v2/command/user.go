@@ -122,6 +122,21 @@ func (r *CommandSide) UnlockUser(ctx context.Context, userID string) (*domain.Us
 	return writeModelToUser(existingUser), nil
 }
 
+func (r *CommandSide) RemoveUser(ctx context.Context, userID string) error {
+	existingUser, err := r.userWriteModelByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existingUser.UserState != domain.UserStateDeleted {
+		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-5M0od", "Errors.User.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
+	userAgg.PushEvents(user.NewUserRemovedEvent(ctx))
+	//TODO: release unqie username
+
+	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
+}
+
 func (r *CommandSide) userWriteModelByID(ctx context.Context, userID string) (writeModel *UserWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

@@ -49,7 +49,7 @@ func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventRead
 type OrgIAMPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserLoginMustBeDomain bool `json:"userLoginMustBeDomain"`
+	UserLoginMustBeDomain *bool `json:"userLoginMustBeDomain"`
 }
 
 func (e *OrgIAMPolicyChangedEvent) Data() interface{} {

@@ -28,11 +28,21 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			wm.PasswordlessType = e.PasswordlessType
 			wm.IsActive = true
 		case *policy.LoginPolicyChangedEvent:
-			wm.AllowRegister = e.AllowRegister
-			wm.AllowUserNamePassword = e.AllowUserNamePassword
-			wm.AllowExternalIDP = e.AllowExternalIDP
-			wm.ForceMFA = e.ForceMFA
-			wm.PasswordlessType = e.PasswordlessType
+			if e.AllowRegister != nil {
+				wm.AllowRegister = *e.AllowRegister
+			}
+			if e.AllowUserNamePassword != nil {
+				wm.AllowUserNamePassword = *e.AllowUserNamePassword
+			}
+			if e.AllowExternalIDP != nil {
+				wm.AllowExternalIDP = *e.AllowExternalIDP
+			}
+			if e.ForceMFA != nil {
+				wm.ForceMFA = *e.ForceMFA
+			}
+			if e.PasswordlessType != nil {
+				wm.PasswordlessType = *e.PasswordlessType
+			}
 		case *policy.LoginPolicyRemovedEvent:
 			wm.IsActive = false
 		}

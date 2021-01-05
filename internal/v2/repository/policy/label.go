@@ -53,8 +53,8 @@ func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReade
 type LabelPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	PrimaryColor   string `json:"primaryColor,omitempty"`
-	SecondaryColor string `json:"secondaryColor,omitempty"`
+	PrimaryColor   *string `json:"primaryColor,omitempty"`
+	SecondaryColor *string `json:"secondaryColor,omitempty"`
 }
 
 func (e *LabelPolicyChangedEvent) Data() interface{} {
