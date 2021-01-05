@@ -1,11 +1,12 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -32,28 +33,28 @@ func (v *View) SearchUserGrants(request *grant_model.UserGrantSearchRequest) ([]
 	return view.SearchUserGrants(v.Db, userGrantTable, request)
 }
 
-func (v *View) PutUserGrant(grant *model.UserGrantView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutUserGrant(grant *model.UserGrantView, event *models.Event) error {
 	err := view.PutUserGrant(v.Db, userGrantTable, grant)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserGrantSequence(sequence, eventTimestamp)
+	return v.ProcessedUserGrantSequence(event)
 }
 
-func (v *View) DeleteUserGrant(grantID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteUserGrant(grantID string, event *models.Event) error {
 	err := view.DeleteUserGrant(v.Db, userGrantTable, grantID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedUserGrantSequence(eventSequence, eventTimestamp)
+	return v.ProcessedUserGrantSequence(event)
 }
 
-func (v *View) GetLatestUserGrantSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(userGrantTable)
+func (v *View) GetLatestUserGrantSequence(aggregateType string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(userGrantTable, aggregateType)
 }
 
-func (v *View) ProcessedUserGrantSequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(userGrantTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedUserGrantSequence(event *models.Event) error {
+	return v.saveCurrentSequence(userGrantTable, event)
 }
 
 func (v *View) UpdateUserGrantSpoolerRunTimestamp() error {

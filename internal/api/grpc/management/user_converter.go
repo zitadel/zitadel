@@ -2,8 +2,8 @@ package management
 
 import (
 	"encoding/json"
+
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
@@ -11,6 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/caos/zitadel/pkg/grpc/message"
@@ -531,6 +532,7 @@ func mfaFromModel(mfa *usr_model.MultiFactor) *management.UserMultiFactor {
 		State:     mfaStateFromModel(mfa.State),
 		Type:      mfaTypeFromModel(mfa.Type),
 		Attribute: mfa.Attribute,
+		Id:        mfa.ID,
 	}
 }
 
@@ -654,4 +656,20 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*management.Change
 	}
 
 	return result
+}
+
+func webAuthNTokensFromModel(tokens []*usr_model.WebAuthNToken) *management.WebAuthNTokens {
+	result := make([]*management.WebAuthNToken, len(tokens))
+	for i, token := range tokens {
+		result[i] = webAuthNTokenFromModel(token)
+	}
+	return &management.WebAuthNTokens{Tokens: result}
+}
+
+func webAuthNTokenFromModel(token *usr_model.WebAuthNToken) *management.WebAuthNToken {
+	return &management.WebAuthNToken{
+		Id:    token.WebAuthNTokenID,
+		Name:  token.WebAuthNTokenName,
+		State: mfaStateFromModel(token.State),
+	}
 }

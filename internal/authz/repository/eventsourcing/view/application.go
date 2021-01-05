@@ -2,8 +2,9 @@ package view
 
 import (
 	"context"
-	"time"
 
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -34,28 +35,28 @@ func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) 
 	return view.SearchApplications(v.Db, applicationTable, request)
 }
 
-func (v *View) PutApplication(project *model.ApplicationView, eventTimestamp time.Time) error {
+func (v *View) PutApplication(project *model.ApplicationView, event *models.Event) error {
 	err := view.PutApplication(v.Db, applicationTable, project)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedApplicationSequence(project.Sequence, eventTimestamp)
+	return v.ProcessedApplicationSequence(event)
 }
 
-func (v *View) DeleteApplication(appID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteApplication(appID string, event *models.Event) error {
 	err := view.DeleteApplication(v.Db, applicationTable, appID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedApplicationSequence(eventSequence, eventTimestamp)
+	return v.ProcessedApplicationSequence(event)
 }
 
-func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(applicationTable)
+func (v *View) GetLatestApplicationSequence(aggregateType string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(applicationTable, aggregateType)
 }
 
-func (v *View) ProcessedApplicationSequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(applicationTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedApplicationSequence(event *models.Event) error {
+	return v.saveCurrentSequence(applicationTable, event)
 }
 
 func (v *View) UpdateApplicationSpoolerRunTimestamp() error {

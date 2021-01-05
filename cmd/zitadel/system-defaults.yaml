@@ -126,7 +126,7 @@ SystemDefaults:
         Text: 'DomainClaimed.Text'
         ButtonText: 'DomainClaimed.ButtonText'
   WebAuthN:
-    ID: $ZITADEL_COOKIE_DOMAIN
+    ID: $ZITADEL_DEFAULT_DOMAIN
     OriginLogin: $ZITADEL_ACCOUNTS
     OriginConsole: $ZITADEL_CONSOLE
     DisplayName: ZITADEL

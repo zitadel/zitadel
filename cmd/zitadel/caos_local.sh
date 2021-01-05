@@ -67,7 +67,7 @@ export ZITADEL_SHORT_CACHE_SHARED_MAXAGE=15m
 export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/
 
 #Org
-export ZITADEL_DEFAULT_DOMAIN=zitadel.ch
+export ZITADEL_DEFAULT_DOMAIN=localhost
 
 
 #Setup

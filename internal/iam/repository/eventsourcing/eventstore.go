@@ -525,20 +525,31 @@ func (es *IAMEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.L
 	return model.LoginPolicyToModel(repoIam.DefaultLoginPolicy), nil
 }
 
-func (es *IAMEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+func (es *IAMEventstore) PrepareChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*model.IAM, *models.Aggregate, error) {
 	if policy == nil || !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-3M0so", "Errors.IAM.LoginPolicyInvalid")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-3M0so", "Errors.IAM.LoginPolicyInvalid")
 	}
 	iam, err := es.IAMByID(ctx, policy.AggregateID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	repoIam := model.IAMFromModel(iam)
 	repoLoginPolicy := model.LoginPolicyFromModel(policy)
 
-	addAggregate := LoginPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLoginPolicy)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	changeAgg, err := LoginPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoLoginPolicy)(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, changeAgg, nil
+}
+
+func (es *IAMEventstore) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+	repoIam, changeAggregate, err := es.PrepareChangeLoginPolicy(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, changeAggregate)
 	if err != nil {
 		return nil, err
 	}
@@ -665,27 +676,38 @@ func (es *IAMEventstore) RemoveSecondFactorFromLoginPolicy(ctx context.Context, 
 	return nil
 }
 
-func (es *IAMEventstore) AddMultiFactorToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
+func (es *IAMEventstore) PrepareAddMultiFactorToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.MultiFactorType) (*model.IAM, *models.Aggregate, error) {
 	if mfa == iam_model.MultiFactorTypeUnspecified {
-		return 0, caos_errs.ThrowPreconditionFailed(nil, "EVENT-2Dh7J", "Errors.IAM.LoginPolicy.MFA.Unspecified")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-2Dh7J", "Errors.IAM.LoginPolicy.MFA.Unspecified")
 	}
 	iam, err := es.IAMByID(ctx, aggregateID)
 	if err != nil {
-		return 0, err
+		return nil, nil, err
 	}
 	if _, m := iam.DefaultLoginPolicy.GetMultiFactor(mfa); m != 0 {
-		return 0, caos_errs.ThrowAlreadyExists(nil, "EVENT-4Rk09", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
+		return nil, nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-4Rk09", "Errors.IAM.LoginPolicy.MFA.AlreadyExists")
 	}
 	repoIam := model.IAMFromModel(iam)
 	repoMFA := model.MultiFactorFromModel(mfa)
 
-	addAggregate := LoginPolicyMultiFactorAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMFA)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	addAggregate, err := LoginPolicyMultiFactorAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMFA)(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, addAggregate, nil
+}
+
+func (es *IAMEventstore) AddMultiFactorToLoginPolicy(ctx context.Context, aggregateID string, mfa iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
+	repoIAM, addAggregate, err := es.PrepareAddMultiFactorToLoginPolicy(ctx, aggregateID, mfa)
 	if err != nil {
 		return 0, err
 	}
-	es.iamCache.cacheIAM(repoIam)
-	if _, m := model.GetMFA(repoIam.DefaultLoginPolicy.MultiFactors, int32(mfa)); m != 0 {
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIAM.AppendEvents, addAggregate)
+	if err != nil {
+		return 0, err
+	}
+	es.iamCache.cacheIAM(repoIAM)
+	if _, m := model.GetMFA(repoIAM.DefaultLoginPolicy.MultiFactors, int32(mfa)); m != 0 {
 		return iam_model.MultiFactorType(m), nil
 	}
 	return 0, caos_errs.ThrowInternal(nil, "EVENT-5N9so", "Errors.Internal")

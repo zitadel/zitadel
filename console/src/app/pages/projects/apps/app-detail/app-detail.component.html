@@ -127,6 +127,22 @@
                         <span>{{'APP.OIDC.IDTOKENROLEASSERTION_DESCRIPTION' | translate}}</span>
                     </cnsl-info-section>
 
+                    <mat-checkbox class="full-width" style="margin-bottom: .5rem"
+                        formControlName="idTokenUserinfoAssertion" color="primary">
+                        {{'APP.OIDC.IDTOKENUSERINFOASSERTION' | translate}}</mat-checkbox>
+                    <cnsl-info-section class="full-width desc">
+                        <span>{{'APP.OIDC.IDTOKENUSERINFOASSERTION_DESCRIPTION' | translate}}</span>
+                    </cnsl-info-section>
+
+                    <p class="clockskew-title">ClockSkew</p>
+                    <mat-slider color="primary" formControlName="clockSkewSeconds" class="clockskew-slider" thumbLabel
+                        [displayWith]="formatClockSkewLabel" tickInterval=".1" min="0" [step]="1" max="5">
+                    </mat-slider>
+                    <cnsl-info-section class="full-width desc">
+                        <span>{{'APP.OIDC.CLOCKSKEW' | translate}}</span>
+                    </cnsl-info-section>
+
+
                     <div class="divider"></div>
 
                     <p class="full-width section-title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}</p>

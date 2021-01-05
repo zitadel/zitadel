@@ -40,7 +40,7 @@ func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID stri
 
 func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestIAMMemberSequence()
+	sequence, err := repo.View.GetLatestIAMMemberSequence("")
 	logging.Log("EVENT-Slkci").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
 	members, count, err := repo.View.SearchIAMMembers(request)
 	if err != nil {
@@ -115,7 +115,7 @@ func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID stri
 
 func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestIDPConfigSequence()
+	sequence, err := repo.View.GetLatestIDPConfigSequence("")
 	logging.Log("EVENT-Dk8si").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest idp config sequence")
 	idps, count, err := repo.View.SearchIDPConfigs(request)
 	if err != nil {
@@ -187,7 +187,7 @@ func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
-	sequence, err := repo.View.GetLatestIDPProviderSequence()
+	sequence, err := repo.View.GetLatestIDPProviderSequence("")
 	logging.Log("EVENT-Tuiks").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
 	providers, count, err := repo.View.SearchIDPProviders(request)
 	if err != nil {

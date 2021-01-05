@@ -103,7 +103,7 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetSequence(90)},
 			},
 			res: &SearchQueryFactory{
-				eventSequence: 90,
+				sequenceFrom: 90,
 			},
 		},
 		{

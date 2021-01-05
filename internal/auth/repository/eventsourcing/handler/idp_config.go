@@ -2,8 +2,10 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -11,25 +13,57 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type IDPConfig struct {
-	handler
-}
-
 const (
 	idpConfigTable = "auth.idp_configs"
 )
+
+type IDPConfig struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newIDPConfig(h handler) *IDPConfig {
+	idpConfig := &IDPConfig{
+		handler: h,
+	}
+
+	idpConfig.subscribe()
+
+	return idpConfig
+}
+
+func (i *IDPConfig) subscribe() {
+	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
+	go func() {
+		for event := range i.subscription.Events {
+			query.ReduceEvent(i, event)
+		}
+	}()
+}
 
 func (i *IDPConfig) ViewModel() string {
 	return idpConfigTable
 }
 
+func (_ *IDPConfig) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (i *IDPConfig) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := i.view.GetLatestIDPConfigSequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestIDPConfigSequence()
+	sequence, err := i.view.GetLatestIDPConfigSequence("")
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(i.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -66,14 +100,14 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		if err != nil {
 			return err
 		}
-		return i.view.DeleteIDPConfig(idp.IDPConfigID, event.Sequence, event.CreationDate)
+		return i.view.DeleteIDPConfig(idp.IDPConfigID, event)
 	default:
-		return i.view.ProcessedIDPConfigSequence(event.Sequence, event.CreationDate)
+		return i.view.ProcessedIDPConfigSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return i.view.PutIDPConfig(idp, idp.Sequence, event.CreationDate)
+	return i.view.PutIDPConfig(idp, event)
 }
 
 func (i *IDPConfig) OnError(event *models.Event, err error) error {

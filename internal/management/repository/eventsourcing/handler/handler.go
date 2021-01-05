@@ -25,6 +25,12 @@ type handler struct {
 	bulkLimit           uint64
 	cycleDuration       time.Duration
 	errorCountUntilSkip uint64
+
+	es eventstore.Eventstore
+}
+
+func (h *handler) Eventstore() eventstore.Eventstore {
+	return h.es
 }
 
 type EventstoreRepos struct {
@@ -34,55 +40,86 @@ type EventstoreRepos struct {
 	IamEvents     *iam_event.IAMEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
 	return []query.Handler{
-		&Project{handler: handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount},
-			eventstore: eventstore},
-		&ProjectGrant{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectGrant"), errorCount},
-			eventstore: eventstore, projectEvents: repos.ProjectEvents, orgEvents: repos.OrgEvents},
-		&ProjectRole{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount},
-			projectEvents: repos.ProjectEvents},
-		&ProjectMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount},
-			userEvents: repos.UserEvents},
-		&ProjectGrantMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount},
-			userEvents: repos.UserEvents},
-		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount},
-			projectEvents: repos.ProjectEvents},
-		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount},
-			eventstore: eventstore, orgEvents: repos.OrgEvents, iamEvents: repos.IamEvents, iamID: defaults.IamID},
-		&UserGrant{handler: handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount},
-			projectEvents: repos.ProjectEvents, userEvents: repos.UserEvents, orgEvents: repos.OrgEvents},
-		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
-		&OrgMember{handler: handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount},
-			userEvents: repos.UserEvents},
-		&OrgDomain{handler: handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount}},
-		&UserMembership{handler: handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount},
-			orgEvents: repos.OrgEvents, projectEvents: repos.ProjectEvents},
-		&MachineKeys{handler: handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount}},
-		&IDPConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount}},
-		&LoginPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount}},
-		&LabelPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount}},
-		&IDPProvider{handler: handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount},
-			systemDefaults: defaults, iamEvents: repos.IamEvents, orgEvents: repos.OrgEvents},
-		&ExternalIDP{handler: handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount},
-			systemDefaults: defaults, iamEvents: repos.IamEvents, orgEvents: repos.OrgEvents},
-		&PasswordComplexityPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount}},
-		&PasswordAgePolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordAgePolicy"), errorCount}},
-		&PasswordLockoutPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("PasswordLockoutPolicy"), errorCount}},
-		&OrgIAMPolicy{handler: handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount}},
+		newProject(
+			handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount, es}),
+		newProjectGrant(
+			handler{view, bulkLimit, configs.cycleDuration("ProjectGrant"), errorCount, es},
+			repos.ProjectEvents,
+			repos.OrgEvents),
+		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es},
+			repos.ProjectEvents),
+		newProjectMember(handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount, es},
+			repos.UserEvents),
+		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es},
+			repos.UserEvents),
+		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es},
+			repos.ProjectEvents),
+		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
+			repos.OrgEvents,
+			repos.IamEvents,
+			defaults.IamID),
+		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
+			repos.ProjectEvents,
+			repos.UserEvents,
+			repos.OrgEvents),
+		newOrg(
+			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
+		newOrgMember(
+			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es},
+			repos.UserEvents),
+		newOrgDomain(
+			handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount, es}),
+		newUserMembership(
+			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es},
+			repos.OrgEvents,
+			repos.ProjectEvents),
+		newMachineKeys(
+			handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount, es}),
+		newIDPConfig(
+			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
+		newLoginPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
+		newLabelPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
+		newIDPProvider(
+			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
+
+			defaults,
+			repos.IamEvents,
+			repos.OrgEvents),
+		newExternalIDP(
+			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
+
+			defaults,
+			repos.IamEvents,
+			repos.OrgEvents),
+		newPasswordComplexityPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
+		newPasswordAgePolicy(
+			handler{view, bulkLimit, configs.cycleDuration("PasswordAgePolicy"), errorCount, es}),
+		newPasswordLockoutPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("PasswordLockoutPolicy"), errorCount, es}),
+		newOrgIAMPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
 	}
 }
 
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 1 * time.Second
+		return 3 * time.Minute
 	}
 	return c.MinimumCycleDuration.Duration
 }
 
 func (h *handler) MinimumCycleDuration() time.Duration {
 	return h.cycleDuration
+}
+
+func (h *handler) LockDuration() time.Duration {
+	return h.cycleDuration / 3
 }
 
 func (h *handler) QueryLimit() uint64 {

@@ -16,6 +16,7 @@ Login:
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
   ExternalLogin: Melde dich mit einem externen Benutzer an
+  MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
 
 UserSelection:
   Title: Account auswählen
@@ -25,6 +26,7 @@ UserSelection:
   OtherUser: Anderer Benutzer
   SessionState0: aktiv
   SessionState1: inaktiv
+  MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
 
 UsernameChange:
   Title: Usernamen ändern
@@ -207,6 +209,7 @@ Actions:
   RegisterToken: Token registrieren
   ValidateToken: Token validieren
   Recreate: erneut erstellen
+  PasswordLogin: Mit Passwort anmelden
 
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten
@@ -216,6 +219,8 @@ Errors:
     RequestTypeNotSupported: Requesttyp wird nicht unterstürzt
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
+    NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     NotMatchingUserID: User stimm nicht mit User in Auth Request überein
     UserIDMissing: UserID ist leer
     Invalid: Userdaten sind ungültig

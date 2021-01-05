@@ -58,13 +58,19 @@ func (q *SearchQuery) LatestSequenceFilter(sequence uint64) *SearchQuery {
 	return q.setFilter(NewFilter(Field_LatestSequence, sequence, sortOrder))
 }
 
+func (q *SearchQuery) SequenceBetween(from, to uint64) *SearchQuery {
+	q.setFilter(NewFilter(Field_LatestSequence, from, Operation_Greater))
+	q.setFilter(NewFilter(Field_LatestSequence, to, Operation_Less))
+	return q
+}
+
 func (q *SearchQuery) ResourceOwnerFilter(resourceOwner string) *SearchQuery {
 	return q.setFilter(NewFilter(Field_ResourceOwner, resourceOwner, Operation_Equals))
 }
 
 func (q *SearchQuery) setFilter(filter *Filter) *SearchQuery {
 	for i, f := range q.Filters {
-		if f.field == filter.field {
+		if f.field == filter.field && f.field != Field_LatestSequence {
 			q.Filters[i] = filter
 			return q
 		}

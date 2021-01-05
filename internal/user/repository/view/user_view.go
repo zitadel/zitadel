@@ -61,7 +61,7 @@ func UserByLoginNameAndResourceOwner(db *gorm.DB, table, loginName, resourceOwne
 	query := repository.PrepareGetByQuery(table, loginNameQuery, resourceOwnerQuery)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFoundOnOrg")
 	}
 	return user, err
 }
