@@ -72,13 +72,9 @@ type OIDCApp struct {
 }
 
 func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1) error {
-	iam, err := r.iamByID(ctx, iamID)
-	if err != nil && !caos_errs.IsNotFound(err) {
-		return err
-	}
+	iamAgg := iam_repo.NewAggregate(r.iamID, "", 0)
 	//create default login policy
-	iamAgg, err := r.addDefaultLoginPolicy(ctx,
-		NewIAMLoginPolicyWriteModel(iam.AggregateID),
+	err := r.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(iamAgg.ID()),
 		&domain.LoginPolicy{
 			AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
 			AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,

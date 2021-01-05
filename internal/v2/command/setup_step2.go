@@ -17,18 +17,23 @@ func (s *Step2) Step() domain.Step {
 }
 
 func (s *Step2) execute(ctx context.Context, commandSide *CommandSide) error {
-	return commandSide.SetupStep2(ctx, commandSide.iamID, s)
+	return commandSide.SetupStep2(ctx, s)
 }
 
-func (r *CommandSide) SetupStep2(ctx context.Context, iamID string, step *Step2) error {
+func (r *CommandSide) SetupStep2(ctx context.Context, step *Step2) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
-		return r.addDefaultPasswordComplexityPolicy(ctx, NewIAMPasswordComplexityPolicyWriteModel(iam.AggregateID), &iam_model.PasswordComplexityPolicy{
+		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
+		err := r.addDefaultPasswordComplexityPolicy(ctx, iamAgg, NewIAMPasswordComplexityPolicyWriteModel(iam.AggregateID), &domain.PasswordComplexityPolicy{
 			MinLength:    step.DefaultPasswordComplexityPolicy.MinLength,
 			HasLowercase: step.DefaultPasswordComplexityPolicy.HasLowercase,
 			HasUppercase: step.DefaultPasswordComplexityPolicy.HasUppercase,
 			HasNumber:    step.DefaultPasswordComplexityPolicy.HasNumber,
 			HasSymbol:    step.DefaultPasswordComplexityPolicy.HasSymbol,
 		})
+		if err != nil {
+			return nil, err
+		}
+		return iamAgg, err
 	}
-	return r.setup(ctx, iamID, step, fn)
+	return r.setup(ctx, step, fn)
 }

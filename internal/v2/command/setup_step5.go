@@ -17,14 +17,19 @@ func (s *Step5) Step() domain.Step {
 }
 
 func (s *Step5) execute(ctx context.Context, commandSide *CommandSide) error {
-	return commandSide.SetupStep5(ctx, commandSide.iamID, s)
+	return commandSide.SetupStep5(ctx, s)
 }
 
-func (r *CommandSide) SetupStep5(ctx context.Context, iamID string, step *Step5) error {
+func (r *CommandSide) SetupStep5(ctx context.Context, step *Step5) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
-		return r.addDefaultOrgIAMPolicy(ctx, NewIAMOrgIAMPolicyWriteModel(iam.AggregateID), &iam_model.OrgIAMPolicy{
+		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
+		err := r.addDefaultOrgIAMPolicy(ctx, iamAgg, NewIAMOrgIAMPolicyWriteModel(iam.AggregateID), &domain.OrgIAMPolicy{
 			UserLoginMustBeDomain: step.DefaultOrgIAMPolicy.UserLoginMustBeDomain,
 		})
+		if err != nil {
+			return nil, err
+		}
+		return iamAgg, nil
 	}
-	return r.setup(ctx, iamID, step, fn)
+	return r.setup(ctx, step, fn)
 }

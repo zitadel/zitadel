@@ -17,16 +17,21 @@ func (s *Step7) Step() domain.Step {
 }
 
 func (s *Step7) execute(ctx context.Context, commandSide *CommandSide) error {
-	return commandSide.SetupStep7(ctx, commandSide.iamID, s)
+	return commandSide.SetupStep7(ctx, s)
 }
 
-func (r *CommandSide) SetupStep7(ctx context.Context, iamID string, step *Step7) error {
+func (r *CommandSide) SetupStep7(ctx context.Context, step *Step7) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
 		secondFactorModel := NewIAMSecondFactorWriteModel(iam.AggregateID)
-		if step.OTP {
-			return r.addSecondFactorToDefaultLoginPolicy(ctx, secondFactorModel, iam_model.SecondFactorTypeOTP)
+		iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
+		if !step.OTP {
+			return iamAgg, nil
 		}
-		return IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel), nil
+		err := r.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, iam_model.SecondFactorTypeOTP)
+		if err != nil {
+			return nil, err
+		}
+		return iamAgg, nil
 	}
-	return r.setup(ctx, iamID, step, fn)
+	return r.setup(ctx, step, fn)
 }

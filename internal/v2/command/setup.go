@@ -13,17 +13,6 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-type IAMSetUp struct {
-	Step1 *Step1
-	//Step2 *Step2
-	//Step3 *Step3
-	//Step4 *Step4
-	//Step5 *Step5
-	//Step6 *Step6
-	//Step7 *Step7
-	//Step8 *Step8
-}
-
 type Step interface {
 	Step() domain.Step
 	execute(context.Context, *CommandSide) error
@@ -81,6 +70,27 @@ func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Grgh1", "Setup start failed")
 	}
 	return writeModelToIAM(iamWriteModel), nil
+}
+
+func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider func(*IAMWriteModel) (*iam_repo.Aggregate, error)) error {
+	iam, err := r.iamByID(ctx, r.iamID)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return err
+	}
+	if iam.SetUpStarted != step.Step() && iam.SetUpDone+1 != step.Step() {
+
+	}
+	iamAgg, err := iamAggregateProvider(iam)
+	if err != nil {
+		return err
+	}
+	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, step.Step()))
+
+	_, err = r.eventstore.PushAggregates(ctx, iamAgg)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailedf(nil, "EVENT-dbG31", "Setup %s failed", step.Step())
+	}
+	return nil
 }
 
 //func (r *CommandSide) setupDone(ctx context.Context, iamAgg *iam_repo.Aggregate, event eventstore.EventPusher, aggregates ...eventstore.Aggregater) error {

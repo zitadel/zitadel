@@ -11,7 +11,8 @@ import (
 func (r *CommandSide) AddDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
 	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMPasswordAgePolicyWriteModel(policy.AggregateID)
-	iamAgg, err := r.addDefaultPasswordAgePolicy(ctx, addedPolicy, policy)
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
+	err := r.addDefaultPasswordAgePolicy(ctx, nil, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -24,19 +25,18 @@ func (r *CommandSide) AddDefaultPasswordAgePolicy(ctx context.Context, policy *d
 	return writeModelToPasswordAgePolicy(addedPolicy), nil
 }
 
-func (r *CommandSide) addDefaultPasswordAgePolicy(ctx context.Context, addedPolicy *IAMPasswordAgePolicyWriteModel, policy *iam_model.PasswordAgePolicy) (*iam_repo.Aggregate, error) {
+func (r *CommandSide) addDefaultPasswordAgePolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMPasswordAgePolicyWriteModel, policy *domain.PasswordAgePolicy) error {
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if addedPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.PasswordAgePolicy.AlreadyExists")
+		return caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.PasswordAgePolicy.AlreadyExists")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.PasswordAgePolicyWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewPasswordAgePolicyAddedEvent(ctx, policy.ExpireWarnDays, policy.MaxAgeDays))
 
-	return iamAgg, nil
+	return nil
 }
 
 func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
