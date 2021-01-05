@@ -11,6 +11,7 @@
 @import '../account_selection/account_selection_theme.scss';
 @import '../avatar/avatar_theme.scss';
 @import '../checkbox/checkbox_theme.scss';
+@import '../select/select_theme.scss';
 @import '../typography/typography.scss';
 @import './theming';
 
@@ -28,4 +29,5 @@
     @include lgn-container-theme($theme-or-color-config);
     @include lgn-account-selection-theme($theme-or-color-config);
     @include lgn-avatar-theme($theme-or-color-config);
+    @include lgn-select-theme($theme-or-color-config);
 }

@@ -1,0 +1,20 @@
+@import '../theming/theming.scss';
+@import './select.scss';
+
+@mixin lgn-select-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    $color: lgn-get-color-config($theme);
+
+    @if $color != null {
+        @include lgn-select-color($color);
+    }
+}
+
+@mixin lgn-select-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+}
+
+// @function svg-icon() {
+//     @return url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 448" enable-background="new 0 0 256 448"><path class="arrow" d="M255.9 168c0-4.2-1.6-7.9-4.8-11.2-3.2-3.2-6.9-4.8-11.2-4.8H16c-4.2 0-7.9 1.6-11.2 4.8S0 163.8 0 168c0 4.4 1.6 8.2 4.8 11.4l112 112c3.1 3.1 6.8 4.6 11.2 4.6 4.4 0 8.2-1.5 11.4-4.6l112-112c3-3.2 4.5-7 4.5-11.4z"/></svg>');
+// }
