@@ -29,10 +29,12 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
 import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.component';
+import { DialogU2FComponent } from './auth-user-detail/dialog-u2f/dialog-u2f.component';
 import { EditDialogComponent } from './auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from './auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 import { ThemeSettingComponent } from './auth-user-detail/theme-setting/theme-setting.component';
@@ -46,6 +48,7 @@ import { ShowKeyDialogModule } from './machine-keys/show-key-dialog/show-key-dia
 import { MembershipsComponent } from './memberships/memberships.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
+import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
 
@@ -56,7 +59,9 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         DialogOtpComponent,
         EditDialogComponent,
         AuthUserMfaComponent,
+        AuthPasswordlessComponent,
         UserMfaComponent,
+        PasswordlessComponent,
         ThemeSettingComponent,
         PasswordComponent,
         CodeDialogComponent,
@@ -65,6 +70,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         ExternalIdpsComponent,
         ContactComponent,
         ResendEmailDialogComponent,
+        DialogU2FComponent,
     ],
     imports: [
         UserDetailRoutingModule,

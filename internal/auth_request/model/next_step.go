@@ -48,10 +48,11 @@ func (s *SelectUserStep) Type() NextStepType {
 }
 
 type UserSelection struct {
-	UserID           string
-	DisplayName      string
-	LoginName        string
-	UserSessionState UserSessionState
+	UserID            string
+	DisplayName       string
+	LoginName         string
+	UserSessionState  UserSessionState
+	SelectionPossible bool
 }
 
 type InitUserStep struct {

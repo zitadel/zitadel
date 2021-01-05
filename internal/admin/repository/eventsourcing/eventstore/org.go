@@ -87,7 +87,7 @@ func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.Org, er
 
 func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error) {
 	query.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestOrgSequence()
+	sequence, err := repo.View.GetLatestOrgSequence("")
 	logging.Log("EVENT-LXo9w").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
 	orgs, count, err := repo.View.SearchOrgs(query)
 	if err != nil {

@@ -4,6 +4,8 @@ Errors:
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
+    NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     UserIDMissing: User ID fehlt
     OrgIamPolicyNil: Organisations Policy ist leer
     EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
@@ -169,6 +171,7 @@ Errors:
     GrantNotExists: Projekt Grant existiert nicht
     GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
     UserIDMisisng: User ID fehlt
+    OIDCSecretInvalid: Client Secret ist ungültig
   IAM:
     Member:
       RolesNotChanged: Rollen wurden nicht verändert
@@ -466,9 +469,16 @@ EventTypes:
       login:
         added: Login Richtlinie hinzugefügt
         changed: Login Richtlinie geändert
+        removed: Login Richtline gelöscht
         idpprovider:
           added: Idp Provider zu Login Richtlinie hinzugefügt
           removed: Idp Provider aus Login Richtlinie gelöscht
+        secondfactor:
+          added: Zweitfaktor zu Login Richtlinie hinzugefügt
+          removed: Zweitfaktor aus Login Richtlinie gelöscht
+        multifactor:
+          added: Multifaktor zu Login Richtlinie hinzugefügt
+          removed: Multifaktor aus Login Richtlinie gelöscht
       password:
         complexity:
           added: Passwort Komplexitäts Richtlinie hinzugefügt

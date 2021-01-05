@@ -1,11 +1,12 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -24,39 +25,36 @@ func (v *View) SearchMachineKeys(request *usr_model.MachineKeySearchRequest) ([]
 	return view.SearchMachineKeys(v.Db, machineKeyTable, request)
 }
 
-func (v *View) PutMachineKey(org *model.MachineKeyView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutMachineKey(org *model.MachineKeyView, event *models.Event) error {
 	err := view.PutMachineKey(v.Db, machineKeyTable, org)
 	if err != nil {
 		return err
 	}
-	if sequence != 0 {
-		return v.ProcessedMachineKeySequence(sequence, eventTimestamp)
-	}
-	return nil
+	return v.ProcessedMachineKeySequence(event)
 }
 
-func (v *View) DeleteMachineKey(keyID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteMachineKey(keyID string, event *models.Event) error {
 	err := view.DeleteMachineKey(v.Db, machineKeyTable, keyID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedMachineKeySequence(eventSequence, eventTimestamp)
+	return v.ProcessedMachineKeySequence(event)
 }
 
-func (v *View) DeleteMachineKeysByUserID(userID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteMachineKeysByUserID(userID string, event *models.Event) error {
 	err := view.DeleteMachineKey(v.Db, machineKeyTable, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedMachineKeySequence(eventSequence, eventTimestamp)
+	return v.ProcessedMachineKeySequence(event)
 }
 
-func (v *View) GetLatestMachineKeySequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(machineKeyTable)
+func (v *View) GetLatestMachineKeySequence(aggregateType string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(machineKeyTable, aggregateType)
 }
 
-func (v *View) ProcessedMachineKeySequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(machineKeyTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedMachineKeySequence(event *models.Event) error {
+	return v.saveCurrentSequence(machineKeyTable, event)
 }
 
 func (v *View) UpdateMachineKeySpoolerRunTimestamp() error {

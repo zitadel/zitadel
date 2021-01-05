@@ -33,6 +33,10 @@ import {
     UserView,
     VerifyMfaOtp,
     VerifyUserPhoneRequest,
+    VerifyWebAuthN,
+    WebAuthNResponse,
+    WebAuthNTokenID,
+    WebAuthNTokens,
 } from '../proto/generated/auth_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageService } from './storage.service';
@@ -325,6 +329,56 @@ export class GrpcAuthService {
     public AddMfaOTP(): Promise<MfaOtpResponse> {
         return this.grpcService.auth.addMfaOTP(
             new Empty(),
+        );
+    }
+
+    public AddMyMfaU2F(): Promise<WebAuthNResponse> {
+        return this.grpcService.auth.addMyMfaU2F(
+            new Empty(),
+        );
+    }
+
+    public RemoveMyMfaU2F(id: string): Promise<Empty> {
+        const req = new WebAuthNTokenID();
+        req.setId(id);
+        return this.grpcService.auth.removeMyMfaU2F(req);
+    }
+
+    public VerifyMyMfaU2F(credential: string, tokenname: string): Promise<Empty> {
+        const req = new VerifyWebAuthN();
+        req.setPublicKeyCredential(credential);
+        req.setTokenName(tokenname);
+
+        return this.grpcService.auth.verifyMyMfaU2F(
+            req,
+        );
+    }
+
+    public GetMyPasswordless(): Promise<WebAuthNTokens> {
+        return this.grpcService.auth.getMyPasswordless(
+            new Empty(),
+        );
+    }
+
+    public AddMyPasswordless(): Promise<WebAuthNResponse> {
+        return this.grpcService.auth.addMyPasswordless(
+            new Empty(),
+        );
+    }
+
+    public RemoveMyPasswordless(id: string): Promise<Empty> {
+        const req = new WebAuthNTokenID();
+        req.setId(id);
+        return this.grpcService.auth.removeMyPasswordless(req);
+    }
+
+    public verifyMyPasswordless(credential: string, tokenname: string): Promise<Empty> {
+        const req = new VerifyWebAuthN();
+        req.setPublicKeyCredential(credential);
+        req.setTokenName(tokenname);
+
+        return this.grpcService.auth.verifyMyPasswordless(
+            req,
         );
     }
 

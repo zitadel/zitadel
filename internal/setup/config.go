@@ -14,6 +14,7 @@ type IAMSetUp struct {
 	//Step6 *Step6
 	//Step7 *Step7
 	//Step8 *Step8
+	//Step9 *Step9
 }
 
 func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]stepV2, error) {
@@ -29,6 +30,7 @@ func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]stepV2, error) {
 		//setup.Step6,
 		//setup.Step7,
 		//setup.Step8,
+		//setup.Step9,
 	} {
 		if step.step() <= currentDone {
 			continue

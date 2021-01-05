@@ -2,34 +2,67 @@ package handler
 
 import (
 	"github.com/caos/logging"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
-
-type LoginPolicy struct {
-	handler
-}
 
 const (
 	loginPolicyTable = "management.login_policies"
 )
 
+type LoginPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newLoginPolicy(handler handler) *LoginPolicy {
+	h := &LoginPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *LoginPolicy) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
+
 func (m *LoginPolicy) ViewModel() string {
 	return loginPolicyTable
 }
 
+func (_ *LoginPolicy) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (m *LoginPolicy) CurrentSequence(event *models.Event) (uint64, error) {
+	sequence, err := m.view.GetLatestLoginPolicySequence(string(event.AggregateType))
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
+}
+
 func (m *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestLoginPolicySequence()
+	sequence, err := m.view.GetLatestLoginPolicySequence("")
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -57,14 +90,14 @@ func (m *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 		}
 		err = policy.AppendEvent(event)
 	case model.LoginPolicyRemoved:
-		return m.view.DeleteLoginPolicy(event.AggregateID, event.Sequence, event.CreationDate)
+		return m.view.DeleteLoginPolicy(event.AggregateID, event)
 	default:
-		return m.view.ProcessedLoginPolicySequence(event.Sequence, event.CreationDate)
+		return m.view.ProcessedLoginPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutLoginPolicy(policy, policy.Sequence, event.CreationDate)
+	return m.view.PutLoginPolicy(policy, event)
 }
 
 func (m *LoginPolicy) OnError(event *models.Event, err error) error {

@@ -24,7 +24,7 @@ func ApplicationByID(db *gorm.DB, table, projectID, appID string) (*model.Applic
 func ApplicationsByProjectID(db *gorm.DB, table, projectID string) ([]*model.ApplicationView, error) {
 	applications := make([]*model.ApplicationView, 0)
 	queries := []*proj_model.ApplicationSearchQuery{
-		&proj_model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.AppSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ApplicationSearchRequest{Queries: queries})
 	_, err := query(db, &applications)

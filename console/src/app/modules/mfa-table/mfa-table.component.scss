@@ -1,0 +1,42 @@
+
+.t .sp_wrapper {
+  display: block;
+}
+
+.mfa-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -.5rem;
+
+  .mfa {
+    border: 1px solid var(--grey);
+    border-radius: .5rem;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    margin: .5rem;
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+    min-height: 70px;
+    min-width: 150px;
+
+    .rm {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translateX(-50%) translateY(-50%);
+      cursor: pointer;
+
+      &[disabled] {
+        display: none;
+      }
+    }
+
+    &:not(.disabled) {
+      &:hover {
+        background-color: #ffffff10;
+      }
+    }
+  }
+}

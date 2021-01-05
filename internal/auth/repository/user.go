@@ -32,6 +32,7 @@ type UserRepository interface {
 	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
 	RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error
 
+	GetPasswordless(ctx context.Context, id string) ([]*model.WebAuthNToken, error)
 	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
 	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
 	RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error
@@ -80,6 +81,7 @@ type myUserRepo interface {
 	VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, data []byte) error
 	RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string) error
 
+	GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error)
 	AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error)
 	VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, data []byte) error
 	RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error
