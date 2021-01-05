@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
 type MailText struct {
@@ -46,7 +47,7 @@ func (m *MailText) ViewModel() string {
 }
 
 func (_ *MailText) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+	return []es_models.AggregateType{org_es_model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
 func (p *MailText) CurrentSequence(event *models.Event) (uint64, error) {
@@ -58,7 +59,7 @@ func (p *MailText) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *MailText) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestMailTextSequence()
+	sequence, err := m.view.GetLatestMailTextSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -91,15 +92,19 @@ func (m *MailText) processMailText(event *models.Event) (err error) {
 		}
 		err = mailText.AppendEvent(event)
 	default:
-		return m.view.ProcessedMailTextSequence(event.Sequence)
+		return m.view.ProcessedMailTextSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutMailText(mailText, mailText.Sequence)
+	return m.view.PutMailText(mailText, event)
 }
 
 func (m *MailText) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("HANDL-5jk84", "id", event.AggregateID).WithError(err).Warn("something went wrong in label mailText handler")
 	return spooler.HandleError(event, err, m.view.GetLatestMailTextFailedEvent, m.view.ProcessedMailTextFailedEvent, m.view.ProcessedMailTextSequence, m.errorCountUntilSkip)
+}
+
+func (o *MailText) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateMailTextSpoolerRunTimestamp)
 }

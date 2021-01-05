@@ -2,6 +2,7 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	global_view "github.com/caos/zitadel/internal/view/repository"
@@ -19,28 +20,32 @@ func (v *View) MailTextByIDs(aggregateID string, textType string, language strin
 	return view.GetMailTextByIDs(v.Db, mailTextTable, aggregateID, textType, language)
 }
 
-func (v *View) PutMailText(template *model.MailTextView, sequence uint64) error {
+func (v *View) PutMailText(template *model.MailTextView, event *models.Event) error {
 	err := view.PutMailText(v.Db, mailTextTable, template)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedMailTextSequence(sequence)
+	return v.ProcessedMailTextSequence(event)
 }
 
-func (v *View) DeleteMailText(aggregateID string, textType string, language string, eventSequence uint64) error {
+func (v *View) DeleteMailText(aggregateID string, textType string, language string, event *models.Event) error {
 	err := view.DeleteMailText(v.Db, mailTextTable, aggregateID, textType, language)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedMailTextSequence(eventSequence)
+	return v.ProcessedMailTextSequence(event)
 }
 
-func (v *View) GetLatestMailTextSequence() (*global_view.CurrentSequence, error) {
-	return v.latestSequence(mailTextTable)
+func (v *View) GetLatestMailTextSequence(aggregateType string) (*global_view.CurrentSequence, error) {
+	return v.latestSequence(mailTextTable, aggregateType)
 }
 
-func (v *View) ProcessedMailTextSequence(eventSequence uint64) error {
-	return v.saveCurrentSequence(mailTextTable, eventSequence)
+func (v *View) ProcessedMailTextSequence(event *models.Event) error {
+	return v.saveCurrentSequence(mailTextTable, event)
+}
+
+func (v *View) UpdateMailTextSpoolerRunTimestamp() error {
+	return v.updateSpoolerRunSequence(mailTextTable)
 }
 
 func (v *View) GetLatestMailTextFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {

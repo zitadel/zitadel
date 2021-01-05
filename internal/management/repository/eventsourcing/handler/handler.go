@@ -104,9 +104,9 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newOrgIAMPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
 		newMailTemplate(
-			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount}),
+			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
 		newMailText(
-			handler{view, bulkLimit, configs.cycleDuration("MailText"), errorCount}),
+			handler{view, bulkLimit, configs.cycleDuration("MailText"), errorCount, es}),
 	}
 }
 

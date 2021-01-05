@@ -1336,6 +1336,26 @@ func (mr *MockManagementServiceClientMockRecorder) GetPasswordLockoutPolicy(arg0
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordLockoutPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).GetPasswordLockoutPolicy), varargs...)
 }
 
+// GetPasswordless mocks base method
+func (m *MockManagementServiceClient) GetPasswordless(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*management.WebAuthNTokens, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetPasswordless", varargs...)
+	ret0, _ := ret[0].(*management.WebAuthNTokens)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPasswordless indicates an expected call of GetPasswordless
+func (mr *MockManagementServiceClientMockRecorder) GetPasswordless(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordless", reflect.TypeOf((*MockManagementServiceClient)(nil).GetPasswordless), varargs...)
+}
+
 // GetProjectGrantMemberRoles mocks base method
 func (m *MockManagementServiceClient) GetProjectGrantMemberRoles(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.ProjectGrantMemberRoles, error) {
 	m.ctrl.T.Helper()
@@ -1969,19 +1989,6 @@ func (m *MockManagementServiceClient) RemoveMailTemplate(arg0 context.Context, a
 	return ret0, ret1
 }
 
-// RemoveMfaOTP mocks base method
-func (m *MockManagementServiceClient) RemoveMfaOTP(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "RemoveMfaOTP", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
 // RemoveMailTemplate indicates an expected call of RemoveMailTemplate
 func (mr *MockManagementServiceClientMockRecorder) RemoveMailTemplate(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
@@ -1997,6 +2004,26 @@ func (m *MockManagementServiceClient) RemoveMailText(arg0 context.Context, arg1 
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "RemoveMailText", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveMailText indicates an expected call of RemoveMailText
+func (mr *MockManagementServiceClientMockRecorder) RemoveMailText(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMailText", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveMailText), varargs...)
+}
+
+// RemoveMfaOTP mocks base method
+func (m *MockManagementServiceClient) RemoveMfaOTP(arg0 context.Context, arg1 *management.UserID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveMfaOTP", varargs...)
 	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -2020,13 +2047,6 @@ func (m *MockManagementServiceClient) RemoveMfaU2F(arg0 context.Context, arg1 *m
 	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
-}
-
-// RemoveMailText indicates an expected call of RemoveMailText
-func (mr *MockManagementServiceClientMockRecorder) RemoveMailText(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMailText", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveMailText), varargs...)
 }
 
 // RemoveMfaU2F indicates an expected call of RemoveMfaU2F
@@ -2154,6 +2174,26 @@ func (mr *MockManagementServiceClientMockRecorder) RemovePasswordLockoutPolicy(a
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePasswordLockoutPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).RemovePasswordLockoutPolicy), varargs...)
+}
+
+// RemovePasswordless mocks base method
+func (m *MockManagementServiceClient) RemovePasswordless(arg0 context.Context, arg1 *management.WebAuthNTokenID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemovePasswordless", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemovePasswordless indicates an expected call of RemovePasswordless
+func (mr *MockManagementServiceClientMockRecorder) RemovePasswordless(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePasswordless", reflect.TypeOf((*MockManagementServiceClient)(nil).RemovePasswordless), varargs...)
 }
 
 // RemoveProject mocks base method

@@ -771,6 +771,9 @@ func MailTextChangedAggregate(aggCreator *es_models.AggregateCreator, existingIA
 			return nil, err
 		}
 		return agg.AppendEvent(model.MailTextChanged, text)
+	}
+}
+
 func checkExistingLoginPolicySecondFactorValidation(mfaType int32) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		mfas := make([]int32, 0)

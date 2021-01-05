@@ -58,7 +58,7 @@ func (p *MailTemplate) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *MailTemplate) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestMailTemplateSequence()
+	sequence, err := m.view.GetLatestMailTemplateSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -87,17 +87,21 @@ func (m *MailTemplate) processMailTemplate(event *models.Event) (err error) {
 		}
 		err = template.AppendEvent(event)
 	case model.MailTemplateRemoved:
-		return m.view.DeleteMailTemplate(event.AggregateID, event.Sequence)
+		return m.view.DeleteMailTemplate(event.AggregateID, event)
 	default:
-		return m.view.ProcessedMailTemplateSequence(event.Sequence)
+		return m.view.ProcessedMailTemplateSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutMailTemplate(template, template.Sequence)
+	return m.view.PutMailTemplate(template, event)
 }
 
 func (m *MailTemplate) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in label template handler")
 	return spooler.HandleError(event, err, m.view.GetLatestMailTemplateFailedEvent, m.view.ProcessedMailTemplateFailedEvent, m.view.ProcessedMailTemplateSequence, m.errorCountUntilSkip)
+}
+
+func (o *MailTemplate) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateMailTemplateSpoolerRunTimestamp)
 }

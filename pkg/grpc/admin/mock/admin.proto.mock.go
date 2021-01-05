@@ -276,19 +276,6 @@ func (mr *MockAdminServiceClientMockRecorder) GetDefaultLoginPolicyIdpProviders(
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicyIdpProviders", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLoginPolicyIdpProviders), varargs...)
 }
 
-// GetDefaultMailTemplate mocks base method
-func (m *MockAdminServiceClient) GetDefaultMailTemplate(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultMailTemplateView, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetDefaultMailTemplate", varargs...)
-	ret0, _ := ret[0].(*admin.DefaultMailTemplateView)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
 // GetDefaultLoginPolicyMultiFactors mocks base method
 func (m *MockAdminServiceClient) GetDefaultLoginPolicyMultiFactors(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.MultiFactorsResult, error) {
 	m.ctrl.T.Helper()
@@ -298,26 +285,6 @@ func (m *MockAdminServiceClient) GetDefaultLoginPolicyMultiFactors(arg0 context.
 	}
 	ret := m.ctrl.Call(m, "GetDefaultLoginPolicyMultiFactors", varargs...)
 	ret0, _ := ret[0].(*admin.MultiFactorsResult)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDefaultMailTemplate indicates an expected call of GetDefaultMailTemplate
-func (mr *MockAdminServiceClientMockRecorder) GetDefaultMailTemplate(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultMailTemplate", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultMailTemplate), varargs...)
-}
-
-// GetDefaultMailTexts mocks base method
-func (m *MockAdminServiceClient) GetDefaultMailTexts(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultMailTextsView, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetDefaultMailTexts", varargs...)
-	ret0, _ := ret[0].(*admin.DefaultMailTextsView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -342,18 +309,51 @@ func (m *MockAdminServiceClient) GetDefaultLoginPolicySecondFactors(arg0 context
 	return ret0, ret1
 }
 
-// GetDefaultMailTexts indicates an expected call of GetDefaultMailTexts
-func (mr *MockAdminServiceClientMockRecorder) GetDefaultMailTexts(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultMailTexts", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultMailTexts), varargs...)
-}
-
 // GetDefaultLoginPolicySecondFactors indicates an expected call of GetDefaultLoginPolicySecondFactors
 func (mr *MockAdminServiceClientMockRecorder) GetDefaultLoginPolicySecondFactors(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLoginPolicySecondFactors", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultLoginPolicySecondFactors), varargs...)
+}
+
+// GetDefaultMailTemplate mocks base method
+func (m *MockAdminServiceClient) GetDefaultMailTemplate(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultMailTemplateView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultMailTemplate", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultMailTemplateView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultMailTemplate indicates an expected call of GetDefaultMailTemplate
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultMailTemplate(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultMailTemplate", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultMailTemplate), varargs...)
+}
+
+// GetDefaultMailTexts mocks base method
+func (m *MockAdminServiceClient) GetDefaultMailTexts(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*admin.DefaultMailTextsView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultMailTexts", varargs...)
+	ret0, _ := ret[0].(*admin.DefaultMailTextsView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultMailTexts indicates an expected call of GetDefaultMailTexts
+func (mr *MockAdminServiceClientMockRecorder) GetDefaultMailTexts(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultMailTexts", reflect.TypeOf((*MockAdminServiceClient)(nil).GetDefaultMailTexts), varargs...)
 }
 
 // GetDefaultOrgIamPolicy mocks base method

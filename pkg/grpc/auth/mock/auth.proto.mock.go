@@ -216,6 +216,26 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyPasswordComplexityPolicy(arg0,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyPasswordComplexityPolicy", reflect.TypeOf((*MockAuthServiceClient)(nil).GetMyPasswordComplexityPolicy), varargs...)
 }
 
+// GetMyPasswordless mocks base method
+func (m *MockAuthServiceClient) GetMyPasswordless(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*auth.WebAuthNTokens, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetMyPasswordless", varargs...)
+	ret0, _ := ret[0].(*auth.WebAuthNTokens)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMyPasswordless indicates an expected call of GetMyPasswordless
+func (mr *MockAuthServiceClientMockRecorder) GetMyPasswordless(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyPasswordless", reflect.TypeOf((*MockAuthServiceClient)(nil).GetMyPasswordless), varargs...)
+}
+
 // GetMyProjectPermissions mocks base method
 func (m *MockAuthServiceClient) GetMyProjectPermissions(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*auth.MyPermissions, error) {
 	m.ctrl.T.Helper()

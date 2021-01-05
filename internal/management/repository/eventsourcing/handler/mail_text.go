@@ -58,7 +58,7 @@ func (p *MailText) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *MailText) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestMailTextSequence()
+	sequence, err := m.view.GetLatestMailTextSequence("")
 	if err != nil {
 		return nil, err
 	}
@@ -93,17 +93,21 @@ func (m *MailText) processMailText(event *models.Event) (err error) {
 		err = text.AppendEvent(event)
 	case model.MailTextRemoved:
 		err = text.SetData(event)
-		return m.view.DeleteMailText(event.AggregateID, text.MailTextType, text.Language, event.Sequence)
+		return m.view.DeleteMailText(event.AggregateID, text.MailTextType, text.Language, event)
 	default:
-		return m.view.ProcessedMailTextSequence(event.Sequence)
+		return m.view.ProcessedMailTextSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutMailText(text, text.Sequence)
+	return m.view.PutMailText(text, event)
 }
 
 func (m *MailText) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in label text handler")
 	return spooler.HandleError(event, err, m.view.GetLatestMailTextFailedEvent, m.view.ProcessedMailTextFailedEvent, m.view.ProcessedMailTextSequence, m.errorCountUntilSkip)
+}
+
+func (o *MailText) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateMailTextSpoolerRunTimestamp)
 }
