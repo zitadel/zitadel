@@ -19,92 +19,112 @@
 
     .lgn-checkbox {
         color: lgn-color($primary, default);
-        font-size: $lgn-checkbox-font-size;
         line-height: 28px;
-    }
-
-    /* Input */
-    .lgn-checkbox > input {
-        background-color: lgn-color($primary, default);
-        box-shadow: none;
-        outline: none;
-        opacity: 0;
-    }
-
-    /* Span */
-    .lgn-checkbox > span {
-        display: inline-block;
-        width: 100%;
-        cursor: pointer;
-        color: lgn-color($foreground, text);
-    }
-
-    /* Box */
-    .lgn-checkbox > span::before {
-        border-color: lgn-color($primary, default);
-    }
-
-    /* Checked, Indeterminate */
-    .lgn-checkbox > input:checked,
-    .lgn-checkbox > input:indeterminate {
-        background-color: lgn-color($primary, default);
-    }
-
-    .lgn-checkbox > input:checked + span::before,
-    .lgn-checkbox > input:indeterminate + span::before {
-        border-color: lgn-color($primary, default);
-        background-color: lgn-color($primary, default);
-    }
-
-    .lgn-checkbox > input:checked + span::after,
-    .lgn-checkbox > input:indeterminate + span::after {
-        border-color: black;
-    }
-
-    /* Hover, Focus */
-    .lgn-checkbox:hover > input {
-        opacity: 0.04;
-    }
-
-    .lgn-checkbox > input:focus {
-        opacity: 0.12;
-    }
-
-    .lgn-checkbox:hover > input:focus {
-        opacity: 0.16;
-    }
-
-    /* Active */
-    .lgn-checkbox > input:active {
-        opacity: 1;
-        transform: scale(0);
-    }
-
-    .lgn-checkbox > input:active + span::before {
-        border-color: lgn-color($primary, 400);
-    }
-
-    .lgn-checkbox > input:checked:active + span::before {
-        border-color: transparent;
-        background-color: lgn-color($primary, 400);
-    }
-
-    /* Disabled */
-    .lgn-checkbox > input:disabled {
-        opacity: 0;
-    }
-
-    .lgn-checkbox > input:disabled + span {
-        color: lgn-color($primary, 400);
-    }
-
-    .lgn-checkbox > input:disabled + span::before {
-        border-color: currentColor;
-    }
-
-    .lgn-checkbox > input:checked:disabled + span::before,
-    .lgn-checkbox > input:indeterminate:disabled + span::before {
-        border-color: transparent;
-        background-color: currentColor;
+        >input {
+            background-color: lgn-color($primary, default);
+            box-shadow: none;
+            outline: none;
+            opacity: 0;
+            &:checked {
+                background-color: lgn-color($primary, default);
+                + {
+                    span {
+                        &::before {
+                            border-color: lgn-color($primary, default);
+                            background-color: lgn-color($primary, default);
+                        }
+                        &::after {
+                            border-color: black;
+                        }
+                    }
+                }
+                &:active {
+                    + {
+                        span {
+                            &::before {
+                                border-color: transparent;
+                                background-color: lgn-color($primary, default);
+                            }
+                        }
+                    }
+                }
+                &:disabled {
+                    + {
+                        span {
+                            &::before {
+                                border-color: transparent;
+                                background-color: currentColor;
+                            }
+                        }
+                    }
+                }
+            }
+            &:indeterminate {
+                background-color: lgn-color($primary, default);
+                + {
+                    span {
+                        &::before {
+                            border-color: lgn-color($primary, default);
+                            background-color: lgn-color($primary, default);
+                        }
+                        &::after {
+                            border-color: black;
+                        }
+                    }
+                }
+                &:disabled {
+                    + {
+                        span {
+                            &::before {
+                                border-color: transparent;
+                                background-color: currentColor;
+                            }
+                        }
+                    }
+                }
+            }
+            &:focus {
+                opacity: 0.12;
+            }
+            &:active {
+                opacity: 1;
+                transform: scale(0);
+                + {
+                    span {
+                        &::before {
+                            border-color: lgn-color($primary, default);
+                        }
+                    }
+                }
+            }
+            &:disabled {
+                opacity: 0;
+                + {
+                    span {
+                        color: lgn-color($primary, default);
+                        &::before {
+                            border-color: currentColor;
+                        }
+                    }
+                }
+            }
+        }
+        >span {
+            display: inline-block;
+            width: 100%;
+            cursor: pointer;
+            color: white;
+            &::before {
+                border-color: yellow;
+            }
+        }
+        &:hover {
+            >input {
+                opacity: 0.04;
+                &:focus {
+                    opacity: 0.16;
+                }
+            }
+        }
     }
 }

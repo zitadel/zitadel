@@ -154,14 +154,6 @@ select::placeholder, .lgn-select::placeholder {
   font-weight: 400;
 }
 
-.lgn-checkbox {
-  /* Input */
-  /* Span */
-  /* Box */
-  /* Checkmark */
-  /* Checked, Indeterminate */
-  /* Active */
-}
 .lgn-checkbox .lgn-checkbox {
   z-index: 0;
   position: relative;
@@ -184,9 +176,20 @@ select::placeholder, .lgn-select::placeholder {
   height: 40px;
   box-shadow: none;
   outline: none;
+  opacity: 0;
   transform: scale(1);
   pointer-events: none;
   transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 .lgn-checkbox .lgn-checkbox > span {
   display: inline-block;
@@ -199,7 +202,6 @@ select::placeholder, .lgn-select::placeholder {
   box-sizing: border-box;
   margin: 3px 11px 3px 1px;
   border: solid 2px;
-  /* Safari */
   border-radius: 2px;
   width: 18px;
   height: 18px;
@@ -218,16 +220,6 @@ select::placeholder, .lgn-select::placeholder {
   border-right: none;
   border-top: none;
   transform: translate(3px, 4px) rotate(-45deg);
-}
-.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
-  border-left: none;
-  transform: translate(4px, 3px);
-}
-.lgn-checkbox .lgn-checkbox > input:active {
-  transition: transform 0s, opacity 0s;
-}
-.lgn-checkbox .lgn-checkbox > input:disabled + span {
-  cursor: initial;
 }
 
 @keyframes ripple {
@@ -445,14 +437,6 @@ i {
   font-weight: bold;
 }
 
-.lgn-checkbox {
-  /* Input */
-  /* Span */
-  /* Box */
-  /* Checkmark */
-  /* Checked, Indeterminate */
-  /* Active */
-}
 .lgn-checkbox .lgn-checkbox {
   z-index: 0;
   position: relative;
@@ -475,9 +459,20 @@ i {
   height: 40px;
   box-shadow: none;
   outline: none;
+  opacity: 0;
   transform: scale(1);
   pointer-events: none;
   transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 .lgn-checkbox .lgn-checkbox > span {
   display: inline-block;
@@ -490,7 +485,6 @@ i {
   box-sizing: border-box;
   margin: 3px 11px 3px 1px;
   border: solid 2px;
-  /* Safari */
   border-radius: 2px;
   width: 18px;
   height: 18px;
@@ -509,16 +503,6 @@ i {
   border-right: none;
   border-top: none;
   transform: translate(3px, 4px) rotate(-45deg);
-}
-.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
-  border-left: none;
-  transform: translate(4px, 3px);
-}
-.lgn-checkbox .lgn-checkbox > input:active {
-  transition: transform 0s, opacity 0s;
-}
-.lgn-checkbox .lgn-checkbox > input:disabled + span {
-  cursor: initial;
 }
 
 @font-face {
@@ -748,14 +732,6 @@ select::placeholder, .lgn-select::placeholder {
   font-weight: 400;
 }
 
-.lgn-checkbox {
-  /* Input */
-  /* Span */
-  /* Box */
-  /* Checkmark */
-  /* Checked, Indeterminate */
-  /* Active */
-}
 .lgn-checkbox .lgn-checkbox {
   z-index: 0;
   position: relative;
@@ -778,9 +754,20 @@ select::placeholder, .lgn-select::placeholder {
   height: 40px;
   box-shadow: none;
   outline: none;
+  opacity: 0;
   transform: scale(1);
   pointer-events: none;
   transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 .lgn-checkbox .lgn-checkbox > span {
   display: inline-block;
@@ -793,7 +780,6 @@ select::placeholder, .lgn-select::placeholder {
   box-sizing: border-box;
   margin: 3px 11px 3px 1px;
   border: solid 2px;
-  /* Safari */
   border-radius: 2px;
   width: 18px;
   height: 18px;
@@ -812,16 +798,6 @@ select::placeholder, .lgn-select::placeholder {
   border-right: none;
   border-top: none;
   transform: translate(3px, 4px) rotate(-45deg);
-}
-.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
-  border-left: none;
-  transform: translate(4px, 3px);
-}
-.lgn-checkbox .lgn-checkbox > input:active {
-  transition: transform 0s, opacity 0s;
-}
-.lgn-checkbox .lgn-checkbox > input:disabled + span {
-  cursor: initial;
 }
 
 @keyframes ripple {
@@ -1039,14 +1015,6 @@ i {
   font-weight: bold;
 }
 
-.lgn-checkbox {
-  /* Input */
-  /* Span */
-  /* Box */
-  /* Checkmark */
-  /* Checked, Indeterminate */
-  /* Active */
-}
 .lgn-checkbox .lgn-checkbox {
   z-index: 0;
   position: relative;
@@ -1069,9 +1037,20 @@ i {
   height: 40px;
   box-shadow: none;
   outline: none;
+  opacity: 0;
   transform: scale(1);
   pointer-events: none;
   transition: opacity 0.3s, transform 0.2s;
+}
+.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
+  border-left: none;
+  transform: translate(4px, 3px);
+}
+.lgn-checkbox .lgn-checkbox > input:active {
+  transition: transform 0s, opacity 0s;
+}
+.lgn-checkbox .lgn-checkbox > input:disabled + span {
+  cursor: initial;
 }
 .lgn-checkbox .lgn-checkbox > span {
   display: inline-block;
@@ -1084,7 +1063,6 @@ i {
   box-sizing: border-box;
   margin: 3px 11px 3px 1px;
   border: solid 2px;
-  /* Safari */
   border-radius: 2px;
   width: 18px;
   height: 18px;
@@ -1103,16 +1081,6 @@ i {
   border-right: none;
   border-top: none;
   transform: translate(3px, 4px) rotate(-45deg);
-}
-.lgn-checkbox .lgn-checkbox > input:indeterminate + span::after {
-  border-left: none;
-  transform: translate(4px, 3px);
-}
-.lgn-checkbox .lgn-checkbox > input:active {
-  transition: transform 0s, opacity 0s;
-}
-.lgn-checkbox .lgn-checkbox > input:disabled + span {
-  cursor: initial;
 }
 
 @font-face {
