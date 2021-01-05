@@ -3,12 +3,13 @@ package command
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) AddDefaultPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+func (r *CommandSide) AddDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMPasswordAgePolicyWriteModel(policy.AggregateID)
 	iamAgg, err := r.addDefaultPasswordAgePolicy(ctx, addedPolicy, policy)
 	if err != nil {
@@ -38,7 +39,8 @@ func (r *CommandSide) addDefaultPasswordAgePolicy(ctx context.Context, addedPoli
 	return iamAgg, nil
 }
 
-func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
+func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+	policy.AggregateID = r.iamID
 	existingPolicy, err := r.defaultPasswordAgePolicyWriteModelByID(ctx, policy.AggregateID)
 	if err != nil {
 		return nil, err

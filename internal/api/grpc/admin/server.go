@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/query"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/admin/repository"
@@ -17,6 +19,8 @@ const (
 var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
+	command       *command.CommandSide
+	query         *query.QuerySide
 	org           repository.OrgRepository
 	iam           repository.IAMRepository
 	administrator repository.AdministratorRepository
@@ -27,8 +31,10 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(repo repository.Repository) *Server {
+func CreateServer(command *command.CommandSide, query *query.QuerySide, repo repository.Repository) *Server {
 	return &Server{
+		command:       command,
+		query:         query,
 		org:           repo,
 		iam:           repo,
 		administrator: repo,

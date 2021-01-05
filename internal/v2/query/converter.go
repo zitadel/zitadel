@@ -4,6 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 func readModelToIAM(readModel *ReadModel) *model.IAM {
@@ -24,25 +25,28 @@ func readModelToIAM(readModel *ReadModel) *model.IAM {
 	}
 }
 
-func readModelToIDPConfigView(rm *IAMIDPConfigReadModel) *model.IDPConfigView {
-	return &model.IDPConfigView{
-		AggregateID:               rm.AggregateID,
-		ChangeDate:                rm.ChangeDate,
-		CreationDate:              rm.CreationDate,
-		IDPConfigID:               rm.ConfigID,
-		IDPProviderType:           model.IDPProviderType(rm.ProviderType),
-		IsOIDC:                    rm.OIDCConfig != nil,
-		Name:                      rm.Name,
-		OIDCClientID:              rm.OIDCConfig.ClientID,
-		OIDCClientSecret:          rm.OIDCConfig.ClientSecret,
-		OIDCIDPDisplayNameMapping: model.OIDCMappingField(rm.OIDCConfig.IDPDisplayNameMapping),
-		OIDCIssuer:                rm.OIDCConfig.Issuer,
-		OIDCScopes:                rm.OIDCConfig.Scopes,
-		OIDCUsernameMapping:       model.OIDCMappingField(rm.OIDCConfig.UserNameMapping),
-		Sequence:                  rm.ProcessedSequence,
-		State:                     model.IDPConfigState(rm.State),
-		StylingType:               model.IDPStylingType(rm.StylingType),
+func readModelToIDPConfigView(rm *IAMIDPConfigReadModel) *domain.IDPConfigView {
+	converted := &domain.IDPConfigView{
+		AggregateID:     rm.AggregateID,
+		ChangeDate:      rm.ChangeDate,
+		CreationDate:    rm.CreationDate,
+		IDPConfigID:     rm.ConfigID,
+		IDPProviderType: rm.ProviderType,
+		IsOIDC:          rm.OIDCConfig != nil,
+		Name:            rm.Name,
+		Sequence:        rm.ProcessedSequence,
+		State:           rm.State,
+		StylingType:     rm.StylingType,
 	}
+	if rm.OIDCConfig != nil {
+		converted.OIDCClientID = rm.OIDCConfig.ClientID
+		converted.OIDCClientSecret = rm.OIDCConfig.ClientSecret
+		converted.OIDCIDPDisplayNameMapping = rm.OIDCConfig.IDPDisplayNameMapping
+		converted.OIDCIssuer = rm.OIDCConfig.Issuer
+		converted.OIDCScopes = rm.OIDCConfig.Scopes
+		converted.OIDCUsernameMapping = rm.OIDCConfig.UserNameMapping
+	}
+	return converted
 }
 
 func readModelToMember(readModel *MemberReadModel) *model.IAMMember {

@@ -27,6 +27,10 @@ type Aggregate struct {
 	Precondition  *precondition
 }
 
+func (a *Aggregate) Type() AggregateType {
+	return a.typ
+}
+
 type precondition struct {
 	Query      *SearchQuery
 	Validation func(...*Event) error

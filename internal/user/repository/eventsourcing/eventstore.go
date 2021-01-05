@@ -1024,12 +1024,12 @@ func (es *UserEventstore) PhoneByID(ctx context.Context, userID string) (*usr_mo
 	if user.Phone != nil {
 		return user.Phone, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-pos9e", "Errors.User.PhoneNotFound")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-pos9e", "Errors.User.Phone.NotFound")
 }
 
 func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phone) (*usr_model.Phone, error) {
 	if !phone.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9s4", "Errors.User.PhoneInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9s4", "Errors.User.Phone.Invalid")
 	}
 	user, err := es.HumanByID(ctx, phone.AggregateID)
 	if err != nil {
@@ -1093,10 +1093,10 @@ func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userI
 		return err
 	}
 	if user.Phone == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp9fs", "Errors.User.PhoneNotFound")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp9fs", "Errors.User.Phone.NotFound")
 	}
 	if user.IsPhoneVerified {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sleis", "Errors.User.PhoneAlreadyVerified")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sleis", "Errors.User.Phone.AlreadyVerified")
 	}
 
 	phoneCode := new(usr_model.PhoneCode)
@@ -1302,12 +1302,12 @@ func (es *UserEventstore) verifyMFAOTP(otp *usr_model.OTP, code string) error {
 	return nil
 }
 
-func (es *UserEventstore) AddU2F(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
+func (es *UserEventstore) AddU2F(ctx context.Context, userID string, accountName string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, isLoginUI, user.U2FTokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, accountName, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, isLoginUI, user.U2FTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1353,7 +1353,7 @@ func (es *UserEventstore) RemoveU2FToken(ctx context.Context, userID, webAuthNTo
 		return err
 	}
 	if _, token := user.Human.GetU2F(webAuthNTokenID); token == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-2M9ds", "Errors.User.NotHuman")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-2M9ds", "Errors.User.MFA.U2F.NotExisting")
 	}
 	repoUser := model.UserFromModel(user)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FRemoveAggregate(es.AggregateCreator(), repoUser, &model.WebAuthNTokenID{webAuthNTokenID}))
@@ -1410,12 +1410,20 @@ func (es *UserEventstore) VerifyMFAU2F(ctx context.Context, userID string, crede
 	return finishErr
 }
 
-func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
+func (es *UserEventstore) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementRequired, isLoginUI, user.PasswordlessTokens...)
+	return user.PasswordlessTokens, nil
+}
+
+func (es *UserEventstore) AddPasswordless(ctx context.Context, userID, accountName string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
+	user, err := es.HumanByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	webAuthN, err := es.webauthn.BeginRegistration(user, accountName, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementRequired, isLoginUI, user.PasswordlessTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1616,11 +1624,10 @@ func (es *UserEventstore) AddMachineKey(ctx context.Context, key *usr_model.Mach
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5ROh4", "Errors.User.NotMachine")
 	}
 
-	id, err := es.idGenerator.Next()
+	key.KeyID, err = es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	key.KeyID = id
 
 	if key.ExpirationDate.IsZero() {
 		key.ExpirationDate, err = time.Parse(yearLayout, defaultExpirationDate)

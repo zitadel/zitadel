@@ -1,6 +1,8 @@
 package management
 
 import (
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/query"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -18,6 +20,8 @@ const (
 var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
+	command        *command.CommandSide
+	query          *query.QuerySide
 	project        repository.ProjectRepository
 	org            repository.OrgRepository
 	user           repository.UserRepository
@@ -31,8 +35,10 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(repo repository.Repository, sd systemdefaults.SystemDefaults) *Server {
+func CreateServer(command *command.CommandSide, query *query.QuerySide, repo repository.Repository, sd systemdefaults.SystemDefaults) *Server {
 	return &Server{
+		command:        command,
+		query:          query,
 		project:        repo,
 		org:            repo,
 		user:           repo,

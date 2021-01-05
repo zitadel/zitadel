@@ -26,7 +26,7 @@ func ProjectRoleByIDs(db *gorm.DB, table, projectID, orgID, key string) (*model.
 func ProjectRolesByProjectID(db *gorm.DB, table, projectID string) ([]*model.ProjectRoleView, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	queries := []*proj_model.ProjectRoleSearchQuery{
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Queries: queries})
 	_, err := query(db, &roles)
@@ -39,9 +39,9 @@ func ProjectRolesByProjectID(db *gorm.DB, table, projectID string) ([]*model.Pro
 func ResourceOwnerProjectRolesByKey(db *gorm.DB, table, projectID, resourceOwner, key string) ([]*model.ProjectRoleView, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	queries := []*proj_model.ProjectRoleSearchQuery{
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals},
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyKey, Value: key, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyKey, Value: key, Method: global_model.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Queries: queries})
 	_, err := query(db, &roles)
@@ -54,8 +54,8 @@ func ResourceOwnerProjectRolesByKey(db *gorm.DB, table, projectID, resourceOwner
 func ResourceOwnerProjectRoles(db *gorm.DB, table, projectID, resourceOwner string) ([]*model.ProjectRoleView, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	queries := []*proj_model.ProjectRoleSearchQuery{
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Queries: queries})
 	_, err := query(db, &roles)

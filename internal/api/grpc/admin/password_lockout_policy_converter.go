@@ -3,18 +3,19 @@ package admin
 import (
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
 )
 
-func passwordLockoutPolicyToModel(policy *admin.DefaultPasswordLockoutPolicyRequest) *iam_model.PasswordLockoutPolicy {
-	return &iam_model.PasswordLockoutPolicy{
+func passwordLockoutPolicyToDomain(policy *admin.DefaultPasswordLockoutPolicyRequest) *domain.PasswordLockoutPolicy {
+	return &domain.PasswordLockoutPolicy{
 		MaxAttempts:         policy.MaxAttempts,
 		ShowLockOutFailures: policy.ShowLockoutFailure,
 	}
 }
 
-func passwordLockoutPolicyFromModel(policy *iam_model.PasswordLockoutPolicy) *admin.DefaultPasswordLockoutPolicy {
+func passwordLockoutPolicyFromDomain(policy *domain.PasswordLockoutPolicy) *admin.DefaultPasswordLockoutPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-4Gsm9f").OnError(err).Debug("date parse failed")
 

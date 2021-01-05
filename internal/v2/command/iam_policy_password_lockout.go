@@ -3,12 +3,13 @@ package command
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMPasswordLockoutPolicyWriteModel(policy.AggregateID)
 	iamAgg, err := r.addDefaultPasswordLockoutPolicy(ctx, addedPolicy, policy)
 	if err != nil {
@@ -38,7 +39,8 @@ func (r *CommandSide) addDefaultPasswordLockoutPolicy(ctx context.Context, added
 	return iamAgg, nil
 }
 
-func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
+func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+	policy.AggregateID = r.iamID
 	existingPolicy, err := r.defaultPasswordLockoutPolicyWriteModelByID(ctx, policy.AggregateID)
 	if err != nil {
 		return nil, err

@@ -51,6 +51,8 @@
             </app-contact>
         </app-card>
 
+        <app-auth-passwordless *ngIf="user" #mfaComponent></app-auth-passwordless>
+
         <app-auth-user-mfa *ngIf="user" #mfaComponent></app-auth-user-mfa>
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"

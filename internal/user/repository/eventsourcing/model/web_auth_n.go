@@ -17,11 +17,12 @@ type WebAuthNToken struct {
 	Challenge       string `json:"challenge"`
 	State           int32  `json:"-"`
 
-	KeyID           []byte `json:"keyId"`
-	PublicKey       []byte `json:"publicKey"`
-	AttestationType string `json:"attestationType"`
-	AAGUID          []byte `json:"aaguid"`
-	SignCount       uint32 `json:"signCount"`
+	KeyID             []byte `json:"keyId"`
+	PublicKey         []byte `json:"publicKey"`
+	AttestationType   string `json:"attestationType"`
+	AAGUID            []byte `json:"aaguid"`
+	SignCount         uint32 `json:"signCount"`
+	WebAuthNTokenName string `json:"webAuthNTokenName"`
 }
 
 type WebAuthNVerify struct {
@@ -79,29 +80,31 @@ func WebAuthNsFromModel(u2fs []*model.WebAuthNToken) []*WebAuthNToken {
 
 func WebAuthNFromModel(webAuthN *model.WebAuthNToken) *WebAuthNToken {
 	return &WebAuthNToken{
-		ObjectRoot:      webAuthN.ObjectRoot,
-		WebauthNTokenID: webAuthN.WebAuthNTokenID,
-		Challenge:       webAuthN.Challenge,
-		State:           int32(webAuthN.State),
-		KeyID:           webAuthN.KeyID,
-		PublicKey:       webAuthN.PublicKey,
-		AAGUID:          webAuthN.AAGUID,
-		SignCount:       webAuthN.SignCount,
-		AttestationType: webAuthN.AttestationType,
+		ObjectRoot:        webAuthN.ObjectRoot,
+		WebauthNTokenID:   webAuthN.WebAuthNTokenID,
+		Challenge:         webAuthN.Challenge,
+		State:             int32(webAuthN.State),
+		KeyID:             webAuthN.KeyID,
+		PublicKey:         webAuthN.PublicKey,
+		AAGUID:            webAuthN.AAGUID,
+		SignCount:         webAuthN.SignCount,
+		AttestationType:   webAuthN.AttestationType,
+		WebAuthNTokenName: webAuthN.WebAuthNTokenName,
 	}
 }
 
 func WebAuthNToModel(webAuthN *WebAuthNToken) *model.WebAuthNToken {
 	return &model.WebAuthNToken{
-		ObjectRoot:      webAuthN.ObjectRoot,
-		WebAuthNTokenID: webAuthN.WebauthNTokenID,
-		Challenge:       webAuthN.Challenge,
-		State:           model.MFAState(webAuthN.State),
-		KeyID:           webAuthN.KeyID,
-		PublicKey:       webAuthN.PublicKey,
-		AAGUID:          webAuthN.AAGUID,
-		SignCount:       webAuthN.SignCount,
-		AttestationType: webAuthN.AttestationType,
+		ObjectRoot:        webAuthN.ObjectRoot,
+		WebAuthNTokenID:   webAuthN.WebauthNTokenID,
+		Challenge:         webAuthN.Challenge,
+		State:             model.MFAState(webAuthN.State),
+		KeyID:             webAuthN.KeyID,
+		PublicKey:         webAuthN.PublicKey,
+		AAGUID:            webAuthN.AAGUID,
+		SignCount:         webAuthN.SignCount,
+		AttestationType:   webAuthN.AttestationType,
+		WebAuthNTokenName: webAuthN.WebAuthNTokenName,
 	}
 }
 

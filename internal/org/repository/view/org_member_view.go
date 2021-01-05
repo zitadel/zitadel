@@ -17,7 +17,7 @@ func OrgMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.OrgMemberV
 	query := repository.PrepareGetByQuery(table, orgIDQuery, userIDQuery)
 	err := query(db, member)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-DG1qh", "Errors.Org.MemberNotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-gIaTM", "Errors.Org.MemberNotFound")
 	}
 	return member, err
 }

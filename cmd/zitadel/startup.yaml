@@ -49,11 +49,11 @@ AuthZ:
         Key: $CR_AUTHZ_KEY
     Spooler:
       ConcurrentWorkers: 1
-      BulkLimit: 100
+      BulkLimit: 10000
       FailureCountUntilSkip: 5
 
 Auth:
-  SearchLimit: 100
+  SearchLimit: 1000
   Domain: $ZITADEL_DEFAULT_DOMAIN
   Eventstore:
     ServiceName: 'authAPI'
@@ -98,7 +98,7 @@ Auth:
       Key: $CR_AUTH_KEY
   Spooler:
     ConcurrentWorkers: 1
-    BulkLimit: 100
+    BulkLimit: 10000
     FailureCountUntilSkip: 5
   KeyConfig:
     Size: 2048
@@ -109,7 +109,7 @@ Auth:
     SigningKeyRotation: 10s
 
 Admin:
-  SearchLimit: 100
+  SearchLimit: 1000
   Domain: $ZITADEL_DEFAULT_DOMAIN
   Eventstore:
     ServiceName: 'Admin'
@@ -142,11 +142,11 @@ Admin:
       Key: $CR_ADMINAPI_KEY
   Spooler:
     ConcurrentWorkers: 1
-    BulkLimit: 100
+    BulkLimit: 10000
     FailureCountUntilSkip: 5
 
 Mgmt:
-  SearchLimit: 100
+  SearchLimit: 1000
   Domain: $ZITADEL_DEFAULT_DOMAIN
   Eventstore:
     ServiceName: 'ManagementAPI'
@@ -179,7 +179,7 @@ Mgmt:
       Key: $CR_MANAGEMENT_KEY
   Spooler:
     ConcurrentWorkers: 1
-    BulkLimit: 100
+    BulkLimit: 10000
     FailureCountUntilSkip: 5
 
 API:
@@ -292,10 +292,6 @@ Notification:
         Key: $CR_NOTIFICATION_KEY
     Spooler:
       ConcurrentWorkers: 1
-      BulkLimit: 100
+      BulkLimit: 10000
       FailureCountUntilSkip: 5
       Handlers:
-        Notification:
-          MinimumCycleDuration: 5s
-        User:
-          MinimumCycleDuration: 5s

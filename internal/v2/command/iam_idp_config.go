@@ -8,12 +8,11 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
 	if config.OIDCConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "IAM-eUpQU", "Errors.idp.config.notset")
 	}
@@ -36,8 +35,8 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *iam_model
 			ctx,
 			idpConfigID,
 			config.Name,
-			domain.IDPConfigType(config.Type),
-			domain.IDPConfigStylingType(config.StylingType),
+			config.Type,
+			config.StylingType,
 		),
 	)
 	iamAgg.PushEvents(
@@ -46,8 +45,8 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *iam_model
 			idpConfigID,
 			config.OIDCConfig.Issuer,
 			clientSecret,
-			domain.OIDCMappingField(config.OIDCConfig.IDPDisplayNameMapping),
-			domain.OIDCMappingField(config.OIDCConfig.UsernameMapping),
+			config.OIDCConfig.IDPDisplayNameMapping,
+			config.OIDCConfig.UsernameMapping,
 			config.OIDCConfig.Scopes...,
 		),
 	)
@@ -58,7 +57,7 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *iam_model
 	return writeModelToIDPConfig(addedConfig), nil
 }
 
-func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
 	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, config.AggregateID, config.IDPConfigID)
 	if err != nil {
 		return nil, err
@@ -67,7 +66,7 @@ func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *iam_mo
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotExisting")
 	}
 
-	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, config.IDPConfigID, config.Name, domain.IDPConfigStylingType(config.StylingType))
+	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, config.IDPConfigID, config.Name, config.StylingType)
 	if !hasChanged {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
@@ -81,8 +80,8 @@ func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *iam_mo
 	return writeModelToIDPConfig(existingIDP), nil
 }
 
-func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
-	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, iamID, idpID)
+func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
+	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, r.iamID, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +98,8 @@ func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, iamID, idp
 	return writeModelToIDPConfig(existingIDP), nil
 }
 
-func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
-	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, iamID, idpID)
+func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
+	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, r.iamID, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +117,7 @@ func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, iamID, idp
 	return writeModelToIDPConfig(existingIDP), nil
 }
 
-func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, iamID, idpID string) (*domain.IDPConfig, error) {
 	writeModel, err := r.pushDefaultIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *IAMIDPConfigWriteModel) *iam.Aggregate {
 		a.Aggregate = *a.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, idpID))
 		return a

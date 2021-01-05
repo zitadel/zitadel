@@ -4,6 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 func writeModelToObjectRoot(writeModel eventstore.WriteModel) models.ObjectRoot {
@@ -25,50 +26,50 @@ func writeModelToIAM(wm *IAMWriteModel) *model.IAM {
 	}
 }
 
-func writeModelToMember(writeModel *IAMMemberWriteModel) *model.IAMMember {
-	return &model.IAMMember{
+func writeModelToMember(writeModel *IAMMemberWriteModel) *domain.IAMMember {
+	return &domain.IAMMember{
 		ObjectRoot: writeModelToObjectRoot(writeModel.MemberWriteModel.WriteModel),
 		Roles:      writeModel.Roles,
 		UserID:     writeModel.UserID,
 	}
 }
 
-func writeModelToLoginPolicy(wm *IAMLoginPolicyWriteModel) *model.LoginPolicy {
-	return &model.LoginPolicy{
+func writeModelToLoginPolicy(wm *IAMLoginPolicyWriteModel) *domain.LoginPolicy {
+	return &domain.LoginPolicy{
 		ObjectRoot:            writeModelToObjectRoot(wm.LoginPolicyWriteModel.WriteModel),
 		AllowUsernamePassword: wm.AllowUserNamePassword,
 		AllowRegister:         wm.AllowRegister,
 		AllowExternalIdp:      wm.AllowExternalIDP,
 		ForceMFA:              wm.ForceMFA,
-		PasswordlessType:      model.PasswordlessType(wm.PasswordlessType),
+		PasswordlessType:      wm.PasswordlessType,
 	}
 }
 
-func writeModelToLabelPolicy(wm *IAMLabelPolicyWriteModel) *model.LabelPolicy {
-	return &model.LabelPolicy{
+func writeModelToLabelPolicy(wm *IAMLabelPolicyWriteModel) *domain.LabelPolicy {
+	return &domain.LabelPolicy{
 		ObjectRoot:     writeModelToObjectRoot(wm.LabelPolicyWriteModel.WriteModel),
 		PrimaryColor:   wm.PrimaryColor,
 		SecondaryColor: wm.SecondaryColor,
 	}
 }
 
-func writeModelToOrgIAMPolicy(wm *IAMOrgIAMPolicyWriteModel) *model.OrgIAMPolicy {
-	return &model.OrgIAMPolicy{
+func writeModelToOrgIAMPolicy(wm *IAMOrgIAMPolicyWriteModel) *domain.OrgIAMPolicy {
+	return &domain.OrgIAMPolicy{
 		ObjectRoot:            writeModelToObjectRoot(wm.PolicyOrgIAMWriteModel.WriteModel),
 		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
 	}
 }
 
-func writeModelToPasswordAgePolicy(wm *IAMPasswordAgePolicyWriteModel) *model.PasswordAgePolicy {
-	return &model.PasswordAgePolicy{
+func writeModelToPasswordAgePolicy(wm *IAMPasswordAgePolicyWriteModel) *domain.PasswordAgePolicy {
+	return &domain.PasswordAgePolicy{
 		ObjectRoot:     writeModelToObjectRoot(wm.PasswordAgePolicyWriteModel.WriteModel),
 		MaxAgeDays:     wm.MaxAgeDays,
 		ExpireWarnDays: wm.ExpireWarnDays,
 	}
 }
 
-func writeModelToPasswordComplexityPolicy(wm *IAMPasswordComplexityPolicyWriteModel) *model.PasswordComplexityPolicy {
-	return &model.PasswordComplexityPolicy{
+func writeModelToPasswordComplexityPolicy(wm *IAMPasswordComplexityPolicyWriteModel) *domain.PasswordComplexityPolicy {
+	return &domain.PasswordComplexityPolicy{
 		ObjectRoot:   writeModelToObjectRoot(wm.PasswordComplexityPolicyWriteModel.WriteModel),
 		MinLength:    wm.MinLength,
 		HasLowercase: wm.HasLowercase,
@@ -78,41 +79,41 @@ func writeModelToPasswordComplexityPolicy(wm *IAMPasswordComplexityPolicyWriteMo
 	}
 }
 
-func writeModelToPasswordLockoutPolicy(wm *IAMPasswordLockoutPolicyWriteModel) *model.PasswordLockoutPolicy {
-	return &model.PasswordLockoutPolicy{
+func writeModelToPasswordLockoutPolicy(wm *IAMPasswordLockoutPolicyWriteModel) *domain.PasswordLockoutPolicy {
+	return &domain.PasswordLockoutPolicy{
 		ObjectRoot:          writeModelToObjectRoot(wm.PasswordLockoutPolicyWriteModel.WriteModel),
 		MaxAttempts:         wm.MaxAttempts,
 		ShowLockOutFailures: wm.ShowLockOutFailures,
 	}
 }
 
-func writeModelToIDPConfig(wm *IAMIDPConfigWriteModel) *model.IDPConfig {
-	return &model.IDPConfig{
+func writeModelToIDPConfig(wm *IAMIDPConfigWriteModel) *domain.IDPConfig {
+	return &domain.IDPConfig{
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
 		OIDCConfig:  writeModelToIDPOIDCConfig(wm.OIDCConfig),
 		IDPConfigID: wm.ConfigID,
 		Name:        wm.Name,
-		State:       model.IDPConfigState(wm.State),
-		StylingType: model.IDPStylingType(wm.StylingType),
+		State:       wm.State,
+		StylingType: wm.StylingType,
 	}
 }
 
-func writeModelToIDPOIDCConfig(wm *OIDCConfigWriteModel) *model.OIDCIDPConfig {
-	return &model.OIDCIDPConfig{
+func writeModelToIDPOIDCConfig(wm *OIDCConfigWriteModel) *domain.OIDCIDPConfig {
+	return &domain.OIDCIDPConfig{
 		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
 		ClientID:              wm.ClientID,
 		IDPConfigID:           wm.IDPConfigID,
-		IDPDisplayNameMapping: model.OIDCMappingField(wm.IDPDisplayNameMapping),
+		IDPDisplayNameMapping: wm.IDPDisplayNameMapping,
 		Issuer:                wm.Issuer,
 		Scopes:                wm.Scopes,
-		UsernameMapping:       model.OIDCMappingField(wm.UserNameMapping),
+		UsernameMapping:       wm.UserNameMapping,
 	}
 }
 
-func writeModelToIDPProvider(wm *IAMIdentityProviderWriteModel) *model.IDPProvider {
-	return &model.IDPProvider{
+func writeModelToIDPProvider(wm *IAMIdentityProviderWriteModel) *domain.IDPProvider {
+	return &domain.IDPProvider{
 		ObjectRoot:  writeModelToObjectRoot(wm.IdentityProviderWriteModel.WriteModel),
 		IDPConfigID: wm.IDPConfigID,
-		Type:        model.IDPProviderType(wm.IDPProviderType),
+		Type:        wm.IDPProviderType,
 	}
 }

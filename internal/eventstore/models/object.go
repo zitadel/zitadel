@@ -15,6 +15,8 @@ type ObjectRoot struct {
 func (o *ObjectRoot) AppendEvent(event *Event) {
 	if o.AggregateID == "" {
 		o.AggregateID = event.AggregateID
+	} else if o.AggregateID != event.AggregateID {
+		return
 	}
 	if o.ResourceOwner == "" {
 		o.ResourceOwner = event.ResourceOwner

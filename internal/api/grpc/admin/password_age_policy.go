@@ -15,9 +15,9 @@ func (s *Server) GetDefaultPasswordAgePolicy(ctx context.Context, _ *empty.Empty
 }
 
 func (s *Server) UpdateDefaultPasswordAgePolicy(ctx context.Context, policy *admin.DefaultPasswordAgePolicyRequest) (*admin.DefaultPasswordAgePolicy, error) {
-	result, err := s.iam.ChangeDefaultPasswordAgePolicy(ctx, passwordAgePolicyToModel(policy))
+	result, err := s.command.ChangeDefaultPasswordAgePolicy(ctx, passwordAgePolicyToDomain(policy))
 	if err != nil {
 		return nil, err
 	}
-	return passwordAgePolicyFromModel(result), nil
+	return passwordAgePolicyFromDomain(result), nil
 }

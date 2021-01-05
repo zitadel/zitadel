@@ -49,7 +49,7 @@ func equalStringArray(a, b []string) bool {
 
 func Test_GetUserMethodPermissions(t *testing.T) {
 	type args struct {
-		ctx          context.Context
+		ctxData      CtxData
 		verifier     *TokenVerifier
 		requiredPerm string
 		authConfig   Config
@@ -64,7 +64,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 		{
 			name: "Empty Context",
 			args: args{
-				ctx: getTestCtx("", ""),
+				ctxData: CtxData{},
 				verifier: Start(&testVerifier{grant: &Grant{
 					Roles: []string{"ORG_OWNER"},
 				}}),
@@ -89,7 +89,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 		{
 			name: "No Grants",
 			args: args{
-				ctx:          getTestCtx("", ""),
+				ctxData:      CtxData{},
 				verifier:     Start(&testVerifier{grant: &Grant{}}),
 				requiredPerm: "project.read",
 				authConfig: Config{
@@ -110,9 +110,9 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 		{
 			name: "Get Permissions",
 			args: args{
-				ctx: getTestCtx("userID", "orgID"),
+				ctxData: CtxData{UserID: "userID", OrgID: "orgID"},
 				verifier: Start(&testVerifier{grant: &Grant{
-					Roles: []string{"ORG_OWNER"},
+					Roles: []string{"IAM_OWNER"},
 				}}),
 				requiredPerm: "project.read",
 				authConfig: Config{
@@ -133,7 +133,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, perms, err := getUserMethodPermissions(tt.args.ctx, tt.args.verifier, tt.args.requiredPerm, tt.args.authConfig)
+			_, perms, err := getUserMethodPermissions(context.Background(), tt.args.verifier, tt.args.requiredPerm, tt.args.authConfig, tt.args.ctxData)
 
 			if tt.wantErr && err == nil {
 				t.Errorf("got wrong result, should get err: actual: %v ", err)

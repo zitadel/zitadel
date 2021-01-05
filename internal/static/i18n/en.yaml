@@ -4,6 +4,8 @@ Errors:
   OriginNotAllowed: This "Origin" is not allowed
   User:
     NotFound: User could not be found
+    NotFoundOnOrg: User could not be found on chosen organisation
+    NotAllowedOrg: User is no member of the required organisation
     UserIDMissing: User ID missing
     OrgIamPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
@@ -26,9 +28,10 @@ Errors:
       Invalid: Email is invalid
       AlreadyVerified: Email is alredy verified
       NotChanged: Email not changed
-    PhoneNotFound: Phone not found
-    PhoneInvalid: Phone is invalid
-    PhoneAlreadyVerified: Phone already verified
+    Phone:
+      NotFound: Phone not found
+      Invalid: Phone is invalid
+      AlreadyVerified: Phone already verified
     Address:
       NotFound: Address not found
       NotChanged: Address not changed
@@ -169,6 +172,7 @@ Errors:
     GrantNotExists: Project grant doesn't exist
     GrantHasNotExistingRole: One role doesn't exist on project
     UserIDMisisng: User ID missing
+    OIDCSecretInvalid: Client Secret is invalid
   IAM:
     Member:
       RolesNotChanged: Roles habe not been changed
@@ -463,9 +467,16 @@ EventTypes:
       login:
         added: Login Policy added
         changed: Login Policy changed
+        removed: Login Policy removed
         idpprovider:
           added: Idp Provider added to Login Policy
           removed: Idp Provider removed from Login Policy
+        secondfactor:
+          added: Second factor added to Login Policy
+          removed: Second factor removed from Login Policy
+        multifactor:
+          added: Multi factor added to Login Policy
+          removed: Multi factor removed from Login Policy
       password:
         complexity:
           added: Password complexity policy added

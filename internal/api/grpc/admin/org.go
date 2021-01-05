@@ -47,11 +47,11 @@ func (s *Server) GetDefaultOrgIamPolicy(ctx context.Context, _ *empty.Empty) (_ 
 }
 
 func (s *Server) UpdateDefaultOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyRequest) (_ *admin.OrgIamPolicy, err error) {
-	policy, err := s.iam.ChangeDefaultOrgIAMPolicy(ctx, orgIAMPolicyRequestToModel(in))
+	policy, err := s.command.ChangeDefaultOrgIAMPolicy(ctx, orgIAMPolicyRequestToDomain(in))
 	if err != nil {
 		return nil, err
 	}
-	return orgIAMPolicyFromModel(policy), err
+	return orgIAMPolicyFromDomain(policy), err
 }
 
 func (s *Server) GetOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) (_ *admin.OrgIamPolicyView, err error) {
@@ -63,19 +63,19 @@ func (s *Server) GetOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) 
 }
 
 func (s *Server) CreateOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyRequest) (_ *admin.OrgIamPolicy, err error) {
-	policy, err := s.org.CreateOrgIAMPolicy(ctx, orgIAMPolicyRequestToModel(in))
+	policy, err := s.command.AddOrgIAMPolicy(ctx, orgIAMPolicyRequestToDomain(in))
 	if err != nil {
 		return nil, err
 	}
-	return orgIAMPolicyFromModel(policy), err
+	return orgIAMPolicyFromDomain(policy), err
 }
 
 func (s *Server) UpdateOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyRequest) (_ *admin.OrgIamPolicy, err error) {
-	policy, err := s.org.ChangeOrgIAMPolicy(ctx, orgIAMPolicyRequestToModel(in))
+	policy, err := s.command.ChangeOrgIAMPolicy(ctx, orgIAMPolicyRequestToDomain(in))
 	if err != nil {
 		return nil, err
 	}
-	return orgIAMPolicyFromModel(policy), err
+	return orgIAMPolicyFromDomain(policy), err
 }
 
 func (s *Server) RemoveOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) (_ *empty.Empty, err error) {

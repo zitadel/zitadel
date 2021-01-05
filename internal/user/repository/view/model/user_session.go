@@ -155,8 +155,12 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		es_model.HumanSignedOut,
 		es_model.UserLocked,
 		es_model.UserDeactivated:
+		v.PasswordlessVerification = time.Time{}
 		v.PasswordVerification = time.Time{}
 		v.SecondFactorVerification = time.Time{}
+		v.SecondFactorVerificationType = int32(req_model.MFALevelNotSetUp)
+		v.MultiFactorVerification = time.Time{}
+		v.MultiFactorVerificationType = int32(req_model.MFALevelNotSetUp)
 		v.ExternalLoginVerification = time.Time{}
 		v.State = int32(req_model.UserSessionStateTerminated)
 	case es_model.HumanExternalIDPRemoved, es_model.HumanExternalIDPCascadeRemoved:

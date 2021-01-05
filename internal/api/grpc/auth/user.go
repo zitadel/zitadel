@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/pkg/grpc/auth"
@@ -162,6 +163,9 @@ func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Emp
 
 func (s *Server) AddMyMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
 	u2f, err := s.repo.AddMyMFAU2F(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return verifyWebAuthNFromModel(u2f), err
 }
 
@@ -175,8 +179,19 @@ func (s *Server) RemoveMyMfaU2F(ctx context.Context, id *auth.WebAuthNTokenID) (
 	return &empty.Empty{}, err
 }
 
+func (s *Server) GetMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNTokens, err error) {
+	tokens, err := s.repo.GetMyPasswordless(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return webAuthNTokensFromModel(tokens), err
+}
+
 func (s *Server) AddMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
 	u2f, err := s.repo.AddMyPasswordless(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return verifyWebAuthNFromModel(u2f), err
 }
 

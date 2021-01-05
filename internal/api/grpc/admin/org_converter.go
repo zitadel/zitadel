@@ -3,6 +3,7 @@ package admin
 import (
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
@@ -197,7 +198,7 @@ func orgQueryMethodToModel(method admin.OrgSearchMethod) model.SearchMethod {
 	}
 }
 
-func orgIAMPolicyFromModel(policy *iam_model.OrgIAMPolicy) *admin.OrgIamPolicy {
+func orgIAMPolicyFromDomain(policy *domain.OrgIAMPolicy) *admin.OrgIamPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-ush36").OnError(err).Debug("unable to get timestamp from time")
 
@@ -227,8 +228,8 @@ func orgIAMPolicyViewFromModel(policy *iam_model.OrgIAMPolicyView) *admin.OrgIam
 	}
 }
 
-func orgIAMPolicyRequestToModel(policy *admin.OrgIamPolicyRequest) *iam_model.OrgIAMPolicy {
-	return &iam_model.OrgIAMPolicy{
+func orgIAMPolicyRequestToDomain(policy *admin.OrgIamPolicyRequest) *domain.OrgIAMPolicy {
+	return &domain.OrgIAMPolicy{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: policy.OrgId,
 		},

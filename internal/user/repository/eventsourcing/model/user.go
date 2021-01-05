@@ -99,18 +99,18 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 	}
 
 	if u.Human != nil {
-		u.Human.User = u
+		u.Human.user = u
 		return u.Human.AppendEvent(event)
 	} else if u.Machine != nil {
-		u.Machine.User = u
+		u.Machine.user = u
 		return u.Machine.AppendEvent(event)
 	}
 	if strings.HasPrefix(string(event.Type), "user.human") || event.AggregateVersion == "v1" {
-		u.Human = &Human{User: u}
+		u.Human = &Human{user: u}
 		return u.Human.AppendEvent(event)
 	}
 	if strings.HasPrefix(string(event.Type), "user.machine") {
-		u.Machine = &Machine{User: u}
+		u.Machine = &Machine{user: u}
 		return u.Machine.AppendEvent(event)
 	}
 

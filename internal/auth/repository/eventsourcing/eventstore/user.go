@@ -109,7 +109,7 @@ func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profil
 
 func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
+	sequence, seqErr := repo.View.GetLatestExternalIDPSequence("")
 	logging.Log("EVENT-5Jsi8").OnError(seqErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest user sequence")
 	request.AppendUserQuery(authz.GetCtxData(ctx).UserID)
 	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
@@ -303,11 +303,26 @@ func (repo *UserRepo) RemoveMyMFAOTP(ctx context.Context) error {
 }
 
 func (repo *UserRepo) AddMFAU2F(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddU2F(ctx, userID, true)
+	accountName := ""
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		logging.Log("EVENT-DAqe1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
+	} else {
+		accountName = user.PreferredLoginName
+	}
+	return repo.UserEvents.AddU2F(ctx, userID, accountName, true)
 }
 
 func (repo *UserRepo) AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID, false)
+	userID := authz.GetCtxData(ctx).UserID
+	accountName := ""
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		logging.Log("EVENT-Ghwl1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
+	} else {
+		accountName = user.PreferredLoginName
+	}
+	return repo.UserEvents.AddU2F(ctx, userID, accountName, false)
 }
 
 func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
@@ -326,12 +341,35 @@ func (repo *UserRepo) RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string
 	return repo.UserEvents.RemoveU2FToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
 }
 
+func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error) {
+	return repo.UserEvents.GetPasswordless(ctx, userID)
+}
+
 func (repo *UserRepo) AddPasswordless(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddPasswordless(ctx, userID, true)
+	accountName := ""
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		logging.Log("EVENT-Vj2k1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
+	} else {
+		accountName = user.PreferredLoginName
+	}
+	return repo.UserEvents.AddPasswordless(ctx, userID, accountName, true)
+}
+
+func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error) {
+	return repo.UserEvents.GetPasswordless(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID, false)
+	userID := authz.GetCtxData(ctx).UserID
+	accountName := ""
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		logging.Log("EVENT-AEq21").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
+	} else {
+		accountName = user.PreferredLoginName
+	}
+	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID, accountName, false)
 }
 
 func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {

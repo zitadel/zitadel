@@ -16,6 +16,7 @@ type Eventstore interface {
 	FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) (events []*models.Event, err error)
 	LatestSequence(ctx context.Context, searchQuery *models.SearchQueryFactory) (uint64, error)
 	V2() *es_v2.Eventstore
+	Subscribe(aggregates ...models.AggregateType) *Subscription
 }
 
 var _ Eventstore = (*eventstore)(nil)
@@ -46,6 +47,8 @@ func (es *eventstore) PushAggregates(ctx context.Context, aggregates ...*models.
 	if err != nil {
 		return err
 	}
+
+	go notify(aggregates)
 	return nil
 }
 

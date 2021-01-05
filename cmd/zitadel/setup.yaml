@@ -99,3 +99,5 @@ SetUp:
     OTP: true
   Step8:
     U2F: true
+  Step9:
+    Passwordless: true

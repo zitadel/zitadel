@@ -2,9 +2,11 @@ package management
 
 import (
 	"context"
+
+	"github.com/golang/protobuf/ptypes/empty"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/management"
-	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, id *management.UserID) (*management.UserView, error) {
@@ -50,11 +52,11 @@ func (s *Server) IsUserUnique(ctx context.Context, request *management.UniqueUse
 }
 
 func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserRequest) (*management.UserResponse, error) {
-	user, err := s.user.CreateUser(ctx, userCreateToModel(in))
+	user, err := s.command.AddUser(ctx, userCreateToDomain(in))
 	if err != nil {
 		return nil, err
 	}
-	return userFromModel(user), nil
+	return userFromDomain(user), nil
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
@@ -223,6 +225,24 @@ func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*m
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
 	err := s.user.RemoveOTP(ctx, userID.Id)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) RemoveMfaU2F(ctx context.Context, webAuthNTokenID *management.WebAuthNTokenID) (*empty.Empty, error) {
+	err := s.user.RemoveU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) GetPasswordless(ctx context.Context, userID *management.UserID) (_ *management.WebAuthNTokens, err error) {
+	tokens, err := s.user.GetPasswordless(ctx, userID.Id)
+	if err != nil {
+		return nil, err
+	}
+	return webAuthNTokensFromModel(tokens), err
+}
+
+func (s *Server) RemovePasswordless(ctx context.Context, id *management.WebAuthNTokenID) (*empty.Empty, error) {
+	err := s.user.RemovePasswordless(ctx, id.UserId, id.Id)
 	return &empty.Empty{}, err
 }
 
