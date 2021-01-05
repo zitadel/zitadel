@@ -18,7 +18,7 @@ func (r *CommandSide) SetupStep2(ctx context.Context, iamID string, step Step2) 
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
-	iamAgg, err := r.addDefaultPasswordComplexityPolicy(ctx, NewIAMPasswordComplexityPolicyWriteModel(iam.AggregateID), &iam_model.PasswordComplexityPolicy{
+	iamAgg, err := r.addDefaultPasswordComplexityPolicy(ctx, NewIAMPasswordComplexityPolicyWriteModel(iam.AggregateID), &domain.PasswordComplexityPolicy{
 		MinLength:    step.DefaultPasswordComplexityPolicy.MinLength,
 		HasLowercase: step.DefaultPasswordComplexityPolicy.HasLowercase,
 		HasUppercase: step.DefaultPasswordComplexityPolicy.HasUppercase,

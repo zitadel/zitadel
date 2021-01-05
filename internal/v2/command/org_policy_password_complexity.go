@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
-func (r *CommandSide) GetOrgPasswordComplexityPolicy(ctx context.Context, orgID string) (*iam_model.PasswordComplexityPolicy, error) {
+func (r *CommandSide) GetOrgPasswordComplexityPolicy(ctx context.Context, orgID string) (*domain.PasswordComplexityPolicy, error) {
 	policy := NewOrgPasswordComplexityPolicyWriteModel(orgID)
 	err := r.eventstore.FilterToQueryReducer(ctx, policy)
 	if err != nil {
@@ -14,5 +14,5 @@ func (r *CommandSide) GetOrgPasswordComplexityPolicy(ctx context.Context, orgID 
 	if policy.IsActive {
 		return orgWriteModelToPasswordComplexityPolicy(policy), nil
 	}
-	return r.GetDefaultPasswordComplexityPolicy(ctx, r.iamID)
+	return r.GetDefaultPasswordComplexityPolicy(ctx)
 }

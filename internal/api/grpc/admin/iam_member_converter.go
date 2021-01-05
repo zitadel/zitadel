@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -9,25 +10,21 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func addIamMemberToModel(member *admin.AddIamMemberRequest) *iam_model.IAMMember {
-	memberModel := &iam_model.IAMMember{
+func addIamMemberToDomain(member *admin.AddIamMemberRequest) *domain.IAMMember {
+	return &domain.IAMMember{
 		UserID: member.UserId,
+		Roles:  member.Roles,
 	}
-	memberModel.Roles = member.Roles
-
-	return memberModel
 }
 
-func changeIamMemberToModel(member *admin.ChangeIamMemberRequest) *iam_model.IAMMember {
-	memberModel := &iam_model.IAMMember{
+func changeIamMemberToDomain(member *admin.ChangeIamMemberRequest) *domain.IAMMember {
+	return &domain.IAMMember{
 		UserID: member.UserId,
+		Roles:  member.Roles,
 	}
-	memberModel.Roles = member.Roles
-
-	return memberModel
 }
 
-func iamMemberFromModel(member *iam_model.IAMMember) *admin.IamMember {
+func iamMemberFromDomain(member *domain.IAMMember) *admin.IamMember {
 	creationDate, err := ptypes.TimestampProto(member.CreationDate)
 	logging.Log("GRPC-Lsp76").OnError(err).Debug("date parse failed")
 

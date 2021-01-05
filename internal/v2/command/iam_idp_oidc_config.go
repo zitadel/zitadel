@@ -4,11 +4,9 @@ import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/v2/domain"
-
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
-func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
+func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
 	existingConfig := NewIDPOIDCConfigWriteModel(config.AggregateID, config.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
@@ -25,8 +23,8 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *ia
 		config.Issuer,
 		config.ClientSecretString,
 		r.idpConfigSecretCrypto,
-		domain.OIDCMappingField(config.IDPDisplayNameMapping),
-		domain.OIDCMappingField(config.UsernameMapping),
+		config.IDPDisplayNameMapping,
+		config.UsernameMapping,
 		config.Scopes...)
 	if err != nil {
 		return nil, err

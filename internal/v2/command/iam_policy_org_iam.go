@@ -3,13 +3,13 @@ package command
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) GetDefaultOrgIAMPolicy(ctx context.Context, aggregateID string) (*iam_model.OrgIAMPolicy, error) {
-	policyWriteModel := NewIAMOrgIAMPolicyWriteModel(aggregateID)
+func (r *CommandSide) GetDefaultOrgIAMPolicy(ctx context.Context) (*domain.OrgIAMPolicy, error) {
+	policyWriteModel := NewIAMOrgIAMPolicyWriteModel(r.iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
@@ -19,7 +19,8 @@ func (r *CommandSide) GetDefaultOrgIAMPolicy(ctx context.Context, aggregateID st
 	return policy, nil
 }
 
-func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMOrgIAMPolicyWriteModel(policy.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -39,7 +40,8 @@ func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_mo
 	return writeModelToOrgIAMPolicy(addedPolicy), nil
 }
 
-func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+	policy.AggregateID = r.iamID
 	existingPolicy, err := r.defaultOrgIAMPolicyWriteModelByID(ctx, policy.AggregateID)
 	if err != nil {
 		return nil, err

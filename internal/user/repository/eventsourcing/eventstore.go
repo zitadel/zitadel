@@ -1024,12 +1024,12 @@ func (es *UserEventstore) PhoneByID(ctx context.Context, userID string) (*usr_mo
 	if user.Phone != nil {
 		return user.Phone, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-pos9e", "Errors.User.PhoneNotFound")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-pos9e", "Errors.User.Phone.NotFound")
 }
 
 func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phone) (*usr_model.Phone, error) {
 	if !phone.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9s4", "Errors.User.PhoneInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9s4", "Errors.User.Phone.Invalid")
 	}
 	user, err := es.HumanByID(ctx, phone.AggregateID)
 	if err != nil {
@@ -1093,10 +1093,10 @@ func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userI
 		return err
 	}
 	if user.Phone == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp9fs", "Errors.User.PhoneNotFound")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp9fs", "Errors.User.Phone.NotFound")
 	}
 	if user.IsPhoneVerified {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sleis", "Errors.User.PhoneAlreadyVerified")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sleis", "Errors.User.Phone.AlreadyVerified")
 	}
 
 	phoneCode := new(usr_model.PhoneCode)

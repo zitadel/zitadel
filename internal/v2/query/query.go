@@ -13,6 +13,7 @@ import (
 )
 
 type QuerySide struct {
+	iamID        string
 	eventstore   *eventstore.Eventstore
 	idGenerator  id.Generator
 	secretCrypto crypto.Crypto
@@ -25,6 +26,7 @@ type Config struct {
 
 func StartQuerySide(config *Config) (repo *QuerySide, err error) {
 	repo = &QuerySide{
+		iamID:       config.SystemDefaults.IamID,
 		eventstore:  config.Eventstore,
 		idGenerator: id.SonyFlakeGenerator,
 	}

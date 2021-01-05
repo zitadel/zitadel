@@ -2,9 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
-
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/spooler"
@@ -39,8 +36,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	if err != nil {
 		return nil, err
 	}
-	esV2 := es.V2()
-
 	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
@@ -66,14 +61,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	if err != nil {
 		return nil, err
 	}
-	iamV2Command, err := command.StartCommandSide(&command.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
-	if err != nil {
-		return nil, err
-	}
-	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
-	if err != nil {
-		return nil, err
-	}
 
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user, OrgEvents: org, IamEvents: iam}, systemDefaults)
 
@@ -95,8 +82,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,
 			Roles:          roles,
-			IAMV2Command:   iamV2Command,
-			IAMV2Query:     iamV2Query,
 		},
 		AdministratorRepo: eventstore.AdministratorRepo{
 			View: view,

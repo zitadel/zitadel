@@ -9,7 +9,8 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) AddDefaultLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
+func (r *CommandSide) AddDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMLoginPolicyWriteModel(policy.AggregateID)
 	iamAgg, err := r.addDefaultLoginPolicy(ctx, addedPolicy, policy)
 	if err != nil {
@@ -23,7 +24,7 @@ func (r *CommandSide) AddDefaultLoginPolicy(ctx context.Context, policy *iam_mod
 	return writeModelToLoginPolicy(addedPolicy), nil
 }
 
-func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, addedPolicy *IAMLoginPolicyWriteModel, policy *iam_model.LoginPolicy) (*iam_repo.Aggregate, error) {
+func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, addedPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) (*iam_repo.Aggregate, error) {
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -33,16 +34,13 @@ func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, addedPolicy *IA
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.LoginPolicyWriteModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType)))
+	iamAgg.PushEvents(iam_repo.NewLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, policy.PasswordlessType))
 
 	return iamAgg, nil
 }
 
-func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-6M0od", "Errors.IAM.LoginPolicyInvalid")
-	}
-
+func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	policy.AggregateID = r.iamID
 	existingPolicy, err := r.defaultLoginPolicyWriteModelByID(ctx, policy.AggregateID)
 	if err != nil {
 		return nil, err
@@ -65,7 +63,8 @@ func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *iam_
 	return writeModelToLoginPolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpProvider *iam_model.IDPProvider) (*iam_model.IDPProvider, error) {
+func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
+	idpProvider.AggregateID = r.iamID
 	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
@@ -86,6 +85,7 @@ func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, id
 }
 
 func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *iam_model.IDPProvider) error {
+	idpProvider.AggregateID = r.iamID
 	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
@@ -100,8 +100,8 @@ func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Contex
 	return r.eventstore.PushAggregate(ctx, idpModel, iamAgg)
 }
 
-func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
-	secondFactorModel := NewIAMSecondFactorWriteModel(iamID)
+func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactor iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
+	secondFactorModel := NewIAMSecondFactorWriteModel(r.iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return iam_model.SecondFactorTypeUnspecified, err
@@ -121,8 +121,8 @@ func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, i
 	return iam_model.SecondFactorType(secondFactorModel.MFAType), nil
 }
 
-func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, iamID string, secondFactor iam_model.SecondFactorType) error {
-	secondFactorModel := NewIAMSecondFactorWriteModel(iamID)
+func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, secondFactor iam_model.SecondFactorType) error {
+	secondFactorModel := NewIAMSecondFactorWriteModel(r.iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return err
@@ -136,8 +136,8 @@ func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Conte
 	return r.eventstore.PushAggregate(ctx, secondFactorModel, iamAgg)
 }
 
-func (r *CommandSide) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, iamID string, multiFactor iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
-	multiFactorModel := NewIAMMultiFactorWriteModel(iamID)
+func (r *CommandSide) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multiFactor iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
+	multiFactorModel := NewIAMMultiFactorWriteModel(r.iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return iam_model.MultiFactorTypeUnspecified, err
@@ -155,8 +155,8 @@ func (r *CommandSide) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, ia
 	return iam_model.MultiFactorType(multiFactorModel.MultiFactoryWriteModel.MFAType), nil
 }
 
-func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, iamID string, multiFactor iam_model.MultiFactorType) error {
-	multiFactorModel := NewIAMMultiFactorWriteModel(iamID)
+func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor iam_model.MultiFactorType) error {
+	multiFactorModel := NewIAMMultiFactorWriteModel(r.iamID)
 	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return err

@@ -3,6 +3,7 @@ package model
 import (
 	"bytes"
 	caos_errors "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"strings"
 	"time"
 
@@ -48,7 +49,7 @@ const (
 	GenderDiverse
 )
 
-func (u *Human) CheckOrgIAMPolicy(userName string, policy *iam_model.OrgIAMPolicy) error {
+func (u *Human) CheckOrgIAMPolicy(userName string, policy *domain.OrgIAMPolicy) error {
 	if policy == nil {
 		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
 	}

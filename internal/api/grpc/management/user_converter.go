@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -16,6 +17,32 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
+func userFromDomain(user *domain.User) *management.UserResponse {
+	creationDate, err := ptypes.TimestampProto(user.CreationDate)
+	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
+	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
+
+	userResp := &management.UserResponse{
+		Id:           user.AggregateID,
+		State:        userStateFromDomain(user.State),
+		CreationDate: creationDate,
+		ChangeDate:   changeDate,
+		Sequence:     user.Sequence,
+		UserName:     user.UserName,
+	}
+
+	if user.Machine != nil {
+		userResp.User = &management.UserResponse_Machine{Machine: machineFromDomain(user.Machine)}
+	}
+	if user.Human != nil {
+		userResp.User = &management.UserResponse_Human{Human: humanFromDomain(user.Human)}
+	}
+
+	return userResp
+}
+
 func userFromModel(user *usr_model.User) *management.UserResponse {
 	creationDate, err := ptypes.TimestampProto(user.CreationDate)
 	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
@@ -25,7 +52,7 @@ func userFromModel(user *usr_model.User) *management.UserResponse {
 
 	userResp := &management.UserResponse{
 		Id:           user.AggregateID,
-		State:        userStateFromModel(user.State),
+		State:        management.UserState(user.State),
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 		Sequence:     user.Sequence,
@@ -42,18 +69,18 @@ func userFromModel(user *usr_model.User) *management.UserResponse {
 	return userResp
 }
 
-func userCreateToModel(user *management.CreateUserRequest) *usr_model.User {
-	var human *usr_model.Human
-	var machine *usr_model.Machine
+func userCreateToDomain(user *management.CreateUserRequest) *domain.User {
+	var human *domain.Human
+	var machine *domain.Machine
 
 	if h := user.GetHuman(); h != nil {
-		human = humanCreateToModel(h)
+		human = humanCreateToDomain(h)
 	}
 	if m := user.GetMachine(); m != nil {
-		machine = machineCreateToModel(m)
+		machine = machineCreateToDomain(m)
 	}
 
-	return &usr_model.User{
+	return &domain.User{
 		UserName: user.UserName,
 		Human:    human,
 		Machine:  machine,
@@ -222,7 +249,7 @@ func profileFromModel(profile *usr_model.Profile) *management.UserProfile {
 		DisplayName:       profile.DisplayName,
 		NickName:          profile.NickName,
 		PreferredLanguage: profile.PreferredLanguage.String(),
-		Gender:            genderFromModel(profile.Gender),
+		Gender:            management.Gender(profile.Gender),
 	}
 }
 
@@ -243,7 +270,7 @@ func profileViewFromModel(profile *usr_model.Profile) *management.UserProfileVie
 		DisplayName:        profile.DisplayName,
 		NickName:           profile.NickName,
 		PreferredLanguage:  profile.PreferredLanguage.String(),
-		Gender:             genderFromModel(profile.Gender),
+		Gender:             management.Gender(profile.Gender),
 		LoginNames:         profile.LoginNames,
 		PreferredLoginName: profile.PreferredLoginName,
 	}
@@ -259,7 +286,7 @@ func updateProfileToModel(u *management.UpdateUserProfileRequest) *usr_model.Pro
 		LastName:          u.LastName,
 		NickName:          u.NickName,
 		PreferredLanguage: preferredLanguage,
-		Gender:            genderToModel(u.Gender),
+		Gender:            usr_model.Gender(u.Gender),
 	}
 }
 
@@ -430,7 +457,7 @@ func userViewFromModel(user *usr_model.UserView) *management.UserView {
 
 	userView := &management.UserView{
 		Id:                 user.ID,
-		State:              userStateFromModel(user.State),
+		State:              management.UserState(user.State),
 		CreationDate:       creationDate,
 		ChangeDate:         changeDate,
 		LastLogin:          lastLogin,
@@ -520,30 +547,30 @@ func notifyTypeToModel(state management.NotificationType) usr_model.Notification
 	}
 }
 
-func userStateFromModel(state usr_model.UserState) management.UserState {
+func userStateFromDomain(state domain.UserState) management.UserState {
 	switch state {
-	case usr_model.UserStateActive:
+	case domain.UserStateActive:
 		return management.UserState_USERSTATE_ACTIVE
-	case usr_model.UserStateInactive:
+	case domain.UserStateInactive:
 		return management.UserState_USERSTATE_INACTIVE
-	case usr_model.UserStateLocked:
+	case domain.UserStateLocked:
 		return management.UserState_USERSTATE_LOCKED
-	case usr_model.UserStateInitial:
+	case domain.UserStateInitial:
 		return management.UserState_USERSTATE_INITIAL
-	case usr_model.UserStateSuspend:
+	case domain.UserStateSuspend:
 		return management.UserState_USERSTATE_SUSPEND
 	default:
 		return management.UserState_USERSTATE_UNSPECIFIED
 	}
 }
 
-func genderFromModel(gender usr_model.Gender) management.Gender {
+func genderFromDomain(gender domain.Gender) management.Gender {
 	switch gender {
-	case usr_model.GenderFemale:
+	case domain.GenderFemale:
 		return management.Gender_GENDER_FEMALE
-	case usr_model.GenderMale:
+	case domain.GenderMale:
 		return management.Gender_GENDER_MALE
-	case usr_model.GenderDiverse:
+	case domain.GenderDiverse:
 		return management.Gender_GENDER_DIVERSE
 	default:
 		return management.Gender_GENDER_UNSPECIFIED
@@ -562,16 +589,17 @@ func memberTypeFromModel(memberType usr_model.MemberType) management.MemberType 
 		return management.MemberType_MEMBERTYPE_UNSPECIFIED
 	}
 }
-func genderToModel(gender management.Gender) usr_model.Gender {
+
+func genderToDomain(gender management.Gender) domain.Gender {
 	switch gender {
 	case management.Gender_GENDER_FEMALE:
-		return usr_model.GenderFemale
+		return domain.GenderFemale
 	case management.Gender_GENDER_MALE:
-		return usr_model.GenderMale
+		return domain.GenderMale
 	case management.Gender_GENDER_DIVERSE:
-		return usr_model.GenderDiverse
+		return domain.GenderDiverse
 	default:
-		return usr_model.GenderUnspecified
+		return domain.GenderUnspecified
 	}
 }
 

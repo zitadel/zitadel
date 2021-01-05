@@ -4,12 +4,11 @@ import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
-func (r *CommandSide) AddUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
+func (r *CommandSide) AddUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	if !user.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.User.Invalid")
 	}
@@ -19,14 +18,27 @@ func (r *CommandSide) AddUser(ctx context.Context, user *usr_model.User) (*usr_m
 		if err != nil {
 			return nil, err
 		}
-		return &usr_model.User{UserName: user.UserName, Human: human}, nil
+		return &domain.User{UserName: user.UserName, Human: human}, nil
 	} else if user.Machine != nil {
 
 	}
 	return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-8K0df", "Errors.User.TypeUndefined")
 }
 
-func (r *CommandSide) DeactivateUser(ctx context.Context, userID string) (*usr_model.User, error) {
+func (r *CommandSide) RegisterUser(ctx context.Context, user *domain.User) (*domain.User, error) {
+	if !user.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.User.Invalid")
+	}
+
+	if user.Human != nil {
+
+	} else if user.Machine != nil {
+
+	}
+	return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-8K0df", "Errors.User.TypeUndefined")
+}
+
+func (r *CommandSide) DeactivateUser(ctx context.Context, userID string) (*domain.User, error) {
 	existingUser, err := r.userWriteModelByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -47,7 +59,7 @@ func (r *CommandSide) DeactivateUser(ctx context.Context, userID string) (*usr_m
 	return writeModelToUser(existingUser), nil
 }
 
-func (r *CommandSide) ReactivateUser(ctx context.Context, userID string) (*usr_model.User, error) {
+func (r *CommandSide) ReactivateUser(ctx context.Context, userID string) (*domain.User, error) {
 	existingUser, err := r.userWriteModelByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -68,7 +80,7 @@ func (r *CommandSide) ReactivateUser(ctx context.Context, userID string) (*usr_m
 	return writeModelToUser(existingUser), nil
 }
 
-func (r *CommandSide) LockUser(ctx context.Context, userID string) (*usr_model.User, error) {
+func (r *CommandSide) LockUser(ctx context.Context, userID string) (*domain.User, error) {
 	existingUser, err := r.userWriteModelByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -89,7 +101,7 @@ func (r *CommandSide) LockUser(ctx context.Context, userID string) (*usr_model.U
 	return writeModelToUser(existingUser), nil
 }
 
-func (r *CommandSide) UnlockUser(ctx context.Context, userID string) (*usr_model.User, error) {
+func (r *CommandSide) UnlockUser(ctx context.Context, userID string) (*domain.User, error) {
 	existingUser, err := r.userWriteModelByID(ctx, userID)
 	if err != nil {
 		return nil, err

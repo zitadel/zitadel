@@ -2,6 +2,7 @@ package management
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"time"
 
 	"github.com/caos/logging"
@@ -12,8 +13,8 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func machineCreateToModel(machine *management.CreateMachineRequest) *usr_model.Machine {
-	return &usr_model.Machine{
+func machineCreateToDomain(machine *management.CreateMachineRequest) *domain.Machine {
+	return &domain.Machine{
 		Name:        machine.Name,
 		Description: machine.Description,
 	}
@@ -23,6 +24,13 @@ func updateMachineToModel(machine *management.UpdateMachineRequest) *usr_model.M
 	return &usr_model.Machine{
 		ObjectRoot:  models.ObjectRoot{AggregateID: machine.Id},
 		Description: machine.Description,
+	}
+}
+
+func machineFromDomain(account *domain.Machine) *management.MachineResponse {
+	return &management.MachineResponse{
+		Name:        account.Name,
+		Description: account.Description,
 	}
 }
 

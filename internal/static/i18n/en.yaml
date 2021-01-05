@@ -28,9 +28,10 @@ Errors:
       Invalid: Email is invalid
       AlreadyVerified: Email is alredy verified
       NotChanged: Email not changed
-    PhoneNotFound: Phone not found
-    PhoneInvalid: Phone is invalid
-    PhoneAlreadyVerified: Phone already verified
+    Phone:
+      NotFound: Phone not found
+      Invalid: Phone is invalid
+      AlreadyVerified: Phone already verified
     Address:
       NotFound: Address not found
       NotChanged: Address not changed

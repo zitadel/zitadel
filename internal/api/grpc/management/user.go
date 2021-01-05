@@ -52,11 +52,11 @@ func (s *Server) IsUserUnique(ctx context.Context, request *management.UniqueUse
 }
 
 func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserRequest) (*management.UserResponse, error) {
-	user, err := s.user.CreateUser(ctx, userCreateToModel(in))
+	user, err := s.command.AddUser(ctx, userCreateToDomain(in))
 	if err != nil {
 		return nil, err
 	}
-	return userFromModel(user), nil
+	return userFromDomain(user), nil
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {

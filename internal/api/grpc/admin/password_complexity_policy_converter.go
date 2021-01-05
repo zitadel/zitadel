@@ -3,12 +3,13 @@ package admin
 import (
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
 )
 
-func passwordComplexityPolicyToModel(policy *admin.DefaultPasswordComplexityPolicyRequest) *iam_model.PasswordComplexityPolicy {
-	return &iam_model.PasswordComplexityPolicy{
+func passwordComplexityPolicyToDomain(policy *admin.DefaultPasswordComplexityPolicyRequest) *domain.PasswordComplexityPolicy {
+	return &domain.PasswordComplexityPolicy{
 		MinLength:    policy.MinLength,
 		HasUppercase: policy.HasUppercase,
 		HasLowercase: policy.HasLowercase,
@@ -17,7 +18,7 @@ func passwordComplexityPolicyToModel(policy *admin.DefaultPasswordComplexityPoli
 	}
 }
 
-func passwordComplexityPolicyFromModel(policy *iam_model.PasswordComplexityPolicy) *admin.DefaultPasswordComplexityPolicy {
+func passwordComplexityPolicyFromDomain(policy *domain.PasswordComplexityPolicy) *admin.DefaultPasswordComplexityPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-6Zhs9").OnError(err).Debug("date parse failed")
 

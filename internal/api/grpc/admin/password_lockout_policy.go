@@ -15,9 +15,9 @@ func (s *Server) GetDefaultPasswordLockoutPolicy(ctx context.Context, _ *empty.E
 }
 
 func (s *Server) UpdateDefaultPasswordLockoutPolicy(ctx context.Context, policy *admin.DefaultPasswordLockoutPolicyRequest) (*admin.DefaultPasswordLockoutPolicy, error) {
-	result, err := s.iam.ChangeDefaultPasswordLockoutPolicy(ctx, passwordLockoutPolicyToModel(policy))
+	result, err := s.command.ChangeDefaultPasswordLockoutPolicy(ctx, passwordLockoutPolicyToDomain(policy))
 	if err != nil {
 		return nil, err
 	}
-	return passwordLockoutPolicyFromModel(result), nil
+	return passwordLockoutPolicyFromDomain(result), nil
 }
