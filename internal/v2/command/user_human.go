@@ -2,27 +2,41 @@ package command
 
 import (
 	"context"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
 func (r *CommandSide) AddHuman(ctx context.Context, orgID, username string, human *domain.Human) (*domain.Human, error) {
+	userAgg, addedHuman, err := r.addHuman(ctx, orgID, username, human)
+	if err != nil {
+		return nil, err
+	}
+	err = r.eventstore.PushAggregate(ctx, addedHuman, userAgg)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToHuman(addedHuman), nil
+}
+
+func (r *CommandSide) addHuman(ctx context.Context, orgID, username string, human *domain.Human) (*user.Aggregate, *HumanWriteModel, error) {
 	if !human.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
 	userID, err := r.idGenerator.Next()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	human.AggregateID = userID
 	orgIAMPolicy, err := r.GetOrgIAMPolicy(ctx, orgID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	pwPolicy, err := r.GetOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	addedHuman := NewHumanWriteModel(human.AggregateID)
@@ -61,10 +75,5 @@ func (r *CommandSide) AddHuman(ctx context.Context, orgID, username string, huma
 		userAgg.PushEvents(user.NewHumanPhoneVerifiedEvent(ctx))
 	}
 
-	err = r.eventstore.PushAggregate(ctx, addedHuman, userAgg)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToHuman(addedHuman), nil
+	return userAgg, addedHuman, nil
 }

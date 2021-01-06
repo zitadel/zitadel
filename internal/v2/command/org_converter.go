@@ -4,6 +4,14 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
+func orgWriteModelToOrg(wm *OrgWriteModel) *domain.Org {
+	return &domain.Org{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		Name:       wm.Name,
+		State:      wm.State,
+	}
+}
+
 func orgWriteModelToOrgIAMPolicy(wm *ORGOrgIAMPolicyWriteModel) *domain.OrgIAMPolicy {
 	return &domain.OrgIAMPolicy{
 		ObjectRoot:            writeModelToObjectRoot(wm.PolicyOrgIAMWriteModel.WriteModel),

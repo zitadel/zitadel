@@ -31,7 +31,7 @@ func (s *Server) IsOrgUnique(ctx context.Context, request *admin.UniqueOrgReques
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, orgSetUp *admin.OrgSetUpRequest) (_ *admin.OrgSetUpResponse, err error) {
-	setUp, err := s.org.SetUpOrg(ctx, setUpRequestToModel(orgSetUp))
+	setUp, err := s.command.SetUpOrg(ctx, setUpRequestToModel(orgSetUp))
 	if err != nil {
 		return nil, err
 	}
