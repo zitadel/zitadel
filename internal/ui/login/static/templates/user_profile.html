@@ -3,11 +3,16 @@
 <div class="lgn-login-profile">
     <div class="lgn-profile-image"></div>
     <div class="lgn-names">
-        {{if .DisplayName}}
+        <div class="inline-block">
+            <div class="lgn-avatar" displayname="{{.DisplayName}}">
+                <span class="initials">A</span>
+            </div>
+        </div>
+        <!-- {{if .DisplayName}}
         <div class="lgn-displayname">
             <p>{{.DisplayName}}</p>
         </div>
-        {{end}}
+        {{end}} -->
         <div class="lgn-loginname">
             <p>{{.LoginName}}</p>
         </div>

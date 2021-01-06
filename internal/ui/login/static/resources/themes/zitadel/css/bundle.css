@@ -242,6 +242,11 @@ select::placeholder, .lgn-select::placeholder {
 a {
   text-decoration: none;
   outline: none;
+  cursor: pointer;
+  margin: 2px 0;
+}
+a.block {
+  display: block;
 }
 
 .lgn-error {
@@ -285,6 +290,12 @@ a {
   border-width: 1px;
   border-style: solid;
   border-radius: 50vw;
+  display: flex;
+  align-items: center;
+}
+.content-container .lgn-login-profile .lgn-names .inline-block {
+  display: inline-block;
+  margin: 0 2px;
 }
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
   margin: 0.5rem 1rem;
@@ -330,6 +341,7 @@ i {
   display: flex;
   align-items: center;
   border: none;
+  outline: none;
 }
 .lgn-account-selection .lgn-account .left {
   padding: 0.5rem 1rem;
@@ -391,11 +403,11 @@ i {
 }
 .lgn-checkbox label {
   display: block;
-  padding: 0 0 0 24px;
+  padding: 0 0 0 30px;
   cursor: pointer;
   box-sizing: inherit;
   font-size: 14px;
-  line-height: 26px;
+  line-height: 28px;
 }
 .lgn-checkbox label:before {
   content: "";
@@ -405,7 +417,6 @@ i {
   width: 16px;
   height: 16px;
   border-radius: 2px;
-  z-index: 1;
   transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   transition-property: background-color, border-color;
 }
@@ -417,12 +428,10 @@ i {
   width: 6px;
   height: 12px;
   transform: rotate(45deg);
-  z-index: 2;
   transition: border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .lgn-select, select {
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20448%22%20enable-background%3D%22new%200%200%20256%20448%22%3E%3Cpath%20class%3D%22arrow%22%20d%3D%22M255.9%20168c0-4.2-1.6-7.9-4.8-11.2-3.2-3.2-6.9-4.8-11.2-4.8H16c-4.2%200-7.9%201.6-11.2%204.8S0%20163.8%200%20168c0%204.4%201.6%208.2%204.8%2011.4l112%20112c3.1%203.1%206.8%204.6%2011.2%204.6%204.4%200%208.2-1.5%2011.4-4.6l112-112c3-3.2%204.5-7%204.5-11.4z%22%2F%3E%3C%2Fsvg%3E%0A");
   background-position: right 10px center;
   background-repeat: no-repeat;
   background-size: auto 50%;
@@ -433,9 +442,6 @@ i {
 }
 .lgn-select::-ms-expand, select::-ms-expand {
   display: none;
-}
-.lgn-select .arrow, select .arrow {
-  fill: yellow !important;
 }
 
 @font-face {
@@ -753,6 +759,11 @@ select::placeholder, .lgn-select::placeholder {
 a {
   text-decoration: none;
   outline: none;
+  cursor: pointer;
+  margin: 2px 0;
+}
+a.block {
+  display: block;
 }
 
 .lgn-error {
@@ -796,6 +807,12 @@ a {
   border-width: 1px;
   border-style: solid;
   border-radius: 50vw;
+  display: flex;
+  align-items: center;
+}
+.content-container .lgn-login-profile .lgn-names .inline-block {
+  display: inline-block;
+  margin: 0 2px;
 }
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
   margin: 0.5rem 1rem;
@@ -841,6 +858,7 @@ i {
   display: flex;
   align-items: center;
   border: none;
+  outline: none;
 }
 .lgn-account-selection .lgn-account .left {
   padding: 0.5rem 1rem;
@@ -902,11 +920,11 @@ i {
 }
 .lgn-checkbox label {
   display: block;
-  padding: 0 0 0 24px;
+  padding: 0 0 0 30px;
   cursor: pointer;
   box-sizing: inherit;
   font-size: 14px;
-  line-height: 26px;
+  line-height: 28px;
 }
 .lgn-checkbox label:before {
   content: "";
@@ -916,7 +934,6 @@ i {
   width: 16px;
   height: 16px;
   border-radius: 2px;
-  z-index: 1;
   transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   transition-property: background-color, border-color;
 }
@@ -928,12 +945,10 @@ i {
   width: 6px;
   height: 12px;
   transform: rotate(45deg);
-  z-index: 2;
   transition: border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .lgn-select, select {
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20448%22%20enable-background%3D%22new%200%200%20256%20448%22%3E%3Cpath%20class%3D%22arrow%22%20d%3D%22M255.9%20168c0-4.2-1.6-7.9-4.8-11.2-3.2-3.2-6.9-4.8-11.2-4.8H16c-4.2%200-7.9%201.6-11.2%204.8S0%20163.8%200%20168c0%204.4%201.6%208.2%204.8%2011.4l112%20112c3.1%203.1%206.8%204.6%2011.2%204.6%204.4%200%208.2-1.5%2011.4-4.6l112-112c3-3.2%204.5-7%204.5-11.4z%22%2F%3E%3C%2Fsvg%3E%0A");
   background-position: right 10px center;
   background-repeat: no-repeat;
   background-size: auto 50%;
@@ -944,9 +959,6 @@ i {
 }
 .lgn-select::-ms-expand, select::-ms-expand {
   display: none;
-}
-.lgn-select .arrow, select .arrow {
-  fill: yellow !important;
 }
 
 @font-face {
@@ -1120,6 +1132,12 @@ i {
   border-width: 1px;
   border-style: solid;
   border-radius: 50vw;
+  display: flex;
+  align-items: center;
+}
+.content-container .lgn-login-profile .lgn-names .inline-block {
+  display: inline-block;
+  margin: 0 2px;
 }
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
   margin: 0.5rem 1rem;

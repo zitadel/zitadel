@@ -28,8 +28,8 @@
         <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" 
         {{if not $user.SelectionPossible}}disabled title="{{t " Errors.User.NotAllowedOrg"}}"{{end}}>
             <div class="left">
-                <div class="lgn-avatar">
-                    <span>A</span>
+                <div class="lgn-avatar" displayname="{{.DisplayName}}">
+                    <span class="initials">A</span>
                 </div>
             </div>
             <div class="lgn-names">
@@ -57,5 +57,6 @@
     </div>
 </form>
 
+<script src="{{ resourceUrl "scripts/avatar.js" }}"></script>
 
 {{template "main-bottom" .}}

@@ -35,6 +35,13 @@ $lgn-container-margin: 0px auto 50px auto;
             border-width: 1px;
             border-style: solid;
             border-radius: 50vw;
+            display: flex;
+            align-items: center;
+
+            .inline-block {
+                display: inline-block;
+                margin: 0 2px;
+            }
 
             .lgn-displayname{
                 margin: .5rem 1rem;
@@ -65,8 +72,6 @@ $lgn-container-margin: 0px auto 50px auto;
             font-size: 20px;
         }
     }
-
-
 
     ul li::before {
         content: "\2022";

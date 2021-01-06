@@ -17,9 +17,13 @@
     <div class="fields">
         <div class="field">
             <label class="lgn-label" for="code">{{t "InitUser.Code"}}</label>
-            <input class="lgn-input" type="text" id="code" name="code" value="{{.Code}}" autocomplete="off" autofocus
+            <input class="lgn-input" {{if .ErrMessage}}shake {{end}} type="text" id="code" name="code" value="{{.Code}}" autocomplete="off" autofocus
                 required>
         </div>
+
+        <a class="block" type="submit" name="resend" value="true"
+            formnovalidate>{{t "Actions.Resend" }}</a>
+
         {{ if not .PasswordSet }}
         <div class="field">
             <label class="lgn-label" for="password">{{t "InitUser.NewPassword"}}</label>
@@ -40,8 +44,6 @@
     {{ template "error-message" .}}
 
     <div class="lgn-actions">
-        <button type="submit" name="resend" value="true" class="lgn-button"
-            formnovalidate>{{t "Actions.Resend" }}</button>
         <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>

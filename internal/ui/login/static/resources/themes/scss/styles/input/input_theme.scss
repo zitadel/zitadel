@@ -38,6 +38,11 @@
       &:focus {
         @include _lgn-input-theme-property($config, 'border-color', default);
       }
+
+      // overwrite if state is warn
+      &[color='warn'] {
+        border-color: lgn-color($warn, default);
+      }
     }
 
     .lgn-input::placeholder,
