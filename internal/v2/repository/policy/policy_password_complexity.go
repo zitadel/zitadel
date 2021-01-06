@@ -17,10 +17,10 @@ type PasswordComplexityPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	MinLength    uint64 `json:"minLength,omitempty"`
-	HasLowercase bool   `json:"hasLowercase"`
-	HasUpperCase bool   `json:"hasUppercase"`
-	HasNumber    bool   `json:"hasNumber"`
-	HasSymbol    bool   `json:"hasSymbol"`
+	HasLowercase bool   `json:"hasLowercase,omitempty"`
+	HasUpperCase bool   `json:"hasUppercase,omitempty"`
+	HasNumber    bool   `json:"hasNumber,omitempty"`
+	HasSymbol    bool   `json:"hasSymbol,omitempty"`
 }
 
 func (e *PasswordComplexityPolicyAddedEvent) Data() interface{} {
@@ -61,11 +61,11 @@ func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventsto
 type PasswordComplexityPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MinLength    *uint64 `json:"minLength"`
-	HasLowercase *bool   `json:"hasLowercase"`
-	HasUpperCase *bool   `json:"hasUppercase"`
-	HasNumber    *bool   `json:"hasNumber"`
-	HasSymbol    *bool   `json:"hasSymbol"`
+	MinLength    *uint64 `json:"minLength,omitempty"`
+	HasLowercase *bool   `json:"hasLowercase,omitempty"`
+	HasUpperCase *bool   `json:"hasUppercase,omitempty"`
+	HasNumber    *bool   `json:"hasNumber,omitempty"`
+	HasSymbol    *bool   `json:"hasSymbol,omitempty"`
 }
 
 func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {

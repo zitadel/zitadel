@@ -21,7 +21,7 @@ const (
 type SecondFactorAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MFAType domain.SecondFactorType `json:"mfaType"`
+	MFAType domain.SecondFactorType `json:"mfaType,omitempty"`
 }
 
 func NewSecondFactorAddedEvent(

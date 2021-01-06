@@ -17,8 +17,8 @@ const (
 type IdentityProviderAddedEvent struct {
 	eventstore.BaseEvent
 
-	IDPConfigID     string                      `json:"idpConfigId"`
-	IDPProviderType domain.IdentityProviderType `json:"idpProviderType"`
+	IDPConfigID     string                      `json:"idpConfigId,omitempty"`
+	IDPProviderType domain.IdentityProviderType `json:"idpProviderType,omitempty"`
 }
 
 func (e *IdentityProviderAddedEvent) Data() interface{} {

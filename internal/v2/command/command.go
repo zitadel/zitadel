@@ -62,7 +62,7 @@ func (r *CommandSide) iamByID(ctx context.Context, id string) (_ *IAMWriteModel,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMriteModel(id)
+	writeModel := NewIAMWriteModel(id)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
