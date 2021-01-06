@@ -20,14 +20,14 @@ const (
 	HumanPasswordCheckFailedType    = passwordEventPrefix + "check.failed"
 )
 
-type HumanPasswordChangedChangedEvent struct {
+type HumanPasswordChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
-	ChangeRequired bool                `json:"changeRequired,omitempty"`
+	ChangeRequired bool                `json:"changeRequired"`
 }
 
-func (e *HumanPasswordChangedChangedEvent) Data() interface{} {
+func (e *HumanPasswordChangedEvent) Data() interface{} {
 	return e
 }
 
@@ -35,8 +35,8 @@ func NewHumanPasswordChangedEvent(
 	ctx context.Context,
 	secret *crypto.CryptoValue,
 	changeRequired bool,
-) *HumanPasswordChangedChangedEvent {
-	return &HumanPasswordChangedChangedEvent{
+) *HumanPasswordChangedEvent {
+	return &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordChangedType,
@@ -47,7 +47,7 @@ func NewHumanPasswordChangedEvent(
 }
 
 func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	humanAdded := &HumanPasswordChangedChangedEvent{
+	humanAdded := &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, humanAdded)

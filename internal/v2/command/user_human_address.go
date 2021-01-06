@@ -4,11 +4,10 @@ import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
-func (r *CommandSide) ChangeHumanAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {
+func (r *CommandSide) ChangeHumanAddress(ctx context.Context, address *domain.Address) (*domain.Address, error) {
 	existingAddress, err := r.addressWriteModel(ctx, address.AggregateID)
 	if err != nil {
 		return nil, err

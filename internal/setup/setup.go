@@ -7,7 +7,6 @@ import (
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/command"
 	"github.com/caos/zitadel/internal/v2/domain"
 )
@@ -42,7 +41,7 @@ func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *
 	}
 
 	if iam == nil {
-		iam = &iam_model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}}
+		iam = &domain.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}}
 	}
 
 	steps, err := setUpConfig.Steps(iam.SetUpDone)

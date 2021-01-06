@@ -61,11 +61,11 @@ func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventsto
 type PasswordComplexityPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MinLength    uint64 `json:"minLength,omitempty"`
-	HasLowercase bool   `json:"hasLowercase,omitempty"`
-	HasUpperCase bool   `json:"hasUppercase,omitempty"`
-	HasNumber    bool   `json:"hasNumber,omitempty"`
-	HasSymbol    bool   `json:"hasSymbol,omitempty"`
+	MinLength    *uint64 `json:"minLength,omitempty"`
+	HasLowercase *bool   `json:"hasLowercase,omitempty"`
+	HasUpperCase *bool   `json:"hasUppercase,omitempty"`
+	HasNumber    *bool   `json:"hasNumber,omitempty"`
+	HasSymbol    *bool   `json:"hasSymbol,omitempty"`
 }
 
 func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {

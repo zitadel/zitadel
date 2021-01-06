@@ -58,11 +58,21 @@ func (wm *HumanAddressWriteModel) Reduce() error {
 			wm.StreetAddress = e.StreetAddress
 			wm.UserState = domain.UserStateActive
 		case *user.HumanAddressChangedEvent:
-			wm.Country = e.Country
-			wm.Locality = e.Locality
-			wm.PostalCode = e.PostalCode
-			wm.Region = e.Region
-			wm.StreetAddress = e.StreetAddress
+			if e.Country != nil {
+				wm.Country = *e.Country
+			}
+			if e.Locality != nil {
+				wm.Locality = *e.Locality
+			}
+			if e.PostalCode != nil {
+				wm.PostalCode = *e.PostalCode
+			}
+			if e.Region != nil {
+				wm.Region = *e.Region
+			}
+			if e.StreetAddress != nil {
+				wm.StreetAddress = *e.StreetAddress
+			}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		}
@@ -87,23 +97,23 @@ func (wm *HumanAddressWriteModel) NewChangedEvent(
 	changedEvent := user.NewHumanAddressChangedEvent(ctx)
 	if wm.Country != country {
 		hasChanged = true
-		changedEvent.Country = country
+		changedEvent.Country = &country
 	}
 	if wm.Locality != locality {
 		hasChanged = true
-		changedEvent.Locality = locality
+		changedEvent.Locality = &locality
 	}
 	if wm.PostalCode != postalCode {
 		hasChanged = true
-		changedEvent.PostalCode = postalCode
+		changedEvent.PostalCode = &postalCode
 	}
 	if wm.Region != region {
 		hasChanged = true
-		changedEvent.Region = region
+		changedEvent.Region = &region
 	}
 	if wm.StreetAddress != streetAddress {
 		hasChanged = true
-		changedEvent.StreetAddress = streetAddress
+		changedEvent.StreetAddress = &streetAddress
 	}
 	return changedEvent, hasChanged
 }

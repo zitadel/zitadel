@@ -61,8 +61,8 @@ type MachineChangedEvent struct {
 
 	UserName string `json:"userName"`
 
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
 }
 
 func (e *MachineChangedEvent) Data() interface{} {

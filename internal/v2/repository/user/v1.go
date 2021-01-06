@@ -190,8 +190,8 @@ func NewUserV1PasswordChangedEvent(
 	ctx context.Context,
 	secret *crypto.CryptoValue,
 	changeRequired bool,
-) *HumanPasswordChangedChangedEvent {
-	return &HumanPasswordChangedChangedEvent{
+) *HumanPasswordChangedEvent {
+	return &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserV1PasswordChangedType,
@@ -360,24 +360,12 @@ func NewUserV1PhoneCodeSentEvent(ctx context.Context) *HumanPhoneCodeSentEvent {
 
 func NewUserV1ProfileChangedEvent(
 	ctx context.Context,
-	firstName,
-	lastName,
-	nickName,
-	displayName string,
-	preferredLanguage language.Tag,
-	gender domain.Gender,
 ) *HumanProfileChangedEvent {
 	return &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserV1ProfileChangedType,
 		),
-		FirstName:         firstName,
-		LastName:          lastName,
-		NickName:          nickName,
-		DisplayName:       displayName,
-		PreferredLanguage: preferredLanguage,
-		Gender:            gender,
 	}
 }
 
@@ -394,11 +382,6 @@ func NewUserV1AddressChangedEvent(
 			ctx,
 			UserV1AddressChangedType,
 		),
-		Country:       country,
-		Locality:      locality,
-		PostalCode:    postalCode,
-		Region:        region,
-		StreetAddress: streetAddress,
 	}
 }
 

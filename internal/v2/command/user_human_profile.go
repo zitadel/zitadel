@@ -4,11 +4,10 @@ import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
-func (r *CommandSide) ChangeHumanProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
+func (r *CommandSide) ChangeHumanProfile(ctx context.Context, profile *domain.Profile) (*domain.Profile, error) {
 	if !profile.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8io0d", "Errors.User.Profile.Invalid")
 	}

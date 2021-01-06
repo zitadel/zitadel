@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
@@ -16,8 +15,8 @@ func writeModelToObjectRoot(writeModel eventstore.WriteModel) models.ObjectRoot 
 	}
 }
 
-func writeModelToIAM(wm *IAMWriteModel) *model.IAM {
-	return &model.IAM{
+func writeModelToIAM(wm *IAMWriteModel) *domain.IAM {
+	return &domain.IAM{
 		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
 		SetUpStarted: wm.SetUpStarted,
 		SetUpDone:    wm.SetUpDone,

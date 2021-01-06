@@ -4,11 +4,10 @@ import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
-func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *usr_model.Email) (*usr_model.Email, error) {
+func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*domain.Email, error) {
 	if !email.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
 	}

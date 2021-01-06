@@ -45,11 +45,11 @@ func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(ctx context.Context, e
 	changedEvent := iam.NewPasswordAgePolicyChangedEvent(ctx)
 	if wm.ExpireWarnDays != expireWarnDays {
 		hasChanged = true
-		changedEvent.ExpireWarnDays = expireWarnDays
+		changedEvent.ExpireWarnDays = &expireWarnDays
 	}
 	if wm.MaxAgeDays != maxAgeDays {
 		hasChanged = true
-		changedEvent.MaxAgeDays = maxAgeDays
+		changedEvent.MaxAgeDays = &maxAgeDays
 	}
 	return changedEvent, hasChanged
 }

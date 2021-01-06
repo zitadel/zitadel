@@ -19,7 +19,9 @@ func (wm *PolicyOrgIAMWriteModel) Reduce() error {
 			wm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
 			wm.IsActive = true
 		case *policy.OrgIAMPolicyChangedEvent:
-			wm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
+			if e.UserLoginMustBeDomain != nil {
+				wm.UserLoginMustBeDomain = *e.UserLoginMustBeDomain
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()

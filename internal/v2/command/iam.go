@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
-func (r *CommandSide) GetIAM(ctx context.Context, aggregateID string) (*iam_model.IAM, error) {
+func (r *CommandSide) GetIAM(ctx context.Context, aggregateID string) (*domain.IAM, error) {
 	iamWriteModel := NewIAMWriteModel(aggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {

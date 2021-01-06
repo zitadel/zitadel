@@ -62,12 +62,24 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 			wm.Gender = e.Gender
 			wm.UserState = domain.UserStateActive
 		case *user.HumanProfileChangedEvent:
-			wm.FirstName = e.FirstName
-			wm.LastName = e.LastName
-			wm.NickName = e.NickName
-			wm.DisplayName = e.DisplayName
-			wm.PreferredLanguage = e.PreferredLanguage
-			wm.Gender = e.Gender
+			if e.FirstName != "" {
+				wm.FirstName = e.FirstName
+			}
+			if e.LastName != "" {
+				wm.LastName = e.LastName
+			}
+			if e.NickName != nil {
+				wm.NickName = *e.NickName
+			}
+			if e.DisplayName != nil {
+				wm.DisplayName = *e.DisplayName
+			}
+			if e.PreferredLanguage != nil {
+				wm.PreferredLanguage = *e.PreferredLanguage
+			}
+			if e.Gender != nil {
+				wm.Gender = *e.Gender
+			}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		}
@@ -101,19 +113,19 @@ func (wm *HumanProfileWriteModel) NewChangedEvent(
 	}
 	if wm.NickName != nickName {
 		hasChanged = true
-		changedEvent.NickName = nickName
+		changedEvent.NickName = &nickName
 	}
 	if wm.DisplayName != displayName {
 		hasChanged = true
-		changedEvent.DisplayName = displayName
+		changedEvent.DisplayName = &displayName
 	}
 	if wm.PreferredLanguage != preferredLanguage {
 		hasChanged = true
-		changedEvent.PreferredLanguage = preferredLanguage
+		changedEvent.PreferredLanguage = &preferredLanguage
 	}
 	if gender.Valid() && wm.Gender != gender {
 		hasChanged = true
-		changedEvent.Gender = gender
+		changedEvent.Gender = &gender
 	}
 
 	return changedEvent, hasChanged

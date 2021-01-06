@@ -21,8 +21,12 @@ func (wm *PasswordAgePolicyWriteModel) Reduce() error {
 			wm.MaxAgeDays = e.MaxAgeDays
 			wm.IsActive = true
 		case *policy.PasswordAgePolicyChangedEvent:
-			wm.ExpireWarnDays = e.ExpireWarnDays
-			wm.MaxAgeDays = e.MaxAgeDays
+			if e.ExpireWarnDays != nil {
+				wm.ExpireWarnDays = *e.ExpireWarnDays
+			}
+			if e.ExpireWarnDays != nil {
+				wm.ExpireWarnDays = *e.ExpireWarnDays
+			}
 		case *policy.PasswordAgePolicyRemovedEvent:
 			wm.IsActive = false
 		}

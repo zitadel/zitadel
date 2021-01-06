@@ -53,8 +53,8 @@ func PasswordLockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.
 type PasswordLockoutPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxAttempts         uint64 `json:"maxAttempts,omitempty"`
-	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
+	MaxAttempts         *uint64 `json:"maxAttempts,omitempty"`
+	ShowLockOutFailures *bool   `json:"showLockOutFailures,omitempty"`
 }
 
 func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {

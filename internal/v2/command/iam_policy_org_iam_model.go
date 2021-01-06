@@ -45,7 +45,7 @@ func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(ctx context.Context, userLo
 	changedEvent := iam.NewOrgIAMPolicyChangedEvent(ctx)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
 		hasChanged = true
-		changedEvent.UserLoginMustBeDomain = userLoginMustBeDomain
+		changedEvent.UserLoginMustBeDomain = &userLoginMustBeDomain
 	}
 	return changedEvent, hasChanged
 }

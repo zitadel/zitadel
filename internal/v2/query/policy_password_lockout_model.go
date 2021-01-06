@@ -19,8 +19,12 @@ func (rm *PasswordLockoutPolicyReadModel) Reduce() error {
 			rm.MaxAttempts = e.MaxAttempts
 			rm.ShowLockOutFailures = e.ShowLockOutFailures
 		case *policy.PasswordLockoutPolicyChangedEvent:
-			rm.MaxAttempts = e.MaxAttempts
-			rm.ShowLockOutFailures = e.ShowLockOutFailures
+			if e.MaxAttempts != nil {
+				rm.MaxAttempts = *e.MaxAttempts
+			}
+			if e.ShowLockOutFailures != nil {
+				rm.ShowLockOutFailures = *e.ShowLockOutFailures
+			}
 		}
 	}
 	return rm.ReadModel.Reduce()

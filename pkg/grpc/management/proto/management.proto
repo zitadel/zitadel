@@ -1842,6 +1842,7 @@ message MachineView {
 message UpdateMachineRequest {
   string id = 1 [(validate.rules).string.min_len = 1];
   string description = 2 [(validate.rules).string.max_len = 500];
+  string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message AddMachineKeyRequest {

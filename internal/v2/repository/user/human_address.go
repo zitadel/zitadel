@@ -16,11 +16,11 @@ const (
 type HumanAddressChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Country       string `json:"country,omitempty"`
-	Locality      string `json:"locality,omitempty"`
-	PostalCode    string `json:"postalCode,omitempty"`
-	Region        string `json:"region,omitempty"`
-	StreetAddress string `json:"streetAddress,omitempty"`
+	Country       *string `json:"country,omitempty"`
+	Locality      *string `json:"locality,omitempty"`
+	PostalCode    *string `json:"postalCode,omitempty"`
+	Region        *string `json:"region,omitempty"`
+	StreetAddress *string `json:"streetAddress,omitempty"`
 }
 
 func (e *HumanAddressChangedEvent) Data() interface{} {
