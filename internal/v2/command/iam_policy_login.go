@@ -221,15 +221,3 @@ func (r *CommandSide) defaultLoginPolicyWriteModelByID(ctx context.Context, writ
 	}
 	return nil
 }
-
-//func (r *CommandSide) defaultLoginPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMLoginPolicyWriteModel, err error) {
-//	ctx, span := tracing.NewSpan(ctx)
-//	defer func() { span.EndWithError(err) }()
-//
-//	writeModel := NewIAMLoginPolicyWriteModel(iamID)
-//	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return writeModel, nil
-//}
