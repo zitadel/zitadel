@@ -19,8 +19,12 @@ func (rm *PasswordAgePolicyReadModel) Reduce() error {
 			rm.ExpireWarnDays = e.ExpireWarnDays
 			rm.MaxAgeDays = e.MaxAgeDays
 		case *policy.PasswordAgePolicyChangedEvent:
-			rm.ExpireWarnDays = e.ExpireWarnDays
-			rm.MaxAgeDays = e.MaxAgeDays
+			if e.ExpireWarnDays != nil {
+				rm.ExpireWarnDays = *e.ExpireWarnDays
+			}
+			if e.MaxAgeDays != nil {
+				rm.MaxAgeDays = *e.MaxAgeDays
+			}
 		}
 	}
 	return rm.ReadModel.Reduce()

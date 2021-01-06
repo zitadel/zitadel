@@ -17,10 +17,6 @@ type Human struct {
 	*Phone
 	*Address
 	ExternalIDPs       []*ExternalIDP
-	InitCode           *InitUserCode
-	EmailCode          *EmailCode
-	PhoneCode          *PhoneCode
-	PasswordCode       *PasswordCode
 	OTP                *OTP
 	U2FTokens          []*WebAuthNToken
 	PasswordlessTokens []*WebAuthNToken
@@ -78,4 +74,19 @@ func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, passwor
 		return u.Password.HashPasswordIfExisting(policy, passwordAlg, onetime)
 	}
 	return nil
+}
+
+func (u *Human) IsInitialState() bool {
+	return u.Email == nil || !u.IsEmailVerified || (u.ExternalIDPs == nil || len(u.ExternalIDPs) == 0) && (u.Password == nil || u.SecretString == "")
+}
+
+func NewInitUserCode(generator crypto.Generator) (*InitUserCode, error) {
+	initCodeCrypto, _, err := crypto.NewCode(generator)
+	if err != nil {
+		return nil, err
+	}
+	return &InitUserCode{
+		Code:   initCodeCrypto,
+		Expiry: generator.Expiry(),
+	}, nil
 }

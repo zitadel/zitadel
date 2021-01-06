@@ -20,7 +20,11 @@ func (r *CommandSide) AddUser(ctx context.Context, user *domain.User) (*domain.U
 		}
 		return &domain.User{UserName: user.UserName, Human: human}, nil
 	} else if user.Machine != nil {
-
+		machine, err := r.AddMachine(ctx, user.ResourceOwner, user.UserName, user.Machine)
+		if err != nil {
+			return nil, err
+		}
+		return &domain.User{UserName: user.UserName, Machine: machine}, nil
 	}
 	return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-8K0df", "Errors.User.TypeUndefined")
 }
@@ -31,9 +35,11 @@ func (r *CommandSide) RegisterUser(ctx context.Context, user *domain.User) (*dom
 	}
 
 	if user.Human != nil {
-
-	} else if user.Machine != nil {
-
+		human, err := r.RegisterHuman(ctx, user.ResourceOwner, user.UserName, user.Human, nil)
+		if err != nil {
+			return nil, err
+		}
+		return &domain.User{UserName: user.UserName, Human: human}, nil
 	}
 	return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-8K0df", "Errors.User.TypeUndefined")
 }
@@ -120,6 +126,21 @@ func (r *CommandSide) UnlockUser(ctx context.Context, userID string) (*domain.Us
 		return nil, err
 	}
 	return writeModelToUser(existingUser), nil
+}
+
+func (r *CommandSide) RemoveUser(ctx context.Context, userID string) error {
+	existingUser, err := r.userWriteModelByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existingUser.UserState != domain.UserStateDeleted {
+		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-5M0od", "Errors.User.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
+	userAgg.PushEvents(user.NewUserRemovedEvent(ctx))
+	//TODO: release unqie username
+
+	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
 
 func (r *CommandSide) userWriteModelByID(ctx context.Context, userID string) (writeModel *UserWriteModel, err error) {

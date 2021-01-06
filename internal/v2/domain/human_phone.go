@@ -39,3 +39,14 @@ func (p *Phone) formatPhone() error {
 	p.PhoneNumber = libphonenumber.Format(phoneNr, libphonenumber.E164)
 	return nil
 }
+
+func NewPhoneCode(phoneGenerator crypto.Generator) (*PhoneCode, error) {
+	phoneCodeCrypto, _, err := crypto.NewCode(phoneGenerator)
+	if err != nil {
+		return nil, err
+	}
+	return &PhoneCode{
+		Code:   phoneCodeCrypto,
+		Expiry: phoneGenerator.Expiry(),
+	}, nil
+}

@@ -45,11 +45,11 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(ctx context.Contex
 	changedEvent := iam.NewPasswordLockoutPolicyChangedEvent(ctx)
 	if wm.MaxAttempts != maxAttempts {
 		hasChanged = true
-		changedEvent.MaxAttempts = maxAttempts
+		changedEvent.MaxAttempts = &maxAttempts
 	}
 	if wm.ShowLockOutFailures != showLockoutFailure {
 		hasChanged = true
-		changedEvent.ShowLockOutFailures = showLockoutFailure
+		changedEvent.ShowLockOutFailures = &showLockoutFailure
 	}
 	return changedEvent, hasChanged
 }

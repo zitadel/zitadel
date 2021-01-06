@@ -58,23 +58,23 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	changedEvent := iam.NewLoginPolicyChangedEvent(ctx)
 	if wm.AllowUserNamePassword == allowUsernamePassword {
 		hasChanged = true
-		changedEvent.AllowUserNamePassword = allowUsernamePassword
+		changedEvent.AllowUserNamePassword = &allowUsernamePassword
 	}
 	if wm.AllowRegister == allowRegister {
 		hasChanged = true
-		changedEvent.AllowRegister = allowRegister
+		changedEvent.AllowRegister = &allowRegister
 	}
 	if wm.AllowExternalIDP == allowExternalIDP {
 		hasChanged = true
-		changedEvent.AllowExternalIDP = allowExternalIDP
+		changedEvent.AllowExternalIDP = &allowExternalIDP
 	}
 	if wm.ForceMFA != forceMFA {
 		hasChanged = true
-		changedEvent.ForceMFA = forceMFA
+		changedEvent.ForceMFA = &forceMFA
 	}
 	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
 		hasChanged = true
-		changedEvent.PasswordlessType = passwordlessType
+		changedEvent.PasswordlessType = &passwordlessType
 	}
 	return changedEvent, hasChanged
 }

@@ -28,11 +28,21 @@ func (rm *LoginPolicyReadModel) Reduce() error {
 			rm.PasswordlessType = e.PasswordlessType
 			rm.IsActive = true
 		case *policy.LoginPolicyChangedEvent:
-			rm.AllowUserNamePassword = e.AllowUserNamePassword
-			rm.AllowExternalIDP = e.AllowExternalIDP
-			rm.AllowRegister = e.AllowRegister
-			rm.ForceMFA = e.ForceMFA
-			rm.PasswordlessType = e.PasswordlessType
+			if e.AllowUserNamePassword != nil {
+				rm.AllowUserNamePassword = *e.AllowUserNamePassword
+			}
+			if e.AllowExternalIDP != nil {
+				rm.AllowExternalIDP = *e.AllowExternalIDP
+			}
+			if e.AllowRegister != nil {
+				rm.AllowRegister = *e.AllowRegister
+			}
+			if e.ForceMFA != nil {
+				rm.ForceMFA = *e.ForceMFA
+			}
+			if e.PasswordlessType != nil {
+				rm.PasswordlessType = *e.PasswordlessType
+			}
 		case *policy.LoginPolicyRemovedEvent:
 			rm.IsActive = false
 		}

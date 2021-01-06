@@ -53,6 +53,34 @@ func (e *HumanAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanAddedEvent) AddAddressData(
+	country,
+	locality,
+	postalCode,
+	region,
+	streetAddress string,
+) {
+	e.Country = country
+	e.Locality = locality
+	e.PostalCode = postalCode
+	e.Region = region
+	e.StreetAddress = streetAddress
+}
+
+func (e *HumanAddedEvent) AddPhoneData(
+	phoneNumber string,
+) {
+	e.PhoneNumber = phoneNumber
+}
+
+func (e *HumanAddedEvent) AddPasswordData(
+	secret *crypto.CryptoValue,
+	changeRequired bool,
+) {
+	e.Secret = secret
+	e.ChangeRequired = changeRequired
+}
+
 func NewHumanAddedEvent(
 	ctx context.Context,
 	userName,
@@ -62,13 +90,7 @@ func NewHumanAddedEvent(
 	displayName string,
 	preferredLanguage language.Tag,
 	gender domain.Gender,
-	emailAddress,
-	phoneNumber,
-	country,
-	locality,
-	postalCode,
-	region,
-	streetAddress string,
+	emailAddress string,
 ) *HumanAddedEvent {
 	return &HumanAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -83,12 +105,6 @@ func NewHumanAddedEvent(
 		PreferredLanguage: preferredLanguage,
 		Gender:            gender,
 		EmailAddress:      emailAddress,
-		PhoneNumber:       phoneNumber,
-		Country:           country,
-		Locality:          locality,
-		PostalCode:        postalCode,
-		Region:            region,
-		StreetAddress:     streetAddress,
 	}
 }
 
@@ -125,10 +141,41 @@ type HumanRegisteredEvent struct {
 	PostalCode    string `json:"postalCode,omitempty"`
 	Region        string `json:"region,omitempty"`
 	StreetAddress string `json:"streetAddress,omitempty"`
+
+	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
+	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
 func (e *HumanRegisteredEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanRegisteredEvent) AddAddressData(
+	country,
+	locality,
+	postalCode,
+	region,
+	streetAddress string,
+) {
+	e.Country = country
+	e.Locality = locality
+	e.PostalCode = postalCode
+	e.Region = region
+	e.StreetAddress = streetAddress
+}
+
+func (e *HumanRegisteredEvent) AddPhoneData(
+	phoneNumber string,
+) {
+	e.PhoneNumber = phoneNumber
+}
+
+func (e *HumanRegisteredEvent) AddPasswordData(
+	secret *crypto.CryptoValue,
+	changeRequired bool,
+) {
+	e.Secret = secret
+	e.ChangeRequired = changeRequired
 }
 
 func NewHumanRegisteredEvent(
@@ -140,13 +187,7 @@ func NewHumanRegisteredEvent(
 	displayName string,
 	preferredLanguage language.Tag,
 	gender domain.Gender,
-	emailAddress,
-	phoneNumber,
-	country,
-	locality,
-	postalCode,
-	region,
-	streetAddress string,
+	emailAddress string,
 ) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -161,12 +202,6 @@ func NewHumanRegisteredEvent(
 		PreferredLanguage: preferredLanguage,
 		Gender:            gender,
 		EmailAddress:      emailAddress,
-		PhoneNumber:       phoneNumber,
-		Country:           country,
-		Locality:          locality,
-		PostalCode:        postalCode,
-		Region:            region,
-		StreetAddress:     streetAddress,
 	}
 }
 

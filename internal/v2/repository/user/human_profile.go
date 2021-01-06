@@ -18,19 +18,20 @@ const (
 type HumanProfileChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	FirstName         string        `json:"firstName,omitempty"`
-	LastName          string        `json:"lastName,omitempty"`
-	NickName          string        `json:"nickName,omitempty"`
-	DisplayName       string        `json:"displayName,omitempty"`
-	PreferredLanguage language.Tag  `json:"preferredLanguage,omitempty"`
-	Gender            domain.Gender `json:"gender,omitempty"`
+	FirstName         string         `json:"firstName,omitempty"`
+	LastName          string         `json:"lastName,omitempty"`
+	NickName          *string        `json:"nickName,omitempty"`
+	DisplayName       *string        `json:"displayName,omitempty"`
+	PreferredLanguage *language.Tag  `json:"preferredLanguage,omitempty"`
+	Gender            *domain.Gender `json:"gender,omitempty"`
 }
 
 func (e *HumanProfileChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanProfileChangedEvent(ctx context.Context) *HumanProfileChangedEvent {
+func NewHumanProfileChangedEvent(
+	ctx context.Context) *HumanProfileChangedEvent {
 	return &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

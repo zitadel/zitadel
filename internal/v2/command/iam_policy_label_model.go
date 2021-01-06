@@ -45,16 +45,15 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	primaryColor,
 	secondaryColor string,
 ) (*iam.LabelPolicyChangedEvent, bool) {
-
 	hasChanged := false
 	changedEvent := iam.NewLabelPolicyChangedEvent(ctx)
 	if wm.PrimaryColor != primaryColor {
 		hasChanged = true
-		changedEvent.PrimaryColor = primaryColor
+		changedEvent.PrimaryColor = &primaryColor
 	}
 	if wm.SecondaryColor != secondaryColor {
 		hasChanged = true
-		changedEvent.SecondaryColor = secondaryColor
+		changedEvent.SecondaryColor = &secondaryColor
 	}
 	return changedEvent, hasChanged
 }

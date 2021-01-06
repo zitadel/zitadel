@@ -17,7 +17,9 @@ func (rm *OrgIAMPolicyReadModel) Reduce() error {
 		case *policy.OrgIAMPolicyAddedEvent:
 			rm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
 		case *policy.OrgIAMPolicyChangedEvent:
-			rm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
+			if e.UserLoginMustBeDomain != nil {
+				rm.UserLoginMustBeDomain = *e.UserLoginMustBeDomain
+			}
 		}
 	}
 	return rm.ReadModel.Reduce()

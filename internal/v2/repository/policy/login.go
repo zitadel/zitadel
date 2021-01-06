@@ -63,11 +63,11 @@ func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReade
 type LoginPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AllowUserNamePassword bool                    `json:"allowUsernamePassword,omitempty"`
-	AllowRegister         bool                    `json:"allowRegister,omitempty"`
-	AllowExternalIDP      bool                    `json:"allowExternalIdp,omitempty"`
-	ForceMFA              bool                    `json:"forceMFA,omitempty"`
-	PasswordlessType      domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	AllowUserNamePassword *bool                    `json:"allowUsernamePassword,omitempty"`
+	AllowRegister         *bool                    `json:"allowRegister,omitempty"`
+	AllowExternalIDP      *bool                    `json:"allowExternalIdp,omitempty"`
+	ForceMFA              *bool                    `json:"forceMFA,omitempty"`
+	PasswordlessType      *domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
 type LoginPolicyEventData struct {

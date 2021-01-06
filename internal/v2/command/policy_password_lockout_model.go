@@ -21,8 +21,12 @@ func (wm *PasswordLockoutPolicyWriteModel) Reduce() error {
 			wm.ShowLockOutFailures = e.ShowLockOutFailures
 			wm.IsActive = true
 		case *policy.PasswordLockoutPolicyChangedEvent:
-			wm.MaxAttempts = e.MaxAttempts
-			wm.ShowLockOutFailures = e.ShowLockOutFailures
+			if e.MaxAttempts != nil {
+				wm.MaxAttempts = *e.MaxAttempts
+			}
+			if e.ShowLockOutFailures != nil {
+				wm.ShowLockOutFailures = *e.ShowLockOutFailures
+			}
 		case *policy.PasswordLockoutPolicyRemovedEvent:
 			wm.IsActive = false
 		}

@@ -17,3 +17,7 @@ type Profile struct {
 	PreferredLoginName string
 	LoginNames         []string
 }
+
+func (p *Profile) IsValid() bool {
+	return p.FirstName != "" && p.LastName != ""
+}
