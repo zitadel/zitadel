@@ -20,21 +20,15 @@ func machineCreateToDomain(machine *management.CreateMachineRequest) *domain.Mac
 	}
 }
 
-func updateMachineToModel(machine *management.UpdateMachineRequest) *usr_model.Machine {
-	return &usr_model.Machine{
+func updateMachineToDomain(machine *management.UpdateMachineRequest) *domain.Machine {
+	return &domain.Machine{
 		ObjectRoot:  models.ObjectRoot{AggregateID: machine.Id},
+		Name:        machine.Name,
 		Description: machine.Description,
 	}
 }
 
 func machineFromDomain(account *domain.Machine) *management.MachineResponse {
-	return &management.MachineResponse{
-		Name:        account.Name,
-		Description: account.Description,
-	}
-}
-
-func machineFromModel(account *usr_model.Machine) *management.MachineResponse {
 	return &management.MachineResponse{
 		Name:        account.Name,
 		Description: account.Description,

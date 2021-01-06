@@ -1,7 +1,6 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
@@ -38,28 +37,28 @@ func writeModelToHuman(wm *HumanWriteModel) *domain.Human {
 	}
 }
 
-func writeModelToProfile(wm *HumanProfileWriteModel) *model.Profile {
-	return &model.Profile{
+func writeModelToProfile(wm *HumanProfileWriteModel) *domain.Profile {
+	return &domain.Profile{
 		ObjectRoot:        writeModelToObjectRoot(wm.WriteModel),
 		FirstName:         wm.FirstName,
 		LastName:          wm.LastName,
 		NickName:          wm.NickName,
 		DisplayName:       wm.DisplayName,
 		PreferredLanguage: wm.PreferredLanguage,
-		Gender:            model.Gender(wm.Gender),
+		Gender:            wm.Gender,
 	}
 }
 
-func writeModelToEmail(wm *HumanEmailWriteModel) *model.Email {
-	return &model.Email{
+func writeModelToEmail(wm *HumanEmailWriteModel) *domain.Email {
+	return &domain.Email{
 		ObjectRoot:      writeModelToObjectRoot(wm.WriteModel),
 		EmailAddress:    wm.Email,
 		IsEmailVerified: wm.IsEmailVerified,
 	}
 }
 
-func writeModelToAddress(wm *HumanAddressWriteModel) *model.Address {
-	return &model.Address{
+func writeModelToAddress(wm *HumanAddressWriteModel) *domain.Address {
+	return &domain.Address{
 		ObjectRoot:    writeModelToObjectRoot(wm.WriteModel),
 		Country:       wm.Country,
 		Locality:      wm.Locality,

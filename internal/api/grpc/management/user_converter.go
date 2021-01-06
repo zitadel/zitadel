@@ -43,32 +43,6 @@ func userFromDomain(user *domain.User) *management.UserResponse {
 	return userResp
 }
 
-func userFromModel(user *usr_model.User) *management.UserResponse {
-	creationDate, err := ptypes.TimestampProto(user.CreationDate)
-	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
-
-	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
-	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
-
-	userResp := &management.UserResponse{
-		Id:           user.AggregateID,
-		State:        management.UserState(user.State),
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Sequence:     user.Sequence,
-		UserName:     user.UserName,
-	}
-
-	if user.Machine != nil {
-		userResp.User = &management.UserResponse_Machine{Machine: machineFromModel(user.Machine)}
-	}
-	if user.Human != nil {
-		userResp.User = &management.UserResponse_Human{Human: humanFromModel(user.Human)}
-	}
-
-	return userResp
-}
-
 func userCreateToDomain(user *management.CreateUserRequest) *domain.User {
 	var human *domain.Human
 	var machine *domain.Machine
@@ -232,7 +206,7 @@ func userMembershipSearchKeyToModel(key management.UserMembershipSearchKey) usr_
 	}
 }
 
-func profileFromModel(profile *usr_model.Profile) *management.UserProfile {
+func profileFromDomain(profile *domain.Profile) *management.UserProfile {
 	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
 	logging.Log("GRPC-dkso3").OnError(err).Debug("unable to parse timestamp")
 
@@ -276,21 +250,21 @@ func profileViewFromModel(profile *usr_model.Profile) *management.UserProfileVie
 	}
 }
 
-func updateProfileToModel(u *management.UpdateUserProfileRequest) *usr_model.Profile {
+func updateProfileToDomain(u *management.UpdateUserProfileRequest) *domain.Profile {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
 	logging.Log("GRPC-d8k2s").OnError(err).Debug("language malformed")
 
-	return &usr_model.Profile{
+	return &domain.Profile{
 		ObjectRoot:        models.ObjectRoot{AggregateID: u.Id},
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		NickName:          u.NickName,
 		PreferredLanguage: preferredLanguage,
-		Gender:            usr_model.Gender(u.Gender),
+		Gender:            genderToDomain(u.Gender),
 	}
 }
 
-func emailFromModel(email *usr_model.Email) *management.UserEmail {
+func emailFromDomain(email *domain.Email) *management.UserEmail {
 	creationDate, err := ptypes.TimestampProto(email.CreationDate)
 	logging.Log("GRPC-d9ow2").OnError(err).Debug("unable to parse timestamp")
 
@@ -324,8 +298,8 @@ func emailViewFromModel(email *usr_model.Email) *management.UserEmailView {
 	}
 }
 
-func updateEmailToModel(e *management.UpdateUserEmailRequest) *usr_model.Email {
-	return &usr_model.Email{
+func updateEmailToDomain(e *management.UpdateUserEmailRequest) *domain.Email {
+	return &domain.Email{
 		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
 		EmailAddress:    e.Email,
 		IsEmailVerified: e.IsEmailVerified,
@@ -373,7 +347,7 @@ func updatePhoneToModel(e *management.UpdateUserPhoneRequest) *usr_model.Phone {
 	}
 }
 
-func addressFromModel(address *usr_model.Address) *management.UserAddress {
+func addressFromDomain(address *domain.Address) *management.UserAddress {
 	creationDate, err := ptypes.TimestampProto(address.CreationDate)
 	logging.Log("GRPC-ud8w7").OnError(err).Debug("unable to parse timestamp")
 
@@ -413,8 +387,8 @@ func addressViewFromModel(address *usr_model.Address) *management.UserAddressVie
 	}
 }
 
-func updateAddressToModel(address *management.UpdateUserAddressRequest) *usr_model.Address {
-	return &usr_model.Address{
+func updateAddressToDomain(address *management.UpdateUserAddressRequest) *domain.Address {
+	return &domain.Address{
 		ObjectRoot:    models.ObjectRoot{AggregateID: address.Id},
 		Country:       address.Country,
 		StreetAddress: address.StreetAddress,

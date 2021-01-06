@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
@@ -87,4 +88,22 @@ func (wm *MachineWriteModel) Reduce() error {
 func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID)
+}
+
+func (wm *MachineWriteModel) NewChangedEvent(
+	ctx context.Context,
+	name,
+	description string,
+) (*user.MachineChangedEvent, bool) {
+	hasChanged := false
+	changedEvent := user.NewMachineChangedEvent(ctx)
+	if wm.Name != name {
+		hasChanged = true
+		changedEvent.Name = &name
+	}
+	if wm.Description != description {
+		hasChanged = true
+		changedEvent.Description = &description
+	}
+	return changedEvent, hasChanged
 }

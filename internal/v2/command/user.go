@@ -20,7 +20,11 @@ func (r *CommandSide) AddUser(ctx context.Context, user *domain.User) (*domain.U
 		}
 		return &domain.User{UserName: user.UserName, Human: human}, nil
 	} else if user.Machine != nil {
-
+		machine, err := r.AddMachine(ctx, user.ResourceOwner, user.UserName, user.Machine)
+		if err != nil {
+			return nil, err
+		}
+		return &domain.User{UserName: user.UserName, Machine: machine}, nil
 	}
 	return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-8K0df", "Errors.User.TypeUndefined")
 }
@@ -31,9 +35,11 @@ func (r *CommandSide) RegisterUser(ctx context.Context, user *domain.User) (*dom
 	}
 
 	if user.Human != nil {
-
-	} else if user.Machine != nil {
-
+		human, err := r.RegisterHuman(ctx, user.ResourceOwner, user.UserName, user.Human, nil)
+		if err != nil {
+			return nil, err
+		}
+		return &domain.User{UserName: user.UserName, Human: human}, nil
 	}
 	return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-8K0df", "Errors.User.TypeUndefined")
 }
