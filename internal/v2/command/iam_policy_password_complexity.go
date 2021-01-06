@@ -22,7 +22,8 @@ func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*
 func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
 	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMPasswordComplexityPolicyWriteModel(policy.AggregateID)
-	iamAgg, err := r.addDefaultPasswordComplexityPolicy(ctx, addedPolicy, policy)
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
+	err := r.addDefaultPasswordComplexityPolicy(ctx, iamAgg, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -35,23 +36,22 @@ func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, po
 	return writeModelToPasswordComplexityPolicy(addedPolicy), nil
 }
 
-func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, addedPolicy *IAMPasswordComplexityPolicyWriteModel, policy *domain.PasswordComplexityPolicy) (*iam_repo.Aggregate, error) {
+func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMPasswordComplexityPolicyWriteModel, policy *domain.PasswordComplexityPolicy) error {
 	if err := policy.IsValid(); err != nil {
-		return nil, err
+		return err
 	}
 
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if addedPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.PasswordComplexityPolicy.AlreadyExists")
+		return caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.PasswordComplexityPolicy.AlreadyExists")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewPasswordComplexityPolicyAddedEvent(ctx, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol))
 
-	return iamAgg, nil
+	return nil
 }
 
 func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {

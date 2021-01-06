@@ -11,16 +11,11 @@ import (
 func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
 	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMLabelPolicyWriteModel(policy.AggregateID)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
+	err := r.addDefaultLabelPolicy(ctx, nil, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
-	if addedPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.AlreadyExists")
-	}
-
-	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewLabelPolicyAddedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
 	if err != nil {
@@ -28,6 +23,20 @@ func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *domain.
 	}
 
 	return writeModelToLabelPolicy(addedPolicy), nil
+}
+
+func (r *CommandSide) addDefaultLabelPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMLabelPolicyWriteModel, policy *domain.LabelPolicy) error {
+	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	if err != nil {
+		return err
+	}
+	if addedPolicy.IsActive {
+		return caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.AlreadyExists")
+	}
+
+	iamAgg.PushEvents(iam_repo.NewLabelPolicyAddedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor))
+
+	return nil
 }
 
 func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {

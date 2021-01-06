@@ -17,7 +17,7 @@ type PasswordLockoutPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	MaxAttempts         uint64 `json:"maxAttempts,omitempty"`
-	ShowLockOutFailures bool   `json:"showLockOutFailures"`
+	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
 }
 
 func (e *PasswordLockoutPolicyAddedEvent) Data() interface{} {

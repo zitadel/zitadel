@@ -26,10 +26,10 @@ SetUp:
   Step1:
     GlobalOrg: 'Global'
     IAMProject: 'Zitadel'
-#    DefaultLoginPolicy:
-#      AllowUsernamePassword: true
-#      AllowRegister: true
-#      AllowExternalIdp: true
+    DefaultLoginPolicy:
+      AllowUsernamePassword: true
+      AllowRegister: true
+      AllowExternalIdp: true
 #    Orgs:
 #      - Name: 'Global'
 #        Domain: 'global.caos.ch'
@@ -96,8 +96,8 @@ SetUp:
       PrimaryColor: '#222324'
       SecondaryColor: '#ffffff'
   Step7:
-    DefaultSecondFactor: 1 #SecondFactorTypeOTP
+    OTP: true
   Step8:
-    DefaultSecondFactor: 2 #SecondFactorTypeU2F
+    U2F: true
   Step9:
     Passwordless: true

@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"flag"
+
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	"github.com/caos/zitadel/internal/v2/command"
 	"github.com/caos/zitadel/internal/v2/query"
 
 	"github.com/caos/logging"
+
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
@@ -176,8 +178,15 @@ func startSetup(configPaths []string, localDevMode bool) {
 
 	ctx := context.Background()
 
-	setup, err := setup.StartSetupV2(conf.Eventstore, conf.SystemDefaults)
-	logging.Log("SERVE-fD252").OnError(err).Panic("failed to start setup")
-	err = setup.ExecuteV2(ctx, conf.SetUp)
-	logging.Log("SERVE-djs3R").OnError(err).Panic("failed to execute setup")
+	es, err := es_int.Start(conf.Eventstore)
+	logging.Log("MAIN-Ddt3").OnError(err).Fatal("cannot start eventstore")
+
+	commands, err := command.StartCommandSide(&command.Config{
+		Eventstore:     es.V2(),
+		SystemDefaults: conf.SystemDefaults,
+	})
+	logging.Log("MAIN-dsjrr").OnError(err).Fatal("cannot start command side")
+
+	err = setup.Execute(ctx, conf.SetUp, conf.SystemDefaults.IamID, commands)
+	logging.Log("MAIN-djs3R").OnError(err).Panic("failed to execute setup steps")
 }

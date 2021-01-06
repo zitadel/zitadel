@@ -22,15 +22,11 @@ func (r *CommandSide) GetDefaultOrgIAMPolicy(ctx context.Context) (*domain.OrgIA
 func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
 	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMOrgIAMPolicyWriteModel(policy.AggregateID)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
+	err := r.addDefaultOrgIAMPolicy(ctx, nil, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
-	if addedPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.OrgIAMPolicy.AlreadyExists")
-	}
-	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
 	if err != nil {
@@ -38,6 +34,19 @@ func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *domain
 	}
 
 	return writeModelToOrgIAMPolicy(addedPolicy), nil
+}
+
+func (r *CommandSide) addDefaultOrgIAMPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMOrgIAMPolicyWriteModel, policy *domain.OrgIAMPolicy) error {
+	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	if err != nil {
+		return err
+	}
+	if addedPolicy.IsActive {
+		return caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.OrgIAMPolicy.AlreadyExists")
+	}
+	iamAgg.PushEvents(iam_repo.NewOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain))
+
+	return nil
 }
 
 func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
