@@ -22,7 +22,7 @@ type HumanProfileChangedEvent struct {
 	LastName          string         `json:"lastName,omitempty"`
 	NickName          *string        `json:"nickName,omitempty"`
 	DisplayName       *string        `json:"displayName,omitempty"`
-	PreferredLanguage language.Tag   `json:"preferredLanguage,omitempty"`
+	PreferredLanguage *language.Tag  `json:"preferredLanguage,omitempty"`
 	Gender            *domain.Gender `json:"gender,omitempty"`
 }
 

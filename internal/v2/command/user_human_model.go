@@ -169,7 +169,9 @@ func (wm *HumanWriteModel) reduceHumanProfileChangedEvent(e *user.HumanProfileCh
 	if e.DisplayName != nil {
 		wm.DisplayName = *e.DisplayName
 	}
-	wm.PreferredLanguage = e.PreferredLanguage
+	if e.PreferredLanguage != nil {
+		wm.PreferredLanguage = *e.PreferredLanguage
+	}
 	if e.Gender != nil {
 		wm.Gender = *e.Gender
 	}

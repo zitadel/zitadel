@@ -62,15 +62,21 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 			wm.Gender = e.Gender
 			wm.UserState = domain.UserStateActive
 		case *user.HumanProfileChangedEvent:
-			wm.FirstName = e.FirstName
-			wm.LastName = e.LastName
+			if e.FirstName != "" {
+				wm.FirstName = e.FirstName
+			}
+			if e.LastName != "" {
+				wm.LastName = e.LastName
+			}
 			if e.NickName != nil {
 				wm.NickName = *e.NickName
 			}
 			if e.DisplayName != nil {
 				wm.DisplayName = *e.DisplayName
 			}
-			wm.PreferredLanguage = e.PreferredLanguage
+			if e.PreferredLanguage != nil {
+				wm.PreferredLanguage = *e.PreferredLanguage
+			}
 			if e.Gender != nil {
 				wm.Gender = *e.Gender
 			}
@@ -115,7 +121,7 @@ func (wm *HumanProfileWriteModel) NewChangedEvent(
 	}
 	if wm.PreferredLanguage != preferredLanguage {
 		hasChanged = true
-		changedEvent.PreferredLanguage = preferredLanguage
+		changedEvent.PreferredLanguage = &preferredLanguage
 	}
 	if gender.Valid() && wm.Gender != gender {
 		hasChanged = true
