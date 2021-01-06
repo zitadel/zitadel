@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -33,7 +32,7 @@ func (r *CommandSide) ExecuteSetupSteps(ctx context.Context, steps []Step) error
 	}
 
 	if iam == nil {
-		iam = &iam_model.IAM{ObjectRoot: models.ObjectRoot{AggregateID: r.iamID}}
+		iam = &domain.IAM{ObjectRoot: models.ObjectRoot{AggregateID: r.iamID}}
 	}
 
 	ctx = setSetUpContextData(ctx, r.iamID)
@@ -56,7 +55,7 @@ func setSetUpContextData(ctx context.Context, orgID string) context.Context {
 	return authz.SetCtxData(ctx, authz.CtxData{UserID: SetupUser, OrgID: orgID})
 }
 
-func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.Step) (*iam_model.IAM, error) {
+func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.Step) (*domain.IAM, error) {
 	iamWriteModel, err := r.iamByID(ctx, iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
@@ -78,7 +77,7 @@ func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider
 		return err
 	}
 	if iam.SetUpStarted != step.Step() && iam.SetUpDone+1 != step.Step() {
-
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dge32", "wrong step")
 	}
 	iamAgg, err := iamAggregateProvider(iam)
 	if err != nil {
