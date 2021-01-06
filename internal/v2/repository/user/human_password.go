@@ -25,6 +25,7 @@ type HumanPasswordChangedEvent struct {
 
 	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
 	ChangeRequired bool                `json:"changeRequired"`
+	UserAgentID    string              `json:"userAgentID,omitempty"`
 }
 
 func (e *HumanPasswordChangedEvent) Data() interface{} {
@@ -35,6 +36,7 @@ func NewHumanPasswordChangedEvent(
 	ctx context.Context,
 	secret *crypto.CryptoValue,
 	changeRequired bool,
+	userAgentID string,
 ) *HumanPasswordChangedEvent {
 	return &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -43,6 +45,7 @@ func NewHumanPasswordChangedEvent(
 		),
 		Secret:         secret,
 		ChangeRequired: changeRequired,
+		UserAgentID:    userAgentID,
 	}
 }
 

@@ -52,7 +52,7 @@ func (s *Server) IsUserUnique(ctx context.Context, request *management.UniqueUse
 }
 
 func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserRequest) (*management.UserResponse, error) {
-	user, err := s.command.AddUser(ctx, userCreateToDomain(in))
+	user, err := s.command.AddUser(ctx, authz.GetCtxData(ctx).OrgID, userCreateToDomain(in))
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (s *Server) GetUserProfile(ctx context.Context, in *management.UserID) (*ma
 }
 
 func (s *Server) ChangeUserUserName(ctx context.Context, request *management.UpdateUserUserNameRequest) (*empty.Empty, error) {
-	return &empty.Empty{}, s.user.ChangeUsername(ctx, request.Id, request.UserName)
+	return &empty.Empty{}, s.command.ChangeUsername(ctx, authz.GetCtxData(ctx).OrgID, request.Id, request.UserName)
 }
 
 func (s *Server) UpdateUserProfile(ctx context.Context, request *management.UpdateUserProfileRequest) (*management.UserProfile, error) {
@@ -141,7 +141,7 @@ func (s *Server) ChangeUserEmail(ctx context.Context, request *management.Update
 }
 
 func (s *Server) ResendEmailVerificationMail(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
-	err := s.user.CreateEmailVerificationCode(ctx, in.Id)
+	err := s.command.CreateHumanEmailVerificationCode(ctx, in.Id)
 	return &empty.Empty{}, err
 }
 
@@ -154,20 +154,20 @@ func (s *Server) GetUserPhone(ctx context.Context, in *management.UserID) (*mana
 }
 
 func (s *Server) ChangeUserPhone(ctx context.Context, request *management.UpdateUserPhoneRequest) (*management.UserPhone, error) {
-	phone, err := s.user.ChangePhone(ctx, updatePhoneToModel(request))
+	phone, err := s.command.ChangeHumanPhone(ctx, updatePhoneToDomain(request))
 	if err != nil {
 		return nil, err
 	}
-	return phoneFromModel(phone), nil
+	return phoneFromDomain(phone), nil
 }
 
 func (s *Server) RemoveUserPhone(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
-	err := s.user.RemovePhone(ctx, userID.Id)
+	err := s.command.RemoveHumanPhone(ctx, userID.Id)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendPhoneVerificationCode(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
-	err := s.user.CreatePhoneVerificationCode(ctx, in.Id)
+	err := s.command.CreateHumanPhoneVerificationCode(ctx, in.Id)
 	return &empty.Empty{}, err
 }
 
@@ -188,18 +188,16 @@ func (s *Server) UpdateUserAddress(ctx context.Context, request *management.Upda
 }
 
 func (s *Server) SendSetPasswordNotification(ctx context.Context, request *management.SetPasswordNotificationRequest) (*empty.Empty, error) {
-	err := s.user.RequestSetPassword(ctx, request.Id, notifyTypeToModel(request.Type))
+	err := s.command.RequestSetPassword(ctx, request.Id, notifyTypeToDomain(request.Type))
 	return &empty.Empty{}, err
 }
 
 func (s *Server) SetInitialPassword(ctx context.Context, request *management.PasswordRequest) (*empty.Empty, error) {
-	_, err := s.user.SetOneTimePassword(ctx, passwordRequestToModel(request))
-	return &empty.Empty{}, err
+	return &empty.Empty{}, s.command.SetOneTimePassword(ctx, authz.GetCtxData(ctx).OrgID, request.Id, request.Password)
 }
 
 func (s *Server) ResendInitialMail(ctx context.Context, request *management.InitialMailRequest) (*empty.Empty, error) {
-	err := s.user.ResendInitialMail(ctx, request.Id, request.Email)
-	return &empty.Empty{}, err
+	return &empty.Empty{}, s.command.ResendInitialMail(ctx, request.Id, request.Email)
 }
 
 func (s *Server) SearchUserExternalIDPs(ctx context.Context, request *management.ExternalIDPSearchRequest) (*management.ExternalIDPSearchResponse, error) {

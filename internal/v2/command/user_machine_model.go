@@ -30,6 +30,8 @@ func (wm *MachineWriteModel) AppendEvents(events ...eventstore.EventReader) {
 		switch e := event.(type) {
 		case *user.MachineAddedEvent:
 			wm.AppendEvents(e)
+		case *user.UsernameChangedEvent:
+			wm.AppendEvents(e)
 		case *user.MachineChangedEvent:
 			wm.AppendEvents(e)
 		case *user.UserDeactivatedEvent:
@@ -55,6 +57,8 @@ func (wm *MachineWriteModel) Reduce() error {
 			wm.Name = e.Name
 			wm.Description = e.Description
 			wm.UserState = domain.UserStateActive
+		case *user.UsernameChangedEvent:
+			wm.UserName = e.UserName
 		case *user.MachineChangedEvent:
 			if e.Name != nil {
 				wm.Name = *e.Name

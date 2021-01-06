@@ -57,6 +57,13 @@ func writeModelToEmail(wm *HumanEmailWriteModel) *domain.Email {
 	}
 }
 
+func writeModelToPhone(wm *HumanPhoneWriteModel) *domain.Phone {
+	return &domain.Phone{
+		ObjectRoot:      writeModelToObjectRoot(wm.WriteModel),
+		PhoneNumber:     wm.Phone,
+		IsPhoneVerified: wm.IsPhoneVerified,
+	}
+}
 func writeModelToAddress(wm *HumanAddressWriteModel) *domain.Address {
 	return &domain.Address{
 		ObjectRoot:    writeModelToObjectRoot(wm.WriteModel),

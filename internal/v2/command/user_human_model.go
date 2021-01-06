@@ -76,6 +76,8 @@ func (wm *HumanWriteModel) Reduce() error {
 			wm.reduceHumanAddedEvent(e)
 		case *user.HumanRegisteredEvent:
 			wm.reduceHumanRegisteredEvent(e)
+		case *user.UsernameChangedEvent:
+			wm.UserName = e.UserName
 		case *user.HumanProfileChangedEvent:
 			wm.reduceHumanProfileChangedEvent(e)
 		case *user.HumanEmailChangedEvent:

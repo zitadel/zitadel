@@ -23,3 +23,14 @@ type EmailCode struct {
 func (e *Email) IsValid() bool {
 	return e.EmailAddress != ""
 }
+
+func NewEmailCode(emailGenerator crypto.Generator) (*EmailCode, error) {
+	emailCodeCrypto, _, err := crypto.NewCode(emailGenerator)
+	if err != nil {
+		return nil, err
+	}
+	return &EmailCode{
+		Code:   emailCodeCrypto,
+		Expiry: emailGenerator.Expiry(),
+	}, nil
+}

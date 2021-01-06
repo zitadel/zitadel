@@ -19,6 +19,7 @@ Errors:
     NotLocked: Benutzer ist nicht gesperrt
     NoChanges: Keine Änderungen gefunden
     InitCodeNotFound: Kein Initialisierungs Code gefunden
+    UsernameNotChanged: Benutzername wurde nicht verändert
     Profile:
       NotFound: Profil nicht gefunden
       NotChanged: Profile nicht verändert

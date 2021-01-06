@@ -306,7 +306,7 @@ func updateEmailToDomain(e *management.UpdateUserEmailRequest) *domain.Email {
 	}
 }
 
-func phoneFromModel(phone *usr_model.Phone) *management.UserPhone {
+func phoneFromDomain(phone *domain.Phone) *management.UserPhone {
 	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
 	logging.Log("GRPC-ps9ws").OnError(err).Debug("unable to parse timestamp")
 
@@ -339,8 +339,8 @@ func phoneViewFromModel(phone *usr_model.Phone) *management.UserPhoneView {
 		IsPhoneVerified: phone.IsPhoneVerified,
 	}
 }
-func updatePhoneToModel(e *management.UpdateUserPhoneRequest) *usr_model.Phone {
-	return &usr_model.Phone{
+func updatePhoneToDomain(e *management.UpdateUserPhoneRequest) *domain.Phone {
+	return &domain.Phone{
 		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
 		PhoneNumber:     e.Phone,
 		IsPhoneVerified: e.IsPhoneVerified,
@@ -510,14 +510,14 @@ func mfaFromModel(mfa *usr_model.MultiFactor) *management.UserMultiFactor {
 	}
 }
 
-func notifyTypeToModel(state management.NotificationType) usr_model.NotificationType {
+func notifyTypeToDomain(state management.NotificationType) domain.NotificationType {
 	switch state {
 	case management.NotificationType_NOTIFICATIONTYPE_EMAIL:
-		return usr_model.NotificationTypeEmail
+		return domain.NotificationTypeEmail
 	case management.NotificationType_NOTIFICATIONTYPE_SMS:
-		return usr_model.NotificationTypeSms
+		return domain.NotificationTypeSms
 	default:
-		return usr_model.NotificationTypeEmail
+		return domain.NotificationTypeEmail
 	}
 }
 

@@ -30,13 +30,12 @@ func (e *HumanPhoneChangedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanPhoneChangedEvent(ctx context.Context, phone string) *HumanPhoneChangedEvent {
+func NewHumanPhoneChangedEvent(ctx context.Context) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPhoneChangedType,
 		),
-		PhoneNumber: phone,
 	}
 }
 
