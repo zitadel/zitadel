@@ -16,8 +16,8 @@ const (
 type PasswordAgePolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ExpireWarnDays uint64 `json:"expireWarnDays"`
-	MaxAgeDays     uint64 `json:"maxAgeDays"`
+	ExpireWarnDays uint64 `json:"expireWarnDays,omitempty"`
+	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
 }
 
 func (e *PasswordAgePolicyAddedEvent) Data() interface{} {

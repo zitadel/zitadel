@@ -26,10 +26,10 @@ SetUp:
   Step1:
     GlobalOrg: 'Global'
     IAMProject: 'Zitadel'
-#    DefaultLoginPolicy:
-#      AllowUsernamePassword: true
-#      AllowRegister: true
-#      AllowExternalIdp: true
+    DefaultLoginPolicy:
+      AllowUsernamePassword: true
+      AllowRegister: true
+      AllowExternalIdp: true
 #    Orgs:
 #      - Name: 'Global'
 #        Domain: 'global.caos.ch'

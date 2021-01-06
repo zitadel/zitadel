@@ -18,11 +18,11 @@ const (
 type LoginPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AllowUserNamePassword bool                    `json:"allowUsernamePassword"`
-	AllowRegister         bool                    `json:"allowRegister"`
-	AllowExternalIDP      bool                    `json:"allowExternalIdp"`
-	ForceMFA              bool                    `json:"forceMFA"`
-	PasswordlessType      domain.PasswordlessType `json:"passwordlessType"`
+	AllowUserNamePassword bool                    `json:"allowUsernamePassword,omitempty"`
+	AllowRegister         bool                    `json:"allowRegister,omitempty"`
+	AllowExternalIDP      bool                    `json:"allowExternalIdp,omitempty"`
+	ForceMFA              bool                    `json:"forceMFA,omitempty"`
+	PasswordlessType      domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
 func (e *LoginPolicyAddedEvent) Data() interface{} {
@@ -64,10 +64,10 @@ type LoginPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AllowUserNamePassword bool                    `json:"allowUsernamePassword,omitempty"`
-	AllowRegister         bool                    `json:"allowRegister"`
-	AllowExternalIDP      bool                    `json:"allowExternalIdp"`
-	ForceMFA              bool                    `json:"forceMFA"`
-	PasswordlessType      domain.PasswordlessType `json:"passwordlessType"`
+	AllowRegister         bool                    `json:"allowRegister,omitempty"`
+	AllowExternalIDP      bool                    `json:"allowExternalIdp,omitempty"`
+	ForceMFA              bool                    `json:"forceMFA,omitempty"`
+	PasswordlessType      domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
 type LoginPolicyEventData struct {
