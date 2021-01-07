@@ -16,7 +16,7 @@ type OrgDomainWriteModel struct {
 	Primary        bool
 	Verified       bool
 
-	IsActive bool
+	State domain.OrgDomainState
 }
 
 func NewOrgDomainWriteModel(orgID string, domain string) *OrgDomainWriteModel {
@@ -67,19 +67,18 @@ func (wm *OrgDomainWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *org.DomainAddedEvent:
 			wm.Domain = e.Domain
-			wm.IsActive = true
+			wm.State = domain.OrgDomainStateActive
 		case *org.DomainVerificationAddedEvent:
 			wm.ValidationType = e.ValidationType
 			wm.ValidationCode = e.ValidationCode
 		case *org.DomainVerificationFailedEvent:
-			//TODO: ?
-			//wm.Verified = false?
+			//TODO: not handled in v1
 		case *org.DomainVerifiedEvent:
 			wm.Verified = true
 		case *org.DomainPrimarySetEvent:
 			wm.Primary = e.Domain == wm.Domain
 		case *org.DomainRemovedEvent:
-			wm.IsActive = false
+			wm.State = domain.OrgDomainStateRemoved
 		}
 	}
 	return nil

@@ -7,7 +7,9 @@ import (
 func RegisterEventMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(OrgAdded, OrgAddedEventMapper).
 		RegisterFilterEventMapper(OrgChanged, OrgChangedEventMapper).
-		//RegisterFilterEventMapper(IDPOIDCConfigAddedEventType, IDPOIDCConfigAddedEventMapper).
+		//RegisterFilterEventMapper(OrgDeactivated, OrgChangedEventMapper). TODO: !
+		//RegisterFilterEventMapper(OrgReactivated, OrgChangedEventMapper).
+		//RegisterFilterEventMapper(OrgRemoved, OrgChangedEventMapper).
 		RegisterFilterEventMapper(OrgDomainAdded, DomainAddedEventMapper).
 		RegisterFilterEventMapper(OrgDomainVerificationAdded, DomainVerificationAddedEventMapper).
 		RegisterFilterEventMapper(OrgDomainVerificationFailed, DomainVerificationFailedEventMapper).

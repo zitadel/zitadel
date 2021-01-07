@@ -3,6 +3,7 @@ package command
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
@@ -23,14 +24,13 @@ func NewOrgWriteModel(orgID string) *OrgWriteModel {
 
 func (wm *OrgWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
-	//for _, event := range events {
-	//	switch e := event.(type) {
-	//	case *iam.LabelPolicyAddedEvent:
-	//		wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyAddedEvent)
-	//	case *iam.LabelPolicyChangedEvent:
-	//		wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyChangedEvent)
-	//	}
-	//}
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.OrgAddedEvent,
+			*iam.LabelPolicyChangedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
 }
 
 func (wm *OrgWriteModel) Reduce() error {
@@ -38,16 +38,9 @@ func (wm *OrgWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *org.OrgAddedEvent:
 			wm.Name = e.Name
+			wm.State = domain.OrgStateActive
 		case *org.OrgChangedEvent:
 			wm.Name = e.Name
-			//case *iam.GlobalOrgSetEvent:
-			//	wm.GlobalOrgID = e.OrgID
-			//case *iam.SetupStepEvent:
-			//	if e.Done {
-			//		wm.SetUpDone = e.Step
-			//	} else {
-			//		wm.SetUpStarted = e.Step
-			//	}
 		}
 	}
 	return nil

@@ -27,7 +27,7 @@ func (r *CommandSide) addOrgDomain(ctx context.Context, orgAgg *org.Aggregate, a
 	if err != nil {
 		return err
 	}
-	if addedDomain.IsActive {
+	if addedDomain.State == domain.OrgDomainStateActive {
 		return caos_errs.ThrowAlreadyExists(nil, "COMMA-Bd2jj", "Errors.Org.Domain.AlreadyExists")
 	}
 	orgAgg.PushEvents(org.NewDomainAddedEvent(ctx, orgDomain.Domain))

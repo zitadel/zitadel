@@ -74,7 +74,7 @@ service AdminService {
         };
     }
 
-    rpc SetUpOrg(OrgSetUpRequest) returns (OrgSetUpResponse) {
+    rpc SetUpOrg(OrgSetUpRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             post: "/orgs/_setup"
             body: "*"

@@ -18,17 +18,14 @@ func (r *CommandSide) GetOrg(ctx context.Context, aggregateID string) (*domain.O
 	return orgWriteModelToOrg(orgWriteModel), nil
 }
 
-func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) (*domain.Org, error) {
+func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) error {
 	orgAgg, userAgg, orgMemberAgg, err := r.setUpOrg(ctx, organisation, admin)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	_, err = r.eventstore.PushAggregates(ctx, orgAgg, userAgg, orgMemberAgg)
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return err
 }
 
 func (r *CommandSide) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) (*org.Aggregate, *user.Aggregate, *org.Aggregate, error) {

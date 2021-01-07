@@ -22,3 +22,17 @@ const (
 	OrgDomainValidationTypeHTTP
 	OrgDomainValidationTypeDNS
 )
+
+type OrgDomainState int32
+
+const (
+	OrgDomainStateUnspecified OrgDomainState = iota
+	OrgDomainStateActive
+	OrgDomainStateRemoved
+
+	orgDomainStateCount
+)
+
+func (f OrgDomainState) Valid() bool {
+	return f >= 0 && f < orgDomainStateCount
+}

@@ -9,11 +9,11 @@ type OrgMemberWriteModel struct {
 	MemberWriteModel
 }
 
-func NewOrgMemberWriteModel(iamID, userID string) *OrgMemberWriteModel {
+func NewOrgMemberWriteModel(orgID, userID string) *OrgMemberWriteModel {
 	return &OrgMemberWriteModel{
 		MemberWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID: orgID,
 			},
 			UserID: userID,
 		},

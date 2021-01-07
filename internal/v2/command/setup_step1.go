@@ -49,8 +49,7 @@ type Org struct {
 	Name         string
 	Domain       string
 	OrgIamPolicy bool
-	Users        []User
-	Owners       []string
+	Owner        User
 	Projects     []Project
 }
 
@@ -93,15 +92,17 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 				Domains: []*domain.OrgDomain{{Domain: organisation.Domain}},
 			},
 			&domain.User{
-				UserName: organisation.Users[0].UserName,
+				UserName: organisation.Owner.UserName,
 				Human: &domain.Human{
 					Profile: &domain.Profile{
-						FirstName: organisation.Users[0].FirstName,
-						LastName:  organisation.Users[0].LastName,
+						FirstName: organisation.Owner.FirstName,
+						LastName:  organisation.Owner.LastName,
 					},
-					Password: domain.NewPassword(organisation.Users[0].Password),
+					Password: &domain.Password{
+						SecretString: organisation.Owner.Password,
+					},
 					Email: &domain.Email{
-						EmailAddress:    organisation.Users[0].Email,
+						EmailAddress:    organisation.Owner.Email,
 						IsEmailVerified: true,
 					},
 				},
