@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -52,7 +53,7 @@ func userViewFromModel(user *usr_model.UserView) *auth.UserView {
 	return userView
 }
 
-func profileFromModel(profile *usr_model.Profile) *auth.UserProfile {
+func profileFromDomain(profile *domain.Profile) *auth.UserProfile {
 	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
 	logging.Log("GRPC-56t5s").OnError(err).Debug("unable to parse timestamp")
 
@@ -69,7 +70,7 @@ func profileFromModel(profile *usr_model.Profile) *auth.UserProfile {
 		DisplayName:       profile.DisplayName,
 		NickName:          profile.NickName,
 		PreferredLanguage: profile.PreferredLanguage.String(),
-		Gender:            genderFromModel(profile.Gender),
+		Gender:            genderFromDomain(profile.Gender),
 	}
 }
 
@@ -81,32 +82,33 @@ func profileViewFromModel(profile *usr_model.Profile) *auth.UserProfileView {
 	logging.Log("GRPC-9sujE").OnError(err).Debug("unable to parse timestamp")
 
 	return &auth.UserProfileView{
-		Id:                 profile.AggregateID,
-		CreationDate:       creationDate,
-		ChangeDate:         changeDate,
-		Sequence:           profile.Sequence,
-		FirstName:          profile.FirstName,
-		LastName:           profile.LastName,
-		DisplayName:        profile.DisplayName,
-		NickName:           profile.NickName,
-		PreferredLanguage:  profile.PreferredLanguage.String(),
-		Gender:             genderFromModel(profile.Gender),
+		Id:                profile.AggregateID,
+		CreationDate:      creationDate,
+		ChangeDate:        changeDate,
+		Sequence:          profile.Sequence,
+		FirstName:         profile.FirstName,
+		LastName:          profile.LastName,
+		DisplayName:       profile.DisplayName,
+		NickName:          profile.NickName,
+		PreferredLanguage: profile.PreferredLanguage.String(),
+		//TODO: Use converter
+		Gender:             auth.Gender(profile.Gender),
 		LoginNames:         profile.LoginNames,
 		PreferredLoginName: profile.PreferredLoginName,
 	}
 }
 
-func updateProfileToModel(ctx context.Context, u *auth.UpdateUserProfileRequest) *usr_model.Profile {
+func updateProfileToDomain(ctx context.Context, u *auth.UpdateUserProfileRequest) *domain.Profile {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
 	logging.Log("GRPC-lk73L").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("language malformed")
 
-	return &usr_model.Profile{
+	return &domain.Profile{
 		ObjectRoot:        models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		NickName:          u.NickName,
 		PreferredLanguage: preferredLanguage,
-		Gender:            genderToModel(u.Gender),
+		Gender:            genderToDomain(u.Gender),
 	}
 }
 
@@ -332,29 +334,29 @@ func userStateFromModel(state usr_model.UserState) auth.UserState {
 	}
 }
 
-func genderFromModel(gender usr_model.Gender) auth.Gender {
+func genderFromDomain(gender domain.Gender) auth.Gender {
 	switch gender {
-	case usr_model.GenderFemale:
+	case domain.GenderFemale:
 		return auth.Gender_GENDER_FEMALE
-	case usr_model.GenderMale:
+	case domain.GenderMale:
 		return auth.Gender_GENDER_MALE
-	case usr_model.GenderDiverse:
+	case domain.GenderDiverse:
 		return auth.Gender_GENDER_DIVERSE
 	default:
 		return auth.Gender_GENDER_UNSPECIFIED
 	}
 }
 
-func genderToModel(gender auth.Gender) usr_model.Gender {
+func genderToDomain(gender auth.Gender) domain.Gender {
 	switch gender {
 	case auth.Gender_GENDER_FEMALE:
-		return usr_model.GenderFemale
+		return domain.GenderFemale
 	case auth.Gender_GENDER_MALE:
-		return usr_model.GenderMale
+		return domain.GenderMale
 	case auth.Gender_GENDER_DIVERSE:
-		return usr_model.GenderDiverse
+		return domain.GenderDiverse
 	default:
-		return usr_model.GenderUnspecified
+		return domain.GenderUnspecified
 	}
 }
 

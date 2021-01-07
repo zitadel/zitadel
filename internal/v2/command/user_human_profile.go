@@ -8,7 +8,7 @@ import (
 )
 
 func (r *CommandSide) ChangeHumanProfile(ctx context.Context, profile *domain.Profile) (*domain.Profile, error) {
-	if !profile.IsValid() {
+	if !profile.IsValid() && profile.AggregateID != "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8io0d", "Errors.User.Profile.Invalid")
 	}
 

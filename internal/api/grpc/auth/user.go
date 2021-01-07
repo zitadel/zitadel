@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/pkg/grpc/auth"
@@ -62,15 +62,16 @@ func (s *Server) GetMyMfas(ctx context.Context, _ *empty.Empty) (*auth.MultiFact
 }
 
 func (s *Server) UpdateMyUserProfile(ctx context.Context, request *auth.UpdateUserProfileRequest) (*auth.UserProfile, error) {
-	profile, err := s.repo.ChangeMyProfile(ctx, updateProfileToModel(ctx, request))
+	profile, err := s.command.ChangeHumanProfile(ctx, updateProfileToDomain(ctx, request))
 	if err != nil {
 		return nil, err
 	}
-	return profileFromModel(profile), nil
+	return profileFromDomain(profile), nil
 }
 
 func (s *Server) ChangeMyUserName(ctx context.Context, request *auth.ChangeUserNameRequest) (*empty.Empty, error) {
-	return &empty.Empty{}, s.repo.ChangeMyUsername(ctx, request.UserName)
+	ctxData := authz.GetCtxData(ctx)
+	return &empty.Empty{}, s.command.ChangeUsername(ctx, ctxData.OrgID, ctxData.UserID, request.UserName)
 }
 
 func (s *Server) ChangeMyUserEmail(ctx context.Context, request *auth.UpdateUserEmailRequest) (*auth.UserEmail, error) {
