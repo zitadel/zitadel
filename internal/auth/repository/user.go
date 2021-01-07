@@ -50,8 +50,10 @@ type myUserRepo interface {
 	MyUser(ctx context.Context) (*model.UserView, error)
 
 	MyProfile(ctx context.Context) (*model.Profile, error)
+	ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 
 	MyEmail(ctx context.Context) (*model.Email, error)
+	ChangeMyEmail(ctx context.Context, email *model.Email) (*model.Email, error)
 	VerifyMyEmail(ctx context.Context, code string) error
 	ResendMyEmailVerificationMail(ctx context.Context) error
 
@@ -62,7 +64,6 @@ type myUserRepo interface {
 	ResendMyPhoneVerificationCode(ctx context.Context) error
 
 	MyAddress(ctx context.Context) (*model.Address, error)
-	ChangeMyAddress(ctx context.Context, address *model.Address) (*model.Address, error)
 
 	ChangeMyPassword(ctx context.Context, old, new string) error
 
@@ -83,6 +84,8 @@ type myUserRepo interface {
 	AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error)
 	VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, data []byte) error
 	RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error
+
+	ChangeMyUsername(ctx context.Context, username string) error
 
 	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
 }

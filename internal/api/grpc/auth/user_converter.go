@@ -194,7 +194,7 @@ func updatePhoneToDomain(ctx context.Context, e *auth.UpdateUserPhoneRequest) *d
 	}
 }
 
-func addressFromModel(address *usr_model.Address) *auth.UserAddress {
+func addressFromDomain(address *domain.Address) *auth.UserAddress {
 	creationDate, err := ptypes.TimestampProto(address.CreationDate)
 	logging.Log("GRPC-65FRs").OnError(err).Debug("unable to parse timestamp")
 
@@ -234,8 +234,8 @@ func addressViewFromModel(address *usr_model.Address) *auth.UserAddressView {
 	}
 }
 
-func updateAddressToModel(ctx context.Context, address *auth.UpdateUserAddressRequest) *usr_model.Address {
-	return &usr_model.Address{
+func updateAddressToDomain(ctx context.Context, address *auth.UpdateUserAddressRequest) *domain.Address {
+	return &domain.Address{
 		ObjectRoot:    models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		Country:       address.Country,
 		StreetAddress: address.StreetAddress,
@@ -252,11 +252,11 @@ func externalIDPSearchRequestToModel(request *auth.ExternalIDPSearchRequest) *us
 	}
 }
 
-func externalIDPRemoveToModel(ctx context.Context, idp *auth.ExternalIDPRemoveRequest) *usr_model.ExternalIDP {
-	return &usr_model.ExternalIDP{
-		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
-		IDPConfigID: idp.IdpConfigId,
-		UserID:      idp.ExternalUserId,
+func externalIDPRemoveToDomain(ctx context.Context, idp *auth.ExternalIDPRemoveRequest) *domain.ExternalIDP {
+	return &domain.ExternalIDP{
+		ObjectRoot:     models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
+		IDPConfigID:    idp.IdpConfigId,
+		ExternalUserID: idp.ExternalUserId,
 	}
 }
 

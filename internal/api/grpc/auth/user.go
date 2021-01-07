@@ -111,15 +111,16 @@ func (s *Server) ResendMyPhoneVerificationCode(ctx context.Context, _ *empty.Emp
 }
 
 func (s *Server) UpdateMyUserAddress(ctx context.Context, request *auth.UpdateUserAddressRequest) (*auth.UserAddress, error) {
-	address, err := s.repo.ChangeMyAddress(ctx, updateAddressToModel(ctx, request))
+	address, err := s.command.ChangeHumanAddress(ctx, updateAddressToDomain(ctx, request))
 	if err != nil {
 		return nil, err
 	}
-	return addressFromModel(address), nil
+	return addressFromDomain(address), nil
 }
 
 func (s *Server) ChangeMyPassword(ctx context.Context, request *auth.PasswordChange) (*empty.Empty, error) {
-	err := s.repo.ChangeMyPassword(ctx, request.OldPassword, request.NewPassword)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.ChangePassword(ctx, ctxData.OrgID, ctxData.UserID, request.OldPassword, request.NewPassword, "")
 	return &empty.Empty{}, err
 }
 
@@ -132,7 +133,7 @@ func (s *Server) SearchMyExternalIDPs(ctx context.Context, request *auth.Externa
 }
 
 func (s *Server) RemoveMyExternalIDP(ctx context.Context, request *auth.ExternalIDPRemoveRequest) (*empty.Empty, error) {
-	err := s.repo.RemoveMyExternalIDP(ctx, externalIDPRemoveToModel(ctx, request))
+	err := s.command.RemoveHumanExternalIDP(ctx, externalIDPRemoveToDomain(ctx, request))
 	return &empty.Empty{}, err
 }
 
@@ -158,7 +159,7 @@ func (s *Server) VerifyMfaOTP(ctx context.Context, request *auth.VerifyMfaOtp) (
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {
-	err = s.repo.RemoveMyMFAOTP(ctx)
+	err = s.command.RemoveHumanOTP(ctx, authz.GetCtxData(ctx).UserID)
 	return &empty.Empty{}, err
 }
 
@@ -176,7 +177,7 @@ func (s *Server) VerifyMyMfaU2F(ctx context.Context, request *auth.VerifyWebAuth
 }
 
 func (s *Server) RemoveMyMfaU2F(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
-	err := s.repo.RemoveMyMFAU2F(ctx, id.Id)
+	err := s.command.RemoveHumanU2F(ctx, authz.GetCtxData(ctx).UserID, id.Id)
 	return &empty.Empty{}, err
 }
 
@@ -202,7 +203,7 @@ func (s *Server) VerifyMyPasswordless(ctx context.Context, request *auth.VerifyW
 }
 
 func (s *Server) RemoveMyPasswordless(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
-	err := s.repo.RemoveMyPasswordless(ctx, id.Id)
+	err := s.command.RemoveHumanPasswordless(ctx, authz.GetCtxData(ctx).UserID, id.Id)
 	return &empty.Empty{}, err
 }
 

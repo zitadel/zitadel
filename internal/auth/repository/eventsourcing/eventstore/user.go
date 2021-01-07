@@ -100,6 +100,13 @@ func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
 	return user.GetProfile()
 }
 
+func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error) {
+	if err := checkIDs(ctx, profile.ObjectRoot); err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.ChangeProfile(ctx, profile)
+}
+
 func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, seqErr := repo.View.GetLatestExternalIDPSequence("")
@@ -145,6 +152,13 @@ func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oGRpc", "Errors.User.NotHuman")
 	}
 	return user.GetEmail()
+}
+
+func (repo *UserRepo) ChangeMyEmail(ctx context.Context, email *model.Email) (*model.Email, error) {
+	if err := checkIDs(ctx, email.ObjectRoot); err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.ChangeEmail(ctx, email)
 }
 
 func (repo *UserRepo) VerifyEmail(ctx context.Context, userID, code string) error {
@@ -202,13 +216,6 @@ func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ok9nI", "Errors.User.NotHuman")
 	}
 	return user.GetAddress()
-}
-
-func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Address) (*model.Address, error) {
-	if err := checkIDs(ctx, address.ObjectRoot); err != nil {
-		return nil, err
-	}
-	return repo.UserEvents.ChangeAddress(ctx, address)
 }
 
 func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
@@ -374,6 +381,18 @@ func (repo *UserRepo) RemoveMyPasswordless(ctx context.Context, webAuthNTokenID 
 	return repo.UserEvents.RemovePasswordlessToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
 }
 
+func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {
+	ctxData := authz.GetCtxData(ctx)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(ctxData.OrgID)
+	if errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
+	if err != nil {
+		return err
+	}
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.ChangeUsername(ctx, ctxData.UserID, username, orgPolicyView)
+}
 func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID string) error {
 	_, err := repo.UserEvents.CreateInitializeUserCodeByID(ctx, userID)
 	return err
