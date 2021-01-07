@@ -52,7 +52,7 @@ func (r *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userNam
 	if err != nil {
 		return err
 	}
-	if existingUser.UserState != domain.UserStateUnspecified || existingUser.UserState != domain.UserStateDeleted {
+	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5N9ds", "Errors.User.NotFound")
 	}
 	if existingUser.UserName == userName {
@@ -82,7 +82,7 @@ func (r *CommandSide) DeactivateUser(ctx context.Context, userID string) (*domai
 	if err != nil {
 		return nil, err
 	}
-	if existingUser.UserState != domain.UserStateUnspecified || existingUser.UserState != domain.UserStateDeleted {
+	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9ds", "Errors.User.NotFound")
 	}
 	if existingUser.UserState == domain.UserStateInactive {
@@ -106,7 +106,7 @@ func (r *CommandSide) ReactivateUser(ctx context.Context, userID string) (*domai
 	if err != nil {
 		return nil, err
 	}
-	if existingUser.UserState != domain.UserStateUnspecified || existingUser.UserState != domain.UserStateDeleted {
+	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-4M0sd", "Errors.User.NotFound")
 	}
 	if existingUser.UserState != domain.UserStateInactive {
@@ -130,7 +130,7 @@ func (r *CommandSide) LockUser(ctx context.Context, userID string) (*domain.User
 	if err != nil {
 		return nil, err
 	}
-	if existingUser.UserState != domain.UserStateUnspecified || existingUser.UserState != domain.UserStateDeleted {
+	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5M9fs", "Errors.User.NotFound")
 	}
 	if existingUser.UserState != domain.UserStateActive && existingUser.UserState != domain.UserStateInitial {
@@ -154,7 +154,7 @@ func (r *CommandSide) UnlockUser(ctx context.Context, userID string) (*domain.Us
 	if err != nil {
 		return nil, err
 	}
-	if existingUser.UserState != domain.UserStateUnspecified || existingUser.UserState != domain.UserStateDeleted {
+	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-M0dos", "Errors.User.NotFound")
 	}
 	if existingUser.UserState != domain.UserStateLocked {
