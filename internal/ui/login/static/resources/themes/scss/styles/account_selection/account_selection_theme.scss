@@ -27,11 +27,11 @@
 
             &:hover {
                 $primary: map-get($config, primary);
-                background-color: rgba(lgn-color($primary, 500), 0.1);
+                background-color: rgba(#ffffff, 0.1);
             }
 
             &:focus {
-                background-color: rgba(lgn-color($primary, 500), 0.2);
+                background-color: rgba(#ffffff, 0.1);
             }
 
             &:active {

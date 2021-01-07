@@ -863,10 +863,10 @@ ul li i.lgn-valid {
   box-shadow: inset 0 -1px #303131;
 }
 .lgn-account-selection .lgn-account:hover {
-  background-color: rgba(82, 130, 193, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .lgn-account-selection .lgn-account:focus {
-  background-color: rgba(82, 130, 193, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .lgn-account-selection .lgn-account:active {
   background-color: rgba(82, 130, 193, 0.25);
@@ -1130,10 +1130,10 @@ ul li i.lgn-valid {
   box-shadow: inset 0 -1px #303131;
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:hover {
-  background-color: rgba(82, 130, 193, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:focus {
-  background-color: rgba(82, 130, 193, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:active {
   background-color: rgba(82, 130, 193, 0.25);
@@ -1394,10 +1394,10 @@ ul li i.lgn-valid {
   box-shadow: inset 0 -1px #e3e8ee;
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:hover {
-  background-color: rgba(84, 105, 212, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:focus {
-  background-color: rgba(84, 105, 212, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:active {
   background-color: rgba(84, 105, 212, 0.25);

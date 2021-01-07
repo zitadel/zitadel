@@ -57,44 +57,19 @@ function ComplexityPolicyCheck(policyElement, pwNew) {
     }
     return valid;
 }
+
 function ValidPolicy(element) {
     element.classList.remove('invalid');
-    // change pwd template;
-    const field = document.getElementById('change-new-password');
-    if (field) {
-        field.setAttribute("color", "primary");
-    }
-
-    // register template
-    const field1 = document.getElementById('register-password');
-    if (field1) {
-        field1.setAttribute("color", "primary");
-    }
-
     element.getElementsByTagName('i')[0].classList.remove('la-times');
     element.getElementsByTagName('i')[0].classList.remove('lgn-warn');
     element.getElementsByTagName('i')[0].classList.add('la-check');
     element.getElementsByTagName('i')[0].classList.add('lgn-valid');
-
-    // element.getElementsByTagName('i')[0].innerText = 'check';
 }
 
 function InvalidPolicy(element) {
     element.classList.add('invalid');
-    // change pwd template
-    const pwdfield = document.getElementById('change-new-password');
-    if (pwdfield) {
-        pwdfield.setAttribute("color", "warn");
-    }
-
-    // // register template
-    const pwdfield1 = document.getElementById('register-password');
-    if (pwdfield1) {
-        pwdfield1.setAttribute("color", "warn");
-    }
     element.getElementsByTagName('i')[0].classList.remove('lgn-valid');
     element.getElementsByTagName('i')[0].classList.remove('la-check');
     element.getElementsByTagName('i')[0].classList.add('lgn-warn');
     element.getElementsByTagName('i')[0].classList.add('la-times');
-    // element.getElementsByTagName('i')[0].innerText = 'clear';
 }

@@ -21,7 +21,7 @@
     <div class="fields">
         <label class="lgb-label" for="loginName">{{t "Login.Loginname"}}</label>
         <input class="lgn-input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}"
-         value="{{ .LoginName }}" autocomplete="username" autofocus required>
+         value="{{ .LoginName }}" {{if .ErrMessage}}shake {{end}} autocomplete="username" autofocus required>
     </div>
     {{end}}
 
