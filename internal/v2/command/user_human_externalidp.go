@@ -22,7 +22,7 @@ func (r *CommandSide) removeHumanExternalIDP(ctx context.Context, externalIDP *d
 		return err
 	}
 	if existingExternalIDP.State == domain.ExternalIDPStateUnspecified || existingExternalIDP.State == domain.ExternalIDPStateRemoved {
-		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-5M0ds", "Errors.User.ExternalIDP.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0ds", "Errors.User.ExternalIDP.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingExternalIDP.WriteModel)
 	if !cascade {

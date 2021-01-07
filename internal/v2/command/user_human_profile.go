@@ -17,11 +17,11 @@ func (r *CommandSide) ChangeHumanProfile(ctx context.Context, profile *domain.Pr
 		return nil, err
 	}
 	if existingProfile.UserState == domain.UserStateUnspecified || existingProfile.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-3M9sd", "Errors.User.Profile.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.User.Profile.NotFound")
 	}
 	changedEvent, hasChanged := existingProfile.NewChangedEvent(ctx, profile.FirstName, profile.LastName, profile.NickName, profile.DisplayName, profile.PreferredLanguage, domain.Gender(profile.Gender))
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingProfile.WriteModel)
 	userAgg.PushEvents(changedEvent)

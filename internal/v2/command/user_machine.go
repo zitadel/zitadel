@@ -45,12 +45,12 @@ func (r *CommandSide) ChangeMachine(ctx context.Context, machine *domain.Machine
 		return nil, err
 	}
 	if existingUser.UserState == domain.UserStateDeleted || existingUser.UserState == domain.UserStateUnspecified {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-5M0od", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 	}
 
 	changedEvent, hasChanged := existingUser.NewChangedEvent(ctx, machine.Name, machine.Description)
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-2M9fs", "Errors.User.Email.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Email.NotChanged")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 	userAgg.PushEvents(changedEvent)

@@ -46,12 +46,12 @@ func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, policy *domain.Org
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-2N9sd", "Errors.Org.OrgIAMPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-2N9sd", "Errors.Org.OrgIAMPolicy.NotFound")
 	}
 
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.UserLoginMustBeDomain)
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
 	}
 
 	orgAgg := ORGAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)

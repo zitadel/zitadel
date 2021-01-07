@@ -18,11 +18,11 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 		return nil, err
 	}
 	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
 	}
 	changedEvent, hasChanged := existingEmail.NewChangedEvent(ctx, email.EmailAddress)
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-2M9fs", "Errors.User.Email.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Email.NotChanged")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 	userAgg.PushEvents(changedEvent)

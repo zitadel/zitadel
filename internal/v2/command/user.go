@@ -178,7 +178,7 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID string) error {
 	if err != nil {
 		return err
 	}
-	if existingUser.UserState != domain.UserStateDeleted {
+	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
