@@ -61,6 +61,7 @@ type HumanExternalIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId,omitempty"`
+	UserID      string `json:"userId,omitempty"`
 	DisplayName string `json:"displayName,omitempty"`
 }
 
@@ -96,19 +97,21 @@ type HumanExternalIDPRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
+	UserID      string `json:"userId,omitempty"`
 }
 
 func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID string) *HumanExternalIDPRemovedEvent {
+func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPRemovedEvent {
 	return &HumanExternalIDPRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalIDPRemovedType,
 		),
 		IDPConfigID: idpConfigID,
+		UserID:      externalUserID,
 	}
 }
 
@@ -129,19 +132,21 @@ type HumanExternalIDPCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
+	UserID      string `json:"userId,omitempty"`
 }
 
 func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID string) *HumanExternalIDPCascadeRemovedEvent {
+func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPCascadeRemovedEvent {
 	return &HumanExternalIDPCascadeRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalIDPCascadeRemovedType,
 		),
 		IDPConfigID: idpConfigID,
+		UserID:      externalUserID,
 	}
 }
 

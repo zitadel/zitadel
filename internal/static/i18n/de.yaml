@@ -2,6 +2,7 @@ Errors:
   Internal: Es ist ein interner Fehler aufgetreten
   NoChangesFound: Keine Änderungen gefunden
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
+  IDMissing: ID fehlt
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
@@ -19,6 +20,7 @@ Errors:
     NotLocked: Benutzer ist nicht gesperrt
     NoChanges: Keine Änderungen gefunden
     InitCodeNotFound: Kein Initialisierungs Code gefunden
+    UsernameNotChanged: Benutzername wurde nicht verändert
     Profile:
       NotFound: Profil nicht gefunden
       NotChanged: Profile nicht verändert

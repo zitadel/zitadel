@@ -30,7 +30,7 @@ func (r *CommandSide) addDefaultLabelPolicy(ctx context.Context, iamAgg *iam_rep
 	if err != nil {
 		return err
 	}
-	if addedPolicy.IsActive {
+	if addedPolicy.State == domain.PolicyStateActive {
 		return caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.AlreadyExists")
 	}
 
@@ -46,13 +46,13 @@ func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *doma
 		return nil, err
 	}
 
-	if !existingPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0K9dq", "Errors.IAM.LabelPolicy.NotFound")
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-0K9dq", "Errors.IAM.LabelPolicy.NotFound")
 	}
 
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor)
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)

@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
@@ -10,7 +11,7 @@ type PasswordAgePolicyWriteModel struct {
 
 	ExpireWarnDays uint64
 	MaxAgeDays     uint64
-	IsActive       bool
+	State          domain.PolicyState
 }
 
 func (wm *PasswordAgePolicyWriteModel) Reduce() error {
@@ -19,7 +20,7 @@ func (wm *PasswordAgePolicyWriteModel) Reduce() error {
 		case *policy.PasswordAgePolicyAddedEvent:
 			wm.ExpireWarnDays = e.ExpireWarnDays
 			wm.MaxAgeDays = e.MaxAgeDays
-			wm.IsActive = true
+			wm.State = domain.PolicyStateActive
 		case *policy.PasswordAgePolicyChangedEvent:
 			if e.ExpireWarnDays != nil {
 				wm.ExpireWarnDays = *e.ExpireWarnDays
@@ -28,7 +29,7 @@ func (wm *PasswordAgePolicyWriteModel) Reduce() error {
 				wm.ExpireWarnDays = *e.ExpireWarnDays
 			}
 		case *policy.PasswordAgePolicyRemovedEvent:
-			wm.IsActive = false
+			wm.State = domain.PolicyStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

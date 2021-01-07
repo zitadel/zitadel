@@ -41,7 +41,7 @@ func (r *CommandSide) addDefaultOrgIAMPolicy(ctx context.Context, iamAgg *iam_re
 	if err != nil {
 		return err
 	}
-	if addedPolicy.IsActive {
+	if addedPolicy.State == domain.PolicyStateActive {
 		return caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.OrgIAMPolicy.AlreadyExists")
 	}
 	iamAgg.PushEvents(iam_repo.NewOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain))
@@ -55,13 +55,13 @@ func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *dom
 	if err != nil {
 		return nil, err
 	}
-	if !existingPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0Pl0d", "Errors.IAM.OrgIAMPolicy.NotFound")
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-0Pl0d", "Errors.IAM.OrgIAMPolicy.NotFound")
 	}
 
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.UserLoginMustBeDomain)
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)

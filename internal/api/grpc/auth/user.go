@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/pkg/grpc/auth"
@@ -62,23 +62,24 @@ func (s *Server) GetMyMfas(ctx context.Context, _ *empty.Empty) (*auth.MultiFact
 }
 
 func (s *Server) UpdateMyUserProfile(ctx context.Context, request *auth.UpdateUserProfileRequest) (*auth.UserProfile, error) {
-	profile, err := s.repo.ChangeMyProfile(ctx, updateProfileToModel(ctx, request))
+	profile, err := s.command.ChangeHumanProfile(ctx, updateProfileToDomain(ctx, request))
 	if err != nil {
 		return nil, err
 	}
-	return profileFromModel(profile), nil
+	return profileFromDomain(profile), nil
 }
 
 func (s *Server) ChangeMyUserName(ctx context.Context, request *auth.ChangeUserNameRequest) (*empty.Empty, error) {
-	return &empty.Empty{}, s.repo.ChangeMyUsername(ctx, request.UserName)
+	ctxData := authz.GetCtxData(ctx)
+	return &empty.Empty{}, s.command.ChangeUsername(ctx, ctxData.OrgID, ctxData.UserID, request.UserName)
 }
 
 func (s *Server) ChangeMyUserEmail(ctx context.Context, request *auth.UpdateUserEmailRequest) (*auth.UserEmail, error) {
-	email, err := s.repo.ChangeMyEmail(ctx, updateEmailToModel(ctx, request))
+	email, err := s.command.ChangeHumanEmail(ctx, updateEmailToDomain(ctx, request))
 	if err != nil {
 		return nil, err
 	}
-	return emailFromModel(email), nil
+	return emailFromDomain(email), nil
 }
 
 func (s *Server) VerifyMyUserEmail(ctx context.Context, request *auth.VerifyMyUserEmailRequest) (*empty.Empty, error) {
@@ -92,11 +93,11 @@ func (s *Server) ResendMyEmailVerificationMail(ctx context.Context, _ *empty.Emp
 }
 
 func (s *Server) ChangeMyUserPhone(ctx context.Context, request *auth.UpdateUserPhoneRequest) (*auth.UserPhone, error) {
-	phone, err := s.repo.ChangeMyPhone(ctx, updatePhoneToModel(ctx, request))
+	phone, err := s.command.ChangeHumanPhone(ctx, updatePhoneToDomain(ctx, request))
 	if err != nil {
 		return nil, err
 	}
-	return phoneFromModel(phone), nil
+	return phoneFromDomain(phone), nil
 }
 
 func (s *Server) VerifyMyUserPhone(ctx context.Context, request *auth.VerifyUserPhoneRequest) (*empty.Empty, error) {

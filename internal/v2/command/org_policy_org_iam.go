@@ -14,7 +14,7 @@ func (r *CommandSide) GetOrgIAMPolicy(ctx context.Context, orgID string) (*domai
 	if err != nil {
 		return nil, err
 	}
-	if policy.IsActive {
+	if policy.State == domain.PolicyStateActive {
 		return orgWriteModelToOrgIAMPolicy(policy), nil
 	}
 	return r.GetDefaultOrgIAMPolicy(ctx)
@@ -26,7 +26,7 @@ func (r *CommandSide) AddOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAM
 	if err != nil {
 		return nil, err
 	}
-	if addedPolicy.IsActive {
+	if addedPolicy.State == domain.PolicyStateActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-5M0ds", "Errors.Org.OrgIAMPolicy.AlreadyExists")
 	}
 	orgAgg := ORGAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
@@ -45,13 +45,13 @@ func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, policy *domain.Org
 	if err != nil {
 		return nil, err
 	}
-	if !existingPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-2N9sd", "Errors.Org.OrgIAMPolicy.NotFound")
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-2N9sd", "Errors.Org.OrgIAMPolicy.NotFound")
 	}
 
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.UserLoginMustBeDomain)
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
 	}
 
 	orgAgg := ORGAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)

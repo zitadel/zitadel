@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
@@ -13,7 +14,7 @@ type PasswordComplexityPolicyWriteModel struct {
 	HasUpperCase bool
 	HasNumber    bool
 	HasSymbol    bool
-	IsActive     bool
+	State        domain.PolicyState
 }
 
 func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
@@ -25,7 +26,7 @@ func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
 			wm.HasUpperCase = e.HasUpperCase
 			wm.HasNumber = e.HasNumber
 			wm.HasSymbol = e.HasSymbol
-			wm.IsActive = true
+			wm.State = domain.PolicyStateActive
 		case *policy.PasswordComplexityPolicyChangedEvent:
 			if e.MinLength != nil {
 				wm.MinLength = *e.MinLength
@@ -43,7 +44,7 @@ func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
 				wm.HasSymbol = *e.HasSymbol
 			}
 		case *policy.PasswordComplexityPolicyRemovedEvent:
-			wm.IsActive = false
+			wm.State = domain.PolicyStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

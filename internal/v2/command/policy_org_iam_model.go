@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
@@ -9,7 +10,7 @@ type PolicyOrgIAMWriteModel struct {
 	eventstore.WriteModel
 
 	UserLoginMustBeDomain bool
-	IsActive              bool
+	State                 domain.PolicyState
 }
 
 func (wm *PolicyOrgIAMWriteModel) Reduce() error {
@@ -17,7 +18,7 @@ func (wm *PolicyOrgIAMWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *policy.OrgIAMPolicyAddedEvent:
 			wm.UserLoginMustBeDomain = e.UserLoginMustBeDomain
-			wm.IsActive = true
+			wm.State = domain.PolicyStateActive
 		case *policy.OrgIAMPolicyChangedEvent:
 			if e.UserLoginMustBeDomain != nil {
 				wm.UserLoginMustBeDomain = *e.UserLoginMustBeDomain

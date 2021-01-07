@@ -14,3 +14,17 @@ type IAMMember struct {
 func (i *IAMMember) IsValid() bool {
 	return i.AggregateID != "" && i.UserID != "" && len(i.Roles) != 0
 }
+
+type MemberState int32
+
+const (
+	MemberStateUnspecified MemberState = iota
+	MemberStateActive
+	MemberStateRemoved
+
+	memberStateCount
+)
+
+func (f MemberState) Valid() bool {
+	return f >= 0 && f < memberStateCount
+}

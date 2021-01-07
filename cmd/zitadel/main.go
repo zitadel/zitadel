@@ -162,7 +162,7 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
 	}
 	if *authEnabled {
-		apis.RegisterServer(ctx, auth.CreateServer(authRepo))
+		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo))
 	}
 	if *oidcEnabled {
 		op := oidc.NewProvider(ctx, conf.API.OIDC, authRepo, *localDevMode)

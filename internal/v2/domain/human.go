@@ -71,7 +71,8 @@ func (u *Human) SetNamesAsDisplayname() {
 
 func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {
 	if u.Password != nil {
-		return u.Password.HashPasswordIfExisting(policy, passwordAlg, onetime)
+		u.Password.ChangeRequired = onetime
+		return u.Password.HashPasswordIfExisting(policy, passwordAlg)
 	}
 	return nil
 }
