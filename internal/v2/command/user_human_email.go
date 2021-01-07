@@ -9,7 +9,7 @@ import (
 )
 
 func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*domain.Email, error) {
-	if !email.IsValid() {
+	if !email.IsValid() || email.AggregateID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
 	}
 

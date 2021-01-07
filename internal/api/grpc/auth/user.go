@@ -75,11 +75,11 @@ func (s *Server) ChangeMyUserName(ctx context.Context, request *auth.ChangeUserN
 }
 
 func (s *Server) ChangeMyUserEmail(ctx context.Context, request *auth.UpdateUserEmailRequest) (*auth.UserEmail, error) {
-	email, err := s.repo.ChangeMyEmail(ctx, updateEmailToModel(ctx, request))
+	email, err := s.command.ChangeHumanEmail(ctx, updateEmailToDomain(ctx, request))
 	if err != nil {
 		return nil, err
 	}
-	return emailFromModel(email), nil
+	return emailFromDomain(email), nil
 }
 
 func (s *Server) VerifyMyUserEmail(ctx context.Context, request *auth.VerifyMyUserEmailRequest) (*empty.Empty, error) {
@@ -93,11 +93,11 @@ func (s *Server) ResendMyEmailVerificationMail(ctx context.Context, _ *empty.Emp
 }
 
 func (s *Server) ChangeMyUserPhone(ctx context.Context, request *auth.UpdateUserPhoneRequest) (*auth.UserPhone, error) {
-	phone, err := s.repo.ChangeMyPhone(ctx, updatePhoneToModel(ctx, request))
+	phone, err := s.command.ChangeHumanPhone(ctx, updatePhoneToDomain(ctx, request))
 	if err != nil {
 		return nil, err
 	}
-	return phoneFromModel(phone), nil
+	return phoneFromDomain(phone), nil
 }
 
 func (s *Server) VerifyMyUserPhone(ctx context.Context, request *auth.VerifyUserPhoneRequest) (*empty.Empty, error) {

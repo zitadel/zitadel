@@ -112,7 +112,7 @@ func updateProfileToDomain(ctx context.Context, u *auth.UpdateUserProfileRequest
 	}
 }
 
-func emailFromModel(email *usr_model.Email) *auth.UserEmail {
+func emailFromDomain(email *domain.Email) *auth.UserEmail {
 	creationDate, err := ptypes.TimestampProto(email.CreationDate)
 	logging.Log("GRPC-sdoi3").OnError(err).Debug("unable to parse timestamp")
 
@@ -146,14 +146,14 @@ func emailViewFromModel(email *usr_model.Email) *auth.UserEmailView {
 	}
 }
 
-func updateEmailToModel(ctx context.Context, e *auth.UpdateUserEmailRequest) *usr_model.Email {
-	return &usr_model.Email{
+func updateEmailToDomain(ctx context.Context, e *auth.UpdateUserEmailRequest) *domain.Email {
+	return &domain.Email{
 		ObjectRoot:   models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		EmailAddress: e.Email,
 	}
 }
 
-func phoneFromModel(phone *usr_model.Phone) *auth.UserPhone {
+func phoneFromDomain(phone *domain.Phone) *auth.UserPhone {
 	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
 	logging.Log("GRPC-kjn5J").OnError(err).Debug("unable to parse timestamp")
 
@@ -187,8 +187,8 @@ func phoneViewFromModel(phone *usr_model.Phone) *auth.UserPhoneView {
 	}
 }
 
-func updatePhoneToModel(ctx context.Context, e *auth.UpdateUserPhoneRequest) *usr_model.Phone {
-	return &usr_model.Phone{
+func updatePhoneToDomain(ctx context.Context, e *auth.UpdateUserPhoneRequest) *domain.Phone {
+	return &domain.Phone{
 		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		PhoneNumber: e.Phone,
 	}

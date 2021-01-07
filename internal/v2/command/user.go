@@ -45,8 +45,8 @@ func (r *CommandSide) RegisterUser(ctx context.Context, orgID string, user *doma
 }
 
 func (r *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userName string) error {
-	if userID == "" || userName == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.User.Invalid")
+	if orgID == "" || userID == "" || userName == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.IDMissing")
 	}
 	existingUser, err := r.userWriteModelByID(ctx, userID)
 	if err != nil {

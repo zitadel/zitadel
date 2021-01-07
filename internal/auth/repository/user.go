@@ -52,7 +52,6 @@ type myUserRepo interface {
 	MyProfile(ctx context.Context) (*model.Profile, error)
 
 	MyEmail(ctx context.Context) (*model.Email, error)
-	ChangeMyEmail(ctx context.Context, email *model.Email) (*model.Email, error)
 	VerifyMyEmail(ctx context.Context, code string) error
 	ResendMyEmailVerificationMail(ctx context.Context) error
 

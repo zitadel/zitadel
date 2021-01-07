@@ -147,13 +147,6 @@ func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
 	return user.GetEmail()
 }
 
-func (repo *UserRepo) ChangeMyEmail(ctx context.Context, email *model.Email) (*model.Email, error) {
-	if err := checkIDs(ctx, email.ObjectRoot); err != nil {
-		return nil, err
-	}
-	return repo.UserEvents.ChangeEmail(ctx, email)
-}
-
 func (repo *UserRepo) VerifyEmail(ctx context.Context, userID, code string) error {
 	return repo.UserEvents.VerifyEmail(ctx, userID, code)
 }
