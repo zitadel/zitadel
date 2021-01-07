@@ -11,7 +11,7 @@ type IdentityProviderWriteModel struct {
 
 	IDPConfigID     string
 	IDPProviderType domain.IdentityProviderType
-	IsActive        bool
+	State           domain.IdentityProviderState
 }
 
 func (wm *IdentityProviderWriteModel) Reduce() error {
@@ -20,9 +20,9 @@ func (wm *IdentityProviderWriteModel) Reduce() error {
 		case *policy.IdentityProviderAddedEvent:
 			wm.IDPConfigID = e.IDPConfigID
 			wm.IDPProviderType = e.IDPProviderType
-			wm.IsActive = true
+			wm.State = domain.IdentityProviderStateActive
 		case *policy.IdentityProviderRemovedEvent:
-			wm.IsActive = false
+			wm.State = domain.IdentityProviderStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
