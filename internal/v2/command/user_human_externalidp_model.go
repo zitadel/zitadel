@@ -13,7 +13,7 @@ type HumanExternalIDPWriteModel struct {
 	ExternalUserID string
 	DisplayName    string
 
-	UserState domain.UserState
+	State domain.ExternalIDPState
 }
 
 func NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID string) *HumanExternalIDPWriteModel {
@@ -41,8 +41,6 @@ func (wm *HumanExternalIDPWriteModel) AppendEvents(events ...eventstore.EventRea
 			if wm.IDPConfigID == e.IDPConfigID {
 				wm.AppendEvents(e)
 			}
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.AppendEvents(e)
 		case *user.UserRemovedEvent:
 			wm.AppendEvents(e)
 		}
@@ -52,19 +50,16 @@ func (wm *HumanExternalIDPWriteModel) AppendEvents(events ...eventstore.EventRea
 func (wm *HumanExternalIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.HumanAddedEvent:
-			wm.UserState = domain.UserStateActive
-		case *user.HumanRegisteredEvent:
-			wm.UserState = domain.UserStateActive
 		case *user.HumanExternalIDPAddedEvent:
 			wm.IDPConfigID = e.IDPConfigID
 			wm.DisplayName = e.DisplayName
+			wm.State = domain.ExternalIDPStateActive
 		case *user.HumanExternalIDPRemovedEvent:
-			wm.UserState = domain.UserStateDeleted
+			wm.State = domain.ExternalIDPStateRemoved
 		case *user.HumanExternalIDPCascadeRemovedEvent:
-			wm.UserState = domain.UserStateDeleted
+			wm.State = domain.ExternalIDPStateRemoved
 		case *user.UserRemovedEvent:
-			wm.UserState = domain.UserStateDeleted
+			wm.State = domain.ExternalIDPStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

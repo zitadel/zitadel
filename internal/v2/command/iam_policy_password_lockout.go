@@ -30,7 +30,7 @@ func (r *CommandSide) addDefaultPasswordLockoutPolicy(ctx context.Context, iamAg
 	if err != nil {
 		return err
 	}
-	if addedPolicy.IsActive {
+	if addedPolicy.State == domain.PolicyStateActive {
 		return caos_errs.ThrowAlreadyExists(nil, "IAM-0olDf", "Errors.IAM.PasswordLockoutPolicy.AlreadyExists")
 	}
 
@@ -45,7 +45,7 @@ func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, po
 	if err != nil {
 		return nil, err
 	}
-	if !existingPolicy.IsActive {
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0oPew", "Errors.IAM.PasswordLockoutPolicy.NotFound")
 	}
 

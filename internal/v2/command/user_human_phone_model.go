@@ -13,7 +13,7 @@ type HumanPhoneWriteModel struct {
 	Phone           string
 	IsPhoneVerified bool
 
-	UserState domain.UserState
+	State domain.PhoneState
 }
 
 func NewHumanPhoneWriteModel(userID string) *HumanPhoneWriteModel {
@@ -27,11 +27,13 @@ func NewHumanPhoneWriteModel(userID string) *HumanPhoneWriteModel {
 func (wm *HumanPhoneWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
+			wm.AppendEvents(e)
 		case *user.HumanPhoneChangedEvent:
 			wm.AppendEvents(e)
 		case *user.HumanPhoneVerifiedEvent:
 			wm.AppendEvents(e)
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
+		case *user.HumanPhoneRemovedEvent:
 			wm.AppendEvents(e)
 		case *user.UserRemovedEvent:
 			wm.AppendEvents(e)
@@ -43,18 +45,25 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
-			wm.Phone = e.PhoneNumber
-			wm.UserState = domain.UserStateActive
+			if e.PhoneNumber != "" {
+				wm.Phone = e.PhoneNumber
+				wm.State = domain.PhoneStateActive
+			}
 		case *user.HumanRegisteredEvent:
-			wm.Phone = e.PhoneNumber
-			wm.UserState = domain.UserStateActive
+			if e.PhoneNumber != "" {
+				wm.Phone = e.PhoneNumber
+				wm.State = domain.PhoneStateActive
+			}
 		case *user.HumanPhoneChangedEvent:
 			wm.Phone = e.PhoneNumber
 			wm.IsPhoneVerified = false
+			wm.State = domain.PhoneStateActive
 		case *user.HumanPhoneVerifiedEvent:
 			wm.IsPhoneVerified = true
+		case *user.HumanPhoneRemovedEvent:
+			wm.State = domain.PhoneStateRemoved
 		case *user.UserRemovedEvent:
-			wm.UserState = domain.UserStateDeleted
+			wm.State = domain.PhoneStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

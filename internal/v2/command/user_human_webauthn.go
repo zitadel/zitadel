@@ -28,7 +28,7 @@ func (r *CommandSide) removeHumanWebAuthN(ctx context.Context, userID, webAuthNI
 	if err != nil {
 		return err
 	}
-	if existingWebAuthN.UserState == domain.UserStateUnspecified || existingWebAuthN.UserState == domain.UserStateDeleted {
+	if existingWebAuthN.State == domain.WebAuthNStateUnspecified || existingWebAuthN.State == domain.WebAuthNStateRemoved {
 		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-5M0ds", "Errors.User.ExternalIDP.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingWebAuthN.WriteModel)

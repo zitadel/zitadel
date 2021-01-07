@@ -13,3 +13,17 @@ type OTP struct {
 	Url          string
 	State        MFAState
 }
+
+type OTPState int32
+
+const (
+	OTPStateUnspecified OTPState = iota
+	OTPStateActive
+	OTPStateRemoved
+
+	otpStateCount
+)
+
+func (s OTPState) Valid() bool {
+	return s >= 0 && s < otpStateCount
+}

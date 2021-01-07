@@ -17,7 +17,7 @@ func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID string) error {
 	if err != nil {
 		return err
 	}
-	if existingOTP.UserState == domain.UserStateUnspecified || existingOTP.UserState == domain.UserStateDeleted {
+	if existingOTP.State == domain.OTPStateUnspecified || existingOTP.State == domain.OTPStateRemoved {
 		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-5M0ds", "Errors.User.OTP.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)

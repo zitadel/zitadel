@@ -17,7 +17,7 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 	if err != nil {
 		return nil, err
 	}
-	if existingPhone.UserState == domain.UserStateUnspecified || existingPhone.UserState == domain.UserStateDeleted {
+	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-5M0ds", "Errors.User.Phone.NotFound")
 	}
 	changedEvent, hasChanged := existingPhone.NewChangedEvent(ctx, phone.PhoneNumber)
@@ -54,7 +54,7 @@ func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, user
 	if err != nil {
 		return err
 	}
-	if existingPhone.UserState == domain.UserStateUnspecified || existingPhone.UserState == domain.UserStateDeleted {
+	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9fs", "Errors.User.Phone.NotFound")
 	}
 	if existingPhone.IsPhoneVerified {
@@ -78,7 +78,7 @@ func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID string) error
 	if err != nil {
 		return err
 	}
-	if existingPhone.UserState == domain.UserStateUnspecified || existingPhone.UserState == domain.UserStateDeleted {
+	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
 		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-5M0ds", "Errors.User.Phone.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)

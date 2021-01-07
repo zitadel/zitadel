@@ -38,3 +38,17 @@ const (
 	UserVerificationRequirementPreferred
 	UserVerificationRequirementDiscouraged
 )
+
+type WebAuthNState int32
+
+const (
+	WebAuthNStateUnspecified WebAuthNState = iota
+	WebAuthNStateActive
+	WebAuthNStateRemoved
+
+	webAuthNStateCount
+)
+
+func (s WebAuthNState) Valid() bool {
+	return s >= 0 && s < webAuthNStateCount
+}

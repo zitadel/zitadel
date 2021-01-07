@@ -8,8 +8,8 @@ import (
 
 type SecondFactorWriteModel struct {
 	eventstore.WriteModel
-	MFAType  domain.SecondFactorType
-	IsActive bool
+	MFAType domain.SecondFactorType
+	State   domain.FactorState
 }
 
 func (wm *SecondFactorWriteModel) Reduce() error {
@@ -17,10 +17,10 @@ func (wm *SecondFactorWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *policy.SecondFactorAddedEvent:
 			wm.MFAType = e.MFAType
-			wm.IsActive = true
+			wm.State = domain.FactorStateActive
 		case *policy.SecondFactorRemovedEvent:
 			wm.MFAType = e.MFAType
-			wm.IsActive = false
+			wm.State = domain.FactorStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -28,8 +28,8 @@ func (wm *SecondFactorWriteModel) Reduce() error {
 
 type MultiFactoryWriteModel struct {
 	eventstore.WriteModel
-	MFAType  domain.MultiFactorType
-	IsActive bool
+	MFAType domain.MultiFactorType
+	State   domain.FactorState
 }
 
 func (wm *MultiFactoryWriteModel) Reduce() error {
@@ -37,10 +37,10 @@ func (wm *MultiFactoryWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *policy.MultiFactorAddedEvent:
 			wm.MFAType = e.MFAType
-			wm.IsActive = true
+			wm.State = domain.FactorStateActive
 		case *policy.MultiFactorRemovedEvent:
 			wm.MFAType = e.MFAType
-			wm.IsActive = false
+			wm.State = domain.FactorStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

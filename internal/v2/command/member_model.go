@@ -2,15 +2,17 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
 type MemberWriteModel struct {
 	eventstore.WriteModel
 
-	UserID   string
-	Roles    []string
-	IsActive bool
+	UserID string
+	Roles  []string
+
+	State domain.MemberState
 }
 
 func NewMemberWriteModel(userID string) *MemberWriteModel {
@@ -25,12 +27,12 @@ func (wm *MemberWriteModel) Reduce() error {
 		case *member.MemberAddedEvent:
 			wm.UserID = e.UserID
 			wm.Roles = e.Roles
-			wm.IsActive = true
+			wm.State = domain.MemberStateActive
 		case *member.MemberChangedEvent:
 			wm.Roles = e.Roles
 		case *member.MemberRemovedEvent:
 			wm.Roles = nil
-			wm.IsActive = false
+			wm.State = domain.MemberStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

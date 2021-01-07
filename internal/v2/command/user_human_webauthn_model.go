@@ -11,7 +11,7 @@ type HumanWebAuthNWriteModel struct {
 
 	WebauthNTokenID string
 
-	UserState domain.UserState
+	State domain.WebAuthNState
 }
 
 func NewHumanWebAuthNWriteModel(userID, wbAuthNTokenID string) *HumanWebAuthNWriteModel {
@@ -45,11 +45,11 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanWebAuthNAddedEvent:
 			wm.WebauthNTokenID = e.WebAuthNTokenID
-			wm.UserState = domain.UserStateActive
+			wm.State = domain.WebAuthNStateActive
 		case *user.HumanWebAuthNRemovedEvent:
-			wm.UserState = domain.UserStateDeleted
+			wm.State = domain.WebAuthNStateRemoved
 		case *user.UserRemovedEvent:
-			wm.UserState = domain.UserStateDeleted
+			wm.State = domain.WebAuthNStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

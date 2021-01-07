@@ -30,7 +30,7 @@ func (r *CommandSide) addDefaultPasswordAgePolicy(ctx context.Context, iamAgg *i
 	if err != nil {
 		return err
 	}
-	if addedPolicy.IsActive {
+	if addedPolicy.State == domain.PolicyStateActive {
 		return caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.PasswordAgePolicy.AlreadyExists")
 	}
 
@@ -45,7 +45,7 @@ func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy
 	if err != nil {
 		return nil, err
 	}
-	if !existingPolicy.IsActive {
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0oPew", "Errors.IAM.PasswordAgePolicy.NotFound")
 	}
 

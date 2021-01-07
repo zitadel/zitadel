@@ -16,7 +16,7 @@ type HumanAddressWriteModel struct {
 	Region        string
 	StreetAddress string
 
-	UserState domain.UserState
+	State domain.AddressState
 }
 
 func NewHumanAddressWriteModel(userID string) *HumanAddressWriteModel {
@@ -49,14 +49,14 @@ func (wm *HumanAddressWriteModel) Reduce() error {
 			wm.PostalCode = e.PostalCode
 			wm.Region = e.Region
 			wm.StreetAddress = e.StreetAddress
-			wm.UserState = domain.UserStateActive
+			wm.State = domain.AddressStateActive
 		case *user.HumanRegisteredEvent:
 			wm.Country = e.Country
 			wm.Locality = e.Locality
 			wm.PostalCode = e.PostalCode
 			wm.Region = e.Region
 			wm.StreetAddress = e.StreetAddress
-			wm.UserState = domain.UserStateActive
+			wm.State = domain.AddressStateActive
 		case *user.HumanAddressChangedEvent:
 			if e.Country != nil {
 				wm.Country = *e.Country
@@ -74,7 +74,7 @@ func (wm *HumanAddressWriteModel) Reduce() error {
 				wm.StreetAddress = *e.StreetAddress
 			}
 		case *user.UserRemovedEvent:
-			wm.UserState = domain.UserStateDeleted
+			wm.State = domain.AddressStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

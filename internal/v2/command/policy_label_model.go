@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
@@ -10,7 +11,8 @@ type LabelPolicyWriteModel struct {
 
 	PrimaryColor   string
 	SecondaryColor string
-	IsActive       bool
+
+	State domain.PolicyState
 }
 
 func (wm *LabelPolicyWriteModel) Reduce() error {
@@ -19,7 +21,7 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 		case *policy.LabelPolicyAddedEvent:
 			wm.PrimaryColor = e.PrimaryColor
 			wm.SecondaryColor = e.SecondaryColor
-			wm.IsActive = true
+			wm.State = domain.PolicyStateActive
 		case *policy.LabelPolicyChangedEvent:
 			if e.PrimaryColor != nil {
 				wm.PrimaryColor = *e.PrimaryColor
@@ -28,7 +30,7 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 				wm.SecondaryColor = *e.SecondaryColor
 			}
 		case *policy.LabelPolicyRemovedEvent:
-			wm.IsActive = false
+			wm.State = domain.PolicyStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

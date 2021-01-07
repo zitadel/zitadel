@@ -12,7 +12,7 @@ type HumanOTPWriteModel struct {
 
 	Secret *crypto.CryptoValue
 
-	UserState domain.UserState
+	State domain.OTPState
 }
 
 func NewHumanOTPWriteModel(userID string) *HumanOTPWriteModel {
@@ -30,8 +30,6 @@ func (wm *HumanOTPWriteModel) AppendEvents(events ...eventstore.EventReader) {
 			wm.AppendEvents(e)
 		case *user.HumanOTPRemovedEvent:
 			wm.AppendEvents(e)
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.AppendEvents(e)
 		case *user.UserRemovedEvent:
 			wm.AppendEvents(e)
 		}
@@ -41,16 +39,13 @@ func (wm *HumanOTPWriteModel) AppendEvents(events ...eventstore.EventReader) {
 func (wm *HumanOTPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.HumanAddedEvent:
-			wm.UserState = domain.UserStateActive
-		case *user.HumanRegisteredEvent:
-			wm.UserState = domain.UserStateActive
 		case *user.HumanOTPAddedEvent:
 			wm.Secret = e.Secret
+			wm.State = domain.OTPStateActive
 		case *user.HumanOTPRemovedEvent:
-			wm.UserState = domain.UserStateDeleted
+			wm.State = domain.OTPStateRemoved
 		case *user.UserRemovedEvent:
-			wm.UserState = domain.UserStateDeleted
+			wm.State = domain.OTPStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

@@ -12,7 +12,7 @@ func (r *CommandSide) ChangeHumanAddress(ctx context.Context, address *domain.Ad
 	if err != nil {
 		return nil, err
 	}
-	if existingAddress.UserState == domain.UserStateUnspecified || existingAddress.UserState == domain.UserStateDeleted {
+	if existingAddress.State == domain.AddressStateUnspecified || existingAddress.State == domain.AddressStateRemoved {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-0pLdo", "Errors.User.Address.NotFound")
 	}
 	changedEvent, hasChanged := existingAddress.NewChangedEvent(ctx, address.Country, address.Locality, address.PostalCode, address.Region, address.StreetAddress)

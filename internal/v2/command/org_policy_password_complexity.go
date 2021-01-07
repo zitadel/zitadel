@@ -11,7 +11,7 @@ func (r *CommandSide) GetOrgPasswordComplexityPolicy(ctx context.Context, orgID 
 	if err != nil {
 		return nil, err
 	}
-	if policy.IsActive {
+	if policy.State == domain.PolicyStateActive {
 		return orgWriteModelToPasswordComplexityPolicy(policy), nil
 	}
 	return r.GetDefaultPasswordComplexityPolicy(ctx)
