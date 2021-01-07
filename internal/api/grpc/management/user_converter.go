@@ -76,11 +76,11 @@ func externalIDPSearchRequestToModel(request *management.ExternalIDPSearchReques
 	}
 }
 
-func externalIDPRemoveToModel(idp *management.ExternalIDPRemoveRequest) *usr_model.ExternalIDP {
-	return &usr_model.ExternalIDP{
-		ObjectRoot:  models.ObjectRoot{AggregateID: idp.UserId},
-		IDPConfigID: idp.IdpConfigId,
-		UserID:      idp.ExternalUserId,
+func externalIDPRemoveToDomain(idp *management.ExternalIDPRemoveRequest) *domain.ExternalIDP {
+	return &domain.ExternalIDP{
+		ObjectRoot:     models.ObjectRoot{AggregateID: idp.UserId},
+		IDPConfigID:    idp.IdpConfigId,
+		ExternalUserID: idp.ExternalUserId,
 	}
 }
 

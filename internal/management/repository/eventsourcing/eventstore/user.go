@@ -129,20 +129,8 @@ func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model
 	return mfas, nil
 }
 
-func (repo *UserRepo) RemoveOTP(ctx context.Context, userID string) error {
-	return repo.UserEvents.RemoveOTP(ctx, userID)
-}
-
-func (repo *UserRepo) RemoveU2F(ctx context.Context, userID, webAuthNTokenID string) error {
-	return repo.UserEvents.RemoveU2FToken(ctx, userID, webAuthNTokenID)
-}
-
 func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
 	return repo.UserEvents.GetPasswordless(ctx, userID)
-}
-
-func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {
-	return repo.UserEvents.RemovePasswordlessToken(ctx, userID, webAuthNTokenID)
 }
 
 func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
@@ -175,10 +163,6 @@ func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
-}
-
-func (repo *UserRepo) RemoveExternalIDP(ctx context.Context, externalIDP *usr_model.ExternalIDP) error {
-	return repo.UserEvents.RemoveExternalIDP(ctx, externalIDP)
 }
 
 func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (*usr_model.MachineKeyView, error) {

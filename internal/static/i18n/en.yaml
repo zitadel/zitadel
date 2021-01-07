@@ -2,6 +2,7 @@ Errors:
   Internal: An internal error occured
   NoChangesFound: No changes
   OriginNotAllowed: This "Origin" is not allowed
+  IDMissing: ID missing
   User:
     NotFound: User could not be found
     NotFoundOnOrg: User could not be found on chosen organisation

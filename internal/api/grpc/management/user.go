@@ -209,8 +209,7 @@ func (s *Server) SearchUserExternalIDPs(ctx context.Context, request *management
 }
 
 func (s *Server) RemoveExternalIDP(ctx context.Context, request *management.ExternalIDPRemoveRequest) (*empty.Empty, error) {
-	err := s.user.RemoveExternalIDP(ctx, externalIDPRemoveToModel(request))
-	return &empty.Empty{}, err
+	return &empty.Empty{}, s.command.RemoveHumanExternalIDP(ctx, externalIDPRemoveToDomain(request))
 }
 
 func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*management.UserMultiFactors, error) {
@@ -222,13 +221,11 @@ func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*m
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
-	err := s.user.RemoveOTP(ctx, userID.Id)
-	return &empty.Empty{}, err
+	return &empty.Empty{}, s.command.RemoveHumanOTP(ctx, userID.Id)
 }
 
 func (s *Server) RemoveMfaU2F(ctx context.Context, webAuthNTokenID *management.WebAuthNTokenID) (*empty.Empty, error) {
-	err := s.user.RemoveU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id)
-	return &empty.Empty{}, err
+	return &empty.Empty{}, s.command.RemoveHumanU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id)
 }
 
 func (s *Server) GetPasswordless(ctx context.Context, userID *management.UserID) (_ *management.WebAuthNTokens, err error) {
@@ -240,8 +237,7 @@ func (s *Server) GetPasswordless(ctx context.Context, userID *management.UserID)
 }
 
 func (s *Server) RemovePasswordless(ctx context.Context, id *management.WebAuthNTokenID) (*empty.Empty, error) {
-	err := s.user.RemovePasswordless(ctx, id.UserId, id.Id)
-	return &empty.Empty{}, err
+	return &empty.Empty{}, s.command.RemoveHumanPasswordless(ctx, id.UserId, id.Id)
 }
 
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {

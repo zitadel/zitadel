@@ -7,7 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 const (
@@ -23,7 +22,6 @@ type HumanOTPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Secret *crypto.CryptoValue `json:"otpSecret,omitempty"`
-	State  domain.MFAState     `json:"-"`
 }
 
 func (e *HumanOTPAddedEvent) Data() interface{} {
@@ -44,7 +42,6 @@ func NewHumanOTPAddedEvent(ctx context.Context,
 func HumanOTPAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	otpAdded := &HumanOTPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     domain.MFAStateNotReady,
 	}
 	err := json.Unmarshal(event.Data, otpAdded)
 	if err != nil {
@@ -55,7 +52,6 @@ func HumanOTPAddedEventMapper(event *repository.Event) (eventstore.EventReader, 
 
 type HumanOTPVerifiedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	State                domain.MFAState `json:"-"`
 }
 
 func (e *HumanOTPVerifiedEvent) Data() interface{} {
@@ -74,7 +70,6 @@ func NewHumanOTPVerifiedEvent(ctx context.Context) *HumanOTPVerifiedEvent {
 func HumanOTPVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &HumanOTPVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     domain.MFAStateReady,
 	}, nil
 }
 
