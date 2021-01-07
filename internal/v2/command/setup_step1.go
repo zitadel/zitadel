@@ -85,9 +85,9 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		return err
 	}
 	//create orgs
-	orgAggs := make([]eventstore.Aggregater, 0)
+	aggregates := make([]eventstore.Aggregater, 0)
 	for _, organisation := range step1.Orgs {
-		orgAgg, userAgg, err := r.setUpOrg(ctx,
+		orgAgg, userAgg, orgMemberAgg, err := r.setUpOrg(ctx,
 			&domain.Org{
 				Name:    organisation.Name,
 				Domains: []*domain.OrgDomain{{Domain: organisation.Domain}},
@@ -109,49 +109,17 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		if err != nil {
 			return err
 		}
-		orgAggs = append(orgAggs, orgAgg[0], userAgg, orgAgg[1])
-		//orgAgg, _, err := r.addOrg(ctx, &domain.Org{
-		//	Name:    organisation.Name,
-		//	Domains: []*domain.OrgDomain{{Domain: organisation.Domain}},
-		//})
-		//if err != nil {
-		//	return err
-		//}
-		//if organisation.OrgIamPolicy {
-		//	err = r.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID()), &domain.OrgIAMPolicy{UserLoginMustBeDomain: false})
-		//	if err != nil {
-		//		return err
-		//	}
-		//	for _, user := range organisation.Users {
-		//		userAgg, _, err := r.addHuman(ctx, orgAgg.ID(), user.UserName, &domain.Human{
-		//			Profile: &domain.Profile{
-		//				FirstName: user.FirstName,
-		//				LastName:  user.LastName,
-		//			},
-		//			Password: domain.NewPassword(user.Password),
-		//			Email: &domain.Email{
-		//				EmailAddress:    user.Email,
-		//				IsEmailVerified: true,
-		//			},
-		//		})
-		//		if err != nil {
-		//			return err
-		//		}
-		//		err = r.addOrgMember(ctx, orgAgg, NewOrgMemberWriteModel(orgAgg.ID(), userAgg.ID()), domain.NewMember(orgAgg.ID(), userAgg.ID(), domain.OrgOwnerRole))
-		//		if err != nil {
-		//			return err
-		//		}
-		//		orgAggs = append(orgAggs, userAgg)
-		//	}
-		//users
+		if organisation.OrgIamPolicy {
+			err = r.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID()), &domain.OrgIAMPolicy{UserLoginMustBeDomain: false})
+			if err != nil {
+				return err
+			}
+		}
+		aggregates = append(aggregates, orgAgg, userAgg, orgMemberAgg)
 		//projects
-		//}
-
-		//orgAggs[i] = orgAgg
+		//create applications
 	}
 
-	//create projects
-	//create applications
 	//set iam owners
 	//set global org
 	//set iam project id
@@ -168,7 +136,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 	*/
 	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
 
-	_, err = r.eventstore.PushAggregates(ctx, append(orgAggs, iamAgg)...)
+	_, err = r.eventstore.PushAggregates(ctx, append(aggregates, iamAgg)...)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Gr2hh", "Setup Step1 failed")
 	}

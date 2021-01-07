@@ -19,36 +19,36 @@ func (r *CommandSide) GetOrg(ctx context.Context, aggregateID string) (*domain.O
 }
 
 func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) (*domain.Org, error) {
-	orgAgg, userAgg, err := r.setUpOrg(ctx, organisation, admin)
+	orgAgg, userAgg, orgMemberAgg, err := r.setUpOrg(ctx, organisation, admin)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = r.eventstore.PushAggregates(ctx, orgAgg[0], orgAgg[1], userAgg)
+	_, err = r.eventstore.PushAggregates(ctx, orgAgg, userAgg, orgMemberAgg)
 	if err != nil {
 		return nil, err
 	}
 	return nil, nil
 }
 
-func (r *CommandSide) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) ([]*org.Aggregate, *user.Aggregate, error) {
+func (r *CommandSide) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) (*org.Aggregate, *user.Aggregate, *org.Aggregate, error) {
 	orgAgg, _, err := r.addOrg(ctx, organisation)
 	if err != nil {
-		return nil, nil, nil
+		return nil, nil, nil, err
 	}
 
 	userAgg, _, err := r.addHuman(ctx, orgAgg.ID(), admin.UserName, admin.Human)
 	if err != nil {
-		return nil, nil, nil
+		return nil, nil, nil, err
 	}
 
 	addedMember := NewOrgMemberWriteModel(orgAgg.ID(), userAgg.ID())
-	orgAgg2 := OrgAggregateFromWriteModel(&addedMember.WriteModel)
-	err = r.addOrgMember(ctx, orgAgg2, addedMember, domain.NewMember(orgAgg2.ID(), userAgg.ID(), domain.OrgOwnerRole)) //TODO: correct?
+	orgMemberAgg := OrgAggregateFromWriteModel(&addedMember.WriteModel)
+	err = r.addOrgMember(ctx, orgMemberAgg, addedMember, domain.NewMember(orgMemberAgg.ID(), userAgg.ID(), domain.OrgOwnerRole)) //TODO: correct?
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return []*org.Aggregate{orgAgg, orgAgg2}, userAgg, nil
+	return orgAgg, userAgg, orgMemberAgg, nil
 }
 
 func (r *CommandSide) addOrg(ctx context.Context, organisation *domain.Org) (_ *org.Aggregate, _ *OrgWriteModel, err error) {
