@@ -11,6 +11,16 @@ type Member struct {
 	Roles  []string
 }
 
+func NewMember(aggregateID, userID string, roles ...string) *Member {
+	return &Member{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: aggregateID,
+		},
+		UserID: userID,
+		Roles:  roles,
+	}
+}
+
 func (i *Member) IsValid() bool {
 	return i.AggregateID != "" && i.UserID != "" && len(i.Roles) != 0
 }

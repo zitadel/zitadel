@@ -15,6 +15,12 @@ type Password struct {
 	ChangeRequired bool
 }
 
+func NewPassword(password string) *Password {
+	return &Password{
+		SecretString: password,
+	}
+}
+
 type PasswordCode struct {
 	es_models.ObjectRoot
 

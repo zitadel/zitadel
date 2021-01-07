@@ -13,7 +13,7 @@ type Org struct {
 	Name  string
 
 	Domains                  []*OrgDomain
-	Members                  []*OrgMember
+	Members                  []*Member
 	OrgIamPolicy             *OrgIAMPolicy
 	LoginPolicy              *LoginPolicy
 	LabelPolicy              *LabelPolicy
