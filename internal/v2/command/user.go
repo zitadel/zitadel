@@ -29,23 +29,6 @@ func (r *CommandSide) AddUser(ctx context.Context, user *domain.User) (*domain.U
 	return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-8K0df", "Errors.User.TypeUndefined")
 }
 
-func (r *CommandSide) addUser(ctx context.Context, user *domain.User) (*user.Aggregate, *domain.User, error) {
-	if !user.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.User.Invalid")
-	}
-
-	if user.Human != nil {
-		userAgg, human, err := r.addHuman(ctx, user.ResourceOwner, user.UserName, user.Human)
-		if err != nil {
-			return nil, nil, err
-		}
-		return userAgg, &domain.User{UserName: user.UserName, Human: human}, nil
-	} else if user.Machine != nil {
-
-	}
-	return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-8K0df", "Errors.User.TypeUndefined")
-}
-
 //func (r *CommandSide) AddUserCommand(ctx context.Context, user *UserWriteModel) (*domain.User, error) {
 //	if !user.IsValid() {
 //		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.User.Invalid")

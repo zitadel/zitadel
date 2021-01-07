@@ -4,6 +4,7 @@ import (
 	"context"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -84,6 +85,26 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		return err
 	}
 	//create orgs
+	orgAggs := make([]eventstore.Aggregater, len(step1.Orgs))
+	for i, organisation := range step1.Orgs {
+		orgAgg, _, err := r.addOrg(ctx, &domain.Org{
+			Name:    organisation.Name,
+			Domains: []*domain.OrgDomain{{Domain: organisation.Domain}},
+		})
+		if err != nil {
+			return err
+		}
+		if organisation.OrgIamPolicy {
+			err = r.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID()), &domain.OrgIAMPolicy{UserLoginMustBeDomain: false})
+			if err != nil {
+				return err
+			}
+			//users
+			//projects
+		}
+
+		orgAggs[i] = orgAgg
+	}
 	//create projects
 	//create applications
 	//set iam owners
@@ -102,7 +123,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 	*/
 	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
 
-	_, err = r.eventstore.PushAggregates(ctx, iamAgg)
+	_, err = r.eventstore.PushAggregates(ctx, append(orgAggs, iamAgg)...)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Gr2hh", "Setup Step1 failed")
 	}

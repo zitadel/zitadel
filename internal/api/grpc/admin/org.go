@@ -31,11 +31,12 @@ func (s *Server) IsOrgUnique(ctx context.Context, request *admin.UniqueOrgReques
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, orgSetUp *admin.OrgSetUpRequest) (_ *admin.OrgSetUpResponse, err error) {
-	setUp, err := s.command.SetUpOrg(ctx, setUpRequestToModel(orgSetUp))
+	_, err = s.command.SetUpOrg(ctx, orgCreateRequestToDomain(orgSetUp.Org), userCreateRequestToDomain(orgSetUp.User))
 	if err != nil {
 		return nil, err
 	}
-	return setUpOrgResponseFromModel(setUp), err
+	//return setUpOrgResponseFromModel(setUp), err
+	return nil, nil //TODO: !
 }
 
 func (s *Server) GetDefaultOrgIamPolicy(ctx context.Context, _ *empty.Empty) (_ *admin.OrgIamPolicyView, err error) {

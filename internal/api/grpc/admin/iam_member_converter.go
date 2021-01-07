@@ -10,21 +10,21 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func addIamMemberToDomain(member *admin.AddIamMemberRequest) *domain.IAMMember {
-	return &domain.IAMMember{
+func addIamMemberToDomain(member *admin.AddIamMemberRequest) *domain.Member {
+	return &domain.Member{
 		UserID: member.UserId,
 		Roles:  member.Roles,
 	}
 }
 
-func changeIamMemberToDomain(member *admin.ChangeIamMemberRequest) *domain.IAMMember {
-	return &domain.IAMMember{
+func changeIamMemberToDomain(member *admin.ChangeIamMemberRequest) *domain.Member {
+	return &domain.Member{
 		UserID: member.UserId,
 		Roles:  member.Roles,
 	}
 }
 
-func iamMemberFromDomain(member *domain.IAMMember) *admin.IamMember {
+func iamMemberFromDomain(member *domain.Member) *admin.IamMember {
 	creationDate, err := ptypes.TimestampProto(member.CreationDate)
 	logging.Log("GRPC-Lsp76").OnError(err).Debug("date parse failed")
 

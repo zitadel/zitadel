@@ -29,3 +29,14 @@ func orgWriteModelToPasswordComplexityPolicy(wm *OrgPasswordComplexityPolicyWrit
 		HasSymbol:    wm.HasSymbol,
 	}
 }
+
+func orgDomainWriteModelToOrgDomain(wm *OrgDomainWriteModel) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
+		Domain:         wm.Domain,
+		Primary:        wm.Primary,
+		Verified:       wm.Verified,
+		ValidationType: wm.ValidationType,
+		ValidationCode: wm.ValidationCode,
+	}
+}

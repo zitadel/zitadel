@@ -76,7 +76,7 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID, username string, huma
 	if human.IsInitialState() {
 		initCode, err := domain.NewInitUserCode(r.initializeUserCode)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		user.NewHumanInitialCodeAddedEvent(ctx, initCode.Code, initCode.Expiry)
 	}
@@ -86,7 +86,7 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID, username string, huma
 	if human.Phone != nil && human.PhoneNumber != "" && !human.IsPhoneVerified {
 		phoneCode, err := domain.NewPhoneCode(r.phoneVerificationCode)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		user.NewHumanPhoneCodeAddedEvent(ctx, phoneCode.Code, phoneCode.Expiry)
 	} else if human.Phone != nil && human.PhoneNumber != "" && human.IsPhoneVerified {

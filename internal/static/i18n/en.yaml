@@ -107,6 +107,8 @@ Errors:
     IdpNotExisting: IDP configuration does not exist
     OIDCConfigInvalid: OIDC IDP configuration is invalid
     IdpIsNotOIDC: IDP configuration is not of type oidc
+    Domain:
+      AlreadyExists: Domain already exists
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:

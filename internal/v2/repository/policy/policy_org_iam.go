@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	//TODO: break current org event
 	OrgIAMPolicyAddedEventType   = "policy.org.iam.added"
 	OrgIAMPolicyChangedEventType = "policy.org.iam.changed"
 )

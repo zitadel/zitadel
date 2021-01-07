@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
@@ -14,10 +13,10 @@ type OrgWriteModel struct {
 	State domain.OrgState
 }
 
-func NewOrgWriteModel(iamID string) *OrgWriteModel {
+func NewOrgWriteModel(orgID string) *OrgWriteModel {
 	return &OrgWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: iamID,
+			AggregateID: orgID,
 		},
 	}
 }
@@ -55,11 +54,11 @@ func (wm *OrgWriteModel) Reduce() error {
 }
 
 func (wm *OrgWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.AggregateID)
 }
 
-func ORGAggregateFromWriteModel(wm *eventstore.WriteModel) *org.Aggregate {
+func OrgAggregateFromWriteModel(wm *eventstore.WriteModel) *org.Aggregate {
 	return &org.Aggregate{
 		Aggregate: *eventstore.AggregateFromWriteModel(wm, org.AggregateType, org.AggregateVersion),
 	}
