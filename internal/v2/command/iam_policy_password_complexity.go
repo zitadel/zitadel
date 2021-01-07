@@ -45,7 +45,7 @@ func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, ia
 	if err != nil {
 		return err
 	}
-	if addedPolicy.IsActive {
+	if addedPolicy.State == domain.PolicyStateActive {
 		return caos_errs.ThrowAlreadyExists(nil, "IAM-Lk0dS", "Errors.IAM.PasswordComplexityPolicy.AlreadyExists")
 	}
 
@@ -64,13 +64,13 @@ func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	if !existingPolicy.IsActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0oPew", "Errors.IAM.PasswordAgePolicy.NotFound")
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-0oPew", "Errors.IAM.PasswordAgePolicy.NotFound")
 	}
 
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
 	iamAgg.PushEvents(changedEvent)

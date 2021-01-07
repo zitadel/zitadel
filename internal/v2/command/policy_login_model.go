@@ -14,7 +14,7 @@ type LoginPolicyWriteModel struct {
 	AllowExternalIDP      bool
 	ForceMFA              bool
 	PasswordlessType      domain.PasswordlessType
-	IsActive              bool
+	State                 domain.PolicyState
 }
 
 func (wm *LoginPolicyWriteModel) Reduce() error {
@@ -26,7 +26,7 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			wm.AllowExternalIDP = e.AllowExternalIDP
 			wm.ForceMFA = e.ForceMFA
 			wm.PasswordlessType = e.PasswordlessType
-			wm.IsActive = true
+			wm.State = domain.PolicyStateActive
 		case *policy.LoginPolicyChangedEvent:
 			if e.AllowRegister != nil {
 				wm.AllowRegister = *e.AllowRegister
@@ -44,7 +44,7 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 				wm.PasswordlessType = *e.PasswordlessType
 			}
 		case *policy.LoginPolicyRemovedEvent:
-			wm.IsActive = false
+			wm.State = domain.PolicyStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

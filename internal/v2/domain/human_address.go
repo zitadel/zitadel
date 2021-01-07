@@ -11,3 +11,17 @@ type Address struct {
 	Region        string
 	StreetAddress string
 }
+
+type AddressState int32
+
+const (
+	AddressStateUnspecified AddressState = iota
+	AddressStateActive
+	AddressStateRemoved
+
+	addressStateCount
+)
+
+func (s AddressState) Valid() bool {
+	return s >= 0 && s < addressStateCount
+}

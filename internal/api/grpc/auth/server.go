@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/query"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -17,16 +19,20 @@ const (
 )
 
 type Server struct {
-	repo repository.Repository
+	command *command.CommandSide
+	query   *query.QuerySide
+	repo    repository.Repository
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(authRepo repository.Repository) *Server {
+func CreateServer(command *command.CommandSide, query *query.QuerySide, authRepo repository.Repository) *Server {
 	return &Server{
-		repo: authRepo,
+		command: command,
+		query:   query,
+		repo:    authRepo,
 	}
 }
 

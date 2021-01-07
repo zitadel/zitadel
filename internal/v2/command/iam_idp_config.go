@@ -63,12 +63,12 @@ func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain
 		return nil, err
 	}
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotExisting")
 	}
 
 	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, config.IDPConfigID, config.Name, config.StylingType)
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
 	iamAgg.PushEvents(changedEvent)
@@ -86,7 +86,7 @@ func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, idpID stri
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotActive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotActive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewIDPConfigDeactivatedEvent(ctx, idpID))
@@ -104,7 +104,7 @@ func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID stri
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateInactive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewIDPConfigReactivatedEvent(ctx, idpID))

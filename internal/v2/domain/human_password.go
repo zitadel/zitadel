@@ -29,7 +29,7 @@ type PasswordCode struct {
 	NotificationType NotificationType
 }
 
-func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {
+func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm) error {
 	if p.SecretString == "" {
 		return nil
 	}
@@ -44,6 +44,16 @@ func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, pass
 		return err
 	}
 	p.SecretCrypto = secret
-	p.ChangeRequired = onetime
 	return nil
+}
+
+func NewPasswordCode(passwordGenerator crypto.Generator) (*PasswordCode, error) {
+	passwordCodeCrypto, _, err := crypto.NewCode(passwordGenerator)
+	if err != nil {
+		return nil, err
+	}
+	return &PasswordCode{
+		Code:   passwordCodeCrypto,
+		Expiry: passwordGenerator.Expiry(),
+	}, nil
 }

@@ -30,7 +30,7 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *do
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingConfig.WriteModel)

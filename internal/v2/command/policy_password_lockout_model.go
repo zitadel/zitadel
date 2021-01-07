@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
@@ -10,7 +11,7 @@ type PasswordLockoutPolicyWriteModel struct {
 
 	MaxAttempts         uint64
 	ShowLockOutFailures bool
-	IsActive            bool
+	State               domain.PolicyState
 }
 
 func (wm *PasswordLockoutPolicyWriteModel) Reduce() error {
@@ -19,7 +20,7 @@ func (wm *PasswordLockoutPolicyWriteModel) Reduce() error {
 		case *policy.PasswordLockoutPolicyAddedEvent:
 			wm.MaxAttempts = e.MaxAttempts
 			wm.ShowLockOutFailures = e.ShowLockOutFailures
-			wm.IsActive = true
+			wm.State = domain.PolicyStateActive
 		case *policy.PasswordLockoutPolicyChangedEvent:
 			if e.MaxAttempts != nil {
 				wm.MaxAttempts = *e.MaxAttempts
@@ -28,7 +29,7 @@ func (wm *PasswordLockoutPolicyWriteModel) Reduce() error {
 				wm.ShowLockOutFailures = *e.ShowLockOutFailures
 			}
 		case *policy.PasswordLockoutPolicyRemovedEvent:
-			wm.IsActive = false
+			wm.State = domain.PolicyStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

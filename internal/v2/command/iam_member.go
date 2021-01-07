@@ -23,7 +23,7 @@ func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.Member) (
 	if err != nil {
 		return nil, err
 	}
-	if addedMember.IsActive {
+	if addedMember.State == domain.MemberStateActive {
 		return nil, errors.ThrowAlreadyExists(nil, "IAM-PtXi1", "Errors.IAM.Member.AlreadyExists")
 	}
 
@@ -95,7 +95,7 @@ func (r *CommandSide) iamMemberWriteModelByID(ctx context.Context, iamID, userID
 		return nil, err
 	}
 
-	if !writeModel.IsActive {
+	if writeModel.State == domain.MemberStateUnspecified || writeModel.State == domain.MemberStateRemoved {
 		return nil, errors.ThrowNotFound(nil, "IAM-D8JxR", "Errors.NotFound")
 	}
 

@@ -41,9 +41,13 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID, username string, huma
 
 	addedHuman := NewHumanWriteModel(human.AggregateID)
 	//TODO: Check Unique Username
-	human.CheckOrgIAMPolicy(username, orgIAMPolicy)
+	if err := human.CheckOrgIAMPolicy(username, orgIAMPolicy); err != nil {
+		return nil, err
+	}
 	human.SetNamesAsDisplayname()
-	human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true)
+	if err := human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true); err != nil {
+		return nil, err
+	}
 
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
 	addEvent := user.NewHumanAddedEvent(
@@ -116,9 +120,13 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 
 	addedHuman := NewHumanWriteModel(human.AggregateID)
 	//TODO: Check Unique Username or unique external idp
-	human.CheckOrgIAMPolicy(username, orgIAMPolicy)
+	if err := human.CheckOrgIAMPolicy(username, orgIAMPolicy); err != nil {
+		return nil, err
+	}
 	human.SetNamesAsDisplayname()
-	human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true)
+	if err := human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true); err != nil {
+		return nil, err
+	}
 
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
 	addEvent := user.NewHumanRegisteredEvent(
@@ -153,7 +161,7 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 		if err != nil {
 			return nil, err
 		}
-		user.NewHumanInitialCodeAddedEvent(ctx, initCode.Code, initCode.Expiry)
+		userAgg.PushEvents(user.NewHumanInitialCodeAddedEvent(ctx, initCode.Code, initCode.Expiry))
 	}
 
 	if human.Email != nil && human.EmailAddress != "" && human.IsEmailVerified {
@@ -164,7 +172,9 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 		if err != nil {
 			return nil, err
 		}
-		user.NewHumanPhoneCodeAddedEvent(ctx, phoneCode.Code, phoneCode.Expiry)
+		userAgg.PushEvents(user.NewHumanPhoneCodeAddedEvent(ctx, phoneCode.Code, phoneCode.Expiry))
+	} else if human.Phone != nil && human.PhoneNumber != "" && human.IsPhoneVerified {
+		userAgg.PushEvents(user.NewHumanPhoneVerifiedEvent(ctx))
 	}
 
 	err = r.eventstore.PushAggregate(ctx, addedHuman, userAgg)
@@ -173,4 +183,32 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 	}
 
 	return writeModelToHuman(addedHuman), nil
+}
+
+func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UserIDMissing")
+	}
+
+	existingEmail, err := r.emailWriteModel(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9df", "Errors.User.NotFound")
+	}
+	if existingEmail.UserState != domain.UserStateInitial {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.AlreadyInitialised")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
+	if email != "" && existingEmail.Email != email {
+		changedEvent, _ := existingEmail.NewChangedEvent(ctx, email)
+		userAgg.PushEvents(changedEvent)
+	}
+	initCode, err := domain.NewInitUserCode(r.initializeUserCode)
+	if err != nil {
+		return err
+	}
+	userAgg.PushEvents(user.NewHumanInitialCodeAddedEvent(ctx, initCode.Code, initCode.Expiry))
+	return r.eventstore.PushAggregate(ctx, existingEmail, userAgg)
 }

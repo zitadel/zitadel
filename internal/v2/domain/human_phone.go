@@ -50,3 +50,17 @@ func NewPhoneCode(phoneGenerator crypto.Generator) (*PhoneCode, error) {
 		Expiry: phoneGenerator.Expiry(),
 	}, nil
 }
+
+type PhoneState int32
+
+const (
+	PhoneStateUnspecified PhoneState = iota
+	PhoneStateActive
+	PhoneStateRemoved
+
+	phoneStateCount
+)
+
+func (s PhoneState) Valid() bool {
+	return s >= 0 && s < phoneStateCount
+}
