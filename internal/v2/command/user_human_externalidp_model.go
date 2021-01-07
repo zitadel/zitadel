@@ -34,11 +34,11 @@ func (wm *HumanExternalIDPWriteModel) AppendEvents(events ...eventstore.EventRea
 				wm.AppendEvents(e)
 			}
 		case *user.HumanExternalIDPRemovedEvent:
-			if wm.IDPConfigID == e.IDPConfigID {
+			if wm.IDPConfigID == e.IDPConfigID && wm.ExternalUserID == e.UserID {
 				wm.AppendEvents(e)
 			}
 		case *user.HumanExternalIDPCascadeRemovedEvent:
-			if wm.IDPConfigID == e.IDPConfigID {
+			if wm.IDPConfigID == e.IDPConfigID && wm.ExternalUserID == e.UserID {
 				wm.AppendEvents(e)
 			}
 		case *user.UserRemovedEvent:
@@ -53,6 +53,7 @@ func (wm *HumanExternalIDPWriteModel) Reduce() error {
 		case *user.HumanExternalIDPAddedEvent:
 			wm.IDPConfigID = e.IDPConfigID
 			wm.DisplayName = e.DisplayName
+			wm.ExternalUserID = e.UserID
 			wm.State = domain.ExternalIDPStateActive
 		case *user.HumanExternalIDPRemovedEvent:
 			wm.State = domain.ExternalIDPStateRemoved
