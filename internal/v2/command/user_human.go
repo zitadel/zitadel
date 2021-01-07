@@ -42,11 +42,11 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID, username string, huma
 	addedHuman := NewHumanWriteModel(human.AggregateID)
 	//TODO: Check Unique Username
 	if err := human.CheckOrgIAMPolicy(username, orgIAMPolicy); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	human.SetNamesAsDisplayname()
 	if err := human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)

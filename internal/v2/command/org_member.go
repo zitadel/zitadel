@@ -38,7 +38,7 @@ func (r *CommandSide) addOrgMember(ctx context.Context, orgAgg *org.Aggregate, a
 	if err != nil {
 		return err
 	}
-	if addedMember.IsActive {
+	if addedMember.State == domain.MemberStateActive {
 		return errors.ThrowAlreadyExists(nil, "Org-PtXi1", "Errors.Org.Member.AlreadyExists")
 	}
 
@@ -104,7 +104,7 @@ func (r *CommandSide) orgMemberWriteModelByID(ctx context.Context, orgID, userID
 		return nil, err
 	}
 
-	if !writeModel.IsActive {
+	if writeModel.State == domain.MemberStateUnspecified || writeModel.State == domain.MemberStateRemoved {
 		return nil, errors.ThrowNotFound(nil, "Org-D8JxR", "Errors.NotFound")
 	}
 
