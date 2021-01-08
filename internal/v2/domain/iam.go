@@ -11,7 +11,7 @@ type IAM struct {
 	IAMProjectID                    string
 	SetUpDone                       Step
 	SetUpStarted                    Step
-	Members                         []*IAMMember
+	Members                         []*Member
 	IDPs                            []*IDPConfig
 	DefaultLoginPolicy              *LoginPolicy
 	DefaultLabelPolicy              *LabelPolicy

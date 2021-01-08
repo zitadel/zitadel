@@ -1,6 +1,6 @@
 package eventstore
 
-type aggregater interface {
+type Aggregater interface {
 	//ID returns the aggreagte id
 	ID() string
 	//KeyType returns the aggregate type
@@ -52,7 +52,7 @@ func AggregateFromWriteModel(
 	}
 }
 
-//Aggregate is the basic implementation of aggregater
+//Aggregate is the basic implementation of Aggregater
 type Aggregate struct {
 	id               string        `json:"-"`
 	typ              AggregateType `json:"-"`
@@ -69,32 +69,32 @@ func (a *Aggregate) PushEvents(events ...EventPusher) *Aggregate {
 	return a
 }
 
-//ID implements aggregater
+//ID implements Aggregater
 func (a *Aggregate) ID() string {
 	return a.id
 }
 
-//KeyType implements aggregater
+//KeyType implements Aggregater
 func (a *Aggregate) Type() AggregateType {
 	return a.typ
 }
 
-//Events implements aggregater
+//Events implements Aggregater
 func (a *Aggregate) Events() []EventPusher {
 	return a.events
 }
 
-//ResourceOwner implements aggregater
+//ResourceOwner implements Aggregater
 func (a *Aggregate) ResourceOwner() string {
 	return a.resourceOwner
 }
 
-//Version implements aggregater
+//Version implements Aggregater
 func (a *Aggregate) Version() Version {
 	return a.version
 }
 
-//PreviousSequence implements aggregater
+//PreviousSequence implements Aggregater
 func (a *Aggregate) PreviousSequence() uint64 {
 	return a.previousSequence
 }

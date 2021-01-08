@@ -8,12 +8,36 @@ import (
 )
 
 var (
-	OrgIAMPolicyAddedEventType   = orgEventTypePrefix + policy.OrgIAMPolicyAddedEventType
-	OrgIAMPolicyChangedEventType = orgEventTypePrefix + policy.OrgIAMPolicyChangedEventType
+	//TODO: enable when possible
+	//OrgIAMPolicyAddedEventType   = orgEventTypePrefix + policy.OrgIAMPolicyAddedEventType
+	//OrgIAMPolicyChangedEventType = orgEventTypePrefix + policy.OrgIAMPolicyChangedEventType
+	OrgIAMPolicyAddedEventType   = orgEventTypePrefix + "iam.policy.added"
+	OrgIAMPolicyChangedEventType = orgEventTypePrefix + "iam.policy.changed"
 )
 
 type OrgIAMPolicyAddedEvent struct {
 	policy.OrgIAMPolicyAddedEvent
+}
+
+func NewOrgIAMPolicyAddedEvent(
+	ctx context.Context,
+	userLoginMustBeDomain bool,
+) *OrgIAMPolicyAddedEvent {
+	return &OrgIAMPolicyAddedEvent{
+		OrgIAMPolicyAddedEvent: *policy.NewOrgIAMPolicyAddedEvent(
+			eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyAddedEventType),
+			userLoginMustBeDomain,
+		),
+	}
+}
+
+func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.OrgIAMPolicyAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OrgIAMPolicyAddedEvent{OrgIAMPolicyAddedEvent: *e.(*policy.OrgIAMPolicyAddedEvent)}, nil
 }
 
 type OrgIAMPolicyChangedEvent struct {

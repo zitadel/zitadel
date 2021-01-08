@@ -15,6 +15,7 @@ type CommandSide struct {
 	eventstore  *eventstore.Eventstore
 	idGenerator id.Generator
 	iamID       string
+	iamDomain   string
 
 	idpConfigSecretCrypto crypto.Crypto
 
@@ -37,6 +38,7 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 		eventstore:  config.Eventstore,
 		idGenerator: id.SonyFlakeGenerator,
 		iamID:       config.SystemDefaults.IamID,
+		iamDomain:   config.SystemDefaults.Domain,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 
