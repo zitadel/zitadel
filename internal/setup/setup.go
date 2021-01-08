@@ -12,20 +12,8 @@ import (
 )
 
 const (
-	OrgOwnerRole                   = "ORG_OWNER"
-	SetupUser                      = "SETUP"
-	OIDCResponseTypeCode           = "CODE"
-	OIDCResponseTypeIDToken        = "ID_TOKEN"
-	OIDCResponseTypeToken          = "ID_TOKEN TOKEN"
-	OIDCGrantTypeAuthorizationCode = "AUTHORIZATION_CODE"
-	OIDCGrantTypeImplicit          = "IMPLICIT"
-	OIDCGrantTypeRefreshToken      = "REFRESH_TOKEN"
-	OIDCApplicationTypeNative      = "NATIVE"
-	OIDCApplicationTypeUserAgent   = "USER_AGENT"
-	OIDCApplicationTypeWeb         = "WEB"
-	OIDCAuthMethodTypeNone         = "NONE"
-	OIDCAuthMethodTypeBasic        = "BASIC"
-	OIDCAuthMethodTypePost         = "POST"
+	OrgOwnerRole = "ORG_OWNER"
+	SetupUser    = "SETUP"
 )
 
 func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *command.CommandSide) error {

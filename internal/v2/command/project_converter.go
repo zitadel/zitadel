@@ -12,3 +12,14 @@ func projectWriteModelToProject(writeModel *ProjectWriteModel) *domain.Project {
 		ProjectRoleCheck:     writeModel.ProjectRoleCheck,
 	}
 }
+
+func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) *domain.Application {
+	return &domain.Application{
+		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel),
+		AppID:      writeModel.AggregateID,
+		State:      writeModel.State,
+		Name:       writeModel.Name,
+		Type:       writeModel.Type,
+		//TODO: OIDC Config
+	}
+}

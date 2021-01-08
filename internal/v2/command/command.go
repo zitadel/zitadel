@@ -19,13 +19,14 @@ type CommandSide struct {
 
 	idpConfigSecretCrypto crypto.Crypto
 
-	userPasswordAlg          crypto.HashAlgorithm
-	initializeUserCode       crypto.Generator
-	emailVerificationCode    crypto.Generator
-	phoneVerificationCode    crypto.Generator
-	passwordVerificationCode crypto.Generator
-	machineKeyAlg            crypto.EncryptionAlgorithm
-	machineKeySize           int
+	userPasswordAlg            crypto.HashAlgorithm
+	initializeUserCode         crypto.Generator
+	emailVerificationCode      crypto.Generator
+	phoneVerificationCode      crypto.Generator
+	passwordVerificationCode   crypto.Generator
+	machineKeyAlg              crypto.EncryptionAlgorithm
+	machineKeySize             int
+	applicationSecretGenerator crypto.Generator
 }
 
 type Config struct {
@@ -42,21 +43,25 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 
+	//TODO: simplify!!!!
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)
 	if err != nil {
 		return nil, err
 	}
-	aesCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.UserVerificationKey)
+	userEncryptionAlgorithm, err := crypto.NewAESCrypto(config.SystemDefaults.UserVerificationKey)
 	if err != nil {
 		return nil, err
 	}
-	repo.initializeUserCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.InitializeUserCode, aesCrypto)
-	repo.emailVerificationCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.EmailVerificationCode, aesCrypto)
-	repo.phoneVerificationCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.PhoneVerificationCode, aesCrypto)
-	repo.passwordVerificationCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
+	repo.initializeUserCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.InitializeUserCode, userEncryptionAlgorithm)
+	repo.emailVerificationCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.EmailVerificationCode, userEncryptionAlgorithm)
+	repo.phoneVerificationCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.PhoneVerificationCode, userEncryptionAlgorithm)
+	repo.passwordVerificationCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.PasswordVerificationCode, userEncryptionAlgorithm)
 	repo.userPasswordAlg = crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
-	repo.machineKeyAlg = aesCrypto
+	repo.machineKeyAlg = userEncryptionAlgorithm
 	repo.machineKeySize = int(config.SystemDefaults.SecretGenerators.MachineKeySize)
+
+	passwordAlg := crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
+	repo.applicationSecretGenerator = crypto.NewHashGenerator(config.SystemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
 	return repo, nil
 }
 

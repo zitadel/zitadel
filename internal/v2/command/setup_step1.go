@@ -4,9 +4,25 @@ import (
 	"context"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
+)
+
+const (
+	OIDCResponseTypeCode           = "CODE"
+	OIDCResponseTypeIDToken        = "ID_TOKEN"
+	OIDCResponseTypeToken          = "ID_TOKEN TOKEN"
+	OIDCGrantTypeAuthorizationCode = "AUTHORIZATION_CODE"
+	OIDCGrantTypeImplicit          = "IMPLICIT"
+	OIDCGrantTypeRefreshToken      = "REFRESH_TOKEN"
+	OIDCApplicationTypeNative      = "NATIVE"
+	OIDCApplicationTypeUserAgent   = "USER_AGENT"
+	OIDCApplicationTypeWeb         = "WEB"
+	OIDCAuthMethodTypeNone         = "NONE"
+	OIDCAuthMethodTypeBasic        = "BASIC"
+	OIDCAuthMethodTypePost         = "POST"
 )
 
 type Step1 struct {
@@ -123,8 +139,28 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 			if err != nil {
 				return err
 			}
-			aggregates = append(aggregates, projectAgg)
 			//create applications
+			for _, app := range proj.OIDCApps {
+				err = r.addApplication(ctx, projectAgg, nil, &domain.Application{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: projectAgg.ID(),
+					},
+					Name: app.Name,
+					Type: domain.AppTypeOIDC,
+					OIDCConfig: &domain.OIDCConfig{
+						RedirectUris:    app.RedirectUris,
+						ResponseTypes:   getOIDCResponseTypes(app.ResponseTypes),
+						GrantTypes:      getOIDCGrantTypes(app.GrantTypes),
+						ApplicationType: getOIDCApplicationType(app.ApplicationType),
+						AuthMethodType:  getOIDCAuthMethod(app.AuthMethodType),
+						DevMode:         app.DevMode,
+					},
+				})
+				if err != nil {
+					return err
+				}
+			}
+			aggregates = append(aggregates, projectAgg)
 		}
 	}
 
@@ -149,4 +185,68 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Gr2hh", "Setup Step1 failed")
 	}
 	return nil
+}
+
+func getOIDCResponseTypes(responseTypes []string) []domain.OIDCResponseType {
+	types := make([]domain.OIDCResponseType, len(responseTypes))
+	for i, t := range responseTypes {
+		types[i] = getOIDCResponseType(t)
+	}
+	return types
+}
+
+func getOIDCResponseType(responseType string) domain.OIDCResponseType {
+	switch responseType {
+	case OIDCResponseTypeCode:
+		return domain.OIDCResponseTypeCode
+	case OIDCResponseTypeIDToken:
+		return domain.OIDCResponseTypeIDToken
+	case OIDCResponseTypeToken:
+		return domain.OIDCResponseTypeIDTokenToken
+	}
+	return domain.OIDCResponseTypeCode
+}
+
+func getOIDCGrantTypes(grantTypes []string) []domain.OIDCGrantType {
+	types := make([]domain.OIDCGrantType, len(grantTypes))
+	for i, t := range grantTypes {
+		types[i] = getOIDCGrantType(t)
+	}
+	return types
+}
+
+func getOIDCGrantType(grantTypes string) domain.OIDCGrantType {
+	switch grantTypes {
+	case OIDCGrantTypeAuthorizationCode:
+		return domain.OIDCGrantTypeAuthorizationCode
+	case OIDCGrantTypeImplicit:
+		return domain.OIDCGrantTypeImplicit
+	case OIDCGrantTypeRefreshToken:
+		return domain.OIDCGrantTypeRefreshToken
+	}
+	return domain.OIDCGrantTypeAuthorizationCode
+}
+
+func getOIDCApplicationType(appType string) domain.OIDCApplicationType {
+	switch appType {
+	case OIDCApplicationTypeNative:
+		return domain.OIDCApplicationTypeNative
+	case OIDCApplicationTypeUserAgent:
+		return domain.OIDCApplicationTypeUserAgent
+	case OIDCApplicationTypeWeb:
+		return domain.OIDCApplicationTypeWeb
+	}
+	return domain.OIDCApplicationTypeWeb
+}
+
+func getOIDCAuthMethod(authMethod string) domain.OIDCAuthMethodType {
+	switch authMethod {
+	case OIDCAuthMethodTypeNone:
+		return domain.OIDCAuthMethodTypeNone
+	case OIDCAuthMethodTypeBasic:
+		return domain.OIDCAuthMethodTypeBasic
+	case OIDCAuthMethodTypePost:
+		return domain.OIDCAuthMethodTypePost
+	}
+	return domain.OIDCAuthMethodTypeBasic
 }
