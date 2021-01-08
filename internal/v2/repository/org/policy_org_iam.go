@@ -8,8 +8,11 @@ import (
 )
 
 var (
-	OrgIAMPolicyAddedEventType   = orgEventTypePrefix + policy.OrgIAMPolicyAddedEventType
-	OrgIAMPolicyChangedEventType = orgEventTypePrefix + policy.OrgIAMPolicyChangedEventType
+	//TODO: enable when possible
+	//OrgIAMPolicyAddedEventType   = orgEventTypePrefix + policy.OrgIAMPolicyAddedEventType
+	//OrgIAMPolicyChangedEventType = orgEventTypePrefix + policy.OrgIAMPolicyChangedEventType
+	OrgIAMPolicyAddedEventType   = orgEventTypePrefix + "iam.policy.added"
+	OrgIAMPolicyChangedEventType = orgEventTypePrefix + "iam.policy.changed"
 )
 
 type OrgIAMPolicyAddedEvent struct {

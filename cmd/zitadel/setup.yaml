@@ -35,24 +35,20 @@ SetUp:
         Domain: 'global.caos.ch'
         Default: true
         OrgIamPolicy: true
-        Users:
-          - FirstName: 'Global Org'
-            LastName: 'Administrator'
-            UserName: 'zitadel-global-org-admin@caos.ch'
-            Email: 'zitadel-global-org-admin@caos.ch'
-            Password: 'Password1!'
-        Owners:
-          - 'zitadel-global-org-admin@caos.ch'
+        Owner:
+          FirstName: 'Global Org'
+          LastName: 'Administrator'
+          UserName: 'zitadel-global-org-admin@caos.ch'
+          Email: 'zitadel-global-org-admin@caos.ch'
+          Password: 'Password1!'
       - Name: 'CAOS AG'
         Domain: 'caos.ch'
-        Users:
-          - FirstName: 'Zitadel'
-            LastName: 'Administrator'
-            UserName: 'zitadel-admin'
-            Email: 'zitadel-admin@caos.ch'
-            Password: 'Password1!'
-        Owners:
-          - 'zitadel-admin@caos.ch'
+        Owner:
+          FirstName: 'Zitadel'
+          LastName: 'Administrator'
+          UserName: 'zitadel-admin'
+          Email: 'zitadel-admin@caos.ch'
+          Password: 'Password1!'
         Projects:
           - Name: 'Zitadel'
             OIDCApps:
