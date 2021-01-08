@@ -356,7 +356,7 @@ func Test_eventData(t *testing.T) {
 
 func TestEventstore_aggregatesToEvents(t *testing.T) {
 	type args struct {
-		aggregates []aggregater
+		aggregates []Aggregater
 	}
 	type res struct {
 		wantErr bool
@@ -370,7 +370,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
-				aggregates: []aggregater{
+				aggregates: []Aggregater{
 					&testAggregate{
 						id: "1",
 						events: []EventPusher{
@@ -403,7 +403,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
-				aggregates: []aggregater{
+				aggregates: []Aggregater{
 					&testAggregate{
 						id: "1",
 						events: []EventPusher{
@@ -452,7 +452,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "invalid data",
 			args: args{
-				aggregates: []aggregater{
+				aggregates: []Aggregater{
 					&testAggregate{
 						id: "1",
 						events: []EventPusher{
@@ -473,7 +473,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "multiple aggregates",
 			args: args{
-				aggregates: []aggregater{
+				aggregates: []Aggregater{
 					&testAggregate{
 						id: "1",
 						events: []EventPusher{
@@ -614,7 +614,7 @@ func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *reposito
 
 func TestEventstore_Push(t *testing.T) {
 	type args struct {
-		aggregates []aggregater
+		aggregates []Aggregater
 	}
 	type fields struct {
 		repo        *testRepo
@@ -632,7 +632,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
-				aggregates: []aggregater{
+				aggregates: []Aggregater{
 					&testAggregate{
 						id: "1",
 						events: []EventPusher{
@@ -672,7 +672,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
-				aggregates: []aggregater{
+				aggregates: []Aggregater{
 					&testAggregate{
 						id: "1",
 						events: []EventPusher{
@@ -731,7 +731,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "multiple aggregates",
 			args: args{
-				aggregates: []aggregater{
+				aggregates: []Aggregater{
 					&testAggregate{
 						id: "1",
 						events: []EventPusher{
@@ -815,7 +815,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "push fails",
 			args: args{
-				aggregates: []aggregater{
+				aggregates: []Aggregater{
 					&testAggregate{
 						id: "1",
 						events: []EventPusher{
@@ -842,7 +842,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "aggreagtes to events mapping fails",
 			args: args{
-				aggregates: []aggregater{
+				aggregates: []Aggregater{
 					&testAggregate{
 						id: "1",
 						events: []EventPusher{

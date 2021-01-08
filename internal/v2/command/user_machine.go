@@ -18,7 +18,7 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID, username string, ma
 	}
 	//TODO: Check Unique username
 	machine.AggregateID = userID
-	orgIAMPolicy, err := r.GetOrgIAMPolicy(ctx, orgID)
+	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}

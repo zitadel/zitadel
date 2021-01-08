@@ -37,7 +37,7 @@ func (es *Eventstore) Health(ctx context.Context) error {
 }
 
 //PushAggregate pushes the aggregate and reduces the new events on the aggregate
-func (es *Eventstore) PushAggregate(ctx context.Context, writeModel queryReducer, aggregate aggregater) error {
+func (es *Eventstore) PushAggregate(ctx context.Context, writeModel queryReducer, aggregate Aggregater) error {
 	events, err := es.PushAggregates(ctx, aggregate)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (es *Eventstore) PushAggregate(ctx context.Context, writeModel queryReducer
 
 //PushAggregates maps the events of all aggregates to an eventstore event
 // based on the pushMapper
-func (es *Eventstore) PushAggregates(ctx context.Context, aggregates ...aggregater) ([]EventReader, error) {
+func (es *Eventstore) PushAggregates(ctx context.Context, aggregates ...Aggregater) ([]EventReader, error) {
 	events, err := es.aggregatesToEvents(aggregates)
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (es *Eventstore) PushAggregates(ctx context.Context, aggregates ...aggregat
 	return es.mapEvents(events)
 }
 
-func (es *Eventstore) aggregatesToEvents(aggregates []aggregater) ([]*repository.Event, error) {
+func (es *Eventstore) aggregatesToEvents(aggregates []Aggregater) ([]*repository.Event, error) {
 	events := make([]*repository.Event, 0, len(aggregates))
 	for _, aggregate := range aggregates {
 		var previousEvent *repository.Event

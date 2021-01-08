@@ -2,9 +2,10 @@ package admin
 
 import (
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
-	"github.com/golang/protobuf/ptypes"
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -14,20 +15,13 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func setUpRequestToModel(setUp *admin.OrgSetUpRequest) *admin_model.SetupOrg {
-	return &admin_model.SetupOrg{
-		Org:  orgCreateRequestToModel(setUp.Org),
-		User: userCreateRequestToModel(setUp.User),
-	}
-}
-
-func orgCreateRequestToModel(org *admin.CreateOrgRequest) *org_model.Org {
-	o := &org_model.Org{
-		Domains: []*org_model.OrgDomain{},
+func orgCreateRequestToDomain(org *admin.CreateOrgRequest) *domain.Org {
+	o := &domain.Org{
+		Domains: []*domain.OrgDomain{},
 		Name:    org.Name,
 	}
 	if org.Domain != "" {
-		o.Domains = append(o.Domains, &org_model.OrgDomain{Domain: org.Domain})
+		o.Domains = append(o.Domains, &domain.OrgDomain{Domain: org.Domain})
 	}
 
 	return o

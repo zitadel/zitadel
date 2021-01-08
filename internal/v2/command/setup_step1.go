@@ -4,6 +4,7 @@ import (
 	"context"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -48,8 +49,7 @@ type Org struct {
 	Name         string
 	Domain       string
 	OrgIamPolicy bool
-	Users        []User
-	Owners       []string
+	Owner        User
 	Projects     []Project
 }
 
@@ -84,25 +84,60 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		return err
 	}
 	//create orgs
-	//create projects
-	//create applications
+	aggregates := make([]eventstore.Aggregater, 0)
+	for _, organisation := range step1.Orgs {
+		orgAgg, userAgg, orgMemberAgg, err := r.setUpOrg(ctx,
+			&domain.Org{
+				Name:    organisation.Name,
+				Domains: []*domain.OrgDomain{{Domain: organisation.Domain}},
+			},
+			&domain.User{
+				UserName: organisation.Owner.UserName,
+				Human: &domain.Human{
+					Profile: &domain.Profile{
+						FirstName: organisation.Owner.FirstName,
+						LastName:  organisation.Owner.LastName,
+					},
+					Password: &domain.Password{
+						SecretString: organisation.Owner.Password,
+					},
+					Email: &domain.Email{
+						EmailAddress:    organisation.Owner.Email,
+						IsEmailVerified: true,
+					},
+				},
+			})
+		if err != nil {
+			return err
+		}
+		if organisation.OrgIamPolicy {
+			err = r.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID()), &domain.OrgIAMPolicy{UserLoginMustBeDomain: false})
+			if err != nil {
+				return err
+			}
+		}
+		aggregates = append(aggregates, orgAgg, userAgg, orgMemberAgg)
+		//projects
+		//create applications
+	}
+
 	//set iam owners
 	//set global org
 	//set iam project id
 
 	/*aggregates:
-	iam:
-		default login policy
-		iam owner
-	org:
-		default
-		caos
-			zitadel
+	  iam:
+	  	default login policy
+	  	iam owner
+	  org:
+	  	default
+	  	caos
+	  		zitadel
 
 	*/
 	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
 
-	_, err = r.eventstore.PushAggregates(ctx, iamAgg)
+	_, err = r.eventstore.PushAggregates(ctx, append(aggregates, iamAgg)...)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Gr2hh", "Setup Step1 failed")
 	}

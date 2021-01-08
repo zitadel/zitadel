@@ -30,12 +30,12 @@ func (s *Server) IsOrgUnique(ctx context.Context, request *admin.UniqueOrgReques
 	return &admin.UniqueOrgResponse{IsUnique: isUnique}, err
 }
 
-func (s *Server) SetUpOrg(ctx context.Context, orgSetUp *admin.OrgSetUpRequest) (_ *admin.OrgSetUpResponse, err error) {
-	setUp, err := s.org.SetUpOrg(ctx, setUpRequestToModel(orgSetUp))
+func (s *Server) SetUpOrg(ctx context.Context, orgSetUp *admin.OrgSetUpRequest) (_ *empty.Empty, err error) {
+	err = s.command.SetUpOrg(ctx, orgCreateRequestToDomain(orgSetUp.Org), userCreateRequestToDomain(orgSetUp.User))
 	if err != nil {
 		return nil, err
 	}
-	return setUpOrgResponseFromModel(setUp), err
+	return &empty.Empty{}, nil
 }
 
 func (s *Server) GetDefaultOrgIamPolicy(ctx context.Context, _ *empty.Empty) (_ *admin.OrgIamPolicyView, err error) {

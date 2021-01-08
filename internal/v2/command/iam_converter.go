@@ -25,9 +25,9 @@ func writeModelToIAM(wm *IAMWriteModel) *domain.IAM {
 	}
 }
 
-func writeModelToMember(writeModel *IAMMemberWriteModel) *domain.IAMMember {
-	return &domain.IAMMember{
-		ObjectRoot: writeModelToObjectRoot(writeModel.MemberWriteModel.WriteModel),
+func memberWriteModelToMember(writeModel *MemberWriteModel) *domain.Member {
+	return &domain.Member{
+		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel),
 		Roles:      writeModel.Roles,
 		UserID:     writeModel.UserID,
 	}

@@ -59,7 +59,7 @@ func (r *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userNam
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UsernameNotChanged")
 	}
 
-	orgIAMPolicy, err := r.GetOrgIAMPolicy(ctx, orgID)
+	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
 		return err
 	}

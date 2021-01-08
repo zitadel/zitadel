@@ -11,7 +11,7 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.IAMMember) (*domain.IAMMember, error) {
+func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
@@ -35,11 +35,11 @@ func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.IAMMember
 		return nil, err
 	}
 
-	return writeModelToMember(addedMember), nil
+	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
 //ChangeIAMMember updates an existing member
-func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *domain.IAMMember) (*domain.IAMMember, error) {
+func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
@@ -67,7 +67,7 @@ func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *domain.IAMMem
 		return nil, err
 	}
 
-	return writeModelToMember(existingMember), nil
+	return memberWriteModelToMember(&existingMember.MemberWriteModel), nil
 }
 
 func (r *CommandSide) RemoveIAMMember(ctx context.Context, userID string) error {
