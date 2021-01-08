@@ -43,7 +43,7 @@ func OrgAddedEventMapper(event *repository.Event) (eventstore.EventReader, error
 	}
 	err := json.Unmarshal(event.Data, orgAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Bren2", "unable to unmarshal org added")
+		return nil, errors.ThrowInternal(err, "ORG-Bren2", "unable to unmarshal org added")
 	}
 
 	return orgAdded, nil
@@ -75,7 +75,7 @@ func OrgChangedEventMapper(event *repository.Event) (eventstore.EventReader, err
 	}
 	err := json.Unmarshal(event.Data, orgChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Bren2", "unable to unmarshal org added")
+		return nil, errors.ThrowInternal(err, "ORG-Bren2", "unable to unmarshal org added")
 	}
 
 	return orgChanged, nil

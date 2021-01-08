@@ -9,15 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
-func (r *CommandSide) GetOrg(ctx context.Context, aggregateID string) (*domain.Org, error) {
-	orgWriteModel := NewOrgWriteModel(aggregateID)
-	err := r.eventstore.FilterToQueryReducer(ctx, orgWriteModel)
-	if err != nil {
-		return nil, err
-	}
-	return orgWriteModelToOrg(orgWriteModel), nil
-}
-
 func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) error {
 	orgAgg, userAgg, orgMemberAgg, err := r.setUpOrg(ctx, organisation, admin)
 	if err != nil {
@@ -69,4 +60,13 @@ func (r *CommandSide) addOrg(ctx context.Context, organisation *domain.Org) (_ *
 		}
 	}
 	return orgAgg, addedOrg, nil
+}
+
+func (r *CommandSide) getOrgWriteModelByID(ctx context.Context, orgID string) (*OrgWriteModel, error) {
+	orgWriteModel := NewOrgWriteModel(orgID)
+	err := r.eventstore.FilterToQueryReducer(ctx, orgWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return orgWriteModel, nil
 }

@@ -30,7 +30,7 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID, username string, huma
 		return nil, nil, err
 	}
 	human.AggregateID = userID
-	orgIAMPolicy, err := r.GetOrgIAMPolicy(ctx, orgID)
+	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -109,7 +109,7 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 		return nil, err
 	}
 	human.AggregateID = userID
-	orgIAMPolicy, err := r.GetOrgIAMPolicy(ctx, orgID)
+	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}

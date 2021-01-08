@@ -8,18 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
-func (r *CommandSide) GetOrgIAMPolicy(ctx context.Context, orgID string) (*domain.OrgIAMPolicy, error) {
-	policy := NewORGOrgIAMPolicyWriteModel(orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, policy)
-	if err != nil {
-		return nil, err
-	}
-	if policy.State == domain.PolicyStateActive {
-		return orgWriteModelToOrgIAMPolicy(policy), nil
-	}
-	return r.GetDefaultOrgIAMPolicy(ctx)
-}
-
 func (r *CommandSide) AddOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
 	addedPolicy := NewORGOrgIAMPolicyWriteModel(policy.AggregateID)
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
@@ -75,6 +63,17 @@ func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, policy *domain.Org
 	}
 
 	return orgWriteModelToOrgIAMPolicy(existingPolicy), nil
+}
+
+func (r *CommandSide) getOrgIAMPolicy(ctx context.Context, orgID string) (*domain.OrgIAMPolicy, error) {
+	policy, err := r.orgIAMPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if policy.State == domain.PolicyStateActive {
+		return orgWriteModelToOrgIAMPolicy(policy), nil
+	}
+	return r.getDefaultOrgIAMPolicy(ctx)
 }
 
 func (r *CommandSide) orgIAMPolicyWriteModelByID(ctx context.Context, orgID string) (policy *ORGOrgIAMPolicyWriteModel, err error) {

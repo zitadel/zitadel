@@ -8,17 +8,6 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) GetDefaultOrgIAMPolicy(ctx context.Context) (*domain.OrgIAMPolicy, error) {
-	policyWriteModel := NewIAMOrgIAMPolicyWriteModel(r.iamID)
-	err := r.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
-	if err != nil {
-		return nil, err
-	}
-	policy := writeModelToOrgIAMPolicy(policyWriteModel)
-	policy.Default = true
-	return policy, nil
-}
-
 func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
 	policy.AggregateID = r.iamID
 	addedPolicy := NewIAMOrgIAMPolicyWriteModel(policy.AggregateID)
@@ -73,6 +62,16 @@ func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *dom
 	}
 
 	return writeModelToOrgIAMPolicy(existingPolicy), nil
+}
+
+func (r *CommandSide) getDefaultOrgIAMPolicy(ctx context.Context) (*domain.OrgIAMPolicy, error) {
+	policyWriteModel, err := r.defaultOrgIAMPolicyWriteModelByID(ctx, r.iamID)
+	if err != nil {
+		return nil, err
+	}
+	policy := writeModelToOrgIAMPolicy(policyWriteModel)
+	policy.Default = true
+	return policy, nil
 }
 
 func (r *CommandSide) defaultOrgIAMPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMOrgIAMPolicyWriteModel, err error) {

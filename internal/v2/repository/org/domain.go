@@ -47,7 +47,7 @@ func DomainAddedEventMapper(event *repository.Event) (eventstore.EventReader, er
 	}
 	err := json.Unmarshal(event.Data, orgDomainAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-GBr52", "unable to unmarshal org domain added")
+		return nil, errors.ThrowInternal(err, "ORG-GBr52", "unable to unmarshal org domain added")
 	}
 
 	return orgDomainAdded, nil
@@ -87,7 +87,7 @@ func DomainVerificationAddedEventMapper(event *repository.Event) (eventstore.Eve
 	}
 	err := json.Unmarshal(event.Data, orgDomainVerificationAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-NRN32", "unable to unmarshal org domain verification added")
+		return nil, errors.ThrowInternal(err, "ORG-NRN32", "unable to unmarshal org domain verification added")
 	}
 
 	return orgDomainVerificationAdded, nil
@@ -119,7 +119,7 @@ func DomainVerificationFailedEventMapper(event *repository.Event) (eventstore.Ev
 	}
 	err := json.Unmarshal(event.Data, orgDomainVerificationFailed)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Bhm37", "unable to unmarshal org domain verification failed")
+		return nil, errors.ThrowInternal(err, "ORG-Bhm37", "unable to unmarshal org domain verification failed")
 	}
 
 	return orgDomainVerificationFailed, nil
@@ -151,7 +151,7 @@ func DomainVerifiedEventMapper(event *repository.Event) (eventstore.EventReader,
 	}
 	err := json.Unmarshal(event.Data, orgDomainVerified)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-BFSwt", "unable to unmarshal org domain verified")
+		return nil, errors.ThrowInternal(err, "ORG-BFSwt", "unable to unmarshal org domain verified")
 	}
 
 	return orgDomainVerified, nil
@@ -183,7 +183,7 @@ func DomainPrimarySetEventMapper(event *repository.Event) (eventstore.EventReade
 	}
 	err := json.Unmarshal(event.Data, orgDomainPrimarySet)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-N5787", "unable to unmarshal org domain primary set")
+		return nil, errors.ThrowInternal(err, "ORG-N5787", "unable to unmarshal org domain primary set")
 	}
 
 	return orgDomainPrimarySet, nil
@@ -215,7 +215,7 @@ func DomainRemovedEventMapper(event *repository.Event) (eventstore.EventReader, 
 	}
 	err := json.Unmarshal(event.Data, orgDomainRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-BngB2", "unable to unmarshal org domain removed")
+		return nil, errors.ThrowInternal(err, "ORG-BngB2", "unable to unmarshal org domain removed")
 	}
 
 	return orgDomainRemoved, nil
