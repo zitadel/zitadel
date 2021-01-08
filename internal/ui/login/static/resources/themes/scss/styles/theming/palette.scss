@@ -204,7 +204,7 @@ $lgn-warn: (
     tooltip: map-get($lgn-grey, 700),
     input: #fafafa50,
     footer:  #fafafa,
-    qrcode: #212224, // use black ground on white background because inverted qrcode colors are not allowed
+    qrcode: white, // use black ground on white background because inverted qrcode colors are not allowed
   );
   
   $lgn-dark-theme-background: (
@@ -221,7 +221,7 @@ $lgn-warn: (
     tooltip: map-get($lgn-grey, 700),
     input: rgba(black, .2),
     footer: #212224,
-    qrcode: #212224, // inherits from background
+    qrcode: white, // needs white background to recognize borders
   );
 
   $lgn-light-theme-foreground: (
@@ -247,7 +247,7 @@ $lgn-warn: (
     slider-min:        rgba(black, 0.87),
     slider-off:        rgba(black, 0.26),
     slider-off-active: rgba(black, 0.38),
-    qrcode:            map-get($lgn-grey, 50),
+    qrcode:            black,
   );
   
   $lgn-dark-theme-foreground: (
@@ -273,5 +273,5 @@ $lgn-warn: (
     slider-min:        white,
     slider-off:        rgba(white, 0.3),
     slider-off-active: rgba(white, 0.3),
-    qrcode:            map-get($lgn-grey, 50),
+    qrcode:            black,
   );

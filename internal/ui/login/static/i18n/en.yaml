@@ -211,6 +211,13 @@ Actions:
   Recreate: recreate
   PasswordLogin: Login with password
 
+Footer:
+  PrivacyPolicy: Privacy Policy
+  PrivacyPolicyLink: https://zitadel.ch/pdf/agb.pdf
+  Tos: Terms of Service
+  TosLink: https://zitadel.ch/pdf/agb.pdf
+  Help: Help
+
 Errors:
   Internal: An internal error occured
   AuthRequest:

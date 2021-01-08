@@ -27,11 +27,11 @@
 
             &:hover {
                 $primary: map-get($config, primary);
-                background-color: rgba(#ffffff, 0.1);
+                background-color: rgba(lgn-color($primary, 500), 0.05);
             }
 
             &:focus {
-                background-color: rgba(#ffffff, 0.1);
+                background-color: rgba(lgn-color($primary, 500), 0.1);
             }
 
             &:active {
@@ -41,6 +41,19 @@
             .lgn-loginname{
                 font-size: 14px;
                 color: lgn-color($foreground, label);
+            }
+
+            .lgn-session-state {
+                color: lgn-color($foreground, label);
+
+                &.i0 {
+                    color: #85d996;
+                }
+
+                &.i1 {
+                    $warn: map-get($config, warn);
+                    color: lgn-color($warn, default);
+                }
             }
         }
     }

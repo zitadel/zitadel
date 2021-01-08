@@ -24,18 +24,18 @@
     <div class="lgn-account-selection">
         {{ if .Users }}
         {{ range $user := .Users }}
-        {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
+        {{ $sessionState := (printf "UserSelection.SessionState%v" $user.UserSessionState) }}
         <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" 
         {{if not $user.SelectionPossible}}disabled title="{{t " Errors.User.NotAllowedOrg"}}"{{end}}>
             <div class="left">
-                <div class="lgn-avatar" displayname="{{.DisplayName}}">
+                <div class="lgn-avatar" displayname="{{$user.DisplayName}}">
                     <span class="initials">A</span>
                 </div>
             </div>
             <div class="lgn-names">
                 <p class="lgn-displayname">{{$user.DisplayName}}</p>
                 <p class="lgn-loginname">{{$user.LoginName}}</p>
-                <!-- <div class="sessionstate {{$sessionState}}"></div> -->
+                <p class="lgn-session-state i{{$user.UserSessionState}}">{{t $sessionState}}</p>
             </div>
             <span class="fill-space"></span>
             <i class="las la-angle-right"></i>

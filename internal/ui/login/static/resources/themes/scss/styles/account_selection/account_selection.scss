@@ -30,8 +30,12 @@ $lgn-container-margin: 0px auto 50px auto;
 
             .lgn-loginname{
                 font-size: 14px;
-                margin: .5rem 0;
-                margin-top: 0;
+                margin: 0;
+            }
+
+            .lgn-session-state {
+                margin: 0;
+                font-size: 14px;
             }
         }
 

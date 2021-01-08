@@ -1,10 +1,3 @@
-@import "fonts";
-
-*, *::before, *::after {
-    box-sizing: border-box;
-    font-size: 16px;
-    font-weight: 400;
-}
 
 body {
     margin: 0 auto;
@@ -14,51 +7,8 @@ body {
     }
 }
 
-html {
-    width: 100%;
-    min-height: 100%;
-    background-color: $backgroundColor;
-    color: $fontColor;
-    background-repeat: no-repeat;
-    background-position: bottom right;
-    background-size: contain;
-    @if($bodyImgDark != "") {
-        background-image: url($bodyImgDark);
-    }
-}
-
-h1 {
-    color: $fontColor;
-    text-align: center;
-}
-
-h2 {
-    color: $fontColor;
-    font-weight: 300;
-    font-size: $header2Size;
-}
-
-p {
-    font-weight: 300;
-    text-align: center;
-}
-
-header {
-    padding: 8px;
-
-    .logo {
-        background-image: url($logoImgDark);
-        background-repeat: no-repeat;
-        background-size: contain;
-        height: 80px;
-        margin: 30px;
-    }
-}
-
-.head {
-    width: 100%;
-    max-width: 1000px;
-    margin: auto;
+.hidden {
+    display: none !important;
 }
 
 // a {

@@ -15,13 +15,13 @@
     <input type="hidden" name="credentialData" />
 
     <div class="fields">
-        <p class="wa-no-support error hidden">{{t "WebAuthN.NotSupported"}}</p>
+        <p class="wa-no-support lgn-error hidden">{{t "WebAuthN.NotSupported"}}</p>
         <div class="field">
-            <label class="label" for="name">{{t "WebAuthN.Name"}}</label>
-            <input class="input" type="text" id="name" name="name" autocomplete="off" autofocus>
+            <label class="lgn-label" for="name">{{t "WebAuthN.Name"}}</label>
+            <input class="lgn-input" type="text" id="name" name="name" autocomplete="off" autofocus>
         </div>
-        <a id="btn-register" class="button primary wa-support">{{t "Actions.RegisterToken"}}</a>
-        <div id="wa-error" class="error hidden">
+        <!-- <a id="btn-register" class="lgn-raised-button lgn-primary wa-support">{{t "Actions.RegisterToken"}}</a> -->
+        <div id="wa-error" class="lgn-error hidden">
             <span class="cause"></span>
             <span>{{t "WebAuthN.Error.Retry"}}</span>
         </div>
@@ -29,10 +29,18 @@
 
     {{ template "error-message" .}}
 
-    <div class="actions">
-        <a class="button secondary" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
+    <div class="lgn-actions">
+        <!-- <a class="lgn-stroked-button lgn-left-action lgn-primary " href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
             {{t "Actions.Back"}}
+        </a> -->
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
+            <!-- {{t "Actions.Back"}} -->
+            <i class="las la-arrow-left"></i>
         </a>
+
+        <span class="fill-space"></span>
+        <a id="btn-register" class="lgn-raised-button lgn-primary wa-support">{{t "Actions.RegisterToken"}}</a>
     </div>
 </form>
 

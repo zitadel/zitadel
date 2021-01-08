@@ -20,11 +20,11 @@
         }
 
         svg rect.color {
-            fill: lgn-color($background, qrcode);
+            fill: lgn-color($foreground, qrcode);
         }
 
         svg rect.bg-color {
-            fill: lgn-color($foreground, qrcode);
+            fill: lgn-color($background, qrcode);
         }
     }
 }

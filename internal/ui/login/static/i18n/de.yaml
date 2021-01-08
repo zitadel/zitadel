@@ -211,6 +211,13 @@ Actions:
   Recreate: erneut erstellen
   PasswordLogin: Mit Passwort anmelden
 
+Footer:
+  PrivacyPolicy: Datenschutz
+  PrivacyPolicyLink: https://zitadel.ch/pdf/agb.pdf
+  Tos: AGB
+  TosLink: https://zitadel.ch/pdf/agb.pdf
+  Help: Hilfe
+
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten
   AuthRequest:

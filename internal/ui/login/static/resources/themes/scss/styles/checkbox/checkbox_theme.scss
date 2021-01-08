@@ -28,7 +28,7 @@
     }
     
     // Unchecked
-    label {            
+    .lgn-checkbox label {            
         &:before {
             background-color: transparent;
             border: 2px solid lgn-color($foreground, input-border);
@@ -42,7 +42,7 @@
     }
     
     // Checked
-    input:checked + label {
+    input[type='checkbox']:checked + label {
         &:before {
             background-color: lgn-color($primary, default);
             border-color: lgn-color($primary, default);

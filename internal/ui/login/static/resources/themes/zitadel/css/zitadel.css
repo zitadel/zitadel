@@ -15,6 +15,7 @@ footer .fill-space {
 }
 footer a {
   font-size: 12px;
+  margin-left: 1rem;
 }
 
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
@@ -256,6 +257,7 @@ a.block {
 .lgn-qrcode {
   display: block;
   margin: auto;
+  margin: 1rem 0;
 }
 .lgn-qrcode svg {
   margin: auto;
@@ -358,8 +360,11 @@ i {
 }
 .lgn-account-selection .lgn-account .lgn-names .lgn-loginname {
   font-size: 14px;
-  margin: 0.5rem 0;
-  margin-top: 0;
+  margin: 0;
+}
+.lgn-account-selection .lgn-account .lgn-names .lgn-session-state {
+  margin: 0;
+  font-size: 14px;
 }
 .lgn-account-selection .lgn-account .fill-space {
   flex: 1;
@@ -786,21 +791,21 @@ input[type=checkbox] {
   z-index: 0;
 }
 
-label:before {
+.lgn-checkbox label:before {
   background-color: transparent;
   border: 2px solid #403e3e;
 }
-label:after {
+.lgn-checkbox label:after {
   border-bottom: 2px solid transparent;
   border-right: 2px solid transparent;
   background: transparent;
 }
 
-input:checked + label:before {
+input[type=checkbox]:checked + label:before {
   background-color: #5282c1;
   border-color: #5282c1;
 }
-input:checked + label:after {
+input[type=checkbox]:checked + label:after {
   border-color: #fff;
 }
 
@@ -824,13 +829,13 @@ a:hover, a:active {
 }
 
 .lgn-qrcode svg {
-  background: #212224;
+  background: white;
 }
 .lgn-qrcode svg rect.color {
-  fill: #212224;
+  fill: black;
 }
 .lgn-qrcode svg rect.bg-color {
-  fill: #fafafa;
+  fill: white;
 }
 
 .lgn-error .lgn-error-message {
@@ -863,10 +868,10 @@ ul li i.lgn-valid {
   box-shadow: inset 0 -1px #303131;
 }
 .lgn-account-selection .lgn-account:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(82, 130, 193, 0.05);
 }
 .lgn-account-selection .lgn-account:focus {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(82, 130, 193, 0.1);
 }
 .lgn-account-selection .lgn-account:active {
   background-color: rgba(82, 130, 193, 0.25);
@@ -874,6 +879,15 @@ ul li i.lgn-valid {
 .lgn-account-selection .lgn-account .lgn-loginname {
   font-size: 14px;
   color: #757575;
+}
+.lgn-account-selection .lgn-account .lgn-session-state {
+  color: #757575;
+}
+.lgn-account-selection .lgn-account .lgn-session-state.i0 {
+  color: #85d996;
+}
+.lgn-account-selection .lgn-account .lgn-session-state.i1 {
+  color: #f44336;
 }
 
 .lgn-avatar:not(.transparent) {
@@ -1063,20 +1077,20 @@ ul li i.lgn-valid {
   opacity: 0;
   z-index: 0;
 }
-.lgn-dark-theme label:before {
+.lgn-dark-theme .lgn-checkbox label:before {
   background-color: transparent;
   border: 2px solid #403e3e;
 }
-.lgn-dark-theme label:after {
+.lgn-dark-theme .lgn-checkbox label:after {
   border-bottom: 2px solid transparent;
   border-right: 2px solid transparent;
   background: transparent;
 }
-.lgn-dark-theme input:checked + label:before {
+.lgn-dark-theme input[type=checkbox]:checked + label:before {
   background-color: #5282c1;
   border-color: #5282c1;
 }
-.lgn-dark-theme input:checked + label:after {
+.lgn-dark-theme input[type=checkbox]:checked + label:after {
   border-color: #fff;
 }
 .lgn-dark-theme .lgn-label {
@@ -1096,13 +1110,13 @@ ul li i.lgn-valid {
   color: #f44336;
 }
 .lgn-dark-theme .lgn-qrcode svg {
-  background: #212224;
+  background: white;
 }
 .lgn-dark-theme .lgn-qrcode svg rect.color {
-  fill: #212224;
+  fill: black;
 }
 .lgn-dark-theme .lgn-qrcode svg rect.bg-color {
-  fill: #fafafa;
+  fill: white;
 }
 .lgn-dark-theme .lgn-error .lgn-error-message {
   color: #f44336;
@@ -1130,10 +1144,10 @@ ul li i.lgn-valid {
   box-shadow: inset 0 -1px #303131;
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(82, 130, 193, 0.05);
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:focus {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(82, 130, 193, 0.1);
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:active {
   background-color: rgba(82, 130, 193, 0.25);
@@ -1141,6 +1155,15 @@ ul li i.lgn-valid {
 .lgn-dark-theme .lgn-account-selection .lgn-account .lgn-loginname {
   font-size: 14px;
   color: #757575;
+}
+.lgn-dark-theme .lgn-account-selection .lgn-account .lgn-session-state {
+  color: #757575;
+}
+.lgn-dark-theme .lgn-account-selection .lgn-account .lgn-session-state.i0 {
+  color: #85d996;
+}
+.lgn-dark-theme .lgn-account-selection .lgn-account .lgn-session-state.i1 {
+  color: #f44336;
 }
 .lgn-dark-theme .lgn-avatar:not(.transparent) {
   background-color: #5282c1;
@@ -1327,20 +1350,20 @@ ul li i.lgn-valid {
   opacity: 0;
   z-index: 0;
 }
-.lgn-light-theme label:before {
+.lgn-light-theme .lgn-checkbox label:before {
   background-color: transparent;
   border: 2px solid rgba(0, 0, 0, 0.2509803922);
 }
-.lgn-light-theme label:after {
+.lgn-light-theme .lgn-checkbox label:after {
   border-bottom: 2px solid transparent;
   border-right: 2px solid transparent;
   background: transparent;
 }
-.lgn-light-theme input:checked + label:before {
+.lgn-light-theme input[type=checkbox]:checked + label:before {
   background-color: #5469d4;
   border-color: #5469d4;
 }
-.lgn-light-theme input:checked + label:after {
+.lgn-light-theme input[type=checkbox]:checked + label:after {
   border-color: #fff;
 }
 .lgn-light-theme .lgn-label {
@@ -1360,13 +1383,13 @@ ul li i.lgn-valid {
   color: #f44336;
 }
 .lgn-light-theme .lgn-qrcode svg {
-  background: #212224;
+  background: white;
 }
 .lgn-light-theme .lgn-qrcode svg rect.color {
-  fill: #212224;
+  fill: black;
 }
 .lgn-light-theme .lgn-qrcode svg rect.bg-color {
-  fill: #fafafa;
+  fill: white;
 }
 .lgn-light-theme .lgn-error .lgn-error-message {
   color: #f44336;
@@ -1394,10 +1417,10 @@ ul li i.lgn-valid {
   box-shadow: inset 0 -1px #e3e8ee;
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(84, 105, 212, 0.05);
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:focus {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(84, 105, 212, 0.1);
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:active {
   background-color: rgba(84, 105, 212, 0.25);
@@ -1405,6 +1428,15 @@ ul li i.lgn-valid {
 .lgn-light-theme .lgn-account-selection .lgn-account .lgn-loginname {
   font-size: 14px;
   color: #757575;
+}
+.lgn-light-theme .lgn-account-selection .lgn-account .lgn-session-state {
+  color: #757575;
+}
+.lgn-light-theme .lgn-account-selection .lgn-account .lgn-session-state.i0 {
+  color: #85d996;
+}
+.lgn-light-theme .lgn-account-selection .lgn-account .lgn-session-state.i1 {
+  color: #f44336;
 }
 .lgn-light-theme .lgn-avatar:not(.transparent) {
   background-color: #5469d4;

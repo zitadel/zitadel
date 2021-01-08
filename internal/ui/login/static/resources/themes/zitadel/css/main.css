@@ -1,0 +1,12 @@
+body {
+  margin: 0 auto;
+}
+body.waiting * {
+  cursor: wait !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/*# sourceMappingURL=main.css.map */
