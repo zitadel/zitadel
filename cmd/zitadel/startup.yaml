@@ -214,6 +214,9 @@ API:
       Token:
         Path: 'token'
         URL: '$ZITADEL_OAUTH/token'
+      Introspection:
+        Path: 'introspect'
+        URL: '$ZITADEL_OAUTH/introspect'
       EndSession:
         Path: 'endsession'
         URL: '$ZITADEL_AUTHORIZE/endsession'
