@@ -181,7 +181,7 @@ func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email strin
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UserIDMissing")
 	}
 
-	existingEmail, err := r.emailWriteModel(ctx, userID)
+	existingEmail, err := r.emailWriteModelByID(ctx, userID)
 	if err != nil {
 		return err
 	}

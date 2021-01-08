@@ -11,8 +11,7 @@ type HumanOTPWriteModel struct {
 	eventstore.WriteModel
 
 	Secret *crypto.CryptoValue
-
-	State domain.OTPState
+	State  domain.OTPState
 }
 
 func NewHumanOTPWriteModel(userID string) *HumanOTPWriteModel {

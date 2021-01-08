@@ -8,6 +8,14 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
+func (r *CommandSide) AddHumanOTP(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
+	}
+
+	return nil
+}
+
 func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")

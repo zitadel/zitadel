@@ -41,7 +41,7 @@ func (s *Server) GetMyUserPhone(ctx context.Context, _ *empty.Empty) (*auth.User
 }
 
 func (s *Server) RemoveMyUserPhone(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.repo.RemoveMyPhone(ctx)
+	err := s.command.RemoveHumanPhone(ctx, authz.GetCtxData(ctx).UserID)
 	return &empty.Empty{}, err
 }
 
@@ -83,12 +83,12 @@ func (s *Server) ChangeMyUserEmail(ctx context.Context, request *auth.UpdateUser
 }
 
 func (s *Server) VerifyMyUserEmail(ctx context.Context, request *auth.VerifyMyUserEmailRequest) (*empty.Empty, error) {
-	err := s.repo.VerifyMyEmail(ctx, request.Code)
+	err := s.command.VerifyHumanEmail(ctx, authz.GetCtxData(ctx).UserID, request.Code)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendMyEmailVerificationMail(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.repo.ResendMyEmailVerificationMail(ctx)
+	err := s.command.CreateHumanEmailVerificationCode(ctx, authz.GetCtxData(ctx).UserID)
 	return &empty.Empty{}, err
 }
 
@@ -101,12 +101,12 @@ func (s *Server) ChangeMyUserPhone(ctx context.Context, request *auth.UpdateUser
 }
 
 func (s *Server) VerifyMyUserPhone(ctx context.Context, request *auth.VerifyUserPhoneRequest) (*empty.Empty, error) {
-	err := s.repo.VerifyMyPhone(ctx, request.Code)
+	err := s.command.VerifyHumanPhone(ctx, authz.GetCtxData(ctx).UserID, request.Code)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendMyPhoneVerificationCode(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.repo.ResendMyPhoneVerificationCode(ctx)
+	err := s.command.CreateHumanPhoneVerificationCode(ctx, authz.GetCtxData(ctx).UserID)
 	return &empty.Empty{}, err
 }
 

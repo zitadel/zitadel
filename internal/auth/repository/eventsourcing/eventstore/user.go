@@ -100,13 +100,6 @@ func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
 	return user.GetProfile()
 }
 
-func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error) {
-	if err := checkIDs(ctx, profile.ObjectRoot); err != nil {
-		return nil, err
-	}
-	return repo.UserEvents.ChangeProfile(ctx, profile)
-}
-
 func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, seqErr := repo.View.GetLatestExternalIDPSequence("")
@@ -173,10 +166,6 @@ func (repo *UserRepo) ResendEmailVerificationMail(ctx context.Context, userID st
 	return repo.UserEvents.CreateEmailVerificationCode(ctx, userID)
 }
 
-func (repo *UserRepo) ResendMyEmailVerificationMail(ctx context.Context) error {
-	return repo.UserEvents.CreateEmailVerificationCode(ctx, authz.GetCtxData(ctx).UserID)
-}
-
 func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
@@ -201,10 +190,6 @@ func (repo *UserRepo) RemoveMyPhone(ctx context.Context) error {
 
 func (repo *UserRepo) VerifyMyPhone(ctx context.Context, code string) error {
 	return repo.UserEvents.VerifyPhone(ctx, authz.GetCtxData(ctx).UserID, code)
-}
-
-func (repo *UserRepo) ResendMyPhoneVerificationCode(ctx context.Context) error {
-	return repo.UserEvents.CreatePhoneVerificationCode(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
@@ -326,14 +311,6 @@ func (repo *UserRepo) VerifyMyMFAU2FSetup(ctx context.Context, tokenName string,
 	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, "", credentialData)
 }
 
-func (repo *UserRepo) RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error {
-	return repo.UserEvents.RemoveU2FToken(ctx, userID, webAuthNTokenID)
-}
-
-func (repo *UserRepo) RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string) error {
-	return repo.UserEvents.RemoveU2FToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
-}
-
 func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error) {
 	return repo.UserEvents.GetPasswordless(ctx, userID)
 }
@@ -371,10 +348,6 @@ func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, token
 
 func (repo *UserRepo) VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, credentialData []byte) error {
 	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, "", credentialData)
-}
-
-func (repo *UserRepo) RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error {
-	return repo.UserEvents.RemovePasswordlessToken(ctx, userID, webAuthNTokenID)
 }
 
 func (repo *UserRepo) RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error {

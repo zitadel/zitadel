@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -13,7 +14,7 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.Phone.Invalid")
 	}
 
-	existingPhone, err := r.phoneWriteModel(ctx, phone.AggregateID)
+	existingPhone, err := r.phoneWriteModelByID(ctx, phone.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -45,12 +46,38 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 	return writeModelToPhone(existingPhone), nil
 }
 
+func (r *CommandSide) VerifyHumanPhone(ctx context.Context, userID, code string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Km9ds", "Errors.User.UserIDMissing")
+	}
+	if code == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-wMe9f", "Errors.User.Code.Empty")
+	}
+
+	existingCode, err := r.phoneWriteModelByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existingCode.Code == nil || existingCode.State == domain.PhoneStateUnspecified || existingCode.State == domain.PhoneStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-Rsj8c", "Errors.User.Code.NotFound")
+	}
+
+	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.emailVerificationCode)
+	if err != nil {
+		userAgg.PushEvents(user.NewHumanPhoneVerificationFailedEvent(ctx))
+	} else {
+		userAgg.PushEvents(user.NewHumanPhoneVerifiedEvent(ctx))
+	}
+	return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+}
+
 func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, userID string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 
-	existingPhone, err := r.phoneWriteModel(ctx, userID)
+	existingPhone, err := r.phoneWriteModelByID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -74,7 +101,7 @@ func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID string) error
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.UserIDMissing")
 	}
 
-	existingPhone, err := r.phoneWriteModel(ctx, userID)
+	existingPhone, err := r.phoneWriteModelByID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -88,7 +115,7 @@ func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID string) error
 	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
 }
 
-func (r *CommandSide) phoneWriteModel(ctx context.Context, userID string) (writeModel *HumanPhoneWriteModel, err error) {
+func (r *CommandSide) phoneWriteModelByID(ctx context.Context, userID string) (writeModel *HumanPhoneWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
