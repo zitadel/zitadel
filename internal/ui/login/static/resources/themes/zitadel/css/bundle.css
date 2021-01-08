@@ -365,6 +365,7 @@ i {
 .lgn-account-selection .lgn-account .lgn-names .lgn-session-state {
   margin: 0;
   font-size: 14px;
+  margin-bottom: 0.5rem;
 }
 .lgn-account-selection .lgn-account .fill-space {
   flex: 1;
@@ -887,6 +888,7 @@ i {
 .lgn-account-selection .lgn-account .lgn-names .lgn-session-state {
   margin: 0;
   font-size: 14px;
+  margin-bottom: 0.5rem;
 }
 .lgn-account-selection .lgn-account .fill-space {
   flex: 1;

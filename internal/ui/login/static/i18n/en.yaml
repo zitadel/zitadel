@@ -212,9 +212,7 @@ Actions:
   PasswordLogin: Login with password
 
 Footer:
-  PrivacyPolicy: Privacy Policy
-  PrivacyPolicyLink: https://zitadel.ch/pdf/agb.pdf
-  Tos: Terms of Service
+  TosPrivacyPolicy: ToS and Privacy Policy
   TosLink: https://zitadel.ch/pdf/agb.pdf
   Help: Help
 
