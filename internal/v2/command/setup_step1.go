@@ -118,7 +118,14 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		}
 		aggregates = append(aggregates, orgAgg, userAgg, orgMemberAgg)
 		//projects
-		//create applications
+		for _, proj := range organisation.Projects {
+			projectAgg, _, err := r.addProject(ctx, &domain.Project{Name: proj.Name}, userAgg.ID())
+			if err != nil {
+				return err
+			}
+			aggregates = append(aggregates, projectAgg)
+			//create applications
+		}
 	}
 
 	//set iam owners

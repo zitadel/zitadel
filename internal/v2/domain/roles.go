@@ -1,5 +1,7 @@
 package domain
 
 const (
-	OrgOwnerRole = "ORG_OWNER"
+	RoleOrgOwner           = "ORG_OWNER"
+	RoleProjectOwner       = "PROJECT_OWNER"
+	RoleProjectOwnerGlobal = "PROJECT_OWNER_GLOBAL"
 )
