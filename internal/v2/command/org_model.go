@@ -10,8 +10,9 @@ import (
 type OrgWriteModel struct {
 	eventstore.WriteModel
 
-	Name  string
-	State domain.OrgState
+	Name          string
+	State         domain.OrgState
+	PrimaryDomain string
 }
 
 func NewOrgWriteModel(orgID string) *OrgWriteModel {
@@ -29,6 +30,8 @@ func (wm *OrgWriteModel) AppendEvents(events ...eventstore.EventReader) {
 		case *org.OrgAddedEvent,
 			*iam.LabelPolicyChangedEvent:
 			wm.WriteModel.AppendEvents(e)
+		case *org.DomainPrimarySetEvent:
+			wm.AppendEvents(e)
 		}
 	}
 }
@@ -41,6 +44,8 @@ func (wm *OrgWriteModel) Reduce() error {
 			wm.State = domain.OrgStateActive
 		case *org.OrgChangedEvent:
 			wm.Name = e.Name
+		case *org.DomainPrimarySetEvent:
+			wm.PrimaryDomain = e.Domain
 		}
 	}
 	return nil

@@ -9,6 +9,17 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
+func (r *CommandSide) getOrg(ctx context.Context, orgID string) (*domain.Org, error) {
+	writeModel, err := r.getOrgWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if writeModel.State == domain.OrgStateActive {
+		return nil, caos_errs.ThrowInternal(err, "COMMAND-4M9sf", "Errors.Org.NotFound")
+	}
+	return orgWriteModelToOrg(writeModel), nil
+}
+
 func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) error {
 	orgAgg, userAgg, orgMemberAgg, err := r.setUpOrg(ctx, organisation, admin)
 	if err != nil {

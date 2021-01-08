@@ -8,6 +8,17 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
+func (r *CommandSide) getUser(ctx context.Context, userID string) (*domain.User, error) {
+	writeModel, err := r.userWriteModelByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if writeModel.UserState == domain.UserStateUnspecified || writeModel.UserState == domain.UserStateDeleted {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-B8dQw", "Errors.User.NotFound")
+	}
+	return writeModelToUser(writeModel), nil
+}
+
 func (r *CommandSide) AddUser(ctx context.Context, orgID string, user *domain.User) (*domain.User, error) {
 	if !user.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.User.Invalid")

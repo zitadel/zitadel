@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	global_model "github.com/caos/zitadel/internal/model"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -26,6 +27,7 @@ type CommandSide struct {
 	passwordVerificationCode crypto.Generator
 	machineKeyAlg            crypto.EncryptionAlgorithm
 	machineKeySize           int
+	multifactors             global_model.Multifactors
 }
 
 type Config struct {
@@ -57,6 +59,17 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	repo.userPasswordAlg = crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeyAlg = aesCrypto
 	repo.machineKeySize = int(config.SystemDefaults.SecretGenerators.MachineKeySize)
+
+	aesOTPCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.Multifactors.OTP.VerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	repo.multifactors = global_model.Multifactors{
+		OTP: global_model.OTP{
+			CryptoMFA: aesOTPCrypto,
+			Issuer:    config.SystemDefaults.Multifactors.OTP.Issuer,
+		},
+	}
 	return repo, nil
 }
 

@@ -77,7 +77,7 @@ func readModelToLabelPolicy(readModel *IAMLabelPolicyReadModel) *model.LabelPoli
 		PrimaryColor:   readModel.PrimaryColor,
 		SecondaryColor: readModel.SecondaryColor,
 		Default:        true,
-		//TODO: State: int32,
+		//TODO: OTPState: int32,
 	}
 }
 
@@ -89,7 +89,7 @@ func readModelToLoginPolicy(readModel *IAMLoginPolicyReadModel) *model.LoginPoli
 		AllowUsernamePassword: readModel.AllowUserNamePassword,
 		Default:               true,
 		//TODO: IDPProviders: []*model.IDPProvider,
-		//TODO: State: int32,
+		//TODO: OTPState: int32,
 	}
 }
 func readModelToOrgIAMPolicy(readModel *IAMOrgIAMPolicyReadModel) *model.OrgIAMPolicy {
@@ -97,7 +97,7 @@ func readModelToOrgIAMPolicy(readModel *IAMOrgIAMPolicyReadModel) *model.OrgIAMP
 		ObjectRoot:            readModelToObjectRoot(readModel.OrgIAMPolicyReadModel.ReadModel),
 		UserLoginMustBeDomain: readModel.UserLoginMustBeDomain,
 		Default:               true,
-		//TODO: State: int32,
+		//TODO: OTPState: int32,
 	}
 }
 func readModelToPasswordAgePolicy(readModel *IAMPasswordAgePolicyReadModel) *model.PasswordAgePolicy {
@@ -105,7 +105,7 @@ func readModelToPasswordAgePolicy(readModel *IAMPasswordAgePolicyReadModel) *mod
 		ObjectRoot:     readModelToObjectRoot(readModel.PasswordAgePolicyReadModel.ReadModel),
 		ExpireWarnDays: uint64(readModel.ExpireWarnDays),
 		MaxAgeDays:     uint64(readModel.MaxAgeDays),
-		//TODO: State: int32,
+		//TODO: OTPState: int32,
 	}
 }
 func readModelToPasswordComplexityPolicy(readModel *IAMPasswordComplexityPolicyReadModel) *model.PasswordComplexityPolicy {
@@ -116,7 +116,7 @@ func readModelToPasswordComplexityPolicy(readModel *IAMPasswordComplexityPolicyR
 		HasSymbol:    readModel.HasSymbol,
 		HasUppercase: readModel.HasUpperCase,
 		MinLength:    uint64(readModel.MinLength),
-		//TODO: State: int32,
+		//TODO: OTPState: int32,
 	}
 }
 func readModelToPasswordLockoutPolicy(readModel *IAMPasswordLockoutPolicyReadModel) *model.PasswordLockoutPolicy {
@@ -124,7 +124,7 @@ func readModelToPasswordLockoutPolicy(readModel *IAMPasswordLockoutPolicyReadMod
 		ObjectRoot:          readModelToObjectRoot(readModel.PasswordLockoutPolicyReadModel.ReadModel),
 		MaxAttempts:         uint64(readModel.MaxAttempts),
 		ShowLockOutFailures: readModel.ShowLockOutFailures,
-		//TODO: State: int32,
+		//TODO: OTPState: int32,
 	}
 }
 

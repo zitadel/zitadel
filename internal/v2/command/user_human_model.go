@@ -68,7 +68,7 @@ func (wm *HumanWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	}
 }
 
-//TODO: Compute State? initial/active
+//TODO: Compute OTPState? initial/active
 func (wm *HumanWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {

@@ -308,7 +308,7 @@ func externalIDPViewFromModel(externalIDP *usr_model.ExternalIDPView) *auth.Exte
 	}
 }
 
-func otpFromModel(otp *usr_model.OTP) *auth.MfaOtpResponse {
+func otpFromDomain(otp *domain.OTP) *auth.MfaOtpResponse {
 	return &auth.MfaOtpResponse{
 		UserId: otp.AggregateID,
 		Url:    otp.Url,

@@ -91,3 +91,10 @@ func NewInitUserCode(generator crypto.Generator) (*InitUserCode, error) {
 		Expiry: generator.Expiry(),
 	}, nil
 }
+
+func GenerateLoginName(username, domain string, appendDomain bool) string {
+	if !appendDomain {
+		return username
+	}
+	return username + "@" + domain
+}

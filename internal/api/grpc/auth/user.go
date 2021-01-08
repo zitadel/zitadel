@@ -146,11 +146,11 @@ func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Emp
 }
 
 func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *auth.MfaOtpResponse, err error) {
-	otp, err := s.repo.AddMyMFAOTP(ctx)
+	otp, err := s.command.AddHumanOTP(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
-	return otpFromModel(otp), nil
+	return otpFromDomain(otp), nil
 }
 
 func (s *Server) VerifyMfaOTP(ctx context.Context, request *auth.VerifyMfaOtp) (*empty.Empty, error) {
