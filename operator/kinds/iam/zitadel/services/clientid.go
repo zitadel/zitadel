@@ -14,7 +14,7 @@ func GetClientIDFunc(
 ) func() string {
 	return func() string {
 		resp, err := http.Get("http://" + httpServiceName + "." + namespace + ":" + strconv.Itoa(httpPort) + "/clientID")
-		if err != nil {
+		if err != nil || resp.StatusCode >= 400 {
 			return ""
 		}
 		defer resp.Body.Close()
