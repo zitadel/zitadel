@@ -2,7 +2,7 @@ package orb
 
 import "github.com/caos/orbos/pkg/labels"
 
-func mustDatabaseOperator(binaryVersion *string) *labels.Operator {
+func mustZITADELOperator(binaryVersion *string) *labels.Operator {
 
 	version := "unknown"
 	if binaryVersion != nil {

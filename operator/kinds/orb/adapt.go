@@ -47,7 +47,7 @@ func AdaptFunc(
 			orbMonitor = orbMonitor.Verbose()
 		}
 
-		operatorLabels := mustDatabaseOperator(binaryVersion)
+		operatorLabels := mustZITADELOperator(binaryVersion)
 
 		iamCurrent := &tree.Tree{}
 		queryIAM, destroyIAM, zitadelSecrets, err := iam.GetQueryAndDestroyFuncs(
@@ -60,7 +60,7 @@ func AdaptFunc(
 			orbconfig,
 			action,
 			migrationsPath,
-			binaryVersion,
+			&desiredKind.Spec.Version,
 			features,
 		)
 		if err != nil {
