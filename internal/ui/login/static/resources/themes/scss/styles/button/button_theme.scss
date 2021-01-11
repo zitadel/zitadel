@@ -29,7 +29,9 @@
   }
 
   .lgn-button:focus,
-  .lgn-stroked-button:focus {
+  .lgn-stroked-button:focus,
+  .lgn-raised-button:focus {
+    @include lgn-b-elevation(8, $config);
     background: map-get($background, base);
   }
 
@@ -76,6 +78,10 @@
     &:not([disabled]):active {
       @include lgn-b-elevation(8, $config);
     }
+
+    // &:focus {
+    //     @include lgn-b-elevation(8, $config);
+    // }
 
     &[disabled] {
       @include lgn-b-elevation(0, $config);

@@ -19,7 +19,7 @@
 
     {{if .LoginPolicy.AllowUsernamePassword }}
     <div class="fields">
-        <label class="lgb-label" for="loginName">{{t "Login.Loginname"}}</label>
+        <label class="lgn-label" for="loginName">{{t "Login.Loginname"}}</label>
         <input class="lgn-input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}"
          value="{{ .LoginName }}" {{if .ErrMessage}}shake {{end}} autocomplete="username" autofocus required>
     </div>
@@ -27,16 +27,16 @@
 
     {{template "error-message" .}}
 
-    <div class="lgn-actions">
-        {{if .LoginPolicy.AllowRegister}}
-        <button class="lgn-stroked-button lgn-primary" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
-        {{end}}
+    <div class="lgn-actions lgn-reverse-order">
+        <button tabindex="1" class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        {{if .LoginPolicy.AllowRegister}}
+        <button tabindex="2" class="lgn-stroked-button lgn-primary" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
+        {{end}}
     </div>
 
     {{if hasExternalLogin }}
-    <div class="lgn-actions idp-providers">
+    <div class="lgn-actionsidp-providers">
         <p>{{t "Login.ExternalLogin"}}</p>
 
         {{ $reqid := .AuthReqID}}
@@ -52,7 +52,8 @@
 </form>
 
 
-<script src="{{ resourceUrl " scripts/form_submit.js" }}"></script>
-<script src="{{ resourceUrl " scripts/default_form_validation.js" }}"></script>
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+<!-- <script src="{{ resourceUrl "scripts/focus.js" }}"></script> -->
 
 {{template "main-bottom" .}}

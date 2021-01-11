@@ -21,6 +21,12 @@ $lgn-container-margin: 0px auto 50px auto;
         align-items: center;
         padding: .5rem 0;
 
+        // this is used to reverse the submit button order. 
+        //The form submits the htmls first element thus for displaying the desired button on the right side, items have to be reversed.
+        &.lgn-reverse-order {
+            flex-direction: row-reverse;
+        }
+
         .fill-space {
             flex: 1;
         }
@@ -57,7 +63,7 @@ $lgn-container-margin: 0px auto 50px auto;
     .lgn-left-action {
         position: absolute;
         left: 1rem;
-        top: calc(-48px);
+        top: calc(-45px);
     }
 
     ul li {

@@ -281,6 +281,9 @@ a.block {
   align-items: center;
   padding: 0.5rem 0;
 }
+.content-container .lgn-actions.lgn-reverse-order {
+  flex-direction: row-reverse;
+}
 .content-container .lgn-actions .fill-space {
   flex: 1;
 }
@@ -804,6 +807,9 @@ a.block {
   align-items: center;
   padding: 0.5rem 0;
 }
+.content-container .lgn-actions.lgn-reverse-order {
+  flex-direction: row-reverse;
+}
 .content-container .lgn-actions .fill-space {
   flex: 1;
 }
@@ -1132,6 +1138,9 @@ i {
   display: flex;
   align-items: center;
   padding: 0.5rem 0;
+}
+.content-container .lgn-actions.lgn-reverse-order {
+  flex-direction: row-reverse;
 }
 .content-container .lgn-actions .fill-space {
   flex: 1;

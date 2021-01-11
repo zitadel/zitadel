@@ -22,30 +22,36 @@ function addRequiredEventListener(inputs, checks, form, button) {
 }
 
 function disableDoubleSubmit(form, button) {
-    form.addEventListener('submit', function() {
+    form.addEventListener('submit', function () {
         document.body.classList.add('waiting');
         button.disabled = true;
-    })
+    });
 }
 
 function toggleButton(checks, form, inputs, button) {
     if (checks !== undefined) {
         if (checks() === false) {
             button.disabled = true;
-            return
+            return;
         }
     }
-    button.disabled = !allRequiredDone(form, inputs);
+    const targetValue = !allRequiredDone(form, inputs);
+    button.disabled = targetValue;
+
+    // console.log(button.classList);
+    // if (targetValue && button.classList.includes('lgn-initial-focus')) {
+    //     button.focus();
+    // }
 }
 
 function allRequiredDone(form, inputs) {
     for (i = 0; i < inputs.length; i++) {
         if (inputs[i].required) {
             if (inputs[i].type === 'checkbox' && !inputs[i].checked) {
-                return false
+                return false;
             }
             if (inputs[i].value === '') {
-                return false
+                return false;
             }
         }
     }
