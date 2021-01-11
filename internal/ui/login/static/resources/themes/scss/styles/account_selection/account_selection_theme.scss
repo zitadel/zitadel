@@ -14,6 +14,7 @@
     $warn: map-get($config, warn);
     $primary: map-get($config, primary);
     $foreground: map-get($config, foreground);
+    $background: map-get($config, background);
 
     .lgn-account-selection{
         display: flex;
@@ -24,18 +25,19 @@
             color: inherit;
             background: transparent;
             box-shadow: inset 0 -1px lgn-color($foreground, footer-line);
+            cursor: pointer;
 
             &:hover {
                 $primary: map-get($config, primary);
-                background-color: rgba(lgn-color($primary, 500), 0.05);
+                background-color: lgn-color($background, account-selector-hover);
             }
 
             &:focus {
-                background-color: rgba(lgn-color($primary, 500), 0.1);
+                background-color: lgn-color($background, account-selector-active);
             }
 
             &:active {
-                background-color: rgba(lgn-color($primary, 500), 0.25);
+                background-color: lgn-color($background, account-selector-active);
             }
 
             .lgn-loginname{

@@ -198,13 +198,12 @@ $lgn-warn: (
     focused-button: $dark-focused,
     selected-button: map-get($lgn-grey, 300),
     selected-disabled-button: map-get($lgn-grey, 400),
-    disabled-button-toggle: map-get($lgn-grey, 200),
-    unselected-chip: map-get($lgn-grey, 300),
-    disabled-list-option: map-get($lgn-grey, 200),
     tooltip: map-get($lgn-grey, 700),
     input: #fafafa50,
     footer:  #fafafa,
     qrcode: white, // use black ground on white background because inverted qrcode colors are not allowed
+    account-selector-hover: rgba(black, 0.02),
+    account-selector-active: rgba(black, 0.05),
   );
   
   $lgn-dark-theme-background: (
@@ -215,13 +214,12 @@ $lgn-warn: (
     focused-button: $light-focused,
     selected-button: map-get($lgn-grey, 900),
     selected-disabled-button: map-get($lgn-grey, 800),
-    disabled-button-toggle: black,
-    unselected-chip: map-get($lgn-grey, 700),
-    disabled-list-option: black,
     tooltip: map-get($lgn-grey, 700),
     input: rgba(black, .2),
     footer: #212224,
-    qrcode: white, // needs white background to recognize borders
+    qrcode: white, // needs white background to recognize borders,
+    account-selector-hover: rgba(white, 0.02),
+    account-selector-active: rgba(white, 0.05),
   );
 
   $lgn-light-theme-foreground: (

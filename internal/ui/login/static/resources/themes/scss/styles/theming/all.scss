@@ -1,5 +1,6 @@
 @import '../core/core.scss';
 @import '../footer/footer_theme.scss';
+@import '../header/header_theme.scss';
 @import '../button/button_theme.scss';
 @import '../input/input_theme.scss';
 @import '../label/label_theme.scss';
@@ -17,6 +18,7 @@
 
 @mixin zitadel-lgn-theme($theme-or-color-config) {
     @include lgn-core-theme($theme-or-color-config);
+    @include lgn-header-theme($theme-or-color-config);
     @include lgn-button-theme($theme-or-color-config);
     @include lgn-input-theme($theme-or-color-config);
     @include lgn-radio-theme($theme-or-color-config);

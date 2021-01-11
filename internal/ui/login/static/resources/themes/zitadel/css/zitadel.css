@@ -18,6 +18,20 @@ footer a {
   margin-left: 1rem;
 }
 
+.lgn-header {
+  display: block;
+  position: relative;
+  margin: 100px auto 0.5rem auto;
+  max-width: 380px;
+  padding: 0;
+  width: 100%;
+}
+.lgn-header .lgn-logo {
+  height: 43px;
+  width: 160px;
+  margin: 0 auto;
+}
+
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
   box-sizing: border-box;
   position: relative;
@@ -251,7 +265,13 @@ a.block {
 }
 
 .lgn-error {
+  display: flex;
+  align-items: center;
   outline: none;
+}
+.lgn-error i {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
 }
 
 .lgn-qrcode {
@@ -311,7 +331,7 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: calc(-48px);
+  top: calc(-45px);
 }
 .content-container ul li {
   display: flex;
@@ -616,6 +636,12 @@ label, .lgn-label, .lgn-typography .lgn-label, .lgn-typography label {
   display: none;
 }
 
+.lgn-logo {
+  background: url("../logo-light.svg") no-repeat;
+  background-position: auto;
+  background-size: contain;
+}
+
 .lgn-button,
 .lgn-stroked-button,
 .lgn-icon-button {
@@ -876,15 +902,16 @@ ul li i.lgn-valid {
   color: inherit;
   background: transparent;
   box-shadow: inset 0 -1px #303131;
+  cursor: pointer;
 }
 .lgn-account-selection .lgn-account:hover {
-  background-color: rgba(82, 130, 193, 0.05);
+  background-color: rgba(255, 255, 255, 0.02);
 }
 .lgn-account-selection .lgn-account:focus {
-  background-color: rgba(82, 130, 193, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 .lgn-account-selection .lgn-account:active {
-  background-color: rgba(82, 130, 193, 0.25);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 .lgn-account-selection .lgn-account .lgn-loginname {
   font-size: 14px;
@@ -904,7 +931,7 @@ ul li i.lgn-valid {
   background-color: #5282c1;
 }
 
-.lgn-avatar {
+.lgn-avatar .initials {
   color: white;
 }
 
@@ -920,6 +947,11 @@ ul li i.lgn-valid {
   display: none;
 }
 
+.lgn-dark-theme .lgn-logo {
+  background: url("../logo-light.svg") no-repeat;
+  background-position: auto;
+  background-size: contain;
+}
 .lgn-dark-theme .lgn-button,
 .lgn-dark-theme .lgn-stroked-button,
 .lgn-dark-theme .lgn-icon-button {
@@ -1157,15 +1189,16 @@ ul li i.lgn-valid {
   color: inherit;
   background: transparent;
   box-shadow: inset 0 -1px #303131;
+  cursor: pointer;
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:hover {
-  background-color: rgba(82, 130, 193, 0.05);
+  background-color: rgba(255, 255, 255, 0.02);
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:focus {
-  background-color: rgba(82, 130, 193, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:active {
-  background-color: rgba(82, 130, 193, 0.25);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account .lgn-loginname {
   font-size: 14px;
@@ -1183,7 +1216,7 @@ ul li i.lgn-valid {
 .lgn-dark-theme .lgn-avatar:not(.transparent) {
   background-color: #5282c1;
 }
-.lgn-dark-theme .lgn-avatar {
+.lgn-dark-theme .lgn-avatar .initials {
   color: white;
 }
 .lgn-dark-theme .lgn-select, .lgn-dark-theme select {
@@ -1198,6 +1231,11 @@ ul li i.lgn-valid {
   display: none;
 }
 
+.lgn-light-theme .lgn-logo {
+  background: url("../logo-dark.svg") no-repeat;
+  background-position: auto;
+  background-size: contain;
+}
 .lgn-light-theme .lgn-button,
 .lgn-light-theme .lgn-stroked-button,
 .lgn-light-theme .lgn-icon-button {
@@ -1435,15 +1473,16 @@ ul li i.lgn-valid {
   color: inherit;
   background: transparent;
   box-shadow: inset 0 -1px #e3e8ee;
+  cursor: pointer;
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:hover {
-  background-color: rgba(84, 105, 212, 0.05);
+  background-color: rgba(0, 0, 0, 0.02);
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:focus {
-  background-color: rgba(84, 105, 212, 0.1);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:active {
-  background-color: rgba(84, 105, 212, 0.25);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 .lgn-light-theme .lgn-account-selection .lgn-account .lgn-loginname {
   font-size: 14px;
@@ -1461,7 +1500,7 @@ ul li i.lgn-valid {
 .lgn-light-theme .lgn-avatar:not(.transparent) {
   background-color: #5469d4;
 }
-.lgn-light-theme .lgn-avatar {
+.lgn-light-theme .lgn-avatar .initials {
   color: white;
 }
 .lgn-light-theme .lgn-select, .lgn-light-theme select {

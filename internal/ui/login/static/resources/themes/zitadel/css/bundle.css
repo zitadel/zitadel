@@ -18,6 +18,20 @@ footer a {
   margin-left: 1rem;
 }
 
+.lgn-header {
+  display: block;
+  position: relative;
+  margin: 100px auto 0.5rem auto;
+  max-width: 380px;
+  padding: 0;
+  width: 100%;
+}
+.lgn-header .lgn-logo {
+  height: 43px;
+  width: 160px;
+  margin: 0 auto;
+}
+
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
   box-sizing: border-box;
   position: relative;
@@ -251,7 +265,13 @@ a.block {
 }
 
 .lgn-error {
+  display: flex;
+  align-items: center;
   outline: none;
+}
+.lgn-error i {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
 }
 
 .lgn-qrcode {
@@ -311,7 +331,7 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: calc(-48px);
+  top: calc(-45px);
 }
 .content-container ul li {
   display: flex;
@@ -544,6 +564,20 @@ footer a {
   margin-left: 1rem;
 }
 
+.lgn-header {
+  display: block;
+  position: relative;
+  margin: 100px auto 0.5rem auto;
+  max-width: 380px;
+  padding: 0;
+  width: 100%;
+}
+.lgn-header .lgn-logo {
+  height: 43px;
+  width: 160px;
+  margin: 0 auto;
+}
+
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
   box-sizing: border-box;
   position: relative;
@@ -777,7 +811,13 @@ a.block {
 }
 
 .lgn-error {
+  display: flex;
+  align-items: center;
   outline: none;
+}
+.lgn-error i {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
 }
 
 .lgn-qrcode {
@@ -837,7 +877,7 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: calc(-48px);
+  top: calc(-45px);
 }
 .content-container ul li {
   display: flex;
@@ -1169,7 +1209,7 @@ i {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: calc(-48px);
+  top: calc(-45px);
 }
 .content-container ul li {
   display: flex;
@@ -1203,11 +1243,10 @@ i {
   padding: 0;
   width: 100%;
 }
-.lgn-header img {
-  width: 100%;
-  display: block;
+.lgn-header .lgn-logo {
+  height: 43px;
+  width: 160px;
   margin: 0 auto;
-  max-width: 160px;
 }
 
 @keyframes shake {

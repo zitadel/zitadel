@@ -18,7 +18,7 @@
         background-color: lgn-color($primary, default); // default color -> gets overwritten by script using the initial letters of the name
     }
 
-    .lgn-avatar {
+    .lgn-avatar .initials{
         color: white;
     }
 }
