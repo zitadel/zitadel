@@ -1,12 +1,10 @@
-$lgn-header-max-width: 380px;
 $lgn-header-padding: 0;
-$lgn-header-margin: 100px auto .5rem auto;
+$lgn-header-margin: 1rem auto .5rem auto;
 
 .lgn-header {
     display: block;
     position: relative;
     margin: $lgn-header-margin;
-    max-width: $lgn-header-max-width;
     padding: $lgn-header-padding;
     width: 100%;
 

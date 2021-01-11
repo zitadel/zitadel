@@ -1,17 +1,35 @@
-$lgn-container-max-width: 380px;
+$lgn-container-max-width: 400px;
 $lgn-container-padding: 20px;
-$lgn-container-margin: 0px auto 50px auto;
+$lgn-container-margin: 0 auto 0 auto;
+$lgn-container-top-offset: 100px;
+$lgn-container-bottom-margin: 50px;
+
+.lgn-max-width-wrapper {
+    max-width: $lgn-container-max-width;
+    margin: auto;
+    margin-top: 50px;
+    margin-bottom: $lgn-container-bottom-margin;
+    display: block;
+
+    @media only screen and (min-width: 600px) {
+        margin-top: $lgn-container-top-offset;
+    }
+}
 
 .content-container {
     position: relative; // used to position a button element relative to the left upper corner of the content wrapper
     display: block;
     margin: $lgn-container-margin;
-    max-width: $lgn-container-max-width;
     padding: $lgn-container-padding;
     width: 100%;
+    box-sizing: border-box;
 
     .lgn-head {
         h1 {
+            text-align: center;
+        }
+
+        p {
             text-align: center;
         }
     }
@@ -33,6 +51,8 @@ $lgn-container-margin: 0px auto 50px auto;
     }
 
     .lgn-login-profile {
+        margin-bottom: .5rem;
+        
         .lgn-profile-image {
             display: block;
             margin: .5rem;

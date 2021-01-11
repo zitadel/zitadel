@@ -1,5 +1,5 @@
 Password:
-  Title: Passwort
+  Title: Willkommen zurück!
   Description: Gib deine Benutzerdaten ein.
   Password: Passwort
   MinLength: Mindestlänge
@@ -10,7 +10,7 @@ Password:
 
 Login:
   Title: Anmeldung
-  Description: Gib deine Benutzerdaten ein.
+  Description: Mit ZITADEL-Konto anmelden.
   TitleLinking: Anmeldung für Benutzer Linking
   DescriptionLinking: Gib deine Benutzerdaten ein um den externen Benutzer mit einem ZITADEL Benutzer zu linken.
   Loginname: Loginname

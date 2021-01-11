@@ -1,5 +1,5 @@
 Login:
-  Title: Login
+  Title: Welcome back!
   Description: Enter your logindata.
   TitleLinking: Login for userlinking
   DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
@@ -10,7 +10,7 @@ Login:
 
 UserSelection:
   Title: Select account
-  Description: Select your account.
+  Description: Use your ZITADEL-Account
   TitleLinking: Select account for userlinking
   DescriptionLinking: Select your account to link with your external user.
   OtherUser: Other User
