@@ -9,9 +9,13 @@ import (
 )
 
 func (r *CommandSide) AddApplication(ctx context.Context, application *domain.Application) (_ *domain.Application, err error) {
+	project, err := r.getProjectByID(ctx, application.AggregateID)
+	if err != nil {
+		return nil, err
+	}
 	addedApplication := NewApplicationWriteModel(application.AggregateID)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
-	err = r.addApplication(ctx, projectAgg, addedApplication, application)
+	err = r.addApplication(ctx, projectAgg, project, application)
 	if err != nil {
 		return nil, err
 	}
@@ -23,21 +27,21 @@ func (r *CommandSide) AddApplication(ctx context.Context, application *domain.Ap
 	return applicationWriteModelToApplication(addedApplication), nil
 }
 
-func (r *CommandSide) addApplication(ctx context.Context, projectAgg *project.Aggregate, addedApplication *ApplicationWriteModel, application *domain.Application) (err error) {
+func (r *CommandSide) addApplication(ctx context.Context, projectAgg *project.Aggregate, proj *domain.Project, application *domain.Application) (err error) {
 	if !application.IsValid(true) {
 		return caos_errs.ThrowPreconditionFailed(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
-	application.AggregateID, err = r.idGenerator.Next()
+	application.AppID, err = r.idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	projectAgg.PushEvents(project.NewApplicationAddedEvent(ctx, application.Name))
+	projectAgg.PushEvents(project.NewApplicationAddedEvent(ctx, application.AppID, application.Name, application.Type))
 
 	var stringPw string
 	if application.OIDCConfig != nil {
 		application.OIDCConfig.AppID = application.AggregateID
-		err := application.OIDCConfig.GenerateNewClientID(r.idGenerator, nil)
+		err = application.OIDCConfig.GenerateNewClientID(r.idGenerator, proj)
 		if err != nil {
 			return err
 		}
@@ -47,7 +51,7 @@ func (r *CommandSide) addApplication(ctx context.Context, projectAgg *project.Ag
 		}
 		projectAgg.PushEvents(project.NewOIDCConfigAddedEvent(ctx,
 			application.OIDCConfig.OIDCVersion,
-			application.OIDCConfig.AggregateID,
+			application.OIDCConfig.AppID,
 			application.OIDCConfig.ClientID,
 			application.OIDCConfig.ClientSecret,
 			application.OIDCConfig.RedirectUris,

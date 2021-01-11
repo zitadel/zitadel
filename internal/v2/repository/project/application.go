@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 const (
@@ -21,20 +22,24 @@ const (
 type ApplicationAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name string `json:"name,omitempty"`
+	AppID   string         `json:"appId,omitempty"`
+	Name    string         `json:"name,omitempty"`
+	AppType domain.AppType `json:"appType,omitempty"`
 }
 
 func (e *ApplicationAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewApplicationAddedEvent(ctx context.Context, name string) *ApplicationAddedEvent {
+func NewApplicationAddedEvent(ctx context.Context, appID, name string, appType domain.AppType) *ApplicationAddedEvent {
 	return &ApplicationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			ApplicationAdded,
 		),
-		Name: name,
+		AppID:   appID,
+		Name:    name,
+		AppType: appType,
 	}
 }
 

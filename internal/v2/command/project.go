@@ -44,3 +44,20 @@ func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project
 	)
 	return projectAgg, addedProject, nil
 }
+
+func (r *CommandSide) getProjectByID(ctx context.Context, projectID string) (*domain.Project, error) {
+	projectWriteModel, err := r.getProjectWriteModelByID(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+	return projectWriteModelToProject(projectWriteModel), nil
+}
+
+func (r *CommandSide) getProjectWriteModelByID(ctx context.Context, projectID string) (*ProjectWriteModel, error) {
+	projectWriteModel := NewProjectWriteModel(projectID)
+	err := r.eventstore.FilterToQueryReducer(ctx, projectWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return projectWriteModel, nil
+}

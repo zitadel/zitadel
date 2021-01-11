@@ -104,7 +104,7 @@ func (c *OIDCConfig) GenerateNewClientID(idGenerator id.Generator, project *Proj
 		return err
 	}
 
-	c.ClientID = fmt.Sprintf("%v@%v", rndID, strings.ReplaceAll(strings.ToLower("project.Name"), " ", "_")) //TODO: project?
+	c.ClientID = fmt.Sprintf("%v@%v", rndID, strings.ReplaceAll(strings.ToLower(project.Name), " ", "_"))
 	return nil
 }
 

@@ -135,13 +135,14 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		aggregates = append(aggregates, orgAgg, userAgg, orgMemberAgg)
 		//projects
 		for _, proj := range organisation.Projects {
-			projectAgg, _, err := r.addProject(ctx, &domain.Project{Name: proj.Name}, userAgg.ID())
+			project := &domain.Project{Name: proj.Name}
+			projectAgg, _, err := r.addProject(ctx, project, userAgg.ID())
 			if err != nil {
 				return err
 			}
 			//create applications
 			for _, app := range proj.OIDCApps {
-				err = r.addApplication(ctx, projectAgg, nil, &domain.Application{
+				err = r.addApplication(ctx, projectAgg, project, &domain.Application{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: projectAgg.ID(),
 					},
