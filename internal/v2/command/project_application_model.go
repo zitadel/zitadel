@@ -16,10 +16,11 @@ type ApplicationWriteModel struct {
 	OIDCConfig *domain.OIDCConfig
 }
 
-func NewApplicationWriteModel(projectID string) *ApplicationWriteModel {
+func NewApplicationWriteModel(projectID, resourceOwner string) *ApplicationWriteModel {
 	return &ApplicationWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: projectID,
+			AggregateID:   projectID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -49,5 +50,5 @@ func (wm *ApplicationWriteModel) Reduce() error {
 
 func (wm *ApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).ResourceOwner(wm.ResourceOwner)
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/project"
 )
 
-func (r *CommandSide) AddProject(ctx context.Context, project *domain.Project, ownerUserID string) (_ *domain.Project, err error) {
-	projectAgg, addedProject, err := r.addProject(ctx, project, ownerUserID)
+func (r *CommandSide) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
+	projectAgg, addedProject, err := r.addProject(ctx, project, resourceOwner, ownerUserID)
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (r *CommandSide) AddProject(ctx context.Context, project *domain.Project, o
 	return projectWriteModelToProject(addedProject), nil
 }
 
-func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project, ownerUserID string) (_ *project.Aggregate, _ *ProjectWriteModel, err error) {
+func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID string) (_ *project.Aggregate, _ *ProjectWriteModel, err error) {
 	if !projectAdd.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
 	}
@@ -29,9 +29,8 @@ func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project
 	if err != nil {
 		return nil, nil, err
 	}
-	//project.State = proj_model.ProjectStateActive
 
-	addedProject := NewProjectWriteModel(projectAdd.AggregateID)
+	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
 
 	projectRole := domain.RoleOrgOwner
@@ -45,16 +44,16 @@ func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project
 	return projectAgg, addedProject, nil
 }
 
-func (r *CommandSide) getProjectByID(ctx context.Context, projectID string) (*domain.Project, error) {
-	projectWriteModel, err := r.getProjectWriteModelByID(ctx, projectID)
+func (r *CommandSide) getProjectByID(ctx context.Context, projectID, resourceOwner string) (*domain.Project, error) {
+	projectWriteModel, err := r.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return projectWriteModelToProject(projectWriteModel), nil
 }
 
-func (r *CommandSide) getProjectWriteModelByID(ctx context.Context, projectID string) (*ProjectWriteModel, error) {
-	projectWriteModel := NewProjectWriteModel(projectID)
+func (r *CommandSide) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectWriteModel, error) {
+	projectWriteModel := NewProjectWriteModel(projectID, resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, projectWriteModel)
 	if err != nil {
 		return nil, err

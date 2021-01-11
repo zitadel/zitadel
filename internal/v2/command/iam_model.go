@@ -19,7 +19,8 @@ type IAMWriteModel struct {
 func NewIAMWriteModel(iamID string) *IAMWriteModel {
 	return &IAMWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: iamID,
+			AggregateID:   iamID,
+			ResourceOwner: domain.ResourceOwnerIAM,
 		},
 	}
 }

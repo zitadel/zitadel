@@ -13,7 +13,8 @@ func NewOrgMemberWriteModel(orgID, userID string) *OrgMemberWriteModel {
 	return &OrgMemberWriteModel{
 		MemberWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: orgID,
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
 			},
 			UserID: userID,
 		},

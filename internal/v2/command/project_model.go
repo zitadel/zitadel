@@ -15,10 +15,11 @@ type ProjectWriteModel struct {
 	State                domain.ProjectState
 }
 
-func NewProjectWriteModel(projectID string) *ProjectWriteModel {
+func NewProjectWriteModel(projectID string, resourceOwner string) *ProjectWriteModel {
 	return &ProjectWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: projectID,
+			AggregateID:   projectID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -48,7 +49,7 @@ func (wm *ProjectWriteModel) Reduce() error {
 
 func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).ResourceOwner(wm.ResourceOwner)
 }
 
 func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *project.Aggregate {

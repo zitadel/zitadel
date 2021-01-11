@@ -4,6 +4,10 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
+const (
+	ResourceOwnerIAM = "IAM"
+)
+
 type IAM struct {
 	models.ObjectRoot
 

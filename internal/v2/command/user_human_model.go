@@ -38,10 +38,11 @@ type HumanWriteModel struct {
 	UserState domain.UserState
 }
 
-func NewHumanWriteModel(userID string) *HumanWriteModel {
+func NewHumanWriteModel(userID, resourceOwner string) *HumanWriteModel {
 	return &HumanWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -115,7 +116,7 @@ func (wm *HumanWriteModel) Reduce() error {
 
 func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *HumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {

@@ -88,7 +88,7 @@ type OIDCApp struct {
 }
 
 func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1) error {
-	iamAgg := iam_repo.NewAggregate(r.iamID, "", 0)
+	iamAgg := iam_repo.NewAggregate(r.iamID, domain.ResourceOwnerIAM, 0)
 	//create default login policy
 	err := r.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(iamAgg.ID()),
 		&domain.LoginPolicy{
@@ -136,7 +136,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		//projects
 		for _, proj := range organisation.Projects {
 			project := &domain.Project{Name: proj.Name}
-			projectAgg, _, err := r.addProject(ctx, project, userAgg.ID())
+			projectAgg, _, err := r.addProject(ctx, project, orgAgg.ID(), userAgg.ID())
 			if err != nil {
 				return err
 			}

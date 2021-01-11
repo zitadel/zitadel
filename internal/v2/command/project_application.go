@@ -8,12 +8,12 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/project"
 )
 
-func (r *CommandSide) AddApplication(ctx context.Context, application *domain.Application) (_ *domain.Application, err error) {
-	project, err := r.getProjectByID(ctx, application.AggregateID)
+func (r *CommandSide) AddApplication(ctx context.Context, application *domain.Application, resourceOwner string) (_ *domain.Application, err error) {
+	project, err := r.getProjectByID(ctx, application.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	addedApplication := NewApplicationWriteModel(application.AggregateID)
+	addedApplication := NewApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 	err = r.addApplication(ctx, projectAgg, project, application)
 	if err != nil {
@@ -40,7 +40,7 @@ func (r *CommandSide) addApplication(ctx context.Context, projectAgg *project.Ag
 
 	var stringPw string
 	if application.OIDCConfig != nil {
-		application.OIDCConfig.AppID = application.AggregateID
+		application.OIDCConfig.AppID = application.AppID
 		err = application.OIDCConfig.GenerateNewClientID(r.idGenerator, proj)
 		if err != nil {
 			return err

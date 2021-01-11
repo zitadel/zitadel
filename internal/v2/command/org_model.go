@@ -17,7 +17,8 @@ type OrgWriteModel struct {
 func NewOrgWriteModel(orgID string) *OrgWriteModel {
 	return &OrgWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: orgID,
+			AggregateID:   orgID,
+			ResourceOwner: orgID,
 		},
 	}
 }
