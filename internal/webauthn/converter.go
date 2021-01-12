@@ -1,7 +1,6 @@
 package webauthn
 
 import (
-	"github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
@@ -25,7 +24,7 @@ func WebAuthNsToCredentials(webAuthNs []*domain.WebAuthNToken) []webauthn.Creden
 	return creds
 }
 
-func WebAuthNToSessionData(webAuthN *model.WebAuthNToken) webauthn.SessionData {
+func WebAuthNToSessionData(webAuthN *domain.WebAuthNToken) webauthn.SessionData {
 	return webauthn.SessionData{
 		Challenge:            webAuthN.Challenge,
 		UserID:               []byte(webAuthN.AggregateID),
@@ -34,7 +33,7 @@ func WebAuthNToSessionData(webAuthN *model.WebAuthNToken) webauthn.SessionData {
 	}
 }
 
-func WebAuthNLoginToSessionData(webAuthN *model.WebAuthNLogin) webauthn.SessionData {
+func WebAuthNLoginToSessionData(webAuthN *domain.WebAuthNLogin) webauthn.SessionData {
 	return webauthn.SessionData{
 		Challenge:            webAuthN.Challenge,
 		UserID:               []byte(webAuthN.AggregateID),

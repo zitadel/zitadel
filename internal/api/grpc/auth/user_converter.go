@@ -431,11 +431,11 @@ func userChangesToAPI(changes *usr_model.UserChanges) (_ []*auth.Change) {
 	return result
 }
 
-func verifyWebAuthNFromModel(u2f *usr_model.WebAuthNToken) *auth.WebAuthNResponse {
+func verifyWebAuthNFromDomain(u2f *domain.WebAuthNToken) *auth.WebAuthNResponse {
 	return &auth.WebAuthNResponse{
 		Id:        u2f.WebAuthNTokenID,
 		PublicKey: u2f.CredentialCreationData,
-		State:     auth.MFAState(u2f.State),
+		State:     mfaStateFromDomain(u2f.State),
 	}
 }
 

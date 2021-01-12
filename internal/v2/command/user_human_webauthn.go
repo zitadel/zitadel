@@ -10,8 +10,9 @@ import (
 )
 
 func (r *CommandSide) getHumanU2FTokens(ctx context.Context, userID, resourceowner string) ([]*domain.WebAuthNToken, error) {
-
+	return nil, nil
 }
+
 func (r *CommandSide) AddHumanU2F(ctx context.Context, userID, resourceowner string, isLoginUI bool) (*domain.WebAuthNToken, error) {
 
 	addWebAuthN, userAgg, webAuthN, err := r.addHumanWebAuthN(ctx, userID, resourceowner, isLoginUI)
