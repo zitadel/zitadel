@@ -33,7 +33,7 @@ func (r *CommandSide) SetupStep7(ctx context.Context, step *Step7) error {
 		if err != nil {
 			return nil, err
 		}
-		logging.Log("SETUP-Dggsg").Info("added 2FA OTP to default login policy")
+		logging.Log("SETUP-Dggsg").Info("added OTP to 2FA login policy")
 		return iamAgg, nil
 	}
 	return r.setup(ctx, step, fn)

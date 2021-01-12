@@ -38,7 +38,7 @@ func (r *CommandSide) SetupStep9(ctx context.Context, step *Step9) error {
 		if err != nil {
 			return nil, err
 		}
-		logging.Log("SETUP-ADfng").Info("added MFA passwordless to default login policy")
+		logging.Log("SETUP-ADfng").Info("added passwordless to MFA login policy")
 		return iamAgg, err
 	}
 	return r.setup(ctx, step, fn)

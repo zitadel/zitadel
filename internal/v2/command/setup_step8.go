@@ -33,7 +33,7 @@ func (r *CommandSide) SetupStep8(ctx context.Context, step *Step8) error {
 		if err != nil {
 			return nil, err
 		}
-		logging.Log("SETUP-BDhne").Info("added 2FA U2F to default login policy")
+		logging.Log("SETUP-BDhne").Info("added U2F to 2FA login policy")
 		return iamAgg, nil
 	}
 	return r.setup(ctx, step, fn)
