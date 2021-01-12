@@ -29,7 +29,7 @@ func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project
 	if err != nil {
 		return nil, nil, err
 	}
-
+// TODO: Add uniqueness check
 	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
 
