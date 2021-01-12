@@ -23,7 +23,7 @@ func (e *ProjectSetEvent) Data() interface{} {
 	return e
 }
 
-func NewProjectSetEvent(ctx context.Context, projectID string) *ProjectSetEvent {
+func NewIAMProjectSetEvent(ctx context.Context, projectID string) *ProjectSetEvent {
 	return &ProjectSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

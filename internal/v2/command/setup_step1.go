@@ -3,6 +3,8 @@ package command
 import (
 	"context"
 
+	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -28,15 +30,8 @@ const (
 type Step1 struct {
 	GlobalOrg          string
 	IAMProject         string
-	DefaultLoginPolicy LoginPolicy //*iam_model.LoginPolicy
+	DefaultLoginPolicy LoginPolicy
 	Orgs               []Org
-	Owners             []string
-
-	//setup              *Setup
-	//createdUsers       map[string]*usr_model.User
-	//createdOrgs        map[string]*org_model.Org
-	//createdProjects    map[string]*proj_model.Project
-	//pwComplexityPolicy *iam_model.PasswordComplexityPolicyView
 }
 
 func (s *Step1) Step() domain.Step {
@@ -88,7 +83,8 @@ type OIDCApp struct {
 }
 
 func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
-	iamAgg := iam_repo.NewAggregate(domain.IAMID, domain.IAMID, 0)
+	iamWriteModel := NewIAMWriteModel()
+	iamAgg := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
 	//create default login policy
 	err := r.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(),
 		&domain.LoginPolicy{
@@ -126,6 +122,8 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 		if err != nil {
 			return err
 		}
+		logging.LogWithFields("SETUP-Gdsfg", "id", orgAgg.ID(), "name", organisation.Name).Info("org set up")
+
 		if organisation.OrgIamPolicy {
 			err = r.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID()), &domain.OrgIAMPolicy{UserLoginMustBeDomain: false})
 			if err != nil {
@@ -133,12 +131,28 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 			}
 		}
 		aggregates = append(aggregates, orgAgg, userAgg, orgMemberAgg)
+		if organisation.Name == step1.GlobalOrg {
+			err = r.setGlobalOrg(ctx, iamAgg, iamWriteModel, orgAgg.ID())
+			if err != nil {
+				return err
+			}
+		}
 		//projects
 		for _, proj := range organisation.Projects {
 			project := &domain.Project{Name: proj.Name}
 			projectAgg, _, err := r.addProject(ctx, project, orgAgg.ID(), userAgg.ID())
 			if err != nil {
 				return err
+			}
+			if project.Name == step1.IAMProject {
+				err = r.setIAMProject(ctx, iamAgg, iamWriteModel, projectAgg.ID())
+				if err != nil {
+					return err
+				}
+				err = r.addIAMMember(ctx, iamAgg, NewIAMMemberWriteModel(userAgg.ID()), domain.NewMember(iamAgg.ID(), userAgg.ID(), domain.RoleIAMOwner))
+				if err != nil {
+					return err
+				}
 			}
 			//create applications
 			for _, app := range proj.OIDCApps {
@@ -165,20 +179,6 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 		}
 	}
 
-	//set iam owners
-	//set global org
-	//set iam project id
-
-	/*aggregates:
-	  iam:
-	  	default login policy
-	  	iam owner
-	  org:
-	  	default
-	  	caos
-	  		zitadel
-
-	*/
 	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
 
 	_, err = r.eventstore.PushAggregates(ctx, append(aggregates, iamAgg)...)

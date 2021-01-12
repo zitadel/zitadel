@@ -2,33 +2,22 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"reflect"
 
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
-	//TODO: check if roles valid
-
-	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-W8m4l", "Errors.IAM.MemberInvalid")
-	}
-
 	addedMember := NewIAMMemberWriteModel(member.UserID)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
+	iamAgg := IAMAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
+	err := r.addIAMMember(ctx, iamAgg, addedMember, member)
 	if err != nil {
 		return nil, err
 	}
-	if addedMember.State == domain.MemberStateActive {
-		return nil, errors.ThrowAlreadyExists(nil, "IAM-PtXi1", "Errors.IAM.Member.AlreadyExists")
-	}
-
-	iamAgg := IAMAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
 
 	err = r.eventstore.PushAggregate(ctx, addedMember, iamAgg)
 	if err != nil {
@@ -36,6 +25,26 @@ func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.Member) (
 	}
 
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
+}
+
+func (r *CommandSide) addIAMMember(ctx context.Context, iamAgg *iam_repo.Aggregate, addedMember *IAMMemberWriteModel, member *domain.Member) error {
+	//TODO: check if roles valid
+
+	if !member.IsValid() {
+		return caos_errs.ThrowPreconditionFailed(nil, "IAM-GR34U", "Errors.IAM.MemberInvalid")
+	}
+
+	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
+	if err != nil {
+		return err
+	}
+	if addedMember.State == domain.MemberStateActive {
+		return errors.ThrowAlreadyExists(nil, "IAM-sdgQ4", "Errors.IAM.Member.AlreadyExists")
+	}
+
+	iamAgg.PushEvents(iam_repo.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
+
+	return nil
 }
 
 //ChangeIAMMember updates an existing member

@@ -67,8 +67,6 @@ SetUp:
                 ApplicationType: 'USER_AGENT'
                 AuthMethodType: 'NONE'
                 DevMode: $ZITADEL_CONSOLE_DEV_MODE
-    Owners:
-      - 'zitadel-admin@caos.ch'
   Step2:
     DefaultPasswordComplexityPolicy:
       MinLength: 8
