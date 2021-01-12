@@ -9,7 +9,7 @@ import (
 )
 
 func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*domain.PasswordComplexityPolicy, error) {
-	policyWriteModel := NewIAMPasswordComplexityPolicyWriteModel(r.iamID)
+	policyWriteModel := NewIAMPasswordComplexityPolicyWriteModel()
 	err := r.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
@@ -20,8 +20,7 @@ func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*
 }
 
 func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
-	policy.AggregateID = r.iamID
-	addedPolicy := NewIAMPasswordComplexityPolicyWriteModel(policy.AggregateID)
+	addedPolicy := NewIAMPasswordComplexityPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
 	err := r.addDefaultPasswordComplexityPolicy(ctx, iamAgg, addedPolicy, policy)
 	if err != nil {
@@ -55,12 +54,11 @@ func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, ia
 }
 
 func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
-	policy.AggregateID = r.iamID
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
 
-	existingPolicy, err := r.defaultPasswordComplexityPolicyWriteModelByID(ctx, policy.AggregateID)
+	existingPolicy, err := r.defaultPasswordComplexityPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -83,11 +81,11 @@ func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context,
 	return writeModelToPasswordComplexityPolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) defaultPasswordComplexityPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMPasswordComplexityPolicyWriteModel, err error) {
+func (r *CommandSide) defaultPasswordComplexityPolicyWriteModelByID(ctx context.Context) (policy *IAMPasswordComplexityPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMPasswordComplexityPolicyWriteModel(iamID)
+	writeModel := NewIAMPasswordComplexityPolicyWriteModel()
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

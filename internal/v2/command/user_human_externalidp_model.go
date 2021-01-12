@@ -16,10 +16,11 @@ type HumanExternalIDPWriteModel struct {
 	State domain.ExternalIDPState
 }
 
-func NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID string) *HumanExternalIDPWriteModel {
+func NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID, resourceOwner string) *HumanExternalIDPWriteModel {
 	return &HumanExternalIDPWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 		IDPConfigID:    idpConfigID,
 		ExternalUserID: externalUserID,
@@ -68,5 +69,6 @@ func (wm *HumanExternalIDPWriteModel) Reduce() error {
 
 func (wm *HumanExternalIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }

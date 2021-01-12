@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
-func (r *CommandSide) AddHumanOTP(ctx context.Context, userID string) (*domain.OTP, error) {
+func (r *CommandSide) AddHumanOTP(ctx context.Context, userID, resourceowner string) (*domain.OTP, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
@@ -25,7 +25,7 @@ func (r *CommandSide) AddHumanOTP(ctx context.Context, userID string) (*domain.O
 	if err != nil {
 		return nil, err
 	}
-	otpWriteModel, err := r.otpWriteModelByID(ctx, userID)
+	otpWriteModel, err := r.otpWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}
@@ -58,12 +58,12 @@ func (r *CommandSide) AddHumanOTP(ctx context.Context, userID string) (*domain.O
 	}, nil
 }
 
-func (r *CommandSide) CheckMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error {
+func (r *CommandSide) CheckMFAOTPSetup(ctx context.Context, userID, code, userAgentID, resourceowner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
 	}
 
-	existingOTP, err := r.otpWriteModelByID(ctx, userID)
+	existingOTP, err := r.otpWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return err
 	}
@@ -84,12 +84,12 @@ func (r *CommandSide) CheckMFAOTPSetup(ctx context.Context, userID, code, userAg
 	return r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
 }
 
-func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID string) error {
+func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
 
-	existingOTP, err := r.otpWriteModelByID(ctx, userID)
+	existingOTP, err := r.otpWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -104,11 +104,11 @@ func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID string) error {
 	return r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
 }
 
-func (r *CommandSide) otpWriteModelByID(ctx context.Context, userID string) (writeModel *HumanOTPWriteModel, err error) {
+func (r *CommandSide) otpWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanOTPWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanOTPWriteModel(userID)
+	writeModel = NewHumanOTPWriteModel(userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

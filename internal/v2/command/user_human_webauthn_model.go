@@ -14,10 +14,11 @@ type HumanWebAuthNWriteModel struct {
 	State domain.WebAuthNState
 }
 
-func NewHumanWebAuthNWriteModel(userID, wbAuthNTokenID string) *HumanWebAuthNWriteModel {
+func NewHumanWebAuthNWriteModel(userID, wbAuthNTokenID, resourceOwner string) *HumanWebAuthNWriteModel {
 	return &HumanWebAuthNWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 		WebauthNTokenID: wbAuthNTokenID,
 	}
@@ -57,5 +58,6 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 
 func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }

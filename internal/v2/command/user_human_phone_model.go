@@ -22,10 +22,11 @@ type HumanPhoneWriteModel struct {
 	State domain.PhoneState
 }
 
-func NewHumanPhoneWriteModel(userID string) *HumanPhoneWriteModel {
+func NewHumanPhoneWriteModel(userID, resourceOwner string) *HumanPhoneWriteModel {
 	return &HumanPhoneWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -85,7 +86,8 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 
 func (wm *HumanPhoneWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *HumanPhoneWriteModel) NewChangedEvent(

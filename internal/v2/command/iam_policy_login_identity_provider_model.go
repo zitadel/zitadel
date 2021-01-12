@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
@@ -9,11 +10,12 @@ type IAMIdentityProviderWriteModel struct {
 	IdentityProviderWriteModel
 }
 
-func NewIAMIdentityProviderWriteModel(iamID, idpConfigID string) *IAMIdentityProviderWriteModel {
+func NewIAMIdentityProviderWriteModel(idpConfigID string) *IAMIdentityProviderWriteModel {
 	return &IAMIdentityProviderWriteModel{
 		IdentityProviderWriteModel: IdentityProviderWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
 			},
 			IDPConfigID: idpConfigID,
 		},
@@ -38,5 +40,6 @@ func (wm *IAMIdentityProviderWriteModel) Reduce() error {
 
 func (wm *IAMIdentityProviderWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }

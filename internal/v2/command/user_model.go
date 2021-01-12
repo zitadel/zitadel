@@ -1,11 +1,12 @@
 package command
 
 import (
+	"strings"
+
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
-	"strings"
 )
 
 type UserWriteModel struct {
@@ -15,10 +16,11 @@ type UserWriteModel struct {
 	UserState domain.UserState
 }
 
-func NewUserWriteModel(userID string) *UserWriteModel {
+func NewUserWriteModel(userID, resourceOwner string) *UserWriteModel {
 	return &UserWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -86,7 +88,8 @@ func (wm *UserWriteModel) Reduce() error {
 
 func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func UserAggregateFromWriteModel(wm *eventstore.WriteModel) *user.Aggregate {

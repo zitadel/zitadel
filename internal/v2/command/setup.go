@@ -22,7 +22,7 @@ const (
 )
 
 func (r *CommandSide) ExecuteSetupSteps(ctx context.Context, steps []Step) error {
-	iam, err := r.GetIAM(ctx, r.iamID)
+	iam, err := r.GetIAM(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
@@ -32,13 +32,13 @@ func (r *CommandSide) ExecuteSetupSteps(ctx context.Context, steps []Step) error
 	}
 
 	if iam == nil {
-		iam = &domain.IAM{ObjectRoot: models.ObjectRoot{AggregateID: r.iamID}}
+		iam = &domain.IAM{ObjectRoot: models.ObjectRoot{}}
 	}
 
-	ctx = setSetUpContextData(ctx, r.iamID)
+	ctx = setSetUpContextData(ctx)
 
 	for _, step := range steps {
-		iam, err = r.StartSetup(ctx, r.iamID, step.Step())
+		iam, err = r.StartSetup(ctx, step.Step())
 		if err != nil {
 			return err
 		}
@@ -51,12 +51,12 @@ func (r *CommandSide) ExecuteSetupSteps(ctx context.Context, steps []Step) error
 	return nil
 }
 
-func setSetUpContextData(ctx context.Context, orgID string) context.Context {
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: SetupUser, OrgID: orgID})
+func setSetUpContextData(ctx context.Context) context.Context {
+	return authz.SetCtxData(ctx, authz.CtxData{UserID: SetupUser})
 }
 
-func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.Step) (*domain.IAM, error) {
-	iamWriteModel, err := r.iamByID(ctx, iamID)
+func (r *CommandSide) StartSetup(ctx context.Context, step domain.Step) (*domain.IAM, error) {
+	iamWriteModel, err := r.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
@@ -68,11 +68,12 @@ func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Grgh1", "Setup start failed")
 	}
+	logging.LogWithFields("SETUP-fhh21", "step", step).Info("setup step started")
 	return writeModelToIAM(iamWriteModel), nil
 }
 
 func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider func(*IAMWriteModel) (*iam_repo.Aggregate, error)) error {
-	iam, err := r.iamByID(ctx, r.iamID)
+	iam, err := r.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
@@ -89,44 +90,6 @@ func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailedf(nil, "EVENT-dbG31", "Setup %s failed", step.Step())
 	}
+	logging.LogWithFields("SETUP-Sg1t1", "step", step.Step()).Info("setup step done")
 	return nil
 }
-
-//func (r *CommandSide) setupDone(ctx context.Context, iamAgg *iam_repo.Aggregate, event eventstore.EventPusher, aggregates ...eventstore.Aggregater) error {
-//	aggregate := iamAgg.PushEvents(event)
-//
-//	aggregates = append(aggregates, aggregate)
-//	_, err := r.eventstore.PushAggregates(ctx, aggregates...)
-//	if err != nil {
-//		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dgd2", "Setup done failed")
-//	}
-//	return nil
-//}
-
-//
-////TODO: should not use readmodel
-//func (r *CommandSide) setup(ctx context.Context, iamID string, step iam_repo.Step, event eventstore.EventPusher) (*iam_model.IAM, error) {
-//	iam, err := r.iamByID(ctx, iamID)
-//	if err != nil && !caos_errs.IsNotFound(err) {
-//		return nil, err
-//	}
-//
-//	if iam != nil && (iam.SetUpStarted >= iam_repo.Step(step) || iam.SetUpStarted != iam.SetUpDone) {
-//		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "setup error")
-//	}
-//
-//	aggregate := query.AggregateFromReadModel(iam).
-//		PushEvents(event)
-//
-//	events, err := r.eventstore.PushAggregates(ctx, aggregate)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	if err = iam.AppendAndReduce(events...); err != nil {
-//		return nil, err
-//	}
-//	return nil, nil
-//	//TODO: return write model
-//	//return readModelToIAM(iam), nil
-//}

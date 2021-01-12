@@ -185,7 +185,9 @@ Errors:
     MemberNotExisting: Member existiert nicht
     IDMissing: Id fehlt
     GlobalOrgMissing: Globale Organisation fehlt
-    IamProjectIDMisisng: Iam Project ID fehlt
+    GlobalOrgAlreadySet: Globale Organisation wurde bereits gesetzt
+    IAMProjectIDMissing: IAM Project ID fehlt
+    IamProjectAlreadySet: IAM Project ID wurde bereits gesetzt
     IdpInvalid: IDP Konfiguration ist ungültig
     IdpNotExisting: IDP Konfiguration existiert nicht
     OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig

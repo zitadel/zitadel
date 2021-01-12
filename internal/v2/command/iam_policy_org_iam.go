@@ -9,8 +9,7 @@ import (
 )
 
 func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
-	policy.AggregateID = r.iamID
-	addedPolicy := NewIAMOrgIAMPolicyWriteModel(policy.AggregateID)
+	addedPolicy := NewIAMOrgIAMPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
 	err := r.addDefaultOrgIAMPolicy(ctx, nil, addedPolicy, policy)
 	if err != nil {
@@ -39,8 +38,7 @@ func (r *CommandSide) addDefaultOrgIAMPolicy(ctx context.Context, iamAgg *iam_re
 }
 
 func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
-	policy.AggregateID = r.iamID
-	existingPolicy, err := r.defaultOrgIAMPolicyWriteModelByID(ctx, policy.AggregateID)
+	existingPolicy, err := r.defaultOrgIAMPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +63,7 @@ func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *dom
 }
 
 func (r *CommandSide) getDefaultOrgIAMPolicy(ctx context.Context) (*domain.OrgIAMPolicy, error) {
-	policyWriteModel, err := r.defaultOrgIAMPolicyWriteModelByID(ctx, r.iamID)
+	policyWriteModel, err := r.defaultOrgIAMPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -74,11 +72,11 @@ func (r *CommandSide) getDefaultOrgIAMPolicy(ctx context.Context) (*domain.OrgIA
 	return policy, nil
 }
 
-func (r *CommandSide) defaultOrgIAMPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMOrgIAMPolicyWriteModel, err error) {
+func (r *CommandSide) defaultOrgIAMPolicyWriteModelByID(ctx context.Context) (policy *IAMOrgIAMPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMOrgIAMPolicyWriteModel(iamID)
+	writeModel := NewIAMOrgIAMPolicyWriteModel()
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

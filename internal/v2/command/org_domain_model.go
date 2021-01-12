@@ -22,7 +22,8 @@ type OrgDomainWriteModel struct {
 func NewOrgDomainWriteModel(orgID string, domain string) *OrgDomainWriteModel {
 	return &OrgDomainWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: orgID,
+			AggregateID:   orgID,
+			ResourceOwner: orgID,
 		},
 		Domain: domain,
 	}
@@ -86,5 +87,6 @@ func (wm *OrgDomainWriteModel) Reduce() error {
 
 func (wm *OrgDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }

@@ -9,8 +9,7 @@ import (
 )
 
 func (r *CommandSide) AddDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	policy.AggregateID = r.iamID
-	addedPolicy := NewIAMPasswordAgePolicyWriteModel(policy.AggregateID)
+	addedPolicy := NewIAMPasswordAgePolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
 	err := r.addDefaultPasswordAgePolicy(ctx, nil, addedPolicy, policy)
 	if err != nil {
@@ -40,8 +39,7 @@ func (r *CommandSide) addDefaultPasswordAgePolicy(ctx context.Context, iamAgg *i
 }
 
 func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	policy.AggregateID = r.iamID
-	existingPolicy, err := r.defaultPasswordAgePolicyWriteModelByID(ctx, policy.AggregateID)
+	existingPolicy, err := r.defaultPasswordAgePolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -65,11 +63,11 @@ func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy
 	return writeModelToPasswordAgePolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) defaultPasswordAgePolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMPasswordAgePolicyWriteModel, err error) {
+func (r *CommandSide) defaultPasswordAgePolicyWriteModelByID(ctx context.Context) (policy *IAMPasswordAgePolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMPasswordAgePolicyWriteModel(iamID)
+	writeModel := NewIAMPasswordAgePolicyWriteModel()
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

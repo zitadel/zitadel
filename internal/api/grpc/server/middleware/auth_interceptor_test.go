@@ -21,8 +21,8 @@ var (
 
 type verifierMock struct{}
 
-func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, error) {
-	return "", "", "", nil
+func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, error) {
+	return "", "", "", "", nil
 }
 func (v *verifierMock) ResolveGrants(ctx context.Context) (*authz.Grant, error) {
 	return nil, nil

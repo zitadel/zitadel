@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
@@ -19,10 +20,11 @@ type HumanAddressWriteModel struct {
 	State domain.AddressState
 }
 
-func NewHumanAddressWriteModel(userID string) *HumanAddressWriteModel {
+func NewHumanAddressWriteModel(userID, resourceOwner string) *HumanAddressWriteModel {
 	return &HumanAddressWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -82,7 +84,8 @@ func (wm *HumanAddressWriteModel) Reduce() error {
 
 func (wm *HumanAddressWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *HumanAddressWriteModel) NewChangedEvent(

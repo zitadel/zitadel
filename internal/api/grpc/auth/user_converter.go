@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -15,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
@@ -103,7 +103,7 @@ func updateProfileToDomain(ctx context.Context, u *auth.UpdateUserProfileRequest
 	logging.Log("GRPC-lk73L").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("language malformed")
 
 	return &domain.Profile{
-		ObjectRoot:        models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
+		ObjectRoot:        ctxToObjectRoot(ctx),
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		NickName:          u.NickName,
@@ -148,7 +148,7 @@ func emailViewFromModel(email *usr_model.Email) *auth.UserEmailView {
 
 func updateEmailToDomain(ctx context.Context, e *auth.UpdateUserEmailRequest) *domain.Email {
 	return &domain.Email{
-		ObjectRoot:   models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
+		ObjectRoot:   ctxToObjectRoot(ctx),
 		EmailAddress: e.Email,
 	}
 }
@@ -189,7 +189,7 @@ func phoneViewFromModel(phone *usr_model.Phone) *auth.UserPhoneView {
 
 func updatePhoneToDomain(ctx context.Context, e *auth.UpdateUserPhoneRequest) *domain.Phone {
 	return &domain.Phone{
-		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
+		ObjectRoot:  ctxToObjectRoot(ctx),
 		PhoneNumber: e.Phone,
 	}
 }
@@ -236,7 +236,7 @@ func addressViewFromModel(address *usr_model.Address) *auth.UserAddressView {
 
 func updateAddressToDomain(ctx context.Context, address *auth.UpdateUserAddressRequest) *domain.Address {
 	return &domain.Address{
-		ObjectRoot:    models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
+		ObjectRoot:    ctxToObjectRoot(ctx),
 		Country:       address.Country,
 		StreetAddress: address.StreetAddress,
 		Region:        address.Region,
@@ -254,7 +254,7 @@ func externalIDPSearchRequestToModel(request *auth.ExternalIDPSearchRequest) *us
 
 func externalIDPRemoveToDomain(ctx context.Context, idp *auth.ExternalIDPRemoveRequest) *domain.ExternalIDP {
 	return &domain.ExternalIDP{
-		ObjectRoot:     models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
+		ObjectRoot:     ctxToObjectRoot(ctx),
 		IDPConfigID:    idp.IdpConfigId,
 		ExternalUserID: idp.ExternalUserId,
 	}
@@ -452,5 +452,13 @@ func webAuthNTokenFromModel(token *usr_model.WebAuthNToken) *auth.WebAuthNToken 
 		Id:    token.WebAuthNTokenID,
 		Name:  token.WebAuthNTokenName,
 		State: auth.MFAState(token.State),
+	}
+}
+
+func ctxToObjectRoot(ctx context.Context) models.ObjectRoot {
+	ctxData := authz.GetCtxData(ctx)
+	return models.ObjectRoot{
+		AggregateID:   ctxData.UserID,
+		ResourceOwner: ctxData.ResourceOwner,
 	}
 }

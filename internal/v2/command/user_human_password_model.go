@@ -16,10 +16,11 @@ type HumanPasswordWriteModel struct {
 	UserState domain.UserState
 }
 
-func NewHumanPasswordWriteModel(userID string) *HumanPasswordWriteModel {
+func NewHumanPasswordWriteModel(userID, resourceOwner string) *HumanPasswordWriteModel {
 	return &HumanPasswordWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -66,5 +67,6 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 
 func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }

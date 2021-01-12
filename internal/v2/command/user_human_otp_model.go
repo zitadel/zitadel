@@ -15,10 +15,11 @@ type HumanOTPWriteModel struct {
 	OTPState domain.OTPState
 }
 
-func NewHumanOTPWriteModel(userID string) *HumanOTPWriteModel {
+func NewHumanOTPWriteModel(userID, resourceOwner string) *HumanOTPWriteModel {
 	return &HumanOTPWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -58,5 +59,6 @@ func (wm *HumanOTPWriteModel) Reduce() error {
 
 func (wm *HumanOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }

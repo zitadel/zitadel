@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
@@ -17,10 +18,11 @@ type MachineWriteModel struct {
 	UserState   domain.UserState
 }
 
-func NewMachineWriteModel(userID string) *MachineWriteModel {
+func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
 	return &MachineWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -91,7 +93,8 @@ func (wm *MachineWriteModel) Reduce() error {
 
 func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *MachineWriteModel) NewChangedEvent(

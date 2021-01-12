@@ -2,7 +2,9 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
@@ -10,11 +12,12 @@ type IAMPasswordAgePolicyWriteModel struct {
 	PasswordAgePolicyWriteModel
 }
 
-func NewIAMPasswordAgePolicyWriteModel(iamID string) *IAMPasswordAgePolicyWriteModel {
+func NewIAMPasswordAgePolicyWriteModel() *IAMPasswordAgePolicyWriteModel {
 	return &IAMPasswordAgePolicyWriteModel{
 		PasswordAgePolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
 			},
 		},
 	}
@@ -37,7 +40,8 @@ func (wm *IAMPasswordAgePolicyWriteModel) Reduce() error {
 
 func (wm *IAMPasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.PasswordAgePolicyWriteModel.AggregateID)
+		AggregateIDs(wm.PasswordAgePolicyWriteModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(ctx context.Context, expireWarnDays, maxAgeDays uint64) (*iam.PasswordAgePolicyChangedEvent, bool) {

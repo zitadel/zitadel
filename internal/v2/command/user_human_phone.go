@@ -14,7 +14,7 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.Phone.Invalid")
 	}
 
-	existingPhone, err := r.phoneWriteModelByID(ctx, phone.AggregateID)
+	existingPhone, err := r.phoneWriteModelByID(ctx, phone.AggregateID, phone.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 	return writeModelToPhone(existingPhone), nil
 }
 
-func (r *CommandSide) VerifyHumanPhone(ctx context.Context, userID, code string) error {
+func (r *CommandSide) VerifyHumanPhone(ctx context.Context, userID, code, resourceowner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Km9ds", "Errors.User.UserIDMissing")
 	}
@@ -54,7 +54,7 @@ func (r *CommandSide) VerifyHumanPhone(ctx context.Context, userID, code string)
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-wMe9f", "Errors.User.Code.Empty")
 	}
 
-	existingCode, err := r.phoneWriteModelByID(ctx, userID)
+	existingCode, err := r.phoneWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return err
 	}
@@ -72,12 +72,12 @@ func (r *CommandSide) VerifyHumanPhone(ctx context.Context, userID, code string)
 	return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
 }
 
-func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, userID string) error {
+func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceowner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 
-	existingPhone, err := r.phoneWriteModelByID(ctx, userID)
+	existingPhone, err := r.phoneWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return err
 	}
@@ -96,12 +96,12 @@ func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, user
 	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
 }
 
-func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID string) error {
+func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.UserIDMissing")
 	}
 
-	existingPhone, err := r.phoneWriteModelByID(ctx, userID)
+	existingPhone, err := r.phoneWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -115,11 +115,11 @@ func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID string) error
 	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
 }
 
-func (r *CommandSide) phoneWriteModelByID(ctx context.Context, userID string) (writeModel *HumanPhoneWriteModel, err error) {
+func (r *CommandSide) phoneWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPhoneWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanPhoneWriteModel(userID)
+	writeModel = NewHumanPhoneWriteModel(userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

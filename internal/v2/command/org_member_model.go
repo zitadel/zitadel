@@ -13,7 +13,8 @@ func NewOrgMemberWriteModel(orgID, userID string) *OrgMemberWriteModel {
 	return &OrgMemberWriteModel{
 		MemberWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: orgID,
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
 			},
 			UserID: userID,
 		},
@@ -48,5 +49,6 @@ func (wm *OrgMemberWriteModel) Reduce() error {
 
 func (wm *OrgMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.MemberWriteModel.AggregateID)
+		AggregateIDs(wm.MemberWriteModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }

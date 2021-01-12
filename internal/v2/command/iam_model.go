@@ -16,10 +16,11 @@ type IAMWriteModel struct {
 	ProjectID   string
 }
 
-func NewIAMWriteModel(iamID string) *IAMWriteModel {
+func NewIAMWriteModel() *IAMWriteModel {
 	return &IAMWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: iamID,
+			AggregateID:   domain.IAMID,
+			ResourceOwner: domain.IAMID,
 		},
 	}
 }
@@ -56,7 +57,8 @@ func (wm *IAMWriteModel) Reduce() error {
 
 func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 //
