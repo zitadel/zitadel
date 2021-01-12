@@ -1,8 +1,15 @@
 package management
 
 import (
+	"context"
 	"encoding/json"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -65,29 +72,42 @@ func orgStateFromModel(state org_model.OrgState) management.OrgState {
 	}
 }
 
-func addOrgDomainToModel(domain *management.AddOrgDomainRequest) *org_model.OrgDomain {
-	return &org_model.OrgDomain{Domain: domain.Domain}
-}
-
-func orgDomainValidationToModel(domain *management.OrgDomainValidationRequest) *org_model.OrgDomain {
-	return &org_model.OrgDomain{
-		Domain:         domain.Domain,
-		ValidationType: orgDomainValidationTypeToModel(domain.Type),
+func addOrgDomainToDomain(ctx context.Context, orgDomain *management.AddOrgDomainRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain: orgDomain.Domain,
 	}
 }
 
-func validateOrgDomainToModel(domain *management.ValidateOrgDomainRequest) *org_model.OrgDomain {
-	return &org_model.OrgDomain{Domain: domain.Domain}
+func orgDomainValidationToDomain(ctx context.Context, orgDomain *management.OrgDomainValidationRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain:         orgDomain.Domain,
+		ValidationType: orgDomainValidationTypeToDomain(orgDomain.Type),
+	}
 }
 
-func orgDomainValidationTypeToModel(key management.OrgDomainValidationType) org_model.OrgDomainValidationType {
-	switch key {
+func validateOrgDomainToDomain(ctx context.Context, orgDomain *management.ValidateOrgDomainRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain: orgDomain.Domain,
+	}
+}
+
+func orgDomainValidationTypeToDomain(validationType management.OrgDomainValidationType) domain.OrgDomainValidationType {
+	switch validationType {
 	case management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_HTTP:
-		return org_model.OrgDomainValidationTypeHTTP
+		return domain.OrgDomainValidationTypeHTTP
 	case management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_DNS:
-		return org_model.OrgDomainValidationTypeDNS
+		return domain.OrgDomainValidationTypeDNS
 	default:
-		return org_model.OrgDomainValidationTypeUnspecified
+		return domain.OrgDomainValidationTypeUnspecified
 	}
 }
 
@@ -102,24 +122,32 @@ func orgDomainValidationTypeFromModel(key org_model.OrgDomainValidationType) man
 	}
 }
 
-func primaryOrgDomainToModel(domain *management.PrimaryOrgDomainRequest) *org_model.OrgDomain {
-	return &org_model.OrgDomain{Domain: domain.Domain}
+func primaryOrgDomainToDomain(ctx context.Context, ordDomain *management.PrimaryOrgDomainRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain: ordDomain.Domain,
+	}
 }
 
-func orgDomainFromModel(domain *org_model.OrgDomain) *management.OrgDomain {
-	creationDate, err := ptypes.TimestampProto(domain.CreationDate)
-	logging.Log("GRPC-u8Ksj").OnError(err).Debug("unable to get timestamp from time")
+func removeOrgDomainToDomain(ctx context.Context, ordDomain *management.RemoveOrgDomainRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain: ordDomain.Domain,
+	}
+}
 
-	changeDate, err := ptypes.TimestampProto(domain.ChangeDate)
-	logging.Log("GRPC-9osFS").OnError(err).Debug("unable to get timestamp from time")
-
+func orgDomainFromDomain(orgDomain *domain.OrgDomain) *management.OrgDomain {
 	return &management.OrgDomain{
-		ChangeDate:   changeDate,
-		CreationDate: creationDate,
-		OrgId:        domain.AggregateID,
-		Domain:       domain.Domain,
-		Verified:     domain.Verified,
-		Primary:      domain.Primary,
+		ChangeDate:   timestamppb.New(orgDomain.ChangeDate),
+		CreationDate: timestamppb.New(orgDomain.CreationDate),
+		OrgId:        orgDomain.AggregateID,
+		Domain:       orgDomain.Domain,
+		Verified:     orgDomain.Verified,
+		Primary:      orgDomain.Primary,
 	}
 }
 

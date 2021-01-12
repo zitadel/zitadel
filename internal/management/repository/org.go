@@ -18,11 +18,11 @@ type OrgRepository interface {
 	OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error)
 
 	SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error)
-	AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error)
-	GenerateMyOrgDomainValidation(ctx context.Context, domain *org_model.OrgDomain) (string, string, error)
-	ValidateMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error
-	SetMyPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error
-	RemoveMyOrgDomain(ctx context.Context, domain string) error
+	//AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error)
+	//GenerateMyOrgDomainValidation(ctx context.Context, domain *org_model.OrgDomain) (string, string, error)
+	//ValidateMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error
+	//SetMyPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error
+	//RemoveMyOrgDomain(ctx context.Context, domain string) error
 
 	SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error)
 	AddMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)

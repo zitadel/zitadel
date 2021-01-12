@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/http"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -18,14 +19,17 @@ type CommandSide struct {
 
 	idpConfigSecretCrypto crypto.Crypto
 
-	userPasswordAlg            crypto.HashAlgorithm
-	initializeUserCode         crypto.Generator
-	emailVerificationCode      crypto.Generator
-	phoneVerificationCode      crypto.Generator
-	passwordVerificationCode   crypto.Generator
-	machineKeyAlg              crypto.EncryptionAlgorithm
-	machineKeySize             int
-	applicationSecretGenerator crypto.Generator
+	userPasswordAlg             crypto.HashAlgorithm
+	initializeUserCode          crypto.Generator
+	emailVerificationCode       crypto.Generator
+	phoneVerificationCode       crypto.Generator
+	passwordVerificationCode    crypto.Generator
+	machineKeyAlg               crypto.EncryptionAlgorithm
+	machineKeySize              int
+	applicationSecretGenerator  crypto.Generator
+	domainVerificationAlg       *crypto.AESCrypto
+	domainVerificationGenerator crypto.Generator
+	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
 }
 
 type Config struct {
@@ -60,6 +64,13 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 
 	passwordAlg := crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
 	repo.applicationSecretGenerator = crypto.NewHashGenerator(config.SystemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
+
+	repo.domainVerificationAlg, err = crypto.NewAESCrypto(config.SystemDefaults.DomainVerification.VerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(config.SystemDefaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
+	repo.domainVerificationValidator = http.ValidateDomain
 	return repo, nil
 }
 

@@ -58,15 +58,15 @@ func (s *Server) SearchMyOrgDomains(ctx context.Context, in *management.OrgDomai
 }
 
 func (s *Server) AddMyOrgDomain(ctx context.Context, in *management.AddOrgDomainRequest) (*management.OrgDomain, error) {
-	domain, err := s.org.AddMyOrgDomain(ctx, addOrgDomainToModel(in))
+	domain, err := s.command.AddOrgDomain(ctx, addOrgDomainToDomain(ctx, in))
 	if err != nil {
 		return nil, err
 	}
-	return orgDomainFromModel(domain), nil
+	return orgDomainFromDomain(domain), nil
 }
 
 func (s *Server) GenerateMyOrgDomainValidation(ctx context.Context, in *management.OrgDomainValidationRequest) (*management.OrgDomainValidationResponse, error) {
-	token, url, err := s.org.GenerateMyOrgDomainValidation(ctx, orgDomainValidationToModel(in))
+	token, url, err := s.command.GenerateOrgDomainValidation(ctx, orgDomainValidationToDomain(ctx, in))
 	if err != nil {
 		return nil, err
 	}
@@ -77,16 +77,16 @@ func (s *Server) GenerateMyOrgDomainValidation(ctx context.Context, in *manageme
 }
 
 func (s *Server) ValidateMyOrgDomain(ctx context.Context, in *management.ValidateOrgDomainRequest) (*empty.Empty, error) {
-	err := s.org.ValidateMyOrgDomain(ctx, validateOrgDomainToModel(in))
+	err := s.command.ValidateOrgDomain(ctx, validateOrgDomainToDomain(ctx, in))
 	return &empty.Empty{}, err
 }
 func (s *Server) SetMyPrimaryOrgDomain(ctx context.Context, in *management.PrimaryOrgDomainRequest) (*empty.Empty, error) {
-	err := s.org.SetMyPrimaryOrgDomain(ctx, primaryOrgDomainToModel(in))
+	err := s.command.SetPrimaryOrgDomain(ctx, primaryOrgDomainToDomain(ctx, in))
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMyOrgDomain(ctx context.Context, in *management.RemoveOrgDomainRequest) (*empty.Empty, error) {
-	err := s.org.RemoveMyOrgDomain(ctx, in.Domain)
+	err := s.command.RemoveOrgDomain(ctx, removeOrgDomainToDomain(ctx, in))
 	return &empty.Empty{}, err
 }
 
