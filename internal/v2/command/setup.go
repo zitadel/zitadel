@@ -22,7 +22,7 @@ const (
 )
 
 func (r *CommandSide) ExecuteSetupSteps(ctx context.Context, steps []Step) error {
-	iam, err := r.GetIAM(ctx, r.iamID)
+	iam, err := r.GetIAM(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
@@ -32,13 +32,13 @@ func (r *CommandSide) ExecuteSetupSteps(ctx context.Context, steps []Step) error
 	}
 
 	if iam == nil {
-		iam = &domain.IAM{ObjectRoot: models.ObjectRoot{AggregateID: r.iamID}}
+		iam = &domain.IAM{ObjectRoot: models.ObjectRoot{}}
 	}
 
-	ctx = setSetUpContextData(ctx, r.iamID)
+	ctx = setSetUpContextData(ctx, "")
 
 	for _, step := range steps {
-		iam, err = r.StartSetup(ctx, r.iamID, step.Step())
+		iam, err = r.StartSetup(ctx, step.Step())
 		if err != nil {
 			return err
 		}
@@ -55,8 +55,8 @@ func setSetUpContextData(ctx context.Context, orgID string) context.Context {
 	return authz.SetCtxData(ctx, authz.CtxData{UserID: SetupUser, OrgID: orgID})
 }
 
-func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.Step) (*domain.IAM, error) {
-	iamWriteModel, err := r.iamByID(ctx, iamID)
+func (r *CommandSide) StartSetup(ctx context.Context, step domain.Step) (*domain.IAM, error) {
+	iamWriteModel, err := r.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (r *CommandSide) StartSetup(ctx context.Context, iamID string, step domain.
 }
 
 func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider func(*IAMWriteModel) (*iam_repo.Aggregate, error)) error {
-	iam, err := r.iamByID(ctx, r.iamID)
+	iam, err := r.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
@@ -106,7 +106,7 @@ func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider
 //
 ////TODO: should not use readmodel
 //func (r *CommandSide) setup(ctx context.Context, iamID string, step iam_repo.Step, event eventstore.EventPusher) (*iam_model.IAM, error) {
-//	iam, err := r.iamByID(ctx, iamID)
+//	iam, err := r.getIAMWriteModel(ctx, iamID)
 //	if err != nil && !caos_errs.IsNotFound(err) {
 //		return nil, err
 //	}

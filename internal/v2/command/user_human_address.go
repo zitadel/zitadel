@@ -8,7 +8,7 @@ import (
 )
 
 func (r *CommandSide) ChangeHumanAddress(ctx context.Context, address *domain.Address) (*domain.Address, error) {
-	existingAddress, err := r.addressWriteModel(ctx, address.AggregateID)
+	existingAddress, err := r.addressWriteModel(ctx, address.AggregateID, address.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -30,11 +30,11 @@ func (r *CommandSide) ChangeHumanAddress(ctx context.Context, address *domain.Ad
 	return writeModelToAddress(existingAddress), nil
 }
 
-func (r *CommandSide) addressWriteModel(ctx context.Context, userID string) (writeModel *HumanAddressWriteModel, err error) {
+func (r *CommandSide) addressWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanAddressWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanAddressWriteModel(userID)
+	writeModel = NewHumanAddressWriteModel(userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

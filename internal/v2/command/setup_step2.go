@@ -23,7 +23,7 @@ func (s *Step2) execute(ctx context.Context, commandSide *CommandSide) error {
 func (r *CommandSide) SetupStep2(ctx context.Context, step *Step2) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		err := r.addDefaultPasswordComplexityPolicy(ctx, iamAgg, NewIAMPasswordComplexityPolicyWriteModel(iam.AggregateID), &domain.PasswordComplexityPolicy{
+		err := r.addDefaultPasswordComplexityPolicy(ctx, iamAgg, NewIAMPasswordComplexityPolicyWriteModel(), &domain.PasswordComplexityPolicy{
 			MinLength:    step.DefaultPasswordComplexityPolicy.MinLength,
 			HasLowercase: step.DefaultPasswordComplexityPolicy.HasLowercase,
 			HasUppercase: step.DefaultPasswordComplexityPolicy.HasUppercase,

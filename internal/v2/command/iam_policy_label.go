@@ -9,8 +9,8 @@ import (
 )
 
 func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
-	policy.AggregateID = r.iamID
-	addedPolicy := NewIAMLabelPolicyWriteModel(policy.AggregateID)
+	//policy.AggregateID = r.iamID
+	addedPolicy := NewIAMLabelPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
 	err := r.addDefaultLabelPolicy(ctx, nil, addedPolicy, policy)
 	if err != nil {
@@ -40,8 +40,8 @@ func (r *CommandSide) addDefaultLabelPolicy(ctx context.Context, iamAgg *iam_rep
 }
 
 func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
-	policy.AggregateID = r.iamID
-	existingPolicy, err := r.defaultLabelPolicyWriteModelByID(ctx, policy.AggregateID)
+	//policy.AggregateID = r.iamID
+	existingPolicy, err := r.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -66,11 +66,11 @@ func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *doma
 	return writeModelToLabelPolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) defaultLabelPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMLabelPolicyWriteModel, err error) {
+func (r *CommandSide) defaultLabelPolicyWriteModelByID(ctx context.Context) (policy *IAMLabelPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMLabelPolicyWriteModel(iamID)
+	writeModel := NewIAMLabelPolicyWriteModel()
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

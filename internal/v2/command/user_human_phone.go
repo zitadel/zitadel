@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -13,7 +14,7 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.Phone.Invalid")
 	}
 
-	existingPhone, err := r.phoneWriteModel(ctx, phone.AggregateID)
+	existingPhone, err := r.phoneWriteModel(ctx, phone.AggregateID, phone.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -45,12 +46,12 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 	return writeModelToPhone(existingPhone), nil
 }
 
-func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, userID string) error {
+func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 
-	existingPhone, err := r.phoneWriteModel(ctx, userID)
+	existingPhone, err := r.phoneWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -69,12 +70,12 @@ func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, user
 	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
 }
 
-func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID string) error {
+func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.UserIDMissing")
 	}
 
-	existingPhone, err := r.phoneWriteModel(ctx, userID)
+	existingPhone, err := r.phoneWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -88,11 +89,11 @@ func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID string) error
 	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
 }
 
-func (r *CommandSide) phoneWriteModel(ctx context.Context, userID string) (writeModel *HumanPhoneWriteModel, err error) {
+func (r *CommandSide) phoneWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPhoneWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanPhoneWriteModel(userID)
+	writeModel = NewHumanPhoneWriteModel(userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

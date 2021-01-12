@@ -23,7 +23,7 @@ func (s *Step5) execute(ctx context.Context, commandSide *CommandSide) error {
 func (r *CommandSide) SetupStep5(ctx context.Context, step *Step5) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		err := r.addDefaultOrgIAMPolicy(ctx, iamAgg, NewIAMOrgIAMPolicyWriteModel(iam.AggregateID), &domain.OrgIAMPolicy{
+		err := r.addDefaultOrgIAMPolicy(ctx, iamAgg, NewIAMOrgIAMPolicyWriteModel(), &domain.OrgIAMPolicy{
 			UserLoginMustBeDomain: step.DefaultOrgIAMPolicy.UserLoginMustBeDomain,
 		})
 		if err != nil {

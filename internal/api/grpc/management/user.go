@@ -60,7 +60,7 @@ func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserReques
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.command.DeactivateUser(ctx, in.Id)
+	user, err := s.command.DeactivateUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*ma
 }
 
 func (s *Server) ReactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.command.ReactivateUser(ctx, in.Id)
+	user, err := s.command.ReactivateUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (s *Server) ReactivateUser(ctx context.Context, in *management.UserID) (*ma
 }
 
 func (s *Server) LockUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.command.LockUser(ctx, in.Id)
+	user, err := s.command.LockUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (s *Server) LockUser(ctx context.Context, in *management.UserID) (*manageme
 }
 
 func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.command.UnlockUser(ctx, in.Id)
+	user, err := s.command.UnlockUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -92,12 +92,12 @@ func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*manage
 }
 
 func (s *Server) DeleteUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
-	err := s.command.RemoveUser(ctx, in.Id)
+	err := s.command.RemoveUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) UpdateUserMachine(ctx context.Context, in *management.UpdateMachineRequest) (*management.MachineResponse, error) {
-	machine, err := s.command.ChangeMachine(ctx, updateMachineToDomain(in))
+	machine, err := s.command.ChangeMachine(ctx, updateMachineToDomain(authz.GetCtxData(ctx), in))
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (s *Server) ChangeUserEmail(ctx context.Context, request *management.Update
 }
 
 func (s *Server) ResendEmailVerificationMail(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
-	err := s.command.CreateHumanEmailVerificationCode(ctx, in.Id)
+	err := s.command.CreateHumanEmailVerificationCode(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 
@@ -162,12 +162,12 @@ func (s *Server) ChangeUserPhone(ctx context.Context, request *management.Update
 }
 
 func (s *Server) RemoveUserPhone(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
-	err := s.command.RemoveHumanPhone(ctx, userID.Id)
+	err := s.command.RemoveHumanPhone(ctx, userID.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendPhoneVerificationCode(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
-	err := s.command.CreateHumanPhoneVerificationCode(ctx, in.Id)
+	err := s.command.CreateHumanPhoneVerificationCode(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 
@@ -180,7 +180,7 @@ func (s *Server) GetUserAddress(ctx context.Context, in *management.UserID) (*ma
 }
 
 func (s *Server) UpdateUserAddress(ctx context.Context, request *management.UpdateUserAddressRequest) (*management.UserAddress, error) {
-	address, err := s.command.ChangeHumanAddress(ctx, updateAddressToDomain(request))
+	address, err := s.command.ChangeHumanAddress(ctx, updateAddressToDomain(authz.GetCtxData(ctx), request))
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (s *Server) UpdateUserAddress(ctx context.Context, request *management.Upda
 }
 
 func (s *Server) SendSetPasswordNotification(ctx context.Context, request *management.SetPasswordNotificationRequest) (*empty.Empty, error) {
-	err := s.command.RequestSetPassword(ctx, request.Id, notifyTypeToDomain(request.Type))
+	err := s.command.RequestSetPassword(ctx, request.Id, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(request.Type))
 	return &empty.Empty{}, err
 }
 
@@ -197,7 +197,7 @@ func (s *Server) SetInitialPassword(ctx context.Context, request *management.Pas
 }
 
 func (s *Server) ResendInitialMail(ctx context.Context, request *management.InitialMailRequest) (*empty.Empty, error) {
-	return &empty.Empty{}, s.command.ResendInitialMail(ctx, request.Id, request.Email)
+	return &empty.Empty{}, s.command.ResendInitialMail(ctx, request.Id, request.Email, authz.GetCtxData(ctx).OrgID)
 }
 
 func (s *Server) SearchUserExternalIDPs(ctx context.Context, request *management.ExternalIDPSearchRequest) (*management.ExternalIDPSearchResponse, error) {
@@ -209,7 +209,7 @@ func (s *Server) SearchUserExternalIDPs(ctx context.Context, request *management
 }
 
 func (s *Server) RemoveExternalIDP(ctx context.Context, request *management.ExternalIDPRemoveRequest) (*empty.Empty, error) {
-	return &empty.Empty{}, s.command.RemoveHumanExternalIDP(ctx, externalIDPRemoveToDomain(request))
+	return &empty.Empty{}, s.command.RemoveHumanExternalIDP(ctx, externalIDPRemoveToDomain(authz.GetCtxData(ctx), request))
 }
 
 func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*management.UserMultiFactors, error) {
@@ -221,11 +221,11 @@ func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*m
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
-	return &empty.Empty{}, s.command.RemoveHumanOTP(ctx, userID.Id)
+	return &empty.Empty{}, s.command.RemoveHumanOTP(ctx, userID.Id, authz.GetCtxData(ctx).OrgID)
 }
 
 func (s *Server) RemoveMfaU2F(ctx context.Context, webAuthNTokenID *management.WebAuthNTokenID) (*empty.Empty, error) {
-	return &empty.Empty{}, s.command.RemoveHumanU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id)
+	return &empty.Empty{}, s.command.RemoveHumanU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id, authz.GetCtxData(ctx).OrgID)
 }
 
 func (s *Server) GetPasswordless(ctx context.Context, userID *management.UserID) (_ *management.WebAuthNTokens, err error) {
@@ -237,7 +237,7 @@ func (s *Server) GetPasswordless(ctx context.Context, userID *management.UserID)
 }
 
 func (s *Server) RemovePasswordless(ctx context.Context, id *management.WebAuthNTokenID) (*empty.Empty, error) {
-	return &empty.Empty{}, s.command.RemoveHumanPasswordless(ctx, id.UserId, id.Id)
+	return &empty.Empty{}, s.command.RemoveHumanPasswordless(ctx, id.UserId, id.Id, authz.GetCtxData(ctx).OrgID)
 }
 
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {

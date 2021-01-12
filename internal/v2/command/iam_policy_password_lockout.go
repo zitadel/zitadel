@@ -9,8 +9,8 @@ import (
 )
 
 func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
-	policy.AggregateID = r.iamID
-	addedPolicy := NewIAMPasswordLockoutPolicyWriteModel(policy.AggregateID)
+	//policy.AggregateID = r.iamID
+	addedPolicy := NewIAMPasswordLockoutPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
 	err := r.addDefaultPasswordLockoutPolicy(ctx, nil, addedPolicy, policy)
 	if err != nil {
@@ -40,8 +40,8 @@ func (r *CommandSide) addDefaultPasswordLockoutPolicy(ctx context.Context, iamAg
 }
 
 func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
-	policy.AggregateID = r.iamID
-	existingPolicy, err := r.defaultPasswordLockoutPolicyWriteModelByID(ctx, policy.AggregateID)
+	//policy.AggregateID = r.iamID
+	existingPolicy, err := r.defaultPasswordLockoutPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -65,11 +65,11 @@ func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, po
 	return writeModelToPasswordLockoutPolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) defaultPasswordLockoutPolicyWriteModelByID(ctx context.Context, iamID string) (policy *IAMPasswordLockoutPolicyWriteModel, err error) {
+func (r *CommandSide) defaultPasswordLockoutPolicyWriteModelByID(ctx context.Context) (policy *IAMPasswordLockoutPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMPasswordLockoutPolicyWriteModel(iamID)
+	writeModel := NewIAMPasswordLockoutPolicyWriteModel()
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

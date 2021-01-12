@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
@@ -16,10 +17,11 @@ type HumanEmailWriteModel struct {
 	UserState domain.UserState
 }
 
-func NewHumanEmailWriteModel(userID string) *HumanEmailWriteModel {
+func NewHumanEmailWriteModel(userID, resourceOwner string) *HumanEmailWriteModel {
 	return &HumanEmailWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -65,7 +67,8 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 
 func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *HumanEmailWriteModel) NewChangedEvent(

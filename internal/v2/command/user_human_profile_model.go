@@ -2,10 +2,12 @@ package command
 
 import (
 	"context"
+
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
-	"golang.org/x/text/language"
 )
 
 type HumanProfileWriteModel struct {
@@ -21,10 +23,11 @@ type HumanProfileWriteModel struct {
 	UserState domain.UserState
 }
 
-func NewHumanProfileWriteModel(userID string) *HumanProfileWriteModel {
+func NewHumanProfileWriteModel(userID, resourceOwner string) *HumanProfileWriteModel {
 	return &HumanProfileWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -89,7 +92,8 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 
 func (wm *HumanProfileWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *HumanProfileWriteModel) NewChangedEvent(

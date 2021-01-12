@@ -22,7 +22,7 @@ func (s *Step7) execute(ctx context.Context, commandSide *CommandSide) error {
 
 func (r *CommandSide) SetupStep7(ctx context.Context, step *Step7) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
-		secondFactorModel := NewIAMSecondFactorWriteModel(iam.AggregateID)
+		secondFactorModel := NewIAMSecondFactorWriteModel()
 		iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 		if !step.OTP {
 			return iamAgg, nil

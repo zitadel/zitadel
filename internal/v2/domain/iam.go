@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	ResourceOwnerIAM = "IAM"
+	IAMID = "IAM"
 )
 
 type IAM struct {

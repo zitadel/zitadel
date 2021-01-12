@@ -18,7 +18,7 @@ func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.Member) (
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-W8m4l", "Errors.IAM.MemberInvalid")
 	}
 
-	addedMember := NewIAMMemberWriteModel(member.AggregateID, member.UserID)
+	addedMember := NewIAMMemberWriteModel(member.UserID)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *domain.Member
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.MemberInvalid")
 	}
 
-	existingMember, err := r.iamMemberWriteModelByID(ctx, member.AggregateID, member.UserID)
+	existingMember, err := r.iamMemberWriteModelByID(ctx, member.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *domain.Member
 }
 
 func (r *CommandSide) RemoveIAMMember(ctx context.Context, userID string) error {
-	m, err := r.iamMemberWriteModelByID(ctx, r.iamID, userID)
+	m, err := r.iamMemberWriteModelByID(ctx, userID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
@@ -85,11 +85,11 @@ func (r *CommandSide) RemoveIAMMember(ctx context.Context, userID string) error 
 	return r.eventstore.PushAggregate(ctx, m, iamAgg)
 }
 
-func (r *CommandSide) iamMemberWriteModelByID(ctx context.Context, iamID, userID string) (member *IAMMemberWriteModel, err error) {
+func (r *CommandSide) iamMemberWriteModelByID(ctx context.Context, userID string) (member *IAMMemberWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMMemberWriteModel(iamID, userID)
+	writeModel := NewIAMMemberWriteModel(userID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

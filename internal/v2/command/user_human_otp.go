@@ -8,12 +8,12 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
-func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID string) error {
+func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
 
-	existingOTP, err := r.otpWriteModelByID(ctx, userID)
+	existingOTP, err := r.otpWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -28,11 +28,11 @@ func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID string) error {
 	return r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
 }
 
-func (r *CommandSide) otpWriteModelByID(ctx context.Context, userID string) (writeModel *HumanOTPWriteModel, err error) {
+func (r *CommandSide) otpWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanOTPWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanOTPWriteModel(userID)
+	writeModel = NewHumanOTPWriteModel(userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

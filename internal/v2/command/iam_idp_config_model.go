@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
@@ -11,11 +12,12 @@ type IAMIDPConfigWriteModel struct {
 	IDPConfigWriteModel
 }
 
-func NewIAMIDPConfigWriteModel(iamID, configID string) *IAMIDPConfigWriteModel {
+func NewIAMIDPConfigWriteModel(configID string) *IAMIDPConfigWriteModel {
 	return &IAMIDPConfigWriteModel{
 		IDPConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
 			},
 			ConfigID: configID,
 		},
@@ -24,7 +26,8 @@ func NewIAMIDPConfigWriteModel(iamID, configID string) *IAMIDPConfigWriteModel {
 
 func (wm *IAMIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *IAMIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {

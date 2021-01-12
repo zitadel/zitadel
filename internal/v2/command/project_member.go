@@ -11,8 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/project"
 )
 
-func (r *CommandSide) AddProjectMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
-	addedMember := NewProjectMemberWriteModel(member.AggregateID, member.UserID)
+func (r *CommandSide) AddProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
+	addedMember := NewProjectMemberWriteModel(member.AggregateID, member.UserID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
 	err := r.addProjectMember(ctx, projectAgg, addedMember, member)
 	if err != nil {
@@ -48,14 +48,14 @@ func (r *CommandSide) addProjectMember(ctx context.Context, projectAgg *project.
 }
 
 //ChangeProjectMember updates an existing member
-func (r *CommandSide) ChangeProjectMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+func (r *CommandSide) ChangeProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.MemberInvalid")
 	}
 
-	existingMember, err := r.projectMemberWriteModelByID(ctx, member.AggregateID, member.UserID)
+	existingMember, err := r.projectMemberWriteModelByID(ctx, member.AggregateID, member.UserID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -79,8 +79,8 @@ func (r *CommandSide) ChangeProjectMember(ctx context.Context, member *domain.Me
 	return memberWriteModelToMember(&existingMember.MemberWriteModel), nil
 }
 
-func (r *CommandSide) RemoveProjectMember(ctx context.Context, projectID, userID string) error {
-	m, err := r.projectMemberWriteModelByID(ctx, projectID, userID)
+func (r *CommandSide) RemoveProjectMember(ctx context.Context, projectID, userID, resourceOwner string) error {
+	m, err := r.projectMemberWriteModelByID(ctx, projectID, userID, resourceOwner)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
@@ -94,11 +94,11 @@ func (r *CommandSide) RemoveProjectMember(ctx context.Context, projectID, userID
 	return r.eventstore.PushAggregate(ctx, m, projectAgg)
 }
 
-func (r *CommandSide) projectMemberWriteModelByID(ctx context.Context, projectID, userID string) (member *ProjectMemberWriteModel, err error) {
+func (r *CommandSide) projectMemberWriteModelByID(ctx context.Context, projectID, userID, resourceOwner string) (member *ProjectMemberWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewProjectMemberWriteModel(projectID, userID)
+	writeModel := NewProjectMemberWriteModel(projectID, userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

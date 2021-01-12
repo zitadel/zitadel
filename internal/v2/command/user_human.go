@@ -185,12 +185,12 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 	return writeModelToHuman(addedHuman), nil
 }
 
-func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email string) (err error) {
+func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, resourceOwner string) (err error) {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UserIDMissing")
 	}
 
-	existingEmail, err := r.emailWriteModel(ctx, userID)
+	existingEmail, err := r.emailWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}

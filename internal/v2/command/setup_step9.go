@@ -22,7 +22,7 @@ func (s *Step9) execute(ctx context.Context, commandSide *CommandSide) error {
 
 func (r *CommandSide) SetupStep9(ctx context.Context, step *Step9) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
-		multiFactorModel := NewIAMMultiFactorWriteModel(iam.AggregateID)
+		multiFactorModel := NewIAMMultiFactorWriteModel()
 		iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
 		if !step.Passwordless {
 			return iamAgg, nil
@@ -46,5 +46,5 @@ func setPasswordlessAllowedInPolicy(ctx context.Context, c *CommandSide, iamAgg 
 		return err
 	}
 	policy.PasswordlessType = domain.PasswordlessTypeAllowed
-	return c.changeDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(iamAgg.ID()), policy)
+	return c.changeDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(), policy)
 }

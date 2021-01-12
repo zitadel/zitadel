@@ -23,7 +23,7 @@ func (s *Step3) execute(ctx context.Context, commandSide *CommandSide) error {
 func (r *CommandSide) SetupStep3(ctx context.Context, step *Step3) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		err := r.addDefaultPasswordAgePolicy(ctx, iamAgg, NewIAMPasswordAgePolicyWriteModel(iam.AggregateID), &domain.PasswordAgePolicy{
+		err := r.addDefaultPasswordAgePolicy(ctx, iamAgg, NewIAMPasswordAgePolicyWriteModel(), &domain.PasswordAgePolicy{
 			MaxAgeDays:     step.DefaultPasswordAgePolicy.MaxAgeDays,
 			ExpireWarnDays: step.DefaultPasswordAgePolicy.ExpireWarnDays,
 		})

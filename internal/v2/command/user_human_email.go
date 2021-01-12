@@ -13,7 +13,7 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
 	}
 
-	existingEmail, err := r.emailWriteModel(ctx, email.AggregateID)
+	existingEmail, err := r.emailWriteModel(ctx, email.AggregateID, email.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -45,12 +45,12 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 	return writeModelToEmail(existingEmail), nil
 }
 
-func (r *CommandSide) CreateHumanEmailVerificationCode(ctx context.Context, userID string) error {
+func (r *CommandSide) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 
-	existingEmail, err := r.emailWriteModel(ctx, userID)
+	existingEmail, err := r.emailWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -73,11 +73,11 @@ func (r *CommandSide) CreateHumanEmailVerificationCode(ctx context.Context, user
 	return r.eventstore.PushAggregate(ctx, existingEmail, userAgg)
 }
 
-func (r *CommandSide) emailWriteModel(ctx context.Context, userID string) (writeModel *HumanEmailWriteModel, err error) {
+func (r *CommandSide) emailWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanEmailWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanEmailWriteModel(userID)
+	writeModel = NewHumanEmailWriteModel(userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

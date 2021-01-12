@@ -2,7 +2,9 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
@@ -10,11 +12,12 @@ type IAMPasswordLockoutPolicyWriteModel struct {
 	PasswordLockoutPolicyWriteModel
 }
 
-func NewIAMPasswordLockoutPolicyWriteModel(iamID string) *IAMPasswordLockoutPolicyWriteModel {
+func NewIAMPasswordLockoutPolicyWriteModel() *IAMPasswordLockoutPolicyWriteModel {
 	return &IAMPasswordLockoutPolicyWriteModel{
 		PasswordLockoutPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
 			},
 		},
 	}
@@ -37,7 +40,8 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) Reduce() error {
 
 func (wm *IAMPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.PasswordLockoutPolicyWriteModel.AggregateID)
+		AggregateIDs(wm.PasswordLockoutPolicyWriteModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) (*iam.PasswordLockoutPolicyChangedEvent, bool) {

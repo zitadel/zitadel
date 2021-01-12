@@ -11,7 +11,7 @@ import (
 )
 
 func (r *CommandSide) GetDefaultLoginPolicy(ctx context.Context) (*domain.LoginPolicy, error) {
-	policyWriteModel := NewIAMLoginPolicyWriteModel(r.iamID)
+	policyWriteModel := NewIAMLoginPolicyWriteModel()
 	err := r.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
@@ -22,8 +22,7 @@ func (r *CommandSide) GetDefaultLoginPolicy(ctx context.Context) (*domain.LoginP
 }
 
 func (r *CommandSide) AddDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
-	policy.AggregateID = r.iamID
-	addedPolicy := NewIAMLoginPolicyWriteModel(policy.AggregateID)
+	addedPolicy := NewIAMLoginPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
 	err := r.addDefaultLoginPolicy(ctx, nil, addedPolicy, policy)
 	if err != nil {
@@ -52,8 +51,8 @@ func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, iamAgg *iam_rep
 }
 
 func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
-	policy.AggregateID = r.iamID
-	existingPolicy := NewIAMLoginPolicyWriteModel(r.iamID)
+	//policy.AggregateID = r.iamID
+	existingPolicy := NewIAMLoginPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
 	err := r.changeDefaultLoginPolicy(ctx, iamAgg, existingPolicy, policy)
 	if err != nil {
@@ -68,7 +67,7 @@ func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *doma
 }
 
 func (r *CommandSide) changeDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, existingPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) error {
-	policy.AggregateID = r.iamID
+	//policy.AggregateID = r.iamID
 	err := r.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
 	if err != nil {
 		return err
@@ -86,8 +85,8 @@ func (r *CommandSide) changeDefaultLoginPolicy(ctx context.Context, iamAgg *iam_
 }
 
 func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
-	idpProvider.AggregateID = r.iamID
-	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
+	//idpProvider.AggregateID = r.iamID
+	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
@@ -107,8 +106,8 @@ func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, id
 }
 
 func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *iam_model.IDPProvider) error {
-	idpProvider.AggregateID = r.iamID
-	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
+	//idpProvider.AggregateID = r.iamID
+	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return err
@@ -123,7 +122,7 @@ func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Contex
 }
 
 func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactor iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
-	secondFactorModel := NewIAMSecondFactorWriteModel(r.iamID)
+	secondFactorModel := NewIAMSecondFactorWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 	err := r.addSecondFactorToDefaultLoginPolicy(ctx, nil, secondFactorModel, secondFactor)
 	if err != nil {
@@ -153,7 +152,7 @@ func (r *CommandSide) addSecondFactorToDefaultLoginPolicy(ctx context.Context, i
 }
 
 func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, secondFactor iam_model.SecondFactorType) error {
-	secondFactorModel := NewIAMSecondFactorWriteModel(r.iamID)
+	secondFactorModel := NewIAMSecondFactorWriteModel()
 	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return err
@@ -168,7 +167,7 @@ func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Conte
 }
 
 func (r *CommandSide) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multiFactor iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
-	multiFactorModel := NewIAMMultiFactorWriteModel(r.iamID)
+	multiFactorModel := NewIAMMultiFactorWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
 	err := r.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, multiFactor)
 	if err != nil {
@@ -197,7 +196,7 @@ func (r *CommandSide) addMultiFactorToDefaultLoginPolicy(ctx context.Context, ia
 }
 
 func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor iam_model.MultiFactorType) error {
-	multiFactorModel := NewIAMMultiFactorWriteModel(r.iamID)
+	multiFactorModel := NewIAMMultiFactorWriteModel()
 	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return err

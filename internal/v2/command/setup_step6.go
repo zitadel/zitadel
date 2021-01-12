@@ -23,7 +23,7 @@ func (s *Step6) execute(ctx context.Context, commandSide *CommandSide) error {
 func (r *CommandSide) SetupStep6(ctx context.Context, step *Step6) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		err := r.addDefaultLabelPolicy(ctx, iamAgg, NewIAMLabelPolicyWriteModel(iam.AggregateID), &domain.LabelPolicy{
+		err := r.addDefaultLabelPolicy(ctx, iamAgg, NewIAMLabelPolicyWriteModel(), &domain.LabelPolicy{
 			PrimaryColor:   step.DefaultLabelPolicy.PrimaryColor,
 			SecondaryColor: step.DefaultLabelPolicy.SecondaryColor,
 		})

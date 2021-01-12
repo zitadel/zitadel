@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
@@ -11,11 +12,12 @@ type IAMLoginPolicyWriteModel struct {
 	LoginPolicyWriteModel
 }
 
-func NewIAMLoginPolicyWriteModel(iamID string) *IAMLoginPolicyWriteModel {
+func NewIAMLoginPolicyWriteModel() *IAMLoginPolicyWriteModel {
 	return &IAMLoginPolicyWriteModel{
 		LoginPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
 			},
 		},
 	}
@@ -42,7 +44,8 @@ func (wm *IAMLoginPolicyWriteModel) Reduce() error {
 
 func (wm *IAMLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.LoginPolicyWriteModel.AggregateID)
+		AggregateIDs(wm.LoginPolicyWriteModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(

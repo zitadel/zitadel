@@ -23,7 +23,7 @@ func (s *Step4) execute(ctx context.Context, commandSide *CommandSide) error {
 func (r *CommandSide) SetupStep4(ctx context.Context, step *Step4) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		err := r.addDefaultPasswordLockoutPolicy(ctx, iamAgg, NewIAMPasswordLockoutPolicyWriteModel(iam.AggregateID), &domain.PasswordLockoutPolicy{
+		err := r.addDefaultPasswordLockoutPolicy(ctx, iamAgg, NewIAMPasswordLockoutPolicyWriteModel(), &domain.PasswordLockoutPolicy{
 			MaxAttempts:         step.DefaultPasswordLockoutPolicy.MaxAttempts,
 			ShowLockOutFailures: step.DefaultPasswordLockoutPolicy.ShowLockOutFailures,
 		})

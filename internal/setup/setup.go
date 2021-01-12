@@ -19,7 +19,7 @@ const (
 func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *command.CommandSide) error {
 	logging.Log("SETUP-JAK2q").Info("starting setup")
 
-	iam, err := commands.GetIAM(ctx, iamID)
+	iam, err := commands.GetIAM(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}

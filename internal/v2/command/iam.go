@@ -7,8 +7,8 @@ import (
 )
 
 //TODO: private
-func (r *CommandSide) GetIAM(ctx context.Context, aggregateID string) (*domain.IAM, error) {
-	iamWriteModel := NewIAMWriteModel(aggregateID)
+func (r *CommandSide) GetIAM(ctx context.Context) (*domain.IAM, error) {
+	iamWriteModel := NewIAMWriteModel()
 	err := r.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
 		return nil, err
