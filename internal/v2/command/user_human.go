@@ -9,8 +9,8 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
-func (r *CommandSide) getHuman(ctx context.Context, userID string) (*domain.Human, error) {
-	writeModel, err := r.getHumanWriteModelByID(ctx, userID)
+func (r *CommandSide) getHuman(ctx context.Context, userID, resourceowner string) (*domain.Human, error) {
+	writeModel, err := r.getHumanWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}
@@ -118,12 +118,12 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID, username string, h
 	return userAgg, addedHuman, nil
 }
 
-func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email string) (err error) {
+func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, resourceowner string) (err error) {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UserIDMissing")
 	}
 
-	existingEmail, err := r.emailWriteModelByID(ctx, userID)
+	existingEmail, err := r.emailWriteModel(ctx, userID, resourceowner)
 	if err != nil {
 		return err
 	}
@@ -204,8 +204,8 @@ func createRegisterHumanEvent(ctx context.Context, username string, human *domai
 	return addEvent
 }
 
-func (r *CommandSide) getHumanWriteModelByID(ctx context.Context, userID string) (*HumanWriteModel, error) {
-	humanWriteModel := NewHumanWriteModel(userID)
+func (r *CommandSide) getHumanWriteModelByID(ctx context.Context, userID, resourceowner string) (*HumanWriteModel, error) {
+	humanWriteModel := NewHumanWriteModel(userID, resourceowner)
 	err := r.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
 	if err != nil {
 		return nil, err

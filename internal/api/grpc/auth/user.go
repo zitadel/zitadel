@@ -42,7 +42,8 @@ func (s *Server) GetMyUserPhone(ctx context.Context, _ *empty.Empty) (*auth.User
 }
 
 func (s *Server) RemoveMyUserPhone(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.command.RemoveHumanPhone(ctx, authz.GetCtxData(ctx).UserID)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.RemoveHumanPhone(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
@@ -84,12 +85,14 @@ func (s *Server) ChangeMyUserEmail(ctx context.Context, request *auth.UpdateUser
 }
 
 func (s *Server) VerifyMyUserEmail(ctx context.Context, request *auth.VerifyMyUserEmailRequest) (*empty.Empty, error) {
-	err := s.command.VerifyHumanEmail(ctx, authz.GetCtxData(ctx).UserID, request.Code)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, request.Code, ctxData.OrgID)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendMyEmailVerificationMail(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.command.CreateHumanEmailVerificationCode(ctx, authz.GetCtxData(ctx).UserID)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.CreateHumanEmailVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
@@ -102,12 +105,14 @@ func (s *Server) ChangeMyUserPhone(ctx context.Context, request *auth.UpdateUser
 }
 
 func (s *Server) VerifyMyUserPhone(ctx context.Context, request *auth.VerifyUserPhoneRequest) (*empty.Empty, error) {
-	err := s.command.VerifyHumanPhone(ctx, authz.GetCtxData(ctx).UserID, request.Code)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, request.Code, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendMyPhoneVerificationCode(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.command.CreateHumanPhoneVerificationCode(ctx, authz.GetCtxData(ctx).UserID)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.CreateHumanPhoneVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
@@ -147,7 +152,8 @@ func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Emp
 }
 
 func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *auth.MfaOtpResponse, err error) {
-	otp, err := s.command.AddHumanOTP(ctx, authz.GetCtxData(ctx).UserID)
+	ctxData := authz.GetCtxData(ctx)
+	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -155,12 +161,14 @@ func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *auth.MfaOtpR
 }
 
 func (s *Server) VerifyMfaOTP(ctx context.Context, request *auth.VerifyMfaOtp) (*empty.Empty, error) {
-	err := s.command.CheckMFAOTPSetup(ctx, authz.GetCtxData(ctx).UserID, request.Code, "")
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.CheckMFAOTPSetup(ctx, ctxData.UserID, request.Code, "", ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {
-	err = s.command.RemoveHumanOTP(ctx, authz.GetCtxData(ctx).UserID)
+	ctxData := authz.GetCtxData(ctx)
+	err = s.command.RemoveHumanOTP(ctx, ctxData.UserID, ctxData.OrgID)
 	return &empty.Empty{}, err
 }
 
@@ -178,7 +186,8 @@ func (s *Server) VerifyMyMfaU2F(ctx context.Context, request *auth.VerifyWebAuth
 }
 
 func (s *Server) RemoveMyMfaU2F(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
-	err := s.command.RemoveHumanU2F(ctx, authz.GetCtxData(ctx).UserID, id.Id)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.RemoveHumanU2F(ctx, ctxData.UserID, id.Id, ctxData.OrgID)
 	return &empty.Empty{}, err
 }
 
@@ -204,7 +213,8 @@ func (s *Server) VerifyMyPasswordless(ctx context.Context, request *auth.VerifyW
 }
 
 func (s *Server) RemoveMyPasswordless(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
-	err := s.command.RemoveHumanPasswordless(ctx, authz.GetCtxData(ctx).UserID, id.Id)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.RemoveHumanPasswordless(ctx, ctxData.UserID, id.Id, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 

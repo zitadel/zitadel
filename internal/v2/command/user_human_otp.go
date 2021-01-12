@@ -13,7 +13,7 @@ func (r *CommandSide) AddHumanOTP(ctx context.Context, userID, resourceowner str
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
-	human, err := r.getUser(ctx, userID)
+	human, err := r.getUser(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}

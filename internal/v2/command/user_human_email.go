@@ -14,7 +14,7 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
 	}
 
-	existingEmail, err := r.emailWriteModelByID(ctx, email.AggregateID, email.ResourceOwner)
+	existingEmail, err := r.emailWriteModel(ctx, email.AggregateID, email.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (r *CommandSide) VerifyHumanEmail(ctx context.Context, userID, code, resour
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-çm0ds", "Errors.User.Code.Empty")
 	}
 
-	existingCode, err := r.emailWriteModelByID(ctx, userID, resourceowner)
+	existingCode, err := r.emailWriteModel(ctx, userID, resourceowner)
 	if err != nil {
 		return err
 	}

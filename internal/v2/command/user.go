@@ -9,8 +9,8 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
-func (r *CommandSide) getUser(ctx context.Context, userID string) (*domain.User, error) {
-	writeModel, err := r.userWriteModelByID(ctx, userID)
+func (r *CommandSide) getUser(ctx context.Context, userID, resourceOwner string) (*domain.User, error) {
+	writeModel, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
