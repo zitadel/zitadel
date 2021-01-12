@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/project"
 )
 
 const (
@@ -156,21 +157,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 			}
 			//create applications
 			for _, app := range proj.OIDCApps {
-				err = r.addApplication(ctx, projectAgg, project, &domain.Application{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: projectAgg.ID(),
-					},
-					Name: app.Name,
-					Type: domain.AppTypeOIDC,
-					OIDCConfig: &domain.OIDCConfig{
-						RedirectUris:    app.RedirectUris,
-						ResponseTypes:   getOIDCResponseTypes(app.ResponseTypes),
-						GrantTypes:      getOIDCGrantTypes(app.GrantTypes),
-						ApplicationType: getOIDCApplicationType(app.ApplicationType),
-						AuthMethodType:  getOIDCAuthMethod(app.AuthMethodType),
-						DevMode:         app.DevMode,
-					},
-				})
+				err = setUpApplication(ctx, r, projectAgg, project, app)
 				if err != nil {
 					return err
 				}
@@ -185,6 +172,30 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Gr2hh", "Setup Step1 failed")
 	}
+	return nil
+}
+
+func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.Aggregate, project *domain.Project, oidcApp OIDCApp) error {
+	app := &domain.Application{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projectAgg.ID(),
+		},
+		Name: oidcApp.Name,
+		Type: domain.AppTypeOIDC,
+		OIDCConfig: &domain.OIDCConfig{
+			RedirectUris:    oidcApp.RedirectUris,
+			ResponseTypes:   getOIDCResponseTypes(oidcApp.ResponseTypes),
+			GrantTypes:      getOIDCGrantTypes(oidcApp.GrantTypes),
+			ApplicationType: getOIDCApplicationType(oidcApp.ApplicationType),
+			AuthMethodType:  getOIDCAuthMethod(oidcApp.AuthMethodType),
+			DevMode:         oidcApp.DevMode,
+		},
+	}
+	err := r.addApplication(ctx, projectAgg, project, app)
+	if err != nil {
+		return err
+	}
+	logging.LogWithFields("SETUP-Edgw4", "id", app.AppID, "name", app.Name, "clientID", app.OIDCConfig.ClientID).Info("application set up")
 	return nil
 }
 
