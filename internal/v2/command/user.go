@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -48,7 +49,7 @@ func (r *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userNam
 	if orgID == "" || userID == "" || userName == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.IDMissing")
 	}
-	existingUser, err := r.userWriteModelByID(ctx, userID)
+	existingUser, err := r.userWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
@@ -74,11 +75,11 @@ func (r *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userNam
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
 
-func (r *CommandSide) DeactivateUser(ctx context.Context, userID string) (*domain.User, error) {
+func (r *CommandSide) DeactivateUser(ctx context.Context, userID, resourceOwner string) (*domain.User, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0gDf", "Errors.User.UserIDMissing")
 	}
-	existingUser, err := r.userWriteModelByID(ctx, userID)
+	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -98,11 +99,11 @@ func (r *CommandSide) DeactivateUser(ctx context.Context, userID string) (*domai
 	return writeModelToUser(existingUser), nil
 }
 
-func (r *CommandSide) ReactivateUser(ctx context.Context, userID string) (*domain.User, error) {
+func (r *CommandSide) ReactivateUser(ctx context.Context, userID, resourceOwner string) (*domain.User, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9ds", "Errors.User.UserIDMissing")
 	}
-	existingUser, err := r.userWriteModelByID(ctx, userID)
+	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -122,11 +123,11 @@ func (r *CommandSide) ReactivateUser(ctx context.Context, userID string) (*domai
 	return writeModelToUser(existingUser), nil
 }
 
-func (r *CommandSide) LockUser(ctx context.Context, userID string) (*domain.User, error) {
+func (r *CommandSide) LockUser(ctx context.Context, userID, resourceOwner string) (*domain.User, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
 	}
-	existingUser, err := r.userWriteModelByID(ctx, userID)
+	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -146,11 +147,11 @@ func (r *CommandSide) LockUser(ctx context.Context, userID string) (*domain.User
 	return writeModelToUser(existingUser), nil
 }
 
-func (r *CommandSide) UnlockUser(ctx context.Context, userID string) (*domain.User, error) {
+func (r *CommandSide) UnlockUser(ctx context.Context, userID, resourceOwner string) (*domain.User, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M0dse", "Errors.User.UserIDMissing")
 	}
-	existingUser, err := r.userWriteModelByID(ctx, userID)
+	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -170,11 +171,11 @@ func (r *CommandSide) UnlockUser(ctx context.Context, userID string) (*domain.Us
 	return writeModelToUser(existingUser), nil
 }
 
-func (r *CommandSide) RemoveUser(ctx context.Context, userID string) error {
+func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
-	existingUser, err := r.userWriteModelByID(ctx, userID)
+	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -189,11 +190,11 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID string) error {
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
 
-func (r *CommandSide) userWriteModelByID(ctx context.Context, userID string) (writeModel *UserWriteModel, err error) {
+func (r *CommandSide) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewUserWriteModel(userID)
+	writeModel = NewUserWriteModel(userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

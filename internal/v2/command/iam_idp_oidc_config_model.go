@@ -2,22 +2,24 @@ package command
 
 import (
 	"context"
+	"reflect"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
-	"reflect"
 )
 
 type IDPOIDCConfigWriteModel struct {
 	OIDCConfigWriteModel
 }
 
-func NewIDPOIDCConfigWriteModel(iamID, idpConfigID string) *IDPOIDCConfigWriteModel {
+func NewIAMIDPOIDCConfigWriteModel(idpConfigID string) *IDPOIDCConfigWriteModel {
 	return &IDPOIDCConfigWriteModel{
 		OIDCConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
 			},
 			IDPConfigID: idpConfigID,
 		},
@@ -67,7 +69,8 @@ func (wm *IDPOIDCConfigWriteModel) Reduce() error {
 
 func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *IDPOIDCConfigWriteModel) NewChangedEvent(

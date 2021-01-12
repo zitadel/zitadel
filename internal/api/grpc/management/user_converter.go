@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/model"
@@ -76,9 +78,12 @@ func externalIDPSearchRequestToModel(request *management.ExternalIDPSearchReques
 	}
 }
 
-func externalIDPRemoveToDomain(idp *management.ExternalIDPRemoveRequest) *domain.ExternalIDP {
+func externalIDPRemoveToDomain(ctxData authz.CtxData, idp *management.ExternalIDPRemoveRequest) *domain.ExternalIDP {
 	return &domain.ExternalIDP{
-		ObjectRoot:     models.ObjectRoot{AggregateID: idp.UserId},
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   idp.UserId,
+			ResourceOwner: ctxData.ResourceOwner,
+		},
 		IDPConfigID:    idp.IdpConfigId,
 		ExternalUserID: idp.ExternalUserId,
 	}
@@ -387,9 +392,12 @@ func addressViewFromModel(address *usr_model.Address) *management.UserAddressVie
 	}
 }
 
-func updateAddressToDomain(address *management.UpdateUserAddressRequest) *domain.Address {
+func updateAddressToDomain(ctxData authz.CtxData, address *management.UpdateUserAddressRequest) *domain.Address {
 	return &domain.Address{
-		ObjectRoot:    models.ObjectRoot{AggregateID: address.Id},
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   address.Id,
+			ResourceOwner: ctxData.OrgID,
+		},
 		Country:       address.Country,
 		StreetAddress: address.StreetAddress,
 		Region:        address.Region,

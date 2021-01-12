@@ -22,7 +22,7 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *domain.ID
 		return nil, err
 	}
 	//TODO: check name unique on aggregate
-	addedConfig := NewIAMIDPConfigWriteModel(config.AggregateID, idpConfigID)
+	addedConfig := NewIAMIDPConfigWriteModel(idpConfigID)
 
 	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), r.idpConfigSecretCrypto)
 	if err != nil {
@@ -58,7 +58,7 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *domain.ID
 }
 
 func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
-	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, config.AggregateID, config.IDPConfigID)
+	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, config.IDPConfigID)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain
 }
 
 func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
-	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, r.iamID, idpID)
+	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, idpID stri
 }
 
 func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
-	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, r.iamID, idpID)
+	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -117,8 +117,8 @@ func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID stri
 	return writeModelToIDPConfig(existingIDP), nil
 }
 
-func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, iamID, idpID string) (*domain.IDPConfig, error) {
-	writeModel, err := r.pushDefaultIDPWriteModel(ctx, iamID, idpID, func(a *iam.Aggregate, _ *IAMIDPConfigWriteModel) *iam.Aggregate {
+func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
+	writeModel, err := r.pushDefaultIDPWriteModel(ctx, idpID, func(a *iam.Aggregate, _ *IAMIDPConfigWriteModel) *iam.Aggregate {
 		a.Aggregate = *a.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, idpID))
 		return a
 	})
@@ -129,8 +129,8 @@ func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, iamID, idpID s
 	return writeModelToIDPConfig(writeModel), nil
 }
 
-func (r *CommandSide) pushDefaultIDPWriteModel(ctx context.Context, iamID, idpID string, eventSetter func(*iam.Aggregate, *IAMIDPConfigWriteModel) *iam.Aggregate) (*IAMIDPConfigWriteModel, error) {
-	writeModel := NewIAMIDPConfigWriteModel(iamID, idpID)
+func (r *CommandSide) pushDefaultIDPWriteModel(ctx context.Context, idpID string, eventSetter func(*iam.Aggregate, *IAMIDPConfigWriteModel) *iam.Aggregate) (*IAMIDPConfigWriteModel, error) {
+	writeModel := NewIAMIDPConfigWriteModel(idpID)
 	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
@@ -145,11 +145,11 @@ func (r *CommandSide) pushDefaultIDPWriteModel(ctx context.Context, iamID, idpID
 	return writeModel, nil
 }
 
-func (r *CommandSide) iamIDPConfigWriteModelByID(ctx context.Context, iamID, idpID string) (policy *IAMIDPConfigWriteModel, err error) {
+func (r *CommandSide) iamIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *IAMIDPConfigWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMIDPConfigWriteModel(iamID, idpID)
+	writeModel := NewIAMIDPConfigWriteModel(idpID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

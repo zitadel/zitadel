@@ -3,24 +3,36 @@ package command
 import (
 	"context"
 
+	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/project"
+)
+
+const (
+	OIDCResponseTypeCode           = "CODE"
+	OIDCResponseTypeIDToken        = "ID_TOKEN"
+	OIDCResponseTypeToken          = "ID_TOKEN TOKEN"
+	OIDCGrantTypeAuthorizationCode = "AUTHORIZATION_CODE"
+	OIDCGrantTypeImplicit          = "IMPLICIT"
+	OIDCGrantTypeRefreshToken      = "REFRESH_TOKEN"
+	OIDCApplicationTypeNative      = "NATIVE"
+	OIDCApplicationTypeUserAgent   = "USER_AGENT"
+	OIDCApplicationTypeWeb         = "WEB"
+	OIDCAuthMethodTypeNone         = "NONE"
+	OIDCAuthMethodTypeBasic        = "BASIC"
+	OIDCAuthMethodTypePost         = "POST"
 )
 
 type Step1 struct {
 	GlobalOrg          string
 	IAMProject         string
-	DefaultLoginPolicy LoginPolicy //*iam_model.LoginPolicy
+	DefaultLoginPolicy LoginPolicy
 	Orgs               []Org
-	Owners             []string
-
-	//setup              *Setup
-	//createdUsers       map[string]*usr_model.User
-	//createdOrgs        map[string]*org_model.Org
-	//createdProjects    map[string]*proj_model.Project
-	//pwComplexityPolicy *iam_model.PasswordComplexityPolicyView
 }
 
 func (s *Step1) Step() domain.Step {
@@ -28,7 +40,7 @@ func (s *Step1) Step() domain.Step {
 }
 
 func (s *Step1) execute(ctx context.Context, commandSide *CommandSide) error {
-	return commandSide.SetupStep1(ctx, commandSide.iamID, s)
+	return commandSide.SetupStep1(ctx, s)
 }
 
 type LoginPolicy struct {
@@ -71,10 +83,11 @@ type OIDCApp struct {
 	DevMode                bool
 }
 
-func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1) error {
-	iamAgg := iam_repo.NewAggregate(r.iamID, "", 0)
+func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
+	iamWriteModel := NewIAMWriteModel()
+	iamAgg := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
 	//create default login policy
-	err := r.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(iamAgg.ID()),
+	err := r.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(),
 		&domain.LoginPolicy{
 			AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
 			AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
@@ -83,6 +96,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 	if err != nil {
 		return err
 	}
+	logging.Log("SETUP-sd2hj").Info("default login policy set up")
 	//create orgs
 	aggregates := make([]eventstore.Aggregater, 0)
 	for _, organisation := range step1.Orgs {
@@ -110,6 +124,8 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		if err != nil {
 			return err
 		}
+		logging.LogWithFields("SETUP-Gdsfg", "id", orgAgg.ID(), "name", organisation.Name).Info("org set up")
+
 		if organisation.OrgIamPolicy {
 			err = r.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID()), &domain.OrgIAMPolicy{UserLoginMustBeDomain: false})
 			if err != nil {
@@ -117,24 +133,43 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 			}
 		}
 		aggregates = append(aggregates, orgAgg, userAgg, orgMemberAgg)
+		if organisation.Name == step1.GlobalOrg {
+			err = r.setGlobalOrg(ctx, iamAgg, iamWriteModel, orgAgg.ID())
+			if err != nil {
+				return err
+			}
+			logging.Log("SETUP-BDn52").Info("global org set")
+		}
 		//projects
-		//create applications
+		for _, proj := range organisation.Projects {
+			project := &domain.Project{Name: proj.Name}
+			projectAgg, _, err := r.addProject(ctx, project, orgAgg.ID(), userAgg.ID())
+			if err != nil {
+				return err
+			}
+			if project.Name == step1.IAMProject {
+				err = r.setIAMProject(ctx, iamAgg, iamWriteModel, projectAgg.ID())
+				if err != nil {
+					return err
+				}
+				logging.Log("SETUP-Bdfs1").Info("IAM project set")
+				err = r.addIAMMember(ctx, iamAgg, NewIAMMemberWriteModel(userAgg.ID()), domain.NewMember(iamAgg.ID(), userAgg.ID(), domain.RoleIAMOwner))
+				if err != nil {
+					return err
+				}
+				logging.Log("SETUP-BSf2h").Info("IAM owner set")
+			}
+			//create applications
+			for _, app := range proj.OIDCApps {
+				err = setUpApplication(ctx, r, projectAgg, project, app)
+				if err != nil {
+					return err
+				}
+			}
+			aggregates = append(aggregates, projectAgg)
+		}
 	}
 
-	//set iam owners
-	//set global org
-	//set iam project id
-
-	/*aggregates:
-	  iam:
-	  	default login policy
-	  	iam owner
-	  org:
-	  	default
-	  	caos
-	  		zitadel
-
-	*/
 	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
 
 	_, err = r.eventstore.PushAggregates(ctx, append(aggregates, iamAgg)...)
@@ -142,4 +177,92 @@ func (r *CommandSide) SetupStep1(ctx context.Context, iamID string, step1 *Step1
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Gr2hh", "Setup Step1 failed")
 	}
 	return nil
+}
+
+func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.Aggregate, project *domain.Project, oidcApp OIDCApp) error {
+	app := &domain.Application{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projectAgg.ID(),
+		},
+		Name: oidcApp.Name,
+		Type: domain.AppTypeOIDC,
+		OIDCConfig: &domain.OIDCConfig{
+			RedirectUris:    oidcApp.RedirectUris,
+			ResponseTypes:   getOIDCResponseTypes(oidcApp.ResponseTypes),
+			GrantTypes:      getOIDCGrantTypes(oidcApp.GrantTypes),
+			ApplicationType: getOIDCApplicationType(oidcApp.ApplicationType),
+			AuthMethodType:  getOIDCAuthMethod(oidcApp.AuthMethodType),
+			DevMode:         oidcApp.DevMode,
+		},
+	}
+	err := r.addApplication(ctx, projectAgg, project, app)
+	if err != nil {
+		return err
+	}
+	logging.LogWithFields("SETUP-Edgw4", "name", app.Name, "clientID", app.OIDCConfig.ClientID).Info("application set up")
+	return nil
+}
+
+func getOIDCResponseTypes(responseTypes []string) []domain.OIDCResponseType {
+	types := make([]domain.OIDCResponseType, len(responseTypes))
+	for i, t := range responseTypes {
+		types[i] = getOIDCResponseType(t)
+	}
+	return types
+}
+
+func getOIDCResponseType(responseType string) domain.OIDCResponseType {
+	switch responseType {
+	case OIDCResponseTypeCode:
+		return domain.OIDCResponseTypeCode
+	case OIDCResponseTypeIDToken:
+		return domain.OIDCResponseTypeIDToken
+	case OIDCResponseTypeToken:
+		return domain.OIDCResponseTypeIDTokenToken
+	}
+	return domain.OIDCResponseTypeCode
+}
+
+func getOIDCGrantTypes(grantTypes []string) []domain.OIDCGrantType {
+	types := make([]domain.OIDCGrantType, len(grantTypes))
+	for i, t := range grantTypes {
+		types[i] = getOIDCGrantType(t)
+	}
+	return types
+}
+
+func getOIDCGrantType(grantTypes string) domain.OIDCGrantType {
+	switch grantTypes {
+	case OIDCGrantTypeAuthorizationCode:
+		return domain.OIDCGrantTypeAuthorizationCode
+	case OIDCGrantTypeImplicit:
+		return domain.OIDCGrantTypeImplicit
+	case OIDCGrantTypeRefreshToken:
+		return domain.OIDCGrantTypeRefreshToken
+	}
+	return domain.OIDCGrantTypeAuthorizationCode
+}
+
+func getOIDCApplicationType(appType string) domain.OIDCApplicationType {
+	switch appType {
+	case OIDCApplicationTypeNative:
+		return domain.OIDCApplicationTypeNative
+	case OIDCApplicationTypeUserAgent:
+		return domain.OIDCApplicationTypeUserAgent
+	case OIDCApplicationTypeWeb:
+		return domain.OIDCApplicationTypeWeb
+	}
+	return domain.OIDCApplicationTypeWeb
+}
+
+func getOIDCAuthMethod(authMethod string) domain.OIDCAuthMethodType {
+	switch authMethod {
+	case OIDCAuthMethodTypeNone:
+		return domain.OIDCAuthMethodTypeNone
+	case OIDCAuthMethodTypeBasic:
+		return domain.OIDCAuthMethodTypeBasic
+	case OIDCAuthMethodTypePost:
+		return domain.OIDCAuthMethodTypePost
+	}
+	return domain.OIDCAuthMethodTypeBasic
 }

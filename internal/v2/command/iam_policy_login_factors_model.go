@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
@@ -9,11 +10,12 @@ type IAMSecondFactorWriteModel struct {
 	SecondFactorWriteModel
 }
 
-func NewIAMSecondFactorWriteModel(iamID string) *IAMSecondFactorWriteModel {
+func NewIAMSecondFactorWriteModel() *IAMSecondFactorWriteModel {
 	return &IAMSecondFactorWriteModel{
 		SecondFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
 			},
 		},
 	}
@@ -34,18 +36,20 @@ func (wm *IAMSecondFactorWriteModel) Reduce() error {
 
 func (wm *IAMSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.WriteModel.AggregateID)
+		AggregateIDs(wm.WriteModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 type IAMMultiFactorWriteModel struct {
 	MultiFactoryWriteModel
 }
 
-func NewIAMMultiFactorWriteModel(iamID string) *IAMMultiFactorWriteModel {
+func NewIAMMultiFactorWriteModel() *IAMMultiFactorWriteModel {
 	return &IAMMultiFactorWriteModel{
 		MultiFactoryWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
 			},
 		},
 	}
@@ -66,5 +70,6 @@ func (wm *IAMMultiFactorWriteModel) Reduce() error {
 
 func (wm *IAMMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.WriteModel.AggregateID)
+		AggregateIDs(wm.WriteModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }

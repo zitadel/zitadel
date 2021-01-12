@@ -23,6 +23,7 @@ type CtxData struct {
 	ProjectID         string
 	AgentID           string
 	PreferredLanguage string
+	ResourceOwner     string
 }
 
 func (ctxData CtxData) IsZero() bool {
@@ -47,7 +48,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 		}
 	}
 
-	userID, clientID, agentID, prefLang, err := verifyAccessToken(ctx, token, t, method)
+	userID, clientID, agentID, prefLang, resourceOwner, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
 		return CtxData{}, err
 	}
@@ -64,6 +65,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 		ProjectID:         projectID,
 		AgentID:           agentID,
 		PreferredLanguage: prefLang,
+		ResourceOwner:     resourceOwner,
 	}, nil
 
 }

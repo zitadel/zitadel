@@ -26,7 +26,7 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID, username string, ma
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6M0ds", "Errors.User.Invalid")
 	}
 
-	addedMachine := NewMachineWriteModel(machine.AggregateID)
+	addedMachine := NewMachineWriteModel(machine.AggregateID, orgID)
 	userAgg := UserAggregateFromWriteModel(&addedMachine.WriteModel)
 	userAgg.PushEvents(
 		user.NewMachineAddedEvent(
@@ -40,7 +40,7 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID, username string, ma
 }
 
 func (r *CommandSide) ChangeMachine(ctx context.Context, machine *domain.Machine) (*domain.Machine, error) {
-	existingUser, err := r.machineWriteModelByID(ctx, machine.AggregateID)
+	existingUser, err := r.machineWriteModelByID(ctx, machine.AggregateID, machine.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -62,14 +62,14 @@ func (r *CommandSide) ChangeMachine(ctx context.Context, machine *domain.Machine
 	return writeModelToMachine(existingUser), nil
 }
 
-func (r *CommandSide) machineWriteModelByID(ctx context.Context, userID string) (writeModel *MachineWriteModel, err error) {
+func (r *CommandSide) machineWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *MachineWriteModel, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0ds", "Errors.User.UserIDMissing")
 	}
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewMachineWriteModel(userID)
+	writeModel = NewMachineWriteModel(userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

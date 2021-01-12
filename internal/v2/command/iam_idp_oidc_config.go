@@ -7,7 +7,7 @@ import (
 )
 
 func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
-	existingConfig := NewIDPOIDCConfigWriteModel(config.AggregateID, config.IDPConfigID)
+	existingConfig := NewIAMIDPOIDCConfigWriteModel(config.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err

@@ -78,7 +78,7 @@ func IAMSetGlobalOrgAggregate(aggCreator *es_models.AggregateCreator, iam *model
 func IAMSetIamProjectAggregate(aggCreator *es_models.AggregateCreator, iam *model.IAM, projectID string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if projectID == "" {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sjuw3", "Errors.IAM.IamProjectIDMisisng")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sjuw3", "Errors.IAM.IAMProjectIDMissing")
 		}
 		agg, err := IAMAggregate(ctx, aggCreator, iam)
 		if err != nil {

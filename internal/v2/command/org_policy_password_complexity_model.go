@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
@@ -10,11 +11,12 @@ type OrgPasswordComplexityPolicyWriteModel struct {
 	PasswordComplexityPolicyWriteModel
 }
 
-func NewOrgPasswordComplexityPolicyWriteModel(iamID string) *OrgPasswordComplexityPolicyWriteModel {
+func NewOrgPasswordComplexityPolicyWriteModel(orgID string) *OrgPasswordComplexityPolicyWriteModel {
 	return &OrgPasswordComplexityPolicyWriteModel{
 		PasswordComplexityPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID: iamID,
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
 			},
 		},
 	}
@@ -37,7 +39,8 @@ func (wm *OrgPasswordComplexityPolicyWriteModel) Reduce() error {
 
 func (wm *OrgPasswordComplexityPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.PasswordComplexityPolicyWriteModel.AggregateID)
+		AggregateIDs(wm.PasswordComplexityPolicyWriteModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner)
 }
 
 func (wm *OrgPasswordComplexityPolicyWriteModel) NewChangedEvent(

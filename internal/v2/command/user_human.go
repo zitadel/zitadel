@@ -39,7 +39,7 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID, username string, huma
 		return nil, nil, err
 	}
 
-	addedHuman := NewHumanWriteModel(human.AggregateID)
+	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
 	//TODO: Check Unique Username
 	if err := human.CheckOrgIAMPolicy(username, orgIAMPolicy); err != nil {
 		return nil, nil, err
@@ -118,7 +118,7 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 		return nil, err
 	}
 
-	addedHuman := NewHumanWriteModel(human.AggregateID)
+	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
 	//TODO: Check Unique Username or unique external idp
 	if err := human.CheckOrgIAMPolicy(username, orgIAMPolicy); err != nil {
 		return nil, err
@@ -185,12 +185,12 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 	return writeModelToHuman(addedHuman), nil
 }
 
-func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email string) (err error) {
+func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, resourceOwner string) (err error) {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UserIDMissing")
 	}
 
-	existingEmail, err := r.emailWriteModel(ctx, userID)
+	existingEmail, err := r.emailWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}

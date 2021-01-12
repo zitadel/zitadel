@@ -2,9 +2,10 @@ package auth
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/golang/protobuf/ptypes/empty"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 )
 
@@ -71,7 +72,7 @@ func (s *Server) UpdateMyUserProfile(ctx context.Context, request *auth.UpdateUs
 
 func (s *Server) ChangeMyUserName(ctx context.Context, request *auth.ChangeUserNameRequest) (*empty.Empty, error) {
 	ctxData := authz.GetCtxData(ctx)
-	return &empty.Empty{}, s.command.ChangeUsername(ctx, ctxData.OrgID, ctxData.UserID, request.UserName)
+	return &empty.Empty{}, s.command.ChangeUsername(ctx, ctxData.ResourceOwner, ctxData.UserID, request.UserName)
 }
 
 func (s *Server) ChangeMyUserEmail(ctx context.Context, request *auth.UpdateUserEmailRequest) (*auth.UserEmail, error) {

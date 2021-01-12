@@ -17,7 +17,7 @@ func (r *CommandSide) removeHumanExternalIDP(ctx context.Context, externalIDP *d
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.IDMissing")
 	}
 
-	existingExternalIDP, err := r.externalIDPWriteModelByID(ctx, externalIDP.AggregateID, externalIDP.IDPConfigID, externalIDP.ExternalUserID)
+	existingExternalIDP, err := r.externalIDPWriteModelByID(ctx, externalIDP.AggregateID, externalIDP.IDPConfigID, externalIDP.ExternalUserID, externalIDP.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -39,11 +39,11 @@ func (r *CommandSide) removeHumanExternalIDP(ctx context.Context, externalIDP *d
 	return r.eventstore.PushAggregate(ctx, existingExternalIDP, userAgg)
 }
 
-func (r *CommandSide) externalIDPWriteModelByID(ctx context.Context, userID, idpConfigID, externalUserID string) (writeModel *HumanExternalIDPWriteModel, err error) {
+func (r *CommandSide) externalIDPWriteModelByID(ctx context.Context, userID, idpConfigID, externalUserID, resourceOwner string) (writeModel *HumanExternalIDPWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID)
+	writeModel = NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

@@ -2,15 +2,18 @@ package management
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/v2/domain"
+
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
-	"github.com/golang/protobuf/ptypes"
 )
 
 func machineCreateToDomain(machine *management.CreateMachineRequest) *domain.Machine {
@@ -20,9 +23,12 @@ func machineCreateToDomain(machine *management.CreateMachineRequest) *domain.Mac
 	}
 }
 
-func updateMachineToDomain(machine *management.UpdateMachineRequest) *domain.Machine {
+func updateMachineToDomain(ctxData authz.CtxData, machine *management.UpdateMachineRequest) *domain.Machine {
 	return &domain.Machine{
-		ObjectRoot:  models.ObjectRoot{AggregateID: machine.Id},
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   machine.Id,
+			ResourceOwner: ctxData.ResourceOwner,
+		},
 		Name:        machine.Name,
 		Description: machine.Description,
 	}

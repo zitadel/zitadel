@@ -13,7 +13,7 @@ func (r *CommandSide) SetOneTimePassword(ctx context.Context, orgID, userID, pas
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	existingPassword, err := r.passwordWriteModel(ctx, userID)
+	existingPassword, err := r.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
@@ -24,11 +24,11 @@ func (r *CommandSide) SetOneTimePassword(ctx context.Context, orgID, userID, pas
 	return r.changePassword(ctx, orgID, userID, "", password, existingPassword)
 }
 
-func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (err error) {
+func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID, resourceOwner string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	existingPassword, err := r.passwordWriteModel(ctx, userID)
+	existingPassword, err := r.passwordWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -74,8 +74,8 @@ func (r *CommandSide) changePassword(ctx context.Context, orgID, userID, userAge
 	return r.eventstore.PushAggregate(ctx, existingPassword, userAgg)
 }
 
-func (r *CommandSide) RequestSetPassword(ctx context.Context, userID string, notifyType domain.NotificationType) (err error) {
-	existingHuman, err := r.userWriteModelByID(ctx, userID)
+func (r *CommandSide) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType) (err error) {
+	existingHuman, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -94,11 +94,11 @@ func (r *CommandSide) RequestSetPassword(ctx context.Context, userID string, not
 	return r.eventstore.PushAggregate(ctx, existingHuman, userAgg)
 }
 
-func (r *CommandSide) passwordWriteModel(ctx context.Context, userID string) (writeModel *HumanPasswordWriteModel, err error) {
+func (r *CommandSide) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanPasswordWriteModel(userID)
+	writeModel = NewHumanPasswordWriteModel(userID, resourceOwner)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

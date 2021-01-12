@@ -32,7 +32,7 @@ func (r *CommandSide) setUpOrg(ctx context.Context, organisation *domain.Org, ad
 
 	addedMember := NewOrgMemberWriteModel(orgAgg.ID(), userAgg.ID())
 	orgMemberAgg := OrgAggregateFromWriteModel(&addedMember.WriteModel)
-	err = r.addOrgMember(ctx, orgMemberAgg, addedMember, domain.NewMember(orgMemberAgg.ID(), userAgg.ID(), domain.OrgOwnerRole)) //TODO: correct?
+	err = r.addOrgMember(ctx, orgMemberAgg, addedMember, domain.NewMember(orgMemberAgg.ID(), userAgg.ID(), domain.RoleOrgOwner))
 	if err != nil {
 		return nil, nil, nil, err
 	}
