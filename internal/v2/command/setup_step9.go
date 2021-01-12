@@ -3,6 +3,8 @@ package command
 import (
 	"context"
 
+	"github.com/caos/logging"
+
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
@@ -31,10 +33,12 @@ func (r *CommandSide) SetupStep9(ctx context.Context, step *Step9) error {
 		if err != nil {
 			return nil, err
 		}
+		logging.Log("SETUP-AEG2t").Info("allowed passwordless in login policy")
 		err = r.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, iam_model.MultiFactorTypeU2FWithPIN)
 		if err != nil {
 			return nil, err
 		}
+		logging.Log("SETUP-ADfng").Info("added MFA passwordless to default login policy")
 		return iamAgg, err
 	}
 	return r.setup(ctx, step, fn)

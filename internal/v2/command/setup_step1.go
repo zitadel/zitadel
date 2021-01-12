@@ -96,6 +96,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 	if err != nil {
 		return err
 	}
+	logging.Log("SETUP-sd2hj").Info("default login policy set up")
 	//create orgs
 	aggregates := make([]eventstore.Aggregater, 0)
 	for _, organisation := range step1.Orgs {
@@ -137,6 +138,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 			if err != nil {
 				return err
 			}
+			logging.Log("SETUP-BDn52").Info("global org set")
 		}
 		//projects
 		for _, proj := range organisation.Projects {
@@ -150,10 +152,12 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 				if err != nil {
 					return err
 				}
+				logging.Log("SETUP-Bdfs1").Info("IAM project set")
 				err = r.addIAMMember(ctx, iamAgg, NewIAMMemberWriteModel(userAgg.ID()), domain.NewMember(iamAgg.ID(), userAgg.ID(), domain.RoleIAMOwner))
 				if err != nil {
 					return err
 				}
+				logging.Log("SETUP-BSf2h").Info("IAM owner set")
 			}
 			//create applications
 			for _, app := range proj.OIDCApps {
@@ -195,7 +199,7 @@ func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.A
 	if err != nil {
 		return err
 	}
-	logging.LogWithFields("SETUP-Edgw4", "id", app.AppID, "name", app.Name, "clientID", app.OIDCConfig.ClientID).Info("application set up")
+	logging.LogWithFields("SETUP-Edgw4", "name", app.Name, "clientID", app.OIDCConfig.ClientID).Info("application set up")
 	return nil
 }
 

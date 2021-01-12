@@ -3,6 +3,8 @@ package command
 import (
 	"context"
 
+	"github.com/caos/logging"
+
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
@@ -31,6 +33,7 @@ func (r *CommandSide) SetupStep7(ctx context.Context, step *Step7) error {
 		if err != nil {
 			return nil, err
 		}
+		logging.Log("SETUP-Dggsg").Info("added 2FA OTP to default login policy")
 		return iamAgg, nil
 	}
 	return r.setup(ctx, step, fn)

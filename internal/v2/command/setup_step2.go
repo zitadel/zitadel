@@ -3,6 +3,8 @@ package command
 import (
 	"context"
 
+	"github.com/caos/logging"
+
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
@@ -33,7 +35,8 @@ func (r *CommandSide) SetupStep2(ctx context.Context, step *Step2) error {
 		if err != nil {
 			return nil, err
 		}
-		return iamAgg, err
+		logging.Log("SETUP-ADgd2").Info("default password complexity policy set up")
+		return iamAgg, nil
 	}
 	return r.setup(ctx, step, fn)
 }
