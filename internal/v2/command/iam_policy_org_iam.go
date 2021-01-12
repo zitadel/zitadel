@@ -9,7 +9,6 @@ import (
 )
 
 func (r *CommandSide) AddDefaultOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
-	//policy.AggregateID = r.iamID
 	addedPolicy := NewIAMOrgIAMPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
 	err := r.addDefaultOrgIAMPolicy(ctx, nil, addedPolicy, policy)
@@ -39,7 +38,6 @@ func (r *CommandSide) addDefaultOrgIAMPolicy(ctx context.Context, iamAgg *iam_re
 }
 
 func (r *CommandSide) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
-	//policy.AggregateID = r.iamID
 	existingPolicy, err := r.defaultOrgIAMPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err

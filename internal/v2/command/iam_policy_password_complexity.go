@@ -20,7 +20,6 @@ func (r *CommandSide) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*
 }
 
 func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
-	//policy.AggregateID = r.iamID
 	addedPolicy := NewIAMPasswordComplexityPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
 	err := r.addDefaultPasswordComplexityPolicy(ctx, iamAgg, addedPolicy, policy)
@@ -55,7 +54,6 @@ func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, ia
 }
 
 func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
-	//policy.AggregateID = r.iamID
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}

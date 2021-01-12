@@ -51,7 +51,6 @@ func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, iamAgg *iam_rep
 }
 
 func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
-	//policy.AggregateID = r.iamID
 	existingPolicy := NewIAMLoginPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
 	err := r.changeDefaultLoginPolicy(ctx, iamAgg, existingPolicy, policy)
@@ -67,7 +66,6 @@ func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *doma
 }
 
 func (r *CommandSide) changeDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, existingPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) error {
-	//policy.AggregateID = r.iamID
 	err := r.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
 	if err != nil {
 		return err
@@ -85,7 +83,6 @@ func (r *CommandSide) changeDefaultLoginPolicy(ctx context.Context, iamAgg *iam_
 }
 
 func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
-	//idpProvider.AggregateID = r.iamID
 	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
@@ -106,7 +103,6 @@ func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, id
 }
 
 func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *iam_model.IDPProvider) error {
-	//idpProvider.AggregateID = r.iamID
 	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {

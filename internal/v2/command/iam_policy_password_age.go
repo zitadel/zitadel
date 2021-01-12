@@ -9,7 +9,6 @@ import (
 )
 
 func (r *CommandSide) AddDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	//policy.AggregateID = r.iamID
 	addedPolicy := NewIAMPasswordAgePolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
 	err := r.addDefaultPasswordAgePolicy(ctx, nil, addedPolicy, policy)
@@ -40,7 +39,6 @@ func (r *CommandSide) addDefaultPasswordAgePolicy(ctx context.Context, iamAgg *i
 }
 
 func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	//policy.AggregateID = r.iamID
 	existingPolicy, err := r.defaultPasswordAgePolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err

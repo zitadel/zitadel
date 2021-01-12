@@ -9,7 +9,6 @@ import (
 )
 
 func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
-	//policy.AggregateID = r.iamID
 	addedPolicy := NewIAMPasswordLockoutPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
 	err := r.addDefaultPasswordLockoutPolicy(ctx, nil, addedPolicy, policy)
@@ -40,7 +39,6 @@ func (r *CommandSide) addDefaultPasswordLockoutPolicy(ctx context.Context, iamAg
 }
 
 func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
-	//policy.AggregateID = r.iamID
 	existingPolicy, err := r.defaultPasswordLockoutPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err

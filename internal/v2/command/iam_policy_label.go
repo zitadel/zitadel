@@ -9,7 +9,6 @@ import (
 )
 
 func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
-	//policy.AggregateID = r.iamID
 	addedPolicy := NewIAMLabelPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
 	err := r.addDefaultLabelPolicy(ctx, nil, addedPolicy, policy)
@@ -40,7 +39,6 @@ func (r *CommandSide) addDefaultLabelPolicy(ctx context.Context, iamAgg *iam_rep
 }
 
 func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
-	//policy.AggregateID = r.iamID
 	existingPolicy, err := r.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
