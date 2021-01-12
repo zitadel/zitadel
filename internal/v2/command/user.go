@@ -212,3 +212,15 @@ func (r *CommandSide) userWriteModelByID(ctx context.Context, userID, resourceOw
 	}
 	return writeModel, nil
 }
+
+func (r *CommandSide) userReadModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	writeModel = NewUserWriteModel(userID, resourceOwner)
+	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}

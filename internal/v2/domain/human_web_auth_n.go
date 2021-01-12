@@ -39,6 +39,14 @@ const (
 	UserVerificationRequirementDiscouraged
 )
 
+type AuthenticatorAttachment int32
+
+const (
+	AuthenticatorAttachmentUnspecified AuthenticatorAttachment = iota
+	AuthenticatorAttachmentPlattform
+	AuthenticatorAttachmentCrossPlattform
+)
+
 type WebAuthNState int32
 
 const (

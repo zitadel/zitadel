@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	global_model "github.com/caos/zitadel/internal/model"
+	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -19,15 +20,17 @@ type CommandSide struct {
 
 	idpConfigSecretCrypto crypto.Crypto
 
-	userPasswordAlg          crypto.HashAlgorithm
-	initializeUserCode       crypto.Generator
-	emailVerificationCode    crypto.Generator
-	phoneVerificationCode    crypto.Generator
-	passwordVerificationCode crypto.Generator
-	machineKeyAlg            crypto.EncryptionAlgorithm
-	machineKeySize           int
-	multifactors             global_model.Multifactors
+	userPasswordAlg            crypto.HashAlgorithm
+	initializeUserCode         crypto.Generator
+	emailVerificationCode      crypto.Generator
+	phoneVerificationCode      crypto.Generator
+	passwordVerificationCode   crypto.Generator
+	machineKeyAlg              crypto.EncryptionAlgorithm
+	machineKeySize             int
+	multifactors               global_model.Multifactors
 	applicationSecretGenerator crypto.Generator
+
+	webauthn *webauthn_helper.WebAuthN
 }
 
 type Config struct {
@@ -72,7 +75,11 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	}
 	passwordAlg := crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
 	repo.applicationSecretGenerator = crypto.NewHashGenerator(config.SystemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
-
+	web, err := webauthn_helper.StartServer(config.SystemDefaults.WebAuthN)
+	if err != nil {
+		return nil, err
+	}
+	repo.webauthn = web
 	return repo, nil
 }
 

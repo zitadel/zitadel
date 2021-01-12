@@ -82,3 +82,10 @@ func writeModelToMachine(wm *MachineWriteModel) *domain.Machine {
 		Description: wm.Description,
 	}
 }
+
+func writeModelToWebAuthN(wm *HumanWebAuthNWriteModel) *domain.WebAuthNToken {
+	return &domain.WebAuthNToken{
+		ObjectRoot:      writeModelToObjectRoot(wm.WriteModel),
+		WebAuthNTokenID: wm.WebauthNTokenID,
+	}
+}

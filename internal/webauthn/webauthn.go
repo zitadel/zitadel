@@ -3,6 +3,7 @@ package webauthn
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
@@ -41,7 +42,7 @@ func StartServer(sd systemdefaults.WebAuthN) (*WebAuthN, error) {
 }
 
 type webUser struct {
-	*usr_model.User
+	*domain.User
 	accountName string
 	credentials []webauthn.Credential
 }
@@ -69,7 +70,7 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *WebAuthN) BeginRegistration(user *usr_model.User, accountName string, authType usr_model.AuthenticatorAttachment, userVerification usr_model.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNToken, error) {
+func (w *WebAuthN) BeginRegistration(user *domain.User, accountName string, authType domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNToken, error) {
 	creds := WebAuthNsToCredentials(webAuthNs)
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
@@ -85,8 +86,8 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, accountName string, a
 			credentials: creds,
 		},
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
-			UserVerification:        UserVerificationFromModel(userVerification),
-			AuthenticatorAttachment: AuthenticatorAttachmentFromModel(authType),
+			UserVerification:        UserVerificationFromDomain(userVerification),
+			AuthenticatorAttachment: AuthenticatorAttachmentFromDomain(authType),
 		}),
 		webauthn.WithConveyancePreference(protocol.PreferNoAttestation),
 		webauthn.WithExclusions(existing),
@@ -98,11 +99,11 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, accountName string, a
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-D7cus", "Errors.User.WebAuthN.MarshalError")
 	}
-	return &usr_model.WebAuthNToken{
+	return &domain.WebAuthNToken{
 		Challenge:              sessionData.Challenge,
 		CredentialCreationData: cred,
 		AllowedCredentialIDs:   sessionData.AllowedCredentialIDs,
-		UserVerification:       UserVerificationToModel(sessionData.UserVerification),
+		UserVerification:       UserVerificationToDomain(sessionData.UserVerification),
 	}, nil
 }
 
@@ -137,7 +138,7 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.U
 	assertion, sessionData, err := w.web(isLoginUI).BeginLogin(&webUser{
 		User:        user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
-	}, webauthn.WithUserVerification(UserVerificationFromModel(userVerification)))
+	}, webauthn.WithUserVerification(UserVerificationFromDomain(userVerification)))
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-4G8sw", "Errors.User.WebAuthN.BeginLoginFailed")
 	}
