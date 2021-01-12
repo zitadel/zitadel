@@ -56,11 +56,8 @@ type myUserRepo interface {
 	MyAddress(ctx context.Context) (*model.Address, error)
 
 	SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
-	AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error)
 
 	MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error)
-	AddMyMFAOTP(ctx context.Context) (*model.OTP, error)
-	VerifyMyMFAOTPSetup(ctx context.Context, code string) error
 
 	AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error)
 	VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, data []byte) error

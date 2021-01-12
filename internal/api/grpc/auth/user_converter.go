@@ -313,7 +313,7 @@ func otpFromDomain(otp *domain.OTP) *auth.MfaOtpResponse {
 		UserId: otp.AggregateID,
 		Url:    otp.Url,
 		Secret: otp.SecretString,
-		State:  mfaStateFromModel(otp.State),
+		State:  mfaStateFromDomain(otp.State),
 	}
 }
 
@@ -360,11 +360,11 @@ func genderToDomain(gender auth.Gender) domain.Gender {
 	}
 }
 
-func mfaStateFromModel(state usr_model.MFAState) auth.MFAState {
+func mfaStateFromDomain(state domain.MFAState) auth.MFAState {
 	switch state {
-	case usr_model.MFAStateReady:
+	case domain.MFAStateReady:
 		return auth.MFAState_MFASTATE_READY
-	case usr_model.MFAStateNotReady:
+	case domain.MFAStateNotReady:
 		return auth.MFAState_MFASTATE_NOT_READY
 	default:
 		return auth.MFAState_MFASTATE_UNSPECIFIED
@@ -381,7 +381,7 @@ func mfasFromModel(mfas []*usr_model.MultiFactor) []*auth.MultiFactor {
 
 func mfaFromModel(mfa *usr_model.MultiFactor) *auth.MultiFactor {
 	return &auth.MultiFactor{
-		State:     mfaStateFromModel(mfa.State),
+		State:     auth.MFAState(mfa.State),
 		Type:      mfaTypeFromModel(mfa.Type),
 		Attribute: mfa.Attribute,
 		Id:        mfa.ID,
@@ -435,7 +435,7 @@ func verifyWebAuthNFromModel(u2f *usr_model.WebAuthNToken) *auth.WebAuthNRespons
 	return &auth.WebAuthNResponse{
 		Id:        u2f.WebAuthNTokenID,
 		PublicKey: u2f.CredentialCreationData,
-		State:     mfaStateFromModel(u2f.State),
+		State:     auth.MFAState(u2f.State),
 	}
 }
 
@@ -451,6 +451,6 @@ func webAuthNTokenFromModel(token *usr_model.WebAuthNToken) *auth.WebAuthNToken 
 	return &auth.WebAuthNToken{
 		Id:    token.WebAuthNTokenID,
 		Name:  token.WebAuthNTokenName,
-		State: mfaStateFromModel(token.State),
+		State: auth.MFAState(token.State),
 	}
 }

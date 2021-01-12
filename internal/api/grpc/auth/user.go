@@ -154,7 +154,7 @@ func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *auth.MfaOtpR
 }
 
 func (s *Server) VerifyMfaOTP(ctx context.Context, request *auth.VerifyMfaOtp) (*empty.Empty, error) {
-	err := s.repo.VerifyMyMFAOTPSetup(ctx, request.Code)
+	err := s.command.CheckMFAOTPSetup(ctx, authz.GetCtxData(ctx).UserID, request.Code, "")
 	return &empty.Empty{}, err
 }
 

@@ -122,20 +122,6 @@ func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.E
 	return result, nil
 }
 
-func (repo *UserRepo) AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error) {
-	if err := checkIDs(ctx, externalIDP.ObjectRoot); err != nil {
-		return nil, err
-	}
-	return repo.UserEvents.AddExternalIDP(ctx, externalIDP)
-}
-
-func (repo *UserRepo) RemoveMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error {
-	if err := checkIDs(ctx, externalIDP.ObjectRoot); err != nil {
-		return err
-	}
-	return repo.UserEvents.RemoveExternalIDP(ctx, externalIDP)
-}
-
 func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
@@ -257,23 +243,8 @@ func (repo *UserRepo) AddMFAOTP(ctx context.Context, userID string) (*model.OTP,
 	return repo.UserEvents.AddOTP(ctx, userID, accountName)
 }
 
-func (repo *UserRepo) AddMyMFAOTP(ctx context.Context) (*model.OTP, error) {
-	accountName := ""
-	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		logging.Log("EVENT-Ml0sd").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
-	} else {
-		accountName = user.PreferredLoginName
-	}
-	return repo.UserEvents.AddOTP(ctx, authz.GetCtxData(ctx).UserID, accountName)
-}
-
 func (repo *UserRepo) VerifyMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error {
 	return repo.UserEvents.CheckMFAOTPSetup(ctx, userID, code, userAgentID)
-}
-
-func (repo *UserRepo) VerifyMyMFAOTPSetup(ctx context.Context, code string) error {
-	return repo.UserEvents.CheckMFAOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code, "")
 }
 
 func (repo *UserRepo) RemoveMyMFAOTP(ctx context.Context) error {
