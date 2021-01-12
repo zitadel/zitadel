@@ -49,6 +49,9 @@ func (r *CommandSide) getProjectByID(ctx context.Context, projectID, resourceOwn
 	if err != nil {
 		return nil, err
 	}
+	if projectWriteModel.State == domain.ProjectStateUnspecified || projectWriteModel.State == domain.ProjectStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "PROJECT-Gd2hh", "Errors.Project.NotFound")
+	}
 	return projectWriteModelToProject(projectWriteModel), nil
 }
 

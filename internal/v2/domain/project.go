@@ -20,7 +20,8 @@ type Project struct {
 type ProjectState int32
 
 const (
-	ProjectStateActive ProjectState = iota
+	ProjectStateUnspecified ProjectState = iota
+	ProjectStateActive
 	ProjectStateInactive
 	ProjectStateRemoved
 )
