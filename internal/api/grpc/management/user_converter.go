@@ -19,48 +19,56 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func userFromDomain(user *domain.User) *management.UserResponse {
-	creationDate, err := ptypes.TimestampProto(user.CreationDate)
+func userMachineFromDomain(machine *domain.Machine) *management.UserResponse {
+	creationDate, err := ptypes.TimestampProto(machine.CreationDate)
 	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
 
-	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
+	changeDate, err := ptypes.TimestampProto(machine.ChangeDate)
 	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
 
 	userResp := &management.UserResponse{
-		Id:           user.AggregateID,
-		State:        userStateFromDomain(user.State),
+		Id:           machine.AggregateID,
+		State:        userStateFromDomain(machine.GetState()),
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
-		Sequence:     user.Sequence,
-		UserName:     user.UserName,
+		Sequence:     machine.Sequence,
+		UserName:     machine.GetUsername(),
 	}
-
-	if user.Machine != nil {
-		userResp.User = &management.UserResponse_Machine{Machine: machineFromDomain(user.Machine)}
-	}
-	if user.Human != nil {
-		userResp.User = &management.UserResponse_Human{Human: humanFromDomain(user.Human)}
-	}
-
+	userResp.User = &management.UserResponse_Machine{Machine: machineFromDomain(machine)}
 	return userResp
 }
 
-func userCreateToDomain(user *management.CreateUserRequest) *domain.User {
-	var human *domain.Human
-	var machine *domain.Machine
+func userHumanFromDomain(human *domain.Human) *management.UserResponse {
+	creationDate, err := ptypes.TimestampProto(human.CreationDate)
+	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
 
+	changeDate, err := ptypes.TimestampProto(human.ChangeDate)
+	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
+
+	userResp := &management.UserResponse{
+		Id:           human.AggregateID,
+		State:        userStateFromDomain(human.GetState()),
+		CreationDate: creationDate,
+		ChangeDate:   changeDate,
+		Sequence:     human.Sequence,
+		UserName:     human.GetUsername(),
+	}
+	userResp.User = &management.UserResponse_Human{Human: humanFromDomain(human)}
+	return userResp
+}
+
+func userCreateToDomain(user *management.CreateUserRequest) (*domain.Human, *domain.Machine) {
 	if h := user.GetHuman(); h != nil {
-		human = humanCreateToDomain(h)
+		human := humanCreateToDomain(h)
+		human.Username = user.UserName
+		return human, nil
 	}
 	if m := user.GetMachine(); m != nil {
-		machine = machineCreateToDomain(m)
+		machine := machineCreateToDomain(m)
+		machine.Username = user.UserName
+		return nil, machine
 	}
-
-	return &domain.User{
-		UserName: user.UserName,
-		Human:    human,
-		Machine:  machine,
-	}
+	return nil, nil
 }
 
 func passwordRequestToModel(r *management.PasswordRequest) *usr_model.Password {

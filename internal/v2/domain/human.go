@@ -11,6 +11,8 @@ import (
 type Human struct {
 	es_models.ObjectRoot
 
+	Username string
+	State    UserState
 	*Password
 	*Profile
 	*Email
@@ -22,6 +24,14 @@ type Human struct {
 	PasswordlessTokens []*WebAuthNToken
 	U2FLogins          []*WebAuthNLogin
 	PasswordlessLogins []*WebAuthNLogin
+}
+
+func (h Human) GetUsername() string {
+	return h.Username
+}
+
+func (h Human) GetState() UserState {
+	return h.State
 }
 
 type InitUserCode struct {

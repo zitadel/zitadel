@@ -20,8 +20,8 @@ func (r *CommandSide) getHuman(ctx context.Context, userID, resourceowner string
 	return writeModelToHuman(writeModel), nil
 }
 
-func (r *CommandSide) AddHuman(ctx context.Context, orgID, username string, human *domain.Human) (*domain.Human, error) {
-	userAgg, addedHuman, err := r.addHuman(ctx, orgID, username, human)
+func (r *CommandSide) AddHuman(ctx context.Context, orgID string, human *domain.Human) (*domain.Human, error) {
+	userAgg, addedHuman, err := r.addHuman(ctx, orgID, human)
 	if err != nil {
 		return nil, err
 	}
@@ -33,15 +33,15 @@ func (r *CommandSide) AddHuman(ctx context.Context, orgID, username string, huma
 	return writeModelToHuman(addedHuman), nil
 }
 
-func (r *CommandSide) addHuman(ctx context.Context, orgID, username string, human *domain.Human) (*user.Aggregate, *HumanWriteModel, error) {
+func (r *CommandSide) addHuman(ctx context.Context, orgID string, human *domain.Human) (*user.Aggregate, *HumanWriteModel, error) {
 	if !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
-	return r.createHuman(ctx, orgID, username, human, nil, false)
+	return r.createHuman(ctx, orgID, human, nil, false)
 }
 
-func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string, human *domain.Human, externalIDP *domain.ExternalIDP) (*domain.Human, error) {
-	userAgg, addedHuman, err := r.registerHuman(ctx, orgID, username, human, externalIDP)
+func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) (*domain.Human, error) {
+	userAgg, addedHuman, err := r.registerHuman(ctx, orgID, human, externalIDP)
 	if err != nil {
 		return nil, err
 	}
@@ -53,14 +53,14 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 	return writeModelToHuman(addedHuman), nil
 }
 
-func (r *CommandSide) registerHuman(ctx context.Context, orgID, username string, human *domain.Human, externalIDP *domain.ExternalIDP) (*user.Aggregate, *HumanWriteModel, error) {
+func (r *CommandSide) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) (*user.Aggregate, *HumanWriteModel, error) {
 	if !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-9dk45", "Errors.User.Invalid")
 	}
-	return r.createHuman(ctx, orgID, username, human, externalIDP, true)
+	return r.createHuman(ctx, orgID, human, externalIDP, true)
 }
 
-func (r *CommandSide) createHuman(ctx context.Context, orgID, username string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister bool) (*user.Aggregate, *HumanWriteModel, error) {
+func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister bool) (*user.Aggregate, *HumanWriteModel, error) {
 	userID, err := r.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
@@ -77,7 +77,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID, username string, h
 
 	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
 	//TODO: Check Unique Username or unique external idp
-	if err := human.CheckOrgIAMPolicy(username, orgIAMPolicy); err != nil {
+	if err := human.CheckOrgIAMPolicy(human.Username, orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}
 	human.SetNamesAsDisplayname()
@@ -88,9 +88,9 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID, username string, h
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
 	var createEvent eventstore.EventPusher
 	if selfregister {
-		createEvent = createRegisterHumanEvent(ctx, username, human)
+		createEvent = createRegisterHumanEvent(ctx, human.Username, human)
 	} else {
-		createEvent = createAddHumanEvent(ctx, username, human)
+		createEvent = createAddHumanEvent(ctx, human.Username, human)
 	}
 	userAgg.PushEvents(createEvent)
 

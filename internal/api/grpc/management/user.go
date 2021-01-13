@@ -52,43 +52,40 @@ func (s *Server) IsUserUnique(ctx context.Context, request *management.UniqueUse
 }
 
 func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserRequest) (*management.UserResponse, error) {
-	user, err := s.command.AddUser(ctx, authz.GetCtxData(ctx).OrgID, userCreateToDomain(in))
-	if err != nil {
-		return nil, err
+	human, machine := userCreateToDomain(in)
+	if human != nil {
+		h, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human)
+		if err != nil {
+			return nil, err
+		}
+		return userHumanFromDomain(h), nil
+	} else {
+		m, err := s.command.AddMachine(ctx, authz.GetCtxData(ctx).OrgID, machine)
+		if err != nil {
+			return nil, err
+		}
+		return userMachineFromDomain(m), nil
 	}
-	return userFromDomain(user), nil
 }
 
-func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.command.DeactivateUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	return userFromDomain(user), nil
+func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
+	err := s.command.DeactivateUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
-func (s *Server) ReactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.command.ReactivateUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	return userFromDomain(user), nil
+func (s *Server) ReactivateUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
+	err := s.command.ReactivateUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
-func (s *Server) LockUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.command.LockUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	return userFromDomain(user), nil
+func (s *Server) LockUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
+	err := s.command.LockUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
-func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
-	user, err := s.command.UnlockUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	return userFromDomain(user), nil
+func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
+	err := s.command.UnlockUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) DeleteUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {

@@ -114,7 +114,7 @@ service ManagementService {
     };
   }
 
-  rpc DeactivateUser(UserID) returns (UserResponse) {
+  rpc DeactivateUser(UserID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{id}/_deactivate"
       body: "*"
@@ -125,7 +125,7 @@ service ManagementService {
     };
   }
 
-  rpc ReactivateUser(UserID) returns (UserResponse) {
+  rpc ReactivateUser(UserID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{id}/_reactivate"
       body: "*"
@@ -136,7 +136,7 @@ service ManagementService {
     };
   }
 
-  rpc LockUser(UserID) returns (UserResponse) {
+  rpc LockUser(UserID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{id}/_lock"
       body: "*"
@@ -147,7 +147,7 @@ service ManagementService {
     };
   }
 
-  rpc UnlockUser(UserID) returns (UserResponse) {
+  rpc UnlockUser(UserID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{id}/_unlock"
       body: "*"

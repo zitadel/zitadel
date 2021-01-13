@@ -4,14 +4,6 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
-func writeModelToUser(wm *UserWriteModel) *domain.User {
-	return &domain.User{
-		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
-		UserName:   wm.UserName,
-		State:      wm.UserState,
-	}
-}
-
 func writeModelToHuman(wm *HumanWriteModel) *domain.Human {
 	return &domain.Human{
 		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),

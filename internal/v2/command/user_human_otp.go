@@ -13,7 +13,7 @@ func (r *CommandSide) AddHumanOTP(ctx context.Context, userID, resourceowner str
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
-	human, err := r.getUser(ctx, userID, resourceowner)
+	human, err := r.getHuman(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (r *CommandSide) AddHumanOTP(ctx context.Context, userID, resourceowner str
 		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
-	accountName := domain.GenerateLoginName(human.UserName, org.PrimaryDomain, orgPolicy.UserLoginMustBeDomain)
+	accountName := domain.GenerateLoginName(human.GetUsername(), org.PrimaryDomain, orgPolicy.UserLoginMustBeDomain)
 	if accountName == "" {
 		accountName = human.EmailAddress
 	}

@@ -55,7 +55,7 @@ func (r *CommandSide) addHumanWebAuthN(ctx context.Context, userID, resourceowne
 		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
 	}
 
-	user, err := r.getUser(ctx, userID, resourceowner)
+	user, err := r.getHuman(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -67,7 +67,7 @@ func (r *CommandSide) addHumanWebAuthN(ctx context.Context, userID, resourceowne
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	accountName := domain.GenerateLoginName(user.UserName, org.PrimaryDomain, orgPolicy.UserLoginMustBeDomain)
+	accountName := domain.GenerateLoginName(user.GetUsername(), org.PrimaryDomain, orgPolicy.UserLoginMustBeDomain)
 	if accountName == "" {
 		accountName = user.EmailAddress
 	}

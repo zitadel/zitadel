@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
-func (r *CommandSide) AddMachine(ctx context.Context, orgID, username string, machine *domain.Machine) (*domain.Machine, error) {
+func (r *CommandSide) AddMachine(ctx context.Context, orgID string, machine *domain.Machine) (*domain.Machine, error) {
 	if !machine.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0ds", "Errors.User.Invalid")
 	}
@@ -31,7 +31,7 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID, username string, ma
 	userAgg.PushEvents(
 		user.NewMachineAddedEvent(
 			ctx,
-			username,
+			machine.Username,
 			machine.Name,
 			machine.Description,
 		),

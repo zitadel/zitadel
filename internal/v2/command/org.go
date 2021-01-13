@@ -20,7 +20,7 @@ func (r *CommandSide) getOrg(ctx context.Context, orgID string) (*domain.Org, er
 	return orgWriteModelToOrg(writeModel), nil
 }
 
-func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) error {
+func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human) error {
 	orgAgg, userAgg, orgMemberAgg, err := r.setUpOrg(ctx, organisation, admin)
 	if err != nil {
 		return err
@@ -30,13 +30,13 @@ func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, ad
 	return err
 }
 
-func (r *CommandSide) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) (*org.Aggregate, *user.Aggregate, *org.Aggregate, error) {
+func (r *CommandSide) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human) (*org.Aggregate, *user.Aggregate, *org.Aggregate, error) {
 	orgAgg, _, err := r.addOrg(ctx, organisation)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	userAgg, _, err := r.addHuman(ctx, orgAgg.ID(), admin.UserName, admin.Human)
+	userAgg, _, err := r.addHuman(ctx, orgAgg.ID(), admin)
 	if err != nil {
 		return nil, nil, nil, err
 	}
