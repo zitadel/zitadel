@@ -12,23 +12,23 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    <div class="fields">
-        <div class="field">
+    <div class="lgn-register">
+        <div class="lgn-field">
             <label class="lgn-label" for="email">{{t "Registration.Email"}}</label>
             <input class="lgn-input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}"
                 autofocus required>
         </div>
-        <div class="field">
+        <div class="lgn-field">
             <label class="lgn-label" for="firstname">{{t "Registration.Firstname"}}</label>
             <input class="lgn-input" type="text" id="firstname" name="firstname" autocomplete="given-name"
                 value="{{ .Firstname }}" required>
         </div>
-        <div class="field">
+        <div class="lgn-field">
             <label class="lgn-label" for="lastname">{{t "Registration.Lastname"}}</label>
             <input class="lgn-input" type="text" id="lastname" name="lastname" autocomplete="family-name"
                 value="{{ .Lastname }}" required>
         </div>
-        <div class="field">
+        <div class="lgn-field">
             <label class="lgn-label" for="languages">{{t "Registration.Language"}}</label>
             <select id="languages" name="language">
                 <option value=""></option>
@@ -38,7 +38,7 @@
                 </option>
             </select>
         </div>
-        <div class="field">
+        <div class="lgn-field">
             <label class="lgn-label" for="genders">
                 {{t "Registration.Gender"}}
                 <span class="optional">{{t "optional"}}</span>
@@ -53,7 +53,7 @@
                 </option>
             </select>
         </div>
-        <div class="field">
+        <div class="lgn-field">
             <label class="lgn-label" for="register-password">{{t "Registration.Password"}}</label>
             <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
                 data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
@@ -61,12 +61,12 @@
                 name="register-password" autocomplete="new-password" required>
             {{ .PasswordPolicyDescription }}
         </div>
-        <div class="field">
+        <div class="lgn-field">
             <label class="lgn-label" for="register-password-confirmation">{{t "Registration.Password2"}}</label>
             <input class="lgn-input" type="password" id="register-password-confirmation"
                 name="register-password-confirmation" autocomplete="new-password" required>
         </div>
-        <div class="field">
+        <div class="lgn-field">
             <label class="lgn-label">{{t "Registration.Tos"}}</label>
             <div class="lgn-checkbox">
                 <input type="checkbox" id="register-term-confirmation"

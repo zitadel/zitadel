@@ -1302,6 +1302,21 @@ i {
   font-size: 1.2rem;
 }
 
+.lgn-register {
+  display: grid;
+  grid-column-gap: 1rem;
+  grid-row-gap: 0.5rem;
+  grid-template-rows: 1fr 1fr;
+}
+.lgn-register .lgn-field {
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+.lgn-register .lgn-field .half-width {
+  grid-row-start: 1;
+  grid-row-end: 1;
+}
+
 .lgn-header {
   display: block;
   position: relative;
