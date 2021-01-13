@@ -278,10 +278,6 @@ func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, 
 	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, userAgentID, credentialData)
 }
 
-func (repo *UserRepo) VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, "", credentialData)
-}
-
 func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error) {
 	return repo.UserEvents.GetPasswordless(ctx, userID)
 }
@@ -301,24 +297,8 @@ func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNT
 	return repo.UserEvents.GetPasswordless(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error) {
-	userID := authz.GetCtxData(ctx).UserID
-	accountName := ""
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		logging.Log("EVENT-AEq21").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
-	} else {
-		accountName = user.PreferredLoginName
-	}
-	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID, accountName, false)
-}
-
 func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
 	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, tokenName, userAgentID, credentialData)
-}
-
-func (repo *UserRepo) VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, credentialData []byte) error {
-	return repo.UserEvents.VerifyPasswordlessSetup(ctx, authz.GetCtxData(ctx).UserID, tokenName, "", credentialData)
 }
 
 func (repo *UserRepo) RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error {

@@ -119,7 +119,7 @@ func startZitadel(configPaths []string) {
 	}
 
 	startAPI(ctx, conf, authZRepo, authRepo, command, query)
-	startUI(ctx, conf, authRepo)
+	startUI(ctx, conf, authRepo, command, query)
 
 	if *notificationEnabled {
 		notification.Start(ctx, conf.Notification, conf.SystemDefaults)
@@ -129,10 +129,10 @@ func startZitadel(configPaths []string) {
 	logging.Log("MAIN-s8d2h").Info("stopping zitadel")
 }
 
-func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) {
+func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, command *command.CommandSide, query *query.QuerySide) {
 	uis := ui.Create(conf.UI)
 	if *loginEnabled {
-		login, prefix := login.Start(conf.UI.Login, authRepo, conf.SystemDefaults, *localDevMode)
+		login, prefix := login.Start(conf.UI.Login, command, query, authRepo, conf.SystemDefaults, *localDevMode)
 		uis.RegisterHandler(prefix, login.Handler())
 	}
 	if *consoleEnabled {

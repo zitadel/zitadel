@@ -60,11 +60,8 @@ type myUserRepo interface {
 	MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error)
 
 	AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error)
-	VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, data []byte) error
 
 	GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error)
-	AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error)
-	VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, data []byte) error
 
 	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
 }

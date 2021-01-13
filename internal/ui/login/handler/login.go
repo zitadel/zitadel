@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/query"
 	"net"
 	"net/http"
 
@@ -27,6 +29,8 @@ type Login struct {
 	router              http.Handler
 	renderer            *Renderer
 	parser              *form.Parser
+	command             *command.CommandSide
+	query               *query.QuerySide
 	authRepo            auth_repository.Repository
 	baseURL             string
 	zitadelURL          string
@@ -56,7 +60,7 @@ const (
 	handlerPrefix = "/login"
 )
 
-func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefaults systemdefaults.SystemDefaults, localDevMode bool) (*Login, string) {
+func CreateLogin(config Config, command *command.CommandSide, query *query.QuerySide, authRepo *eventsourcing.EsRepository, systemDefaults systemdefaults.SystemDefaults, localDevMode bool) (*Login, string) {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
@@ -65,6 +69,8 @@ func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, systemDefa
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
 		baseURL:             config.BaseURL,
 		zitadelURL:          config.ZitadelURL,
+		command:             command,
+		query:               query,
 		authRepo:            authRepo,
 		IDPConfigAesCrypto:  aesCrypto,
 	}
