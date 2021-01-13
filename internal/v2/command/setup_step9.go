@@ -45,7 +45,7 @@ func (r *CommandSide) SetupStep9(ctx context.Context, step *Step9) error {
 }
 
 func setPasswordlessAllowedInPolicy(ctx context.Context, c *CommandSide, iamAgg *iam_repo.Aggregate) error {
-	policy, err := c.GetDefaultLoginPolicy(ctx)
+	policy, err := c.getDefaultLoginPolicy(ctx)
 	if err != nil {
 		return err
 	}

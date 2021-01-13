@@ -34,7 +34,7 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID, username string, huma
 	if err != nil {
 		return nil, nil, err
 	}
-	pwPolicy, err := r.GetOrgPasswordComplexityPolicy(ctx, orgID)
+	pwPolicy, err := r.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -113,7 +113,7 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID, username string,
 	if err != nil {
 		return nil, err
 	}
-	pwPolicy, err := r.GetOrgPasswordComplexityPolicy(ctx, orgID)
+	pwPolicy, err := r.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}

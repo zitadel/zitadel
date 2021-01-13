@@ -1,0 +1,182 @@
+package command
+
+import (
+	"context"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/v2/repository/org"
+)
+
+func (r *CommandSide) AddLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	addedPolicy := NewOrgLoginPolicyWriteModel(policy.AggregateID)
+	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	if err != nil {
+		return nil, err
+	}
+	if addedPolicy.State == domain.PolicyStateActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
+	orgAgg.PushEvents(org.NewLoginPolicyAddedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, policy.PasswordlessType))
+
+	err = r.eventstore.PushAggregate(ctx, addedPolicy, orgAgg)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToLoginPolicy(&addedPolicy.LoginPolicyWriteModel), nil
+}
+
+func (r *CommandSide) ChangeLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	existingPolicy := NewOrgLoginPolicyWriteModel(policy.AggregateID)
+	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-M0sif", "Errors.Org.LoginPolicy.NotFound")
+	}
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType))
+	if !hasChanged {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
+	orgAgg.PushEvents(changedEvent)
+
+	err = r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
+}
+
+func (r *CommandSide) AddIDPProviderToLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
+	idpModel := NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
+	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
+	if err != nil {
+		return nil, err
+	}
+	if idpModel.State == domain.IdentityProviderStateActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LoginPolicy.IDP.AlreadyExists")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&idpModel.WriteModel)
+	orgAgg.PushEvents(org.NewIdentityProviderAddedEvent(ctx, idpProvider.IDPConfigID, idpProvider.Type))
+
+	if err = r.eventstore.PushAggregate(ctx, idpModel, orgAgg); err != nil {
+		return nil, err
+	}
+
+	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
+}
+
+func (r *CommandSide) RemoveIDPProviderFromLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) error {
+	idpModel := NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
+	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
+	if err != nil {
+		return err
+	}
+	if idpModel.State == domain.IdentityProviderStateUnspecified || idpModel.State == domain.IdentityProviderStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "Org-39fjs", "Errors.Org.LoginPolicy.IDP.NotExisting")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
+	orgAgg.PushEvents(org.NewIdentityProviderRemovedEvent(ctx, idpProvider.IDPConfigID))
+
+	return r.eventstore.PushAggregate(ctx, idpModel, orgAgg)
+}
+
+func (r *CommandSide) AddSecondFactorToLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) (domain.SecondFactorType, error) {
+	secondFactorModel := NewOrgSecondFactorWriteModel(orgID)
+	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	if err != nil {
+		return domain.SecondFactorTypeUnspecified, err
+	}
+
+	if secondFactorModel.State == domain.FactorStateActive {
+		return domain.SecondFactorTypeUnspecified, caos_errs.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
+	orgAgg.PushEvents(org.NewLoginPolicySecondFactorAddedEvent(ctx, secondFactor))
+
+	if err = r.eventstore.PushAggregate(ctx, secondFactorModel, orgAgg); err != nil {
+		return domain.SecondFactorTypeUnspecified, err
+	}
+
+	return secondFactorModel.MFAType, nil
+}
+
+func (r *CommandSide) RemoveSecondFactorFromLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) error {
+	secondFactorModel := NewOrgSecondFactorWriteModel(orgID)
+	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	if err != nil {
+		return err
+	}
+	if secondFactorModel.State == domain.FactorStateUnspecified || secondFactorModel.State == domain.FactorStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.NotExisting")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
+	orgAgg.PushEvents(org.NewLoginPolicySecondFactorRemovedEvent(ctx, domain.SecondFactorType(secondFactor)))
+
+	return r.eventstore.PushAggregate(ctx, secondFactorModel, orgAgg)
+}
+
+func (r *CommandSide) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) (domain.MultiFactorType, error) {
+	multiFactorModel := NewOrgMultiFactorWriteModel()
+	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
+	err := r.addMultiFactorToDefaultLoginPolicy(ctx, orgAgg, multiFactorModel, multiFactor)
+	if err != nil {
+		return domain.MultiFactorTypeUnspecified, err
+	}
+
+	if err = r.eventstore.PushAggregate(ctx, multiFactorModel, orgAgg); err != nil {
+		return domain.MultiFactorTypeUnspecified, err
+	}
+
+	return domain.MultiFactorType(multiFactorModel.MultiFactoryWriteModel.MFAType), nil
+}
+
+func (r *CommandSide) addMultiFactorToDefaultLoginPolicy(ctx context.Context, orgAgg *org.Aggregate, multiFactorModel *OrgMultiFactorWriteModel, multiFactor domain.MultiFactorType) error {
+	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	if err != nil {
+		return err
+	}
+	if multiFactorModel.State == domain.FactorStateActive {
+		return caos_errs.ThrowAlreadyExists(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
+	}
+
+	orgAgg.PushEvents(org.NewLoginPolicyMultiFactorAddedEvent(ctx, domain.MultiFactorType(multiFactor)))
+
+	return nil
+}
+
+func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) error {
+	multiFactorModel := NewOrgMultiFactorWriteModel()
+	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	if err != nil {
+		return err
+	}
+	if multiFactorModel.State == domain.FactorStateUnspecified || multiFactorModel.State == domain.FactorStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LoginPolicy.MFA.NotExisting")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
+	orgAgg.PushEvents(org.NewLoginPolicyMultiFactorRemovedEvent(ctx, domain.MultiFactorType(multiFactor)))
+
+	return r.eventstore.PushAggregate(ctx, multiFactorModel, orgAgg)
+}
+
+func (r *CommandSide) defaultLoginPolicyWriteModelByID(ctx context.Context, writeModel *OrgLoginPolicyWriteModel) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return err
+	}
+	return nil
+}

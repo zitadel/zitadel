@@ -33,9 +33,9 @@ func memberWriteModelToMember(writeModel *MemberWriteModel) *domain.Member {
 	}
 }
 
-func writeModelToLoginPolicy(wm *IAMLoginPolicyWriteModel) *domain.LoginPolicy {
+func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.LoginPolicyWriteModel.WriteModel),
+		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
 		AllowUsernamePassword: wm.AllowUserNamePassword,
 		AllowRegister:         wm.AllowRegister,
 		AllowExternalIdp:      wm.AllowExternalIDP,
@@ -59,17 +59,17 @@ func writeModelToOrgIAMPolicy(wm *IAMOrgIAMPolicyWriteModel) *domain.OrgIAMPolic
 	}
 }
 
-func writeModelToPasswordAgePolicy(wm *IAMPasswordAgePolicyWriteModel) *domain.PasswordAgePolicy {
+func writeModelToPasswordAgePolicy(wm *PasswordAgePolicyWriteModel) *domain.PasswordAgePolicy {
 	return &domain.PasswordAgePolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.PasswordAgePolicyWriteModel.WriteModel),
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
 		MaxAgeDays:     wm.MaxAgeDays,
 		ExpireWarnDays: wm.ExpireWarnDays,
 	}
 }
 
-func writeModelToPasswordComplexityPolicy(wm *IAMPasswordComplexityPolicyWriteModel) *domain.PasswordComplexityPolicy {
+func writeModelToPasswordComplexityPolicy(wm *PasswordComplexityPolicyWriteModel) *domain.PasswordComplexityPolicy {
 	return &domain.PasswordComplexityPolicy{
-		ObjectRoot:   writeModelToObjectRoot(wm.PasswordComplexityPolicyWriteModel.WriteModel),
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
 		MinLength:    wm.MinLength,
 		HasLowercase: wm.HasLowercase,
 		HasUppercase: wm.HasUpperCase,
@@ -78,9 +78,9 @@ func writeModelToPasswordComplexityPolicy(wm *IAMPasswordComplexityPolicyWriteMo
 	}
 }
 
-func writeModelToPasswordLockoutPolicy(wm *IAMPasswordLockoutPolicyWriteModel) *domain.PasswordLockoutPolicy {
+func writeModelToPasswordLockoutPolicy(wm *PasswordLockoutPolicyWriteModel) *domain.PasswordLockoutPolicy {
 	return &domain.PasswordLockoutPolicy{
-		ObjectRoot:          writeModelToObjectRoot(wm.PasswordLockoutPolicyWriteModel.WriteModel),
+		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
 		MaxAttempts:         wm.MaxAttempts,
 		ShowLockOutFailures: wm.ShowLockOutFailures,
 	}
@@ -109,9 +109,9 @@ func writeModelToIDPOIDCConfig(wm *OIDCConfigWriteModel) *domain.OIDCIDPConfig {
 	}
 }
 
-func writeModelToIDPProvider(wm *IAMIdentityProviderWriteModel) *domain.IDPProvider {
+func writeModelToIDPProvider(wm *IdentityProviderWriteModel) *domain.IDPProvider {
 	return &domain.IDPProvider{
-		ObjectRoot:  writeModelToObjectRoot(wm.IdentityProviderWriteModel.WriteModel),
+		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
 		IDPConfigID: wm.IDPConfigID,
 		Type:        wm.IDPProviderType,
 	}

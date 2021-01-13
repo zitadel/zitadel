@@ -1,37 +1,40 @@
 package management
 
 import (
+	"context"
+
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func loginPolicyRequestToModel(policy *management.LoginPolicyRequest) *iam_model.LoginPolicy {
-	return &iam_model.LoginPolicy{
+func loginPolicyRequestToDomain(ctx context.Context, policy *management.LoginPolicyRequest) *domain.LoginPolicy {
+	return &domain.LoginPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
 		ForceMFA:              policy.ForceMfa,
-		PasswordlessType:      passwordlessTypeToModel(policy.PasswordlessType),
+		PasswordlessType:      passwordlessTypeToDomain(policy.PasswordlessType),
 	}
 }
 
-func loginPolicyFromModel(policy *iam_model.LoginPolicy) *management.LoginPolicy {
-	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-2Fsm8").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-3Flo0").OnError(err).Debug("date parse failed")
-
+func loginPolicyFromDomain(policy *domain.LoginPolicy) *management.LoginPolicy {
 	return &management.LoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
-		CreationDate:          creationDate,
-		ChangeDate:            changeDate,
+		CreationDate:          timestamppb.New(policy.CreationDate),
+		ChangeDate:            timestamppb.New(policy.ChangeDate),
 		ForceMfa:              policy.ForceMFA,
-		PasswordlessType:      passwordlessTypeFromModel(policy.PasswordlessType),
+		PasswordlessType:      passwordlessTypeFromDomain(policy.PasswordlessType),
 	}
 }
 
@@ -228,11 +231,20 @@ func passwordlessTypeFromModel(passwordlessType iam_model.PasswordlessType) mana
 	}
 }
 
-func passwordlessTypeToModel(passwordlessType management.PasswordlessType) iam_model.PasswordlessType {
+func passwordlessTypeFromDomain(passwordlessType domain.PasswordlessType) management.PasswordlessType {
+	switch passwordlessType {
+	case domain.PasswordlessTypeAllowed:
+		return management.PasswordlessType_PASSWORDLESSTYPE_ALLOWED
+	default:
+		return management.PasswordlessType_PASSWORDLESSTYPE_NOT_ALLOWED
+	}
+}
+
+func passwordlessTypeToDomain(passwordlessType management.PasswordlessType) domain.PasswordlessType {
 	switch passwordlessType {
 	case management.PasswordlessType_PASSWORDLESSTYPE_ALLOWED:
-		return iam_model.PasswordlessTypeAllowed
+		return domain.PasswordlessTypeAllowed
 	default:
-		return iam_model.PasswordlessTypeNotAllowed
+		return domain.PasswordlessTypeNotAllowed
 	}
 }

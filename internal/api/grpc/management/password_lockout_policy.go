@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -23,22 +24,22 @@ func (s *Server) GetDefaultPasswordLockoutPolicy(ctx context.Context, _ *empty.E
 }
 
 func (s *Server) CreatePasswordLockoutPolicy(ctx context.Context, policy *management.PasswordLockoutPolicyRequest) (*management.PasswordLockoutPolicy, error) {
-	result, err := s.org.AddPasswordLockoutPolicy(ctx, passwordLockoutPolicyRequestToModel(policy))
+	result, err := s.command.AddPasswordLockoutPolicy(ctx, passwordLockoutPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
-	return passwordLockoutPolicyFromModel(result), nil
+	return passwordLockoutPolicyFromDomain(result), nil
 }
 
 func (s *Server) UpdatePasswordLockoutPolicy(ctx context.Context, policy *management.PasswordLockoutPolicyRequest) (*management.PasswordLockoutPolicy, error) {
-	result, err := s.org.ChangePasswordLockoutPolicy(ctx, passwordLockoutPolicyRequestToModel(policy))
+	result, err := s.command.ChangePasswordLockoutPolicy(ctx, passwordLockoutPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
-	return passwordLockoutPolicyFromModel(result), nil
+	return passwordLockoutPolicyFromDomain(result), nil
 }
 
 func (s *Server) RemovePasswordLockoutPolicy(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.org.RemovePasswordLockoutPolicy(ctx)
+	err := s.command.RemovePasswordLockoutPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }

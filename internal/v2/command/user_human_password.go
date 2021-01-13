@@ -62,7 +62,7 @@ func (r *CommandSide) changePassword(ctx context.Context, orgID, userID, userAge
 	if existingPassword.UserState == domain.UserStateInitial {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised")
 	}
-	pwPolicy, err := r.GetOrgPasswordComplexityPolicy(ctx, orgID)
+	pwPolicy, err := r.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
 		return err
 	}

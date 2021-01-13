@@ -10,13 +10,13 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-func (r *CommandSide) GetDefaultLoginPolicy(ctx context.Context) (*domain.LoginPolicy, error) {
+func (r *CommandSide) getDefaultLoginPolicy(ctx context.Context) (*domain.LoginPolicy, error) {
 	policyWriteModel := NewIAMLoginPolicyWriteModel()
 	err := r.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
 	}
-	policy := writeModelToLoginPolicy(policyWriteModel)
+	policy := writeModelToLoginPolicy(&policyWriteModel.LoginPolicyWriteModel)
 	policy.Default = true
 	return policy, nil
 }
@@ -33,7 +33,7 @@ func (r *CommandSide) AddDefaultLoginPolicy(ctx context.Context, policy *domain.
 		return nil, err
 	}
 
-	return writeModelToLoginPolicy(addedPolicy), nil
+	return writeModelToLoginPolicy(&addedPolicy.LoginPolicyWriteModel), nil
 }
 
 func (r *CommandSide) addDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) error {
@@ -62,7 +62,7 @@ func (r *CommandSide) ChangeDefaultLoginPolicy(ctx context.Context, policy *doma
 		return nil, err
 	}
 
-	return writeModelToLoginPolicy(existingPolicy), nil
+	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
 }
 
 func (r *CommandSide) changeDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, existingPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) error {
@@ -99,7 +99,7 @@ func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, id
 		return nil, err
 	}
 
-	return writeModelToIDPProvider(idpModel), nil
+	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
 func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *iam_model.IDPProvider) error {

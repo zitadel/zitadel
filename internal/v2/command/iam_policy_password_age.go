@@ -21,7 +21,7 @@ func (r *CommandSide) AddDefaultPasswordAgePolicy(ctx context.Context, policy *d
 		return nil, err
 	}
 
-	return writeModelToPasswordAgePolicy(addedPolicy), nil
+	return writeModelToPasswordAgePolicy(&addedPolicy.PasswordAgePolicyWriteModel), nil
 }
 
 func (r *CommandSide) addDefaultPasswordAgePolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMPasswordAgePolicyWriteModel, policy *domain.PasswordAgePolicy) error {
@@ -60,7 +60,7 @@ func (r *CommandSide) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy
 		return nil, err
 	}
 
-	return writeModelToPasswordAgePolicy(existingPolicy), nil
+	return writeModelToPasswordAgePolicy(&existingPolicy.PasswordAgePolicyWriteModel), nil
 }
 
 func (r *CommandSide) defaultPasswordAgePolicyWriteModelByID(ctx context.Context) (policy *IAMPasswordAgePolicyWriteModel, err error) {

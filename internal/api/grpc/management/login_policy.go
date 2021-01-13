@@ -23,19 +23,19 @@ func (s *Server) GetDefaultLoginPolicy(ctx context.Context, _ *empty.Empty) (*ma
 }
 
 func (s *Server) CreateLoginPolicy(ctx context.Context, policy *management.LoginPolicyRequest) (*management.LoginPolicy, error) {
-	result, err := s.org.AddLoginPolicy(ctx, loginPolicyRequestToModel(policy))
+	result, err := s.command.AddLoginPolicy(ctx, loginPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
-	return loginPolicyFromModel(result), nil
+	return loginPolicyFromDomain(result), nil
 }
 
 func (s *Server) UpdateLoginPolicy(ctx context.Context, policy *management.LoginPolicyRequest) (*management.LoginPolicy, error) {
-	result, err := s.org.ChangeLoginPolicy(ctx, loginPolicyRequestToModel(policy))
+	result, err := s.org.ChangeLoginPolicy(ctx, loginPolicyRequestToDomain(nil, policy))
 	if err != nil {
 		return nil, err
 	}
-	return loginPolicyFromModel(result), nil
+	return loginPolicyFromDomain(result), nil
 }
 
 func (s *Server) RemoveLoginPolicy(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
