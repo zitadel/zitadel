@@ -32,9 +32,8 @@ const (
 type HumanWebAuthNAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	WebAuthNTokenID string          `json:"webAuthNTokenId"`
-	Challenge       string          `json:"challenge"`
-	State           domain.MFAState `json:"-"`
+	WebAuthNTokenID string `json:"webAuthNTokenId"`
+	Challenge       string `json:"challenge"`
 }
 
 func (e *HumanWebAuthNAddedEvent) Data() interface{} {
@@ -74,7 +73,6 @@ func NewHumanPasswordlessAddedEvent(
 func WebAuthNAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webAuthNAdded := &HumanWebAuthNAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     domain.MFAStateNotReady,
 	}
 	err := json.Unmarshal(event.Data, webAuthNAdded)
 	if err != nil {
@@ -86,14 +84,13 @@ func WebAuthNAddedEventMapper(event *repository.Event) (eventstore.EventReader, 
 type HumanWebAuthNVerifiedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	WebAuthNTokenID   string          `json:"webAuthNTokenId"`
-	KeyID             []byte          `json:"keyId"`
-	PublicKey         []byte          `json:"publicKey"`
-	AttestationType   string          `json:"attestationType"`
-	AAGUID            []byte          `json:"aaguid"`
-	SignCount         uint32          `json:"signCount"`
-	WebAuthNTokenName string          `json:"webAuthNTokenName"`
-	State             domain.MFAState `json:"-"`
+	WebAuthNTokenID   string `json:"webAuthNTokenId"`
+	KeyID             []byte `json:"keyId"`
+	PublicKey         []byte `json:"publicKey"`
+	AttestationType   string `json:"attestationType"`
+	AAGUID            []byte `json:"aaguid"`
+	SignCount         uint32 `json:"signCount"`
+	WebAuthNTokenName string `json:"webAuthNTokenName"`
 }
 
 func (e *HumanWebAuthNVerifiedEvent) Data() interface{} {
@@ -153,7 +150,6 @@ func NewHumanPasswordlessVerifiedEvent(
 func HumanWebAuthNVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webauthNVerified := &HumanWebAuthNVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-		State:     domain.MFAStateReady,
 	}
 	err := json.Unmarshal(event.Data, webauthNVerified)
 	if err != nil {
@@ -165,9 +161,8 @@ func HumanWebAuthNVerifiedEventMapper(event *repository.Event) (eventstore.Event
 type HumanWebAuthNSignCountChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	WebAuthNTokenID string          `json:"webAuthNTokenId"`
-	SignCount       uint32          `json:"signCount"`
-	State           domain.MFAState `json:"-"`
+	WebAuthNTokenID string `json:"webAuthNTokenId"`
+	SignCount       uint32 `json:"signCount"`
 }
 
 func (e *HumanWebAuthNSignCountChangedEvent) Data() interface{} {

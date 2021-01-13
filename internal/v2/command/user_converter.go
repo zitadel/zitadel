@@ -7,6 +7,8 @@ import (
 func writeModelToHuman(wm *HumanWriteModel) *domain.Human {
 	return &domain.Human{
 		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		Username:   wm.UserName,
+		State:      wm.UserState,
 		Profile: &domain.Profile{
 			FirstName:         wm.FirstName,
 			LastName:          wm.LastName,
@@ -75,9 +77,33 @@ func writeModelToMachine(wm *MachineWriteModel) *domain.Machine {
 	}
 }
 
+func readModelToU2FTokens(wm *HumanU2FTokensReadModel) []*domain.WebAuthNToken {
+	tokens := make([]*domain.WebAuthNToken, len(wm.WebAuthNTokens))
+	for i, token := range wm.WebAuthNTokens {
+		tokens[i] = writeModelToWebAuthN(token)
+	}
+	return tokens
+}
+
+func readModelToPasswordlessTokens(wm *HumanPasswordlessTokensReadModel) []*domain.WebAuthNToken {
+	tokens := make([]*domain.WebAuthNToken, len(wm.WebAuthNTokens))
+	for i, token := range wm.WebAuthNTokens {
+		tokens[i] = writeModelToWebAuthN(token)
+	}
+	return tokens
+}
+
 func writeModelToWebAuthN(wm *HumanWebAuthNWriteModel) *domain.WebAuthNToken {
 	return &domain.WebAuthNToken{
-		ObjectRoot:      writeModelToObjectRoot(wm.WriteModel),
-		WebAuthNTokenID: wm.WebauthNTokenID,
+		ObjectRoot:        writeModelToObjectRoot(wm.WriteModel),
+		WebAuthNTokenID:   wm.WebauthNTokenID,
+		Challenge:         wm.Challenge,
+		KeyID:             wm.KeyID,
+		PublicKey:         wm.PublicKey,
+		AttestationType:   wm.AttestationType,
+		AAGUID:            wm.AAGUID,
+		SignCount:         wm.SignCount,
+		WebAuthNTokenName: wm.WebAuthNTokenName,
+		State:             wm.MFAState,
 	}
 }

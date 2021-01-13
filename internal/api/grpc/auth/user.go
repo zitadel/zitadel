@@ -182,7 +182,8 @@ func (s *Server) AddMyMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.WebAu
 }
 
 func (s *Server) VerifyMyMfaU2F(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
-	err := s.repo.VerifyMyMFAU2FSetup(ctx, request.TokenName, request.PublicKeyCredential)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.VerifyHumanU2F(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
 	return &empty.Empty{}, err
 }
 
@@ -210,7 +211,8 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth
 }
 
 func (s *Server) VerifyMyPasswordless(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
-	err := s.repo.VerifyMyPasswordlessSetup(ctx, request.TokenName, request.PublicKeyCredential)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.VerifyHumanPasswordless(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
 	return &empty.Empty{}, err
 }
 
