@@ -80,3 +80,61 @@ func OrgChangedEventMapper(event *repository.Event) (eventstore.EventReader, err
 
 	return orgChanged, nil
 }
+
+type OrgDeactivatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *OrgDeactivatedEvent) Data() interface{} {
+	return e
+}
+
+func NewOrgDeactivatedEvent(ctx context.Context) *OrgDeactivatedEvent {
+	return &OrgDeactivatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			OrgDeactivated,
+		),
+	}
+}
+
+func OrgDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	orgChanged := &OrgDeactivatedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, orgChanged)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "ORG-DAfbs", "unable to unmarshal org deactivated")
+	}
+
+	return orgChanged, nil
+}
+
+type OrgReactivatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *OrgReactivatedEvent) Data() interface{} {
+	return e
+}
+
+func NewOrgReactivatedEvent(ctx context.Context) *OrgReactivatedEvent {
+	return &OrgReactivatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			OrgReactivated,
+		),
+	}
+}
+
+func OrgReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	orgChanged := &OrgReactivatedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, orgChanged)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "ORG-DAfbs", "unable to unmarshal org deactivated")
+	}
+
+	return orgChanged, nil
+}

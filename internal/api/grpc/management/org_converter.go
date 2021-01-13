@@ -21,27 +21,13 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func orgsFromModel(orgs []*org_model.Org) []*management.Org {
-	orgList := make([]*management.Org, len(orgs))
-	for i, org := range orgs {
-		orgList[i] = orgFromModel(org)
-	}
-	return orgList
-}
-
-func orgFromModel(org *org_model.Org) *management.Org {
-	creationDate, err := ptypes.TimestampProto(org.CreationDate)
-	logging.Log("GRPC-GTHsZ").OnError(err).Debug("unable to get timestamp from time")
-
-	changeDate, err := ptypes.TimestampProto(org.ChangeDate)
-	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
-
+func orgFromDomain(org *domain.Org) *management.Org {
 	return &management.Org{
-		ChangeDate:   changeDate,
-		CreationDate: creationDate,
+		ChangeDate:   timestamppb.New(org.ChangeDate),
+		CreationDate: timestamppb.New(org.CreationDate),
 		Id:           org.AggregateID,
 		Name:         org.Name,
-		State:        orgStateFromModel(org.State),
+		State:        orgStateFromDomain(org.State),
 	}
 }
 
@@ -58,6 +44,17 @@ func orgViewFromModel(org *org_model.OrgView) *management.OrgView {
 		Id:           org.ID,
 		Name:         org.Name,
 		State:        orgStateFromModel(org.State),
+	}
+}
+
+func orgStateFromDomain(state domain.OrgState) management.OrgState {
+	switch state {
+	case domain.OrgStateActive:
+		return management.OrgState_ORGSTATE_ACTIVE
+	case domain.OrgStateInactive:
+		return management.OrgState_ORGSTATE_INACTIVE
+	default:
+		return management.OrgState_ORGSTATE_UNSPECIFIED
 	}
 }
 

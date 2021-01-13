@@ -38,6 +38,8 @@ func (o *Org) nameForDomain(iamDomain string) string {
 type OrgState int32
 
 const (
-	OrgStateActive OrgState = iota
+	OrgStateUnspecified OrgState = iota
+	OrgStateActive
 	OrgStateInactive
+	OrgStateRemoved
 )

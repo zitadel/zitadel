@@ -19,6 +19,65 @@ func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, ad
 	return err
 }
 
+func (r *CommandSide) AddOrg(ctx context.Context, name, userID, resourceOwner string) (*domain.Org, error) {
+	orgAgg, addedOrg, err := r.addOrg(ctx, &domain.Org{Name: name})
+	if err != nil {
+		return nil, err
+	}
+
+	active, err := r.isUserActive(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !active {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "ORG-HBR2z", "Errors.User.NotFound")
+	}
+	addedMember := NewOrgMemberWriteModel(orgAgg.ID(), userID)
+	err = r.addOrgMember(ctx, orgAgg, addedMember, domain.NewMember(orgAgg.ID(), userID, domain.RoleOrgOwner))
+	if err != nil {
+		return nil, err
+	}
+	err = r.eventstore.PushAggregate(ctx, addedOrg, orgAgg)
+	if err != nil {
+		return nil, err
+	}
+	return orgWriteModelToOrg(addedOrg), nil
+}
+
+func (r *CommandSide) DeactivateOrg(ctx context.Context, orgID string) error {
+	orgWriteModel, err := r.getOrgWriteModelByID(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "ORG-oL9nT", "Errors.Org.NotFound")
+	}
+	if orgWriteModel.State == domain.OrgStateInactive {
+		return caos_errs.ThrowInvalidArgument(nil, "EVENT-Dbs2g", "Errors.Org.AlreadyDeactivated")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
+	orgAgg.PushEvents(org.NewOrgDeactivatedEvent(ctx))
+
+	return r.eventstore.PushAggregate(ctx, orgWriteModel, orgAgg)
+}
+
+func (r *CommandSide) ReactivateOrg(ctx context.Context, orgID string) error {
+	orgWriteModel, err := r.getOrgWriteModelByID(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "ORG-Dgf3g", "Errors.Org.NotFound")
+	}
+	if orgWriteModel.State == domain.OrgStateActive {
+		return caos_errs.ThrowInvalidArgument(nil, "EVENT-bfnrh", "Errors.Org.AlreadyActive")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
+	orgAgg.PushEvents(org.NewOrgReactivatedEvent(ctx))
+
+	return r.eventstore.PushAggregate(ctx, orgWriteModel, orgAgg)
+}
+
 func (r *CommandSide) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.User) (*org.Aggregate, *user.Aggregate, *org.Aggregate, error) {
 	orgAgg, _, err := r.addOrg(ctx, organisation)
 	if err != nil {
@@ -60,6 +119,14 @@ func (r *CommandSide) addOrg(ctx context.Context, organisation *domain.Org) (_ *
 		}
 	}
 	return orgAgg, addedOrg, nil
+}
+
+func (r *CommandSide) getOrgByID(ctx context.Context, orgID string) (*domain.Org, error) {
+	orgWriteModel, err := r.getOrgWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	return orgWriteModelToOrg(orgWriteModel), nil
 }
 
 func (r *CommandSide) getOrgWriteModelByID(ctx context.Context, orgID string) (*OrgWriteModel, error) {

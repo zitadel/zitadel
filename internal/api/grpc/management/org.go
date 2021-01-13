@@ -10,11 +10,12 @@ import (
 )
 
 func (s *Server) CreateOrg(ctx context.Context, request *management.OrgCreateRequest) (_ *management.Org, err error) {
-	org, err := s.org.CreateOrg(ctx, request.Name)
+	ctxData := authz.GetCtxData(ctx)
+	org, err := s.command.AddOrg(ctx, request.Name, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return orgFromModel(org), err
+	return orgFromDomain(org), err
 }
 
 func (s *Server) GetMyOrg(ctx context.Context, _ *empty.Empty) (*management.OrgView, error) {
@@ -33,20 +34,14 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, in *management.Domain
 	return orgViewFromModel(org), nil
 }
 
-func (s *Server) DeactivateMyOrg(ctx context.Context, _ *empty.Empty) (*management.Org, error) {
-	org, err := s.org.DeactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	return orgFromModel(org), nil
+func (s *Server) DeactivateMyOrg(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
+	err := s.command.DeactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
-func (s *Server) ReactivateMyOrg(ctx context.Context, _ *empty.Empty) (*management.Org, error) {
-	org, err := s.org.ReactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	return orgFromModel(org), nil
+func (s *Server) ReactivateMyOrg(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
+	err := s.command.ReactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) SearchMyOrgDomains(ctx context.Context, in *management.OrgDomainSearchRequest) (*management.OrgDomainSearchResponse, error) {

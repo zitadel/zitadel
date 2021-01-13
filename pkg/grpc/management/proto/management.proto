@@ -518,7 +518,7 @@ service ManagementService {
     };
   }
 
-  rpc DeactivateMyOrg(google.protobuf.Empty) returns (Org) {
+  rpc DeactivateMyOrg(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/orgs/me/_deactivate"
       body: "*"
@@ -529,7 +529,7 @@ service ManagementService {
     };
   }
 
-  rpc ReactivateMyOrg(google.protobuf.Empty) returns (Org) {
+  rpc ReactivateMyOrg(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/orgs/me/_reactivate"
       body: "*"

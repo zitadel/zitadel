@@ -5,6 +5,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -21,23 +22,23 @@ func (s *Server) SearchMyOrgMembers(ctx context.Context, in *management.OrgMembe
 }
 
 func (s *Server) AddMyOrgMember(ctx context.Context, member *management.AddOrgMemberRequest) (*management.OrgMember, error) {
-	addedMember, err := s.org.AddMyOrgMember(ctx, addOrgMemberToModel(member))
+	addedMember, err := s.command.AddOrgMember(ctx, addOrgMemberToDomain(ctx, member))
 	if err != nil {
 		return nil, err
 	}
 
-	return orgMemberFromModel(addedMember), nil
+	return orgMemberFromDomain(addedMember), nil
 }
 
 func (s *Server) ChangeMyOrgMember(ctx context.Context, member *management.ChangeOrgMemberRequest) (*management.OrgMember, error) {
-	changedMember, err := s.org.ChangeMyOrgMember(ctx, changeOrgMemberToModel(member))
+	changedMember, err := s.command.ChangeOrgMember(ctx, changeOrgMemberToModel(ctx, member))
 	if err != nil {
 		return nil, err
 	}
-	return orgMemberFromModel(changedMember), nil
+	return orgMemberFromDomain(changedMember), nil
 }
 
 func (s *Server) RemoveMyOrgMember(ctx context.Context, member *management.RemoveOrgMemberRequest) (*empty.Empty, error) {
-	err := s.org.RemoveMyOrgMember(ctx, member.UserId)
+	err := s.command.RemoveOrgMember(ctx, authz.GetCtxData(ctx).OrgID, member.UserId)
 	return &empty.Empty{}, err
 }
