@@ -4,7 +4,6 @@ import (
 	"context"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
@@ -53,6 +52,21 @@ func (r *CommandSide) ChangeLoginPolicy(ctx context.Context, policy *domain.Logi
 	}
 
 	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
+}
+
+func (r *CommandSide) RemoveLoginPolicy(ctx context.Context, orgID string) error {
+	existingPolicy := NewOrgLoginPolicyWriteModel(orgID)
+	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	if err != nil {
+		return err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "Org-GHB37", "Errors.Org.LoginPolicy.NotFound")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
+	orgAgg.PushEvents(org.NewLoginPolicyRemovedEvent(ctx))
+
+	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
 }
 
 func (r *CommandSide) AddIDPProviderToLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
@@ -126,37 +140,28 @@ func (r *CommandSide) RemoveSecondFactorFromLoginPolicy(ctx context.Context, sec
 	return r.eventstore.PushAggregate(ctx, secondFactorModel, orgAgg)
 }
 
-func (r *CommandSide) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) (domain.MultiFactorType, error) {
-	multiFactorModel := NewOrgMultiFactorWriteModel()
-	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
-	err := r.addMultiFactorToDefaultLoginPolicy(ctx, orgAgg, multiFactorModel, multiFactor)
+func (r *CommandSide) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) (domain.MultiFactorType, error) {
+	multiFactorModel := NewOrgMultiFactorWriteModel(orgID)
+	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, err
 	}
+	if multiFactorModel.State == domain.FactorStateActive {
+		return domain.MultiFactorTypeUnspecified, caos_errs.ThrowAlreadyExists(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.WriteModel)
+	orgAgg.PushEvents(org.NewLoginPolicyMultiFactorAddedEvent(ctx, multiFactor))
 
 	if err = r.eventstore.PushAggregate(ctx, multiFactorModel, orgAgg); err != nil {
 		return domain.MultiFactorTypeUnspecified, err
 	}
 
-	return domain.MultiFactorType(multiFactorModel.MultiFactoryWriteModel.MFAType), nil
+	return multiFactorModel.MFAType, nil
 }
 
-func (r *CommandSide) addMultiFactorToDefaultLoginPolicy(ctx context.Context, orgAgg *org.Aggregate, multiFactorModel *OrgMultiFactorWriteModel, multiFactor domain.MultiFactorType) error {
-	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
-	if err != nil {
-		return err
-	}
-	if multiFactorModel.State == domain.FactorStateActive {
-		return caos_errs.ThrowAlreadyExists(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
-	}
-
-	orgAgg.PushEvents(org.NewLoginPolicyMultiFactorAddedEvent(ctx, domain.MultiFactorType(multiFactor)))
-
-	return nil
-}
-
-func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) error {
-	multiFactorModel := NewOrgMultiFactorWriteModel()
+func (r *CommandSide) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) error {
+	multiFactorModel := NewOrgMultiFactorWriteModel(orgID)
 	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return err
@@ -168,15 +173,4 @@ func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Contex
 	orgAgg.PushEvents(org.NewLoginPolicyMultiFactorRemovedEvent(ctx, domain.MultiFactorType(multiFactor)))
 
 	return r.eventstore.PushAggregate(ctx, multiFactorModel, orgAgg)
-}
-
-func (r *CommandSide) defaultLoginPolicyWriteModelByID(ctx context.Context, writeModel *OrgLoginPolicyWriteModel) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return err
-	}
-	return nil
 }

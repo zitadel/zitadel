@@ -2,8 +2,11 @@ package management
 
 import (
 	"context"
-	"github.com/caos/zitadel/pkg/grpc/management"
+
 	"github.com/golang/protobuf/ptypes/empty"
+
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetLoginPolicy(ctx context.Context, _ *empty.Empty) (*management.LoginPolicyView, error) {
@@ -31,7 +34,7 @@ func (s *Server) CreateLoginPolicy(ctx context.Context, policy *management.Login
 }
 
 func (s *Server) UpdateLoginPolicy(ctx context.Context, policy *management.LoginPolicyRequest) (*management.LoginPolicy, error) {
-	result, err := s.org.ChangeLoginPolicy(ctx, loginPolicyRequestToDomain(nil, policy))
+	result, err := s.command.ChangeLoginPolicy(ctx, loginPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +42,7 @@ func (s *Server) UpdateLoginPolicy(ctx context.Context, policy *management.Login
 }
 
 func (s *Server) RemoveLoginPolicy(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.org.RemoveLoginPolicy(ctx)
+	err := s.command.RemoveLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 
@@ -52,15 +55,15 @@ func (s *Server) GetLoginPolicyIdpProviders(ctx context.Context, request *manage
 }
 
 func (s *Server) AddIdpProviderToLoginPolicy(ctx context.Context, provider *management.IdpProviderAdd) (*management.IdpProvider, error) {
-	result, err := s.org.AddIDPProviderToLoginPolicy(ctx, idpProviderAddToModel(provider))
+	result, err := s.command.AddIDPProviderToLoginPolicy(ctx, idpProviderAddToDomain(ctx, provider))
 	if err != nil {
 		return nil, err
 	}
-	return idpProviderFromModel(result), nil
+	return idpProviderFromDomain(result), nil
 }
 
 func (s *Server) RemoveIdpProviderFromLoginPolicy(ctx context.Context, provider *management.IdpProviderID) (*empty.Empty, error) {
-	err := s.org.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
+	err := s.command.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderIDToDomain(ctx, provider))
 	return &empty.Empty{}, err
 }
 
@@ -73,15 +76,15 @@ func (s *Server) GetLoginPolicySecondFactors(ctx context.Context, _ *empty.Empty
 }
 
 func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, mfa *management.SecondFactor) (*management.SecondFactor, error) {
-	result, err := s.org.AddSecondFactorToLoginPolicy(ctx, secondFactorTypeToModel(mfa))
+	result, err := s.command.AddSecondFactorToLoginPolicy(ctx, secondFactorTypeToDomain(mfa), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return secondFactorFromModel(result), nil
+	return secondFactorFromDomain(result), nil
 }
 
 func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, mfa *management.SecondFactor) (*empty.Empty, error) {
-	err := s.org.RemoveSecondFactorFromLoginPolicy(ctx, secondFactorTypeToModel(mfa))
+	err := s.command.RemoveSecondFactorFromLoginPolicy(ctx, secondFactorTypeToDomain(mfa), authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 
@@ -94,14 +97,14 @@ func (s *Server) GetLoginPolicyMultiFactors(ctx context.Context, _ *empty.Empty)
 }
 
 func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, mfa *management.MultiFactor) (*management.MultiFactor, error) {
-	result, err := s.org.AddMultiFactorToLoginPolicy(ctx, multiFactorTypeToModel(mfa))
+	result, err := s.command.AddMultiFactorToLoginPolicy(ctx, multiFactorTypeToDomain(mfa), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return multiFactorFromModel(result), nil
+	return multiFactorFromDomain(result), nil
 }
 
 func (s *Server) RemoveMultiFactorFromLoginPolicy(ctx context.Context, mfa *management.MultiFactor) (*empty.Empty, error) {
-	err := s.org.RemoveMultiFactorFromLoginPolicy(ctx, multiFactorTypeToModel(mfa))
+	err := s.command.RemoveMultiFactorFromLoginPolicy(ctx, multiFactorTypeToDomain(mfa), authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }

@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
-	"github.com/golang/protobuf/ptypes"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func loginPolicyRequestToDomain(ctx context.Context, policy *management.LoginPolicyRequest) *domain.LoginPolicy {
@@ -73,17 +74,22 @@ func idpProviderSearchResponseFromModel(response *iam_model.IDPProviderSearchRes
 	}
 }
 
-func idpProviderToModel(provider *management.IdpProviderID) *iam_model.IDPProvider {
-	return &iam_model.IDPProvider{
+func idpProviderIDToDomain(ctx context.Context, provider *management.IdpProviderID) *domain.IDPProvider {
+	return &domain.IDPProvider{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
 		IDPConfigID: provider.IdpConfigId,
-		Type:        iam_model.IDPProviderTypeSystem,
 	}
 }
 
-func idpProviderAddToModel(provider *management.IdpProviderAdd) *iam_model.IDPProvider {
-	return &iam_model.IDPProvider{
+func idpProviderAddToDomain(ctx context.Context, provider *management.IdpProviderAdd) *domain.IDPProvider {
+	return &domain.IDPProvider{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
 		IDPConfigID: provider.IdpConfigId,
-		Type:        idpProviderTypeToModel(provider.IdpProviderType),
+		Type:        idpProviderTypeToDomain(provider.IdpProviderType),
 	}
 }
 
@@ -93,10 +99,10 @@ func idpProviderIDFromModel(provider *iam_model.IDPProvider) *management.IdpProv
 	}
 }
 
-func idpProviderFromModel(provider *iam_model.IDPProvider) *management.IdpProvider {
+func idpProviderFromDomain(provider *domain.IDPProvider) *management.IdpProvider {
 	return &management.IdpProvider{
 		IdpConfigId:      provider.IDPConfigID,
-		IdpProvider_Type: idpProviderTypeFromModel(provider.Type),
+		IdpProvider_Type: idpProviderTypeFromDomain(provider.Type),
 	}
 }
 
@@ -128,14 +134,25 @@ func idpConfigTypeToModel(providerType iam_model.IdpConfigType) management.IdpTy
 	}
 }
 
-func idpProviderTypeToModel(providerType management.IdpProviderType) iam_model.IDPProviderType {
+func idpProviderTypeToDomain(providerType management.IdpProviderType) domain.IdentityProviderType {
 	switch providerType {
 	case management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM:
-		return iam_model.IDPProviderTypeSystem
+		return domain.IdentityProviderTypeSystem
 	case management.IdpProviderType_IDPPROVIDERTYPE_ORG:
-		return iam_model.IDPProviderTypeOrg
+		return domain.IdentityProviderTypeOrg
 	default:
-		return iam_model.IDPProviderTypeSystem
+		return domain.IdentityProviderTypeSystem
+	}
+}
+
+func idpProviderTypeFromDomain(providerType domain.IdentityProviderType) management.IdpProviderType {
+	switch providerType {
+	case domain.IdentityProviderTypeSystem:
+		return management.IdpProviderType_IDPPROVIDERTYPE_SYSTEM
+	case domain.IdentityProviderTypeOrg:
+		return management.IdpProviderType_IDPPROVIDERTYPE_ORG
+	default:
+		return management.IdpProviderType_IDPPROVIDERTYPE_UNSPECIFIED
 	}
 }
 
@@ -160,9 +177,26 @@ func secondFactorResultFromModel(result *iam_model.SecondFactorsSearchResponse) 
 	}
 }
 
+func secondFactorFromDomain(mfaType domain.SecondFactorType) *management.SecondFactor {
+	return &management.SecondFactor{
+		SecondFactor: secondFactorTypeFromDomain(mfaType),
+	}
+}
+
 func secondFactorFromModel(mfaType iam_model.SecondFactorType) *management.SecondFactor {
 	return &management.SecondFactor{
 		SecondFactor: secondFactorTypeFromModel(mfaType),
+	}
+}
+
+func secondFactorTypeFromDomain(mfaType domain.SecondFactorType) management.SecondFactorType {
+	switch mfaType {
+	case domain.SecondFactorTypeOTP:
+		return management.SecondFactorType_SECONDFACTORTYPE_OTP
+	case domain.SecondFactorTypeU2F:
+		return management.SecondFactorType_SECONDFACTORTYPE_U2F
+	default:
+		return management.SecondFactorType_SECONDFACTORTYPE_UNSPECIFIED
 	}
 }
 
@@ -177,14 +211,14 @@ func secondFactorTypeFromModel(mfaType iam_model.SecondFactorType) management.Se
 	}
 }
 
-func secondFactorTypeToModel(mfaType *management.SecondFactor) iam_model.SecondFactorType {
+func secondFactorTypeToDomain(mfaType *management.SecondFactor) domain.SecondFactorType {
 	switch mfaType.SecondFactor {
 	case management.SecondFactorType_SECONDFACTORTYPE_OTP:
-		return iam_model.SecondFactorTypeOTP
+		return domain.SecondFactorTypeOTP
 	case management.SecondFactorType_SECONDFACTORTYPE_U2F:
-		return iam_model.SecondFactorTypeU2F
+		return domain.SecondFactorTypeU2F
 	default:
-		return iam_model.SecondFactorTypeUnspecified
+		return domain.SecondFactorTypeUnspecified
 	}
 }
 
@@ -198,9 +232,18 @@ func multiFactorResultFromModel(result *iam_model.MultiFactorsSearchResponse) *m
 	}
 }
 
-func multiFactorFromModel(mfaType iam_model.MultiFactorType) *management.MultiFactor {
+func multiFactorFromDomain(mfaType domain.MultiFactorType) *management.MultiFactor {
 	return &management.MultiFactor{
-		MultiFactor: multiFactorTypeFromModel(mfaType),
+		MultiFactor: multiFactorTypeFromDomain(mfaType),
+	}
+}
+
+func multiFactorTypeFromDomain(mfaType domain.MultiFactorType) management.MultiFactorType {
+	switch mfaType {
+	case domain.MultiFactorTypeU2FWithPIN:
+		return management.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN
+	default:
+		return management.MultiFactorType_MULTIFACTORTYPE_UNSPECIFIED
 	}
 }
 
@@ -213,12 +256,12 @@ func multiFactorTypeFromModel(mfaType iam_model.MultiFactorType) management.Mult
 	}
 }
 
-func multiFactorTypeToModel(mfaType *management.MultiFactor) iam_model.MultiFactorType {
+func multiFactorTypeToDomain(mfaType *management.MultiFactor) domain.MultiFactorType {
 	switch mfaType.MultiFactor {
 	case management.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN:
-		return iam_model.MultiFactorTypeU2FWithPIN
+		return domain.MultiFactorTypeU2FWithPIN
 	default:
-		return iam_model.MultiFactorTypeUnspecified
+		return domain.MultiFactorTypeUnspecified
 	}
 }
 
