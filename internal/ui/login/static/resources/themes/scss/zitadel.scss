@@ -1,4 +1,4 @@
-@import './theming/all';
+@import './styles/theming/all';
 
 // Include non-theme styles for core. -> mainly background of the login
 @include lgn-core();

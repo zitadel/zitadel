@@ -41,16 +41,16 @@
 
         &:disabled {
             + label::before {
-                border-color: blue;
+                border-color: lgn-color($background, disabled-button);
             }
 
             &:checked {
                 + label::before {
-                    color: blue;
+                    color: lgn-color($background, disabled-selected-button);;
                 }
 
                 + label::after {
-                    background:  blue;
+                    background:  lgn-color($background, disabled-selected-button);;
                 }
             }
 

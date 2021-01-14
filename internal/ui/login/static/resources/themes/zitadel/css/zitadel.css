@@ -833,13 +833,7 @@ input[type=radio]:focus + label {
   outline: none;
 }
 input[type=radio]:disabled + label::before {
-  border-color: blue;
-}
-input[type=radio]:disabled:checked + label::before {
-  color: blue;
-}
-input[type=radio]:disabled:checked + label::after {
-  background: blue;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 input[type=radio]:disabled:focus {
   opacity: 0;
@@ -1131,13 +1125,7 @@ a:hover, a:active {
   outline: none;
 }
 .lgn-dark-theme input[type=radio]:disabled + label::before {
-  border-color: blue;
-}
-.lgn-dark-theme input[type=radio]:disabled:checked + label::before {
-  color: blue;
-}
-.lgn-dark-theme input[type=radio]:disabled:checked + label::after {
-  background: blue;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 .lgn-dark-theme input[type=radio]:disabled:focus {
   opacity: 0;
@@ -1415,13 +1403,7 @@ a:hover, a:active {
   outline: none;
 }
 .lgn-light-theme input[type=radio]:disabled + label::before {
-  border-color: blue;
-}
-.lgn-light-theme input[type=radio]:disabled:checked + label::before {
-  color: blue;
-}
-.lgn-light-theme input[type=radio]:disabled:checked + label::after {
-  background: blue;
+  border-color: rgba(0, 0, 0, 0.12);
 }
 .lgn-light-theme input[type=radio]:disabled:focus {
   opacity: 0;
