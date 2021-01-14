@@ -30,6 +30,11 @@ func (wm *IAMIdentityProviderWriteModel) AppendEvents(events ...eventstore.Event
 				continue
 			}
 			wm.IdentityProviderWriteModel.AppendEvents(&e.IdentityProviderAddedEvent)
+		case *iam.IdentityProviderRemovedEvent:
+			if e.IDPConfigID != wm.IDPConfigID {
+				continue
+			}
+			wm.IdentityProviderWriteModel.AppendEvents(&e.IdentityProviderRemovedEvent)
 		}
 	}
 }

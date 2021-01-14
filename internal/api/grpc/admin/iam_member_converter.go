@@ -11,17 +11,11 @@ import (
 )
 
 func addIamMemberToDomain(member *admin.AddIamMemberRequest) *domain.Member {
-	return &domain.Member{
-		UserID: member.UserId,
-		Roles:  member.Roles,
-	}
+	return domain.NewMember(domain.IAMID, member.UserId, member.Roles...)
 }
 
 func changeIamMemberToDomain(member *admin.ChangeIamMemberRequest) *domain.Member {
-	return &domain.Member{
-		UserID: member.UserId,
-		Roles:  member.Roles,
-	}
+	return domain.NewMember(domain.IAMID, member.UserId, member.Roles...)
 }
 
 func iamMemberFromDomain(member *domain.Member) *admin.IamMember {
