@@ -27,7 +27,7 @@
                 <span id="secret"> {{.Secret}} </span>
                 <span class="fill-space"></span>
                 <button id="copy" data-copy="{{ .Secret }}" class="lgn-icon-button">
-                    <i class="las la-clipboard"></i>
+                    <i class="icon-clipboard"></i>
                 </button>
             </div>
         </div>
@@ -42,7 +42,7 @@
         <!-- position element in header -->
         <a class="lgn-icon-button lgn-left-action" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
             <!-- {{t "Actions.Back"}} -->
-            <i class="las la-arrow-left"></i>
+            <i class="icon-arrow-left-solid"></i>
         </a>
         <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}

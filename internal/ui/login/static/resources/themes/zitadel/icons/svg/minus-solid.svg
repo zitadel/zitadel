@@ -1,1 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M 5 15 L 5 17 L 27 17 L 27 15 Z"/></svg>
