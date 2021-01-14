@@ -44,9 +44,9 @@ func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 	}
 }
 
-func writeModelToLabelPolicy(wm *IAMLabelPolicyWriteModel) *domain.LabelPolicy {
+func writeModelToLabelPolicy(wm *LabelPolicyWriteModel) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.LabelPolicyWriteModel.WriteModel),
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
 		PrimaryColor:   wm.PrimaryColor,
 		SecondaryColor: wm.SecondaryColor,
 	}

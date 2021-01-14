@@ -21,7 +21,7 @@ func (r *CommandSide) AddDefaultLabelPolicy(ctx context.Context, policy *domain.
 		return nil, err
 	}
 
-	return writeModelToLabelPolicy(addedPolicy), nil
+	return writeModelToLabelPolicy(&addedPolicy.LabelPolicyWriteModel), nil
 }
 
 func (r *CommandSide) addDefaultLabelPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMLabelPolicyWriteModel, policy *domain.LabelPolicy) error {
@@ -61,7 +61,7 @@ func (r *CommandSide) ChangeDefaultLabelPolicy(ctx context.Context, policy *doma
 		return nil, err
 	}
 
-	return writeModelToLabelPolicy(existingPolicy), nil
+	return writeModelToLabelPolicy(&existingPolicy.LabelPolicyWriteModel), nil
 }
 
 func (r *CommandSide) defaultLabelPolicyWriteModelByID(ctx context.Context) (policy *IAMLabelPolicyWriteModel, err error) {

@@ -90,13 +90,13 @@ func (e *LabelPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyRemovedEvent {
+func NewLabelPolicyRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyRemovedEvent {
 	return &LabelPolicyRemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &LabelPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
