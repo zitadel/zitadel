@@ -5,7 +5,7 @@
     $color: lgn-get-color-config($theme);
 
     @if $color != null {
-    @include lgn-account-selection-color($color);
+        @include lgn-account-selection-color($color);
     }
 }
 

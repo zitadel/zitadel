@@ -60,16 +60,16 @@ function ComplexityPolicyCheck(policyElement, pwNew) {
 
 function ValidPolicy(element) {
     element.classList.remove('invalid');
-    element.getElementsByTagName('i')[0].classList.remove('la-times');
+    element.getElementsByTagName('i')[0].classList.remove('lgn-icon-times-solid');
     element.getElementsByTagName('i')[0].classList.remove('lgn-warn');
-    element.getElementsByTagName('i')[0].classList.add('la-check');
+    element.getElementsByTagName('i')[0].classList.add('lgn-icon-check-solid');
     element.getElementsByTagName('i')[0].classList.add('lgn-valid');
 }
 
 function InvalidPolicy(element) {
     element.classList.add('invalid');
     element.getElementsByTagName('i')[0].classList.remove('lgn-valid');
-    element.getElementsByTagName('i')[0].classList.remove('la-check');
+    element.getElementsByTagName('i')[0].classList.remove('lgn-icon-check-solid');
     element.getElementsByTagName('i')[0].classList.add('lgn-warn');
-    element.getElementsByTagName('i')[0].classList.add('la-times');
+    element.getElementsByTagName('i')[0].classList.add('lgn-icon-times-solid');
 }

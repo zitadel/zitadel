@@ -4,7 +4,7 @@ $lgn-button-margin: 0 !default;
 $lgn-button-line-height: 36px !default;
 $lgn-button-border-radius: 6px !default;
 $lgn-button-focus-transition: opacity 200ms cubic-bezier(0.35, 0, 0.25, 1),
-                              background-color 200ms cubic-bezier(0.35, 0, 0.25, 1) !default;
+    background-color 200ms cubic-bezier(0.35, 0, 0.25, 1) !default;
 
 // Stroked button padding is 1px less horizontally than default or raised lgn button
 // button's padding.
@@ -16,7 +16,7 @@ $lgn-icon-button-size: 40px !default;
 $lgn-icon-button-border-radius: 50% !default;
 $lgn-icon-button-line-height: 24px !default;
 
-// Applies base styles to all button types.
+// adds base styles to all button types.
 @mixin lgn-button-base {
   box-sizing: border-box;
   position: relative;
@@ -25,7 +25,7 @@ $lgn-icon-button-line-height: 24px !default;
   border: none;
   -webkit-tap-highlight-color: transparent;
 
-  // Make anchors render like buttons.
+  // Make anchors (a href) render like buttons.
   display: inline-block;
   white-space: nowrap;
   text-decoration: none;

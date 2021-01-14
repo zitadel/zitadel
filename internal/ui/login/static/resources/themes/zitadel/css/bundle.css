@@ -573,14 +573,6 @@ i {
   font-style: italic;
   font-weight: 800;
 }
-@font-face {
-  font-family: "Material Icons";
-  font-style: normal;
-  font-weight: 400;
-  src: url(../../../fonts/material/MaterialIcons-Regular.eot);
-  /* For IE6-8 */
-  src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
-}
 footer {
   width: 100%;
   box-sizing: border-box;
@@ -1156,14 +1148,6 @@ i {
   font-weight: 800;
 }
 @font-face {
-  font-family: "Material Icons";
-  font-style: normal;
-  font-weight: 400;
-  src: url(../../../fonts/material/MaterialIcons-Regular.eot);
-  /* For IE6-8 */
-  src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
-}
-@font-face {
   font-family: Aileron;
   src: url(../../../fonts/ailerons/ailerons.otf) format("opentype");
 }
@@ -1226,14 +1210,6 @@ i {
   src: url(../../../fonts/lato/Lato-BlackItalic.ttf) format("truetype");
   font-style: italic;
   font-weight: 800;
-}
-@font-face {
-  font-family: "Material Icons";
-  font-style: normal;
-  font-weight: 400;
-  src: url(../../../fonts/material/MaterialIcons-Regular.eot);
-  /* For IE6-8 */
-  src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
 }
 .lgn-max-width-wrapper {
   max-width: 400px;

@@ -90,38 +90,39 @@ $lgn-light-brand: (
     )
 );
   
-$lgn-accent-color: (
-    50: #ebf4f2,
-    100: #cce3de,
-    200: #abd1c9,
-    300: #89bfb3,
-    400: #6fb1a2,
-    500: #56a392,
-    600: #4f9b8a,
-    700: #45917f,
-    800: #3c8875,
-    900: #2b7763,
-    A100: #beffed,
-    A200: #8bffde,
-    A400: #58ffd0,
-    A700: #3effc9,
-    contrast: (
-        50: $dark-primary-text,
-        100: $dark-primary-text,
-        200: $dark-primary-text,
-        300: $dark-primary-text,
-        400: $dark-primary-text,
-        500: $light-primary-text,
-        600: $light-primary-text,
-        700: $light-primary-text,
-        800: $light-primary-text,
-        900: $light-primary-text,
-        A100: $dark-primary-text,
-        A200: $light-primary-text,
-        A400: $light-primary-text,
-        A700: $light-primary-text,
-    )
-);
+// skip accent color for first gen theming
+// $lgn-accent-color: (
+//     50: #ebf4f2,
+//     100: #cce3de,
+//     200: #abd1c9,
+//     300: #89bfb3,
+//     400: #6fb1a2,
+//     500: #56a392,
+//     600: #4f9b8a,
+//     700: #45917f,
+//     800: #3c8875,
+//     900: #2b7763,
+//     A100: #beffed,
+//     A200: #8bffde,
+//     A400: #58ffd0,
+//     A700: #3effc9,
+//     contrast: (
+//         50: $dark-primary-text,
+//         100: $dark-primary-text,
+//         200: $dark-primary-text,
+//         300: $dark-primary-text,
+//         400: $dark-primary-text,
+//         500: $light-primary-text,
+//         600: $light-primary-text,
+//         700: $light-primary-text,
+//         800: $light-primary-text,
+//         900: $light-primary-text,
+//         A100: $dark-primary-text,
+//         A200: $light-primary-text,
+//         A400: $light-primary-text,
+//         A700: $light-primary-text,
+//     )
+// );
   
 $lgn-warn: (
     50: #ffebee,
@@ -155,9 +156,8 @@ $lgn-warn: (
         A700: $light-primary-text,
     )
 );
-
   
-  $lgn-grey: (
+$lgn-grey: (
     50: #fafafa,
     100: #f5f5f5,
     200: #eeeeee,
@@ -190,7 +190,7 @@ $lgn-warn: (
     )
 );
 
-  $lgn-light-theme-background: (
+$lgn-light-theme-background: (
     background: map-get($lgn-grey, 50),
     hover:      rgba(black, 0.04),
     disabled-button: rgba(black, 0.12),
@@ -204,9 +204,9 @@ $lgn-warn: (
     qrcode: white, // use black ground on white background because inverted qrcode colors are not allowed
     account-selector-hover: rgba(black, 0.02),
     account-selector-active: rgba(black, 0.05),
-  );
+);
   
-  $lgn-dark-theme-background: (
+$lgn-dark-theme-background: (
     background: #212224,
     hover:      rgba(white, 0.04), // TODO(kara): check style with Material Design UX
     disabled-button: rgba(white, 0.12),
@@ -220,9 +220,9 @@ $lgn-warn: (
     qrcode: white, // needs white background to recognize borders,
     account-selector-hover: rgba(white, 0.02),
     account-selector-active: rgba(white, 0.05),
-  );
+);
 
-  $lgn-light-theme-foreground: (
+$lgn-light-theme-foreground: (
     footer-links:      map-get($lgn-light-brand, 500),
     footer-line:     #e3e8ee,
     base:              black,
@@ -232,23 +232,16 @@ $lgn-warn: (
     input-placeholder: map-get($lgn-grey, 600),
     label:             map-get($lgn-grey, 600),//#697386
     divider:           $dark-dividers,
-    dividers:          $dark-dividers,
     disabled:          $dark-disabled-text,
     disabled-button:   rgba(black, 0.26),
-    disabled-text:     $dark-disabled-text,
     elevation:         black,
-    hint-text:         $dark-disabled-text,
     secondary-text:    $dark-secondary-text,
     icon:              rgba(black, 0.54),
-    icons:             rgba(black, 0.54),
     text:              rgba(black, 0.87),
-    slider-min:        rgba(black, 0.87),
-    slider-off:        rgba(black, 0.26),
-    slider-off-active: rgba(black, 0.38),
     qrcode:            black,
-  );
+);
   
-  $lgn-dark-theme-foreground: (
+$lgn-dark-theme-foreground: (
     footer-links:      map-get($lgn-grey, 500),
     footer-line:     #303131,
     base:            white,
@@ -258,18 +251,11 @@ $lgn-warn: (
     input-placeholder: map-get($lgn-grey, 600),
     label:             map-get($lgn-grey, 600),// #8795a1,
     divider:           $light-dividers,
-    dividers:          $light-dividers,
     disabled:          $light-disabled-text,
     disabled-button:   rgba(white, 0.3),
-    disabled-text:     $light-disabled-text,
     elevation:         black,
-    hint-text:         $light-disabled-text,
     secondary-text:    $light-secondary-text,
     icon:              white,
-    icons:             white,
     text:              white,
-    slider-min:        white,
-    slider-off:        rgba(white, 0.3),
-    slider-off-active: rgba(white, 0.3),
     qrcode:            black,
-  );
+);

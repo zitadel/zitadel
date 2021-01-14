@@ -12,7 +12,8 @@
       @error 'No color configuration specified.';
     }
   
+    // includes all themes with given color
     @include zitadel-lgn-theme((
       color: $config,
     ));
-  }
+}

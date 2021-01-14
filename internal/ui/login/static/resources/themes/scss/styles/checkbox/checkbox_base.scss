@@ -52,13 +52,5 @@ $lgn-checkbox-font-size: 14px !default;
             // z-index: 2;
             transition: border-color .28s cubic-bezier(.4, 0, .2, 1);
         }
-    }
-    
-    // Focused
-    // Uncomment for accessible outline
-    // &__input:focus + &__label {
-    //     &:before {
-    //         outline: 1px dotted currentColor;
-    //     }
-    // }    
+    } 
 }

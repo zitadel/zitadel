@@ -5,7 +5,7 @@
     $color: lgn-get-color-config($theme);
 
     @if $color != null {
-    @include lgn-avatar-color($color);
+        @include lgn-avatar-color($color);
     }
 }
 

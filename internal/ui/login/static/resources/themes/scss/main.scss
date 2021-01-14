@@ -1,4 +1,3 @@
-
 body {
     margin: 0 auto;
 
@@ -10,31 +9,3 @@ body {
 .hidden {
     display: none !important;
 }
-
-// a {
-//     color: $primaryColor;
-//     text-decoration: none;
-//     font-weight: 400;
-
-//     &:hover {
-//         color: $primaryColorHover;
-//     }
-
-//     &.tos-link {
-//         font-size: 14px;
-//     }
-// }
-
-// %profile-image {
-//     .profile-image {
-//         height: 80px;
-//         width: 80px;
-//         background-position: center;
-//         background-repeat: no-repeat;
-//         @include retina-background-image($profileImgDark, "png", false, 80px, 80px);
-//     }
-
-//     &:hover .profile-image {
-//         @include retina-background-image($profileImgDark, "png", true, 80px, 80px);
-//     }
-// }

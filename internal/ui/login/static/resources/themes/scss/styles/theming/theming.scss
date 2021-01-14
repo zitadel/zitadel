@@ -50,7 +50,7 @@
       background: $lgn-dark-theme-background,
     );
   }
-  
+
 @function lgn-light-theme($primary, $accent: null, $warn: lgn-palette($lgn-warn)) {
     @if $accent != null {
       @return lgn-private-create-backwards-compatibility-theme(_lgn-validate-theme((
@@ -70,7 +70,7 @@
     @return lgn-private-create-backwards-compatibility-theme(_lgn-validate-theme($result));
   }
 
-@function lgn-dark-theme($primary, $accent: null, $warn: lgn-palette($lgn-red)) {
+@function lgn-dark-theme($primary, $accent: null, $warn: lgn-palette($lgn-warn)) {
     @if $accent != null {
       @return lgn-private-create-backwards-compatibility-theme(_lgn-validate-theme((
         _is-legacy-theme: true,
@@ -103,20 +103,6 @@
     }
     @return $default;
   }
-  
-/// Gets the density configuration from the given theme or configuration.
-@function lgn-get-density-config($theme-or-config, $default: 0) {
-    // If a configuration has been passed, return the config directly.
-    @if not lgn-private-is-theme-object($theme-or-config) {
-        @return $theme-or-config;
-    }
-    // In case a theme has been passed, extract the configuration if present,
-    // or fall back to the default density config.
-    @if map-has-key($theme-or-config, density) {
-        @return map-get($theme-or-config, density);
-    }
-    @return $default;
-}
 
 @function lgn-private-create-backwards-compatibility-theme($theme) {
     @if not map-get($theme, color) {
@@ -165,7 +151,7 @@
     @return map-merge($theme, $color);
   }
   
-  // Validates the specified theme by ensuring that the optional color config defines
+// Validates the specified theme by ensuring that the optional color config defines
 // a primary, accent and warn palette. Returns the theme if no failures were found.
 @function _lgn-validate-theme($theme) {
     @if map-get($theme, color) {
@@ -183,7 +169,7 @@
     @return $theme;
   }
 
-  // Checks whether a given value corresponds to a legacy constructed theme.
+// Checks whether a given value corresponds to a legacy constructed theme.
 @function lgn-private-is-legacy-constructed-theme($value) {
     @return type-of($value) == 'map' and map-get($value, '_is-legacy-theme');
   }

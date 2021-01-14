@@ -1,7 +1,12 @@
+// themes and colors
 @import './styles/theming/all.scss';
 @import './styles/color/all_color.scss';
 @import './styles/typography/typography.scss';
+
+// layouts
 @import './styles/container/container.scss';
 @import './styles/register/register.scss';
 @import './styles/header/header.scss';
+
+// animations
 @import './styles/animations.scss';
