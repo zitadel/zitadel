@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
+	usr_repo "github.com/caos/zitadel/internal/v2/repository/user"
 )
 
 type CommandSide struct {
@@ -45,6 +46,7 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 		iamDomain:   config.SystemDefaults.Domain,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
+	usr_repo.RegisterEventMappers(repo.eventstore)
 
 	//TODO: simplify!!!!
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)

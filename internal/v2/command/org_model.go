@@ -32,7 +32,7 @@ func (wm *OrgWriteModel) AppendEvents(events ...eventstore.EventReader) {
 			*iam.LabelPolicyChangedEvent:
 			wm.WriteModel.AppendEvents(e)
 		case *org.DomainPrimarySetEvent:
-			wm.AppendEvents(e)
+			wm.WriteModel.AppendEvents(e)
 		}
 	}
 }

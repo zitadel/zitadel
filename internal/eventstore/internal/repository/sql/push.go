@@ -74,7 +74,7 @@ func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Ev
 			event.AggregateType, event.AggregateID, previousSequence, previousSequence).Scan(&previousSequence, &event.CreationDate)
 
 		if err != nil {
-			logging.LogWithFields("SQL-IP3js",
+			logging.LogWithFields("SQL-5M0sd",
 				"aggregate", event.AggregateType,
 				"previousSequence", previousSequence,
 				"aggregateId", event.AggregateID,

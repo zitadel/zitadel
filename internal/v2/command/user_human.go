@@ -100,7 +100,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 		if err != nil {
 			return nil, nil, err
 		}
-		user.NewHumanInitialCodeAddedEvent(ctx, initCode.Code, initCode.Expiry)
+		userAgg.PushEvents(user.NewHumanInitialCodeAddedEvent(ctx, initCode.Code, initCode.Expiry))
 	}
 	if human.Email != nil && human.EmailAddress != "" && human.IsEmailVerified {
 		userAgg.PushEvents(user.NewHumanEmailVerifiedEvent(ctx))

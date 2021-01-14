@@ -32,22 +32,7 @@ func NewHumanPhoneWriteModel(userID, resourceOwner string) *HumanPhoneWriteModel
 }
 
 func (wm *HumanPhoneWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.AppendEvents(e)
-		case *user.HumanPhoneChangedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanPhoneCodeAddedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanPhoneVerifiedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanPhoneRemovedEvent:
-			wm.AppendEvents(e)
-		case *user.UserRemovedEvent:
-			wm.AppendEvents(e)
-		}
-	}
+	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanPhoneWriteModel) Reduce() error {

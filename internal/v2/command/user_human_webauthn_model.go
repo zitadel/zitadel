@@ -38,14 +38,14 @@ func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.EventReader
 		switch e := event.(type) {
 		case *user.HumanWebAuthNAddedEvent:
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
-				wm.AppendEvents(e)
+				wm.WriteModel.AppendEvents(e)
 			}
 		case *user.HumanWebAuthNRemovedEvent:
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
-				wm.AppendEvents(e)
+				wm.WriteModel.AppendEvents(e)
 			}
 		case *user.UserRemovedEvent:
-			wm.AppendEvents(e)
+			wm.WriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -109,13 +109,13 @@ func (wm *HumanU2FTokensReadModel) AppendEvents(events ...eventstore.EventReader
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanWebAuthNAddedEvent:
-			wm.AppendEvents(e)
+			wm.WriteModel.AppendEvents(e)
 		case *user.HumanWebAuthNVerifiedEvent:
-			wm.AppendEvents(e)
+			wm.WriteModel.AppendEvents(e)
 		case *user.HumanWebAuthNRemovedEvent:
-			wm.AppendEvents(e)
+			wm.WriteModel.AppendEvents(e)
 		case *user.UserRemovedEvent:
-			wm.AppendEvents(e)
+			wm.WriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -186,18 +186,7 @@ func NewHumanPasswordlessTokensReadModel(userID, resourceOwner string) *HumanPas
 }
 
 func (wm *HumanPasswordlessTokensReadModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *user.HumanWebAuthNAddedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanWebAuthNVerifiedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanWebAuthNRemovedEvent:
-			wm.AppendEvents(e)
-		case *user.UserRemovedEvent:
-			wm.AppendEvents(e)
-		}
-	}
+	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanPasswordlessTokensReadModel) Reduce() error {

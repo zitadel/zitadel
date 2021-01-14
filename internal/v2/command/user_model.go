@@ -26,26 +26,7 @@ func NewUserWriteModel(userID, resourceOwner string) *UserWriteModel {
 }
 
 func (wm *UserWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.AppendEvents(e)
-		case *user.MachineAddedEvent:
-			wm.AppendEvents(e)
-		case *user.UsernameChangedEvent:
-			wm.AppendEvents(e)
-		case *user.UserDeactivatedEvent:
-			wm.AppendEvents(e)
-		case *user.UserReactivatedEvent:
-			wm.AppendEvents(e)
-		case *user.UserLockedEvent:
-			wm.AppendEvents(e)
-		case *user.UserUnlockedEvent:
-			wm.AppendEvents(e)
-		case *user.UserRemovedEvent:
-			wm.AppendEvents(e)
-		}
-	}
+	wm.WriteModel.AppendEvents(events...)
 }
 
 //TODO: Compute OTPState? initial/active
