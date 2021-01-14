@@ -1,5 +1,6 @@
 package resources
 
+// TODO whitelabeling go:generate sass themes/scss/zitadel-alternative.scss themes/zitadel/css/zitadel.css
 // scss
 
 //go:generate sass themes/scss/main.scss themes/zitadel/css/main.css
