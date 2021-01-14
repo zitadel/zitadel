@@ -36,7 +36,7 @@ const (
 		//previous_data selects the needed data of the latest event of the aggregate
 		// and buffers it (crdb inmemory)
 		"    WITH previous_data AS (" +
-		"        SELECT COALESCE($9, MAX(event_sequence)) AS seq, resource_owner " +
+		"        SELECT MAX(event_sequence) AS seq, resource_owner " +
 		"        FROM eventstore.events " +
 		//TODO: remove LIMIT 1 as soon as data cleaned up (only 1 resource_owner per aggregate)
 		"        WHERE aggregate_type = $2 AND aggregate_id = $3 GROUP BY resource_owner LIMIT 1" +
@@ -112,7 +112,6 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 
 		var previousSequence Sequence
 		for _, event := range events {
-			if previousSequence == 0 && event.
 			err = stmt.QueryRowContext(ctx,
 				event.Type,
 				event.AggregateType,
@@ -125,10 +124,6 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 			).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate, &event.ResourceOwner)
 
 			event.PreviousSequence = uint64(previousSequence)
-
-			if event.CheckPreviousSequence && event.PreviousSequence != uint64(previousSequence) {
-				return caos_errs.ThrowAlreadyExists(nil, "SQL-k0sNg", "wrong previous sequence")
-			}
 
 			if err != nil {
 				logging.LogWithFields("SQL-IP3js",
