@@ -4,7 +4,6 @@ import (
 	"context"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
@@ -102,7 +101,7 @@ func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, id
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *iam_model.IDPProvider) error {
+func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) error {
 	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
@@ -117,22 +116,22 @@ func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Contex
 	return r.eventstore.PushAggregate(ctx, idpModel, iamAgg)
 }
 
-func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactor iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
+func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) (domain.SecondFactorType, error) {
 	secondFactorModel := NewIAMSecondFactorWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 	err := r.addSecondFactorToDefaultLoginPolicy(ctx, nil, secondFactorModel, secondFactor)
 	if err != nil {
-		return iam_model.SecondFactorTypeUnspecified, err
+		return domain.SecondFactorTypeUnspecified, err
 	}
 
 	if err = r.eventstore.PushAggregate(ctx, secondFactorModel, iamAgg); err != nil {
-		return iam_model.SecondFactorTypeUnspecified, err
+		return domain.SecondFactorTypeUnspecified, err
 	}
 
-	return iam_model.SecondFactorType(secondFactorModel.MFAType), nil
+	return domain.SecondFactorType(secondFactorModel.MFAType), nil
 }
 
-func (r *CommandSide) addSecondFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, secondFactorModel *IAMSecondFactorWriteModel, secondFactor iam_model.SecondFactorType) error {
+func (r *CommandSide) addSecondFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, secondFactorModel *IAMSecondFactorWriteModel, secondFactor domain.SecondFactorType) error {
 	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return err
@@ -147,7 +146,7 @@ func (r *CommandSide) addSecondFactorToDefaultLoginPolicy(ctx context.Context, i
 	return nil
 }
 
-func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, secondFactor iam_model.SecondFactorType) error {
+func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) error {
 	secondFactorModel := NewIAMSecondFactorWriteModel()
 	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
@@ -162,22 +161,22 @@ func (r *CommandSide) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Conte
 	return r.eventstore.PushAggregate(ctx, secondFactorModel, iamAgg)
 }
 
-func (r *CommandSide) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multiFactor iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
+func (r *CommandSide) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) (domain.MultiFactorType, error) {
 	multiFactorModel := NewIAMMultiFactorWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
 	err := r.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, multiFactor)
 	if err != nil {
-		return iam_model.MultiFactorTypeUnspecified, err
+		return domain.MultiFactorTypeUnspecified, err
 	}
 
 	if err = r.eventstore.PushAggregate(ctx, multiFactorModel, iamAgg); err != nil {
-		return iam_model.MultiFactorTypeUnspecified, err
+		return domain.MultiFactorTypeUnspecified, err
 	}
 
-	return iam_model.MultiFactorType(multiFactorModel.MultiFactoryWriteModel.MFAType), nil
+	return domain.MultiFactorType(multiFactorModel.MultiFactoryWriteModel.MFAType), nil
 }
 
-func (r *CommandSide) addMultiFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, multiFactorModel *IAMMultiFactorWriteModel, multiFactor iam_model.MultiFactorType) error {
+func (r *CommandSide) addMultiFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, multiFactorModel *IAMMultiFactorWriteModel, multiFactor domain.MultiFactorType) error {
 	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return err
@@ -191,7 +190,7 @@ func (r *CommandSide) addMultiFactorToDefaultLoginPolicy(ctx context.Context, ia
 	return nil
 }
 
-func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor iam_model.MultiFactorType) error {
+func (r *CommandSide) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) error {
 	multiFactorModel := NewIAMMultiFactorWriteModel()
 	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {

@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -67,6 +68,35 @@ func NewOrgIAMPolicyChangedEvent(
 
 func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &OrgIAMPolicyChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "POLIC-0Pl9d", "unable to unmarshal policy")
+	}
+
+	return e, nil
+}
+
+type OrgIAMPolicyRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *OrgIAMPolicyRemovedEvent) Data() interface{} {
+	return e
+}
+
+func NewOrgIAMPolicyRemovedEvent(
+	base *eventstore.BaseEvent,
+) *OrgIAMPolicyRemovedEvent {
+	return &OrgIAMPolicyRemovedEvent{
+		BaseEvent: *base,
+	}
+}
+
+func OrgIAMPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &OrgIAMPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

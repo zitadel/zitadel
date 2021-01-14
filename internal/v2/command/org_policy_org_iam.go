@@ -65,6 +65,21 @@ func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, policy *domain.Org
 	return orgWriteModelToOrgIAMPolicy(existingPolicy), nil
 }
 
+func (r *CommandSide) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
+	existingPolicy, err := r.orgIAMPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.OrgIAMPolicy.NotFound")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
+	orgAgg.PushEvents(org.NewOrgIAMPolicyChangedEvent(ctx))
+
+	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+}
+
 func (r *CommandSide) getOrgIAMPolicy(ctx context.Context, orgID string) (*domain.OrgIAMPolicy, error) {
 	policy, err := r.orgIAMPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
