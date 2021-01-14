@@ -13,11 +13,6 @@ type Aggregater interface {
 	ResourceOwner() string
 	//Version represents the semantic version of the aggregate
 	Version() Version
-	//PreviouseSequence should return the sequence of the latest event of this aggregate
-	// stored in the eventstore
-	// it's set to the first event of this push transaction,
-	// later events consume the sequence of the previously pushed event of the aggregate
-	PreviousSequence() uint64
 }
 
 func NewAggregate(
@@ -25,15 +20,13 @@ func NewAggregate(
 	typ AggregateType,
 	resourceOwner string,
 	version Version,
-	previousSequence uint64,
 ) *Aggregate {
 	return &Aggregate{
-		id:               id,
-		typ:              typ,
-		resourceOwner:    resourceOwner,
-		version:          version,
-		previousSequence: previousSequence,
-		events:           []EventPusher{},
+		id:            id,
+		typ:           typ,
+		resourceOwner: resourceOwner,
+		version:       version,
+		events:        []EventPusher{},
 	}
 }
 
@@ -43,23 +36,21 @@ func AggregateFromWriteModel(
 	version Version,
 ) *Aggregate {
 	return &Aggregate{
-		id:               wm.AggregateID,
-		typ:              typ,
-		resourceOwner:    wm.ResourceOwner,
-		version:          version,
-		previousSequence: wm.ProcessedSequence,
-		events:           []EventPusher{},
+		id:            wm.AggregateID,
+		typ:           typ,
+		resourceOwner: wm.ResourceOwner,
+		version:       version,
+		events:        []EventPusher{},
 	}
 }
 
 //Aggregate is the basic implementation of Aggregater
 type Aggregate struct {
-	id               string        `json:"-"`
-	typ              AggregateType `json:"-"`
-	events           []EventPusher `json:"-"`
-	resourceOwner    string        `json:"-"`
-	version          Version       `json:"-"`
-	previousSequence uint64        `json:"-"`
+	id            string        `json:"-"`
+	typ           AggregateType `json:"-"`
+	events        []EventPusher `json:"-"`
+	resourceOwner string        `json:"-"`
+	version       Version       `json:"-"`
 }
 
 //PushEvents adds all the events to the aggregate.
@@ -92,9 +83,4 @@ func (a *Aggregate) ResourceOwner() string {
 //Version implements Aggregater
 func (a *Aggregate) Version() Version {
 	return a.version
-}
-
-//PreviousSequence implements Aggregater
-func (a *Aggregate) PreviousSequence() uint64 {
-	return a.previousSequence
 }

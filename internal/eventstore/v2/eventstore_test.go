@@ -14,9 +14,8 @@ import (
 )
 
 type testAggregate struct {
-	id               string
-	events           []EventPusher
-	previousSequence uint64
+	id     string
+	events []EventPusher
 }
 
 func (a *testAggregate) ID() string {
@@ -37,10 +36,6 @@ func (a *testAggregate) ResourceOwner() string {
 
 func (a *testAggregate) Version() Version {
 	return "v1"
-}
-
-func (a *testAggregate) PreviousSequence() uint64 {
-	return a.previousSequence
 }
 
 // testEvent implements the Event interface

@@ -93,7 +93,6 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	if !ok {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
 	}
-	var previousSequence Sequence
 	data := make(Data, 0)
 	event := new(repository.Event)
 
@@ -101,7 +100,6 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 		&event.CreationDate,
 		&event.Type,
 		&event.Sequence,
-		&previousSequence,
 		&data,
 		&event.EditorService,
 		&event.EditorUser,
@@ -112,11 +110,9 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	)
 
 	if err != nil {
-		logging.Log("SQL-kn1Sw").WithError(err).Warn("unable to scan row")
-		return z_errors.ThrowInternal(err, "SQL-J0hFS", "unable to scan row")
+		logging.Log("SQL-3mofs").WithError(err).Warn("unable to scan row")
+		return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 	}
-
-	event.PreviousSequence = uint64(previousSequence)
 
 	event.Data = make([]byte, len(data))
 	copy(event.Data, data)

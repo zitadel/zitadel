@@ -33,6 +33,5 @@ type EventReader interface {
 	ResourceOwner() string
 	AggregateVersion() Version
 	Sequence() uint64
-	PreviousSequence() uint64
 	CreationDate() time.Time
 }

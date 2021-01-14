@@ -17,86 +17,30 @@ import (
 )
 
 const (
-	crdbInsert = "WITH input_event ( " +
-		"    event_type, " +
-		"    aggregate_type, " +
-		"    aggregate_id, " +
-		"    aggregate_version, " +
-		"    creation_date, " +
-		"    event_data, " +
-		"    editor_user, " +
-		"    editor_service, " +
-		"    resource_owner, " +
-		"    previous_sequence, " +
-		// variables below are calculated
-		"    max_event_seq " +
-		") AS ( " +
-		"		( " +
-		//the following select will return no row if no previous event defined
-		"			SELECT " +
-		"				$1::VARCHAR, " +
-		"				$2::VARCHAR, " +
-		"				$3::VARCHAR, " +
-		"				$4::VARCHAR, " +
-		"				COALESCE($5::TIMESTAMPTZ, NOW()), " +
-		"				$6::JSONB, " +
-		"				$7::VARCHAR, " +
-		"				$8::VARCHAR, " +
-		"				resource_owner, " +
-		"				$10::BIGINT, " +
-		"				MAX(event_sequence) AS max_event_seq " +
-		"			FROM eventstore.events " +
-		"			WHERE " +
-		"				aggregate_type = $2::VARCHAR " +
-		"				AND aggregate_id = $3::VARCHAR " +
-		"			GROUP BY resource_owner " +
-		"		) UNION (" +
-		// if no previous event we use the given data
-		"			VALUES (" +
-		"				$1::VARCHAR, " +
-		"				$2::VARCHAR, " +
-		"				$3::VARCHAR, " +
-		"				$4::VARCHAR, " +
-		"				COALESCE($5::TIMESTAMPTZ, NOW()), " +
-		"				$6::JSONB, " +
-		"				$7::VARCHAR, " +
-		"				$8::VARCHAR, " +
-		"				$9::VARCHAR, " +
-		"				$10::BIGINT, " +
-		"				NULL::BIGINT " +
-		"			) " +
-		"		) " +
-		// ensure only 1 row in input_event
-		"		LIMIT 1 " +
-		") " +
-		"INSERT INTO eventstore.events " +
-		"	( " +
-		"		event_type, " +
-		"		aggregate_type," +
-		"		aggregate_id, " +
-		"		aggregate_version, " +
-		"		creation_date, " +
-		"		event_data, " +
-		"		editor_user, " +
-		"		editor_service, " +
-		"		resource_owner, " +
-		"		previous_sequence " +
-		"	) " +
-		"	( " +
-		"		SELECT " +
-		"			event_type, " +
-		"			aggregate_type," +
-		"			aggregate_id, " +
-		"			aggregate_version, " +
-		"			COALESCE(creation_date, NOW()), " +
-		"			event_data, " +
-		"			editor_user, " +
-		"			editor_service, " +
-		"			resource_owner, " +
-		"			previous_sequence " +
-		"		FROM input_event " +
-		"	) " +
-		"RETURNING id, event_sequence, previous_sequence, creation_date, resource_owner "
+	crdbInsert = `INSERT INTO eventstore.events 
+			(
+				event_type,
+				aggregate_type,
+				aggregate_id, 
+				aggregate_version, 
+				creation_date, 
+				event_data, 
+				editor_user, 
+				editor_service, 
+				resource_owner
+			) 
+			VALUES (  
+				$1::VARCHAR, 
+				$2::VARCHAR, 
+				$3::VARCHAR, 
+				$4::VARCHAR, 
+				COALESCE($5::TIMESTAMPTZ, NOW()), 
+				$6::JSONB, 
+				$7::VARCHAR, 
+				$8::VARCHAR, 
+				$9::VARCHAR
+			) 
+			RETURNING id, event_sequence, creation_date, resource_owner `
 )
 
 type CRDB struct {
@@ -120,13 +64,6 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 		}
 
 		for _, event := range events {
-			previousSequence := Sequence(event.PreviousSequence)
-			if event.PreviousEvent != nil {
-				if event.PreviousEvent.AggregateType != event.AggregateType || event.PreviousEvent.AggregateID != event.AggregateID {
-					return caos_errs.ThrowPreconditionFailed(nil, "SQL-J55uR", "aggregate of linked events unequal")
-				}
-				previousSequence = Sequence(event.PreviousEvent.Sequence)
-			}
 			err = stmt.QueryRowContext(ctx,
 				event.Type,
 				event.AggregateType,
@@ -140,18 +77,14 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 				event.EditorUser,
 				event.EditorService,
 				event.ResourceOwner,
-				previousSequence,
-			).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate, &event.ResourceOwner)
-
-			event.PreviousSequence = uint64(previousSequence)
+			).Scan(&event.ID, &event.Sequence, &event.CreationDate, &event.ResourceOwner)
 
 			if err != nil {
 				logging.LogWithFields("SQL-IP3js",
 					"aggregate", event.AggregateType,
 					"aggregateId", event.AggregateID,
 					"aggregateType", event.AggregateType,
-					"eventType", event.Type).WithError(err).Info("query failed",
-					"seq", event.PreviousSequence)
+					"eventType", event.Type).WithError(err).Info("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
 		}
@@ -203,7 +136,6 @@ func (db *CRDB) eventQuery() string {
 		" creation_date" +
 		", event_type" +
 		", event_sequence" +
-		", previous_sequence" +
 		", event_data" +
 		", editor_service" +
 		", editor_user" +

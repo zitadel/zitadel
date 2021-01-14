@@ -12,10 +12,6 @@ type Event struct {
 	//Sequence is the sequence of the event
 	Sequence uint64
 
-	//PreviousSequence is the sequence of the previous sequence
-	// if it's 0 then it's the first event of this aggregate
-	PreviousSequence uint64
-
 	//PreviousEvent is needed in push to update PreviousSequence
 	// it implements a linked list
 	PreviousEvent *Event
