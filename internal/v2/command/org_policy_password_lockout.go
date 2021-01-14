@@ -5,7 +5,6 @@ import (
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/v2/domain"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
@@ -20,7 +19,7 @@ func (r *CommandSide) AddPasswordLockoutPolicy(ctx context.Context, policy *doma
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewPasswordLockoutPolicyAddedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures))
+	iamAgg.PushEvents(org.NewPasswordLockoutPolicyAddedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures))
 
 	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 var (
 	LabelPolicyAddedEventType   = orgEventTypePrefix + policy.LabelPolicyAddedEventType
 	LabelPolicyChangedEventType = orgEventTypePrefix + policy.LabelPolicyChangedEventType
+	LabelPolicyRemovedEventType = orgEventTypePrefix + policy.LabelPolicyRemovedEventType
 )
 
 type LabelPolicyAddedEvent struct {

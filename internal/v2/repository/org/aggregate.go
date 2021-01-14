@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	iamEventTypePrefix = eventstore.EventType("org.")
+	orgEventTypePrefix = eventstore.EventType("org.")
 )
 
 const (

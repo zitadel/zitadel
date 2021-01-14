@@ -54,7 +54,7 @@ func NewPasswordComplexityPolicyChangedEvent(
 ) *PasswordComplexityPolicyChangedEvent {
 	return &PasswordComplexityPolicyChangedEvent{
 		PasswordComplexityPolicyChangedEvent: *policy.NewPasswordComplexityPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
+			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyChangedEventType),
 		),
 	}
 }
