@@ -20,38 +20,30 @@ import (
 )
 
 func userMachineFromDomain(machine *domain.Machine) *management.UserResponse {
-	creationDate, err := ptypes.TimestampProto(machine.CreationDate)
-	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
-
 	changeDate, err := ptypes.TimestampProto(machine.ChangeDate)
 	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
 
 	userResp := &management.UserResponse{
-		Id:           machine.AggregateID,
-		State:        userStateFromDomain(machine.GetState()),
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Sequence:     machine.Sequence,
-		UserName:     machine.GetUsername(),
+		Id:         machine.AggregateID,
+		State:      userStateFromDomain(machine.GetState()),
+		ChangeDate: changeDate,
+		Sequence:   machine.Sequence,
+		UserName:   machine.GetUsername(),
 	}
 	userResp.User = &management.UserResponse_Machine{Machine: machineFromDomain(machine)}
 	return userResp
 }
 
 func userHumanFromDomain(human *domain.Human) *management.UserResponse {
-	creationDate, err := ptypes.TimestampProto(human.CreationDate)
-	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
-
 	changeDate, err := ptypes.TimestampProto(human.ChangeDate)
 	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
 
 	userResp := &management.UserResponse{
-		Id:           human.AggregateID,
-		State:        userStateFromDomain(human.GetState()),
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Sequence:     human.Sequence,
-		UserName:     human.GetUsername(),
+		Id:         human.AggregateID,
+		State:      userStateFromDomain(human.GetState()),
+		ChangeDate: changeDate,
+		Sequence:   human.Sequence,
+		UserName:   human.GetUsername(),
 	}
 	userResp.User = &management.UserResponse_Human{Human: humanFromDomain(human)}
 	return userResp
@@ -220,15 +212,11 @@ func userMembershipSearchKeyToModel(key management.UserMembershipSearchKey) usr_
 }
 
 func profileFromDomain(profile *domain.Profile) *management.UserProfile {
-	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
-	logging.Log("GRPC-dkso3").OnError(err).Debug("unable to parse timestamp")
-
 	changeDate, err := ptypes.TimestampProto(profile.ChangeDate)
 	logging.Log("GRPC-ski8d").OnError(err).Debug("unable to parse timestamp")
 
 	return &management.UserProfile{
 		Id:                profile.AggregateID,
-		CreationDate:      creationDate,
 		ChangeDate:        changeDate,
 		Sequence:          profile.Sequence,
 		FirstName:         profile.FirstName,
@@ -278,15 +266,11 @@ func updateProfileToDomain(u *management.UpdateUserProfileRequest) *domain.Profi
 }
 
 func emailFromDomain(email *domain.Email) *management.UserEmail {
-	creationDate, err := ptypes.TimestampProto(email.CreationDate)
-	logging.Log("GRPC-d9ow2").OnError(err).Debug("unable to parse timestamp")
-
 	changeDate, err := ptypes.TimestampProto(email.ChangeDate)
 	logging.Log("GRPC-s0dkw").OnError(err).Debug("unable to parse timestamp")
 
 	return &management.UserEmail{
 		Id:              email.AggregateID,
-		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
 		Sequence:        email.Sequence,
 		Email:           email.EmailAddress,
@@ -320,15 +304,11 @@ func updateEmailToDomain(e *management.UpdateUserEmailRequest) *domain.Email {
 }
 
 func phoneFromDomain(phone *domain.Phone) *management.UserPhone {
-	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
-	logging.Log("GRPC-ps9ws").OnError(err).Debug("unable to parse timestamp")
-
 	changeDate, err := ptypes.TimestampProto(phone.ChangeDate)
 	logging.Log("GRPC-09ewq").OnError(err).Debug("unable to parse timestamp")
 
 	return &management.UserPhone{
 		Id:              phone.AggregateID,
-		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
 		Sequence:        phone.Sequence,
 		Phone:           phone.PhoneNumber,
@@ -361,15 +341,11 @@ func updatePhoneToDomain(e *management.UpdateUserPhoneRequest) *domain.Phone {
 }
 
 func addressFromDomain(address *domain.Address) *management.UserAddress {
-	creationDate, err := ptypes.TimestampProto(address.CreationDate)
-	logging.Log("GRPC-ud8w7").OnError(err).Debug("unable to parse timestamp")
-
 	changeDate, err := ptypes.TimestampProto(address.ChangeDate)
 	logging.Log("GRPC-si9ws").OnError(err).Debug("unable to parse timestamp")
 
 	return &management.UserAddress{
 		Id:            address.AggregateID,
-		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
 		Sequence:      address.Sequence,
 		Country:       address.Country,

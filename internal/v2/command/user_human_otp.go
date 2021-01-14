@@ -68,7 +68,7 @@ func (r *CommandSide) CheckMFAOTPSetup(ctx context.Context, userID, code, userAg
 		return err
 	}
 	if existingOTP.OTPState == domain.OTPStateUnspecified || existingOTP.OTPState == domain.OTPStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0ds", "Errors.User.MFA.OTP.NotExisting")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting")
 	}
 	if existingOTP.MFAState == domain.MFAStateReady {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-qx4ls", "Errors.Users.MFA.OTP.AlreadyReady")
@@ -94,7 +94,7 @@ func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID, resourceOwner 
 		return err
 	}
 	if existingOTP.OTPState == domain.OTPStateUnspecified || existingOTP.OTPState == domain.OTPStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0ds", "Errors.User.MFA.OTP.NotExisting")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	userAgg.PushEvents(

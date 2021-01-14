@@ -34,7 +34,7 @@ func (r *CommandSide) addOrgIAMPolicy(ctx context.Context, orgAgg *org.Aggregate
 		return err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return caos_errs.ThrowAlreadyExists(nil, "ORG-5M0ds", "Errors.Org.OrgIAMPolicy.AlreadyExists")
+		return caos_errs.ThrowAlreadyExists(nil, "ORG-1M8ds", "Errors.Org.OrgIAMPolicy.AlreadyExists")
 	}
 	orgAgg.PushEvents(org.NewOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain))
 	return nil

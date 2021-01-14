@@ -41,8 +41,8 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 		case *user.HumanAddedEvent:
 			if e.PhoneNumber != "" {
 				wm.Phone = e.PhoneNumber
-				wm.State = domain.PhoneStateActive
 			}
+			wm.State = domain.PhoneStateActive
 		case *user.HumanRegisteredEvent:
 			if e.PhoneNumber != "" {
 				wm.Phone = e.PhoneNumber

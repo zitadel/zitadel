@@ -10,7 +10,7 @@ import (
 
 func (r *CommandSide) AddMachine(ctx context.Context, orgID string, machine *domain.Machine) (*domain.Machine, error) {
 	if !machine.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0ds", "Errors.User.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 	}
 	userID, err := r.idGenerator.Next()
 	if err != nil {
@@ -36,6 +36,7 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID string, machine *dom
 			machine.Description,
 		),
 	)
+	err = r.eventstore.PushAggregate(ctx, addedMachine, userAgg)
 	return writeModelToMachine(addedMachine), nil
 }
 
@@ -64,7 +65,7 @@ func (r *CommandSide) ChangeMachine(ctx context.Context, machine *domain.Machine
 
 func (r *CommandSide) machineWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *MachineWriteModel, err error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Plof", "Errors.User.UserIDMissing")
 	}
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

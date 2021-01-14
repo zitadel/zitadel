@@ -19,7 +19,7 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 		return nil, err
 	}
 	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5M0ds", "Errors.User.Phone.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-aM9cs", "Errors.User.Phone.NotFound")
 	}
 	changedEvent, hasChanged := existingPhone.NewChangedEvent(ctx, phone.PhoneNumber)
 	if !hasChanged {
@@ -106,7 +106,7 @@ func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID, resourceOwne
 		return err
 	}
 	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0ds", "Errors.User.Phone.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-p6rsc", "Errors.User.Phone.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
 	userAgg.PushEvents(
