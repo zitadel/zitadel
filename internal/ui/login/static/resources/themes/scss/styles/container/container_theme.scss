@@ -2,13 +2,11 @@
 
 @mixin lgn-container-theme($theme-or-color-config) {
     $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
-      $color: lgn-get-color-config($theme);
+    $color: lgn-get-color-config($theme);
 
-      @if $color != null {
+    @if $color != null {
         @include lgn-container-color($color);
-      }
-    // }
+    }
 }
 
 @mixin lgn-container-color($config-or-theme) {
@@ -26,20 +24,6 @@
         .lgn-names {
             $foreground: map-get($config, foreground);
             border-color: lgn-color($foreground, divider);
-        }
-    }
-
-    ul li::before {
-        color: lgn-color($primary, default);
-    }
-
-    ul li i {
-        &.lgn-warn {
-            color: lgn-color($warn, default);
-        }
-
-        &.lgn-valid {
-            color: #85d996;
         }
     }
 }

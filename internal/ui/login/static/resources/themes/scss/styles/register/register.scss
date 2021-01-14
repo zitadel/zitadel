@@ -1,19 +1,20 @@
-$column-gap: 1rem;
-$row-gap: .5rem;
+$column-gap: .5rem;
 
 .lgn-register {
-    display: grid;
-    grid-column-gap: $column-gap;
-    grid-row-gap: $row-gap;
-    grid-template-rows: 1fr 1fr;
+    .double-col {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -.5rem;
+
+        .lgn-field {
+            margin: 0 $column-gap;
+            flex: 1;
+            box-sizing: border-box;
+            margin-bottom: .5rem;
+        }
+    }
 
     .lgn-field {
-        grid-row-start: 1;
-        grid-row-end: 2;
-
-        .half-width {
-            grid-row-start: 1;
-            grid-row-end: 1;
-        }
+        margin-bottom: .5rem;
     }
 }

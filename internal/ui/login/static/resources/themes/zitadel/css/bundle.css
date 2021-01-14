@@ -357,25 +357,6 @@ a.block {
   left: 1rem;
   top: calc(-45px);
 }
-.content-container ul li {
-  display: flex;
-  align-items: center;
-  list-style: none;
-  margin: 10px 0;
-  font-style: italic;
-}
-.content-container ul li i {
-  margin-right: 1rem;
-  font-size: 20px;
-}
-.content-container ul li::before {
-  content: "•";
-  font-weight: bold;
-  display: inline-block;
-  width: 20px;
-  margin-left: -20px;
-  font-style: normal;
-}
 
 i {
   font-size: 1.2rem;
@@ -495,6 +476,37 @@ i {
 }
 .lgn-select::-ms-expand, select::-ms-expand {
   display: none;
+}
+
+.lgn-list.lgn-policy, ul.lgn-policy {
+  display: flex;
+  flex-wrap: wrap;
+}
+.lgn-list.lgn-policy li, ul.lgn-policy li {
+  flex: 1 0 50%;
+}
+.lgn-list li, ul li {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 4px 0;
+  font-style: italic;
+}
+.lgn-list li i, ul li i {
+  margin: 0 0.5rem;
+  font-size: 20px;
+}
+.lgn-list:not(.lgn-no-dots) li::before, ul:not(.lgn-no-dots) li::before {
+  content: "•";
+  font-weight: bold;
+  display: inline-block;
+  width: 20px;
+  margin-left: -20px;
+  font-style: normal;
+}
+.lgn-list.lgn-no-dots, ul.lgn-no-dots {
+  list-style-type: none;
+  padding-inline-start: 0;
 }
 
 @font-face {
@@ -927,25 +939,6 @@ a.block {
   left: 1rem;
   top: calc(-45px);
 }
-.content-container ul li {
-  display: flex;
-  align-items: center;
-  list-style: none;
-  margin: 10px 0;
-  font-style: italic;
-}
-.content-container ul li i {
-  margin-right: 1rem;
-  font-size: 20px;
-}
-.content-container ul li::before {
-  content: "•";
-  font-weight: bold;
-  display: inline-block;
-  width: 20px;
-  margin-left: -20px;
-  font-style: normal;
-}
 
 i {
   font-size: 1.2rem;
@@ -1065,6 +1058,37 @@ i {
 }
 .lgn-select::-ms-expand, select::-ms-expand {
   display: none;
+}
+
+.lgn-list.lgn-policy, ul.lgn-policy {
+  display: flex;
+  flex-wrap: wrap;
+}
+.lgn-list.lgn-policy li, ul.lgn-policy li {
+  flex: 1 0 50%;
+}
+.lgn-list li, ul li {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 4px 0;
+  font-style: italic;
+}
+.lgn-list li i, ul li i {
+  margin: 0 0.5rem;
+  font-size: 20px;
+}
+.lgn-list:not(.lgn-no-dots) li::before, ul:not(.lgn-no-dots) li::before {
+  content: "•";
+  font-weight: bold;
+  display: inline-block;
+  width: 20px;
+  margin-left: -20px;
+  font-style: normal;
+}
+.lgn-list.lgn-no-dots, ul.lgn-no-dots {
+  list-style-type: none;
+  padding-inline-start: 0;
 }
 
 @font-face {
@@ -1278,43 +1302,24 @@ i {
   left: 1rem;
   top: calc(-45px);
 }
-.content-container ul li {
-  display: flex;
-  align-items: center;
-  list-style: none;
-  margin: 10px 0;
-  font-style: italic;
-}
-.content-container ul li i {
-  margin-right: 1rem;
-  font-size: 20px;
-}
-.content-container ul li::before {
-  content: "•";
-  font-weight: bold;
-  display: inline-block;
-  width: 20px;
-  margin-left: -20px;
-  font-style: normal;
-}
 
 i {
   font-size: 1.2rem;
 }
 
-.lgn-register {
-  display: grid;
-  grid-column-gap: 1rem;
-  grid-row-gap: 0.5rem;
-  grid-template-rows: 1fr 1fr;
+.lgn-register .double-col {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -0.5rem;
+}
+.lgn-register .double-col .lgn-field {
+  margin: 0 0.5rem;
+  flex: 1;
+  box-sizing: border-box;
+  margin-bottom: 0.5rem;
 }
 .lgn-register .lgn-field {
-  grid-row-start: 1;
-  grid-row-end: 2;
-}
-.lgn-register .lgn-field .half-width {
-  grid-row-start: 1;
-  grid-row-end: 1;
+  margin-bottom: 0.5rem;
 }
 
 .lgn-header {

@@ -13,6 +13,7 @@
 @import '../avatar/avatar_theme.scss';
 @import '../checkbox/checkbox_theme.scss';
 @import '../select/select_theme.scss';
+@import '../list/list_theme.scss';
 @import '../typography/typography.scss';
 @import './theming';
 
@@ -32,4 +33,5 @@
     @include lgn-account-selection-theme($theme-or-color-config);
     @include lgn-avatar-theme($theme-or-color-config);
     @include lgn-select-theme($theme-or-color-config);
+    @include lgn-list-theme($theme-or-color-config);
 }
