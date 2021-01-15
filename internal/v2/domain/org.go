@@ -12,6 +12,7 @@ type Org struct {
 	State OrgState
 	Name  string
 
+	PrimaryDomain            string
 	Domains                  []*OrgDomain
 	Members                  []*Member
 	OrgIamPolicy             *OrgIAMPolicy
@@ -38,6 +39,7 @@ func (o *Org) nameForDomain(iamDomain string) string {
 type OrgState int32
 
 const (
-	OrgStateActive OrgState = iota
+	OrgStateUnspecified OrgState = iota
+	OrgStateActive
 	OrgStateInactive
 )

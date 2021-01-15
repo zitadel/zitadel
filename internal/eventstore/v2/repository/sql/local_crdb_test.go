@@ -27,8 +27,12 @@ func TestMain(m *testing.M) {
 	}
 
 	testCRDBClient, err = sql.Open("postgres", ts.PGURL().String())
+
 	if err != nil {
 		logging.LogWithFields("REPOS-CF6dQ", "error", err).Fatal("unable to connect to db")
+	}
+	if err = testCRDBClient.Ping(); err != nil {
+		logging.LogWithFields("REPOS-CF6dQ", "error", err).Fatal("unable to ping db")
 	}
 
 	defer func() {

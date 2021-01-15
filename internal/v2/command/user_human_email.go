@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -43,6 +45,34 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 	}
 
 	return writeModelToEmail(existingEmail), nil
+}
+
+func (r *CommandSide) VerifyHumanEmail(ctx context.Context, userID, code, resourceowner string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
+	}
+	if code == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-çm0ds", "Errors.User.Code.Empty")
+	}
+
+	existingCode, err := r.emailWriteModel(ctx, userID, resourceowner)
+	if err != nil {
+		return err
+	}
+	if existingCode.Code == nil || existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
+	}
+
+	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.emailVerificationCode)
+	if err == nil {
+		userAgg.PushEvents(user.NewHumanEmailVerifiedEvent(ctx))
+		return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+	}
+	userAgg.PushEvents(user.NewHumanEmailVerificationFailedEvent(ctx))
+	err = r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+	logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID()).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
+	return caos_errs.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
 }
 
 func (r *CommandSide) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string) error {

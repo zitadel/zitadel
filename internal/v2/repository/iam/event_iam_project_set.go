@@ -27,7 +27,7 @@ func NewIAMProjectSetEvent(ctx context.Context, projectID string) *ProjectSetEve
 	return &ProjectSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			SetupDoneEventType,
+			ProjectSetEventType,
 		),
 		ProjectID: projectID,
 	}

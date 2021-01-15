@@ -3,13 +3,13 @@ package webauthn
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
 type WebAuthN struct {
@@ -41,7 +41,7 @@ func StartServer(sd systemdefaults.WebAuthN) (*WebAuthN, error) {
 }
 
 type webUser struct {
-	*usr_model.User
+	*domain.Human
 	accountName string
 	credentials []webauthn.Credential
 }
@@ -54,7 +54,7 @@ func (u *webUser) WebAuthnName() string {
 	if u.accountName != "" {
 		return u.accountName
 	}
-	return u.UserName
+	return u.GetUsername()
 }
 
 func (u *webUser) WebAuthnDisplayName() string {
@@ -69,7 +69,7 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *WebAuthN) BeginRegistration(user *usr_model.User, accountName string, authType usr_model.AuthenticatorAttachment, userVerification usr_model.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNToken, error) {
+func (w *WebAuthN) BeginRegistration(user *domain.Human, accountName string, authType domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNToken, error) {
 	creds := WebAuthNsToCredentials(webAuthNs)
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
@@ -80,13 +80,13 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, accountName string, a
 	}
 	credentialOptions, sessionData, err := w.web(isLoginUI).BeginRegistration(
 		&webUser{
-			User:        user,
+			Human:       user,
 			accountName: accountName,
 			credentials: creds,
 		},
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
-			UserVerification:        UserVerificationFromModel(userVerification),
-			AuthenticatorAttachment: AuthenticatorAttachmentFromModel(authType),
+			UserVerification:        UserVerificationFromDomain(userVerification),
+			AuthenticatorAttachment: AuthenticatorAttachmentFromDomain(authType),
 		}),
 		webauthn.WithConveyancePreference(protocol.PreferNoAttestation),
 		webauthn.WithExclusions(existing),
@@ -98,15 +98,15 @@ func (w *WebAuthN) BeginRegistration(user *usr_model.User, accountName string, a
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-D7cus", "Errors.User.WebAuthN.MarshalError")
 	}
-	return &usr_model.WebAuthNToken{
+	return &domain.WebAuthNToken{
 		Challenge:              sessionData.Challenge,
 		CredentialCreationData: cred,
 		AllowedCredentialIDs:   sessionData.AllowedCredentialIDs,
-		UserVerification:       UserVerificationToModel(sessionData.UserVerification),
+		UserVerification:       UserVerificationToDomain(sessionData.UserVerification),
 	}, nil
 }
 
-func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.WebAuthNToken, tokenName string, credData []byte, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
+func (w *WebAuthN) FinishRegistration(user *domain.Human, webAuthN *domain.WebAuthNToken, tokenName string, credData []byte, isLoginUI bool) (*domain.WebAuthNToken, error) {
 	if webAuthN == nil {
 		return nil, caos_errs.ThrowInternal(nil, "WEBAU-5M9so", "Errors.User.WebAuthN.NotFound")
 	}
@@ -117,7 +117,7 @@ func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.
 	sessionData := WebAuthNToSessionData(webAuthN)
 	credential, err := w.web(isLoginUI).CreateCredential(
 		&webUser{
-			User: user,
+			Human: user,
 		},
 		sessionData, credentialData)
 	if err != nil {
@@ -133,11 +133,11 @@ func (w *WebAuthN) FinishRegistration(user *usr_model.User, webAuthN *usr_model.
 	return webAuthN, nil
 }
 
-func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*usr_model.WebAuthNToken) (*usr_model.WebAuthNLogin, error) {
+func (w *WebAuthN) BeginLogin(user *domain.Human, userVerification domain.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNLogin, error) {
 	assertion, sessionData, err := w.web(isLoginUI).BeginLogin(&webUser{
-		User:        user,
+		Human:       user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
-	}, webauthn.WithUserVerification(UserVerificationFromModel(userVerification)))
+	}, webauthn.WithUserVerification(UserVerificationFromDomain(userVerification)))
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-4G8sw", "Errors.User.WebAuthN.BeginLoginFailed")
 	}
@@ -145,7 +145,7 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.U
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-2M0s9", "Errors.User.WebAuthN.MarshalError")
 	}
-	return &usr_model.WebAuthNLogin{
+	return &domain.WebAuthNLogin{
 		Challenge:               sessionData.Challenge,
 		CredentialAssertionData: cred,
 		AllowedCredentialIDs:    sessionData.AllowedCredentialIDs,
@@ -153,13 +153,13 @@ func (w *WebAuthN) BeginLogin(user *usr_model.User, userVerification usr_model.U
 	}, nil
 }
 
-func (w *WebAuthN) FinishLogin(user *usr_model.User, webAuthN *usr_model.WebAuthNLogin, credData []byte, isLoginUI bool, webAuthNs ...*usr_model.WebAuthNToken) ([]byte, uint32, error) {
+func (w *WebAuthN) FinishLogin(user *domain.Human, webAuthN *domain.WebAuthNLogin, credData []byte, isLoginUI bool, webAuthNs ...*domain.WebAuthNToken) ([]byte, uint32, error) {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	if err != nil {
 		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-ADgv4", "Errors.User.WebAuthN.ValidateLoginFailed")
 	}
 	webUser := &webUser{
-		User:        user,
+		Human:       user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
 	}
 	credential, err := w.web(isLoginUI).ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)

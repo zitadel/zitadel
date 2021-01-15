@@ -138,7 +138,6 @@ func IAMAggregateFromReadModel(rm *ReadModel) *iam.Aggregate {
 			iam.AggregateType,
 			rm.ResourceOwner,
 			iam.AggregateVersion,
-			rm.ProcessedSequence,
 		),
 	}
 }

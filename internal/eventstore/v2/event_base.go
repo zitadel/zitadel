@@ -14,11 +14,10 @@ type BaseEvent struct {
 	aggregateType AggregateType `json:"-"`
 	EventType     EventType     `json:"-"`
 
-	resourceOwner     string    `json:"-"`
-	aggregateVersion  Version   `json:"-"`
-	sequence          uint64    `json:"-"`
-	previouseSequence uint64    `json:"-"`
-	creationDate      time.Time `json:"-"`
+	resourceOwner    string    `json:"-"`
+	aggregateVersion Version   `json:"-"`
+	sequence         uint64    `json:"-"`
+	creationDate     time.Time `json:"-"`
 
 	//User is the user who created the event
 	User string `json:"-"`
@@ -55,9 +54,6 @@ func (e *BaseEvent) AggregateVersion() Version {
 }
 func (e *BaseEvent) Sequence() uint64 {
 	return e.sequence
-}
-func (e *BaseEvent) PreviousSequence() uint64 {
-	return e.previouseSequence
 }
 func (e *BaseEvent) CreationDate() time.Time {
 	return e.creationDate

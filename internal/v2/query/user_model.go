@@ -59,7 +59,6 @@ func UserAggregateFromReadModel(rm *UserReadModel) *user.Aggregate {
 			user.AggregateType,
 			rm.ResourceOwner,
 			user.AggregateVersion,
-			rm.ProcessedSequence,
 		),
 	}
 }

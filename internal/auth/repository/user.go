@@ -30,12 +30,10 @@ type UserRepository interface {
 
 	AddMFAU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
 	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
-	RemoveMFAU2F(ctx context.Context, userID, webAuthNTokenID string) error
 
 	GetPasswordless(ctx context.Context, id string) ([]*model.WebAuthNToken, error)
 	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
 	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
-	RemovePasswordless(ctx context.Context, userID, webAuthNTokenID string) error
 
 	ChangeUsername(ctx context.Context, userID, username string) error
 
@@ -52,37 +50,18 @@ type myUserRepo interface {
 	MyProfile(ctx context.Context) (*model.Profile, error)
 
 	MyEmail(ctx context.Context) (*model.Email, error)
-	VerifyMyEmail(ctx context.Context, code string) error
-	ResendMyEmailVerificationMail(ctx context.Context) error
 
 	MyPhone(ctx context.Context) (*model.Phone, error)
-	ChangeMyPhone(ctx context.Context, phone *model.Phone) (*model.Phone, error)
-	RemoveMyPhone(ctx context.Context) error
-	VerifyMyPhone(ctx context.Context, code string) error
-	ResendMyPhoneVerificationCode(ctx context.Context) error
 
 	MyAddress(ctx context.Context) (*model.Address, error)
-	ChangeMyAddress(ctx context.Context, address *model.Address) (*model.Address, error)
-
-	ChangeMyPassword(ctx context.Context, old, new string) error
 
 	SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
-	AddMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) (*model.ExternalIDP, error)
-	RemoveMyExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
 
 	MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error)
-	AddMyMFAOTP(ctx context.Context) (*model.OTP, error)
-	VerifyMyMFAOTPSetup(ctx context.Context, code string) error
-	RemoveMyMFAOTP(ctx context.Context) error
 
 	AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error)
-	VerifyMyMFAU2FSetup(ctx context.Context, tokenName string, data []byte) error
-	RemoveMyMFAU2F(ctx context.Context, webAuthNTokenID string) error
 
 	GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error)
-	AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error)
-	VerifyMyPasswordlessSetup(ctx context.Context, tokenName string, data []byte) error
-	RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error
 
 	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
 }

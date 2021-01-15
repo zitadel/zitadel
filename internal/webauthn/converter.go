@@ -1,15 +1,15 @@
 package webauthn
 
 import (
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 )
 
-func WebAuthNsToCredentials(webAuthNs []*model.WebAuthNToken) []webauthn.Credential {
+func WebAuthNsToCredentials(webAuthNs []*domain.WebAuthNToken) []webauthn.Credential {
 	creds := make([]webauthn.Credential, 0)
 	for _, webAuthN := range webAuthNs {
-		if webAuthN.State == model.MFAStateReady {
+		if webAuthN.State == domain.MFAStateReady {
 			creds = append(creds, webauthn.Credential{
 				ID:              webAuthN.KeyID,
 				PublicKey:       webAuthN.PublicKey,
@@ -24,55 +24,55 @@ func WebAuthNsToCredentials(webAuthNs []*model.WebAuthNToken) []webauthn.Credent
 	return creds
 }
 
-func WebAuthNToSessionData(webAuthN *model.WebAuthNToken) webauthn.SessionData {
+func WebAuthNToSessionData(webAuthN *domain.WebAuthNToken) webauthn.SessionData {
 	return webauthn.SessionData{
 		Challenge:            webAuthN.Challenge,
 		UserID:               []byte(webAuthN.AggregateID),
 		AllowedCredentialIDs: webAuthN.AllowedCredentialIDs,
-		UserVerification:     UserVerificationFromModel(webAuthN.UserVerification),
+		UserVerification:     UserVerificationFromDomain(webAuthN.UserVerification),
 	}
 }
 
-func WebAuthNLoginToSessionData(webAuthN *model.WebAuthNLogin) webauthn.SessionData {
+func WebAuthNLoginToSessionData(webAuthN *domain.WebAuthNLogin) webauthn.SessionData {
 	return webauthn.SessionData{
 		Challenge:            webAuthN.Challenge,
 		UserID:               []byte(webAuthN.AggregateID),
 		AllowedCredentialIDs: webAuthN.AllowedCredentialIDs,
-		UserVerification:     UserVerificationFromModel(webAuthN.UserVerification),
+		UserVerification:     UserVerificationFromDomain(webAuthN.UserVerification),
 	}
 }
 
-func UserVerificationToModel(verification protocol.UserVerificationRequirement) model.UserVerificationRequirement {
+func UserVerificationToDomain(verification protocol.UserVerificationRequirement) domain.UserVerificationRequirement {
 	switch verification {
 	case protocol.VerificationRequired:
-		return model.UserVerificationRequirementRequired
+		return domain.UserVerificationRequirementRequired
 	case protocol.VerificationPreferred:
-		return model.UserVerificationRequirementPreferred
+		return domain.UserVerificationRequirementPreferred
 	case protocol.VerificationDiscouraged:
-		return model.UserVerificationRequirementDiscouraged
+		return domain.UserVerificationRequirementDiscouraged
 	default:
-		return model.UserVerificationRequirementUnspecified
+		return domain.UserVerificationRequirementUnspecified
 	}
 }
 
-func UserVerificationFromModel(verification model.UserVerificationRequirement) protocol.UserVerificationRequirement {
+func UserVerificationFromDomain(verification domain.UserVerificationRequirement) protocol.UserVerificationRequirement {
 	switch verification {
-	case model.UserVerificationRequirementRequired:
+	case domain.UserVerificationRequirementRequired:
 		return protocol.VerificationRequired
-	case model.UserVerificationRequirementPreferred:
+	case domain.UserVerificationRequirementPreferred:
 		return protocol.VerificationPreferred
-	case model.UserVerificationRequirementDiscouraged:
+	case domain.UserVerificationRequirementDiscouraged:
 		return protocol.VerificationDiscouraged
 	default:
 		return protocol.VerificationDiscouraged
 	}
 }
 
-func AuthenticatorAttachmentFromModel(authType model.AuthenticatorAttachment) protocol.AuthenticatorAttachment {
+func AuthenticatorAttachmentFromDomain(authType domain.AuthenticatorAttachment) protocol.AuthenticatorAttachment {
 	switch authType {
-	case model.AuthenticatorAttachmentPlattform:
+	case domain.AuthenticatorAttachmentPlattform:
 		return protocol.Platform
-	case model.AuthenticatorAttachmentCrossPlattform:
+	case domain.AuthenticatorAttachmentCrossPlattform:
 		return protocol.CrossPlatform
 	default:
 		return ""

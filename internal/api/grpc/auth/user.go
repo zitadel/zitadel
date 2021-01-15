@@ -42,7 +42,8 @@ func (s *Server) GetMyUserPhone(ctx context.Context, _ *empty.Empty) (*auth.User
 }
 
 func (s *Server) RemoveMyUserPhone(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.repo.RemoveMyPhone(ctx)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.RemoveHumanPhone(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
@@ -84,12 +85,14 @@ func (s *Server) ChangeMyUserEmail(ctx context.Context, request *auth.UpdateUser
 }
 
 func (s *Server) VerifyMyUserEmail(ctx context.Context, request *auth.VerifyMyUserEmailRequest) (*empty.Empty, error) {
-	err := s.repo.VerifyMyEmail(ctx, request.Code)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, request.Code, ctxData.OrgID)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendMyEmailVerificationMail(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.repo.ResendMyEmailVerificationMail(ctx)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.CreateHumanEmailVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
@@ -102,25 +105,28 @@ func (s *Server) ChangeMyUserPhone(ctx context.Context, request *auth.UpdateUser
 }
 
 func (s *Server) VerifyMyUserPhone(ctx context.Context, request *auth.VerifyUserPhoneRequest) (*empty.Empty, error) {
-	err := s.repo.VerifyMyPhone(ctx, request.Code)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, request.Code, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendMyPhoneVerificationCode(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.repo.ResendMyPhoneVerificationCode(ctx)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.CreateHumanPhoneVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) UpdateMyUserAddress(ctx context.Context, request *auth.UpdateUserAddressRequest) (*auth.UserAddress, error) {
-	address, err := s.repo.ChangeMyAddress(ctx, updateAddressToModel(ctx, request))
+	address, err := s.command.ChangeHumanAddress(ctx, updateAddressToDomain(ctx, request))
 	if err != nil {
 		return nil, err
 	}
-	return addressFromModel(address), nil
+	return addressFromDomain(address), nil
 }
 
 func (s *Server) ChangeMyPassword(ctx context.Context, request *auth.PasswordChange) (*empty.Empty, error) {
-	err := s.repo.ChangeMyPassword(ctx, request.OldPassword, request.NewPassword)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.ChangePassword(ctx, ctxData.OrgID, ctxData.UserID, request.OldPassword, request.NewPassword, "")
 	return &empty.Empty{}, err
 }
 
@@ -133,7 +139,7 @@ func (s *Server) SearchMyExternalIDPs(ctx context.Context, request *auth.Externa
 }
 
 func (s *Server) RemoveMyExternalIDP(ctx context.Context, request *auth.ExternalIDPRemoveRequest) (*empty.Empty, error) {
-	err := s.repo.RemoveMyExternalIDP(ctx, externalIDPRemoveToModel(ctx, request))
+	err := s.command.RemoveHumanExternalIDP(ctx, externalIDPRemoveToDomain(ctx, request))
 	return &empty.Empty{}, err
 }
 
@@ -146,38 +152,44 @@ func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Emp
 }
 
 func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *auth.MfaOtpResponse, err error) {
-	otp, err := s.repo.AddMyMFAOTP(ctx)
+	ctxData := authz.GetCtxData(ctx)
+	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return otpFromModel(otp), nil
+	return otpFromDomain(otp), nil
 }
 
 func (s *Server) VerifyMfaOTP(ctx context.Context, request *auth.VerifyMfaOtp) (*empty.Empty, error) {
-	err := s.repo.VerifyMyMFAOTPSetup(ctx, request.Code)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.CheckMFAOTPSetup(ctx, ctxData.UserID, request.Code, "", ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {
-	err = s.repo.RemoveMyMFAOTP(ctx)
+	ctxData := authz.GetCtxData(ctx)
+	err = s.command.RemoveHumanOTP(ctx, ctxData.UserID, ctxData.OrgID)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) AddMyMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
-	u2f, err := s.repo.AddMyMFAU2F(ctx)
+	ctxData := authz.GetCtxData(ctx)
+	u2f, err := s.command.AddHumanU2F(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
-	return verifyWebAuthNFromModel(u2f), err
+	return verifyWebAuthNFromDomain(u2f), err
 }
 
 func (s *Server) VerifyMyMfaU2F(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
-	err := s.repo.VerifyMyMFAU2FSetup(ctx, request.TokenName, request.PublicKeyCredential)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.VerifyHumanU2F(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMyMfaU2F(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
-	err := s.repo.RemoveMyMFAU2F(ctx, id.Id)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.RemoveHumanU2F(ctx, ctxData.UserID, id.Id, ctxData.OrgID)
 	return &empty.Empty{}, err
 }
 
@@ -190,20 +202,23 @@ func (s *Server) GetMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth
 }
 
 func (s *Server) AddMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
-	u2f, err := s.repo.AddMyPasswordless(ctx)
+	ctxData := authz.GetCtxData(ctx)
+	u2f, err := s.command.AddHumanPasswordless(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
-	return verifyWebAuthNFromModel(u2f), err
+	return verifyWebAuthNFromDomain(u2f), err
 }
 
 func (s *Server) VerifyMyPasswordless(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
-	err := s.repo.VerifyMyPasswordlessSetup(ctx, request.TokenName, request.PublicKeyCredential)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.VerifyHumanPasswordless(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMyPasswordless(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
-	err := s.repo.RemoveMyPasswordless(ctx, id.Id)
+	ctxData := authz.GetCtxData(ctx)
+	err := s.command.RemoveHumanPasswordless(ctx, ctxData.UserID, id.Id, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 

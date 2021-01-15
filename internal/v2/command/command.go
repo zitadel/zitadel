@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	global_model "github.com/caos/zitadel/internal/model"
+	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -9,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
+	usr_repo "github.com/caos/zitadel/internal/v2/repository/user"
 )
 
 type CommandSide struct {
@@ -18,14 +21,18 @@ type CommandSide struct {
 
 	idpConfigSecretCrypto crypto.Crypto
 
-	userPasswordAlg            crypto.HashAlgorithm
-	initializeUserCode         crypto.Generator
-	emailVerificationCode      crypto.Generator
-	phoneVerificationCode      crypto.Generator
-	passwordVerificationCode   crypto.Generator
-	machineKeyAlg              crypto.EncryptionAlgorithm
-	machineKeySize             int
+	userPasswordAlg          crypto.HashAlgorithm
+	initializeUserCode       crypto.Generator
+	emailVerificationCode    crypto.Generator
+	phoneVerificationCode    crypto.Generator
+	passwordVerificationCode crypto.Generator
+	machineKeyAlg            crypto.EncryptionAlgorithm
+	machineKeySize           int
+	//TODO: remove global model, or move to domain
+	multifactors               global_model.Multifactors
 	applicationSecretGenerator crypto.Generator
+
+	webauthn *webauthn_helper.WebAuthN
 }
 
 type Config struct {
@@ -40,6 +47,7 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 		iamDomain:   config.SystemDefaults.Domain,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
+	usr_repo.RegisterEventMappers(repo.eventstore)
 
 	//TODO: simplify!!!!
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)
@@ -58,8 +66,23 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	repo.machineKeyAlg = userEncryptionAlgorithm
 	repo.machineKeySize = int(config.SystemDefaults.SecretGenerators.MachineKeySize)
 
+	aesOTPCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.Multifactors.OTP.VerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	repo.multifactors = global_model.Multifactors{
+		OTP: global_model.OTP{
+			CryptoMFA: aesOTPCrypto,
+			Issuer:    config.SystemDefaults.Multifactors.OTP.Issuer,
+		},
+	}
 	passwordAlg := crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
 	repo.applicationSecretGenerator = crypto.NewHashGenerator(config.SystemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
+	web, err := webauthn_helper.StartServer(config.SystemDefaults.WebAuthN)
+	if err != nil {
+		return nil, err
+	}
+	repo.webauthn = web
 	return repo, nil
 }
 

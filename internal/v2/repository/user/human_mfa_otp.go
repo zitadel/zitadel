@@ -52,18 +52,20 @@ func HumanOTPAddedEventMapper(event *repository.Event) (eventstore.EventReader, 
 
 type HumanOTPVerifiedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	UserAgentID          string `json:"userAgentID,omitempty"`
 }
 
 func (e *HumanOTPVerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanOTPVerifiedEvent(ctx context.Context) *HumanOTPVerifiedEvent {
+func NewHumanOTPVerifiedEvent(ctx context.Context, userAgentID string) *HumanOTPVerifiedEvent {
 	return &HumanOTPVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanMFAOTPVerifiedType,
 		),
+		UserAgentID: userAgentID,
 	}
 }
 

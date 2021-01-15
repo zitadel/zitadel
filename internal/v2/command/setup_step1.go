@@ -105,20 +105,18 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 				Name:    organisation.Name,
 				Domains: []*domain.OrgDomain{{Domain: organisation.Domain}},
 			},
-			&domain.User{
-				UserName: organisation.Owner.UserName,
-				Human: &domain.Human{
-					Profile: &domain.Profile{
-						FirstName: organisation.Owner.FirstName,
-						LastName:  organisation.Owner.LastName,
-					},
-					Password: &domain.Password{
-						SecretString: organisation.Owner.Password,
-					},
-					Email: &domain.Email{
-						EmailAddress:    organisation.Owner.Email,
-						IsEmailVerified: true,
-					},
+			&domain.Human{
+				Username: organisation.Owner.UserName,
+				Profile: &domain.Profile{
+					FirstName: organisation.Owner.FirstName,
+					LastName:  organisation.Owner.LastName,
+				},
+				Password: &domain.Password{
+					SecretString: organisation.Owner.Password,
+				},
+				Email: &domain.Email{
+					EmailAddress:    organisation.Owner.Email,
+					IsEmailVerified: true,
 				},
 			})
 		if err != nil {

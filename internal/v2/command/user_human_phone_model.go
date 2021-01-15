@@ -2,10 +2,11 @@ package command
 
 import (
 	"context"
-
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
+	"time"
 )
 
 type HumanPhoneWriteModel struct {
@@ -13,6 +14,10 @@ type HumanPhoneWriteModel struct {
 
 	Phone           string
 	IsPhoneVerified bool
+
+	Code             *crypto.CryptoValue
+	CodeCreationDate time.Time
+	CodeExpiry       time.Duration
 
 	State domain.PhoneState
 }
@@ -27,20 +32,7 @@ func NewHumanPhoneWriteModel(userID, resourceOwner string) *HumanPhoneWriteModel
 }
 
 func (wm *HumanPhoneWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.AppendEvents(e)
-		case *user.HumanPhoneChangedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanPhoneVerifiedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanPhoneRemovedEvent:
-			wm.AppendEvents(e)
-		case *user.UserRemovedEvent:
-			wm.AppendEvents(e)
-		}
-	}
+	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanPhoneWriteModel) Reduce() error {
@@ -49,8 +41,8 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 		case *user.HumanAddedEvent:
 			if e.PhoneNumber != "" {
 				wm.Phone = e.PhoneNumber
-				wm.State = domain.PhoneStateActive
 			}
+			wm.State = domain.PhoneStateActive
 		case *user.HumanRegisteredEvent:
 			if e.PhoneNumber != "" {
 				wm.Phone = e.PhoneNumber
@@ -60,8 +52,14 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 			wm.Phone = e.PhoneNumber
 			wm.IsPhoneVerified = false
 			wm.State = domain.PhoneStateActive
+			wm.Code = nil
 		case *user.HumanPhoneVerifiedEvent:
 			wm.IsPhoneVerified = true
+			wm.Code = nil
+		case *user.HumanPhoneCodeAddedEvent:
+			wm.Code = e.Code
+			wm.CodeCreationDate = e.CreationDate()
+			wm.CodeExpiry = e.Expiry
 		case *user.HumanPhoneRemovedEvent:
 			wm.State = domain.PhoneStateRemoved
 		case *user.UserRemovedEvent:

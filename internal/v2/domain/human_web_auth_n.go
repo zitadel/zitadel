@@ -39,16 +39,19 @@ const (
 	UserVerificationRequirementDiscouraged
 )
 
-type WebAuthNState int32
+type AuthenticatorAttachment int32
 
 const (
-	WebAuthNStateUnspecified WebAuthNState = iota
-	WebAuthNStateActive
-	WebAuthNStateRemoved
-
-	webAuthNStateCount
+	AuthenticatorAttachmentUnspecified AuthenticatorAttachment = iota
+	AuthenticatorAttachmentPlattform
+	AuthenticatorAttachmentCrossPlattform
 )
 
-func (s WebAuthNState) Valid() bool {
-	return s >= 0 && s < webAuthNStateCount
+func GetTokenToVerify(tokens []*WebAuthNToken) (int, *WebAuthNToken) {
+	for i, u2f := range tokens {
+		if u2f.State == MFAStateNotReady {
+			return i, u2f
+		}
+	}
+	return -1, nil
 }
