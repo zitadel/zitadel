@@ -7,6 +7,7 @@
     @return map-get(map-get($palette, contrast), $hue);
 }
 
+// add contrast colors to the palette to display text on buttons or the user avatar
 @function lgn-palette($base-palette, $default: 500, $lighter: 100, $darker: 700, $text: $default) {
     $result: map-merge($base-palette, (
       default: map-get($base-palette, $default),

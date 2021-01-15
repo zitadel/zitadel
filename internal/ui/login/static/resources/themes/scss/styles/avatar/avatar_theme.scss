@@ -1,4 +1,5 @@
 @import './avatar.scss';
+@import "../elevation/elevation.scss";
 
 @mixin lgn-avatar-theme($theme-or-color-config) {
     $theme: lgn-private-legacy-get-theme($theme-or-color-config);
@@ -15,10 +16,51 @@
     $primary: map-get($config, primary);
 
     .lgn-avatar:not(.transparent) {
-        background-color: lgn-color($primary, default); // default color -> gets overwritten by script using the initial letters of the name
+        @include _lgn-avatar-theme-property($config, "background-color", default);
+        @include lgn-button-elevation(2, $config);
     }
 
     .lgn-avatar .initials{
-        color: white;
+        @include _lgn-avatar-theme-property($config, "color", default-contrast);
     }
 }
+
+@mixin _lgn-avatar-theme-property($theme, $property, $hue) {
+    $primary: map-get($theme, primary);
+    $accent: map-get($theme, accent);
+    $warn: map-get($theme, warn);
+    $background: map-get($theme, background);
+    $foreground: map-get($theme, foreground);
+  
+    &.lgn-primary {
+      #{$property}: lgn-color($primary, $hue);
+    }
+    &.lgn-accent {
+      #{$property}: lgn-color($accent, $hue);
+    }
+    &.lgn-warn {
+      #{$property}: lgn-color($warn, $hue);
+    }
+  
+    &.lgn-primary,
+    &.lgn-accent,
+    &.lgn-warn,
+    &[disabled] {
+        &[disabled] {
+            $palette: if($property == "color", $foreground, $background);
+            #{$property}: lgn-color($palette, disabled-button);
+        }
+    }
+}
+
+@mixin lgn-avatar-elevation($zValue, $config, $opacity: $lgn-elevation-opacity) {
+    $foreground: map-get($config, foreground);
+    $elevation-color: map-get($foreground, elevation);
+    $elevation-color-or-default: if(
+      $elevation-color == null,
+      $lgn-elevation-color,
+      $elevation-color
+    );
+  
+    @include lgn-elevation($zValue, $elevation-color-or-default, $opacity);
+  }

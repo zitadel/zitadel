@@ -939,11 +939,32 @@ a:hover, a:active {
 }
 
 .lgn-avatar:not(.transparent) {
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+.lgn-avatar:not(.transparent).lgn-primary {
   background-color: #5282c1;
 }
+.lgn-avatar:not(.transparent).lgn-accent {
+  background-color: #5282c1;
+}
+.lgn-avatar:not(.transparent).lgn-warn {
+  background-color: #f44336;
+}
+.lgn-avatar:not(.transparent).lgn-primary[disabled], .lgn-avatar:not(.transparent).lgn-accent[disabled], .lgn-avatar:not(.transparent).lgn-warn[disabled], .lgn-avatar:not(.transparent)[disabled][disabled] {
+  background-color: rgba(255, 255, 255, 0.12);
+}
 
-.lgn-avatar .initials {
+.lgn-avatar .initials.lgn-primary {
   color: white;
+}
+.lgn-avatar .initials.lgn-accent {
+  color: white;
+}
+.lgn-avatar .initials.lgn-warn {
+  color: white;
+}
+.lgn-avatar .initials.lgn-primary[disabled], .lgn-avatar .initials.lgn-accent[disabled], .lgn-avatar .initials.lgn-warn[disabled], .lgn-avatar .initials[disabled][disabled] {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .lgn-select, select {
@@ -1220,10 +1241,31 @@ a:hover, a:active {
   color: #f44336;
 }
 .lgn-dark-theme .lgn-avatar:not(.transparent) {
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+.lgn-dark-theme .lgn-avatar:not(.transparent).lgn-primary {
   background-color: #5282c1;
 }
-.lgn-dark-theme .lgn-avatar .initials {
+.lgn-dark-theme .lgn-avatar:not(.transparent).lgn-accent {
+  background-color: #5282c1;
+}
+.lgn-dark-theme .lgn-avatar:not(.transparent).lgn-warn {
+  background-color: #f44336;
+}
+.lgn-dark-theme .lgn-avatar:not(.transparent).lgn-primary[disabled], .lgn-dark-theme .lgn-avatar:not(.transparent).lgn-accent[disabled], .lgn-dark-theme .lgn-avatar:not(.transparent).lgn-warn[disabled], .lgn-dark-theme .lgn-avatar:not(.transparent)[disabled][disabled] {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+.lgn-dark-theme .lgn-avatar .initials.lgn-primary {
   color: white;
+}
+.lgn-dark-theme .lgn-avatar .initials.lgn-accent {
+  color: white;
+}
+.lgn-dark-theme .lgn-avatar .initials.lgn-warn {
+  color: white;
+}
+.lgn-dark-theme .lgn-avatar .initials.lgn-primary[disabled], .lgn-dark-theme .lgn-avatar .initials.lgn-accent[disabled], .lgn-dark-theme .lgn-avatar .initials.lgn-warn[disabled], .lgn-dark-theme .lgn-avatar .initials[disabled][disabled] {
+  color: rgba(255, 255, 255, 0.3);
 }
 .lgn-dark-theme .lgn-select, .lgn-dark-theme select {
   background-image: url("../select_arrow_dark.svg");
@@ -1498,10 +1540,31 @@ a:hover, a:active {
   color: #f44336;
 }
 .lgn-light-theme .lgn-avatar:not(.transparent) {
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+.lgn-light-theme .lgn-avatar:not(.transparent).lgn-primary {
   background-color: #5469d4;
 }
-.lgn-light-theme .lgn-avatar .initials {
+.lgn-light-theme .lgn-avatar:not(.transparent).lgn-accent {
+  background-color: #5469d4;
+}
+.lgn-light-theme .lgn-avatar:not(.transparent).lgn-warn {
+  background-color: #f44336;
+}
+.lgn-light-theme .lgn-avatar:not(.transparent).lgn-primary[disabled], .lgn-light-theme .lgn-avatar:not(.transparent).lgn-accent[disabled], .lgn-light-theme .lgn-avatar:not(.transparent).lgn-warn[disabled], .lgn-light-theme .lgn-avatar:not(.transparent)[disabled][disabled] {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.lgn-light-theme .lgn-avatar .initials.lgn-primary {
   color: white;
+}
+.lgn-light-theme .lgn-avatar .initials.lgn-accent {
+  color: white;
+}
+.lgn-light-theme .lgn-avatar .initials.lgn-warn {
+  color: white;
+}
+.lgn-light-theme .lgn-avatar .initials.lgn-primary[disabled], .lgn-light-theme .lgn-avatar .initials.lgn-accent[disabled], .lgn-light-theme .lgn-avatar .initials.lgn-warn[disabled], .lgn-light-theme .lgn-avatar .initials[disabled][disabled] {
+  color: rgba(0, 0, 0, 0.26);
 }
 .lgn-light-theme .lgn-select, .lgn-light-theme select {
   background-image: url("../select_arrow_light.svg");

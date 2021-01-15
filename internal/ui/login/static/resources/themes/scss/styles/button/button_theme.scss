@@ -31,7 +31,7 @@
   .lgn-button:focus,
   .lgn-stroked-button:focus,
   .lgn-raised-button:focus {
-    @include lgn-b-elevation(8, $config);
+    @include lgn-button-elevation(8, $config);
     background: map-get($background, base);
   }
 
@@ -69,14 +69,14 @@
 
   .lgn-button,
   .lgn-stroked-button {
-    @include lgn-b-elevation(0, $config);
+    @include lgn-button-elevation(0, $config);
   }
 
   .lgn-raised-button {
-    @include lgn-b-elevation(2, $config);
+    @include lgn-button-elevation(2, $config);
 
     &:not([disabled]):active {
-      @include lgn-b-elevation(8, $config);
+      @include lgn-button-elevation(8, $config);
     }
 
     // &:focus {
@@ -84,7 +84,7 @@
     // }
 
     &[disabled] {
-      @include lgn-b-elevation(0, $config);
+      @include lgn-button-elevation(0, $config);
     }
   }
 }
@@ -110,10 +110,10 @@
   &.lgn-accent,
   &.lgn-warn,
   &[disabled] {
-    &[disabled] {
-      $palette: if($property == "color", $foreground, $background);
-      #{$property}: lgn-color($palette, disabled-button);
-    }
+        &[disabled] {
+            $palette: if($property == "color", $foreground, $background);
+            #{$property}: lgn-color($palette, disabled-button);
+        }
   }
 }
 
@@ -136,7 +136,7 @@
   }
 }
 
-@mixin lgn-b-elevation($zValue, $config, $opacity: $lgn-elevation-opacity) {
+@mixin lgn-button-elevation($zValue, $config, $opacity: $lgn-elevation-opacity) {
   $foreground: map-get($config, foreground);
   $elevation-color: map-get($foreground, elevation);
   $elevation-color-or-default: if(

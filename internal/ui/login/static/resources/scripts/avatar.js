@@ -12,6 +12,8 @@ for (let i = 0; i < avatars.length; i++) {
 
         const color = this.getColor(displayName);
         avatars[i].style.background = color;
+        // set default white text instead of contrast text mode
+        avatars[i].style.color = '#ffffff';
     }
 }
 
