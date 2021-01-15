@@ -112,12 +112,11 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	)
 
 	if err != nil {
-		logging.Log("SQL-kn1Sw").WithError(err).Warn("unable to scan row")
-		return z_errors.ThrowInternal(err, "SQL-J0hFS", "unable to scan row")
+		logging.Log("SQL-3mofs").WithError(err).Warn("unable to scan row")
+		return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 	}
 
 	event.PreviousSequence = uint64(previousSequence)
-
 	event.Data = make([]byte, len(data))
 	copy(event.Data, data)
 

@@ -9,22 +9,18 @@ import (
 	"golang.org/x/text/language"
 )
 
-func userCreateRequestToDomain(user *admin.CreateUserRequest) *domain.User {
-	var human *domain.Human
-	var machine *domain.Machine
-
+func userCreateRequestToDomain(user *admin.CreateUserRequest) (*domain.Human, *domain.Machine) {
 	if h := user.GetHuman(); h != nil {
-		human = humanCreateToDomain(h)
+		human := humanCreateToDomain(h)
+		human.Username = user.UserName
+		return human, nil
 	}
 	if m := user.GetMachine(); m != nil {
-		machine = machineCreateToDomain(m)
+		machine := machineCreateToDomain(m)
+		machine.Username = user.UserName
+		return nil, machine
 	}
-
-	return &domain.User{
-		UserName: user.UserName,
-		Human:    human,
-		Machine:  machine,
-	}
+	return nil, nil
 }
 
 func humanCreateToDomain(u *admin.CreateHumanRequest) *domain.Human {

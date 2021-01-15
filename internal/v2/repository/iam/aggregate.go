@@ -19,23 +19,6 @@ type Aggregate struct {
 	eventstore.Aggregate
 }
 
-func NewAggregate(
-	id,
-	resourceOwner string,
-	previousSequence uint64,
-) *Aggregate {
-
-	return &Aggregate{
-		Aggregate: *eventstore.NewAggregate(
-			id,
-			AggregateType,
-			resourceOwner,
-			AggregateVersion,
-			previousSequence,
-		),
-	}
-}
-
 func (a *Aggregate) PushStepStarted(ctx context.Context, step domain.Step) *Aggregate {
 	a.Aggregate = *a.PushEvents(NewSetupStepStartedEvent(ctx, step))
 	return a

@@ -114,7 +114,7 @@ service ManagementService {
     };
   }
 
-  rpc DeactivateUser(UserID) returns (UserResponse) {
+  rpc DeactivateUser(UserID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{id}/_deactivate"
       body: "*"
@@ -125,7 +125,7 @@ service ManagementService {
     };
   }
 
-  rpc ReactivateUser(UserID) returns (UserResponse) {
+  rpc ReactivateUser(UserID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{id}/_reactivate"
       body: "*"
@@ -136,7 +136,7 @@ service ManagementService {
     };
   }
 
-  rpc LockUser(UserID) returns (UserResponse) {
+  rpc LockUser(UserID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{id}/_lock"
       body: "*"
@@ -147,7 +147,7 @@ service ManagementService {
     };
   }
 
-  rpc UnlockUser(UserID) returns (UserResponse) {
+  rpc UnlockUser(UserID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{id}/_unlock"
       body: "*"
@@ -1741,16 +1741,15 @@ message CreateMachineRequest {
 message UserResponse {
   string id = 1;
   UserState state = 2;
-  google.protobuf.Timestamp creation_date = 3;
-  google.protobuf.Timestamp change_date = 4;
-  uint64 sequence = 5;
-  string user_name = 6;
+  google.protobuf.Timestamp change_date = 3;
+  uint64 sequence = 4;
+  string user_name = 5;
 
   oneof user {
     option (validate.required) = true;
 
-    HumanResponse human = 7;
-    MachineResponse machine = 8;
+    HumanResponse human = 6;
+    MachineResponse machine = 7;
   }
 }
 
@@ -1954,8 +1953,7 @@ message UserProfile {
   string preferred_language = 6;
   Gender gender = 7;
   uint64 sequence = 8;
-  google.protobuf.Timestamp creation_date = 9;
-  google.protobuf.Timestamp change_date = 10;
+  google.protobuf.Timestamp change_date = 9;
 }
 
 message UserProfileView {
@@ -1992,8 +1990,7 @@ message UserEmail {
   string email = 2;
   bool is_email_verified = 3;
   uint64 sequence = 4;
-  google.protobuf.Timestamp creation_date = 5;
-  google.protobuf.Timestamp change_date = 6;
+  google.protobuf.Timestamp change_date = 5;
 }
 
 message UserEmailView {
@@ -2016,8 +2013,7 @@ message UserPhone {
   string phone = 2;
   bool is_phone_verified = 3;
   uint64 sequence = 5;
-  google.protobuf.Timestamp creation_date = 6;
-  google.protobuf.Timestamp change_date = 7;
+  google.protobuf.Timestamp change_date = 6;
 }
 
 message UserPhoneView {
@@ -2043,8 +2039,7 @@ message UserAddress {
   string region = 5;
   string street_address = 6;
   uint64 sequence = 7;
-  google.protobuf.Timestamp creation_date = 8;
-  google.protobuf.Timestamp change_date = 9;
+  google.protobuf.Timestamp change_date = 8;
 }
 
 message UserAddressView {
@@ -2528,7 +2523,6 @@ enum AppState {
 message Application {
   string id = 1;
   AppState state = 2;
-  google.protobuf.Timestamp creation_date = 3;
   google.protobuf.Timestamp change_date = 4;
   string name = 5;
   oneof app_config {

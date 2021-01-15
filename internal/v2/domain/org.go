@@ -12,6 +12,7 @@ type Org struct {
 	State OrgState
 	Name  string
 
+	PrimaryDomain            string
 	Domains                  []*OrgDomain
 	Members                  []*Member
 	OrgIamPolicy             *OrgIAMPolicy

@@ -26,18 +26,7 @@ func NewHumanPasswordWriteModel(userID, resourceOwner string) *HumanPasswordWrit
 }
 
 func (wm *HumanPasswordWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *user.HumanPasswordChangedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.AppendEvents(e)
-		case *user.HumanEmailVerifiedEvent:
-			wm.AppendEvents(e)
-		case *user.UserRemovedEvent:
-			wm.AppendEvents(e)
-		}
-	}
+	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanPasswordWriteModel) Reduce() error {

@@ -33,16 +33,7 @@ func NewHumanProfileWriteModel(userID, resourceOwner string) *HumanProfileWriteM
 }
 
 func (wm *HumanProfileWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *user.HumanProfileChangedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.AppendEvents(e)
-		case *user.UserRemovedEvent:
-			wm.AppendEvents(e)
-		}
-	}
+	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanProfileWriteModel) Reduce() error {

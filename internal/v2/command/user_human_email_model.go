@@ -2,10 +2,11 @@ package command
 
 import (
 	"context"
-
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
+	"time"
 )
 
 type HumanEmailWriteModel struct {
@@ -13,6 +14,10 @@ type HumanEmailWriteModel struct {
 
 	Email           string
 	IsEmailVerified bool
+
+	Code             *crypto.CryptoValue
+	CodeCreationDate time.Time
+	CodeExpiry       time.Duration
 
 	UserState domain.UserState
 }
@@ -27,18 +32,7 @@ func NewHumanEmailWriteModel(userID, resourceOwner string) *HumanEmailWriteModel
 }
 
 func (wm *HumanEmailWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *user.HumanEmailChangedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanEmailVerifiedEvent:
-			wm.AppendEvents(e)
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.AppendEvents(e)
-		case *user.UserRemovedEvent:
-			wm.AppendEvents(e)
-		}
-	}
+	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanEmailWriteModel) Reduce() error {
@@ -53,8 +47,14 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 		case *user.HumanEmailChangedEvent:
 			wm.Email = e.EmailAddress
 			wm.IsEmailVerified = false
+			wm.Code = nil
+		case *user.HumanEmailCodeAddedEvent:
+			wm.Code = e.Code
+			wm.CodeCreationDate = e.CreationDate()
+			wm.CodeExpiry = e.Expiry
 		case *user.HumanEmailVerifiedEvent:
 			wm.IsEmailVerified = true
+			wm.Code = nil
 			if wm.UserState == domain.UserStateInitial {
 				wm.UserState = domain.UserStateActive
 			}

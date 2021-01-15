@@ -8,9 +8,12 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/id"
+	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/org"
+	usr_repo "github.com/caos/zitadel/internal/v2/repository/user"
+	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 )
 
 type CommandSide struct {
@@ -31,6 +34,9 @@ type CommandSide struct {
 	domainVerificationAlg       *crypto.AESCrypto
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
+	//TODO: remove global model, or move to domain
+	multifactors global_model.Multifactors
+	webauthn     *webauthn_helper.WebAuthN
 }
 
 type Config struct {
@@ -46,6 +52,7 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
+	usr_repo.RegisterEventMappers(repo.eventstore)
 
 	//TODO: simplify!!!!
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)
@@ -64,6 +71,16 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	repo.machineKeyAlg = userEncryptionAlgorithm
 	repo.machineKeySize = int(config.SystemDefaults.SecretGenerators.MachineKeySize)
 
+	aesOTPCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.Multifactors.OTP.VerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	repo.multifactors = global_model.Multifactors{
+		OTP: global_model.OTP{
+			CryptoMFA: aesOTPCrypto,
+			Issuer:    config.SystemDefaults.Multifactors.OTP.Issuer,
+		},
+	}
 	passwordAlg := crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
 	repo.applicationSecretGenerator = crypto.NewHashGenerator(config.SystemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
 
@@ -73,6 +90,11 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	}
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(config.SystemDefaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = http.ValidateDomain
+	web, err := webauthn_helper.StartServer(config.SystemDefaults.WebAuthN)
+	if err != nil {
+		return nil, err
+	}
+	repo.webauthn = web
 	return repo, nil
 }
 

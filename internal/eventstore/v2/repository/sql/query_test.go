@@ -329,9 +329,9 @@ func Test_query_events_with_crdb(t *testing.T) {
 			fields: fields{
 				client: testCRDBClient,
 				existingEvents: []*repository.Event{
-					generateEvent(t, "300", false, 0),
-					generateEvent(t, "300", false, 0),
-					generateEvent(t, "300", false, 0),
+					generateEvent(t, "300"),
+					generateEvent(t, "300"),
+					generateEvent(t, "300"),
 				},
 			},
 			res: res{
@@ -352,10 +352,10 @@ func Test_query_events_with_crdb(t *testing.T) {
 			fields: fields{
 				client: testCRDBClient,
 				existingEvents: []*repository.Event{
-					generateEvent(t, "301", false, 0),
-					generateEvent(t, "302", false, 0),
-					generateEvent(t, "302", false, 0),
-					generateEvent(t, "303", false, 0, func(e *repository.Event) { e.AggregateType = "not in list" }),
+					generateEvent(t, "301"),
+					generateEvent(t, "302"),
+					generateEvent(t, "302"),
+					generateEvent(t, "303", func(e *repository.Event) { e.AggregateType = "not in list" }),
 				},
 			},
 			res: res{
@@ -377,11 +377,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			fields: fields{
 				client: testCRDBClient,
 				existingEvents: []*repository.Event{
-					generateEvent(t, "303", false, 0),
-					generateEvent(t, "303", false, 0),
-					generateEvent(t, "303", false, 0),
-					generateEvent(t, "304", false, 0, func(e *repository.Event) { e.AggregateType = "not in list" }),
-					generateEvent(t, "305", false, 0),
+					generateEvent(t, "303"),
+					generateEvent(t, "303"),
+					generateEvent(t, "303"),
+					generateEvent(t, "304", func(e *repository.Event) { e.AggregateType = "not in list" }),
+					generateEvent(t, "305"),
 				},
 			},
 			res: res{
@@ -402,11 +402,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			fields: fields{
 				client: testCRDBClient,
 				existingEvents: []*repository.Event{
-					generateEvent(t, "306", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "307", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "308", false, 0, func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "309", false, 0, func(e *repository.Event) { e.ResourceOwner = "orgID" }),
-					generateEvent(t, "309", false, 0, func(e *repository.Event) { e.ResourceOwner = "orgID" }),
+					generateEvent(t, "306", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "307", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "308", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "309", func(e *repository.Event) { e.ResourceOwner = "orgID" }),
+					generateEvent(t, "309", func(e *repository.Event) { e.ResourceOwner = "orgID" }),
 				},
 			},
 			res: res{
@@ -428,11 +428,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			fields: fields{
 				client: testCRDBClient,
 				existingEvents: []*repository.Event{
-					generateEvent(t, "307", false, 0, func(e *repository.Event) { e.EditorService = "MANAGEMENT-API" }),
-					generateEvent(t, "307", false, 0, func(e *repository.Event) { e.EditorService = "MANAGEMENT-API" }),
-					generateEvent(t, "308", false, 0, func(e *repository.Event) { e.EditorService = "ADMIN-API" }),
-					generateEvent(t, "309", false, 0, func(e *repository.Event) { e.EditorService = "AUTHAPI" }),
-					generateEvent(t, "309", false, 0, func(e *repository.Event) { e.EditorService = "AUTHAPI" }),
+					generateEvent(t, "307", func(e *repository.Event) { e.EditorService = "MANAGEMENT-API" }),
+					generateEvent(t, "307", func(e *repository.Event) { e.EditorService = "MANAGEMENT-API" }),
+					generateEvent(t, "308", func(e *repository.Event) { e.EditorService = "ADMIN-API" }),
+					generateEvent(t, "309", func(e *repository.Event) { e.EditorService = "AUTHAPI" }),
+					generateEvent(t, "309", func(e *repository.Event) { e.EditorService = "AUTHAPI" }),
 				},
 			},
 			res: res{
@@ -455,13 +455,13 @@ func Test_query_events_with_crdb(t *testing.T) {
 			fields: fields{
 				client: testCRDBClient,
 				existingEvents: []*repository.Event{
-					generateEvent(t, "310", false, 0, func(e *repository.Event) { e.EditorUser = "adlerhurst" }),
-					generateEvent(t, "310", false, 0, func(e *repository.Event) { e.EditorUser = "adlerhurst" }),
-					generateEvent(t, "310", false, 0, func(e *repository.Event) { e.EditorUser = "nobody" }),
-					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.EditorUser = "" }),
-					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.EditorUser = "" }),
-					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.EditorUser = "fforootd" }),
-					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.EditorUser = "fforootd" }),
+					generateEvent(t, "310", func(e *repository.Event) { e.EditorUser = "adlerhurst" }),
+					generateEvent(t, "310", func(e *repository.Event) { e.EditorUser = "adlerhurst" }),
+					generateEvent(t, "310", func(e *repository.Event) { e.EditorUser = "nobody" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.EditorUser = "" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.EditorUser = "" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.EditorUser = "fforootd" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.EditorUser = "fforootd" }),
 				},
 			},
 			res: res{
@@ -483,15 +483,15 @@ func Test_query_events_with_crdb(t *testing.T) {
 			fields: fields{
 				client: testCRDBClient,
 				existingEvents: []*repository.Event{
-					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.Type = "user.created" }),
-					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.Type = "user.updated" }),
-					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.Type = "user.deactivated" }),
-					generateEvent(t, "311", false, 0, func(e *repository.Event) { e.Type = "user.locked" }),
-					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.Type = "user.created" }),
-					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.Type = "user.updated" }),
-					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.Type = "user.deactivated" }),
-					generateEvent(t, "312", false, 0, func(e *repository.Event) { e.Type = "user.reactivated" }),
-					generateEvent(t, "313", false, 0, func(e *repository.Event) { e.Type = "user.locked" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.Type = "user.created" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.Type = "user.updated" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.Type = "user.deactivated" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.Type = "user.locked" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.Type = "user.created" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.Type = "user.updated" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.Type = "user.deactivated" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.Type = "user.reactivated" }),
+					generateEvent(t, "313", func(e *repository.Event) { e.Type = "user.locked" }),
 				},
 			},
 			res: res{

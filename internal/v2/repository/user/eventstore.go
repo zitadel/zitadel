@@ -37,7 +37,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(UserV1MFAOTPCheckSucceededType, HumanOTPCheckSucceededEventMapper).
 		RegisterFilterEventMapper(UserV1MFAOTPCheckFailedType, HumanOTPCheckFailedEventMapper).
 		RegisterFilterEventMapper(UserLockedType, UserLockedEventMapper).
-		RegisterFilterEventMapper(UserUnlockedType, UserLockedEventMapper).
+		RegisterFilterEventMapper(UserUnlockedType, UserUnlockedEventMapper).
 		RegisterFilterEventMapper(UserDeactivatedType, UserDeactivatedEventMapper).
 		RegisterFilterEventMapper(UserReactivatedType, UserReactivatedEventMapper).
 		RegisterFilterEventMapper(UserRemovedType, UserRemovedEventMapper).

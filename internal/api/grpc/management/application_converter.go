@@ -17,20 +17,16 @@ import (
 )
 
 func appFromModel(app *proj_model.Application) *management.Application {
-	creationDate, err := ptypes.TimestampProto(app.CreationDate)
-	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
-
 	changeDate, err := ptypes.TimestampProto(app.ChangeDate)
 	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
 
 	return &management.Application{
-		Id:           app.AppID,
-		State:        appStateFromModel(app.State),
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Name:         app.Name,
-		Sequence:     app.Sequence,
-		AppConfig:    appConfigFromModel(app),
+		Id:         app.AppID,
+		State:      appStateFromModel(app.State),
+		ChangeDate: changeDate,
+		Name:       app.Name,
+		Sequence:   app.Sequence,
+		AppConfig:  appConfigFromModel(app),
 	}
 }
 

@@ -194,7 +194,7 @@ func updatePhoneToDomain(ctx context.Context, e *auth.UpdateUserPhoneRequest) *d
 	}
 }
 
-func addressFromModel(address *usr_model.Address) *auth.UserAddress {
+func addressFromDomain(address *domain.Address) *auth.UserAddress {
 	creationDate, err := ptypes.TimestampProto(address.CreationDate)
 	logging.Log("GRPC-65FRs").OnError(err).Debug("unable to parse timestamp")
 
@@ -234,8 +234,8 @@ func addressViewFromModel(address *usr_model.Address) *auth.UserAddressView {
 	}
 }
 
-func updateAddressToModel(ctx context.Context, address *auth.UpdateUserAddressRequest) *usr_model.Address {
-	return &usr_model.Address{
+func updateAddressToDomain(ctx context.Context, address *auth.UpdateUserAddressRequest) *domain.Address {
+	return &domain.Address{
 		ObjectRoot:    ctxToObjectRoot(ctx),
 		Country:       address.Country,
 		StreetAddress: address.StreetAddress,
@@ -252,11 +252,11 @@ func externalIDPSearchRequestToModel(request *auth.ExternalIDPSearchRequest) *us
 	}
 }
 
-func externalIDPRemoveToModel(ctx context.Context, idp *auth.ExternalIDPRemoveRequest) *usr_model.ExternalIDP {
-	return &usr_model.ExternalIDP{
-		ObjectRoot:  ctxToObjectRoot(ctx),
-		IDPConfigID: idp.IdpConfigId,
-		UserID:      idp.ExternalUserId,
+func externalIDPRemoveToDomain(ctx context.Context, idp *auth.ExternalIDPRemoveRequest) *domain.ExternalIDP {
+	return &domain.ExternalIDP{
+		ObjectRoot:     ctxToObjectRoot(ctx),
+		IDPConfigID:    idp.IdpConfigId,
+		ExternalUserID: idp.ExternalUserId,
 	}
 }
 
@@ -308,12 +308,12 @@ func externalIDPViewFromModel(externalIDP *usr_model.ExternalIDPView) *auth.Exte
 	}
 }
 
-func otpFromModel(otp *usr_model.OTP) *auth.MfaOtpResponse {
+func otpFromDomain(otp *domain.OTP) *auth.MfaOtpResponse {
 	return &auth.MfaOtpResponse{
 		UserId: otp.AggregateID,
 		Url:    otp.Url,
 		Secret: otp.SecretString,
-		State:  mfaStateFromModel(otp.State),
+		State:  mfaStateFromDomain(otp.State),
 	}
 }
 
@@ -360,11 +360,11 @@ func genderToDomain(gender auth.Gender) domain.Gender {
 	}
 }
 
-func mfaStateFromModel(state usr_model.MFAState) auth.MFAState {
+func mfaStateFromDomain(state domain.MFAState) auth.MFAState {
 	switch state {
-	case usr_model.MFAStateReady:
+	case domain.MFAStateReady:
 		return auth.MFAState_MFASTATE_READY
-	case usr_model.MFAStateNotReady:
+	case domain.MFAStateNotReady:
 		return auth.MFAState_MFASTATE_NOT_READY
 	default:
 		return auth.MFAState_MFASTATE_UNSPECIFIED
@@ -381,7 +381,7 @@ func mfasFromModel(mfas []*usr_model.MultiFactor) []*auth.MultiFactor {
 
 func mfaFromModel(mfa *usr_model.MultiFactor) *auth.MultiFactor {
 	return &auth.MultiFactor{
-		State:     mfaStateFromModel(mfa.State),
+		State:     auth.MFAState(mfa.State),
 		Type:      mfaTypeFromModel(mfa.Type),
 		Attribute: mfa.Attribute,
 		Id:        mfa.ID,
@@ -431,11 +431,11 @@ func userChangesToAPI(changes *usr_model.UserChanges) (_ []*auth.Change) {
 	return result
 }
 
-func verifyWebAuthNFromModel(u2f *usr_model.WebAuthNToken) *auth.WebAuthNResponse {
+func verifyWebAuthNFromDomain(u2f *domain.WebAuthNToken) *auth.WebAuthNResponse {
 	return &auth.WebAuthNResponse{
 		Id:        u2f.WebAuthNTokenID,
 		PublicKey: u2f.CredentialCreationData,
-		State:     mfaStateFromModel(u2f.State),
+		State:     mfaStateFromDomain(u2f.State),
 	}
 }
 
@@ -451,7 +451,7 @@ func webAuthNTokenFromModel(token *usr_model.WebAuthNToken) *auth.WebAuthNToken 
 	return &auth.WebAuthNToken{
 		Id:    token.WebAuthNTokenID,
 		Name:  token.WebAuthNTokenName,
-		State: mfaStateFromModel(token.State),
+		State: auth.MFAState(token.State),
 	}
 }
 

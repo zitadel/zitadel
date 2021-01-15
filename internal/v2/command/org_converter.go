@@ -6,9 +6,10 @@ import (
 
 func orgWriteModelToOrg(wm *OrgWriteModel) *domain.Org {
 	return &domain.Org{
-		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
-		Name:       wm.Name,
-		State:      wm.State,
+		ObjectRoot:    writeModelToObjectRoot(wm.WriteModel),
+		Name:          wm.Name,
+		State:         wm.State,
+		PrimaryDomain: wm.PrimaryDomain,
 	}
 }
 

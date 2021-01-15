@@ -24,11 +24,11 @@ func (r *CommandSide) SetOneTimePassword(ctx context.Context, orgID, userID, pas
 	return r.changePassword(ctx, orgID, userID, "", password, existingPassword)
 }
 
-func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID, resourceOwner string) (err error) {
+func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	existingPassword, err := r.passwordWriteModel(ctx, userID, resourceOwner)
+	existingPassword, err := r.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}

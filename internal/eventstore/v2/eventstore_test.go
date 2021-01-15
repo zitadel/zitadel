@@ -14,9 +14,8 @@ import (
 )
 
 type testAggregate struct {
-	id               string
-	events           []EventPusher
-	previousSequence uint64
+	id     string
+	events []EventPusher
 }
 
 func (a *testAggregate) ID() string {
@@ -37,10 +36,6 @@ func (a *testAggregate) ResourceOwner() string {
 
 func (a *testAggregate) Version() Version {
 	return "v1"
-}
-
-func (a *testAggregate) PreviousSequence() uint64 {
-	return a.previousSequence
 }
 
 // testEvent implements the Event interface
@@ -425,8 +420,8 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 			},
 			res: res{
 				wantErr: false,
-				events: linkEvents(
-					&repository.Event{
+				events: []*repository.Event{
+					{
 						AggregateID:   "1",
 						AggregateType: "test.aggregate",
 						Data:          []byte(nil),
@@ -436,7 +431,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Type:          "test.event",
 						Version:       "v1",
 					},
-					&repository.Event{
+					{
 						AggregateID:   "1",
 						AggregateType: "test.aggregate",
 						Data:          []byte(nil),
@@ -446,7 +441,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Type:          "test.event",
 						Version:       "v1",
 					},
-				),
+				},
 			},
 		},
 		{
@@ -507,8 +502,8 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 			res: res{
 				wantErr: false,
 				events: combineEventLists(
-					linkEvents(
-						&repository.Event{
+					[]*repository.Event{
+						{
 							AggregateID:   "1",
 							AggregateType: "test.aggregate",
 							Data:          []byte(nil),
@@ -518,7 +513,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Type:          "test.event",
 							Version:       "v1",
 						},
-						&repository.Event{
+						{
 							AggregateID:   "1",
 							AggregateType: "test.aggregate",
 							Data:          []byte(nil),
@@ -528,7 +523,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Type:          "test.event",
 							Version:       "v1",
 						},
-					),
+					},
 					[]*repository.Event{
 						{
 							AggregateID:   "2",
@@ -695,8 +690,8 @@ func TestEventstore_Push(t *testing.T) {
 			fields: fields{
 				repo: &testRepo{
 					t: t,
-					events: linkEvents(
-						&repository.Event{
+					events: []*repository.Event{
+						{
 							AggregateID:   "1",
 							AggregateType: "test.aggregate",
 							Data:          []byte(nil),
@@ -706,7 +701,7 @@ func TestEventstore_Push(t *testing.T) {
 							Type:          "test.event",
 							Version:       "v1",
 						},
-						&repository.Event{
+						{
 							AggregateID:   "1",
 							AggregateType: "test.aggregate",
 							Data:          []byte(nil),
@@ -716,7 +711,7 @@ func TestEventstore_Push(t *testing.T) {
 							Type:          "test.event",
 							Version:       "v1",
 						},
-					),
+					},
 				},
 				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
 					"test.event": func(e *repository.Event) (EventReader, error) {
@@ -766,8 +761,8 @@ func TestEventstore_Push(t *testing.T) {
 				repo: &testRepo{
 					t: t,
 					events: combineEventLists(
-						linkEvents(
-							&repository.Event{
+						[]*repository.Event{
+							{
 								AggregateID:   "1",
 								AggregateType: "test.aggregate",
 								Data:          []byte(nil),
@@ -777,7 +772,7 @@ func TestEventstore_Push(t *testing.T) {
 								Type:          "test.event",
 								Version:       "v1",
 							},
-							&repository.Event{
+							{
 								AggregateID:   "1",
 								AggregateType: "test.aggregate",
 								Data:          []byte(nil),
@@ -787,7 +782,7 @@ func TestEventstore_Push(t *testing.T) {
 								Type:          "test.event",
 								Version:       "v1",
 							},
-						),
+						},
 						[]*repository.Event{
 							{
 								AggregateID:   "2",
@@ -1305,7 +1300,7 @@ func combineEventLists(lists ...[]*repository.Event) []*repository.Event {
 
 func linkEvents(events ...*repository.Event) []*repository.Event {
 	for i := 1; i < len(events); i++ {
-		events[i].PreviousEvent = events[i-1]
+		// events[i].PreviousEvent = events[i-1]
 	}
 	return events
 }
@@ -1336,9 +1331,6 @@ func compareEvents(t *testing.T, want, got *repository.Event) {
 	}
 	if want.Version != got.Version {
 		t.Errorf("wrong version got %q want %q", got.Version, want.Version)
-	}
-	if (want.PreviousEvent == nil) != (got.PreviousEvent == nil) {
-		t.Errorf("linking failed got was linked: %v want was linked: %v", (got.PreviousEvent != nil), (want.PreviousEvent != nil))
 	}
 	if want.PreviousSequence != got.PreviousSequence {
 		t.Errorf("wrong previous sequence got %d want %d", got.PreviousSequence, want.PreviousSequence)
