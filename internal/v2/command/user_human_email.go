@@ -64,12 +64,14 @@ func (r *CommandSide) VerifyHumanEmail(ctx context.Context, userID, code, resour
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.emailVerificationCode)
-	if err != nil {
-		userAgg.PushEvents(user.NewHumanEmailVerificationFailedEvent(ctx))
-	} else {
+	if err == nil {
 		userAgg.PushEvents(user.NewHumanEmailVerifiedEvent(ctx))
+		return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
 	}
-	return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+	userAgg.PushEvents(user.NewHumanEmailVerificationFailedEvent(ctx))
+	err = r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+	logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID()).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
+	return caos_errs.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")	
 }
 
 func (r *CommandSide) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string) error {
