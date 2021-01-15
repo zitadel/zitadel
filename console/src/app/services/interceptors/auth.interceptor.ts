@@ -24,7 +24,6 @@ export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
         private dialog: MatDialog,
     ) {
         this.triggerDialog.pipe(debounceTime(1000)).subscribe(() => {
-            console.log('opendialog');
             this.openDialog();
         });
     }
