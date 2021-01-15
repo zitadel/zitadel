@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -64,12 +65,22 @@ func (r *CommandSide) VerifyHumanPhone(ctx context.Context, userID, code, resour
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.emailVerificationCode)
-	if err != nil {
-		userAgg.PushEvents(user.NewHumanPhoneVerificationFailedEvent(ctx))
-	} else {
+	if err == nil {
 		userAgg.PushEvents(user.NewHumanPhoneVerifiedEvent(ctx))
+		return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
 	}
-	return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+	userAgg.PushEvents(user.NewHumanPhoneVerificationFailedEvent(ctx))
+	err = r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.emailVerificationCode)
+	if err == nil {
+		userAgg.PushEvents(user.NewHumanEmailVerifiedEvent(ctx))
+		return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+	}
+	userAgg.PushEvents(user.NewHumanEmailVerificationFailedEvent(ctx))
+	err = r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+	logging.LogWithFields("COMMAND-5M9ds", "userID", userAgg.ID()).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
+	return caos_errs.ThrowInvalidArgument(err, "COMMAND-sM0cs", "Errors.User.Code.Invalid")
 }
 
 func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceowner string) error {

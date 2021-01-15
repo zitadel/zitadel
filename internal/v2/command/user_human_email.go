@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -71,7 +72,7 @@ func (r *CommandSide) VerifyHumanEmail(ctx context.Context, userID, code, resour
 	userAgg.PushEvents(user.NewHumanEmailVerificationFailedEvent(ctx))
 	err = r.eventstore.PushAggregate(ctx, existingCode, userAgg)
 	logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID()).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
-	return caos_errs.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")	
+	return caos_errs.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
 }
 
 func (r *CommandSide) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string) error {
