@@ -78,7 +78,7 @@ func MailTextFromModel(mailText *iam_model.MailText) *MailText {
 }
 
 func (p *MailText) Changes(changed *MailText) map[string]interface{} {
-	changes := make(map[string]interface{}, 2)
+	changes := make(map[string]interface{}, 8)
 
 	changes["mailTextType"] = changed.MailTextType
 

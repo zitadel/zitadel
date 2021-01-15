@@ -15,8 +15,8 @@ func (s *Server) GetDefaultMailTexts(ctx context.Context, _ *empty.Empty) (*admi
 	return textsViewFromModel(result), nil
 }
 
-func (s *Server) GetDefaultMailText(ctx context.Context, _ *empty.Empty) (*admin.DefaultMailTextView, error) {
-	result, err := s.iam.GetDefaultMailText(ctx, "type", "language") // todo wag
+func (s *Server) GetDefaultMailText(ctx context.Context, textType string, language string) (*admin.DefaultMailTextView, error) {
+	result, err := s.iam.GetDefaultMailText(ctx, textType, language)
 	if err != nil {
 		return nil, err
 	}

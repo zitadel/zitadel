@@ -32,7 +32,7 @@ func SendDomainClaimed(mailhtml string, text *iam_model.MailTextView, user *view
 	text.Text, err = templates.ParseTemplateText(text.Text, args)
 	text.Text = html.UnescapeString(text.Text)
 
-	emailCodeData := &EmailVerificationCodeData{
+	emailCodeData := &DomainClaimedData{
 		TemplateData: templates.TemplateData{
 			Title:          text.Title,
 			PreHeader:      text.PreHeader,

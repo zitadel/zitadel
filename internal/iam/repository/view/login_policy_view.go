@@ -11,8 +11,8 @@ import (
 
 func GetLoginPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.LoginPolicyView, error) {
 	policy := new(model.LoginPolicyView)
-	userIDQuery := &model.LoginPolicySearchQuery{Key: iam_model.LoginPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, userIDQuery)
+	aggregateIDQuery := &model.LoginPolicySearchQuery{Key: iam_model.LoginPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.IAM.LoginPolicy.NotExisting")

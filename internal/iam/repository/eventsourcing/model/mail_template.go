@@ -33,7 +33,7 @@ func MailTemplateFromModel(template *iam_model.MailTemplate) *MailTemplate {
 }
 
 func (p *MailTemplate) Changes(changed *MailTemplate) map[string]interface{} {
-	changes := make(map[string]interface{}, 2)
+	changes := make(map[string]interface{}, 1)
 	if b64.StdEncoding.EncodeToString(changed.Template) != b64.StdEncoding.EncodeToString(p.Template) {
 		changes["template"] = b64.StdEncoding.EncodeToString(changed.Template)
 	}

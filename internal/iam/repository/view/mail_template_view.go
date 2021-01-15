@@ -11,8 +11,8 @@ import (
 
 func GetMailTemplateByAggregateID(db *gorm.DB, table, aggregateID string) (*model.MailTemplateView, error) {
 	template := new(model.MailTemplateView)
-	userIDQuery := &model.MailTemplateSearchQuery{Key: iam_model.MailTemplateSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, userIDQuery)
+	aggregateIDQuery := &model.MailTemplateSearchQuery{Key: iam_model.MailTemplateSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, template)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-iPnmU", "Errors.IAM.MailTemplate.NotExisting")

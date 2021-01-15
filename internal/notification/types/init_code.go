@@ -42,7 +42,7 @@ func SendUserInitCode(mailhtml string, text *iam_model.MailTextView, user *view_
 	text.Text, err = templates.ParseTemplateText(text.Text, args)
 	text.Text = html.UnescapeString(text.Text)
 
-	emailCodeData := &EmailVerificationCodeData{
+	emailCodeData := &InitCodeEmailData{
 		TemplateData: templates.TemplateData{
 			Title:          text.Title,
 			PreHeader:      text.PreHeader,
