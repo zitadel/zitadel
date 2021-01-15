@@ -355,7 +355,7 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: calc(-45px);
+  top: -40px;
 }
 
 i {

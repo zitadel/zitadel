@@ -1,6 +1,8 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
+    <h1>{{t "MFAVerify.Title"}}</h1>
+
     {{ template "user-profile" . }}
 
     <p>{{t "MFAVerify.Description"}}</p>
@@ -20,6 +22,17 @@
 
     {{ template "error-message" .}}
 
+    {{ if .MFAProviders }}
+        <div class="mfa-other">
+            <p>{{t "MFA.ChooseOther"}}</p>
+            {{ range $provider := .MFAProviders}}
+            {{ $providerName := (t (printf "MFA.Provider%v" $provider)) }}
+            <button class="lgn-stroked-button lgn-primary" type="submit" name="provider" value="{{$provider}}"
+                formnovalidate>{{$providerName}}</button>
+            {{ end }}
+        </div>
+    {{ end }}
+
     <div class="lgn-actions">
         <!-- position element in header -->
         <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
@@ -28,16 +41,6 @@
         </a>
         <span class="fill-space"></span>
         <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-        {{ if .MFAProviders }}
-        <div class="mfa-other">
-            <p>{{t "MFA.ChooseOther"}}</p>
-            {{ range $provider := .MFAProviders}}
-            {{ $providerName := (t (printf "MFA.Provider%v" $provider)) }}
-            <button class="secondary" type="submit" name="provider" value="{{$provider}}"
-                formnovalidate>{{$providerName}}</button>
-            {{ end }}
-        </div>
-        {{ end }}
     </div>
 </form>
 
