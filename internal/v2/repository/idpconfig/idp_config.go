@@ -2,6 +2,7 @@ package idpconfig
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -70,6 +71,7 @@ func NewIDPConfigChangedEvent(
 ) *IDPConfigChangedEvent {
 	changeEvent := &IDPConfigChangedEvent{
 		BaseEvent: *base,
+		ConfigID:  configID,
 	}
 	for _, change := range changes {
 		change(changeEvent)
@@ -107,7 +109,7 @@ func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.EventReade
 type IDPConfigDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID string `idpConfigId`
+	ConfigID string `json:"idpConfigId"`
 }
 
 func NewIDPConfigDeactivatedEvent(
@@ -141,7 +143,7 @@ func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.EventR
 type IDPConfigReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID string `idpConfigId`
+	ConfigID string `json:"idpConfigId"`
 }
 
 func NewIDPConfigReactivatedEvent(
@@ -175,7 +177,7 @@ func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.EventR
 type IDPConfigRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID string `idpConfigId`
+	ConfigID string `json:"idpConfigId"`
 }
 
 func NewIDPConfigRemovedEvent(

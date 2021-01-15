@@ -5,8 +5,8 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/idpconfig"
+	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
 type OrgIDPConfigWriteModel struct {
@@ -26,7 +26,7 @@ func NewOrgIDPConfigWriteModel(configID, orgID string) *OrgIDPConfigWriteModel {
 }
 
 func (wm *OrgIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		ResourceOwner(wm.ResourceOwner)
 }
@@ -34,37 +34,37 @@ func (wm *OrgIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *OrgIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *iam.IDPConfigAddedEvent:
+		case *org.IDPConfigAddedEvent:
 			if wm.ConfigID != e.ConfigID {
 				continue
 			}
 			wm.IDPConfigWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
-		case *iam.IDPConfigChangedEvent:
+		case *org.IDPConfigChangedEvent:
 			if wm.ConfigID != e.ConfigID {
 				continue
 			}
 			wm.IDPConfigWriteModel.AppendEvents(&e.IDPConfigChangedEvent)
-		case *iam.IDPConfigDeactivatedEvent:
+		case *org.IDPConfigDeactivatedEvent:
 			if wm.ConfigID != e.ConfigID {
 				continue
 			}
 			wm.IDPConfigWriteModel.AppendEvents(&e.IDPConfigDeactivatedEvent)
-		case *iam.IDPConfigReactivatedEvent:
+		case *org.IDPConfigReactivatedEvent:
 			if wm.ConfigID != e.ConfigID {
 				continue
 			}
 			wm.IDPConfigWriteModel.AppendEvents(&e.IDPConfigReactivatedEvent)
-		case *iam.IDPConfigRemovedEvent:
+		case *org.IDPConfigRemovedEvent:
 			if wm.ConfigID != e.ConfigID {
 				continue
 			}
 			wm.IDPConfigWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
-		case *iam.IDPOIDCConfigAddedEvent:
+		case *org.IDPOIDCConfigAddedEvent:
 			if wm.ConfigID != e.IDPConfigID {
 				continue
 			}
 			wm.IDPConfigWriteModel.AppendEvents(&e.OIDCConfigAddedEvent)
-		case *iam.IDPOIDCConfigChangedEvent:
+		case *org.IDPOIDCConfigChangedEvent:
 			if wm.ConfigID != e.IDPConfigID {
 				continue
 			}
@@ -87,7 +87,7 @@ func (wm *OrgIDPConfigWriteModel) NewChangedEvent(
 	configID,
 	name string,
 	stylingType domain.IDPConfigStylingType,
-) (*iam.IDPConfigChangedEvent, bool) {
+) (*org.IDPConfigChangedEvent, bool) {
 
 	changes := make([]idpconfig.IDPConfigChanges, 0)
 	if wm.Name != name {
@@ -99,5 +99,5 @@ func (wm *OrgIDPConfigWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return iam.NewIDPConfigChangedEvent(ctx, configID, changes), true
+	return org.NewIDPConfigChangedEvent(ctx, configID, changes), true
 }
