@@ -204,7 +204,7 @@ $lgn-light-theme-background: (
     qrcode: white, // use black ground on white background because inverted qrcode colors are not allowed
     account-selector-hover: rgba(black, 0.02),
     account-selector-active: rgba(black, 0.05),
-    google: #ffffff,
+    google: #4285F4,
 );
   
 $lgn-dark-theme-background: (
@@ -221,7 +221,7 @@ $lgn-dark-theme-background: (
     qrcode: white, // needs white background to recognize borders,
     account-selector-hover: rgba(white, 0.02),
     account-selector-active: rgba(white, 0.05),
-    google: #4285F4,
+    google: #ffffff,
 );
 
 $lgn-light-theme-foreground: (
@@ -241,7 +241,7 @@ $lgn-light-theme-foreground: (
     icon:              rgba(black, 0.54),
     text:              rgba(black, 0.87),
     qrcode:            black,
-    google-text:      #8b8d8d,
+    google-text:      #ffffff,
 );
   
 $lgn-dark-theme-foreground: (
@@ -261,5 +261,5 @@ $lgn-dark-theme-foreground: (
     icon:              white,
     text:              white,
     qrcode:            black,
-    google-text:       #ffffff,
+    google-text:       #8b8d8d,
 );

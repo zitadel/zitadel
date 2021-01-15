@@ -276,10 +276,20 @@ a.block {
   display: flex;
   align-items: center;
   position: relative;
-}
-.lgn-idp.google {
   padding: 0 1px;
   border-radius: 0.5rem;
+  border-width: 1px;
+  border-style: solid;
+}
+.lgn-idp span.logo {
+  height: 46px;
+  width: 46px;
+}
+.lgn-idp span.provider-name {
+  line-height: 36px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .lgn-idp.google span.logo {
   height: 46px;
@@ -289,12 +299,6 @@ a.block {
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
-}
-.lgn-idp.google span.provider-name {
-  position: absolute;
-  left: 50%;
-  line-height: 36px;
-  transform: translateX(-50%);
 }
 
 .lgn-error {
@@ -882,10 +886,20 @@ a.block {
   display: flex;
   align-items: center;
   position: relative;
-}
-.lgn-idp.google {
   padding: 0 1px;
   border-radius: 0.5rem;
+  border-width: 1px;
+  border-style: solid;
+}
+.lgn-idp span.logo {
+  height: 46px;
+  width: 46px;
+}
+.lgn-idp span.provider-name {
+  line-height: 36px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .lgn-idp.google span.logo {
   height: 46px;
@@ -895,12 +909,6 @@ a.block {
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
-}
-.lgn-idp.google span.provider-name {
-  position: absolute;
-  left: 50%;
-  line-height: 36px;
-  transform: translateX(-50%);
 }
 
 .lgn-error {

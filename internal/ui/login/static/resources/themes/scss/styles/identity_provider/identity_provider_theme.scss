@@ -17,9 +17,27 @@
     .lgn-idp {
         border-color: lgn-color($foreground, divider);
 
+        @include lgn-idp-elevation(2, $config);
+
+        &:not([disabled]):active {
+            @include lgn-idp-elevation(8, $config);
+        }
+
         &.google {
             color: lgn-color($foreground, google-text);
             background-color: lgn-color($background, google);
         }
     }
 }
+
+@mixin lgn-idp-elevation($zValue, $config, $opacity: $lgn-elevation-opacity) {
+    $foreground: map-get($config, foreground);
+    $elevation-color: map-get($foreground, elevation);
+    $elevation-color-or-default: if(
+      $elevation-color == null,
+      $lgn-elevation-color,
+      $elevation-color
+    );
+  
+    @include lgn-elevation($zValue, $elevation-color-or-default, $opacity);
+  }
