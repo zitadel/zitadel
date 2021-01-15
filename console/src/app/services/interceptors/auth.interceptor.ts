@@ -17,7 +17,7 @@ const accessTokenStorageKey = 'access_token';
  * Set the authentication token
  */
 export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryInterceptor<TReq, TResp> {
-    public triggerDialog: Subject<any> = new Subject();
+    public triggerDialog: Subject<boolean> = new Subject();
     constructor(
         private authenticationService: AuthenticationService,
         private storageService: StorageService,
@@ -42,7 +42,7 @@ export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
             return response;
         }).catch((error: any) => {
             if (error.code === 16) {
-                this.triggerDialog.next();
+                this.triggerDialog.next(true);
             }
             return Promise.reject(error);
         });
