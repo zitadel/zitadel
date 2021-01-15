@@ -12,24 +12,25 @@
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="lgn-actions">
-        <a class="lgn-stroked-button lgn-primary" href="{{ loginNameChangeUrl .AuthReqID }}">
-            {{t "Actions.Back"}}
+        <a class="lgn-icon-button lgn-left-action" href="{{ loginNameChangeUrl .AuthReqID }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
         </a>
-        <span class="fill-space"></span>
-
+    </div>
+    <div class="lgn-register-options">
         {{if .LoginPolicy.AllowUsernamePassword }}
         <button class="lgn-raised-button lgn-primary" name="usernamepassword" value="true"
             formnovalidate>{{t "RegisterOption.RegisterUsernamePassword"}}</button>
         {{end}}
+
         {{if .LoginPolicy.AllowExternalIDP}}
-        {{ $reqid := .AuthReqID}}
-        {{range $provider := .IDPProviders}}
-        <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}"
-            class="lgn-raised-button lgn-primary idp-provider {{idpProviderClass $provider.StylingType}}">
-            <span class="logo"></span>
-            <span class="provider-name">{{$provider.Name}}</span>
-        </a>
-        {{end}}
+            {{ $reqid := .AuthReqID}}
+            {{range $provider := .IDPProviders}}
+                <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}"
+                    class="lgn-idp {{idpProviderClass $provider.StylingType}}">
+                    <span class="logo"></span>
+                    <span class="provider-name">{{$provider.Name}}</span>
+                </a>
+            {{end}}
         {{end}}
     </div>
 

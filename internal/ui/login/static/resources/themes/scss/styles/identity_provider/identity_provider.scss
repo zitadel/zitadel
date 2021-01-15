@@ -1,7 +1,5 @@
-$container-max-width: 350px;
-$idp-height: 50px;
-$idp-padding: 0 1rem;
+@import './identity_provider_base.scss';
 
-.idp-container {
-   max-width: $container-max-width;
+.lgn-idp {
+  @include lgn-idp-base;
 }

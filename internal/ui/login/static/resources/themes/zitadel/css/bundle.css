@@ -269,6 +269,34 @@ a.block {
   display: block;
 }
 
+.lgn-idp {
+  display: block;
+  margin: 0.5rem 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.lgn-idp.google {
+  padding: 0 1px;
+  border-radius: 0.5rem;
+}
+.lgn-idp.google span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/google.png");
+  background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.google span.provider-name {
+  position: absolute;
+  left: 50%;
+  line-height: 36px;
+  transform: translateX(-50%);
+}
+
 .lgn-error {
   display: flex;
   align-items: center;
@@ -356,6 +384,10 @@ a.block {
   position: absolute;
   left: 1rem;
   top: -40px;
+}
+.content-container .lgn-register-options {
+  display: flex;
+  flex-direction: column;
 }
 
 i {
@@ -843,6 +875,34 @@ a.block {
   display: block;
 }
 
+.lgn-idp {
+  display: block;
+  margin: 0.5rem 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.lgn-idp.google {
+  padding: 0 1px;
+  border-radius: 0.5rem;
+}
+.lgn-idp.google span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/google.png");
+  background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.google span.provider-name {
+  position: absolute;
+  left: 50%;
+  line-height: 36px;
+  transform: translateX(-50%);
+}
+
 .lgn-error {
   display: flex;
   align-items: center;
@@ -930,6 +990,10 @@ a.block {
   position: absolute;
   left: 1rem;
   top: -40px;
+}
+.content-container .lgn-register-options {
+  display: flex;
+  flex-direction: column;
 }
 
 i {
@@ -1277,6 +1341,10 @@ i {
   position: absolute;
   left: 1rem;
   top: -40px;
+}
+.content-container .lgn-register-options {
+  display: flex;
+  flex-direction: column;
 }
 
 i {

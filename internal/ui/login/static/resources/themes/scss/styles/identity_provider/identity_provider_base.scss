@@ -1,0 +1,36 @@
+$lgn-idp-margin: .5rem 0;
+$lgn-idp-padding: 0 1px;
+$lgn-idp-provider-name-line-height: 36px;
+$lgn-idp-border-radius: .5rem;
+$googlelogosource: '../../../images/idp/google';
+
+@mixin lgn-idp-base {
+    display: block;
+    margin: $lgn-idp-margin;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    position: relative;
+    
+    &.google {
+        padding: $lgn-idp-padding;
+        border-radius: $lgn-idp-border-radius;
+
+        span.logo {
+            height: 46px;
+            width: 46px;
+            background-image: url($googlelogosource + '.png');
+            background-size: 25px;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 5px;
+        }
+
+        span.provider-name {
+            position: absolute;
+            left: 50%;
+            line-height: $lgn-idp-provider-name-line-height;
+            transform: translateX(-50%);
+        }
+    }
+}

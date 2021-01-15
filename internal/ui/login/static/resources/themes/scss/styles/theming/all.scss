@@ -6,6 +6,7 @@
 @import '../label/label_theme.scss';
 @import '../radio/radio_theme.scss';
 @import '../a/a_theme.scss';
+@import '../identity_provider/identity_provider_theme.scss';
 @import '../error/error_theme.scss';
 @import '../qrcode/qrcode_theme.scss';
 @import '../container/container_theme.scss';
@@ -34,4 +35,5 @@
     @include lgn-avatar-theme($theme-or-color-config);
     @include lgn-select-theme($theme-or-color-config);
     @include lgn-list-theme($theme-or-color-config);
+    @include lgn-idp-theme($theme-or-color-config);
 }

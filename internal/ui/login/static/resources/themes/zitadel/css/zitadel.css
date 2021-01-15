@@ -269,6 +269,34 @@ a.block {
   display: block;
 }
 
+.lgn-idp {
+  display: block;
+  margin: 0.5rem 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.lgn-idp.google {
+  padding: 0 1px;
+  border-radius: 0.5rem;
+}
+.lgn-idp.google span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/google.png");
+  background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.google span.provider-name {
+  position: absolute;
+  left: 50%;
+  line-height: 36px;
+  transform: translateX(-50%);
+}
+
 .lgn-error {
   display: flex;
   align-items: center;
@@ -356,6 +384,10 @@ a.block {
   position: absolute;
   left: 1rem;
   top: -40px;
+}
+.content-container .lgn-register-options {
+  display: flex;
+  flex-direction: column;
 }
 
 i {
@@ -981,6 +1013,14 @@ a:hover, a:active {
   color: #85d996;
 }
 
+.lgn-idp {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.lgn-idp.google {
+  color: white;
+  background-color: #4285f4;
+}
+
 .lgn-dark-theme .lgn-app-background, .lgn-dark-theme.lgn-app-background {
   background-color: #212224;
   color: white;
@@ -1278,6 +1318,13 @@ a:hover, a:active {
 }
 .lgn-dark-theme .lgn-list li i.lgn-valid, .lgn-dark-theme ul li i.lgn-valid {
   color: #85d996;
+}
+.lgn-dark-theme .lgn-idp {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.lgn-dark-theme .lgn-idp.google {
+  color: white;
+  background-color: #4285f4;
 }
 
 .lgn-light-theme .lgn-app-background, .lgn-light-theme.lgn-app-background {
@@ -1577,6 +1624,13 @@ a:hover, a:active {
 }
 .lgn-light-theme .lgn-list li i.lgn-valid, .lgn-light-theme ul li i.lgn-valid {
   color: #85d996;
+}
+.lgn-light-theme .lgn-idp {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+.lgn-light-theme .lgn-idp.google {
+  color: #8b8d8d;
+  background-color: white;
 }
 
 /*# sourceMappingURL=zitadel.css.map */

@@ -36,13 +36,13 @@
     </div>
 
     {{if hasExternalLogin }}
-    <div class="lgn-actions idp-providers">
+    <div class="lgn-idp-providers">
         <p>{{t "Login.ExternalLogin"}}</p>
 
         {{ $reqid := .AuthReqID}}
         {{range $provider := .IDPProviders}}
         <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}"
-            class="button secondary idp-provider {{idpProviderClass $provider.StylingType}}">
+            class="lgn-idp {{idpProviderClass $provider.StylingType}}">
             <span class="logo"></span>
             <span class="provider-name">{{$provider.Name}}</span>
         </a>

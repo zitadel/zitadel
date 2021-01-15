@@ -105,6 +105,11 @@ $lgn-container-bottom-margin: 50px;
         left: 1rem;
         top: -40px;
     }
+
+    .lgn-register-options {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 i {

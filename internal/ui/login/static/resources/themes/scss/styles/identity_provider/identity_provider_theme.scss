@@ -1,4 +1,4 @@
-@import './footer.scss';
+@import './identity_provider.scss';
 
 @mixin lgn-idp-theme($theme-or-color-config) {
     $theme: lgn-private-legacy-get-theme($theme-or-color-config);
@@ -14,12 +14,12 @@
     $background: map-get($config, background);
     $foreground: map-get($config, foreground);
   
-    footer {
-      background-color: lgn-color($background, footer);
-      border-top: 1px solid lgn-color($foreground, footer-line);
+    .lgn-idp {
+        border-color: lgn-color($foreground, divider);
 
-      a {
-        color: lgn-color($background, footer-links);
-      }
+        &.google {
+            color: lgn-color($foreground, google-text);
+            background-color: lgn-color($background, google);
+        }
     }
 }
