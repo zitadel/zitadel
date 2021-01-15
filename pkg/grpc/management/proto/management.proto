@@ -1265,7 +1265,7 @@ service ManagementService {
     };
   }
 
-  rpc DeactivateIdpConfig(IdpID) returns (Idp) {
+  rpc DeactivateIdpConfig(IdpID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/orgs/me/idps/{id}/_deactivate"
       body: "*"
@@ -1276,7 +1276,7 @@ service ManagementService {
     };
   }
 
-  rpc ReactivateIdpConfig(IdpID) returns (Idp) {
+  rpc ReactivateIdpConfig(IdpID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/orgs/me/idps/{id}/_reactivate"
       body: "*"

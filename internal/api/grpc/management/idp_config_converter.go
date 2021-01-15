@@ -1,47 +1,73 @@
 package management
 
 import (
+	"context"
+
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errors "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"strconv"
 )
 
-func createOidcIdpToModel(idp *management.OidcIdpConfigCreate) *iam_model.IDPConfig {
-	return &iam_model.IDPConfig{
+func createOidcIdpToDomain(idp *management.OidcIdpConfigCreate) *domain.IDPConfig {
+	return &domain.IDPConfig{
 		Name:        idp.Name,
-		StylingType: idpConfigStylingTypeToModel(idp.StylingType),
-		Type:        iam_model.IDPConfigTypeOIDC,
-		OIDCConfig: &iam_model.OIDCIDPConfig{
+		StylingType: idpConfigStylingTypeToDomain(idp.StylingType),
+		Type:        domain.IDPConfigTypeOIDC,
+		OIDCConfig: &domain.OIDCIDPConfig{
 			ClientID:              idp.ClientId,
 			ClientSecretString:    idp.ClientSecret,
 			Issuer:                idp.Issuer,
 			Scopes:                idp.Scopes,
-			IDPDisplayNameMapping: oidcMappingFieldToModel(idp.IdpDisplayNameMapping),
-			UsernameMapping:       oidcMappingFieldToModel(idp.UsernameMapping),
+			IDPDisplayNameMapping: oidcMappingFieldToDomain(idp.IdpDisplayNameMapping),
+			UsernameMapping:       oidcMappingFieldToDomain(idp.UsernameMapping),
 		},
 	}
 }
 
-func updateIdpToModel(idp *management.IdpUpdate) *iam_model.IDPConfig {
-	return &iam_model.IDPConfig{
+func updateIdpToDomain(ctx context.Context, idp *management.IdpUpdate) *domain.IDPConfig {
+	return &domain.IDPConfig{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
 		IDPConfigID: idp.Id,
 		Name:        idp.Name,
-		StylingType: idpConfigStylingTypeToModel(idp.StylingType),
+		StylingType: idpConfigStylingTypeToDomain(idp.StylingType),
 	}
 }
 
-func updateOidcIdpToModel(idp *management.OidcIdpConfigUpdate) *iam_model.OIDCIDPConfig {
-	return &iam_model.OIDCIDPConfig{
+func updateOidcIdpToDomain(ctx context.Context, idp *management.OidcIdpConfigUpdate) *domain.OIDCIDPConfig {
+	return &domain.OIDCIDPConfig{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
 		IDPConfigID:           idp.IdpId,
 		ClientID:              idp.ClientId,
 		ClientSecretString:    idp.ClientSecret,
 		Issuer:                idp.Issuer,
 		Scopes:                idp.Scopes,
-		IDPDisplayNameMapping: oidcMappingFieldToModel(idp.IdpDisplayNameMapping),
-		UsernameMapping:       oidcMappingFieldToModel(idp.UsernameMapping),
+		IDPDisplayNameMapping: oidcMappingFieldToDomain(idp.IdpDisplayNameMapping),
+		UsernameMapping:       oidcMappingFieldToDomain(idp.UsernameMapping),
+	}
+}
+
+func idpFromDomain(idp *domain.IDPConfig) *management.Idp {
+	return &management.Idp{
+		Id:           idp.IDPConfigID,
+		CreationDate: timestamppb.New(idp.CreationDate),
+		ChangeDate:   timestamppb.New(idp.ChangeDate),
+		Sequence:     idp.Sequence,
+		Name:         idp.Name,
+		StylingType:  idpConfigStylingTypeFromDomain(idp.StylingType),
+		State:        idpConfigStateFromDomain(idp.State),
+		IdpConfig:    idpConfigFromDomain(idp),
 	}
 }
 
@@ -84,6 +110,15 @@ func idpViewFromModel(idp *iam_model.IDPConfigView) *management.IdpView {
 	}
 }
 
+func idpConfigFromDomain(idp *domain.IDPConfig) *management.Idp_OidcConfig {
+	if idp.Type == domain.IDPConfigTypeOIDC {
+		return &management.Idp_OidcConfig{
+			OidcConfig: oidcIdpConfigFromDomain(idp.OIDCConfig),
+		}
+	}
+	return nil
+}
+
 func idpConfigFromModel(idp *iam_model.IDPConfig) *management.Idp_OidcConfig {
 	if idp.Type == iam_model.IDPConfigTypeOIDC {
 		return &management.Idp_OidcConfig{
@@ -91,6 +126,16 @@ func idpConfigFromModel(idp *iam_model.IDPConfig) *management.Idp_OidcConfig {
 		}
 	}
 	return nil
+}
+
+func oidcIdpConfigFromDomain(idp *domain.OIDCIDPConfig) *management.OidcIdpConfig {
+	return &management.OidcIdpConfig{
+		ClientId:              idp.ClientID,
+		Issuer:                idp.Issuer,
+		Scopes:                idp.Scopes,
+		IdpDisplayNameMapping: oidcMappingFieldFromDomain(idp.IDPDisplayNameMapping),
+		UsernameMapping:       oidcMappingFieldFromDomain(idp.UsernameMapping),
+	}
 }
 
 func oidcIdpConfigFromModel(idp *iam_model.OIDCIDPConfig) *management.OidcIdpConfig {
@@ -119,6 +164,17 @@ func oidcIdpConfigViewFromModel(idp *iam_model.IDPConfigView) *management.OidcId
 		Scopes:                idp.OIDCScopes,
 		IdpDisplayNameMapping: oidcMappingFieldFromModel(idp.OIDCIDPDisplayNameMapping),
 		UsernameMapping:       oidcMappingFieldFromModel(idp.OIDCUsernameMapping),
+	}
+}
+
+func idpConfigStateFromDomain(state domain.IDPConfigState) management.IdpState {
+	switch state {
+	case domain.IDPConfigStateActive:
+		return management.IdpState_IDPCONFIGSTATE_ACTIVE
+	case domain.IDPConfigStateInactive:
+		return management.IdpState_IDPCONFIGSTATE_INACTIVE
+	default:
+		return management.IdpState_IDPCONFIGSTATE_UNSPECIFIED
 	}
 }
 
@@ -210,6 +266,17 @@ func idpConfigsFromView(viewIdps []*iam_model.IDPConfigView) []*management.IdpVi
 	return idps
 }
 
+func oidcMappingFieldFromDomain(field domain.OIDCMappingField) management.OIDCMappingField {
+	switch field {
+	case domain.OIDCMappingFieldPreferredLoginName:
+		return management.OIDCMappingField_OIDCMAPPINGFIELD_PREFERRED_USERNAME
+	case domain.OIDCMappingFieldEmail:
+		return management.OIDCMappingField_OIDCMAPPINGFIELD_EMAIL
+	default:
+		return management.OIDCMappingField_OIDCMAPPINGFIELD_UNSPECIFIED
+	}
+}
+
 func oidcMappingFieldFromModel(field iam_model.OIDCMappingField) management.OIDCMappingField {
 	switch field {
 	case iam_model.OIDCMappingFieldPreferredLoginName:
@@ -218,6 +285,17 @@ func oidcMappingFieldFromModel(field iam_model.OIDCMappingField) management.OIDC
 		return management.OIDCMappingField_OIDCMAPPINGFIELD_EMAIL
 	default:
 		return management.OIDCMappingField_OIDCMAPPINGFIELD_UNSPECIFIED
+	}
+}
+
+func oidcMappingFieldToDomain(field management.OIDCMappingField) domain.OIDCMappingField {
+	switch field {
+	case management.OIDCMappingField_OIDCMAPPINGFIELD_PREFERRED_USERNAME:
+		return domain.OIDCMappingFieldPreferredLoginName
+	case management.OIDCMappingField_OIDCMAPPINGFIELD_EMAIL:
+		return domain.OIDCMappingFieldEmail
+	default:
+		return domain.OIDCMappingFieldUnspecified
 	}
 }
 
@@ -232,6 +310,15 @@ func oidcMappingFieldToModel(field management.OIDCMappingField) iam_model.OIDCMa
 	}
 }
 
+func idpConfigStylingTypeFromDomain(stylingType domain.IDPConfigStylingType) management.IdpStylingType {
+	switch stylingType {
+	case domain.IDPConfigStylingTypeGoogle:
+		return management.IdpStylingType_IDPSTYLINGTYPE_GOOGLE
+	default:
+		return management.IdpStylingType_IDPSTYLINGTYPE_UNSPECIFIED
+	}
+}
+
 func idpConfigStylingTypeFromModel(stylingType iam_model.IDPStylingType) management.IdpStylingType {
 	switch stylingType {
 	case iam_model.IDPStylingTypeGoogle:
@@ -241,12 +328,12 @@ func idpConfigStylingTypeFromModel(stylingType iam_model.IDPStylingType) managem
 	}
 }
 
-func idpConfigStylingTypeToModel(stylingType management.IdpStylingType) iam_model.IDPStylingType {
+func idpConfigStylingTypeToDomain(stylingType management.IdpStylingType) domain.IDPConfigStylingType {
 	switch stylingType {
 	case management.IdpStylingType_IDPSTYLINGTYPE_GOOGLE:
-		return iam_model.IDPStylingTypeGoogle
+		return domain.IDPConfigStylingTypeGoogle
 	default:
-		return iam_model.IDPStylingTypeUnspecified
+		return domain.IDPConfigStylingTypeUnspecified
 	}
 }
 

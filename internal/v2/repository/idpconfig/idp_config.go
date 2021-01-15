@@ -54,9 +54,9 @@ func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 type IDPConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID    string                      `json:"idpConfigId"`
-	Name        string                      `json:"name,omitempty"`
-	StylingType domain.IDPConfigStylingType `json:"stylingType,omitempty"`
+	ConfigID    string                       `json:"idpConfigId"`
+	Name        *string                      `json:"name,omitempty"`
+	StylingType *domain.IDPConfigStylingType `json:"stylingType,omitempty"`
 }
 
 func (e *IDPConfigChangedEvent) Data() interface{} {
@@ -65,9 +65,29 @@ func (e *IDPConfigChangedEvent) Data() interface{} {
 
 func NewIDPConfigChangedEvent(
 	base *eventstore.BaseEvent,
+	configID string,
+	changes []IDPConfigChanges,
 ) *IDPConfigChangedEvent {
-	return &IDPConfigChangedEvent{
+	changeEvent := &IDPConfigChangedEvent{
 		BaseEvent: *base,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent
+}
+
+type IDPConfigChanges func(*IDPConfigChangedEvent)
+
+func ChangeName(name string) func(*IDPConfigChangedEvent) {
+	return func(e *IDPConfigChangedEvent) {
+		e.Name = &name
+	}
+}
+
+func ChangeStyleType(styleType domain.IDPConfigStylingType) func(*IDPConfigChangedEvent) {
+	return func(e *IDPConfigChangedEvent) {
+		e.StylingType = &styleType
 	}
 }
 

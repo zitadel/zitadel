@@ -1,4 +1,4 @@
-package iam
+package org
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	IDPOIDCConfigAddedEventType   eventstore.EventType = "iam.idp." + idpconfig.OIDCConfigAddedEventType
-	IDPOIDCConfigChangedEventType eventstore.EventType = "iam.idp." + idpconfig.ConfigChangedEventType
+	IDPOIDCConfigAddedEventType   eventstore.EventType = "org.idp." + idpconfig.OIDCConfigAddedEventType
+	IDPOIDCConfigChangedEventType eventstore.EventType = "org.idp." + idpconfig.ConfigChangedEventType
 )
 
 type IDPOIDCConfigAddedEvent struct {

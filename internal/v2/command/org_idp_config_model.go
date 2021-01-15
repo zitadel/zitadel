@@ -9,29 +9,29 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/idpconfig"
 )
 
-type IAMIDPConfigWriteModel struct {
+type OrgIDPConfigWriteModel struct {
 	IDPConfigWriteModel
 }
 
-func NewIAMIDPConfigWriteModel(configID string) *IAMIDPConfigWriteModel {
-	return &IAMIDPConfigWriteModel{
+func NewOrgIDPConfigWriteModel(configID, orgID string) *OrgIDPConfigWriteModel {
+	return &OrgIDPConfigWriteModel{
 		IDPConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
 			},
 			ConfigID: configID,
 		},
 	}
 }
 
-func (wm *IAMIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *OrgIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		ResourceOwner(wm.ResourceOwner)
 }
 
-func (wm *IAMIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.IDPConfigAddedEvent:
@@ -73,16 +73,16 @@ func (wm *IAMIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader)
 	}
 }
 
-func (wm *IAMIDPConfigWriteModel) Reduce() error {
+func (wm *OrgIDPConfigWriteModel) Reduce() error {
 	return wm.IDPConfigWriteModel.Reduce()
 }
 
-func (wm *IAMIDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventReader) error {
+func (wm *OrgIDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventReader) error {
 	wm.AppendEvents(events...)
 	return wm.Reduce()
 }
 
-func (wm *IAMIDPConfigWriteModel) NewChangedEvent(
+func (wm *OrgIDPConfigWriteModel) NewChangedEvent(
 	ctx context.Context,
 	configID,
 	name string,

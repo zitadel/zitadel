@@ -11,23 +11,23 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/idpconfig"
 )
 
-type IAMIDPOIDCConfigWriteModel struct {
+type IDPOIDCConfigWriteModel struct {
 	OIDCConfigWriteModel
 }
 
-func NewIAMIDPOIDCConfigWriteModel(idpConfigID string) *IAMIDPOIDCConfigWriteModel {
-	return &IAMIDPOIDCConfigWriteModel{
+func NewOrgIDPOIDCConfigWriteModel(idpConfigID, orgID string) *IDPOIDCConfigWriteModel {
+	return &IDPOIDCConfigWriteModel{
 		OIDCConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
 			},
 			IDPConfigID: idpConfigID,
 		},
 	}
 }
 
-func (wm *IAMIDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.IDPOIDCConfigAddedEvent:
@@ -61,20 +61,20 @@ func (wm *IAMIDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventRea
 	}
 }
 
-func (wm *IAMIDPOIDCConfigWriteModel) Reduce() error {
+func (wm *IDPOIDCConfigWriteModel) Reduce() error {
 	if err := wm.OIDCConfigWriteModel.Reduce(); err != nil {
 		return err
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *IAMIDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		ResourceOwner(wm.ResourceOwner)
 }
 
-func (wm *IAMIDPOIDCConfigWriteModel) NewChangedEvent(
+func (wm *IDPOIDCConfigWriteModel) NewChangedEvent(
 	ctx context.Context,
 	idpConfigID,
 	clientID,
