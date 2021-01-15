@@ -33,12 +33,11 @@ func (s *Server) IsOrgUnique(ctx context.Context, request *admin.UniqueOrgReques
 
 func (s *Server) SetUpOrg(ctx context.Context, orgSetUp *admin.OrgSetUpRequest) (_ *empty.Empty, err error) {
 	human, _ := userCreateRequestToDomain(orgSetUp.User)
-	if human != nil {
-		err = s.command.SetUpOrg(ctx, orgCreateRequestToDomain(orgSetUp.Org), human)
-		return &empty.Empty{}, nil
-	} else {
+	if human == nil {
 		return &empty.Empty{}, errors.ThrowPreconditionFailed(nil, "ADMIN-4nd9f", "Errors.User.NotHuman")
 	}
+	err = s.command.SetUpOrg(ctx, orgCreateRequestToDomain(orgSetUp.Org), human)
+	return &empty.Empty{}, nil
 }
 
 func (s *Server) GetDefaultOrgIamPolicy(ctx context.Context, _ *empty.Empty) (_ *admin.OrgIamPolicyView, err error) {

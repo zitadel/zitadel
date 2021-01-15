@@ -104,6 +104,6 @@ func writeModelToWebAuthN(wm *HumanWebAuthNWriteModel) *domain.WebAuthNToken {
 		AAGUID:            wm.AAGUID,
 		SignCount:         wm.SignCount,
 		WebAuthNTokenName: wm.WebAuthNTokenName,
-		State:             wm.MFAState,
+		State:             wm.State,
 	}
 }

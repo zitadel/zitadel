@@ -17,20 +17,6 @@ type OTP struct {
 	State        MFAState
 }
 
-type OTPState int32
-
-const (
-	OTPStateUnspecified OTPState = iota
-	OTPStateActive
-	OTPStateRemoved
-
-	otpStateCount
-)
-
-func (s OTPState) Valid() bool {
-	return s >= 0 && s < otpStateCount
-}
-
 func NewOTPKey(issuer, accountName string, cryptoAlg crypto.EncryptionAlgorithm) (*otp.Key, *crypto.CryptoValue, error) {
 	key, err := totp.Generate(totp.GenerateOpts{Issuer: issuer, AccountName: accountName})
 	if err != nil {

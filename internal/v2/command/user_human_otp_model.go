@@ -10,9 +10,8 @@ import (
 type HumanOTPWriteModel struct {
 	eventstore.WriteModel
 
-	MFAState domain.MFAState
-	Secret   *crypto.CryptoValue
-	OTPState domain.OTPState
+	State  domain.MFAState
+	Secret *crypto.CryptoValue
 }
 
 func NewHumanOTPWriteModel(userID, resourceOwner string) *HumanOTPWriteModel {
@@ -33,14 +32,13 @@ func (wm *HumanOTPWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanOTPAddedEvent:
 			wm.Secret = e.Secret
-			wm.MFAState = domain.MFAStateNotReady
-			wm.OTPState = domain.OTPStateActive
+			wm.State = domain.MFAStateNotReady
 		case *user.HumanOTPVerifiedEvent:
-			wm.MFAState = domain.MFAStateReady
+			wm.State = domain.MFAStateReady
 		case *user.HumanOTPRemovedEvent:
-			wm.OTPState = domain.OTPStateRemoved
+			wm.State = domain.MFAStateRemoved
 		case *user.UserRemovedEvent:
-			wm.OTPState = domain.OTPStateRemoved
+			wm.State = domain.MFAStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

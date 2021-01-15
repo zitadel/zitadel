@@ -19,8 +19,7 @@ type HumanWebAuthNWriteModel struct {
 	SignCount         uint32
 	WebAuthNTokenName string
 
-	State    domain.WebAuthNState
-	MFAState domain.MFAState
+	State domain.MFAState
 }
 
 func NewHumanWebAuthNWriteModel(userID, wbAuthNTokenID, resourceOwner string) *HumanWebAuthNWriteModel {
@@ -58,9 +57,9 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 		case *user.HumanWebAuthNVerifiedEvent:
 			wm.appendVerifiedEvent(e)
 		case *user.HumanWebAuthNRemovedEvent:
-			wm.State = domain.WebAuthNStateRemoved
+			wm.State = domain.MFAStateRemoved
 		case *user.UserRemovedEvent:
-			wm.State = domain.WebAuthNStateRemoved
+			wm.State = domain.MFAStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -69,8 +68,7 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 func (wm *HumanWebAuthNWriteModel) appendAddedEvent(e *user.HumanWebAuthNAddedEvent) {
 	wm.WebauthNTokenID = e.WebAuthNTokenID
 	wm.Challenge = e.Challenge
-	wm.State = domain.WebAuthNStateActive
-	wm.MFAState = domain.MFAStateNotReady
+	wm.State = domain.MFAStateNotReady
 }
 
 func (wm *HumanWebAuthNWriteModel) appendVerifiedEvent(e *user.HumanWebAuthNVerifiedEvent) {
@@ -80,7 +78,7 @@ func (wm *HumanWebAuthNWriteModel) appendVerifiedEvent(e *user.HumanWebAuthNVeri
 	wm.AAGUID = e.AAGUID
 	wm.SignCount = e.SignCount
 	wm.WebAuthNTokenName = e.WebAuthNTokenName
-	wm.MFAState = domain.MFAStateReady
+	wm.State = domain.MFAStateReady
 }
 
 func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {

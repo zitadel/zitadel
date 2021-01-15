@@ -21,13 +21,14 @@ type CommandSide struct {
 
 	idpConfigSecretCrypto crypto.Crypto
 
-	userPasswordAlg            crypto.HashAlgorithm
-	initializeUserCode         crypto.Generator
-	emailVerificationCode      crypto.Generator
-	phoneVerificationCode      crypto.Generator
-	passwordVerificationCode   crypto.Generator
-	machineKeyAlg              crypto.EncryptionAlgorithm
-	machineKeySize             int
+	userPasswordAlg          crypto.HashAlgorithm
+	initializeUserCode       crypto.Generator
+	emailVerificationCode    crypto.Generator
+	phoneVerificationCode    crypto.Generator
+	passwordVerificationCode crypto.Generator
+	machineKeyAlg            crypto.EncryptionAlgorithm
+	machineKeySize           int
+	//TODO: remove global model, or move to domain
 	multifactors               global_model.Multifactors
 	applicationSecretGenerator crypto.Generator
 

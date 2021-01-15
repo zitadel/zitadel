@@ -6,6 +6,7 @@ const (
 	MFAStateUnspecified MFAState = iota
 	MFAStateNotReady
 	MFAStateReady
+	MFAStateRemoved
 
 	stateCount
 )

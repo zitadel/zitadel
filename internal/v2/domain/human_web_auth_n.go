@@ -47,20 +47,6 @@ const (
 	AuthenticatorAttachmentCrossPlattform
 )
 
-type WebAuthNState int32
-
-const (
-	WebAuthNStateUnspecified WebAuthNState = iota
-	WebAuthNStateActive
-	WebAuthNStateRemoved
-
-	webAuthNStateCount
-)
-
-func (s WebAuthNState) Valid() bool {
-	return s >= 0 && s < webAuthNStateCount
-}
-
 func GetTokenToVerify(tokens []*WebAuthNToken) (int, *WebAuthNToken) {
 	for i, u2f := range tokens {
 		if u2f.State == MFAStateNotReady {
