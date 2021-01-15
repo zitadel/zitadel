@@ -59,13 +59,12 @@ func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserReques
 			return nil, err
 		}
 		return userHumanFromDomain(h), nil
-	} else {
-		m, err := s.command.AddMachine(ctx, authz.GetCtxData(ctx).OrgID, machine)
-		if err != nil {
-			return nil, err
-		}
-		return userMachineFromDomain(m), nil
 	}
+	m, err := s.command.AddMachine(ctx, authz.GetCtxData(ctx).OrgID, machine)
+	if err != nil {
+		return nil, err
+	}
+	return userMachineFromDomain(m), nil
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
