@@ -1,15 +1,16 @@
 package migration
 
 import (
+	"time"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator"
 	"github.com/pkg/errors"
-	"time"
 )
 
 const (
-	timeout time.Duration = 300
+	timeout = 20 * time.Minute
 )
 
 func GetDoneFunc(

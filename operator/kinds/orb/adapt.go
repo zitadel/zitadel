@@ -72,7 +72,7 @@ func AdaptFunc(
 		queriers := make([]operator.QueryFunc, 0)
 		for _, feature := range features {
 			switch feature {
-			case "iam":
+			case "iam", "migration", "scaleup", "scaledown":
 				queriers = append(queriers, queryIAM)
 				destroyers = append(destroyers, destroyIAM)
 			case "operator":
