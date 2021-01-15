@@ -89,7 +89,7 @@ func (r *CommandSide) ValidateOrgDomain(ctx context.Context, orgDomain *domain.O
 	err = r.domainVerificationValidator(domainWriteModel.Domain, validationCode, validationCode, checkType)
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
 	if err == nil {
-		orgAgg.PushEvents(org.NewDomainVerificationAddedEvent(ctx, orgDomain.Domain, orgDomain.ValidationType, orgDomain.ValidationCode))
+		orgAgg.PushEvents(org.NewDomainVerifiedEvent(ctx, orgDomain.Domain))
 		return r.eventstore.PushAggregate(ctx, domainWriteModel, orgAgg)
 	}
 	orgAgg.PushEvents(org.NewDomainVerificationFailedEvent(ctx, orgDomain.Domain))

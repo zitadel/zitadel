@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/org"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type OrgPasswordLockoutPolicyWriteModel struct {
@@ -29,6 +30,8 @@ func (wm *OrgPasswordLockoutPolicyWriteModel) AppendEvents(events ...eventstore.
 			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyAddedEvent)
 		case *org.PasswordLockoutPolicyChangedEvent:
 			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyChangedEvent)
+		case *org.PasswordComplexityPolicyRemovedEvent:
+			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordComplexityPolicyRemovedEvent)
 		}
 	}
 }
@@ -44,15 +47,15 @@ func (wm *OrgPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBui
 }
 
 func (wm *OrgPasswordLockoutPolicyWriteModel) NewChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) (*org.PasswordLockoutPolicyChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := org.NewPasswordLockoutPolicyChangedEvent(ctx)
+	changes := make([]policy.PasswordLockoutPolicyChanges, 0)
 	if wm.MaxAttempts != maxAttempts {
-		hasChanged = true
-		changedEvent.MaxAttempts = &maxAttempts
+		changes = append(changes, policy.ChangeMaxAttempts(maxAttempts))
 	}
 	if wm.ShowLockOutFailures != showLockoutFailure {
-		hasChanged = true
-		changedEvent.ShowLockOutFailures = &showLockoutFailure
+		changes = append(changes, policy.ChangeShowLockOutFailures(showLockoutFailure))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	return org.NewPasswordLockoutPolicyChangedEvent(ctx, changes), true
 }

@@ -72,7 +72,7 @@ func (r *CommandSide) changeDefaultLoginPolicy(ctx context.Context, iamAgg *iam_
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "IAM-M0sif", "Errors.IAM.LoginPolicy.NotFound")
 	}
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, domain.PasswordlessType(policy.PasswordlessType))
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIdp, policy.ForceMFA, policy.PasswordlessType)
 	if !hasChanged {
 		return caos_errs.ThrowPreconditionFailed(nil, "IAM-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")
 	}

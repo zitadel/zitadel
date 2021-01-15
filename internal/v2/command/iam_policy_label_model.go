@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type IAMLabelPolicyWriteModel struct {
@@ -49,15 +50,15 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	primaryColor,
 	secondaryColor string,
 ) (*iam.LabelPolicyChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := iam.NewLabelPolicyChangedEvent(ctx)
+	changes := make([]policy.LabelPolicyChanges, 0)
 	if wm.PrimaryColor != primaryColor {
-		hasChanged = true
-		changedEvent.PrimaryColor = &primaryColor
+		changes = append(changes, policy.ChangePrimaryColor(primaryColor))
 	}
 	if wm.SecondaryColor != secondaryColor {
-		hasChanged = true
-		changedEvent.SecondaryColor = &secondaryColor
+		changes = append(changes, policy.ChangeSecondaryColor(secondaryColor))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	return iam.NewLabelPolicyChangedEvent(ctx, changes), true
 }

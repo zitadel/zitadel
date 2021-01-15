@@ -63,9 +63,28 @@ func (e *LabelPolicyChangedEvent) Data() interface{} {
 
 func NewLabelPolicyChangedEvent(
 	base *eventstore.BaseEvent,
+	changes []LabelPolicyChanges,
 ) *LabelPolicyChangedEvent {
-	return &LabelPolicyChangedEvent{
+	changeEvent := &LabelPolicyChangedEvent{
 		BaseEvent: *base,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent
+}
+
+type LabelPolicyChanges func(*LabelPolicyChangedEvent)
+
+func ChangePrimaryColor(primaryColor string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.PrimaryColor = &primaryColor
+	}
+}
+
+func ChangeSecondaryColor(secondaryColor string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.SecondaryColor = &secondaryColor
 	}
 }
 

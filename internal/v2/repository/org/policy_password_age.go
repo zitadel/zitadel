@@ -46,10 +46,12 @@ type PasswordAgePolicyChangedEvent struct {
 
 func NewPasswordAgePolicyChangedEvent(
 	ctx context.Context,
+	changes []policy.PasswordAgePolicyChanges,
 ) *PasswordAgePolicyChangedEvent {
 	return &PasswordAgePolicyChangedEvent{
 		PasswordAgePolicyChangedEvent: *policy.NewPasswordAgePolicyChangedEvent(
 			eventstore.NewBaseEventForPush(ctx, PasswordAgePolicyChangedEventType),
+			changes,
 		),
 	}
 }

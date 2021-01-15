@@ -25,7 +25,7 @@ func orgWriteModelToPasswordComplexityPolicy(wm *OrgPasswordComplexityPolicyWrit
 		ObjectRoot:   writeModelToObjectRoot(wm.PasswordComplexityPolicyWriteModel.WriteModel),
 		MinLength:    wm.MinLength,
 		HasLowercase: wm.HasLowercase,
-		HasUppercase: wm.HasUpperCase,
+		HasUppercase: wm.HasUppercase,
 		HasNumber:    wm.HasNumber,
 		HasSymbol:    wm.HasSymbol,
 	}

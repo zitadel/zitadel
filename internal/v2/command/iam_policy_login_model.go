@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type IAMLoginPolicyWriteModel struct {
@@ -57,27 +58,24 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	passwordlessType domain.PasswordlessType,
 ) (*iam.LoginPolicyChangedEvent, bool) {
 
-	hasChanged := false
-	changedEvent := iam.NewLoginPolicyChangedEvent(ctx)
-	if wm.AllowUserNamePassword == allowUsernamePassword {
-		hasChanged = true
-		changedEvent.AllowUserNamePassword = &allowUsernamePassword
+	changes := make([]policy.LoginPolicyChanges, 0)
+	if wm.AllowUserNamePassword != allowUsernamePassword {
+		changes = append(changes, policy.ChangeAllowUserNamePassword(allowUsernamePassword))
 	}
-	if wm.AllowRegister == allowRegister {
-		hasChanged = true
-		changedEvent.AllowRegister = &allowRegister
+	if wm.AllowRegister != allowRegister {
+		changes = append(changes, policy.ChangeAllowRegister(allowRegister))
 	}
-	if wm.AllowExternalIDP == allowExternalIDP {
-		hasChanged = true
-		changedEvent.AllowExternalIDP = &allowExternalIDP
+	if wm.AllowExternalIDP != allowExternalIDP {
+		changes = append(changes, policy.ChangeAllowExternalIDP(allowExternalIDP))
 	}
 	if wm.ForceMFA != forceMFA {
-		hasChanged = true
-		changedEvent.ForceMFA = &forceMFA
+		changes = append(changes, policy.ChangeForceMFA(forceMFA))
 	}
 	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
-		hasChanged = true
-		changedEvent.PasswordlessType = &passwordlessType
+		changes = append(changes, policy.ChangePasswordlessType(passwordlessType))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	return iam.NewLoginPolicyChangedEvent(ctx, changes), true
 }

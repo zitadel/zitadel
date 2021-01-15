@@ -72,7 +72,7 @@ func writeModelToPasswordComplexityPolicy(wm *PasswordComplexityPolicyWriteModel
 		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
 		MinLength:    wm.MinLength,
 		HasLowercase: wm.HasLowercase,
-		HasUppercase: wm.HasUpperCase,
+		HasUppercase: wm.HasUppercase,
 		HasNumber:    wm.HasNumber,
 		HasSymbol:    wm.HasSymbol,
 	}

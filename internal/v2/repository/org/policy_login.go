@@ -53,10 +53,12 @@ type LoginPolicyChangedEvent struct {
 
 func NewLoginPolicyChangedEvent(
 	ctx context.Context,
+	changes []policy.LoginPolicyChanges,
 ) *LoginPolicyChangedEvent {
 	return &LoginPolicyChangedEvent{
 		LoginPolicyChangedEvent: *policy.NewLoginPolicyChangedEvent(
 			eventstore.NewBaseEventForPush(ctx, LoginPolicyChangedEventType),
+			changes,
 		),
 	}
 }

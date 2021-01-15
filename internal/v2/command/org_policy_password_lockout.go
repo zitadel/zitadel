@@ -15,13 +15,13 @@ func (r *CommandSide) AddPasswordLockoutPolicy(ctx context.Context, policy *doma
 		return nil, err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0olDf", "Errors.IAM.PasswordLockoutPolicy.AlreadyExists")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-0olDf", "Errors.ORG.PasswordLockoutPolicy.AlreadyExists")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
-	iamAgg.PushEvents(org.NewPasswordLockoutPolicyAddedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures))
+	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
+	orgAgg.PushEvents(org.NewPasswordLockoutPolicyAddedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures))
 
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
+	err = r.eventstore.PushAggregate(ctx, addedPolicy, orgAgg)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (r *CommandSide) ChangePasswordLockoutPolicy(ctx context.Context, policy *d
 
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.MaxAttempts, policy.ShowLockOutFailures)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-4M9vs", "Errors.IAM.PasswordLockoutPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-4M9vs", "Errors.Org.PasswordLockoutPolicy.NotChanged")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PasswordLockoutPolicyWriteModel.WriteModel)

@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type IAMPasswordLockoutPolicyWriteModel struct {
@@ -45,15 +46,15 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBui
 }
 
 func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) (*iam.PasswordLockoutPolicyChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := iam.NewPasswordLockoutPolicyChangedEvent(ctx)
+	changes := make([]policy.PasswordLockoutPolicyChanges, 0)
 	if wm.MaxAttempts != maxAttempts {
-		hasChanged = true
-		changedEvent.MaxAttempts = &maxAttempts
+		changes = append(changes, policy.ChangeMaxAttempts(maxAttempts))
 	}
 	if wm.ShowLockOutFailures != showLockoutFailure {
-		hasChanged = true
-		changedEvent.ShowLockOutFailures = &showLockoutFailure
+		changes = append(changes, policy.ChangeShowLockOutFailures(showLockoutFailure))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	return iam.NewPasswordLockoutPolicyChangedEvent(ctx, changes), true
 }

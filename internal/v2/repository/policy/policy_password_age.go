@@ -63,9 +63,28 @@ func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
 
 func NewPasswordAgePolicyChangedEvent(
 	base *eventstore.BaseEvent,
+	changes []PasswordAgePolicyChanges,
 ) *PasswordAgePolicyChangedEvent {
-	return &PasswordAgePolicyChangedEvent{
+	changeEvent := &PasswordAgePolicyChangedEvent{
 		BaseEvent: *base,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent
+}
+
+type PasswordAgePolicyChanges func(*PasswordAgePolicyChangedEvent)
+
+func ChangeExpireWarnDays(expireWarnDay uint64) func(*PasswordAgePolicyChangedEvent) {
+	return func(e *PasswordAgePolicyChangedEvent) {
+		e.ExpireWarnDays = &expireWarnDay
+	}
+}
+
+func ChangeMaxAgeDays(maxAgeDays uint64) func(*PasswordAgePolicyChangedEvent) {
+	return func(e *PasswordAgePolicyChangedEvent) {
+		e.MaxAgeDays = &maxAgeDays
 	}
 }
 
@@ -90,23 +109,14 @@ func (e *PasswordAgePolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewPasswordAgePolicyRemovedEvent(
-	base *eventstore.BaseEvent,
-) *PasswordAgePolicyRemovedEvent {
+func NewPasswordAgePolicyRemovedEvent(base *eventstore.BaseEvent) *PasswordAgePolicyRemovedEvent {
 	return &PasswordAgePolicyRemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
 func PasswordAgePolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &PasswordAgePolicyRemovedEvent{
+	return &PasswordAgePolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := json.Unmarshal(event.Data, e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-02878", "unable to unmarshal policy")
-	}
-
-	return e, nil
+	}, nil
 }

@@ -44,10 +44,12 @@ type PasswordLockoutPolicyChangedEvent struct {
 
 func NewPasswordLockoutPolicyChangedEvent(
 	ctx context.Context,
+	changes []policy.PasswordLockoutPolicyChanges,
 ) *PasswordLockoutPolicyChangedEvent {
 	return &PasswordLockoutPolicyChangedEvent{
 		PasswordLockoutPolicyChangedEvent: *policy.NewPasswordLockoutPolicyChangedEvent(
 			eventstore.NewBaseEventForPush(ctx, PasswordLockoutPolicyChangedEventType),
+			changes,
 		),
 	}
 }

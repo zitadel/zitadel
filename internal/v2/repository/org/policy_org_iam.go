@@ -47,10 +47,12 @@ type OrgIAMPolicyChangedEvent struct {
 
 func NewOrgIAMPolicyChangedEvent(
 	ctx context.Context,
+	changes []policy.OrgIAMPolicyChanges,
 ) *OrgIAMPolicyChangedEvent {
 	return &OrgIAMPolicyChangedEvent{
 		OrgIAMPolicyChangedEvent: *policy.NewOrgIAMPolicyChangedEvent(
 			eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyChangedEventType),
+			changes,
 		),
 	}
 }

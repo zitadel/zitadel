@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/org"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type OrgPasswordAgePolicyWriteModel struct {
@@ -29,6 +30,8 @@ func (wm *OrgPasswordAgePolicyWriteModel) AppendEvents(events ...eventstore.Even
 			wm.PasswordAgePolicyWriteModel.AppendEvents(&e.PasswordAgePolicyAddedEvent)
 		case *org.PasswordAgePolicyChangedEvent:
 			wm.PasswordAgePolicyWriteModel.AppendEvents(&e.PasswordAgePolicyChangedEvent)
+		case *org.PasswordAgePolicyRemovedEvent:
+			wm.PasswordAgePolicyWriteModel.AppendEvents(&e.PasswordAgePolicyRemovedEvent)
 		}
 	}
 }
@@ -44,15 +47,15 @@ func (wm *OrgPasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder
 }
 
 func (wm *OrgPasswordAgePolicyWriteModel) NewChangedEvent(ctx context.Context, expireWarnDays, maxAgeDays uint64) (*org.PasswordAgePolicyChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := org.NewPasswordAgePolicyChangedEvent(ctx)
+	changes := make([]policy.PasswordAgePolicyChanges, 0)
 	if wm.ExpireWarnDays != expireWarnDays {
-		hasChanged = true
-		changedEvent.ExpireWarnDays = &expireWarnDays
+		changes = append(changes, policy.ChangeExpireWarnDays(expireWarnDays))
 	}
 	if wm.MaxAgeDays != maxAgeDays {
-		hasChanged = true
-		changedEvent.MaxAgeDays = &maxAgeDays
+		changes = append(changes, policy.ChangeMaxAgeDays(maxAgeDays))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	return org.NewPasswordAgePolicyChangedEvent(ctx, changes), true
 }

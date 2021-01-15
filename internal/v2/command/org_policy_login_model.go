@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/org"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type OrgLoginPolicyWriteModel struct {
@@ -30,6 +31,8 @@ func (wm *OrgLoginPolicyWriteModel) AppendEvents(events ...eventstore.EventReade
 			wm.LoginPolicyWriteModel.AppendEvents(&e.LoginPolicyAddedEvent)
 		case *org.LoginPolicyChangedEvent:
 			wm.LoginPolicyWriteModel.AppendEvents(&e.LoginPolicyChangedEvent)
+		case *org.LoginPolicyRemovedEvent:
+			wm.LoginPolicyWriteModel.AppendEvents(&e.LoginPolicyRemovedEvent)
 		}
 	}
 }
@@ -57,27 +60,24 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	passwordlessType domain.PasswordlessType,
 ) (*org.LoginPolicyChangedEvent, bool) {
 
-	hasChanged := false
-	changedEvent := org.NewLoginPolicyChangedEvent(ctx)
-	if wm.AllowUserNamePassword == allowUsernamePassword {
-		hasChanged = true
-		changedEvent.AllowUserNamePassword = &allowUsernamePassword
+	changes := make([]policy.LoginPolicyChanges, 0)
+	if wm.AllowUserNamePassword != allowUsernamePassword {
+		changes = append(changes, policy.ChangeAllowUserNamePassword(allowUsernamePassword))
 	}
-	if wm.AllowRegister == allowRegister {
-		hasChanged = true
-		changedEvent.AllowRegister = &allowRegister
+	if wm.AllowRegister != allowRegister {
+		changes = append(changes, policy.ChangeAllowRegister(allowRegister))
 	}
-	if wm.AllowExternalIDP == allowExternalIDP {
-		hasChanged = true
-		changedEvent.AllowExternalIDP = &allowExternalIDP
+	if wm.AllowExternalIDP != allowExternalIDP {
+		changes = append(changes, policy.ChangeAllowExternalIDP(allowExternalIDP))
 	}
 	if wm.ForceMFA != forceMFA {
-		hasChanged = true
-		changedEvent.ForceMFA = &forceMFA
+		changes = append(changes, policy.ChangeForceMFA(forceMFA))
 	}
 	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
-		hasChanged = true
-		changedEvent.PasswordlessType = &passwordlessType
+		changes = append(changes, policy.ChangePasswordlessType(passwordlessType))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	return org.NewLoginPolicyChangedEvent(ctx, changes), true
 }

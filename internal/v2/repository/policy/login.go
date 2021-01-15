@@ -79,9 +79,46 @@ func (e *LoginPolicyChangedEvent) Data() interface{} {
 
 func NewLoginPolicyChangedEvent(
 	base *eventstore.BaseEvent,
+	changes []LoginPolicyChanges,
 ) *LoginPolicyChangedEvent {
-	return &LoginPolicyChangedEvent{
+	changeEvent := &LoginPolicyChangedEvent{
 		BaseEvent: *base,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent
+}
+
+type LoginPolicyChanges func(*LoginPolicyChangedEvent)
+
+func ChangeAllowUserNamePassword(allowUserNamePassword bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.AllowUserNamePassword = &allowUserNamePassword
+	}
+}
+
+func ChangeAllowRegister(allowRegister bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.AllowRegister = &allowRegister
+	}
+}
+
+func ChangeAllowExternalIDP(allowExternalIDP bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.AllowExternalIDP = &allowExternalIDP
+	}
+}
+
+func ChangeForceMFA(forceMFA bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.ForceMFA = &forceMFA
+	}
+}
+
+func ChangePasswordlessType(passwordlessType domain.PasswordlessType) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.PasswordlessType = &passwordlessType
 	}
 }
 

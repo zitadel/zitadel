@@ -75,7 +75,7 @@ func (r *CommandSide) RemoveOrgIAMPolicy(ctx context.Context, orgID string) erro
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	orgAgg.PushEvents(org.NewOrgIAMPolicyChangedEvent(ctx))
+	orgAgg.PushEvents(org.NewOrgIAMPolicyRemovedEvent(ctx))
 
 	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
 }

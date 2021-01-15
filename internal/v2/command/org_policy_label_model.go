@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/org"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type OrgLabelPolicyWriteModel struct {
@@ -48,15 +49,15 @@ func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(
 	primaryColor,
 	secondaryColor string,
 ) (*org.LabelPolicyChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := org.NewLabelPolicyChangedEvent(ctx)
+	changes := make([]policy.LabelPolicyChanges, 0)
 	if wm.PrimaryColor != primaryColor {
-		hasChanged = true
-		changedEvent.PrimaryColor = &primaryColor
+		changes = append(changes, policy.ChangePrimaryColor(primaryColor))
 	}
 	if wm.SecondaryColor != secondaryColor {
-		hasChanged = true
-		changedEvent.SecondaryColor = &secondaryColor
+		changes = append(changes, policy.ChangeSecondaryColor(secondaryColor))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	return org.NewLabelPolicyChangedEvent(ctx, changes), true
 }

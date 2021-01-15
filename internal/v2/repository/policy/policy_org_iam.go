@@ -60,9 +60,22 @@ func (e *OrgIAMPolicyChangedEvent) Data() interface{} {
 
 func NewOrgIAMPolicyChangedEvent(
 	base *eventstore.BaseEvent,
+	changes []OrgIAMPolicyChanges,
 ) *OrgIAMPolicyChangedEvent {
-	return &OrgIAMPolicyChangedEvent{
+	changeEvent := &OrgIAMPolicyChangedEvent{
 		BaseEvent: *base,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent
+}
+
+type OrgIAMPolicyChanges func(*OrgIAMPolicyChangedEvent)
+
+func ChangeUserLoginMustBeDomain(userLoginMustBeDomain bool) func(*OrgIAMPolicyChangedEvent) {
+	return func(e *OrgIAMPolicyChangedEvent) {
+		e.UserLoginMustBeDomain = &userLoginMustBeDomain
 	}
 }
 
@@ -84,26 +97,17 @@ type OrgIAMPolicyRemovedEvent struct {
 }
 
 func (e *OrgIAMPolicyRemovedEvent) Data() interface{} {
-	return e
+	return nil
 }
 
-func NewOrgIAMPolicyRemovedEvent(
-	base *eventstore.BaseEvent,
-) *OrgIAMPolicyRemovedEvent {
+func NewOrgIAMPolicyRemovedEvent(base *eventstore.BaseEvent) *OrgIAMPolicyRemovedEvent {
 	return &OrgIAMPolicyRemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
 func OrgIAMPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &OrgIAMPolicyRemovedEvent{
+	return &OrgIAMPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := json.Unmarshal(event.Data, e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-0Pl9d", "unable to unmarshal policy")
-	}
-
-	return e, nil
+	}, nil
 }

@@ -44,10 +44,12 @@ type LabelPolicyChangedEvent struct {
 
 func NewLabelPolicyChangedEvent(
 	ctx context.Context,
+	changes []policy.LabelPolicyChanges,
 ) *LabelPolicyChangedEvent {
 	return &LabelPolicyChangedEvent{
 		LabelPolicyChangedEvent: *policy.NewLabelPolicyChangedEvent(
 			eventstore.NewBaseEventForPush(ctx, LabelPolicyChangedEventType),
+			changes,
 		),
 	}
 }

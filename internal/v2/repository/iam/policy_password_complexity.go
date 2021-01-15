@@ -50,10 +50,12 @@ type PasswordComplexityPolicyChangedEvent struct {
 
 func NewPasswordComplexityPolicyChangedEvent(
 	ctx context.Context,
+	changes []policy.PasswordComplexityPolicyChanges,
 ) *PasswordComplexityPolicyChangedEvent {
 	return &PasswordComplexityPolicyChangedEvent{
 		PasswordComplexityPolicyChangedEvent: *policy.NewPasswordComplexityPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
+			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyChangedEventType),
+			changes,
 		),
 	}
 }
