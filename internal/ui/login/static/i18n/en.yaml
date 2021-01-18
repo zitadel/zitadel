@@ -157,6 +157,7 @@ Registration:
   TosConfirm: I agree the
   TosLinkText: TOS
   TosLink: https://zitadel.ch/pdf/tos.pdf
+  ExternalLogin: or register with an external user
 
 RegistrationOrg:
   Title: Organisation Registration
