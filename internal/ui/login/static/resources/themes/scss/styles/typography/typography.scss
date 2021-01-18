@@ -1,4 +1,8 @@
-@import './font_faces.scss';
+@import './faces/ailerons_font_faces.scss';
+@import './faces/lato_font_faces.scss';
+@import './faces/roboto_font_faces.scss';
+@import './faces/raleway_font_faces.scss';
+@import './faces/pt_sans_font_faces.scss';
 
 @mixin zitadel-lgn-typography($config-or-theme: null) {
     $config: if(lgn-private-is-theme-object($config-or-theme),
@@ -176,6 +180,10 @@
       p {
         margin: 0 0 12px;
       }
+    }
+
+    button, .lgn-button {
+        @include lgn-typography-level-to-styles($config, button);
     }
 
     span {
