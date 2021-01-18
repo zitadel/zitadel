@@ -17,7 +17,7 @@
     .lgn-idp {
         border-color: lgn-color($foreground, divider);
 
-        @include lgn-idp-elevation(2, $config);
+        @include lgn-idp-elevation(1, $config);
 
         &:not([disabled]):active {
             @include lgn-idp-elevation(8, $config);

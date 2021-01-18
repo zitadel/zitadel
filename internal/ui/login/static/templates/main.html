@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="{{ resourceThemeUrl "../../fonts/lgn-icons/css/lgn-icon-font.css" .Theme }}">
 
     <title>{{ .Title }}</title>
+
+    <script src="{{ resourceUrl "scripts/theme.js" }}"></script>
 </head>
 
 <!-- lgn-app-background tints the background to the selected theme colors -->
@@ -34,6 +36,4 @@
 <footer>
     {{template "footer" .}}
 </footer>
-
-<script src="{{ resourceUrl "scripts/theme.js" }}"></script>
 {{end}}
