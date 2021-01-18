@@ -1,7 +1,9 @@
 function disableSubmit(checks, button) {
     let form = document.getElementsByTagName('form')[0];
     let inputs = form.getElementsByTagName('input');
-    button.disabled = true;
+    if (button) {
+        button.disabled = true;
+    }
     addRequiredEventListener(inputs, checks, form, button);
     disableDoubleSubmit(form, button);
 }

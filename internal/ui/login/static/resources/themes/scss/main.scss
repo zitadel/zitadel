@@ -1,5 +1,12 @@
 body {
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+
+    .lgn-grow {
+        flex: 1;
+    }
 
     &.waiting * {
         cursor: wait !important;

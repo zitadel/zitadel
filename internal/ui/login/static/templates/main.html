@@ -23,15 +23,17 @@
 <!-- lgn-app-background tints the background to the selected theme colors -->
 
 <body class="lgn-app-background">
-    <div class="lgn-max-width-wrapper">
-        {{template "header" .}}
-        <div class="content-container">
-            {{end}}
-                <!-- here goes the content -->
+    <div class="lgn-grow">
+        <div class="lgn-max-width-wrapper">
+            {{template "header" .}}
+            <div class="content-container">
+                {{end}}
+                    <!-- here goes the content -->
 
-            {{define "main-bottom"}}
-        </div>
-   </div>
+                {{define "main-bottom"}}
+            </div>
+    </div>
+    </div>
 </body>
 <footer>
     {{template "footer" .}}
