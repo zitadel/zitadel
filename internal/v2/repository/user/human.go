@@ -54,7 +54,7 @@ func (e *HumanAddedEvent) Data() interface{} {
 }
 
 func (e *HumanAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
+	return []eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName)}
 }
 
 func (e *HumanAddedEvent) AddAddressData(
@@ -155,7 +155,7 @@ func (e *HumanRegisteredEvent) Data() interface{} {
 }
 
 func (e *HumanRegisteredEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
+	return []eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName)}
 }
 
 func (e *HumanRegisteredEvent) AddAddressData(

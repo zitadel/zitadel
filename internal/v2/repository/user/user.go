@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	uniqueUsernameTable       = "unique_usernames"
 	userEventTypePrefix       = eventstore.EventType("user.")
 	UserLockedType            = userEventTypePrefix + "locked"
 	UserUnlockedType          = userEventTypePrefix + "unlocked"
@@ -21,6 +22,40 @@ const (
 	UserDomainClaimedSentType = userEventTypePrefix + "domain.claimed.sent"
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
 )
+
+type UsernameUniqueConstraint struct {
+	tableName string
+	userName  string
+	action    eventstore.UniqueConstraintAction
+}
+
+func NewAddUsernameUniqueConstraint(userName string) *UsernameUniqueConstraint {
+	return &UsernameUniqueConstraint{
+		tableName: uniqueUsernameTable,
+		userName:  userName,
+		action:    eventstore.UniqueConstraintAdd,
+	}
+}
+
+func NewRemoveUsernameUniqueConstraint(userName string) *UsernameUniqueConstraint {
+	return &UsernameUniqueConstraint{
+		tableName: uniqueUsernameTable,
+		userName:  userName,
+		action:    eventstore.UniqueConstraintRemoved,
+	}
+}
+
+func (e *UsernameUniqueConstraint) TableName() string {
+	return e.tableName
+}
+
+func (e *UsernameUniqueConstraint) UniqueField() string {
+	return e.userName
+}
+
+func (e *UsernameUniqueConstraint) Action() eventstore.UniqueConstraintAction {
+	return e.action
+}
 
 type UserLockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
