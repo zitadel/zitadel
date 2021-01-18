@@ -27,6 +27,9 @@ func (r *CommandSide) AddHuman(ctx context.Context, orgID string, human *domain.
 	}
 	err = r.eventstore.PushAggregate(ctx, addedHuman, userAgg)
 	if err != nil {
+		if caos_errs.IsErrorAlreadyExists(err) {
+			return nil, caos_errs.ThrowAlreadyExists(err, "COMMAND-4kSff", "Errors.User.AlreadyExists")
+		}
 		return nil, err
 	}
 
@@ -47,6 +50,9 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *do
 	}
 	err = r.eventstore.PushAggregate(ctx, addedHuman, userAgg)
 	if err != nil {
+		if caos_errs.IsErrorAlreadyExists(err) {
+			return nil, caos_errs.ThrowAlreadyExists(err, "COMMAND-4kSff", "Errors.User.AlreadyExists")
+		}
 		return nil, err
 	}
 

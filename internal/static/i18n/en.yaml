@@ -5,6 +5,7 @@ Errors:
   IDMissing: ID missing
   User:
     NotFound: User could not be found
+    AlreadyExists: User already exists
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
     UserIDMissing: User ID missing

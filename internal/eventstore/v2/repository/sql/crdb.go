@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/lib/pq"
 	"regexp"
 	"strconv"
 
@@ -166,24 +167,6 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 		return nil
 	}
 
-	//add, remove := repository.CheckUniqueConstraintActions(uniqueConstraints...)
-	//var insertUniqueStmt *sql.Stmt
-	//var deleteUniqueStmt *sql.Stmt
-	//if add {
-	//	insertUniqueStmt, err = tx.PrepareContext(ctx, uniqueInsert)
-	//	if err != nil {
-	//		logging.Log("SQL-0oLds").WithError(err).Warn("prepare insert unique failed")
-	//		return caos_errs.ThrowInternal(err, "SQL-3M0fs", "prepare insert unique failed")
-	//	}
-	//}
-	//if remove {
-	//	deleteUniqueStmt, err = tx.PrepareContext(ctx, uniqueDelete)
-	//	if err != nil {
-	//		logging.Log("SQL-fM0sd").WithError(err).Warn("prepare delete unique failed")
-	//		return caos_errs.ThrowInternal(err, "SQL-5M0fs", "prepare delete unique failed")
-	//	}
-	//}
-
 	for _, uniqueConstraint := range uniqueConstraints {
 		if uniqueConstraint.Action == repository.UniqueConstraintAdd {
 			_, err := tx.ExecContext(ctx, fmt.Sprintf(uniqueInsert, uniqueConstraint.TableName), uniqueConstraint.UniqueField)
@@ -191,16 +174,24 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 				logging.LogWithFields("SQL-IP3js",
 					"table_name", uniqueConstraint.TableName,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("insert unique constraint failed")
+
+				switch e := err.(type) {
+				case *pq.Error:
+					if e.Code.Name() == "unique_violation" {
+						return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", "unable to create unique constraint")
+					}
+				}
+
 				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint ")
 			}
 		} else if uniqueConstraint.Action == repository.UniqueConstraintRemoved {
-			//_, err := deleteUniqueStmt.ExecContext(ctx, uniqueConstraint.TableName, uniqueConstraint.UniqueField)
-			//if err != nil {
-			//	logging.LogWithFields("SQL-M0vsf",
-			//		"table_name", uniqueConstraint.TableName,
-			//		"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
-			//	return caos_errs.ThrowInternal(err, "SQL-2M9fs", "unable to remove unique constraint ")
-			//}
+			_, err := tx.ExecContext(ctx, fmt.Sprintf(uniqueDelete, uniqueConstraint.TableName), uniqueConstraint.UniqueField)
+			if err != nil {
+				logging.LogWithFields("SQL-M0vsf",
+					"table_name", uniqueConstraint.TableName,
+					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
+				return caos_errs.ThrowInternal(err, "SQL-2M9fs", "unable to remove unique constraint ")
+			}
 		}
 	}
 	return nil
