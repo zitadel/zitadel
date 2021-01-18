@@ -64,14 +64,17 @@ func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
 func NewPasswordAgePolicyChangedEvent(
 	base *eventstore.BaseEvent,
 	changes []PasswordAgePolicyChanges,
-) *PasswordAgePolicyChangedEvent {
+) (*PasswordAgePolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-DAgt5", "Errors.NoChangesFound")
+	}
 	changeEvent := &PasswordAgePolicyChangedEvent{
 		BaseEvent: *base,
 	}
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent
+	return changeEvent, nil
 }
 
 type PasswordAgePolicyChanges func(*PasswordAgePolicyChangedEvent)

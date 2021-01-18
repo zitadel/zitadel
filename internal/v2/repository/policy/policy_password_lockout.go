@@ -65,14 +65,17 @@ func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {
 func NewPasswordLockoutPolicyChangedEvent(
 	base *eventstore.BaseEvent,
 	changes []PasswordLockoutPolicyChanges,
-) *PasswordLockoutPolicyChangedEvent {
+) (*PasswordLockoutPolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-sdgh6", "Errors.NoChangesFound")
+	}
 	changeEvent := &PasswordLockoutPolicyChangedEvent{
 		BaseEvent: *base,
 	}
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent
+	return changeEvent, nil
 }
 
 type PasswordLockoutPolicyChanges func(*PasswordLockoutPolicyChangedEvent)

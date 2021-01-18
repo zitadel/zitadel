@@ -64,14 +64,17 @@ func (e *LabelPolicyChangedEvent) Data() interface{} {
 func NewLabelPolicyChangedEvent(
 	base *eventstore.BaseEvent,
 	changes []LabelPolicyChanges,
-) *LabelPolicyChangedEvent {
+) (*LabelPolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-Asfd3", "Errors.NoChangesFound")
+	}
 	changeEvent := &LabelPolicyChangedEvent{
 		BaseEvent: *base,
 	}
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent
+	return changeEvent, nil
 }
 
 type LabelPolicyChanges func(*LabelPolicyChangedEvent)

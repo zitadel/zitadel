@@ -57,5 +57,9 @@ func (wm *OrgPasswordLockoutPolicyWriteModel) NewChangedEvent(ctx context.Contex
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return org.NewPasswordLockoutPolicyChangedEvent(ctx, changes), true
+	changedEvent, err := org.NewPasswordLockoutPolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }

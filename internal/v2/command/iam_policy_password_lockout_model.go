@@ -56,5 +56,9 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(ctx context.Contex
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return iam.NewPasswordLockoutPolicyChangedEvent(ctx, changes), true
+	changedEvent, err := iam.NewPasswordLockoutPolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }

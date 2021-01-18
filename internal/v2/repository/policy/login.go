@@ -80,14 +80,17 @@ func (e *LoginPolicyChangedEvent) Data() interface{} {
 func NewLoginPolicyChangedEvent(
 	base *eventstore.BaseEvent,
 	changes []LoginPolicyChanges,
-) *LoginPolicyChangedEvent {
+) (*LoginPolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-ADg34", "Errors.NoChangesFound")
+	}
 	changeEvent := &LoginPolicyChangedEvent{
 		BaseEvent: *base,
 	}
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent
+	return changeEvent, nil
 }
 
 type LoginPolicyChanges func(*LoginPolicyChangedEvent)

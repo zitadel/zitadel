@@ -52,13 +52,15 @@ type PasswordComplexityPolicyChangedEvent struct {
 func NewPasswordComplexityPolicyChangedEvent(
 	ctx context.Context,
 	changes []policy.PasswordComplexityPolicyChanges,
-) *PasswordComplexityPolicyChangedEvent {
-	return &PasswordComplexityPolicyChangedEvent{
-		PasswordComplexityPolicyChangedEvent: *policy.NewPasswordComplexityPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyChangedEventType),
-			changes,
-		),
+) (*PasswordComplexityPolicyChangedEvent, error) {
+	changedEvent, err := policy.NewPasswordComplexityPolicyChangedEvent(
+		eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyChangedEventType),
+		changes,
+	)
+	if err != nil {
+		return nil, err
 	}
+	return &PasswordComplexityPolicyChangedEvent{PasswordComplexityPolicyChangedEvent: *changedEvent}, nil
 }
 
 func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

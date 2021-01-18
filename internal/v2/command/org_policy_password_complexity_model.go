@@ -74,5 +74,9 @@ func (wm *OrgPasswordComplexityPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return org.NewPasswordComplexityPolicyChangedEvent(ctx, changes), true
+	changedEvent, err := org.NewPasswordComplexityPolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }

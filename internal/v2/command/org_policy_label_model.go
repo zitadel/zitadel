@@ -59,5 +59,9 @@ func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return org.NewLabelPolicyChangedEvent(ctx, changes), true
+	changedEvent, err := org.NewLabelPolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }

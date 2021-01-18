@@ -53,5 +53,9 @@ func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(ctx context.Context, userLo
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return iam.NewOrgIAMPolicyChangedEvent(ctx, changes), true
+	changedEvent, err := iam.NewOrgIAMPolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }
