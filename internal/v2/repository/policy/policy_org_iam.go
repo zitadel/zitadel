@@ -61,14 +61,17 @@ func (e *OrgIAMPolicyChangedEvent) Data() interface{} {
 func NewOrgIAMPolicyChangedEvent(
 	base *eventstore.BaseEvent,
 	changes []OrgIAMPolicyChanges,
-) *OrgIAMPolicyChangedEvent {
+) (*OrgIAMPolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-DAf3h", "Errors.NoChangesFound")
+	}
 	changeEvent := &OrgIAMPolicyChangedEvent{
 		BaseEvent: *base,
 	}
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent
+	return changeEvent, nil
 }
 
 type OrgIAMPolicyChanges func(*OrgIAMPolicyChangedEvent)

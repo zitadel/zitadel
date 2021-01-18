@@ -47,13 +47,15 @@ type PasswordLockoutPolicyChangedEvent struct {
 func NewPasswordLockoutPolicyChangedEvent(
 	ctx context.Context,
 	changes []policy.PasswordLockoutPolicyChanges,
-) *PasswordLockoutPolicyChangedEvent {
-	return &PasswordLockoutPolicyChangedEvent{
-		PasswordLockoutPolicyChangedEvent: *policy.NewPasswordLockoutPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordLockoutPolicyChangedEventType),
-			changes,
-		),
+) (*PasswordLockoutPolicyChangedEvent, error) {
+	changedEvent, err := policy.NewPasswordLockoutPolicyChangedEvent(
+		eventstore.NewBaseEventForPush(ctx, PasswordLockoutPolicyChangedEventType),
+		changes,
+	)
+	if err != nil {
+		return nil, err
 	}
+	return &PasswordLockoutPolicyChangedEvent{PasswordLockoutPolicyChangedEvent: *changedEvent}, nil
 }
 
 func PasswordLockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

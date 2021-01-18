@@ -76,14 +76,17 @@ func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
 func NewPasswordComplexityPolicyChangedEvent(
 	base *eventstore.BaseEvent,
 	changes []PasswordComplexityPolicyChanges,
-) *PasswordComplexityPolicyChangedEvent {
+) (*PasswordComplexityPolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-Rdhu3", "Errors.NoChangesFound")
+	}
 	changeEvent := &PasswordComplexityPolicyChangedEvent{
 		BaseEvent: *base,
 	}
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent
+	return changeEvent, nil
 }
 
 type PasswordComplexityPolicyChanges func(*PasswordComplexityPolicyChangedEvent)

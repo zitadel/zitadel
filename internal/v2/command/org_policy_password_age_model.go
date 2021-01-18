@@ -57,5 +57,9 @@ func (wm *OrgPasswordAgePolicyWriteModel) NewChangedEvent(ctx context.Context, e
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return org.NewPasswordAgePolicyChangedEvent(ctx, changes), true
+	changedEvent, err := org.NewPasswordAgePolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }

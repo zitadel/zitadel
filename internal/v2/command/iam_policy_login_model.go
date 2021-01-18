@@ -77,5 +77,9 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return iam.NewLoginPolicyChangedEvent(ctx, changes), true
+	changedEvent, err := iam.NewLoginPolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }

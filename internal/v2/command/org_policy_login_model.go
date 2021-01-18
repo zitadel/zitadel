@@ -79,5 +79,9 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return org.NewLoginPolicyChangedEvent(ctx, changes), true
+	changedEvent, err := org.NewLoginPolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }
