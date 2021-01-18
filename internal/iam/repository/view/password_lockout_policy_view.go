@@ -11,8 +11,8 @@ import (
 
 func GetPasswordLockoutPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.PasswordLockoutPolicyView, error) {
 	policy := new(model.PasswordLockoutPolicyView)
-	userIDQuery := &model.PasswordLockoutPolicySearchQuery{Key: iam_model.PasswordLockoutPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, userIDQuery)
+	aggregateIDQuery := &model.PasswordLockoutPolicySearchQuery{Key: iam_model.PasswordLockoutPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.IAM.PasswordLockoutPolicy.NotExisting")

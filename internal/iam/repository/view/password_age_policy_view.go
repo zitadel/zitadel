@@ -11,8 +11,8 @@ import (
 
 func GetPasswordAgePolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.PasswordAgePolicyView, error) {
 	policy := new(model.PasswordAgePolicyView)
-	userIDQuery := &model.PasswordAgePolicySearchQuery{Key: iam_model.PasswordAgePolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, userIDQuery)
+	aggregateIDQuery := &model.PasswordAgePolicySearchQuery{Key: iam_model.PasswordAgePolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.IAM.PasswordAgePolicy.NotExisting")

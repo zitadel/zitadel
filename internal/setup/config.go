@@ -6,15 +6,16 @@ import (
 )
 
 type IAMSetUp struct {
-	Step1 *Step1
-	Step2 *Step2
-	Step3 *Step3
-	Step4 *Step4
-	Step5 *Step5
-	Step6 *Step6
-	Step7 *Step7
-	Step8 *Step8
-	Step9 *Step9
+	Step1  *Step1
+	Step2  *Step2
+	Step3  *Step3
+	Step4  *Step4
+	Step5  *Step5
+	Step6  *Step6
+	Step7  *Step7
+	Step8  *Step8
+	Step9  *Step9
+	Step10 *Step10
 }
 
 func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]step, error) {
@@ -31,6 +32,7 @@ func (setup *IAMSetUp) steps(currentDone iam_model.Step) ([]step, error) {
 		setup.Step7,
 		setup.Step8,
 		setup.Step9,
+		setup.Step10,
 	} {
 		if step.step() <= currentDone {
 			continue
