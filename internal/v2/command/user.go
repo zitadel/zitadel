@@ -138,7 +138,7 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
 
-func (r *CommandSide) isUserActive(ctx context.Context, userID, resourceOwner string) (bool, error) {
+func (r *CommandSide) checkUserExists(ctx context.Context, userID, resourceOwner string) (bool, error) {
 	userWriteModel, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return false, err

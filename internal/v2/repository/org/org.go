@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	OrgAdded       = orgEventTypePrefix + "added"
-	OrgChanged     = orgEventTypePrefix + "changed"
-	OrgDeactivated = orgEventTypePrefix + "deactivated"
-	OrgReactivated = orgEventTypePrefix + "reactivated"
-	OrgRemoved     = orgEventTypePrefix + "removed"
+	OrgAddedEventType       = orgEventTypePrefix + "added"
+	OrgChangedEventType     = orgEventTypePrefix + "changed"
+	OrgDeactivatedEventType = orgEventTypePrefix + "deactivated"
+	OrgReactivatedEventType = orgEventTypePrefix + "reactivated"
+	OrgRemovedEventType     = orgEventTypePrefix + "removed"
 )
 
 type OrgAddedEvent struct {
@@ -31,7 +31,7 @@ func NewOrgAddedEvent(ctx context.Context, name string) *OrgAddedEvent {
 	return &OrgAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgAdded,
+			OrgAddedEventType,
 		),
 		Name: name,
 	}
@@ -63,7 +63,7 @@ func NewOrgChangedEvent(ctx context.Context, name string) *OrgChangedEvent {
 	return &OrgChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgChanged,
+			OrgChangedEventType,
 		),
 		Name: name,
 	}
@@ -93,7 +93,7 @@ func NewOrgDeactivatedEvent(ctx context.Context) *OrgDeactivatedEvent {
 	return &OrgDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgDeactivated,
+			OrgDeactivatedEventType,
 		),
 	}
 }
@@ -122,7 +122,7 @@ func NewOrgReactivatedEvent(ctx context.Context) *OrgReactivatedEvent {
 	return &OrgReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgReactivated,
+			OrgReactivatedEventType,
 		),
 	}
 }

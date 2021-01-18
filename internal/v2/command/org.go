@@ -36,7 +36,7 @@ func (r *CommandSide) AddOrg(ctx context.Context, name, userID, resourceOwner st
 		return nil, err
 	}
 
-	active, err := r.isUserActive(ctx, userID, resourceOwner)
+	active, err := r.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -130,14 +130,6 @@ func (r *CommandSide) addOrg(ctx context.Context, organisation *domain.Org) (_ *
 		}
 	}
 	return orgAgg, addedOrg, nil
-}
-
-func (r *CommandSide) getOrgByID(ctx context.Context, orgID string) (*domain.Org, error) {
-	orgWriteModel, err := r.getOrgWriteModelByID(ctx, orgID)
-	if err != nil {
-		return nil, err
-	}
-	return orgWriteModelToOrg(orgWriteModel), nil
 }
 
 func (r *CommandSide) getOrgWriteModelByID(ctx context.Context, orgID string) (*OrgWriteModel, error) {
