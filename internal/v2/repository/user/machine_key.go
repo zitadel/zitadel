@@ -29,6 +29,10 @@ func (e *MachineKeyAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *MachineKeyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewMachineKeyAddedEvent(
 	ctx context.Context,
 	keyID string,
@@ -68,6 +72,10 @@ type MachineKeyRemovedEvent struct {
 
 func (e *MachineKeyRemovedEvent) Data() interface{} {
 	return e
+}
+
+func (e *MachineKeyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewMachineKeyRemovedEvent(

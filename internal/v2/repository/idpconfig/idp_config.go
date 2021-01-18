@@ -38,6 +38,10 @@ func (e *IDPConfigAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *IDPConfigAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &IDPConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -61,6 +65,10 @@ type IDPConfigChangedEvent struct {
 
 func (e *IDPConfigChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *IDPConfigChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewIDPConfigChangedEvent(
@@ -105,6 +113,10 @@ func (e *IDPConfigDeactivatedEvent) Data() interface{} {
 	return e
 }
 
+func (e *IDPConfigDeactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &IDPConfigDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -139,6 +151,10 @@ func (e *IDPConfigReactivatedEvent) Data() interface{} {
 	return e
 }
 
+func (e *IDPConfigReactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &IDPConfigReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -171,6 +187,10 @@ func NewIDPConfigRemovedEvent(
 
 func (e *IDPConfigRemovedEvent) Data() interface{} {
 	return e
+}
+
+func (e *IDPConfigRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

@@ -28,6 +28,10 @@ func (e *HumanOTPAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanOTPAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanOTPAddedEvent(ctx context.Context,
 	secret *crypto.CryptoValue) *HumanOTPAddedEvent {
 	return &HumanOTPAddedEvent{
@@ -59,6 +63,10 @@ func (e *HumanOTPVerifiedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanOTPVerifiedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanOTPVerifiedEvent(ctx context.Context, userAgentID string) *HumanOTPVerifiedEvent {
 	return &HumanOTPVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -80,6 +88,10 @@ type HumanOTPRemovedEvent struct {
 }
 
 func (e *HumanOTPRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanOTPRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -106,6 +118,10 @@ func (e *HumanOTPCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanOTPCheckSucceededEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanOTPCheckSucceededEvent(ctx context.Context) *HumanOTPCheckSucceededEvent {
 	return &HumanOTPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -126,6 +142,10 @@ type HumanOTPCheckFailedEvent struct {
 }
 
 func (e *HumanOTPCheckFailedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanOTPCheckFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 

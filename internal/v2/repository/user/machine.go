@@ -27,6 +27,10 @@ func (e *MachineAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *MachineAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewMachineAddedEvent(
 	ctx context.Context,
 	userName,
@@ -67,6 +71,10 @@ type MachineChangedEvent struct {
 
 func (e *MachineChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *MachineChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewMachineChangedEvent(

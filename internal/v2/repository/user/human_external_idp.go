@@ -31,6 +31,10 @@ func (e *HumanExternalIDPReservedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanExternalIDPReservedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanExternalIDPReservedEvent(ctx context.Context) *HumanExternalIDPReservedEvent {
 	return &HumanExternalIDPReservedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -45,6 +49,10 @@ type HumanExternalIDPReleasedEvent struct {
 }
 
 func (e *HumanExternalIDPReleasedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanExternalIDPReleasedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -67,6 +75,10 @@ type HumanExternalIDPAddedEvent struct {
 
 func (e *HumanExternalIDPAddedEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanExternalIDPAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName string) *HumanExternalIDPAddedEvent {
@@ -104,6 +116,10 @@ func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanExternalIDPRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPRemovedEvent {
 	return &HumanExternalIDPRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -139,6 +155,10 @@ func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanExternalIDPCascadeRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPCascadeRemovedEvent {
 	return &HumanExternalIDPCascadeRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -168,6 +188,10 @@ type HumanExternalIDPCheckSucceededEvent struct {
 }
 
 func (e *HumanExternalIDPCheckSucceededEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanExternalIDPCheckSucceededEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 

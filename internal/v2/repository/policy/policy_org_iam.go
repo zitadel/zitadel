@@ -23,6 +23,10 @@ func (e *OrgIAMPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *OrgIAMPolicyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOrgIAMPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	userLoginMustBeDomain bool,
@@ -55,6 +59,10 @@ type OrgIAMPolicyChangedEvent struct {
 
 func (e *OrgIAMPolicyChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *OrgIAMPolicyChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewOrgIAMPolicyChangedEvent(

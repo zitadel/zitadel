@@ -30,6 +30,10 @@ func (e *UserLockedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *UserLockedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewUserLockedEvent(ctx context.Context) *UserLockedEvent {
 	return &UserLockedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -50,6 +54,10 @@ type UserUnlockedEvent struct {
 }
 
 func (e *UserUnlockedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *UserUnlockedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -76,6 +84,10 @@ func (e *UserDeactivatedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *UserDeactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewUserDeactivatedEvent(ctx context.Context) *UserDeactivatedEvent {
 	return &UserDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -99,6 +111,10 @@ func (e *UserReactivatedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *UserReactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewUserReactivatedEvent(ctx context.Context) *UserReactivatedEvent {
 	return &UserReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -119,6 +135,10 @@ type UserRemovedEvent struct {
 }
 
 func (e *UserRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *UserRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -153,6 +173,10 @@ func (e *UserTokenAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *UserTokenAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewUserTokenAddedEvent(
 	ctx context.Context,
 	tokenID,
@@ -168,12 +192,13 @@ func NewUserTokenAddedEvent(
 			ctx,
 			UserTokenAddedType,
 		),
-		TokenID:       tokenID,
-		ApplicationID: applicationID,
-		UserAgentID:   userAgentID,
-		Audience:      audience,
-		Scopes:        scopes,
-		Expiration:    expiration,
+		TokenID:           tokenID,
+		ApplicationID:     applicationID,
+		UserAgentID:       userAgentID,
+		Audience:          audience,
+		Scopes:            scopes,
+		Expiration:        expiration,
+		PreferredLanguage: preferredLanguage,
 	}
 }
 
@@ -197,6 +222,10 @@ type DomainClaimedEvent struct {
 
 func (e *DomainClaimedEvent) Data() interface{} {
 	return e
+}
+
+func (e *DomainClaimedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewDomainClaimedEvent(
@@ -232,6 +261,10 @@ func (e *DomainClaimedSentEvent) Data() interface{} {
 	return nil
 }
 
+func (e *DomainClaimedSentEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewDomainClaimedSentEvent(
 	ctx context.Context,
 ) *DomainClaimedSentEvent {
@@ -257,6 +290,10 @@ type UsernameChangedEvent struct {
 
 func (e *UsernameChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *UsernameChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewUsernameChangedEvent(

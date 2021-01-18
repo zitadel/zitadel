@@ -30,6 +30,10 @@ func (e *HumanProfileChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanProfileChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanProfileChangedEvent(
 	ctx context.Context) *HumanProfileChangedEvent {
 	return &HumanProfileChangedEvent{

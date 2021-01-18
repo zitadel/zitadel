@@ -45,6 +45,10 @@ func (e *OIDCConfigAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *OIDCConfigAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOIDCConfigAddedEvent(
 	ctx context.Context,
 	version domain.OIDCVersion,

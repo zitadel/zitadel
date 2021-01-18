@@ -29,6 +29,10 @@ func (e *LoginPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *LoginPolicyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewLoginPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	allowUserNamePassword,
@@ -77,6 +81,10 @@ func (e *LoginPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *LoginPolicyChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewLoginPolicyChangedEvent(
 	base *eventstore.BaseEvent,
 ) *LoginPolicyChangedEvent {
@@ -103,6 +111,10 @@ type LoginPolicyRemovedEvent struct {
 }
 
 func (e *LoginPolicyRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *LoginPolicyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 

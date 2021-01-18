@@ -24,6 +24,10 @@ func (e *LabelPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *LabelPolicyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewLabelPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	primaryColor,
@@ -61,6 +65,10 @@ func (e *LabelPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *LabelPolicyChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewLabelPolicyChangedEvent(
 	base *eventstore.BaseEvent,
 ) *LabelPolicyChangedEvent {
@@ -87,6 +95,10 @@ type LabelPolicyRemovedEvent struct {
 }
 
 func (e *LabelPolicyRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *LabelPolicyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 

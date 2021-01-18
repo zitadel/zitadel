@@ -23,6 +23,10 @@ func (e *ProjectSetEvent) Data() interface{} {
 	return e
 }
 
+func (e *ProjectSetEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewIAMProjectSetEvent(ctx context.Context, projectID string) *ProjectSetEvent {
 	return &ProjectSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

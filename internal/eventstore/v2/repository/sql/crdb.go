@@ -88,6 +88,16 @@ const (
 		"		FROM data " +
 		"	) " +
 		"RETURNING id, event_sequence, previous_sequence, creation_date, resource_owner"
+	uniqueInsert = `INSERT INTO eventstore.$1 
+					(
+						unique_field
+					) 
+					VALUES (  
+						$2::VARCHAR
+					)`
+
+	uniqueDelete = `DELETE FROM eventstore.$1 
+					WHERE unique_field = $2`
 )
 
 type CRDB struct {
@@ -102,7 +112,7 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
-func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
+func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 		stmt, err := tx.PrepareContext(ctx, crdbInsert)
 		if err != nil {
@@ -136,6 +146,10 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 			}
 		}
 
+		err = db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 	if err != nil && !errors.Is(err, &caos_errs.CaosError{}) {
@@ -143,6 +157,52 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 	}
 
 	return err
+}
+
+// handleUniqueConstraints adds or removes unique constraints
+func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*repository.UniqueConstraint) (err error) {
+	if len(uniqueConstraints) == 0 {
+		return nil
+	}
+
+	add, remove := repository.CheckUniqueConstraintActions(uniqueConstraints...)
+	var insertUniqueStmt *sql.Stmt
+	var deleteUniqueStmt *sql.Stmt
+	if add {
+		insertUniqueStmt, err = tx.PrepareContext(ctx, uniqueInsert)
+		if err != nil {
+			logging.Log("SQL-0oLds").WithError(err).Warn("prepare insert unique failed")
+			return caos_errs.ThrowInternal(err, "SQL-3M0fs", "prepare insert unique failed")
+		}
+	}
+	if remove {
+		deleteUniqueStmt, err = tx.PrepareContext(ctx, uniqueDelete)
+		if err != nil {
+			logging.Log("SQL-fM0sd").WithError(err).Warn("prepare delete unique failed")
+			return caos_errs.ThrowInternal(err, "SQL-5M0fs", "prepare delete unique failed")
+		}
+	}
+
+	for _, uniqueConstraint := range uniqueConstraints {
+		if uniqueConstraint.Action == repository.UniqueConstraintAdd {
+			_, err := insertUniqueStmt.ExecContext(ctx, uniqueConstraint.TableName, uniqueConstraint.UniqueField)
+			if err != nil {
+				logging.LogWithFields("SQL-IP3js",
+					"table_name", uniqueConstraint.TableName,
+					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("insert unique constraint failed")
+				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint ")
+			}
+		} else if uniqueConstraint.Action == repository.UniqueConstraintRemoved {
+			_, err := deleteUniqueStmt.ExecContext(ctx, uniqueConstraint.TableName, uniqueConstraint.UniqueField)
+			if err != nil {
+				logging.LogWithFields("SQL-M0vsf",
+					"table_name", uniqueConstraint.TableName,
+					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
+				return caos_errs.ThrowInternal(err, "SQL-2M9fs", "unable to remove unique constraint ")
+			}
+		}
+	}
+	return nil
 }
 
 // Filter returns all events matching the given search query

@@ -24,6 +24,10 @@ func (e *MemberAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *MemberAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewMemberAddedEvent(
 	base *eventstore.BaseEvent,
 	userID string,
@@ -61,6 +65,10 @@ func (e *MemberChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *MemberChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewMemberChangedEvent(
 	base *eventstore.BaseEvent,
 	userID string,
@@ -94,6 +102,10 @@ type MemberRemovedEvent struct {
 
 func (e *MemberRemovedEvent) Data() interface{} {
 	return e
+}
+
+func (e *MemberRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewRemovedEvent(

@@ -31,6 +31,10 @@ func (e *OIDCConfigAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *OIDCConfigAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOIDCConfigAddedEvent(
 	base *eventstore.BaseEvent,
 	clientID,
@@ -83,6 +87,10 @@ type OIDCConfigChangedEvent struct {
 
 func (e *OIDCConfigChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *OIDCConfigChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewOIDCConfigChangedEvent(

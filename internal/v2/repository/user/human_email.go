@@ -29,6 +29,10 @@ func (e *HumanEmailChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanEmailChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanEmailChangedEvent(ctx context.Context) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -60,6 +64,10 @@ func (e *HumanEmailVerifiedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanEmailVerifiedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanEmailVerifiedEvent(ctx context.Context) *HumanEmailVerifiedEvent {
 	return &HumanEmailVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -82,6 +90,10 @@ type HumanEmailVerificationFailedEvent struct {
 }
 
 func (e *HumanEmailVerificationFailedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanEmailVerificationFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -109,6 +121,10 @@ type HumanEmailCodeAddedEvent struct {
 
 func (e *HumanEmailCodeAddedEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanEmailCodeAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewHumanEmailCodeAddedEvent(
@@ -142,6 +158,10 @@ type HumanEmailCodeSentEvent struct {
 }
 
 func (e *HumanEmailCodeSentEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanEmailCodeSentEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 

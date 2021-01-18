@@ -30,6 +30,10 @@ func (e *ProjectAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *ProjectAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewProjectAddedEvent(ctx context.Context, name string) *ProjectAddedEvent {
 	return &ProjectAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

@@ -53,6 +53,10 @@ func (e *HumanAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func (e *HumanAddedEvent) AddAddressData(
 	country,
 	locality,
@@ -150,6 +154,10 @@ func (e *HumanRegisteredEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanRegisteredEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func (e *HumanRegisteredEvent) AddAddressData(
 	country,
 	locality,
@@ -227,6 +235,10 @@ func (e *HumanInitialCodeAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanInitialCodeAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanInitialCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
@@ -262,6 +274,10 @@ func (e *HumanInitialCodeSentEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanInitialCodeSentEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanInitialCodeSentEvent(ctx context.Context) *HumanInitialCodeSentEvent {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -282,6 +298,10 @@ type HumanInitializedCheckSucceededEvent struct {
 }
 
 func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanInitializedCheckSucceededEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -308,6 +328,10 @@ func (e *HumanInitializedCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanInitializedCheckFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanInitializedCheckFailedEvent(ctx context.Context) *HumanInitializedCheckFailedEvent {
 	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -328,6 +352,10 @@ type HumanSignedOutEvent struct {
 }
 
 func (e *HumanSignedOutEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanSignedOutEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 

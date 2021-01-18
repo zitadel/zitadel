@@ -19,6 +19,10 @@ func (e *HumanMFAInitSkippedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanMFAInitSkippedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanMFAInitSkippedEvent(ctx context.Context) *HumanMFAInitSkippedEvent {
 	return &HumanMFAInitSkippedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

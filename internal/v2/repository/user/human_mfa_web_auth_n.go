@@ -40,6 +40,10 @@ func (e *HumanWebAuthNAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanWebAuthNAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanU2FAddedEvent(
 	ctx context.Context,
 	webAuthNTokenID,
@@ -95,6 +99,10 @@ type HumanWebAuthNVerifiedEvent struct {
 
 func (e *HumanWebAuthNVerifiedEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanWebAuthNVerifiedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewHumanU2FVerifiedEvent(
@@ -169,6 +177,10 @@ func (e *HumanWebAuthNSignCountChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanWebAuthNSignCountChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanU2FSignCountChangedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
@@ -221,6 +233,10 @@ func (e *HumanWebAuthNRemovedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanWebAuthNRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanU2FRemovedEvent(
 	ctx context.Context,
 	webAuthNTokenID string,
@@ -269,6 +285,10 @@ type HumanWebAuthNBeginLoginEvent struct {
 
 func (e *HumanWebAuthNBeginLoginEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanWebAuthNBeginLoginEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewHumanU2FBeginLoginEvent(
@@ -323,6 +343,10 @@ func (e *HumanWebAuthNCheckSucceededEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanWebAuthNCheckSucceededEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanU2FCheckSucceededEvent(ctx context.Context) *HumanWebAuthNCheckSucceededEvent {
 	return &HumanWebAuthNCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -361,6 +385,10 @@ type HumanWebAuthNCheckFailedEvent struct {
 
 func (e *HumanWebAuthNCheckFailedEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanWebAuthNCheckFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewHumanU2FCheckFailedEvent(ctx context.Context) *HumanWebAuthNCheckFailedEvent {

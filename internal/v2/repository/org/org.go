@@ -27,6 +27,10 @@ func (e *OrgAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *OrgAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOrgAddedEvent(ctx context.Context, name string) *OrgAddedEvent {
 	return &OrgAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -57,6 +61,10 @@ type OrgChangedEvent struct {
 
 func (e *OrgChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *OrgChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewOrgChangedEvent(ctx context.Context, name string) *OrgChangedEvent {

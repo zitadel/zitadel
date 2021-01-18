@@ -23,6 +23,10 @@ func (e *GlobalOrgSetEvent) Data() interface{} {
 	return e
 }
 
+func (e *GlobalOrgSetEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewGlobalOrgSetEventEvent(ctx context.Context, orgID string) *GlobalOrgSetEvent {
 	return &GlobalOrgSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
