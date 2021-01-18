@@ -340,7 +340,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(tt.args.ctx, tt.args.events...); (err != nil) != tt.res.wantErr {
+			if err := db.Push(tt.args.ctx, tt.args.events); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -445,7 +445,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events...); (err != nil) != tt.res.wantErr {
+			if err := db.Push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -616,7 +616,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			for _, events := range tt.args.events {
 				wg.Add(1)
 				go func(events []*repository.Event) {
-					err := db.Push(context.Background(), events...)
+					err := db.Push(context.Background(), events)
 					if err != nil {
 						errsMu.Lock()
 						errs = append(errs, err)
@@ -728,7 +728,7 @@ func TestCRDB_Filter(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents...); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -814,7 +814,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents...); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -956,7 +956,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events...); err != nil {
+			if err := db.Push(context.Background(), tt.args.events); err != nil {
 				t.Errorf("CRDB.Push() error = %v", err)
 			}
 

@@ -2,14 +2,15 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 type IAM struct {
 	eventstore.ReadModel
 
-	SetUpStarted iam.Step
-	SetUpDone    iam.Step
+	SetUpStarted domain.Step
+	SetUpDone    domain.Step
 
 	GlobalOrgID string
 	ProjectID   string

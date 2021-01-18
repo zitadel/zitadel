@@ -29,7 +29,6 @@ func NewUserAggregate(id string) *UserAggregate {
 			"test.user",
 			"caos",
 			"v1",
-			0,
 		),
 	}
 }
@@ -84,6 +83,10 @@ func (e *UserAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *UserAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 // ------------------------------------------------------------
 // User first name changed event start
 // ------------------------------------------------------------
@@ -122,6 +125,10 @@ func (e *UserFirstNameChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *UserFirstNameChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 // ------------------------------------------------------------
 // User password checked event start
 // ------------------------------------------------------------
@@ -152,6 +159,10 @@ func (e *UserPasswordCheckedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *UserPasswordCheckedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 // ------------------------------------------------------------
 // User deleted event
 // ------------------------------------------------------------
@@ -179,6 +190,10 @@ func UserDeletedMapper() (eventstore.EventType, func(*repository.Event) (eventst
 }
 
 func (e *UserDeletedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *UserDeletedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
 	return nil
 }
 
