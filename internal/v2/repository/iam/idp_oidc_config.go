@@ -64,14 +64,16 @@ func NewIDPOIDCConfigChangedEvent(
 	ctx context.Context,
 	idpConfigID string,
 	changes []idpconfig.OIDCConfigChanges,
-) *IDPOIDCConfigChangedEvent {
-	return &IDPOIDCConfigChangedEvent{
-		OIDCConfigChangedEvent: *idpconfig.NewOIDCConfigChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, IDPOIDCConfigChangedEventType),
-			idpConfigID,
-			changes,
-		),
+) (*IDPOIDCConfigChangedEvent, error) {
+	changeEvent, err := idpconfig.NewOIDCConfigChangedEvent(
+		eventstore.NewBaseEventForPush(ctx, IDPOIDCConfigChangedEventType),
+		idpConfigID,
+		changes,
+	)
+	if err != nil {
+		return nil, err
 	}
+	return &IDPOIDCConfigChangedEvent{OIDCConfigChangedEvent: *changeEvent}, nil
 }
 
 func IDPOIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

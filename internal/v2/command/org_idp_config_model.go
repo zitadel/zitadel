@@ -99,5 +99,9 @@ func (wm *OrgIDPConfigWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return org.NewIDPConfigChangedEvent(ctx, configID, changes), true
+	changeEvent, err := org.NewIDPConfigChangedEvent(ctx, configID, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changeEvent, true
 }

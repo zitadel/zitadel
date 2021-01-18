@@ -90,7 +90,10 @@ func NewOIDCConfigChangedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID string,
 	changes []OIDCConfigChanges,
-) *OIDCConfigChangedEvent {
+) (*OIDCConfigChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "IDPCONFIG-ADzr5", "Errors.NoChangesFound")
+	}
 	changeEvent := &OIDCConfigChangedEvent{
 		BaseEvent:   *base,
 		IDPConfigID: idpConfigID,
@@ -98,7 +101,7 @@ func NewOIDCConfigChangedEvent(
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent
+	return changeEvent, nil
 }
 
 type OIDCConfigChanges func(*OIDCConfigChangedEvent)

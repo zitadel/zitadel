@@ -68,7 +68,10 @@ func NewIDPConfigChangedEvent(
 	base *eventstore.BaseEvent,
 	configID string,
 	changes []IDPConfigChanges,
-) *IDPConfigChangedEvent {
+) (*IDPConfigChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "IDPCONFIG-Dsg21", "Errors.NoChangesFound")
+	}
 	changeEvent := &IDPConfigChangedEvent{
 		BaseEvent: *base,
 		ConfigID:  configID,
@@ -76,7 +79,7 @@ func NewIDPConfigChangedEvent(
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent
+	return changeEvent, nil
 }
 
 type IDPConfigChanges func(*IDPConfigChangedEvent)

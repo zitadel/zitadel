@@ -99,5 +99,9 @@ func (wm *IAMIDPConfigWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	return iam.NewIDPConfigChangedEvent(ctx, configID, changes), true
+	changeEvent, err := iam.NewIDPConfigChangedEvent(ctx, configID, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changeEvent, true
 }

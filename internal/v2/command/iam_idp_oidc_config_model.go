@@ -114,5 +114,9 @@ func (wm *IAMIDPOIDCConfigWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	return iam.NewIDPOIDCConfigChangedEvent(ctx, idpConfigID, changes), true, nil
+	changeEvent, err := iam.NewIDPOIDCConfigChangedEvent(ctx, idpConfigID, changes)
+	if err != nil {
+		return nil, false, err
+	}
+	return changeEvent, true, nil
 }
