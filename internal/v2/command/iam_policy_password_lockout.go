@@ -21,7 +21,7 @@ func (r *CommandSide) AddDefaultPasswordLockoutPolicy(ctx context.Context, polic
 		return nil, err
 	}
 
-	return writeModelToPasswordLockoutPolicy(addedPolicy), nil
+	return writeModelToPasswordLockoutPolicy(&addedPolicy.PasswordLockoutPolicyWriteModel), nil
 }
 
 func (r *CommandSide) addDefaultPasswordLockoutPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMPasswordLockoutPolicyWriteModel, policy *domain.PasswordLockoutPolicy) error {
@@ -60,7 +60,7 @@ func (r *CommandSide) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, po
 		return nil, err
 	}
 
-	return writeModelToPasswordLockoutPolicy(existingPolicy), nil
+	return writeModelToPasswordLockoutPolicy(&existingPolicy.PasswordLockoutPolicyWriteModel), nil
 }
 
 func (r *CommandSide) defaultPasswordLockoutPolicyWriteModelByID(ctx context.Context) (policy *IAMPasswordLockoutPolicyWriteModel, err error) {

@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -23,22 +24,22 @@ func (s *Server) GetDefaultPasswordAgePolicy(ctx context.Context, _ *empty.Empty
 }
 
 func (s *Server) CreatePasswordAgePolicy(ctx context.Context, policy *management.PasswordAgePolicyRequest) (*management.PasswordAgePolicy, error) {
-	result, err := s.org.AddPasswordAgePolicy(ctx, passwordAgePolicyRequestToModel(policy))
+	result, err := s.command.AddPasswordAgePolicy(ctx, passwordAgePolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
-	return passwordAgePolicyFromModel(result), nil
+	return passwordAgePolicyFromDomain(result), nil
 }
 
 func (s *Server) UpdatePasswordAgePolicy(ctx context.Context, policy *management.PasswordAgePolicyRequest) (*management.PasswordAgePolicy, error) {
-	result, err := s.org.ChangePasswordAgePolicy(ctx, passwordAgePolicyRequestToModel(policy))
+	result, err := s.command.ChangePasswordAgePolicy(ctx, passwordAgePolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
-	return passwordAgePolicyFromModel(result), nil
+	return passwordAgePolicyFromDomain(result), nil
 }
 
 func (s *Server) RemovePasswordAgePolicy(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	err := s.org.RemovePasswordAgePolicy(ctx)
+	err := s.command.RemovePasswordAgePolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }

@@ -63,9 +63,31 @@ func (e *LabelPolicyChangedEvent) Data() interface{} {
 
 func NewLabelPolicyChangedEvent(
 	base *eventstore.BaseEvent,
-) *LabelPolicyChangedEvent {
-	return &LabelPolicyChangedEvent{
+	changes []LabelPolicyChanges,
+) (*LabelPolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-Asfd3", "Errors.NoChangesFound")
+	}
+	changeEvent := &LabelPolicyChangedEvent{
 		BaseEvent: *base,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type LabelPolicyChanges func(*LabelPolicyChangedEvent)
+
+func ChangePrimaryColor(primaryColor string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.PrimaryColor = &primaryColor
+	}
+}
+
+func ChangeSecondaryColor(secondaryColor string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.SecondaryColor = &secondaryColor
 	}
 }
 
@@ -90,13 +112,13 @@ func (e *LabelPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyRemovedEvent {
+func NewLabelPolicyRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyRemovedEvent {
 	return &LabelPolicyRemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &LabelPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

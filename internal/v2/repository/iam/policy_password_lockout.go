@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
@@ -44,12 +45,16 @@ type PasswordLockoutPolicyChangedEvent struct {
 
 func NewPasswordLockoutPolicyChangedEvent(
 	ctx context.Context,
-) *PasswordLockoutPolicyChangedEvent {
-	return &PasswordLockoutPolicyChangedEvent{
-		PasswordLockoutPolicyChangedEvent: *policy.NewPasswordLockoutPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordLockoutPolicyChangedEventType),
-		),
+	changes []policy.PasswordLockoutPolicyChanges,
+) (*PasswordLockoutPolicyChangedEvent, error) {
+	changedEvent, err := policy.NewPasswordLockoutPolicyChangedEvent(
+		eventstore.NewBaseEventForPush(ctx, PasswordLockoutPolicyChangedEventType),
+		changes,
+	)
+	if err != nil {
+		return nil, err
 	}
+	return &PasswordLockoutPolicyChangedEvent{PasswordLockoutPolicyChangedEvent: *changedEvent}, nil
 }
 
 func PasswordLockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

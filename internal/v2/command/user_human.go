@@ -70,7 +70,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	if err != nil {
 		return nil, nil, err
 	}
-	pwPolicy, err := r.GetOrgPasswordComplexityPolicy(ctx, orgID)
+	pwPolicy, err := r.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -1,8 +1,15 @@
 package management
 
 import (
+	"context"
 	"encoding/json"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -14,27 +21,13 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func orgsFromModel(orgs []*org_model.Org) []*management.Org {
-	orgList := make([]*management.Org, len(orgs))
-	for i, org := range orgs {
-		orgList[i] = orgFromModel(org)
-	}
-	return orgList
-}
-
-func orgFromModel(org *org_model.Org) *management.Org {
-	creationDate, err := ptypes.TimestampProto(org.CreationDate)
-	logging.Log("GRPC-GTHsZ").OnError(err).Debug("unable to get timestamp from time")
-
-	changeDate, err := ptypes.TimestampProto(org.ChangeDate)
-	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
-
+func orgFromDomain(org *domain.Org) *management.Org {
 	return &management.Org{
-		ChangeDate:   changeDate,
-		CreationDate: creationDate,
+		ChangeDate:   timestamppb.New(org.ChangeDate),
+		CreationDate: timestamppb.New(org.CreationDate),
 		Id:           org.AggregateID,
 		Name:         org.Name,
-		State:        orgStateFromModel(org.State),
+		State:        orgStateFromDomain(org.State),
 	}
 }
 
@@ -54,6 +47,17 @@ func orgViewFromModel(org *org_model.OrgView) *management.OrgView {
 	}
 }
 
+func orgStateFromDomain(state domain.OrgState) management.OrgState {
+	switch state {
+	case domain.OrgStateActive:
+		return management.OrgState_ORGSTATE_ACTIVE
+	case domain.OrgStateInactive:
+		return management.OrgState_ORGSTATE_INACTIVE
+	default:
+		return management.OrgState_ORGSTATE_UNSPECIFIED
+	}
+}
+
 func orgStateFromModel(state org_model.OrgState) management.OrgState {
 	switch state {
 	case org_model.OrgStateActive:
@@ -65,29 +69,42 @@ func orgStateFromModel(state org_model.OrgState) management.OrgState {
 	}
 }
 
-func addOrgDomainToModel(domain *management.AddOrgDomainRequest) *org_model.OrgDomain {
-	return &org_model.OrgDomain{Domain: domain.Domain}
-}
-
-func orgDomainValidationToModel(domain *management.OrgDomainValidationRequest) *org_model.OrgDomain {
-	return &org_model.OrgDomain{
-		Domain:         domain.Domain,
-		ValidationType: orgDomainValidationTypeToModel(domain.Type),
+func addOrgDomainToDomain(ctx context.Context, orgDomain *management.AddOrgDomainRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain: orgDomain.Domain,
 	}
 }
 
-func validateOrgDomainToModel(domain *management.ValidateOrgDomainRequest) *org_model.OrgDomain {
-	return &org_model.OrgDomain{Domain: domain.Domain}
+func orgDomainValidationToDomain(ctx context.Context, orgDomain *management.OrgDomainValidationRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain:         orgDomain.Domain,
+		ValidationType: orgDomainValidationTypeToDomain(orgDomain.Type),
+	}
 }
 
-func orgDomainValidationTypeToModel(key management.OrgDomainValidationType) org_model.OrgDomainValidationType {
-	switch key {
+func validateOrgDomainToDomain(ctx context.Context, orgDomain *management.ValidateOrgDomainRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain: orgDomain.Domain,
+	}
+}
+
+func orgDomainValidationTypeToDomain(validationType management.OrgDomainValidationType) domain.OrgDomainValidationType {
+	switch validationType {
 	case management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_HTTP:
-		return org_model.OrgDomainValidationTypeHTTP
+		return domain.OrgDomainValidationTypeHTTP
 	case management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_DNS:
-		return org_model.OrgDomainValidationTypeDNS
+		return domain.OrgDomainValidationTypeDNS
 	default:
-		return org_model.OrgDomainValidationTypeUnspecified
+		return domain.OrgDomainValidationTypeUnspecified
 	}
 }
 
@@ -102,24 +119,32 @@ func orgDomainValidationTypeFromModel(key org_model.OrgDomainValidationType) man
 	}
 }
 
-func primaryOrgDomainToModel(domain *management.PrimaryOrgDomainRequest) *org_model.OrgDomain {
-	return &org_model.OrgDomain{Domain: domain.Domain}
+func primaryOrgDomainToDomain(ctx context.Context, ordDomain *management.PrimaryOrgDomainRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain: ordDomain.Domain,
+	}
 }
 
-func orgDomainFromModel(domain *org_model.OrgDomain) *management.OrgDomain {
-	creationDate, err := ptypes.TimestampProto(domain.CreationDate)
-	logging.Log("GRPC-u8Ksj").OnError(err).Debug("unable to get timestamp from time")
+func removeOrgDomainToDomain(ctx context.Context, ordDomain *management.RemoveOrgDomainRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain: ordDomain.Domain,
+	}
+}
 
-	changeDate, err := ptypes.TimestampProto(domain.ChangeDate)
-	logging.Log("GRPC-9osFS").OnError(err).Debug("unable to get timestamp from time")
-
+func orgDomainFromDomain(orgDomain *domain.OrgDomain) *management.OrgDomain {
 	return &management.OrgDomain{
-		ChangeDate:   changeDate,
-		CreationDate: creationDate,
-		OrgId:        domain.AggregateID,
-		Domain:       domain.Domain,
-		Verified:     domain.Verified,
-		Primary:      domain.Primary,
+		ChangeDate:   timestamppb.New(orgDomain.ChangeDate),
+		CreationDate: timestamppb.New(orgDomain.CreationDate),
+		OrgId:        orgDomain.AggregateID,
+		Domain:       orgDomain.Domain,
+		Verified:     orgDomain.Verified,
+		Primary:      orgDomain.Primary,
 	}
 }
 

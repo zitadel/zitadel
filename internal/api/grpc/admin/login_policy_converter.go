@@ -128,9 +128,20 @@ func secondFactorsResultFromModel(result *iam_model.SecondFactorsSearchResponse)
 	}
 }
 
-func secondFactorFromModel(mfaType iam_model.SecondFactorType) *admin.SecondFactor {
+func secondFactorFromDomain(mfaType domain.SecondFactorType) *admin.SecondFactor {
 	return &admin.SecondFactor{
-		SecondFactor: secondFactorTypeFromModel(mfaType),
+		SecondFactor: secondFactorTypeFromDomain(mfaType),
+	}
+}
+
+func secondFactorTypeFromDomain(mfaType domain.SecondFactorType) admin.SecondFactorType {
+	switch mfaType {
+	case domain.SecondFactorTypeOTP:
+		return admin.SecondFactorType_SECONDFACTORTYPE_OTP
+	case domain.SecondFactorTypeU2F:
+		return admin.SecondFactorType_SECONDFACTORTYPE_U2F
+	default:
+		return admin.SecondFactorType_SECONDFACTORTYPE_UNSPECIFIED
 	}
 }
 
@@ -145,14 +156,14 @@ func secondFactorTypeFromModel(mfaType iam_model.SecondFactorType) admin.SecondF
 	}
 }
 
-func secondFactorTypeToModel(mfaType *admin.SecondFactor) iam_model.SecondFactorType {
+func secondFactorTypeToDomain(mfaType *admin.SecondFactor) domain.SecondFactorType {
 	switch mfaType.SecondFactor {
 	case admin.SecondFactorType_SECONDFACTORTYPE_OTP:
-		return iam_model.SecondFactorTypeOTP
+		return domain.SecondFactorTypeOTP
 	case admin.SecondFactorType_SECONDFACTORTYPE_U2F:
-		return iam_model.SecondFactorTypeU2F
+		return domain.SecondFactorTypeU2F
 	default:
-		return iam_model.SecondFactorTypeUnspecified
+		return domain.SecondFactorTypeUnspecified
 	}
 }
 
@@ -184,9 +195,18 @@ func multiFactorResultFromModel(result *iam_model.MultiFactorsSearchResponse) *a
 	}
 }
 
-func multiFactorFromModel(mfaType iam_model.MultiFactorType) *admin.MultiFactor {
+func multiFactorFromDomain(mfaType domain.MultiFactorType) *admin.MultiFactor {
 	return &admin.MultiFactor{
-		MultiFactor: multiFactorTypeFromModel(mfaType),
+		MultiFactor: multiFactorTypeFromDomain(mfaType),
+	}
+}
+
+func multiFactorTypeFromDomain(mfaType domain.MultiFactorType) admin.MultiFactorType {
+	switch mfaType {
+	case domain.MultiFactorTypeU2FWithPIN:
+		return admin.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN
+	default:
+		return admin.MultiFactorType_MULTIFACTORTYPE_UNSPECIFIED
 	}
 }
 
@@ -199,11 +219,11 @@ func multiFactorTypeFromModel(mfaType iam_model.MultiFactorType) admin.MultiFact
 	}
 }
 
-func multiFactorTypeToModel(mfaType *admin.MultiFactor) iam_model.MultiFactorType {
+func multiFactorTypeToDomain(mfaType *admin.MultiFactor) domain.MultiFactorType {
 	switch mfaType.MultiFactor {
 	case admin.MultiFactorType_MULTIFACTORTYPE_U2F_WITH_PIN:
-		return iam_model.MultiFactorTypeU2FWithPIN
+		return domain.MultiFactorTypeU2FWithPIN
 	default:
-		return iam_model.MultiFactorTypeUnspecified
+		return domain.MultiFactorTypeUnspecified
 	}
 }

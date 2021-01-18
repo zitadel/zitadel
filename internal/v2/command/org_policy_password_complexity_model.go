@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/org"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type OrgPasswordComplexityPolicyWriteModel struct {
@@ -29,6 +30,8 @@ func (wm *OrgPasswordComplexityPolicyWriteModel) AppendEvents(events ...eventsto
 			wm.PasswordComplexityPolicyWriteModel.AppendEvents(&e.PasswordComplexityPolicyAddedEvent)
 		case *org.PasswordComplexityPolicyChangedEvent:
 			wm.PasswordComplexityPolicyWriteModel.AppendEvents(&e.PasswordComplexityPolicyChangedEvent)
+		case *org.PasswordComplexityPolicyRemovedEvent:
+			wm.PasswordComplexityPolicyWriteModel.AppendEvents(&e.PasswordComplexityPolicyRemovedEvent)
 		}
 	}
 }
@@ -52,27 +55,28 @@ func (wm *OrgPasswordComplexityPolicyWriteModel) NewChangedEvent(
 	hasSymbol bool,
 ) (*org.PasswordComplexityPolicyChangedEvent, bool) {
 
-	hasChanged := false
-	changedEvent := org.NewPasswordComplexityPolicyChangedEvent(ctx)
+	changes := make([]policy.PasswordComplexityPolicyChanges, 0)
 	if wm.MinLength != minLength {
-		hasChanged = true
-		changedEvent.MinLength = &minLength
+		changes = append(changes, policy.ChangeMinLength(minLength))
 	}
 	if wm.HasLowercase != hasLowercase {
-		hasChanged = true
-		changedEvent.HasLowercase = &hasLowercase
+		changes = append(changes, policy.ChangeHasLowercase(hasLowercase))
 	}
-	if wm.HasUpperCase != hasUppercase {
-		hasChanged = true
-		changedEvent.HasUpperCase = &hasUppercase
+	if wm.HasUppercase != hasUppercase {
+		changes = append(changes, policy.ChangeHasUppercase(hasUppercase))
 	}
 	if wm.HasNumber != hasNumber {
-		hasChanged = true
-		changedEvent.HasNumber = &hasNumber
+		changes = append(changes, policy.ChangeHasNumber(hasNumber))
 	}
 	if wm.HasSymbol != hasSymbol {
-		hasChanged = true
-		changedEvent.HasSymbol = &hasSymbol
+		changes = append(changes, policy.ChangeHasSymbol(hasSymbol))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	changedEvent, err := org.NewPasswordComplexityPolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }

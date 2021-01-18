@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
@@ -50,12 +51,16 @@ type PasswordComplexityPolicyChangedEvent struct {
 
 func NewPasswordComplexityPolicyChangedEvent(
 	ctx context.Context,
-) *PasswordComplexityPolicyChangedEvent {
-	return &PasswordComplexityPolicyChangedEvent{
-		PasswordComplexityPolicyChangedEvent: *policy.NewPasswordComplexityPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
-		),
+	changes []policy.PasswordComplexityPolicyChanges,
+) (*PasswordComplexityPolicyChangedEvent, error) {
+	changedEvent, err := policy.NewPasswordComplexityPolicyChangedEvent(
+		eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyChangedEventType),
+		changes,
+	)
+	if err != nil {
+		return nil, err
 	}
+	return &PasswordComplexityPolicyChangedEvent{PasswordComplexityPolicyChangedEvent: *changedEvent}, nil
 }
 
 func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

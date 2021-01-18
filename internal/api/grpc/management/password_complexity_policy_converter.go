@@ -1,14 +1,23 @@
 package management
 
 import (
+	"context"
+
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func passwordComplexityPolicyRequestToModel(policy *management.PasswordComplexityPolicyRequest) *iam_model.PasswordComplexityPolicy {
-	return &iam_model.PasswordComplexityPolicy{
+func passwordComplexityPolicyRequestToDomain(ctx context.Context, policy *management.PasswordComplexityPolicyRequest) *domain.PasswordComplexityPolicy {
+	return &domain.PasswordComplexityPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
 		MinLength:    policy.MinLength,
 		HasLowercase: policy.HasLowercase,
 		HasUppercase: policy.HasUppercase,
@@ -17,21 +26,15 @@ func passwordComplexityPolicyRequestToModel(policy *management.PasswordComplexit
 	}
 }
 
-func passwordComplexityPolicyFromModel(policy *iam_model.PasswordComplexityPolicy) *management.PasswordComplexityPolicy {
-	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-5Gslo").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-Bmd9e").OnError(err).Debug("date parse failed")
-
+func passwordComplexityPolicyFromDomain(policy *domain.PasswordComplexityPolicy) *management.PasswordComplexityPolicy {
 	return &management.PasswordComplexityPolicy{
 		MinLength:    policy.MinLength,
 		HasLowercase: policy.HasLowercase,
 		HasUppercase: policy.HasUppercase,
 		HasSymbol:    policy.HasSymbol,
 		HasNumber:    policy.HasNumber,
-		CreationDate: changeDate,
-		ChangeDate:   creationDate,
+		CreationDate: timestamppb.New(policy.CreationDate),
+		ChangeDate:   timestamppb.New(policy.ChangeDate),
 	}
 }
 

@@ -25,8 +25,8 @@ func (wm *PasswordAgePolicyWriteModel) Reduce() error {
 			if e.ExpireWarnDays != nil {
 				wm.ExpireWarnDays = *e.ExpireWarnDays
 			}
-			if e.ExpireWarnDays != nil {
-				wm.ExpireWarnDays = *e.ExpireWarnDays
+			if e.MaxAgeDays != nil {
+				wm.MaxAgeDays = *e.MaxAgeDays
 			}
 		case *policy.PasswordAgePolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved

@@ -12,13 +12,13 @@ import (
 )
 
 const (
-	domainEventPrefix           = orgEventTypePrefix + "domain."
-	OrgDomainAdded              = domainEventPrefix + "added"
-	OrgDomainVerificationAdded  = domainEventPrefix + "verification.added"
-	OrgDomainVerificationFailed = domainEventPrefix + "verification.failed"
-	OrgDomainVerified           = domainEventPrefix + "verified"
-	OrgDomainPrimarySet         = domainEventPrefix + "primary.set"
-	OrgDomainRemoved            = domainEventPrefix + "removed"
+	domainEventPrefix                    = orgEventTypePrefix + "domain."
+	OrgDomainAddedEventType              = domainEventPrefix + "added"
+	OrgDomainVerificationAddedEventType  = domainEventPrefix + "verification.added"
+	OrgDomainVerificationFailedEventType = domainEventPrefix + "verification.failed"
+	OrgDomainVerifiedEventType           = domainEventPrefix + "verified"
+	OrgDomainPrimarySetEventType         = domainEventPrefix + "primary.set"
+	OrgDomainRemovedEventType            = domainEventPrefix + "removed"
 )
 
 type DomainAddedEvent struct {
@@ -35,7 +35,7 @@ func NewDomainAddedEvent(ctx context.Context, domain string) *DomainAddedEvent {
 	return &DomainAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgDomainAdded,
+			OrgDomainAddedEventType,
 		),
 		Domain: domain,
 	}
@@ -73,7 +73,7 @@ func NewDomainVerificationAddedEvent(
 	return &DomainVerificationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgDomainVerificationAdded,
+			OrgDomainVerificationAddedEventType,
 		),
 		Domain:         domain,
 		ValidationType: validationType,
@@ -107,7 +107,7 @@ func NewDomainVerificationFailedEvent(ctx context.Context, domain string) *Domai
 	return &DomainVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgDomainVerificationFailed,
+			OrgDomainVerificationFailedEventType,
 		),
 		Domain: domain,
 	}
@@ -139,7 +139,7 @@ func NewDomainVerifiedEvent(ctx context.Context, domain string) *DomainVerifiedE
 	return &DomainVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgDomainVerified,
+			OrgDomainVerifiedEventType,
 		),
 		Domain: domain,
 	}
@@ -171,7 +171,7 @@ func NewDomainPrimarySetEvent(ctx context.Context, domain string) *DomainPrimary
 	return &DomainPrimarySetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgDomainPrimarySet,
+			OrgDomainPrimarySetEventType,
 		),
 		Domain: domain,
 	}
@@ -203,7 +203,7 @@ func NewDomainRemovedEvent(ctx context.Context, domain string) *DomainRemovedEve
 	return &DomainRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			OrgDomainRemoved,
+			OrgDomainRemovedEventType,
 		),
 		Domain: domain,
 	}

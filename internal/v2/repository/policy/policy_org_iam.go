@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -59,9 +60,25 @@ func (e *OrgIAMPolicyChangedEvent) Data() interface{} {
 
 func NewOrgIAMPolicyChangedEvent(
 	base *eventstore.BaseEvent,
-) *OrgIAMPolicyChangedEvent {
-	return &OrgIAMPolicyChangedEvent{
+	changes []OrgIAMPolicyChanges,
+) (*OrgIAMPolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-DAf3h", "Errors.NoChangesFound")
+	}
+	changeEvent := &OrgIAMPolicyChangedEvent{
 		BaseEvent: *base,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type OrgIAMPolicyChanges func(*OrgIAMPolicyChangedEvent)
+
+func ChangeUserLoginMustBeDomain(userLoginMustBeDomain bool) func(*OrgIAMPolicyChangedEvent) {
+	return func(e *OrgIAMPolicyChangedEvent) {
+		e.UserLoginMustBeDomain = &userLoginMustBeDomain
 	}
 }
 
@@ -76,4 +93,24 @@ func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventRe
 	}
 
 	return e, nil
+}
+
+type OrgIAMPolicyRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *OrgIAMPolicyRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func NewOrgIAMPolicyRemovedEvent(base *eventstore.BaseEvent) *OrgIAMPolicyRemovedEvent {
+	return &OrgIAMPolicyRemovedEvent{
+		BaseEvent: *base,
+	}
+}
+
+func OrgIAMPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &OrgIAMPolicyRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

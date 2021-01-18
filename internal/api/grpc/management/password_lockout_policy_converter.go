@@ -1,31 +1,34 @@
 package management
 
 import (
+	"context"
+
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func passwordLockoutPolicyRequestToModel(policy *management.PasswordLockoutPolicyRequest) *iam_model.PasswordLockoutPolicy {
-	return &iam_model.PasswordLockoutPolicy{
+func passwordLockoutPolicyRequestToDomain(ctx context.Context, policy *management.PasswordLockoutPolicyRequest) *domain.PasswordLockoutPolicy {
+	return &domain.PasswordLockoutPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
 		MaxAttempts:         policy.MaxAttempts,
 		ShowLockOutFailures: policy.ShowLockoutFailure,
 	}
 }
 
-func passwordLockoutPolicyFromModel(policy *iam_model.PasswordLockoutPolicy) *management.PasswordLockoutPolicy {
-	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-bMd9o").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-jFs89").OnError(err).Debug("date parse failed")
-
+func passwordLockoutPolicyFromDomain(policy *domain.PasswordLockoutPolicy) *management.PasswordLockoutPolicy {
 	return &management.PasswordLockoutPolicy{
 		MaxAttempts:        policy.MaxAttempts,
 		ShowLockoutFailure: policy.ShowLockOutFailures,
-		CreationDate:       changeDate,
-		ChangeDate:         creationDate,
+		CreationDate:       timestamppb.New(policy.CreationDate),
+		ChangeDate:         timestamppb.New(policy.ChangeDate),
 	}
 }
 

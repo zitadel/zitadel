@@ -38,9 +38,8 @@ func (s *Server) AddIdpProviderToDefaultLoginPolicy(ctx context.Context, provide
 	return idpProviderFromDomain(result), nil
 }
 
-//TODO: Change to v2
 func (s *Server) RemoveIdpProviderFromDefaultLoginPolicy(ctx context.Context, provider *admin.IdpProviderID) (*empty.Empty, error) {
-	err := s.iam.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
+	err := s.command.RemoveIDPProviderFromDefaultLoginPolicy(ctx, idpProviderToDomain(provider))
 	return &empty.Empty{}, err
 }
 
@@ -53,15 +52,15 @@ func (s *Server) GetDefaultLoginPolicySecondFactors(ctx context.Context, _ *empt
 }
 
 func (s *Server) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, mfa *admin.SecondFactor) (*admin.SecondFactor, error) {
-	result, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, secondFactorTypeToModel(mfa))
+	result, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, secondFactorTypeToDomain(mfa))
 	if err != nil {
 		return nil, err
 	}
-	return secondFactorFromModel(result), nil
+	return secondFactorFromDomain(result), nil
 }
 
 func (s *Server) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, mfa *admin.SecondFactor) (*empty.Empty, error) {
-	err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, secondFactorTypeToModel(mfa))
+	err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, secondFactorTypeToDomain(mfa))
 	return &empty.Empty{}, err
 }
 
@@ -74,14 +73,14 @@ func (s *Server) GetDefaultLoginPolicyMultiFactors(ctx context.Context, _ *empty
 }
 
 func (s *Server) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, mfa *admin.MultiFactor) (*admin.MultiFactor, error) {
-	result, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, multiFactorTypeToModel(mfa))
+	result, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, multiFactorTypeToDomain(mfa))
 	if err != nil {
 		return nil, err
 	}
-	return multiFactorFromModel(result), nil
+	return multiFactorFromDomain(result), nil
 }
 
 func (s *Server) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, mfa *admin.MultiFactor) (*empty.Empty, error) {
-	err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, multiFactorTypeToModel(mfa))
+	err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, multiFactorTypeToDomain(mfa))
 	return &empty.Empty{}, err
 }
