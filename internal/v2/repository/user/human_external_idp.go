@@ -149,7 +149,7 @@ func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPCascadeRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
+	return []eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
 }
 
 func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPCascadeRemovedEvent {

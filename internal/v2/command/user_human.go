@@ -82,7 +82,6 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	}
 
 	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
-	//TODO: Check Unique Username or unique external idp
 	if err := human.CheckOrgIAMPolicy(human.Username, orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}

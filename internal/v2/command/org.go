@@ -122,7 +122,6 @@ func (r *CommandSide) addOrg(ctx context.Context, organisation *domain.Org) (_ *
 	addedOrg := NewOrgWriteModel(organisation.AggregateID)
 
 	orgAgg := OrgAggregateFromWriteModel(&addedOrg.WriteModel)
-	//TODO: uniqueness org name
 	orgAgg.PushEvents(org.NewOrgAddedEvent(ctx, organisation.Name))
 	for _, orgDomain := range organisation.Domains {
 		if err := r.addOrgDomain(ctx, orgAgg, NewOrgDomainWriteModel(orgAgg.ID(), orgDomain.Domain), orgDomain); err != nil {

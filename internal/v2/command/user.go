@@ -32,9 +32,7 @@ func (r *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userNam
 		return err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	userAgg.PushEvents(user.NewUsernameChangedEvent(ctx, userName))
-	//TODO: Check Uniqueness
-	//TODO: release old username, set new unique username
+	userAgg.PushEvents(user.NewUsernameChangedEvent(ctx, existingUser.UserName, userName, orgIAMPolicy.UserLoginMustBeDomain))
 
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
@@ -136,7 +134,6 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 	userAgg.PushEvents(user.NewUserRemovedEvent(ctx, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
-	//TODO: release unqie username
 	//TODO: remove user grants
 
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)

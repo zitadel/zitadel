@@ -329,7 +329,9 @@ func DomainClaimedSentEventMapper(event *repository.Event) (eventstore.EventRead
 type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName string `json:"userName"`
+	UserName              string `json:"userName"`
+	OldUserName           string
+	UserLoginMustBeDomain bool
 }
 
 func (e *UsernameChangedEvent) Data() interface{} {
@@ -337,19 +339,34 @@ func (e *UsernameChangedEvent) Data() interface{} {
 }
 
 func (e *UsernameChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
+	oldUniqueUsername := e.OldUserName
+	if e.UserLoginMustBeDomain {
+		oldUniqueUsername = e.OldUserName + e.ResourceOwner()
+	}
+	newUniqueUsername := e.UserName
+	if e.UserLoginMustBeDomain {
+		newUniqueUsername = e.UserName + e.ResourceOwner()
+	}
+	return []eventstore.EventUniqueConstraint{
+		NewRemoveUsernameUniqueConstraint(oldUniqueUsername),
+		NewAddUsernameUniqueConstraint(newUniqueUsername),
+	}
 }
 
 func NewUsernameChangedEvent(
 	ctx context.Context,
-	userName string,
+	oldUserName,
+	newUserName string,
+	userLoginMustBeDomain bool,
 ) *UsernameChangedEvent {
 	return &UsernameChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserUserNameChangedType,
 		),
-		UserName: userName,
+		UserName:              newUserName,
+		OldUserName:           oldUserName,
+		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 

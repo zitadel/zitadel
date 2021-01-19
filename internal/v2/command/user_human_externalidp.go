@@ -34,8 +34,6 @@ func (r *CommandSide) removeHumanExternalIDP(ctx context.Context, externalIDP *d
 			user.NewHumanExternalIDPCascadeRemovedEvent(ctx, externalIDP.IDPConfigID, externalIDP.ExternalUserID),
 		)
 	}
-
-	//TODO: Release unique externalidp
 	return r.eventstore.PushAggregate(ctx, existingExternalIDP, userAgg)
 }
 
