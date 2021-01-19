@@ -25,7 +25,7 @@ type ProjectnameUniqueConstraint struct {
 	action      eventstore.UniqueConstraintAction
 }
 
-func NewAddProjectnameUniqueConstraint(projectName, resourceOwner string) *ProjectnameUniqueConstraint {
+func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *ProjectnameUniqueConstraint {
 	return &ProjectnameUniqueConstraint{
 		tableName:   uniqueProjectnameTable,
 		projectName: projectName + resourceOwner,
@@ -33,7 +33,7 @@ func NewAddProjectnameUniqueConstraint(projectName, resourceOwner string) *Proje
 	}
 }
 
-func NewRemoveUsernameUniqueConstraint(projectName, resourceOwner string) *ProjectnameUniqueConstraint {
+func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *ProjectnameUniqueConstraint {
 	return &ProjectnameUniqueConstraint{
 		tableName:   uniqueProjectnameTable,
 		projectName: projectName + resourceOwner,
@@ -66,7 +66,7 @@ func (e *ProjectAddedEvent) Data() interface{} {
 }
 
 func (e *ProjectAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return []eventstore.EventUniqueConstraint{NewAddProjectnameUniqueConstraint(e.Name, e.ResourceOwner())}
+	return []eventstore.EventUniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.ResourceOwner())}
 }
 
 func NewProjectAddedEvent(ctx context.Context, name string) *ProjectAddedEvent {
