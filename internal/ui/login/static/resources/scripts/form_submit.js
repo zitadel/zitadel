@@ -39,11 +39,6 @@ function toggleButton(checks, form, inputs, button) {
     }
     const targetValue = !allRequiredDone(form, inputs);
     button.disabled = targetValue;
-
-    // console.log(button.classList);
-    // if (targetValue && button.classList.includes('lgn-initial-focus')) {
-    //     button.focus();
-    // }
 }
 
 function allRequiredDone(form, inputs) {
