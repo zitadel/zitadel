@@ -36,7 +36,6 @@ $lgn-checkbox-font-size: 14px !default;
             width: 16px;
             height: 16px;
             border-radius: 2px;
-            // z-index: 1;
             transition: all .28s cubic-bezier(.4, 0, .2, 1);
             transition-property: background-color, border-color;
         }
@@ -49,7 +48,6 @@ $lgn-checkbox-font-size: 14px !default;
             width: 6px;
             height: 12px;
             transform: rotate(45deg);
-            // z-index: 2;
             transition: border-color .28s cubic-bezier(.4, 0, .2, 1);
         }
     } 

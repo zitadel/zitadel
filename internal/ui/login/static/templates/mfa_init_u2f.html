@@ -20,7 +20,6 @@
             <label class="lgn-label" for="name">{{t "WebAuthN.Name"}}</label>
             <input class="lgn-input" type="text" id="name" name="name" autocomplete="off" autofocus>
         </div>
-        <!-- <a id="btn-register" class="lgn-raised-button lgn-primary wa-support">{{t "Actions.RegisterToken"}}</a> -->
         <div id="wa-error" class="lgn-error hidden">
             <span class="cause"></span>
             <span>{{t "WebAuthN.Error.Retry"}}</span>
@@ -30,9 +29,6 @@
     {{ template "error-message" .}}
 
     <div class="lgn-actions">
-        <!-- <a class="lgn-stroked-button lgn-left-action lgn-primary " href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
-            {{t "Actions.Back"}}
-        </a> -->
         <!-- position element in header -->
         <a class="lgn-icon-button lgn-left-action" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
             <!-- {{t "Actions.Back"}} -->

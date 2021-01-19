@@ -14,26 +14,6 @@ $lgn-container-bottom-margin: 50px;
     @media only screen and (min-width: 600px) {
         margin-top: $lgn-container-top-offset;
     }
-
-    // --borderWidth: 3px;
-    // background: #1D1F20;
-    // position: relative;
-    // padding-top: 2px;
-    // border-radius: var(--borderWidth);
-
-    // &:after {
-    //     content: '';
-    //     position: absolute;
-    //     top: calc(-1 * var(--borderWidth));
-    //     left: calc(-1 * var(--borderWidth));
-    //     height: calc(100% + var(--borderWidth) * 2);
-    //     width: calc(100% + var(--borderWidth) * 2);
-    //     background: linear-gradient(60deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
-    //     border-radius: calc(2 * var(--borderWidth));
-    //     z-index: -1;
-    //     animation: animatedgradient 3s ease alternate infinite;
-    //     background-size: 300% 300%;
-    // }
 }
 
 .content-container {
@@ -58,6 +38,7 @@ $lgn-container-bottom-margin: 50px;
         display: flex;
         align-items: center;
         padding: .5rem 0;
+        margin-top: 1rem;
 
         // this is used to reverse the submit button order. 
         //The form submits the htmls first element thus for displaying the desired button on the right side, items have to be reversed.
