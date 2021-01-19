@@ -167,6 +167,9 @@ func UserReactivatedEventMapper(event *repository.Event) (eventstore.EventReader
 
 type UserRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	UserName              string
+	UserLoginMustBeDomain bool
 }
 
 func (e *UserRemovedEvent) Data() interface{} {
@@ -174,15 +177,21 @@ func (e *UserRemovedEvent) Data() interface{} {
 }
 
 func (e *UserRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
+	uniqueUserName := e.UserName
+	if e.UserLoginMustBeDomain {
+		uniqueUserName = e.UserName + e.ResourceOwner()
+	}
+	return []eventstore.EventUniqueConstraint{NewRemoveUsernameUniqueConstraint(uniqueUserName)}
 }
 
-func NewUserRemovedEvent(ctx context.Context) *UserRemovedEvent {
+func NewUserRemovedEvent(ctx context.Context, userName string, userLoginMustBeDomain bool) *UserRemovedEvent {
 	return &UserRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserRemovedType,
 		),
+		UserName:              userName,
+		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 

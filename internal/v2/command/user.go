@@ -130,8 +130,12 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 	}
+	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
+	if err != nil {
+		return err
+	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	userAgg.PushEvents(user.NewUserRemovedEvent(ctx))
+	userAgg.PushEvents(user.NewUserRemovedEvent(ctx, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
 	//TODO: release unqie username
 	//TODO: remove user grants
 
