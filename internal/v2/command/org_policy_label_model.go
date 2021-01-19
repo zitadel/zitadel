@@ -4,52 +4,51 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/org"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
-type IAMLabelPolicyWriteModel struct {
+type OrgLabelPolicyWriteModel struct {
 	LabelPolicyWriteModel
 }
 
-func NewIAMLabelPolicyWriteModel() *IAMLabelPolicyWriteModel {
-	return &IAMLabelPolicyWriteModel{
+func NewOrgLabelPolicyWriteModel(orgID string) *OrgLabelPolicyWriteModel {
+	return &OrgLabelPolicyWriteModel{
 		LabelPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
 			},
 		},
 	}
 }
 
-func (wm *IAMLabelPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgLabelPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *iam.LabelPolicyAddedEvent:
+		case *org.LabelPolicyAddedEvent:
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyAddedEvent)
-		case *iam.LabelPolicyChangedEvent:
+		case *org.LabelPolicyChangedEvent:
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyChangedEvent)
 		}
 	}
 }
 
-func (wm *IAMLabelPolicyWriteModel) Reduce() error {
+func (wm *OrgLabelPolicyWriteModel) Reduce() error {
 	return wm.LabelPolicyWriteModel.Reduce()
 }
 
-func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+func (wm *OrgLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.LabelPolicyWriteModel.AggregateID).
 		ResourceOwner(wm.ResourceOwner)
 }
 
-func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
+func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	primaryColor,
 	secondaryColor string,
-) (*iam.LabelPolicyChangedEvent, bool) {
+) (*org.LabelPolicyChangedEvent, bool) {
 	changes := make([]policy.LabelPolicyChanges, 0)
 	if wm.PrimaryColor != primaryColor {
 		changes = append(changes, policy.ChangePrimaryColor(primaryColor))
@@ -60,7 +59,7 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewLabelPolicyChangedEvent(ctx, changes)
+	changedEvent, err := org.NewLabelPolicyChangedEvent(ctx, changes)
 	if err != nil {
 		return nil, false
 	}

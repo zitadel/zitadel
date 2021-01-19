@@ -138,6 +138,14 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
 
+func (r *CommandSide) checkUserExists(ctx context.Context, userID, resourceOwner string) (bool, error) {
+	userWriteModel, err := r.userWriteModelByID(ctx, userID, resourceOwner)
+	if err != nil {
+		return false, err
+	}
+	return userWriteModel.UserState != domain.UserStateUnspecified && userWriteModel.UserState != domain.UserStateDeleted, nil
+}
+
 func (r *CommandSide) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

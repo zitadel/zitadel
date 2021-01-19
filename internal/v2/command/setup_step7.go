@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/logging"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -29,7 +28,7 @@ func (r *CommandSide) SetupStep7(ctx context.Context, step *Step7) error {
 		if !step.OTP {
 			return iamAgg, nil
 		}
-		err := r.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, iam_model.SecondFactorTypeOTP)
+		err := r.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, domain.SecondFactorTypeOTP)
 		if err != nil {
 			return nil, err
 		}

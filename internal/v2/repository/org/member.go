@@ -3,11 +3,8 @@ package org
 import (
 	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/member"
-)
-
-const (
-	orgEventTypePrefix = eventstore.EventType("org.")
 )
 
 var (
@@ -37,6 +34,15 @@ func NewMemberAddedEvent(
 	}
 }
 
+func MemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.MemberAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MemberAddedEvent{MemberAddedEvent: *e.(*member.MemberAddedEvent)}, nil
+}
+
 type MemberChangedEvent struct {
 	member.MemberChangedEvent
 }
@@ -59,6 +65,15 @@ func NewMemberChangedEvent(
 	}
 }
 
+func MemberChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.ChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MemberChangedEvent{MemberChangedEvent: *e.(*member.MemberChangedEvent)}, nil
+}
+
 type MemberRemovedEvent struct {
 	member.MemberRemovedEvent
 }
@@ -77,4 +92,13 @@ func NewMemberRemovedEvent(
 			userID,
 		),
 	}
+}
+
+func MemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MemberRemovedEvent{MemberRemovedEvent: *e.(*member.MemberRemovedEvent)}, nil
 }

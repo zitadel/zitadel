@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -117,16 +118,12 @@ func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID stri
 	return writeModelToIDPConfig(existingIDP), nil
 }
 
-func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
-	writeModel, err := r.pushDefaultIDPWriteModel(ctx, idpID, func(a *iam.Aggregate, _ *IAMIDPConfigWriteModel) *iam.Aggregate {
+func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string) error {
+	_, err := r.pushDefaultIDPWriteModel(ctx, idpID, func(a *iam.Aggregate, _ *IAMIDPConfigWriteModel) *iam.Aggregate {
 		a.Aggregate = *a.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, idpID))
 		return a
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToIDPConfig(writeModel), nil
+	return err
 }
 
 func (r *CommandSide) pushDefaultIDPWriteModel(ctx context.Context, idpID string, eventSetter func(*iam.Aggregate, *IAMIDPConfigWriteModel) *iam.Aggregate) (*IAMIDPConfigWriteModel, error) {

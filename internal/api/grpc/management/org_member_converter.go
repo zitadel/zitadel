@@ -1,43 +1,32 @@
 package management
 
 import (
+	"context"
+
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func addOrgMemberToModel(member *management.AddOrgMemberRequest) *org_model.OrgMember {
-	memberModel := &org_model.OrgMember{
-		UserID: member.UserId,
-	}
-	memberModel.Roles = member.Roles
-
-	return memberModel
+func addOrgMemberToDomain(ctx context.Context, member *management.AddOrgMemberRequest) *domain.Member {
+	return domain.NewMember(authz.GetCtxData(ctx).OrgID, member.UserId, member.Roles...)
 }
 
-func changeOrgMemberToModel(member *management.ChangeOrgMemberRequest) *org_model.OrgMember {
-	memberModel := &org_model.OrgMember{
-		UserID: member.UserId,
-	}
-	memberModel.Roles = member.Roles
-
-	return memberModel
+func changeOrgMemberToModel(ctx context.Context, member *management.ChangeOrgMemberRequest) *domain.Member {
+	return domain.NewMember(authz.GetCtxData(ctx).OrgID, member.UserId, member.Roles...)
 }
 
-func orgMemberFromModel(member *org_model.OrgMember) *management.OrgMember {
-	creationDate, err := ptypes.TimestampProto(member.CreationDate)
-	logging.Log("GRPC-jC5wY").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(member.ChangeDate)
-	logging.Log("GRPC-Nc2jJ").OnError(err).Debug("date parse failed")
-
+func orgMemberFromDomain(member *domain.Member) *management.OrgMember {
 	return &management.OrgMember{
 		UserId:       member.UserID,
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
+		CreationDate: timestamppb.New(member.CreationDate),
+		ChangeDate:   timestamppb.New(member.ChangeDate),
 		Roles:        member.Roles,
 		Sequence:     member.Sequence,
 	}

@@ -11,7 +11,7 @@ type PasswordComplexityPolicyWriteModel struct {
 
 	MinLength    uint64
 	HasLowercase bool
-	HasUpperCase bool
+	HasUppercase bool
 	HasNumber    bool
 	HasSymbol    bool
 	State        domain.PolicyState
@@ -23,7 +23,7 @@ func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
 		case *policy.PasswordComplexityPolicyAddedEvent:
 			wm.MinLength = e.MinLength
 			wm.HasLowercase = e.HasLowercase
-			wm.HasUpperCase = e.HasUpperCase
+			wm.HasUppercase = e.HasUppercase
 			wm.HasNumber = e.HasNumber
 			wm.HasSymbol = e.HasSymbol
 			wm.State = domain.PolicyStateActive
@@ -34,8 +34,8 @@ func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
 			if e.HasLowercase != nil {
 				wm.HasLowercase = *e.HasLowercase
 			}
-			if e.HasUpperCase != nil {
-				wm.HasUpperCase = *e.HasUpperCase
+			if e.HasUppercase != nil {
+				wm.HasUppercase = *e.HasUppercase
 			}
 			if e.HasNumber != nil {
 				wm.HasNumber = *e.HasNumber

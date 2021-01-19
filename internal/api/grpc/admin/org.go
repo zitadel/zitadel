@@ -81,6 +81,6 @@ func (s *Server) UpdateOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyR
 }
 
 func (s *Server) RemoveOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) (_ *empty.Empty, err error) {
-	err = s.org.RemoveOrgIAMPolicy(ctx, in.OrgId)
+	err = s.command.RemoveOrgIAMPolicy(ctx, in.OrgId)
 	return &empty.Empty{}, err
 }

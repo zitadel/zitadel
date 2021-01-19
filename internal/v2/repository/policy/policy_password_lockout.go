@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -71,9 +72,31 @@ func (e *PasswordLockoutPolicyChangedEvent) UniqueConstraint() []eventstore.Even
 
 func NewPasswordLockoutPolicyChangedEvent(
 	base *eventstore.BaseEvent,
-) *PasswordLockoutPolicyChangedEvent {
-	return &PasswordLockoutPolicyChangedEvent{
+	changes []PasswordLockoutPolicyChanges,
+) (*PasswordLockoutPolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-sdgh6", "Errors.NoChangesFound")
+	}
+	changeEvent := &PasswordLockoutPolicyChangedEvent{
 		BaseEvent: *base,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type PasswordLockoutPolicyChanges func(*PasswordLockoutPolicyChangedEvent)
+
+func ChangeMaxAttempts(maxAttempts uint64) func(*PasswordLockoutPolicyChangedEvent) {
+	return func(e *PasswordLockoutPolicyChangedEvent) {
+		e.MaxAttempts = &maxAttempts
+	}
+}
+
+func ChangeShowLockOutFailures(showLockOutFailures bool) func(*PasswordLockoutPolicyChangedEvent) {
+	return func(e *PasswordLockoutPolicyChangedEvent) {
+		e.ShowLockOutFailures = &showLockOutFailures
 	}
 }
 
@@ -102,10 +125,7 @@ func (e *PasswordLockoutPolicyRemovedEvent) UniqueConstraint() []eventstore.Even
 	return nil
 }
 
-func NewPasswordLockoutPolicyRemovedEvent(
-	base *eventstore.BaseEvent,
-) *PasswordLockoutPolicyRemovedEvent {
-
+func NewPasswordLockoutPolicyRemovedEvent(base *eventstore.BaseEvent) *PasswordLockoutPolicyRemovedEvent {
 	return &PasswordLockoutPolicyRemovedEvent{
 		BaseEvent: *base,
 	}

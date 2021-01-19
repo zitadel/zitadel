@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type IAMPasswordAgePolicyWriteModel struct {
@@ -45,15 +46,19 @@ func (wm *IAMPasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder
 }
 
 func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(ctx context.Context, expireWarnDays, maxAgeDays uint64) (*iam.PasswordAgePolicyChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := iam.NewPasswordAgePolicyChangedEvent(ctx)
+	changes := make([]policy.PasswordAgePolicyChanges, 0)
 	if wm.ExpireWarnDays != expireWarnDays {
-		hasChanged = true
-		changedEvent.ExpireWarnDays = &expireWarnDays
+		changes = append(changes, policy.ChangeExpireWarnDays(expireWarnDays))
 	}
 	if wm.MaxAgeDays != maxAgeDays {
-		hasChanged = true
-		changedEvent.MaxAgeDays = &maxAgeDays
+		changes = append(changes, policy.ChangeMaxAgeDays(maxAgeDays))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	changedEvent, err := iam.NewPasswordAgePolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }

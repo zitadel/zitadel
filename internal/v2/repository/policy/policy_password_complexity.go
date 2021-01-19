@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -18,7 +19,7 @@ type PasswordComplexityPolicyAddedEvent struct {
 
 	MinLength    uint64 `json:"minLength,omitempty"`
 	HasLowercase bool   `json:"hasLowercase,omitempty"`
-	HasUpperCase bool   `json:"hasUppercase,omitempty"`
+	HasUppercase bool   `json:"hasUppercase,omitempty"`
 	HasNumber    bool   `json:"hasNumber,omitempty"`
 	HasSymbol    bool   `json:"hasSymbol,omitempty"`
 }
@@ -43,9 +44,9 @@ func NewPasswordComplexityPolicyAddedEvent(
 		BaseEvent:    *base,
 		MinLength:    minLength,
 		HasLowercase: hasLowerCase,
+		HasUppercase: hasUpperCase,
 		HasNumber:    hasNumber,
 		HasSymbol:    hasSymbol,
-		HasUpperCase: hasUpperCase,
 	}
 }
 
@@ -67,7 +68,7 @@ type PasswordComplexityPolicyChangedEvent struct {
 
 	MinLength    *uint64 `json:"minLength,omitempty"`
 	HasLowercase *bool   `json:"hasLowercase,omitempty"`
-	HasUpperCase *bool   `json:"hasUppercase,omitempty"`
+	HasUppercase *bool   `json:"hasUppercase,omitempty"`
 	HasNumber    *bool   `json:"hasNumber,omitempty"`
 	HasSymbol    *bool   `json:"hasSymbol,omitempty"`
 }
@@ -82,9 +83,49 @@ func (e *PasswordComplexityPolicyChangedEvent) UniqueConstraint() []eventstore.E
 
 func NewPasswordComplexityPolicyChangedEvent(
 	base *eventstore.BaseEvent,
-) *PasswordComplexityPolicyChangedEvent {
-	return &PasswordComplexityPolicyChangedEvent{
+	changes []PasswordComplexityPolicyChanges,
+) (*PasswordComplexityPolicyChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-Rdhu3", "Errors.NoChangesFound")
+	}
+	changeEvent := &PasswordComplexityPolicyChangedEvent{
 		BaseEvent: *base,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type PasswordComplexityPolicyChanges func(*PasswordComplexityPolicyChangedEvent)
+
+func ChangeMinLength(minLength uint64) func(*PasswordComplexityPolicyChangedEvent) {
+	return func(e *PasswordComplexityPolicyChangedEvent) {
+		e.MinLength = &minLength
+	}
+}
+
+func ChangeHasLowercase(hasLowercase bool) func(*PasswordComplexityPolicyChangedEvent) {
+	return func(e *PasswordComplexityPolicyChangedEvent) {
+		e.HasLowercase = &hasLowercase
+	}
+}
+
+func ChangeHasUppercase(hasUppercase bool) func(*PasswordComplexityPolicyChangedEvent) {
+	return func(e *PasswordComplexityPolicyChangedEvent) {
+		e.HasUppercase = &hasUppercase
+	}
+}
+
+func ChangeHasNumber(hasNumber bool) func(*PasswordComplexityPolicyChangedEvent) {
+	return func(e *PasswordComplexityPolicyChangedEvent) {
+		e.HasNumber = &hasNumber
+	}
+}
+
+func ChangeHasSymbol(hasSymbol bool) func(*PasswordComplexityPolicyChangedEvent) {
+	return func(e *PasswordComplexityPolicyChangedEvent) {
+		e.HasSymbol = &hasSymbol
 	}
 }
 

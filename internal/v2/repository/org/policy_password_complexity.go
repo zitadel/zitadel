@@ -10,6 +10,7 @@ import (
 var (
 	PasswordComplexityPolicyAddedEventType   = orgEventTypePrefix + policy.PasswordComplexityPolicyAddedEventType
 	PasswordComplexityPolicyChangedEventType = orgEventTypePrefix + policy.PasswordComplexityPolicyChangedEventType
+	PasswordComplexityPolicyRemovedEventType = orgEventTypePrefix + policy.PasswordComplexityPolicyRemovedEventType
 )
 
 type PasswordComplexityPolicyAddedEvent struct {
@@ -50,12 +51,16 @@ type PasswordComplexityPolicyChangedEvent struct {
 
 func NewPasswordComplexityPolicyChangedEvent(
 	ctx context.Context,
-) *PasswordComplexityPolicyChangedEvent {
-	return &PasswordComplexityPolicyChangedEvent{
-		PasswordComplexityPolicyChangedEvent: *policy.NewPasswordComplexityPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
-		),
+	changes []policy.PasswordComplexityPolicyChanges,
+) (*PasswordComplexityPolicyChangedEvent, error) {
+	changedEvent, err := policy.NewPasswordComplexityPolicyChangedEvent(
+		eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyChangedEventType),
+		changes,
+	)
+	if err != nil {
+		return nil, err
 	}
+	return &PasswordComplexityPolicyChangedEvent{PasswordComplexityPolicyChangedEvent: *changedEvent}, nil
 }
 
 func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
@@ -65,4 +70,27 @@ func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (events
 	}
 
 	return &PasswordComplexityPolicyChangedEvent{PasswordComplexityPolicyChangedEvent: *e.(*policy.PasswordComplexityPolicyChangedEvent)}, nil
+}
+
+type PasswordComplexityPolicyRemovedEvent struct {
+	policy.PasswordComplexityPolicyRemovedEvent
+}
+
+func NewPasswordComplexityPolicyRemovedEvent(
+	ctx context.Context,
+) *PasswordComplexityPolicyRemovedEvent {
+	return &PasswordComplexityPolicyRemovedEvent{
+		PasswordComplexityPolicyRemovedEvent: *policy.NewPasswordComplexityPolicyRemovedEvent(
+			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyRemovedEventType),
+		),
+	}
+}
+
+func PasswordComplexityPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.PasswordComplexityPolicyRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PasswordComplexityPolicyRemovedEvent{PasswordComplexityPolicyRemovedEvent: *e.(*policy.PasswordComplexityPolicyRemovedEvent)}, nil
 }

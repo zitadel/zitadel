@@ -42,4 +42,5 @@ const (
 	OrgStateUnspecified OrgState = iota
 	OrgStateActive
 	OrgStateInactive
+	OrgStateRemoved
 )

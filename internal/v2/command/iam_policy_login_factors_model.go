@@ -26,6 +26,8 @@ func (wm *IAMSecondFactorWriteModel) AppendEvents(events ...eventstore.EventRead
 		switch e := event.(type) {
 		case *iam.LoginPolicySecondFactorAddedEvent:
 			wm.WriteModel.AppendEvents(&e.SecondFactorAddedEvent)
+		case *iam.LoginPolicySecondFactorRemovedEvent:
+			wm.WriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
 		}
 	}
 }
@@ -60,6 +62,8 @@ func (wm *IAMMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReade
 		switch e := event.(type) {
 		case *iam.LoginPolicyMultiFactorAddedEvent:
 			wm.WriteModel.AppendEvents(&e.MultiFactorAddedEvent)
+		case *iam.LoginPolicyMultiFactorRemovedEvent:
+			wm.WriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
 		}
 	}
 }

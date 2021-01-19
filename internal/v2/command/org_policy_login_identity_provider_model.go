@@ -2,27 +2,26 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
-type IAMIdentityProviderWriteModel struct {
+type OrgIdentityProviderWriteModel struct {
 	IdentityProviderWriteModel
 }
 
-func NewIAMIdentityProviderWriteModel(idpConfigID string) *IAMIdentityProviderWriteModel {
-	return &IAMIdentityProviderWriteModel{
+func NewOrgIdentityProviderWriteModel(orgID, idpConfigID string) *OrgIdentityProviderWriteModel {
+	return &OrgIdentityProviderWriteModel{
 		IdentityProviderWriteModel: IdentityProviderWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
 			},
 			IDPConfigID: idpConfigID,
 		},
 	}
 }
 
-func (wm *IAMIdentityProviderWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgIdentityProviderWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.IdentityProviderAddedEvent:
@@ -30,20 +29,15 @@ func (wm *IAMIdentityProviderWriteModel) AppendEvents(events ...eventstore.Event
 				continue
 			}
 			wm.IdentityProviderWriteModel.AppendEvents(&e.IdentityProviderAddedEvent)
-		case *iam.IdentityProviderRemovedEvent:
-			if e.IDPConfigID != wm.IDPConfigID {
-				continue
-			}
-			wm.IdentityProviderWriteModel.AppendEvents(&e.IdentityProviderRemovedEvent)
 		}
 	}
 }
 
-func (wm *IAMIdentityProviderWriteModel) Reduce() error {
+func (wm *OrgIdentityProviderWriteModel) Reduce() error {
 	return wm.IdentityProviderWriteModel.Reduce()
 }
 
-func (wm *IAMIdentityProviderWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *OrgIdentityProviderWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		ResourceOwner(wm.ResourceOwner)

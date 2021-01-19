@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/logging"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -34,7 +33,7 @@ func (r *CommandSide) SetupStep9(ctx context.Context, step *Step9) error {
 			return nil, err
 		}
 		logging.Log("SETUP-AEG2t").Info("allowed passwordless in login policy")
-		err = r.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, iam_model.MultiFactorTypeU2FWithPIN)
+		err = r.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, domain.MultiFactorTypeU2FWithPIN)
 		if err != nil {
 			return nil, err
 		}
@@ -45,7 +44,7 @@ func (r *CommandSide) SetupStep9(ctx context.Context, step *Step9) error {
 }
 
 func setPasswordlessAllowedInPolicy(ctx context.Context, c *CommandSide, iamAgg *iam_repo.Aggregate) error {
-	policy, err := c.GetDefaultLoginPolicy(ctx)
+	policy, err := c.getDefaultLoginPolicy(ctx)
 	if err != nil {
 		return err
 	}

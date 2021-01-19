@@ -5,58 +5,60 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/org"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
-type IAMLoginPolicyWriteModel struct {
+type OrgLoginPolicyWriteModel struct {
 	LoginPolicyWriteModel
 }
 
-func NewIAMLoginPolicyWriteModel() *IAMLoginPolicyWriteModel {
-	return &IAMLoginPolicyWriteModel{
+func NewOrgLoginPolicyWriteModel(orgID string) *OrgLoginPolicyWriteModel {
+	return &OrgLoginPolicyWriteModel{
 		LoginPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
 			},
 		},
 	}
 }
 
-func (wm *IAMLoginPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgLoginPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *iam.LoginPolicyAddedEvent:
+		case *org.LoginPolicyAddedEvent:
 			wm.LoginPolicyWriteModel.AppendEvents(&e.LoginPolicyAddedEvent)
-		case *iam.LoginPolicyChangedEvent:
+		case *org.LoginPolicyChangedEvent:
 			wm.LoginPolicyWriteModel.AppendEvents(&e.LoginPolicyChangedEvent)
+		case *org.LoginPolicyRemovedEvent:
+			wm.LoginPolicyWriteModel.AppendEvents(&e.LoginPolicyRemovedEvent)
 		}
 	}
 }
 
-func (wm *IAMLoginPolicyWriteModel) IsValid() bool {
+func (wm *OrgLoginPolicyWriteModel) IsValid() bool {
 	return wm.AggregateID != ""
 }
 
-func (wm *IAMLoginPolicyWriteModel) Reduce() error {
+func (wm *OrgLoginPolicyWriteModel) Reduce() error {
 	return wm.LoginPolicyWriteModel.Reduce()
 }
 
-func (wm *IAMLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+func (wm *OrgLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.LoginPolicyWriteModel.AggregateID).
 		ResourceOwner(wm.ResourceOwner)
 }
 
-func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
+func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
 	forceMFA bool,
 	passwordlessType domain.PasswordlessType,
-) (*iam.LoginPolicyChangedEvent, bool) {
+) (*org.LoginPolicyChangedEvent, bool) {
 
 	changes := make([]policy.LoginPolicyChanges, 0)
 	if wm.AllowUserNamePassword != allowUsernamePassword {
@@ -77,7 +79,7 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewLoginPolicyChangedEvent(ctx, changes)
+	changedEvent, err := org.NewLoginPolicyChangedEvent(ctx, changes)
 	if err != nil {
 		return nil, false
 	}

@@ -13,6 +13,7 @@ var (
 	//OrgIAMPolicyChangedEventType = orgEventTypePrefix + policy.OrgIAMPolicyChangedEventType
 	OrgIAMPolicyAddedEventType   = orgEventTypePrefix + "iam.policy.added"
 	OrgIAMPolicyChangedEventType = orgEventTypePrefix + "iam.policy.changed"
+	OrgIAMPolicyRemovedEventType = orgEventTypePrefix + "iam.policy.removed"
 )
 
 type OrgIAMPolicyAddedEvent struct {
@@ -46,12 +47,16 @@ type OrgIAMPolicyChangedEvent struct {
 
 func NewOrgIAMPolicyChangedEvent(
 	ctx context.Context,
-) *OrgIAMPolicyChangedEvent {
-	return &OrgIAMPolicyChangedEvent{
-		OrgIAMPolicyChangedEvent: *policy.NewOrgIAMPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyChangedEventType),
-		),
+	changes []policy.OrgIAMPolicyChanges,
+) (*OrgIAMPolicyChangedEvent, error) {
+	changedEvent, err := policy.NewOrgIAMPolicyChangedEvent(
+		eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyChangedEventType),
+		changes,
+	)
+	if err != nil {
+		return nil, err
 	}
+	return &OrgIAMPolicyChangedEvent{OrgIAMPolicyChangedEvent: *changedEvent}, nil
 }
 
 func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
@@ -61,4 +66,27 @@ func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventRe
 	}
 
 	return &OrgIAMPolicyChangedEvent{OrgIAMPolicyChangedEvent: *e.(*policy.OrgIAMPolicyChangedEvent)}, nil
+}
+
+type OrgIAMPolicyRemovedEvent struct {
+	policy.OrgIAMPolicyRemovedEvent
+}
+
+func NewOrgIAMPolicyRemovedEvent(
+	ctx context.Context,
+) *OrgIAMPolicyRemovedEvent {
+	return &OrgIAMPolicyRemovedEvent{
+		OrgIAMPolicyRemovedEvent: *policy.NewOrgIAMPolicyRemovedEvent(
+			eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyRemovedEventType),
+		),
+	}
+}
+
+func OrgIAMPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.OrgIAMPolicyRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OrgIAMPolicyRemovedEvent{OrgIAMPolicyRemovedEvent: *e.(*policy.OrgIAMPolicyRemovedEvent)}, nil
 }

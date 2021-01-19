@@ -44,12 +44,16 @@ type LabelPolicyChangedEvent struct {
 
 func NewLabelPolicyChangedEvent(
 	ctx context.Context,
-) *LabelPolicyChangedEvent {
-	return &LabelPolicyChangedEvent{
-		LabelPolicyChangedEvent: *policy.NewLabelPolicyChangedEvent(
-			eventstore.NewBaseEventForPush(ctx, LabelPolicyChangedEventType),
-		),
+	changes []policy.LabelPolicyChanges,
+) (*LabelPolicyChangedEvent, error) {
+	changedEvent, err := policy.NewLabelPolicyChangedEvent(
+		eventstore.NewBaseEventForPush(ctx, LabelPolicyChangedEventType),
+		changes,
+	)
+	if err != nil {
+		return nil, err
 	}
+	return &LabelPolicyChangedEvent{LabelPolicyChangedEvent: *changedEvent}, nil
 }
 
 func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

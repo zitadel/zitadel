@@ -47,9 +47,8 @@ func (s *Server) ReactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*adm
 	return idpFromDomain(config), nil
 }
 
-//TODO: Change To V2
 func (s *Server) RemoveIdpConfig(ctx context.Context, id *admin.IdpID) (*empty.Empty, error) {
-	err := s.iam.RemoveIDPConfig(ctx, id.Id)
+	err := s.command.RemoveDefaultIDPConfig(ctx, id.Id)
 	return &empty.Empty{}, err
 }
 

@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/logging"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
@@ -29,7 +28,7 @@ func (r *CommandSide) SetupStep8(ctx context.Context, step *Step8) error {
 		if !step.U2F {
 			return iamAgg, nil
 		}
-		err := r.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, iam_model.SecondFactorTypeU2F)
+		err := r.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, domain.SecondFactorTypeU2F)
 		if err != nil {
 			return nil, err
 		}

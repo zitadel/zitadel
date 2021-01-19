@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/repository/org"
+	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
 type ORGOrgIAMPolicyWriteModel struct {
@@ -44,11 +45,16 @@ func (wm *ORGOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (wm *ORGOrgIAMPolicyWriteModel) NewChangedEvent(ctx context.Context, userLoginMustBeDomain bool) (*org.OrgIAMPolicyChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := org.NewOrgIAMPolicyChangedEvent(ctx)
+	changes := make([]policy.OrgIAMPolicyChanges, 0)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
-		hasChanged = true
-		changedEvent.UserLoginMustBeDomain = &userLoginMustBeDomain
+		changes = append(changes, policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false
+	}
+	changedEvent, err := org.NewOrgIAMPolicyChangedEvent(ctx, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
 }

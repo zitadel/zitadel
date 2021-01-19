@@ -21,7 +21,7 @@ func (rm *PasswordComplexityPolicyReadModel) Reduce() error {
 		case *policy.PasswordComplexityPolicyAddedEvent:
 			rm.MinLength = e.MinLength
 			rm.HasLowercase = e.HasLowercase
-			rm.HasUpperCase = e.HasUpperCase
+			rm.HasUpperCase = e.HasUppercase
 			rm.HasNumber = e.HasNumber
 			rm.HasSymbol = e.HasSymbol
 		case *policy.PasswordComplexityPolicyChangedEvent:
@@ -31,8 +31,8 @@ func (rm *PasswordComplexityPolicyReadModel) Reduce() error {
 			if e.HasLowercase != nil {
 				rm.HasLowercase = *e.HasLowercase
 			}
-			if e.HasUpperCase != nil {
-				rm.HasUpperCase = *e.HasUpperCase
+			if e.HasUppercase != nil {
+				rm.HasUpperCase = *e.HasUppercase
 			}
 			if e.HasNumber != nil {
 				rm.HasNumber = *e.HasNumber
