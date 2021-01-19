@@ -80,6 +80,11 @@ func executeMigrations() error {
 	return nil
 }
 
+func fillUniqueData(table, field string) error {
+	_, err := testCRDBClient.Exec(fmt.Sprintf("INSERT INTO eventstore.%s (unique_field) VALUES ($1)", table), field)
+	return err
+}
+
 type migrationPaths []string
 
 type version struct {

@@ -163,7 +163,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 
 // handleUniqueConstraints adds or removes unique constraints
 func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*repository.UniqueConstraint) (err error) {
-	if len(uniqueConstraints) == 0 {
+	if uniqueConstraints == nil || len(uniqueConstraints) == 0 || (len(uniqueConstraints) == 1 && uniqueConstraints[0] == nil) {
 		return nil
 	}
 

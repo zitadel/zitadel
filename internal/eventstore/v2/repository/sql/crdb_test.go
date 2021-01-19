@@ -268,7 +268,9 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 	type args struct {
 		ctx               context.Context
 		events            []*repository.Event
-		uniqueConstraints []*repository.UniqueConstraint
+		uniqueConstraints *repository.UniqueConstraint
+		uniqueDataTable   string
+		uniqueDataField   string
 	}
 	type eventsRes struct {
 		pushedEventsCount int
@@ -343,9 +345,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				events: []*repository.Event{
 					generateEvent(t, "10"),
 				},
-				uniqueConstraints: []*repository.UniqueConstraint{
-					generateAddUniqueConstraint(t, "field"),
-				},
+				uniqueConstraints: generateAddUniqueConstraint(t, "unique_usernames", "field"),
 			},
 			res: res{
 				wantErr: false,
@@ -356,13 +356,40 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					aggType:           repository.AggregateType(t.Name()),
 				}},
 		},
+		{
+			name: "push 1 event and remove unique constraint",
+			args: args{
+				ctx: context.Background(),
+				events: []*repository.Event{
+					generateEvent(t, "11"),
+				},
+				uniqueConstraints: generateRemoveUniqueConstraint(t, "unique_usernames", "testremove"),
+				uniqueDataTable:   "unique_usernames",
+				uniqueDataField:   "testremove",
+			},
+			res: res{
+				wantErr: false,
+				eventsRes: eventsRes{
+					pushedEventsCount: 1,
+					uniqueCount:       0,
+					aggID:             []string{"11"},
+					aggType:           repository.AggregateType(t.Name()),
+				}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints...); (err != nil) != tt.res.wantErr {
+			if tt.args.uniqueDataTable != "" && tt.args.uniqueDataField != "" {
+				err := fillUniqueData(tt.args.uniqueDataTable, tt.args.uniqueDataField)
+				if err != nil {
+					t.Error("unable to prefill insert unique data: ", err)
+					return
+				}
+			}
+			if err := db.Push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -377,7 +404,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, eventCount)
 			}
 			if tt.args.uniqueConstraints != nil {
-				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_usernames")
+				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_usernames where unique_field = $1", tt.args.uniqueConstraints.UniqueField)
 				var uniqueCount int
 				err := countUniqueRow.Scan(&uniqueCount)
 				if err != nil {
@@ -1072,10 +1099,10 @@ func generateEventWithData(t *testing.T, aggregateID string, data []byte) *repos
 	}
 }
 
-func generateAddUniqueConstraint(t *testing.T, uniqueField string) *repository.UniqueConstraint {
+func generateAddUniqueConstraint(t *testing.T, table, uniqueField string) *repository.UniqueConstraint {
 	t.Helper()
 	e := &repository.UniqueConstraint{
-		TableName:   "unique_usernames",
+		TableName:   table,
 		UniqueField: uniqueField,
 		Action:      repository.UniqueConstraintAdd,
 	}
@@ -1083,10 +1110,10 @@ func generateAddUniqueConstraint(t *testing.T, uniqueField string) *repository.U
 	return e
 }
 
-func generateRemoveUniqueConstraint(t *testing.T, uniqueField string) *repository.UniqueConstraint {
+func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *repository.UniqueConstraint {
 	t.Helper()
 	e := &repository.UniqueConstraint{
-		TableName:   "unique_usernames",
+		TableName:   table,
 		UniqueField: uniqueField,
 		Action:      repository.UniqueConstraintRemoved,
 	}
