@@ -36,10 +36,12 @@
         <div class="lgn-field">
             <label class="lgn-label" for="username">{{t "RegistrationOrg.Username"}}</label>
             <span id="loginname">
-                <input data-iam-domain="{{ .IamDomain }}" class="lgn-input" type="text" id="username" name="username"
-                    value="{{ .Username }}" autofocus required>
-                <span id="default-login-suffix" class="loginname-suffix"></span>
-
+                <div class="lgn-suffix-wrapper">
+                    <input data-iam-domain="{{ .IamDomain }}" class="lgn-input lgn-suffix-input" type="text" id="username" name="username"
+                        value="{{ .Username }}" autofocus required>
+                    <!-- suffix requires parent div 'lgn-suffix-wrapper', corresponding input class 'lgn-suffix-input' and its id="default-login-suffix" as well as an offset script -->
+                    <span id="default-login-suffix" lgnSuffix class="loginname-suffix"></span>
+                </div>
             </span>
         </div>
         {{end}}
@@ -87,7 +89,7 @@
     </div>
 </form>
 
-
+<script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
 <script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
 <script src="{{ resourceUrl "scripts/register_check.js" }}"></script>

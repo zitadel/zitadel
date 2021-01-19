@@ -9,4 +9,15 @@ input:not([type=radio]):not([type=checkbox]),
 select, .lgn-select {
     @include lgn-input-base;
 }
-  
+
+.lgn-suffix-wrapper {
+    position: relative;
+
+    [lgnSuffix] {
+        position: absolute;
+        right: .5rem;
+        top: 9px;
+        height: inherit;
+        vertical-align: middle;
+    }
+}
