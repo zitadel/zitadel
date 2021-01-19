@@ -31,7 +31,7 @@
     "angularx-qrcode": "^10.0.11",
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
-    "google-proto-files": "^2.3.0",
+    "google-proto-files": "^2.4.0",
     "google-protobuf": "^3.13.0",
     "grpc": "^1.24.3",
     "grpc-web": "^1.2.1",
