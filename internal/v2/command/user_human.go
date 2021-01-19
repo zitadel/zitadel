@@ -94,9 +94,9 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
 	var createEvent eventstore.EventPusher
 	if selfregister {
-		createEvent = createRegisterHumanEvent(ctx, human.Username, human)
+		createEvent = createRegisterHumanEvent(ctx, human.Username, human, orgIAMPolicy.UserLoginMustBeDomain)
 	} else {
-		createEvent = createAddHumanEvent(ctx, human.Username, human)
+		createEvent = createAddHumanEvent(ctx, human.Username, human, orgIAMPolicy.UserLoginMustBeDomain)
 	}
 	userAgg.PushEvents(createEvent)
 
@@ -158,7 +158,7 @@ func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, reso
 	return r.eventstore.PushAggregate(ctx, existingEmail, userAgg)
 }
 
-func createAddHumanEvent(ctx context.Context, username string, human *domain.Human) *user.HumanAddedEvent {
+func createAddHumanEvent(ctx context.Context, username string, human *domain.Human, userLoginMustBeDomain bool) *user.HumanAddedEvent {
 	addEvent := user.NewHumanAddedEvent(
 		ctx,
 		username,
@@ -169,6 +169,7 @@ func createAddHumanEvent(ctx context.Context, username string, human *domain.Hum
 		human.PreferredLanguage,
 		human.Gender,
 		human.EmailAddress,
+		userLoginMustBeDomain,
 	)
 	if human.Phone != nil {
 		addEvent.AddPhoneData(human.PhoneNumber)
@@ -187,7 +188,7 @@ func createAddHumanEvent(ctx context.Context, username string, human *domain.Hum
 	return addEvent
 }
 
-func createRegisterHumanEvent(ctx context.Context, username string, human *domain.Human) *user.HumanRegisteredEvent {
+func createRegisterHumanEvent(ctx context.Context, username string, human *domain.Human, userLoginMustBeDomain bool) *user.HumanRegisteredEvent {
 	addEvent := user.NewHumanRegisteredEvent(
 		ctx,
 		username,
@@ -198,6 +199,7 @@ func createRegisterHumanEvent(ctx context.Context, username string, human *domai
 		human.PreferredLanguage,
 		human.Gender,
 		human.EmailAddress,
+		userLoginMustBeDomain,
 	)
 	if human.Phone != nil {
 		addEvent.AddPhoneData(human.PhoneNumber)

@@ -34,6 +34,7 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID string, machine *dom
 			machine.Username,
 			machine.Name,
 			machine.Description,
+			orgIAMPolicy.UserLoginMustBeDomain,
 		),
 	)
 	err = r.eventstore.PushAggregate(ctx, addedMachine, userAgg)
