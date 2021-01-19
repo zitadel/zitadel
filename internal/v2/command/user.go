@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -130,6 +129,7 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 	}
+
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 	userAgg.PushEvents(user.NewUserRemovedEvent(ctx))
 	//TODO: release unqie username

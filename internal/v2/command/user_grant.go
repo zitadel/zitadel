@@ -24,6 +24,10 @@ func (r *CommandSide) AddUserGrant(ctx context.Context, usergrant *domain.UserGr
 }
 
 func (r *CommandSide) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (_ *usergrant.Aggregate, _ *UserGrantWriteModel, err error) {
+	err = checkExplicitProjectPermission(ctx, userGrant.ProjectGrantID, userGrant.ProjectID)
+	if err != nil {
+		return nil, nil, err
+	}
 	if !userGrant.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.UserGrant.Invalid")
 	}
@@ -61,6 +65,10 @@ func (r *CommandSide) ChangeUserGrant(ctx context.Context, usergrant *domain.Use
 }
 
 func (r *CommandSide) changeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, cascade bool) (_ *usergrant.Aggregate, _ *UserGrantWriteModel, err error) {
+	err = checkExplicitProjectPermission(ctx, userGrant.ProjectGrantID, userGrant.ProjectID)
+	if err != nil {
+		return nil, nil, err
+	}
 	if userGrant.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
 	}
@@ -101,6 +109,10 @@ func (r *CommandSide) DeactivateUserGrant(ctx context.Context, grantID, resource
 	if err != nil {
 		return err
 	}
+	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
+	if err != nil {
+		return err
+	}
 	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
 	}
@@ -123,6 +135,10 @@ func (r *CommandSide) ReactivateUserGrant(ctx context.Context, grantID, resource
 	}
 
 	existingUserGrant, err := r.userGrantWriteModelByID(ctx, grantID, resourceOwner)
+	if err != nil {
+		return err
+	}
+	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
 	if err != nil {
 		return err
 	}
@@ -170,6 +186,10 @@ func (r *CommandSide) removeUserGrant(ctx context.Context, grantID, resourceOwne
 	}
 
 	existingUserGrant, err := r.userGrantWriteModelByID(ctx, grantID, resourceOwner)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
 	if err != nil {
 		return nil, nil, err
 	}
