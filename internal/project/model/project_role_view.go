@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 type ProjectRoleView struct {
@@ -13,6 +14,7 @@ type ProjectRoleView struct {
 	DisplayName   string
 	Group         string
 	CreationDate  time.Time
+	ChangeDate    time.Time
 	Sequence      uint64
 }
 

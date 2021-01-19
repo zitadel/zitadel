@@ -1,11 +1,10 @@
 package types
 
 import (
-	"net/http"
+	"html"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/notification/templates"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -23,7 +22,7 @@ type UrlData struct {
 	PasswordSet bool
 }
 
-func SendUserInitCode(dir http.FileSystem, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
+func SendUserInitCode(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -38,15 +37,28 @@ func SendUserInitCode(dir http.FileSystem, i18n *i18n.Translator, user *view_mod
 		"Code":               codeString,
 		"PreferredLoginName": user.PreferredLoginName,
 	}
-	systemDefaults.Notifications.TemplateData.InitCode.Translate(i18n, args, user.PreferredLanguage)
-	initCodeData := &InitCodeEmailData{TemplateData: systemDefaults.Notifications.TemplateData.InitCode, URL: url}
 
-	// Set the color in initCodeData
-	initCodeData.PrimaryColor = colors.PrimaryColor
-	initCodeData.SecondaryColor = colors.SecondaryColor
-	template, err := templates.GetParsedTemplate(dir, initCodeData)
+	text.Greeting, err = templates.ParseTemplateText(text.Greeting, args)
+	text.Text, err = templates.ParseTemplateText(text.Text, args)
+	text.Text = html.UnescapeString(text.Text)
+
+	emailCodeData := &InitCodeEmailData{
+		TemplateData: templates.TemplateData{
+			Title:          text.Title,
+			PreHeader:      text.PreHeader,
+			Subject:        text.Subject,
+			Greeting:       text.Greeting,
+			Text:           html.UnescapeString(text.Text),
+			Href:           url,
+			ButtonText:     text.ButtonText,
+			PrimaryColor:   colors.PrimaryColor,
+			SecondaryColor: colors.SecondaryColor,
+		},
+		URL: url,
+	}
+	template, err := templates.GetParsedTemplate(mailhtml, emailCodeData)
 	if err != nil {
 		return err
 	}
-	return generateEmail(user, systemDefaults.Notifications.TemplateData.InitCode.Subject, template, systemDefaults.Notifications, true)
+	return generateEmail(user, text.Subject, template, systemDefaults.Notifications, true)
 }
