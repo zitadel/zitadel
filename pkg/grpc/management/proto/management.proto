@@ -1189,7 +1189,7 @@ service ManagementService {
     };
   }
 
-  rpc DeactivateUserGrant(UserGrantID) returns (UserGrant) {
+  rpc DeactivateUserGrant(UserGrantID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{user_id}/grants/{id}/_deactivate"
       body: "*"
@@ -1200,7 +1200,7 @@ service ManagementService {
     };
   }
 
-  rpc ReactivateUserGrant(UserGrantID) returns (UserGrant) {
+  rpc ReactivateUserGrant(UserGrantID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/users/{user_id}/grants/{id}/_reactivate"
       body: "*"
@@ -2836,10 +2836,9 @@ message UserGrant {
   string project_id = 4;
   repeated string role_keys = 5;
   UserGrantState state = 6;
-  google.protobuf.Timestamp creation_date = 7;
-  google.protobuf.Timestamp change_date = 8;
-  uint64 sequence = 9;
-  string grant_id = 10;
+  google.protobuf.Timestamp change_date = 7;
+  uint64 sequence = 8;
+  string grant_id = 9;
 }
 
 message UserGrantCreate {

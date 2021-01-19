@@ -28,42 +28,42 @@ func (s *Server) UserGrantByID(ctx context.Context, request *management.UserGran
 }
 
 func (s *Server) CreateUserGrant(ctx context.Context, in *management.UserGrantCreate) (*management.UserGrant, error) {
-	user, err := s.usergrant.AddUserGrant(ctx, userGrantCreateToModel(in))
+	//TODO: Check explicit Permissions
+	user, err := s.command.AddUserGrant(ctx, userGrantCreateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return usergrantFromModel(user), nil
+	return userGrantFromDomain(user), nil
 }
 
 func (s *Server) UpdateUserGrant(ctx context.Context, in *management.UserGrantUpdate) (*management.UserGrant, error) {
-	user, err := s.usergrant.ChangeUserGrant(ctx, userGrantUpdateToModel(in))
+	//TODO: Check explicit Permissions
+	user, err := s.command.ChangeUserGrant(ctx, userGrantUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return usergrantFromModel(user), nil
+	return userGrantFromDomain(user), nil
 }
 
-func (s *Server) DeactivateUserGrant(ctx context.Context, in *management.UserGrantID) (*management.UserGrant, error) {
-	user, err := s.usergrant.DeactivateUserGrant(ctx, in.Id)
-	if err != nil {
-		return nil, err
-	}
-	return usergrantFromModel(user), nil
+func (s *Server) DeactivateUserGrant(ctx context.Context, in *management.UserGrantID) (*empty.Empty, error) {
+	//TODO: Check explicit Permissions
+	err := s.command.DeactivateUserGrant(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
-func (s *Server) ReactivateUserGrant(ctx context.Context, in *management.UserGrantID) (*management.UserGrant, error) {
-	user, err := s.usergrant.ReactivateUserGrant(ctx, in.Id)
-	if err != nil {
-		return nil, err
-	}
-	return usergrantFromModel(user), nil
+func (s *Server) ReactivateUserGrant(ctx context.Context, in *management.UserGrantID) (*empty.Empty, error) {
+	//TODO: Check explicit Permissions
+	err := s.command.ReactivateUserGrant(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveUserGrant(ctx context.Context, in *management.UserGrantID) (*empty.Empty, error) {
-	err := s.usergrant.RemoveUserGrant(ctx, in.Id)
+	//TODO: Check explicit Permissions
+	err := s.command.RemoveUserGrant(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) BulkRemoveUserGrant(ctx context.Context, in *management.UserGrantRemoveBulk) (*empty.Empty, error) {
-	err := s.usergrant.BulkRemoveUserGrant(ctx, userGrantRemoveBulkToModel(in)...)
+	//TODO: Check explicit Permissions
+	err := s.command.BulkRemoveUserGrant(ctx, userGrantRemoveBulkToModel(in), authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }

@@ -170,7 +170,7 @@ func GetMockManipulateProjectWithSAMLApp(ctrl *gomock.Controller) *ProjectEvents
 
 func GetMockManipulateProjectWithGrant(ctrl *gomock.Controller) *ProjectEventstore {
 	data, _ := json.Marshal(model.Project{Name: "Name"})
-	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
@@ -186,7 +186,7 @@ func GetMockManipulateProjectWithGrantExistingRole(ctrl *gomock.Controller) *Pro
 	data, _ := json.Marshal(model.Project{Name: "Name"})
 	roleData, _ := json.Marshal(model.ProjectRole{Key: "Key", DisplayName: "DisplayName", Group: "Group"})
 	roleData2, _ := json.Marshal(model.ProjectRole{Key: "KeyChanged", DisplayName: "DisplayName", Group: "Group"})
-	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectRoleAdded, Data: roleData},
@@ -202,8 +202,8 @@ func GetMockManipulateProjectWithGrantExistingRole(ctrl *gomock.Controller) *Pro
 
 func GetMockManipulateProjectWithGrantMember(ctrl *gomock.Controller) *ProjectEventstore {
 	data, _ := json.Marshal(model.Project{Name: "Name"})
-	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
-	memberData, _ := json.Marshal(model.ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
+	memberData, _ := json.Marshal(model.ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"Role"}})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
@@ -254,7 +254,7 @@ func GetMockProjectAppsByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 
 func GetMockProjectGrantByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 	projectData, _ := json.Marshal(model.Project{Name: "Name"})
-	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantID", RoleKeys: []string{"Key"}})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "ProjectGrantID", RoleKeys: []string{"Key"}})
 
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
@@ -267,8 +267,8 @@ func GetMockProjectGrantByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 
 func GetMockProjectGrantMemberByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 	projectData, _ := json.Marshal(model.Project{Name: "Name"})
-	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantID", RoleKeys: []string{"Key"}})
-	memberData, _ := json.Marshal(model.ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "ProjectGrantID", RoleKeys: []string{"Key"}})
+	memberData, _ := json.Marshal(model.ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"Role"}})
 
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},

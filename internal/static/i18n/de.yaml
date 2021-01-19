@@ -246,6 +246,7 @@ Errors:
   UserGrant:
     NotFound: Benutzer Berechtigung konnte nicht gefunden werden
     Invalid: Benutzer Berechtigung ist ungültig
+    NotChanged: Benutzer Berechtigung wurde nicht verändert
     IDMissing: Id fehlt
     NotActive: Benutzer Berechtigung ist nicht aktiv
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
