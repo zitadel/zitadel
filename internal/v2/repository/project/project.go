@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	uniqueProjectnameTable = "unique_project_names"
 	projectEventTypePrefix = eventstore.EventType("project.")
 	ProjectAdded           = projectEventTypePrefix + "added"
 	ProjectChanged         = projectEventTypePrefix + "changed"
@@ -17,6 +18,40 @@ const (
 	ProjectReactivated     = projectEventTypePrefix + "reactivated"
 	ProjectRemoved         = projectEventTypePrefix + "removed"
 )
+
+type ProjectnameUniqueConstraint struct {
+	tableName   string
+	projectName string
+	action      eventstore.UniqueConstraintAction
+}
+
+func NewAddProjectnameUniqueConstraint(projectName, resourceOwner string) *ProjectnameUniqueConstraint {
+	return &ProjectnameUniqueConstraint{
+		tableName:   uniqueProjectnameTable,
+		projectName: projectName + resourceOwner,
+		action:      eventstore.UniqueConstraintAdd,
+	}
+}
+
+func NewRemoveUsernameUniqueConstraint(projectName, resourceOwner string) *ProjectnameUniqueConstraint {
+	return &ProjectnameUniqueConstraint{
+		tableName:   uniqueProjectnameTable,
+		projectName: projectName + resourceOwner,
+		action:      eventstore.UniqueConstraintRemoved,
+	}
+}
+
+func (e *ProjectnameUniqueConstraint) TableName() string {
+	return e.tableName
+}
+
+func (e *ProjectnameUniqueConstraint) UniqueField() string {
+	return e.projectName
+}
+
+func (e *ProjectnameUniqueConstraint) Action() eventstore.UniqueConstraintAction {
+	return e.action
+}
 
 type ProjectAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -31,7 +66,7 @@ func (e *ProjectAddedEvent) Data() interface{} {
 }
 
 func (e *ProjectAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
+	return []eventstore.EventUniqueConstraint{NewAddProjectnameUniqueConstraint(e.Name, e.ResourceOwner())}
 }
 
 func NewProjectAddedEvent(ctx context.Context, name string) *ProjectAddedEvent {

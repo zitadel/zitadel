@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	uniqueExternalIDPTable   = "unique_external_idps"
 	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
 	externalLoginEventPrefix = humanEventPrefix + "externallogin."
 
@@ -23,46 +24,38 @@ const (
 	HumanExternalLoginCheckSucceededType = externalLoginEventPrefix + "check.succeeded"
 )
 
-type HumanExternalIDPReservedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+type ExternalIDPUniqueConstraint struct {
+	tableName   string
+	uniqueField string
+	action      eventstore.UniqueConstraintAction
 }
 
-func (e *HumanExternalIDPReservedEvent) Data() interface{} {
-	return nil
-}
-
-func (e *HumanExternalIDPReservedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func NewHumanExternalIDPReservedEvent(ctx context.Context) *HumanExternalIDPReservedEvent {
-	return &HumanExternalIDPReservedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanExternalIDPReservedType,
-		),
+func NewAddExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *ExternalIDPUniqueConstraint {
+	return &ExternalIDPUniqueConstraint{
+		tableName:   uniqueExternalIDPTable,
+		uniqueField: idpConfigID + externalUserID,
+		action:      eventstore.UniqueConstraintAdd,
 	}
 }
 
-type HumanExternalIDPReleasedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *HumanExternalIDPReleasedEvent) Data() interface{} {
-	return nil
-}
-
-func (e *HumanExternalIDPReleasedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func NewHumanExternalIDPReleasedEvent(ctx context.Context) *HumanExternalIDPReleasedEvent {
-	return &HumanExternalIDPReleasedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanExternalIDPReleasedType,
-		),
+func NewRemoveExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *ExternalIDPUniqueConstraint {
+	return &ExternalIDPUniqueConstraint{
+		tableName:   uniqueExternalIDPTable,
+		uniqueField: idpConfigID + externalUserID,
+		action:      eventstore.UniqueConstraintRemoved,
 	}
+}
+
+func (e *ExternalIDPUniqueConstraint) TableName() string {
+	return e.tableName
+}
+
+func (e *ExternalIDPUniqueConstraint) UniqueField() string {
+	return e.uniqueField
+}
+
+func (e *ExternalIDPUniqueConstraint) Action() eventstore.UniqueConstraintAction {
+	return e.action
 }
 
 type HumanExternalIDPAddedEvent struct {
@@ -78,7 +71,7 @@ func (e *HumanExternalIDPAddedEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
+	return []eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
 }
 
 func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName string) *HumanExternalIDPAddedEvent {
@@ -117,7 +110,7 @@ func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
+	return []eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
 }
 
 func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPRemovedEvent {

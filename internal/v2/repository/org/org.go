@@ -10,12 +10,47 @@ import (
 )
 
 const (
+	uniqueOrgnameTable      = "unique_org_names"
 	OrgAddedEventType       = orgEventTypePrefix + "added"
 	OrgChangedEventType     = orgEventTypePrefix + "changed"
 	OrgDeactivatedEventType = orgEventTypePrefix + "deactivated"
 	OrgReactivatedEventType = orgEventTypePrefix + "reactivated"
 	OrgRemovedEventType     = orgEventTypePrefix + "removed"
 )
+
+type OrgnameUniqueConstraint struct {
+	tableName string
+	orgName   string
+	action    eventstore.UniqueConstraintAction
+}
+
+func NewAddOrgnameUniqueConstraint(orgName string) *OrgnameUniqueConstraint {
+	return &OrgnameUniqueConstraint{
+		tableName: uniqueOrgnameTable,
+		orgName:   orgName,
+		action:    eventstore.UniqueConstraintAdd,
+	}
+}
+
+func NewRemoveUsernameUniqueConstraint(orgName string) *OrgnameUniqueConstraint {
+	return &OrgnameUniqueConstraint{
+		tableName: uniqueOrgnameTable,
+		orgName:   orgName,
+		action:    eventstore.UniqueConstraintRemoved,
+	}
+}
+
+func (e *OrgnameUniqueConstraint) TableName() string {
+	return e.tableName
+}
+
+func (e *OrgnameUniqueConstraint) UniqueField() string {
+	return e.orgName
+}
+
+func (e *OrgnameUniqueConstraint) Action() eventstore.UniqueConstraintAction {
+	return e.action
+}
 
 type OrgAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -28,7 +63,7 @@ func (e *OrgAddedEvent) Data() interface{} {
 }
 
 func (e *OrgAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return nil
+	return []eventstore.EventUniqueConstraint{NewAddOrgnameUniqueConstraint(e.Name)}
 }
 
 func NewOrgAddedEvent(ctx context.Context, name string) *OrgAddedEvent {
