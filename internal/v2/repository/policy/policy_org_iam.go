@@ -111,6 +111,10 @@ func (e *OrgIAMPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *OrgIAMPolicyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOrgIAMPolicyRemovedEvent(base *eventstore.BaseEvent) *OrgIAMPolicyRemovedEvent {
 	return &OrgIAMPolicyRemovedEvent{
 		BaseEvent: *base,

@@ -97,6 +97,10 @@ func (e *OrgDeactivatedEvent) Data() interface{} {
 	return e
 }
 
+func (e *OrgDeactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOrgDeactivatedEvent(ctx context.Context) *OrgDeactivatedEvent {
 	return &OrgDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -124,6 +128,10 @@ type OrgReactivatedEvent struct {
 
 func (e *OrgReactivatedEvent) Data() interface{} {
 	return e
+}
+
+func (e *OrgReactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewOrgReactivatedEvent(ctx context.Context) *OrgReactivatedEvent {
