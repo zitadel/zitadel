@@ -2,11 +2,11 @@ package handler
 
 import (
 	"encoding/base64"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
-	user_model "github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -20,9 +20,9 @@ type u2fInitData struct {
 
 func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var errType, errMessage, credentialData string
-	var u2f *user_model.WebAuthNToken
+	var u2f *domain.WebAuthNToken
 	if err == nil {
-		u2f, err = l.authRepo.AddMFAU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
+		u2f, err = l.command.AddHumanU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, true)
 	}
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)

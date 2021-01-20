@@ -9,7 +9,7 @@ import (
 type UserRepository interface {
 	myUserRepo
 
-	RequestPasswordReset(ctx context.Context, username string) error
+	RequestPasswordReset(ctx context.Context, loginname string) error
 
 	ResendEmailVerificationMail(ctx context.Context, userID string) error
 
