@@ -14,28 +14,29 @@
     <input type="hidden" name="credentialAssertionData" value="{{ .CredentialCreationData }}"/>
     <input type="hidden" name="credentialData"/>
 
-    <div id="webauthn">
-        <p class="wa-no-support error hidden">{{t "WebAuthN.NotSupported"}}</p>
+    <p class="wa-no-support error hidden">{{t "WebAuthN.NotSupported"}}</p>
+
+    <div class="lgn-actions" id="webauthn">
+        <span class="fill-space"></span>
         <a id="btn-login" class="lgn-raised-button lgn-primary wa-support">{{t "Actions.ValidateToken"}}</a>
-        <div id="wa-error" class="error hidden">
-            <span class="cause"></span>
-            <span>{{t "WebAuthN.Error.Retry"}}</span>
-        </div>
+    </div>
+
+    <div id="wa-error" class="error hidden">
+        <span class="cause"></span>
+        <span>{{t "WebAuthN.Error.Retry"}}</span>
     </div>
 
     {{ template "error-message" .}}
-    <!-- check if layout needs to align items  -->
-    <div class="actions">
-        {{ if .MFAProviders }}
-            <div class="mfa-other">
-                <p>{{t "MFA.ChooseOther"}}</p>
-                {{ range $provider := .MFAProviders}}
-                    {{ $providerName := (t (printf "MFA.Provider%v" $provider)) }}
-                    <button class="lgn-stroked-button lgn-primary" type="submit" name="provider" value="{{$provider}}">{{$providerName}}</button>
-                {{ end }}
-            </div>
-        {{ end }}
-    </div>
+
+    {{ if .MFAProviders }}
+        <div class="lgn-mfa-other">
+            <p>{{t "MFA.ChooseOther"}}</p>
+            {{ range $provider := .MFAProviders}}
+                {{ $providerName := (t (printf "MFA.Provider%v" $provider)) }}
+                <button class="lgn-stroked-button lgn-primary" type="submit" name="provider" value="{{$provider}}">{{$providerName}}</button>
+            {{ end }}
+        </div>
+    {{ end }}
 </form>
 
 <script src="{{ resourceUrl "scripts/base64.js" }}"></script>

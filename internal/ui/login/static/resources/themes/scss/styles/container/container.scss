@@ -107,6 +107,16 @@ $lgn-container-bottom-margin: 50px;
         display: flex;
         flex-direction: column;
     }
+
+    .lgn-mfa-other {
+        display: flex;
+        flex-direction: column;
+        
+        button {
+            width: 100%;
+            margin: .5rem 0;
+        }
+    }
 }
 
 i {
