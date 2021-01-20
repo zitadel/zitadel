@@ -31,20 +31,14 @@ func (s *Server) UpdateIdpConfig(ctx context.Context, idpConfig *admin.IdpUpdate
 	return idpFromDomain(config), nil
 }
 
-func (s *Server) DeactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*admin.Idp, error) {
-	config, err := s.command.DeactivateDefaultIDPConfig(ctx, id.Id)
-	if err != nil {
-		return nil, err
-	}
-	return idpFromDomain(config), nil
+func (s *Server) DeactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*empty.Empty, error) {
+	err := s.command.DeactivateDefaultIDPConfig(ctx, id.Id)
+	return &empty.Empty{}, err
 }
 
-func (s *Server) ReactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*admin.Idp, error) {
-	config, err := s.command.ReactivateDefaultIDPConfig(ctx, id.Id)
-	if err != nil {
-		return nil, err
-	}
-	return idpFromDomain(config), nil
+func (s *Server) ReactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*empty.Empty, error) {
+	err := s.command.ReactivateDefaultIDPConfig(ctx, id.Id)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveIdpConfig(ctx context.Context, id *admin.IdpID) (*empty.Empty, error) {

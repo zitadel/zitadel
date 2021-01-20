@@ -3,6 +3,7 @@ package admin
 import (
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -57,34 +58,26 @@ func orgViewsFromModel(orgs []*org_model.OrgView) []*admin.Org {
 }
 
 func orgFromModel(org *org_model.Org) *admin.Org {
-	creationDate, err := ptypes.TimestampProto(org.CreationDate)
-	logging.Log("GRPC-GTHsZ").OnError(err).Debug("unable to get timestamp from time")
-
 	changeDate, err := ptypes.TimestampProto(org.ChangeDate)
 	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
 
 	return &admin.Org{
-		ChangeDate:   changeDate,
-		CreationDate: creationDate,
-		Id:           org.AggregateID,
-		Name:         org.Name,
-		State:        orgStateFromModel(org.State),
+		ChangeDate: changeDate,
+		Id:         org.AggregateID,
+		Name:       org.Name,
+		State:      orgStateFromModel(org.State),
 	}
 }
 
 func orgViewFromModel(org *org_model.OrgView) *admin.Org {
-	creationDate, err := ptypes.TimestampProto(org.CreationDate)
-	logging.Log("GRPC-GTHsZ").OnError(err).Debug("unable to get timestamp from time")
-
 	changeDate, err := ptypes.TimestampProto(org.ChangeDate)
 	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
 
 	return &admin.Org{
-		ChangeDate:   changeDate,
-		CreationDate: creationDate,
-		Id:           org.ID,
-		Name:         org.Name,
-		State:        orgStateFromModel(org.State),
+		ChangeDate: changeDate,
+		Id:         org.ID,
+		Name:       org.Name,
+		State:      orgStateFromModel(org.State),
 	}
 }
 
@@ -193,17 +186,10 @@ func orgQueryMethodToModel(method admin.OrgSearchMethod) model.SearchMethod {
 }
 
 func orgIAMPolicyFromDomain(policy *domain.OrgIAMPolicy) *admin.OrgIamPolicy {
-	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-ush36").OnError(err).Debug("unable to get timestamp from time")
-
-	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-Ps9fW").OnError(err).Debug("unable to get timestamp from time")
-
 	return &admin.OrgIamPolicy{
 		OrgId:                 policy.AggregateID,
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
-		CreationDate:          creationDate,
-		ChangeDate:            changeDate,
+		ChangeDate:            timestamppb.New(policy.ChangeDate),
 	}
 }
 

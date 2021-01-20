@@ -27,7 +27,6 @@ func passwordLockoutPolicyFromDomain(policy *domain.PasswordLockoutPolicy) *mana
 	return &management.PasswordLockoutPolicy{
 		MaxAttempts:        policy.MaxAttempts,
 		ShowLockoutFailure: policy.ShowLockOutFailures,
-		CreationDate:       timestamppb.New(policy.CreationDate),
 		ChangeDate:         timestamppb.New(policy.ChangeDate),
 	}
 }

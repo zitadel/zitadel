@@ -4,6 +4,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/model"
@@ -19,18 +20,11 @@ func changeIamMemberToDomain(member *admin.ChangeIamMemberRequest) *domain.Membe
 }
 
 func iamMemberFromDomain(member *domain.Member) *admin.IamMember {
-	creationDate, err := ptypes.TimestampProto(member.CreationDate)
-	logging.Log("GRPC-Lsp76").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(member.ChangeDate)
-	logging.Log("GRPC-3fG5s").OnError(err).Debug("date parse failed")
-
 	return &admin.IamMember{
-		UserId:       member.UserID,
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Roles:        member.Roles,
-		Sequence:     member.Sequence,
+		UserId:     member.UserID,
+		ChangeDate: timestamppb.New(member.ChangeDate),
+		Roles:      member.Roles,
+		Sequence:   member.Sequence,
 	}
 }
 

@@ -274,7 +274,7 @@ service AdminService {
         };
     }
 
-    rpc DeactivateIdpConfig(IdpID) returns (Idp) {
+    rpc DeactivateIdpConfig(IdpID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             put: "/idps/{id}/_deactivate"
             body: "*"
@@ -285,7 +285,7 @@ service AdminService {
         };
     }
 
-    rpc ReactivateIdpConfig(IdpID) returns (Idp) {
+    rpc ReactivateIdpConfig(IdpID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             put: "/idps/{id}/_reactivate"
             body: "*"
@@ -544,10 +544,9 @@ message UniqueOrgResponse {
 message Org {
     string id = 1;
     OrgState state = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
-    string name = 5;
-    string domain = 6;
+    google.protobuf.Timestamp change_date = 3;
+    string name = 4;
+    string domain = 5;
 }
 
 enum OrgState {
@@ -717,8 +716,7 @@ message OrgIamPolicy {
     bool user_login_must_be_domain = 2;
     bool default = 3;
     uint64 sequence = 4;
-    google.protobuf.Timestamp creation_date = 5;
-    google.protobuf.Timestamp change_date = 6;
+    google.protobuf.Timestamp change_date = 5;
 }
 
 message OrgIamPolicyView {
@@ -748,8 +746,7 @@ message IamMember {
     string user_id = 1;
     repeated string roles = 2;
     google.protobuf.Timestamp change_date = 3;
-    google.protobuf.Timestamp creation_date = 4;
-    uint64 sequence = 5;
+    uint64 sequence = 4;
 }
 
 message AddIamMemberRequest {
@@ -864,14 +861,13 @@ message IdpID {
 message Idp {
     string id = 1;
     IdpState state = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
-    string name = 5;
-    IdpStylingType styling_type = 6;
+    google.protobuf.Timestamp change_date = 3;
+    string name = 4;
+    IdpStylingType styling_type = 5;
     oneof idp_config {
-        OidcIdpConfig oidc_config = 7;
+        OidcIdpConfig oidc_config = 6;
     }
-    uint64 sequence = 8;
+    uint64 sequence = 7;
 }
 
 message IdpUpdate {
@@ -976,8 +972,7 @@ enum IdpSearchKey {
 message DefaultLabelPolicy {
     string primary_color = 1;
     string secondary_color = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
+    google.protobuf.Timestamp change_date = 3;
 }
 
 message DefaultLabelPolicyUpdate {
@@ -996,10 +991,9 @@ message DefaultLoginPolicy {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
-    google.protobuf.Timestamp creation_date = 4;
-    google.protobuf.Timestamp change_date = 5;
-    bool force_mfa = 6;
-    PasswordlessType passwordless_type = 7;
+    google.protobuf.Timestamp change_date = 4;
+    bool force_mfa = 5;
+    PasswordlessType passwordless_type = 6;
 }
 
 message DefaultLoginPolicyRequest {
@@ -1088,8 +1082,7 @@ message DefaultPasswordComplexityPolicy {
     bool has_lowercase = 3;
     bool has_number = 4;
     bool has_symbol = 5;
-    google.protobuf.Timestamp creation_date = 6;
-    google.protobuf.Timestamp change_date = 7;
+    google.protobuf.Timestamp change_date = 6;
 }
 
 message DefaultPasswordComplexityPolicyRequest {
@@ -1113,8 +1106,7 @@ message DefaultPasswordComplexityPolicyView {
 message DefaultPasswordAgePolicy {
     uint64 max_age_days = 1;
     uint64 expire_warn_days = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
+    google.protobuf.Timestamp change_date = 3;
 }
 
 message DefaultPasswordAgePolicyRequest {
@@ -1132,8 +1124,7 @@ message DefaultPasswordAgePolicyView {
 message DefaultPasswordLockoutPolicy {
     uint64 max_attempts = 1;
     bool show_lockout_failure = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
+    google.protobuf.Timestamp change_date = 3;
 }
 
 message DefaultPasswordLockoutPolicyRequest {

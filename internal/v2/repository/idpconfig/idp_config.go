@@ -2,6 +2,7 @@ package idpconfig
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -75,9 +76,9 @@ func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 type IDPConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID    string                      `json:"idpConfigId"`
-	Name        string                      `json:"name,omitempty"`
-	StylingType domain.IDPConfigStylingType `json:"stylingType,omitempty"`
+	ConfigID    string                       `json:"idpConfigId"`
+	Name        *string                      `json:"name,omitempty"`
+	StylingType *domain.IDPConfigStylingType `json:"stylingType,omitempty"`
 }
 
 func (e *IDPConfigChangedEvent) Data() interface{} {
@@ -90,9 +91,33 @@ func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 
 func NewIDPConfigChangedEvent(
 	base *eventstore.BaseEvent,
-) *IDPConfigChangedEvent {
-	return &IDPConfigChangedEvent{
+	configID string,
+	changes []IDPConfigChanges,
+) (*IDPConfigChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "IDPCONFIG-Dsg21", "Errors.NoChangesFound")
+	}
+	changeEvent := &IDPConfigChangedEvent{
 		BaseEvent: *base,
+		ConfigID:  configID,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type IDPConfigChanges func(*IDPConfigChangedEvent)
+
+func ChangeName(name string) func(*IDPConfigChangedEvent) {
+	return func(e *IDPConfigChangedEvent) {
+		e.Name = &name
+	}
+}
+
+func ChangeStyleType(styleType domain.IDPConfigStylingType) func(*IDPConfigChangedEvent) {
+	return func(e *IDPConfigChangedEvent) {
+		e.StylingType = &styleType
 	}
 }
 
@@ -112,7 +137,7 @@ func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.EventReade
 type IDPConfigDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID string `idpConfigId`
+	ConfigID string `json:"idpConfigId"`
 }
 
 func NewIDPConfigDeactivatedEvent(
@@ -150,7 +175,7 @@ func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.EventR
 type IDPConfigReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID string `idpConfigId`
+	ConfigID string `json:"idpConfigId"`
 }
 
 func NewIDPConfigReactivatedEvent(
@@ -188,7 +213,7 @@ func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.EventR
 type IDPConfigRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID string `idpConfigId`
+	ConfigID string `json:"idpConfigId"`
 	Name     string
 }
 
