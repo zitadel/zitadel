@@ -29,10 +29,10 @@
     {{template "error-message" .}}
 
     <div class="lgn-actions lgn-reverse-order">
-        <button tabindex="1" class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
         <span class="fill-space"></span>
         {{if .LoginPolicy.AllowRegister}}
-        <button tabindex="2" class="lgn-stroked-button lgn-primary" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
+        <button class="lgn-stroked-button lgn-primary" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
         {{end}}
     </div>
 
