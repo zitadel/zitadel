@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/lib/pq"
 	"regexp"
 	"strconv"
@@ -90,16 +89,18 @@ const (
 		"		FROM data " +
 		"	) " +
 		"RETURNING id, event_sequence, previous_sequence, creation_date, resource_owner"
-	uniqueInsert = `INSERT INTO eventstore.%s
+	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
+						unique_type,
 						unique_field
 					) 
 					VALUES (  
-						$1
+						$1,
+						$2
 					)`
 
-	uniqueDelete = `DELETE FROM eventstore.%s
-					WHERE unique_field = $1`
+	uniqueDelete = `DELETE FROM eventstore.unique_constraints
+					WHERE unique_type = $1 and unique_field = $2`
 )
 
 type CRDB struct {
@@ -169,15 +170,15 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 
 	for _, uniqueConstraint := range uniqueConstraints {
 		if uniqueConstraint.Action == repository.UniqueConstraintAdd {
-			_, err := tx.ExecContext(ctx, fmt.Sprintf(uniqueInsert, uniqueConstraint.TableName), uniqueConstraint.UniqueField)
+			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
 			if err != nil {
 				logging.LogWithFields("SQL-IP3js",
-					"table_name", uniqueConstraint.TableName,
+					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("insert unique constraint failed")
 
 				switch e := err.(type) {
 				case *pq.Error:
-					if e.Code.Name() == "unique_violation" {
+					if e.Code == "23505" {
 						return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", uniqueConstraint.ErrorMessage)
 					}
 				}
@@ -185,10 +186,10 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint ")
 			}
 		} else if uniqueConstraint.Action == repository.UniqueConstraintRemoved {
-			_, err := tx.ExecContext(ctx, fmt.Sprintf(uniqueDelete, uniqueConstraint.TableName), uniqueConstraint.UniqueField)
+			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
 			if err != nil {
 				logging.LogWithFields("SQL-M0vsf",
-					"table_name", uniqueConstraint.TableName,
+					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
 				return caos_errs.ThrowInternal(err, "SQL-2M9fs", "unable to remove unique constraint ")
 			}

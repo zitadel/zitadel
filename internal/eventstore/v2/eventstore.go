@@ -86,7 +86,7 @@ func (es *Eventstore) aggregatesToEvents(aggregates []Aggregater) ([]*repository
 				for _, constraint := range event.UniqueConstraints() {
 					uniqueConstraints = append(uniqueConstraints,
 						&repository.UniqueConstraint{
-							TableName:    constraint.TableName,
+							UniqueType:   constraint.UniqueType,
 							UniqueField:  constraint.UniqueField,
 							Action:       uniqueConstraintActionToRepository(constraint.Action),
 							ErrorMessage: constraint.ErrorMessage,

@@ -5,8 +5,8 @@ type UniqueConstraint struct {
 	//UniqueField is the field which should be unique
 	UniqueField string
 
-	//TableName is the table name for the unique field
-	TableName string
+	//UniqueType is the type of the unique field
+	UniqueType string
 
 	//Action defines if unique constraint should be added or removed
 	Action UniqueConstraintAction

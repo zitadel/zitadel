@@ -269,7 +269,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 		ctx               context.Context
 		events            []*repository.Event
 		uniqueConstraints *repository.UniqueConstraint
-		uniqueDataTable   string
+		uniqueDataType    string
 		uniqueDataField   string
 	}
 	type eventsRes struct {
@@ -345,7 +345,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				events: []*repository.Event{
 					generateEvent(t, "10"),
 				},
-				uniqueConstraints: generateAddUniqueConstraint(t, "unique_usernames", "field"),
+				uniqueConstraints: generateAddUniqueConstraint(t, "usernames", "field"),
 			},
 			res: res{
 				wantErr: false,
@@ -363,8 +363,8 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				events: []*repository.Event{
 					generateEvent(t, "11"),
 				},
-				uniqueConstraints: generateRemoveUniqueConstraint(t, "unique_usernames", "testremove"),
-				uniqueDataTable:   "unique_usernames",
+				uniqueConstraints: generateRemoveUniqueConstraint(t, "usernames", "testremove"),
+				uniqueDataType:    "usernames",
 				uniqueDataField:   "testremove",
 			},
 			res: res{
@@ -382,8 +382,8 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if tt.args.uniqueDataTable != "" && tt.args.uniqueDataField != "" {
-				err := fillUniqueData(tt.args.uniqueDataTable, tt.args.uniqueDataField)
+			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
+				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField)
 				if err != nil {
 					t.Error("unable to prefill insert unique data: ", err)
 					return
@@ -404,7 +404,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, eventCount)
 			}
 			if tt.args.uniqueConstraints != nil {
-				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_usernames where unique_field = $1", tt.args.uniqueConstraints.UniqueField)
+				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField)
 				var uniqueCount int
 				err := countUniqueRow.Scan(&uniqueCount)
 				if err != nil {
@@ -1102,7 +1102,7 @@ func generateEventWithData(t *testing.T, aggregateID string, data []byte) *repos
 func generateAddUniqueConstraint(t *testing.T, table, uniqueField string) *repository.UniqueConstraint {
 	t.Helper()
 	e := &repository.UniqueConstraint{
-		TableName:   table,
+		UniqueType:  table,
 		UniqueField: uniqueField,
 		Action:      repository.UniqueConstraintAdd,
 	}
@@ -1113,7 +1113,7 @@ func generateAddUniqueConstraint(t *testing.T, table, uniqueField string) *repos
 func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *repository.UniqueConstraint {
 	t.Helper()
 	e := &repository.UniqueConstraint{
-		TableName:   table,
+		UniqueType:  table,
 		UniqueField: uniqueField,
 		Action:      repository.UniqueConstraintRemoved,
 	}

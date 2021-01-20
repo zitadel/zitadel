@@ -1,8 +1,8 @@
 package eventstore
 
 type EventUniqueConstraint struct {
-	// TableName is the table name for the unique constraint
-	TableName string
+	// UniqueType is the table name for the unique constraint
+	UniqueType string
 	//UniqueField is the unique key
 	UniqueField string
 	//Action defines if unique constraint should be added or removed
@@ -21,11 +21,11 @@ const (
 )
 
 func NewAddEventUniqueConstraint(
-	tableName,
+	uniqueType,
 	uniqueField,
 	errMessage string) *EventUniqueConstraint {
 	return &EventUniqueConstraint{
-		TableName:    tableName,
+		UniqueType:   uniqueType,
 		UniqueField:  uniqueField,
 		ErrorMessage: errMessage,
 		Action:       UniqueConstraintAdd,
@@ -33,10 +33,10 @@ func NewAddEventUniqueConstraint(
 }
 
 func NewRemoveEventUniqueConstraint(
-	tableName,
+	uniqueType,
 	uniqueField string) *EventUniqueConstraint {
 	return &EventUniqueConstraint{
-		TableName:   tableName,
+		UniqueType:  uniqueType,
 		UniqueField: uniqueField,
 		Action:      UniqueConstraintRemove,
 	}

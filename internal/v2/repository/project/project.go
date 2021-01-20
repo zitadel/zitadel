@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	uniqueProjectnameTable = "unique_project_names"
+	uniqueProjectnameTable = "project_names"
 	projectEventTypePrefix = eventstore.EventType("project.")
 	ProjectAdded           = projectEventTypePrefix + "added"
 	ProjectChanged         = projectEventTypePrefix + "changed"

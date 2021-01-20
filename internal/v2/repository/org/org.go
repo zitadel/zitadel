@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	uniqueOrgnameTable      = "unique_org_names"
+	uniqueOrgname           = "org_name"
 	OrgAddedEventType       = orgEventTypePrefix + "added"
 	OrgChangedEventType     = orgEventTypePrefix + "changed"
 	OrgDeactivatedEventType = orgEventTypePrefix + "deactivated"
@@ -19,34 +19,22 @@ const (
 )
 
 type OrgnameUniqueConstraint struct {
-	tableName string
-	orgName   string
-	action    eventstore.UniqueConstraintAction
+	uniqueType string
+	orgName    string
+	action     eventstore.UniqueConstraintAction
 }
 
 func NewAddOrgnameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueOrgnameTable,
+		uniqueOrgname,
 		orgName,
 		"Errors.Org.AlreadyExists")
 }
 
 func NewRemoveUsernameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueOrgnameTable,
+		uniqueOrgname,
 		orgName)
-}
-
-func (e *OrgnameUniqueConstraint) TableName() string {
-	return e.tableName
-}
-
-func (e *OrgnameUniqueConstraint) UniqueField() string {
-	return e.orgName
-}
-
-func (e *OrgnameUniqueConstraint) Action() eventstore.UniqueConstraintAction {
-	return e.action
 }
 
 type OrgAddedEvent struct {
