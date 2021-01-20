@@ -8,8 +8,7 @@ type UniqueConstraint struct {
 	//TableName is the table name for the unique field
 	TableName string
 
-	//Type describes the cause of the event (e.g. user.added)
-	// it should always be in past-form
+	//Action defines if unique constraint should be added or removed
 	Action UniqueConstraintAction
 
 	//ErrorMessage is the message key which should be returned if constraint is violated

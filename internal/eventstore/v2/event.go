@@ -18,6 +18,7 @@ type EventPusher interface {
 	// * struct which can be marshalled to json
 	// * pointer to struct which can be marshalled to json
 	Data() interface{}
+	//UniqueConstraints should be added for unique attributes of an event, if nil constraints will not be checked
 	UniqueConstraints() []*EventUniqueConstraint
 }
 
