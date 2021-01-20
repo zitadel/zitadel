@@ -33,7 +33,6 @@ func passwordComplexityPolicyFromDomain(policy *domain.PasswordComplexityPolicy)
 		HasUppercase: policy.HasUppercase,
 		HasSymbol:    policy.HasSymbol,
 		HasNumber:    policy.HasNumber,
-		CreationDate: timestamppb.New(policy.CreationDate),
 		ChangeDate:   timestamppb.New(policy.ChangeDate),
 	}
 }

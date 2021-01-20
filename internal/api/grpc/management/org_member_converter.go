@@ -24,11 +24,10 @@ func changeOrgMemberToModel(ctx context.Context, member *management.ChangeOrgMem
 
 func orgMemberFromDomain(member *domain.Member) *management.OrgMember {
 	return &management.OrgMember{
-		UserId:       member.UserID,
-		CreationDate: timestamppb.New(member.CreationDate),
-		ChangeDate:   timestamppb.New(member.ChangeDate),
-		Roles:        member.Roles,
-		Sequence:     member.Sequence,
+		UserId:     member.UserID,
+		ChangeDate: timestamppb.New(member.ChangeDate),
+		Roles:      member.Roles,
+		Sequence:   member.Sequence,
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func passwordComplexityPolicyToDomain(policy *admin.DefaultPasswordComplexityPolicyRequest) *domain.PasswordComplexityPolicy {
@@ -19,20 +20,13 @@ func passwordComplexityPolicyToDomain(policy *admin.DefaultPasswordComplexityPol
 }
 
 func passwordComplexityPolicyFromDomain(policy *domain.PasswordComplexityPolicy) *admin.DefaultPasswordComplexityPolicy {
-	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-6Zhs9").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-bMso0").OnError(err).Debug("date parse failed")
-
 	return &admin.DefaultPasswordComplexityPolicy{
 		MinLength:    policy.MinLength,
 		HasUppercase: policy.HasUppercase,
 		HasLowercase: policy.HasLowercase,
 		HasNumber:    policy.HasNumber,
 		HasSymbol:    policy.HasSymbol,
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
+		ChangeDate:   timestamppb.New(policy.ChangeDate),
 	}
 }
 

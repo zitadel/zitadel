@@ -2,6 +2,7 @@ package idpconfig
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -72,13 +73,13 @@ type OIDCConfigChangedEvent struct {
 
 	IDPConfigID string `json:"idpConfigId"`
 
-	ClientID     string              `json:"clientId,omitempty"`
+	ClientID     *string             `json:"clientId,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Issuer       string              `json:"issuer,omitempty"`
+	Issuer       *string             `json:"issuer,omitempty"`
 	Scopes       []string            `json:"scpoes,omitempty"`
 
-	IDPDisplayNameMapping domain.OIDCMappingField `json:"idpDisplayNameMapping,omitempty"`
-	UserNameMapping       domain.OIDCMappingField `json:"usernameMapping,omitempty"`
+	IDPDisplayNameMapping *domain.OIDCMappingField `json:"idpDisplayNameMapping,omitempty"`
+	UserNameMapping       *domain.OIDCMappingField `json:"usernameMapping,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Data() interface{} {
@@ -87,9 +88,57 @@ func (e *OIDCConfigChangedEvent) Data() interface{} {
 
 func NewOIDCConfigChangedEvent(
 	base *eventstore.BaseEvent,
-) *OIDCConfigChangedEvent {
-	return &OIDCConfigChangedEvent{
-		BaseEvent: *base,
+	idpConfigID string,
+	changes []OIDCConfigChanges,
+) (*OIDCConfigChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "IDPCONFIG-ADzr5", "Errors.NoChangesFound")
+	}
+	changeEvent := &OIDCConfigChangedEvent{
+		BaseEvent:   *base,
+		IDPConfigID: idpConfigID,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type OIDCConfigChanges func(*OIDCConfigChangedEvent)
+
+func ChangeClientID(clientID string) func(*OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.ClientID = &clientID
+	}
+}
+
+func ChangeClientSecret(secret *crypto.CryptoValue) func(*OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.ClientSecret = secret
+	}
+}
+
+func ChangeIssuer(issuer string) func(*OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.Issuer = &issuer
+	}
+}
+
+func ChangeIDPDisplayNameMapping(idpDisplayNameMapping domain.OIDCMappingField) func(*OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.IDPDisplayNameMapping = &idpDisplayNameMapping
+	}
+}
+
+func ChangeUserNameMapping(userNameMapping domain.OIDCMappingField) func(*OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.UserNameMapping = &userNameMapping
+	}
+}
+
+func ChangeScopes(scopes []string) func(*OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.Scopes = scopes
 	}
 }
 

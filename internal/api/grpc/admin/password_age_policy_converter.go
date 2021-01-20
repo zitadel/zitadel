@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func passwordAgePolicyToDomain(policy *admin.DefaultPasswordAgePolicyRequest) *domain.PasswordAgePolicy {
@@ -16,17 +17,10 @@ func passwordAgePolicyToDomain(policy *admin.DefaultPasswordAgePolicyRequest) *d
 }
 
 func passwordAgePolicyFromDomain(policy *domain.PasswordAgePolicy) *admin.DefaultPasswordAgePolicy {
-	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-mH9os").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-3tGs9").OnError(err).Debug("date parse failed")
-
 	return &admin.DefaultPasswordAgePolicy{
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
-		CreationDate:   creationDate,
-		ChangeDate:     changeDate,
+		ChangeDate:     timestamppb.New(policy.ChangeDate),
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func loginPolicyToDomain(policy *admin.DefaultLoginPolicyRequest) *domain.LoginPolicy {
@@ -19,20 +20,13 @@ func loginPolicyToDomain(policy *admin.DefaultLoginPolicyRequest) *domain.LoginP
 }
 
 func loginPolicyFromDomain(policy *domain.LoginPolicy) *admin.DefaultLoginPolicy {
-	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-3Fsm9").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-5Gsko").OnError(err).Debug("date parse failed")
-
 	return &admin.DefaultLoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
 		ForceMfa:              policy.ForceMFA,
 		PasswordlessType:      passwordlessTypeFromDomain(policy.PasswordlessType),
-		CreationDate:          creationDate,
-		ChangeDate:            changeDate,
+		ChangeDate:            timestamppb.New(policy.ChangeDate),
 	}
 }
 

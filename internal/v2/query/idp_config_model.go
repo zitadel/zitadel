@@ -80,11 +80,11 @@ func (rm *IDPConfigReadModel) reduceConfigAddedEvent(e *idpconfig.IDPConfigAdded
 }
 
 func (rm *IDPConfigReadModel) reduceConfigChangedEvent(e *idpconfig.IDPConfigChangedEvent) {
-	if e.Name != "" {
-		rm.Name = e.Name
+	if e.Name != nil {
+		rm.Name = *e.Name
 	}
-	if e.StylingType.Valid() {
-		rm.StylingType = e.StylingType
+	if e.StylingType != nil && e.StylingType.Valid() {
+		rm.StylingType = *e.StylingType
 	}
 }
 

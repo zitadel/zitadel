@@ -14,5 +14,4 @@ type OrgRepository interface {
 	SearchOrgs(ctx context.Context, query *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error)
 
 	GetOrgIAMPolicyByID(ctx context.Context, id string) (*iam_model.OrgIAMPolicyView, error)
-	RemoveOrgIAMPolicy(ctx context.Context, id string) error
 }
