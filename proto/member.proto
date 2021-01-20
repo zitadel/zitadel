@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+package caos.zitadel.api.v1;
+
+message MemberRoles {
+    repeated string roles = 1;
+}
+
+message AddMemberRequest {}
+
+message AddMemberResponse {}

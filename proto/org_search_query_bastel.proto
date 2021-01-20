@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "search_query";
+
+package caos.zitadel.api.v1;
+
+message SafeOrgSearchQuery {
+    oneof query {
+        OrgNameQuery name = 1;
+        OrgDomainQuery domain = 2;
+    };
+}
+
+message OrgNameQuery {
+    caos.zitadel.api.v1.TextSearchMethod method = 1;
+    string value = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message OrgDomainQuery {
+    caos.zitadel.api.v1.TextSearchMethod method = 1;
+    string value = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+enum QueryCombine {
+    QUERY_COMBINE_AND = 0;
+    QUERY_COMBINE_OR = 1;
+}

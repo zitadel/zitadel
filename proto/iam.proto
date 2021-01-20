@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+package caos.zitadel.api.v1;
+
+message AddIAMMemberRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string roles = 2;
+}
+
+message AddIAMMemberResponse{
+    string user_id = 1;
+    repeated string roles = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    uint64 sequence = 4;
+}
+
+message ChangeIAMMemberRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string roles = 2;
+}
+
+message ChangeIAMMemberResponse{
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    uint64 sequence = 4;
+}
+
+message RemoveIAMMemberRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message RemoveIAMMemberResponse {}
+
+message SearchIAMMembersRequest {
+    //offset is the number of skipped entries (analog sql)
+    uint32 offset = 1;
+    //limit is the maximum amount of entries (analog sql)
+    uint32 limit = 2; //TODO: https://github.com/caos/zitadel/issues/1083 
+    //sorting_column specifies which field is used for sorting
+    IAMMemberField sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];
+    //asc indicates if sorting is ascending (true) or descending (false, default)
+    bool asc = 4;
+    //queries are used to enclose the search result
+    repeated IAMMemberSearchQuery queries = 5;
+}
+
+message IAMMemberField {
+
+}
+
+message IAMMemberSearchQuery {}

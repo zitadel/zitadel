@@ -1,2 +1,116 @@
 syntax = "proto3";
 
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "search_query";
+
+package caos.zitadel.api.v1;
+
+//OrgIDRequest represents the org id
+message OrgIDRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message IsOrgUniqueRequest {
+    string name = 1 [(validate.rules).string.min_len = 1];
+    string domain = 2 [(validate.rules).string.min_len = 1];
+}
+
+message IsOrgUniqueResponse {
+    bool is_unique = 1;
+}
+
+//OrgResponse represents a ZITADEL org
+message OrgResponse {
+    string id = 1;
+    OrgState state = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+    string name = 5;
+    string domain = 6;
+}
+
+enum OrgState {
+    ORGSTATE_UNSPECIFIED = 0;
+    ORGSTATE_ACTIVE = 1;
+    ORGSTATE_INACTIVE = 2;
+}
+
+message SearchOrgsRequest {
+    //offset is the number of skipped orgs (analog sql)
+    uint32 offset = 1;
+    //limit is the maximum amount of orgs (analog sql)
+    uint32 limit = 2; //TODO: https://github.com/caos/zitadel/issues/1083 
+    //sorting_column specifies which field is used for sorting
+    OrgField sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];
+    //asc indicates if sorting is ascending (true) or descending (false, default)
+    bool asc = 4;
+    //queries are used to enclose the search result
+    repeated OrgSearchQuery queries = 5;
+}
+
+message SearchOrgsResponse {
+    //offset is the offset from the request
+    uint64 offset = 1;
+    //limit is the limit from the request
+    uint64 limit = 2;
+    //total_result is the amount of results found by SearchOrgsRequest.queries
+    uint64 total_result = 3;
+    //result is the list of orgs found filtered by the SearchOrgsRequest
+    repeated Org result = 4;
+    //processed_sequence is the latest processed sequence from this view
+    uint64 processed_sequence = 5;
+    //view_timestamp represents the last timestamp when the view was updated
+    google.protobuf.Timestamp view_timestamp = 6;
+}
+
+enum OrgField {
+    ORG_FIELD_UNSPECIFIED = 0;
+    ORG_FIELD_NAME = 1;
+    ORG_FIELD_DOMAIN = 2;
+    ORG_FIELD_STATE = 3;
+}
+
+message OrgSearchQuery {
+    //field represents the fields you want to search
+    OrgField field = 1 [(validate.rules).enum = {not_in: [0]}];
+    //method represents the comparision you want to make on the field
+    OrgSearchMethod method = 2;
+    //value represents what you want to find
+    oneof value {
+        string text_value = 3;
+    }
+}
+
+enum OrgSearchMethod {
+    ORGSEARCHMETHOD_EQUALS = 0;
+    ORGSEARCHMETHOD_STARTS_WITH = 1;
+    ORGSEARCHMETHOD_CONTAINS = 2;
+}
+
+message Org {
+    //id is the unique identifier
+    string id = 1;
+    //state indicates the state
+    OrgState state = 2;
+    //creation_date is the timestamp when the org was created
+    google.protobuf.Timestamp creation_date = 3;
+    //change_date is the timestamp of the last change
+    google.protobuf.Timestamp change_date = 4;
+    //name is the unique name of this org
+    string name = 5;
+    //domain is the primary domain of this org
+    string domain = 6; //TODO: multiple possible?
+}
+
+message CreateOrgRequest {
+    string name = 1 [(validate.rules).string.min_len = 1];
+    string domain = 2;
+}
+
+message CreateOrgResponse {
+    string id = 1;
+    string name = 2;
+    string domain = 3;
+    google.protobuf.Timestamp creation_date = 4;
+}

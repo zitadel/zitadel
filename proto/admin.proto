@@ -1,4 +1,3 @@
-
 syntax = "proto3";
 
 import "google/api/annotations.proto";
@@ -6,7 +5,13 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
-import "zitadel/options.proto";
+import "authoption/options.proto";
+
+//zitadel imports
+import "org.proto";
+import "probes.proto";
+import "user.proto";
+import "iam.proto";
 
 package caos.zitadel.admin.api.v1;
 
@@ -15,9 +20,9 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/admin";
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
     info: {
         title: "admin service";
-        version: "0.1";
+        version: "1.0";
         contact:{
-            url: "https://github.com/caos/zitadel/pkg/admin"
+            url: "https://github.com/caos/zitadel/api/admin" //TODO: should be swagger path
         };
     };
 
@@ -30,20 +35,18 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
     produces: "application/grpc";
 };
 
-service AdminService {
-    // ---------
-    // Probes
-    // ---------
 
+service AdminService {
     // Healthz returns status OK as soon as the service started
-    rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    rpc Healthz(caos.zitadel.api.v1.HealthzRequest) returns (caos.zitadel.api.v1.HealthzResponse) {
         option (google.api.http) = {
            get: "/healthz"
         };
     }
 
-//ORG
-    rpc IsOrgUnique(UniqueOrgRequest) returns (UniqueOrgResponse) {
+    //IsOrgUnique checks if the passed parameters are unique
+    // an organisation is unique if all parameters are unique
+    rpc IsOrgUnique(caos.zitadel.api.v1.IsOrgUniqueRequest) returns (caos.zitadel.api.v1.IsOrgUniqueResponse) {
         option (google.api.http) = {
             get: "/orgs/_isunique"
         };
@@ -53,7 +56,8 @@ service AdminService {
         };
     }
 
-    rpc GetOrgByID(OrgID) returns (Org) {
+    //GetOrgByID returns the requested organisation
+    rpc GetOrgByID(caos.zitadel.api.v1.OrgIDRequest) returns (caos.zitadel.api.v1.OrgResponse) {
         option (google.api.http) = {
             get: "/orgs/{id}"
         };
@@ -63,7 +67,9 @@ service AdminService {
         };
     }
 
-    rpc SearchOrgs(OrgSearchRequest) returns (OrgSearchResponse) {
+    //SearchOrgs returns all orgs matching the request
+    // all queries need to match (ANDed)
+    rpc SearchOrgs(caos.zitadel.api.v1.SearchOrgsRequest) returns (caos.zitadel.api.v1.SearchOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search"
             body: "*"
@@ -74,7 +80,9 @@ service AdminService {
         };
     }
 
-    rpc SetUpOrg(OrgSetUpRequest) returns (OrgSetUpResponse) {
+    //SetUpOrg creates a new org and user 
+    // and adds the user to the orgs members as ORG_OWNER
+    rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/_setup"
             body: "*"
@@ -85,8 +93,8 @@ service AdminService {
         };
     }
 
-    //ORG_IAM_POLICY
-    rpc GetDefaultOrgIamPolicy(google.protobuf.Empty) returns (OrgIamPolicyView) {
+    //GetDefaultOrgIAMPolicy returns the IAM policy defined by the administrators of ZITADEL
+    rpc GetDefaultOrgIAMPolicy(DefaultOrgIAMPolicyRequest) returns (DefaultOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/orgs/default/policies/orgiam"
         };
@@ -96,7 +104,9 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
+    //UpdateDefaultOrgIAMPolicy changes the default IAM policy it will impact all
+    // it impacts all organisations without a customised policy
+    rpc UpdateDefaultOrgIAMPolicy(caos.zitadel.api.v1.UpdatedOrgIAMPolicyRequest) returns (caos.zitadel.api.v1.UpdateOrgIAMPolicyResponse) {
         option (google.api.http) = {
             put: "/orgs/default/policies/orgiam"
             body: "*"
@@ -107,7 +117,8 @@ service AdminService {
         };
     }
 
-    rpc GetOrgIamPolicy(OrgIamPolicyID) returns (OrgIamPolicyView) {
+    //GetOrgIAMPolicy returns the customised policy or the default if not defined
+    rpc GetOrgIAMPolicy(caos.zitadel.api.v1.OrgIAMPolicyIDRequest) returns (caos.zitadel.api.v1.OrgIAMPolicy) {
         option (google.api.http) = {
             get: "/orgs/{org_id}/policies/orgiam"
         };
@@ -117,7 +128,8 @@ service AdminService {
         };
     }
 
-    rpc CreateOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
+    //CreateOrgIAMPolicy let's an organisation manager define a custom IAM policy
+    rpc CreateOrgIAMPolicy(caos.zitadel.api.v1.CreateOrgIAMPolicyRequest) returns (caos.zitadel.api.v1.CreateOrgIAMPolicyResponse) {
         option (google.api.http) = {
             post: "/orgs/{org_id}/policies/orgiam"
             body: "*"
@@ -128,7 +140,8 @@ service AdminService {
         };
     }
 
-    rpc UpdateOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
+    //UpdateOrgIAMPolicy let's an organisation manager define a custom IAM policy
+    rpc UpdateOrgIAMPolicy(caos.zitadel.api.v1.UpdateOrgIAMPolicyRequest) returns (caos.zitadel.api.v1.UpdateOrgIAMPolicyResponse) {
         option (google.api.http) = {
             put: "/orgs/{org_id}/policies/orgiam"
             body: "*"
@@ -139,7 +152,9 @@ service AdminService {
         };
     }
 
-    rpc RemoveOrgIamPolicy(OrgIamPolicyID) returns (google.protobuf.Empty) {
+    //RemoveOrgIAMPolicy deletes a custom IAM policy
+    // ZITADEL will fallback to the default policy defined by the ZITADEL managers
+    rpc RemoveOrgIAMPolicy(caos.zitadel.api.v1.OrgIAMPolicyIDRequest) returns (caos.zitadel.api.v1.RemoveOrgIAMPolicyResponse) {
         option (google.api.http) = {
             delete: "/orgs/{org_id}/policies/orgiam"
         };
@@ -149,7 +164,8 @@ service AdminService {
         };
     }
 
-    rpc GetIamMemberRoles(google.protobuf.Empty) returns (IamMemberRoles) {
+    //GetIAMMemberRoles returns the IAM roles visible for this user 
+    rpc GetIAMMemberRoles(IAMMemberRolesRequest) returns (IAMMemberRolesResponse) {
         option (google.api.http) = {
             get: "/members/roles"
         };
@@ -159,7 +175,9 @@ service AdminService {
         };
     }
 
-    rpc AddIamMember(AddIamMemberRequest) returns (IamMember) {
+    //AddIAMMember adds a user to the membership list of ZITADEL with the given roles
+    // undefined roles will be dropped
+    rpc AddIAMMember(caos.zitadel.api.v1.AddIAMMemberRequest) returns (caos.zitadel.api.v1.AddIAMMemberResponse) {
         option (google.api.http) = {
             post: "/members"
             body: "*"
@@ -170,7 +188,8 @@ service AdminService {
         };
     }
 
-    rpc ChangeIamMember(ChangeIamMemberRequest) returns (IamMember) {
+    //ChangeIAMMember will set the given roles on a member
+    rpc ChangeIAMMember(caos.zitadel.api.v1.ChangeIAMMemberRequest) returns (caos.zitadel.api.v1.ChangeIAMMemberResponse) {
         option (google.api.http) = {
             put: "/members/{user_id}"
             body: "*"
@@ -181,7 +200,8 @@ service AdminService {
         };
     }
 
-    rpc RemoveIamMember(RemoveIamMemberRequest) returns (google.protobuf.Empty) {
+    //RemoveIAMMember removes the user from the membershiplist of ZITADEL
+    rpc RemoveIAMMember(caos.zitadel.api.v1.RemoveIAMMemberRequest) returns (caos.zitadel.api.v1.RemoveIAMMemberResponse) {
         option (google.api.http) = {
             delete: "/members/{user_id}"
         };
@@ -191,7 +211,9 @@ service AdminService {
         };
     }
 
-    rpc SearchIamMembers(IamMemberSearchRequest) returns (IamMemberSearchResponse) {
+    //SearchIAMMembers returns all members matching the request
+    // all queries need to match (ANDed)
+    rpc SearchIAMMembers(IAMMemberSearchRequest) returns (IAMMemberSearchResponse) {
         option (google.api.http) = {
             post: "/members/_search"
             body: "*"
@@ -202,7 +224,10 @@ service AdminService {
         };
     }
 
-    rpc GetViews(google.protobuf.Empty) returns (Views) {
+    //GetViews returns all stored read models of ZITADEL
+    // views are used for search optimisation and optimise request latencies
+    // they represent the delta of the event happend on the objects
+    rpc GetViews(GetViewsRequest) returns (ViewsResponse) {
         option (google.api.http) = {
             get: "/views"
         };
@@ -212,7 +237,11 @@ service AdminService {
         };
     }
 
-    rpc ClearView(ViewID) returns (google.protobuf.Empty) {
+    //ClearView truncates the delta of the change stream
+    // be carefull with this function because view need to 
+    // be recomputed after they got cleared. 
+    // Search requests will return wrong results until all deltas are recomputed
+    rpc ClearView(ViewIDRequest) returns (ClearViewResponse) {
         option (google.api.http) = {
             post: "/views/{database}/{view_name}"
         };
@@ -222,7 +251,10 @@ service AdminService {
         };
     }
 
-    rpc GetFailedEvents(google.protobuf.Empty) returns (FailedEvents) {
+    //GetFailedEvents returns event descriptions which cannot be processed.
+    // It's possible that some events need some retries. 
+    // For example if the SMTP-API wasn't able to send an email
+    rpc GetFailedEvents(FailedEventsRequest) returns (FailedEventsResponse) {
         option (google.api.http) = {
             get: "/failedevents"
         };
@@ -232,7 +264,9 @@ service AdminService {
         };
     }
 
-    rpc RemoveFailedEvent(FailedEventID) returns (google.protobuf.Empty) {
+    //RemoveFailedEvent deletes the event from failed events
+    // the event is not removed from the change stream
+    rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
         option (google.api.http) = {
             delete: "/failedevents/{database}/{view_name}/{failed_sequence}"
         };
@@ -242,7 +276,8 @@ service AdminService {
         };
     }
 
-    rpc IdpByID(IdpID) returns (IdpView) {
+    //GetIDPByID returns the requested idp
+    rpc GetIDPByID(IDPIDRequest) returns (IDPView) {
         option (google.api.http) = {
             get: "/idps/{id}"
         };
@@ -252,18 +287,8 @@ service AdminService {
         };
     }
 
-    rpc CreateOidcIdp(OidcIdpConfigCreate) returns (Idp) {
-        option (google.api.http) = {
-            post: "/idps/oidc"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "iam.idp.write"
-        };
-    }
-
-    rpc UpdateIdpConfig(IdpUpdate) returns (Idp) {
+    //UpdateIDP changes the specified idp
+    rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
         option (google.api.http) = {
             put: "/idps/{id}"
             body: "*"
@@ -274,7 +299,9 @@ service AdminService {
         };
     }
 
-    rpc DeactivateIdpConfig(IdpID) returns (Idp) {
+    //DeactivateIDP deactivates the specified idp
+    // The idp will still be visible but logins via this idp are disabled
+    rpc DeactivateIDP(IDPIDRequest) returns (UpdateIDPResponse) {
         option (google.api.http) = {
             put: "/idps/{id}/_deactivate"
             body: "*"
@@ -285,7 +312,9 @@ service AdminService {
         };
     }
 
-    rpc ReactivateIdpConfig(IdpID) returns (Idp) {
+    //ReactivateIDP reactivates the specified idp
+    // logins via this idp are enabled
+    rpc ReactivateIDP(IDPIDRequest) returns (UpdateIDPResponse) {
         option (google.api.http) = {
             put: "/idps/{id}/_reactivate"
             body: "*"
@@ -296,7 +325,8 @@ service AdminService {
         };
     }
 
-    rpc RemoveIdpConfig(IdpID) returns (google.protobuf.Empty) {
+    //RemoveIDP deletes the idp
+    rpc RemoveIDP(IDPIDRequest) returns (RemoveIDPResponse) {
         option (google.api.http) = {
             delete: "/idps/{id}"
         };
@@ -306,9 +336,10 @@ service AdminService {
         };
     }
 
-    rpc UpdateOidcIdpConfig(OidcIdpConfigUpdate) returns (OidcIdpConfig) {
+    //CreateOIDCIDP creates the specified oidc idp
+    rpc CreateOIDCIDP(CreateOIDCIDPConfigRequest) returns (CreateIDPResponse) {
         option (google.api.http) = {
-            put: "/idps/{idp_id}/oidcconfig"
+            post: "/idps/oidc"
             body: "*"
         };
 
@@ -317,7 +348,21 @@ service AdminService {
         };
     }
 
-    rpc SearchIdps(IdpSearchRequest) returns (IdpSearchResponse) {
+    //UpdateOIDCIDP changes the passed oidc idp config
+    rpc UpdateOIDCIDP(OIDCIDPConfigUpdate) returns (UpdateOIDCIDPResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}/oidc"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    //SearchIDPs returns all idp's matching the request
+    // all queries need to match (ANDed)
+    rpc SearchIDPs(IDPSearchRequest) returns (IDPSearchResponse) {
         option (google.api.http) = {
             post: "/idps/_search"
             body: "*"
@@ -327,8 +372,9 @@ service AdminService {
             permission: "iam.idp.read"
         };
     }
-
-    rpc GetDefaultLabelPolicy(google.protobuf.Empty) returns (DefaultLabelPolicyView) {
+    
+    //GetDefaultLabelPolicy returns the label policy defined by the administrators of ZITADEL
+    rpc GetDefaultLabelPolicy(DefaultLabelPolicyRequest) returns (DefaultLabelPolicyView) {
         option (google.api.http) = {
             get: "/policies/label"
         };
@@ -338,7 +384,9 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultLabelPolicy(DefaultLabelPolicyUpdate) returns (DefaultLabelPolicy) {
+    //UpdateDefaultLabelPolicy changes the default label policy it will impact all
+    // it impacts all organisations without a customised policy
+    rpc UpdateDefaultLabelPolicy(UpdateDefaultLabelPolicyRequest) returns (UpdateDefaultLabelPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/label"
             body: "*"
@@ -348,8 +396,8 @@ service AdminService {
             permission: "iam.policy.write"
         };
     }
-
-    rpc GetDefaultLoginPolicy(google.protobuf.Empty) returns (DefaultLoginPolicyView) {
+    //GetDefaultLoginPolicy returns the login policy defined by the administrators of ZITADEL
+    rpc GetDefaultLoginPolicy(DefaultLoginPolicyRequest) returns (DefaultLoginPolicyView) {
         option (google.api.http) = {
             get: "/policies/login"
         };
@@ -359,7 +407,9 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultLoginPolicy(DefaultLoginPolicyRequest) returns (DefaultLoginPolicy) {
+    //UpdateDefaultLoginPolicy changes the default login policy it will impact all
+    // it impacts all organisations without a customised policy
+    rpc UpdateDefaultLoginPolicy(UpdateDefaultLoginPolicyRequest) returns (UpdateDefaultLoginPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/login"
             body: "*"
@@ -370,7 +420,8 @@ service AdminService {
         };
     }
 
-    rpc GetDefaultLoginPolicyIdpProviders(IdpProviderSearchRequest) returns (IdpProviderSearchResponse) {
+    //GetDefaultLoginPolicyIDPProviders returns the idp providers defined by the administrators of ZITADEL
+    rpc GetDefaultLoginPolicyIDPProviders(IDPProviderSearchRequest) returns (IDPProviderSearchResponse) {
         option (google.api.http) = {
             post: "/policies/login/idpproviders/_search"
             body: "*"
@@ -381,7 +432,9 @@ service AdminService {
         };
     }
 
-    rpc AddIdpProviderToDefaultLoginPolicy(IdpProviderID) returns (IdpProviderID) {
+    //AddIDPProviderToDefaultLoginPolicy adds an idp provider to the default login policy it will impact all
+    // it impacts all organisations without a customised policy
+    rpc AddIDPProviderToDefaultLoginPolicy(IDPProviderID) returns (IDPProviderID) {
         option (google.api.http) = {
             post: "/policies/login/idpproviders"
             body: "*"
@@ -392,7 +445,9 @@ service AdminService {
         };
     }
 
-    rpc RemoveIdpProviderFromDefaultLoginPolicy(IdpProviderID) returns (google.protobuf.Empty) {
+    //RemoveIDPProviderFromDefaultLoginPolicy removes an idp provider from the default login policy it will impact all
+    // it impacts all organisations without a customised policy
+    rpc RemoveIDPProviderFromDefaultLoginPolicy(IDPProviderID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/policies/login/idpproviders/{idp_config_id}"
         };
@@ -402,6 +457,7 @@ service AdminService {
         };
     }
 
+    //GetDefaultLoginPolicySecondFactors returns the second factors defined by the administrators of ZITADEL
     rpc GetDefaultLoginPolicySecondFactors(google.protobuf.Empty) returns (SecondFactorsResult) {
         option (google.api.http) = {
             get: "/policies/login/secondfactors/_search"
@@ -412,6 +468,8 @@ service AdminService {
         };
     }
 
+    //AddSecondFactorToDefaultLoginPolicy adds a second factor to the default login policy it will impact all
+    // it impacts all organisations without a customised policy
     rpc AddSecondFactorToDefaultLoginPolicy(SecondFactor) returns (SecondFactor) {
         option (google.api.http) = {
             post: "/policies/login/secondfactors"
@@ -423,6 +481,8 @@ service AdminService {
         };
     }
 
+    //RemoveSecondFactorFromDefaultLoginPolicy removes a second factor from the default login policy it will impact all
+    // it impacts all organisations without a customised policy
     rpc RemoveSecondFactorFromDefaultLoginPolicy(SecondFactor) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/policies/login/secondfactors/{second_factor}"
@@ -433,6 +493,7 @@ service AdminService {
         };
     }
 
+    //GetDefaultLoginPolicyMultiFactors returns the multi factors defined by the administrators of ZITADEL
     rpc GetDefaultLoginPolicyMultiFactors(google.protobuf.Empty) returns (MultiFactorsResult) {
         option (google.api.http) = {
             get: "/policies/login/multifactors/_search"
@@ -443,6 +504,8 @@ service AdminService {
         };
     }
 
+    //AddMultiFactorToDefaultLoginPolicy adds a multiy factor to the default login policy it will impact all
+    // it impacts all organisations without a customised policy
     rpc AddMultiFactorToDefaultLoginPolicy(MultiFactor) returns (MultiFactor) {
         option (google.api.http) = {
             post: "/policies/login/multifactors"
@@ -454,6 +517,8 @@ service AdminService {
         };
     }
 
+    //RemoveMultiFactorFromDefaultLoginPolicy removes a multi factor from the default login policy it will impact all
+    // it impacts all organisations without a customised policy
     rpc RemoveMultiFactorFromDefaultLoginPolicy(MultiFactor) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/policies/login/multifactors/{multi_factor}"
@@ -463,7 +528,7 @@ service AdminService {
             permission: "iam.policy.write"
         };
     }
-
+    //GetDefaultPasswordComplexityPolicy returns the password complexity policy defined by the administrators of ZITADEL
     rpc GetDefaultPasswordComplexityPolicy(google.protobuf.Empty) returns (DefaultPasswordComplexityPolicyView) {
         option (google.api.http) = {
             get: "/policies/password/complexity"
@@ -474,6 +539,8 @@ service AdminService {
         };
     }
 
+    //UpdateDefaultPasswordComplexityPolicy changes the default password complexity policy it will impact all
+    // it impacts all organisations without a customised policy
     rpc UpdateDefaultPasswordComplexityPolicy(DefaultPasswordComplexityPolicyRequest) returns (DefaultPasswordComplexityPolicy) {
         option (google.api.http) = {
             put: "/policies/password/complexity"
@@ -484,7 +551,7 @@ service AdminService {
             permission: "iam.policy.write"
         };
     }
-
+    //GetDefaultPasswordAgePolicy returns the password age policy defined by the administrators of ZITADEL
     rpc GetDefaultPasswordAgePolicy(google.protobuf.Empty) returns (DefaultPasswordAgePolicyView) {
         option (google.api.http) = {
             get: "/policies/password/age"
@@ -495,6 +562,8 @@ service AdminService {
         };
     }
 
+    //UpdateDefaultPasswordPolicy changes the default password age policy it will impact all
+    // it impacts all organisations without a customised policy
     rpc UpdateDefaultPasswordAgePolicy(DefaultPasswordAgePolicyRequest) returns (DefaultPasswordAgePolicy) {
         option (google.api.http) = {
             put: "/policies/password/age"
@@ -506,6 +575,7 @@ service AdminService {
         };
     }
 
+    //GetDefaultPasswordLockoutPolicy returns the password lockout policy defined by the administrators of ZITADEL
     rpc GetDefaultPasswordLockoutPolicy(google.protobuf.Empty) returns (DefaultPasswordLockoutPolicyView) {
         option (google.api.http) = {
             get: "/policies/password/lockout"
@@ -516,6 +586,8 @@ service AdminService {
         };
     }
 
+    //UpdateDefaultPasswordLockoutPolicy changes the default password lockout policy it will impact all
+    // it impacts all organisations without a customised policy
     rpc UpdateDefaultPasswordLockoutPolicy(DefaultPasswordLockoutPolicyRequest) returns (DefaultPasswordLockoutPolicy) {
         option (google.api.http) = {
             put: "/policies/password/lockout"
@@ -527,6 +599,82 @@ service AdminService {
         };
     }
 }
+
+message SetUpOrgRequest {
+    caos.zitadel.api.v1.CreateOrgRequest org = 1 [(validate.rules).message.required = true];
+    caos.zitadel.api.v1.CreateUserRequest user = 2 [(validate.rules).message.required = true];
+}
+
+message SetUpOrgResponse {
+    caos.zitadel.api.v1.CreateOrgResponse org = 1;
+    caos.zitadel.api.v1.CreateUserResponse user = 2;
+}
+
+message DefaultOrgIAMPolicyResponse{
+    caos.zitadel.api.v1.OrgIAMPolicy policy = 1;
+}
+
+message DefaultOrgIAMPolicyRequest {}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 message OrgID {
     string id = 1 [(validate.rules).string = {min_len: 1}];

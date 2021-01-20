@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+package caos.zitadel.api.v1;
+
+message OrgIAMPolicyRequest {
+    string org_id = 1;
+}
+
+message OrgIAMPolicy {
+    string org_id = 1;
+    bool user_login_must_be_domain = 2;
+    bool default = 3;
+    uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
+}
+
+message CreateOrgIAMPolicyRequest{
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool user_login_must_be_domain = 2;
+    bool default = 3;
+}
+
+message CreateOrgIAMPolicyResponse{
+    string org_id = 1;
+    bool user_login_must_be_domain = 2;
+    bool default = 3;
+    uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+}
+
+message UpdateOrgIAMPolicyRequest {
+
+}
+
+message UpdateOrgIAMPolicyResponse {
+
+}
+
+message RemoveOrgIAMPolicyRequest {
+    string org_id = 1;
+}
+
+message RemoveOrgIAMPolicyResponse {}

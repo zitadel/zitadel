@@ -10,3 +10,5 @@ build:
     context: .
     docker:
       dockerfile: build/Dockerfile.dev
+deploy:
+  kubeContext: minikube

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package caos.zitadel.api.v1;
+
+message CreateUserRequest {
+    google.protobuf.Timestamp creation_date = 99; //TODO: correct field id
+}

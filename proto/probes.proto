@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package caos.zitadel.api.v1;
+
+message HealthzRequest{}
+
+message HealthzResponse{}
