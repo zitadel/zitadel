@@ -889,8 +889,8 @@ p p, .lgn-body p, .lgn-body-1 p, .lgn-typography p {
   margin: 0 0 12px;
 }
 
-button, .lgn-button {
-  font: 500 14px/14px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+button, .lgn-button, .lgn-raised-button, .lgn-stroked-button {
+  font: 500 14px/36px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
 }
 

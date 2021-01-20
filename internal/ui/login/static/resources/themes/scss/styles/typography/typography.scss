@@ -28,7 +28,7 @@
   $body-2:        lgn-typography-level(14px, 24px, 500),
   $body-1:        lgn-typography-level(14px, 20px, 400),
   $caption-1:     lgn-typography-level(12px, 20px, 400),
-  $button:        lgn-typography-level(14px, 14px, 500),
+  $button:        lgn-typography-level(14px, 36px, 500),
   $input:         lgn-typography-level(inherit, 1.125, 400),
 ) {
   $config: (
@@ -182,7 +182,7 @@
       }
     }
 
-    button, .lgn-button {
+    button, .lgn-button, .lgn-raised-button, .lgn-stroked-button {
         @include lgn-typography-level-to-styles($config, button);
     }
 
