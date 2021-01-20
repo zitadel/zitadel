@@ -32,7 +32,6 @@ func loginPolicyFromDomain(policy *domain.LoginPolicy) *management.LoginPolicy {
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		AllowExternalIdp:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
-		CreationDate:          timestamppb.New(policy.CreationDate),
 		ChangeDate:            timestamppb.New(policy.ChangeDate),
 		ForceMfa:              policy.ForceMFA,
 		PasswordlessType:      passwordlessTypeFromDomain(policy.PasswordlessType),

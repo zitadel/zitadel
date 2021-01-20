@@ -27,7 +27,6 @@ func passwordAgePolicyFromDomain(policy *domain.PasswordAgePolicy) *management.P
 	return &management.PasswordAgePolicy{
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
-		CreationDate:   timestamppb.New(policy.CreationDate),
 		ChangeDate:     timestamppb.New(policy.ChangeDate),
 	}
 }

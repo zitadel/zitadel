@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func passwordLockoutPolicyToDomain(policy *admin.DefaultPasswordLockoutPolicyRequest) *domain.PasswordLockoutPolicy {
@@ -16,17 +17,10 @@ func passwordLockoutPolicyToDomain(policy *admin.DefaultPasswordLockoutPolicyReq
 }
 
 func passwordLockoutPolicyFromDomain(policy *domain.PasswordLockoutPolicy) *admin.DefaultPasswordLockoutPolicy {
-	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-4Gsm9f").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-3Gms9").OnError(err).Debug("date parse failed")
-
 	return &admin.DefaultPasswordLockoutPolicy{
 		MaxAttempts:        policy.MaxAttempts,
 		ShowLockoutFailure: policy.ShowLockOutFailures,
-		CreationDate:       creationDate,
-		ChangeDate:         changeDate,
+		ChangeDate:         timestamppb.New(policy.ChangeDate),
 	}
 }
 

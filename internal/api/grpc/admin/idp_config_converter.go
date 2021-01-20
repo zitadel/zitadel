@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func createOIDCIDPToDomain(idp *admin.OidcIdpConfigCreate) *domain.IDPConfig {
@@ -45,21 +46,14 @@ func updateOIDCIDPToDomain(idp *admin.OidcIdpConfigUpdate) *domain.OIDCIDPConfig
 }
 
 func idpFromDomain(idp *domain.IDPConfig) *admin.Idp {
-	creationDate, err := ptypes.TimestampProto(idp.CreationDate)
-	logging.Log("GRPC-8dju8").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(idp.ChangeDate)
-	logging.Log("GRPC-Dsj8i").OnError(err).Debug("date parse failed")
-
 	return &admin.Idp{
-		Id:           idp.IDPConfigID,
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Sequence:     idp.Sequence,
-		Name:         idp.Name,
-		StylingType:  idpConfigStylingTypeFromDomain(idp.StylingType),
-		State:        idpConfigStateFromDomain(idp.State),
-		IdpConfig:    idpConfigFromDomain(idp),
+		Id:          idp.IDPConfigID,
+		ChangeDate:  timestamppb.New(idp.ChangeDate),
+		Sequence:    idp.Sequence,
+		Name:        idp.Name,
+		StylingType: idpConfigStylingTypeFromDomain(idp.StylingType),
+		State:       idpConfigStateFromDomain(idp.State),
+		IdpConfig:   idpConfigFromDomain(idp),
 	}
 }
 

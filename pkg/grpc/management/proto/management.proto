@@ -2126,10 +2126,9 @@ message OrgCreateRequest {
 message Org {
   string id = 1;
   OrgState state = 2;
-  google.protobuf.Timestamp creation_date = 3;
-  google.protobuf.Timestamp change_date = 4;
-  string name = 5;
-  uint64 sequence = 6;
+  google.protobuf.Timestamp change_date = 3;
+  string name = 4;
+  uint64 sequence = 5;
 }
 
 message OrgView {
@@ -2153,12 +2152,11 @@ message Domain {
 
 message OrgDomain {
   string org_id = 1;
-  google.protobuf.Timestamp creation_date = 2;
-  google.protobuf.Timestamp change_date = 3;
-  string domain = 4;
-  bool verified = 5;
-  bool primary = 6;
-  uint64 sequence = 7;
+  google.protobuf.Timestamp change_date = 2;
+  string domain = 3;
+  bool verified = 4;
+  bool primary = 5;
+  uint64 sequence = 6;
 }
 
 message OrgDomainView {
@@ -2238,8 +2236,7 @@ message OrgMember {
   string user_id = 1;
   repeated string roles = 2;
   google.protobuf.Timestamp change_date = 3;
-  google.protobuf.Timestamp creation_date = 4;
-  uint64 sequence = 5;
+  uint64 sequence = 4;
 }
 
 message AddOrgMemberRequest {
@@ -2986,14 +2983,13 @@ message IdpID {
 message Idp {
   string id = 1;
   IdpState state = 2;
-  google.protobuf.Timestamp creation_date = 3;
-  google.protobuf.Timestamp change_date = 4;
-  string name = 5;
-  IdpStylingType styling_type = 6;
+  google.protobuf.Timestamp change_date = 3;
+  string name = 4;
+  IdpStylingType styling_type = 5;
   oneof idp_config {
-    OidcIdpConfig oidc_config = 7;
+    OidcIdpConfig oidc_config = 6;
   }
-  uint64 sequence = 8;
+  uint64 sequence = 7;
 }
 
 message IdpUpdate {
@@ -3103,10 +3099,9 @@ message LoginPolicy {
   bool allow_username_password = 1;
   bool allow_register = 2;
   bool allow_external_idp = 3;
-  google.protobuf.Timestamp creation_date = 4;
-  google.protobuf.Timestamp change_date = 5;
-  bool force_mfa = 6;
-  PasswordlessType passwordless_type = 7;
+  google.protobuf.Timestamp change_date = 4;
+  bool force_mfa = 5;
+  PasswordlessType passwordless_type = 6;
 }
 
 message LoginPolicyRequest {
@@ -3252,8 +3247,7 @@ message PasswordComplexityPolicy {
   bool has_number = 4;
   bool has_symbol = 5;
   uint64 sequence = 6;
-  google.protobuf.Timestamp creation_date = 7;
-  google.protobuf.Timestamp change_date = 8;
+  google.protobuf.Timestamp change_date = 7;
 }
 
 message PasswordComplexityPolicyRequest {
@@ -3280,8 +3274,7 @@ message PasswordAgePolicy {
   uint64 max_age_days = 1;
   uint64 expire_warn_days = 2;
   uint64 sequence = 3;
-  google.protobuf.Timestamp creation_date = 4;
-  google.protobuf.Timestamp change_date = 5;
+  google.protobuf.Timestamp change_date = 4;
 }
 
 message PasswordAgePolicyRequest {
@@ -3302,8 +3295,7 @@ message PasswordLockoutPolicy {
   uint64 max_attempts = 1;
   bool show_lockout_failure = 2;
   uint64 sequence = 3;
-  google.protobuf.Timestamp creation_date = 4;
-  google.protobuf.Timestamp change_date = 5;
+  google.protobuf.Timestamp change_date = 4;
 }
 
 message PasswordLockoutPolicyRequest {

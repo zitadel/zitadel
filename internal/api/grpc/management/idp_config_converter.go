@@ -60,33 +60,13 @@ func updateOidcIdpToDomain(ctx context.Context, idp *management.OidcIdpConfigUpd
 
 func idpFromDomain(idp *domain.IDPConfig) *management.Idp {
 	return &management.Idp{
-		Id:           idp.IDPConfigID,
-		CreationDate: timestamppb.New(idp.CreationDate),
-		ChangeDate:   timestamppb.New(idp.ChangeDate),
-		Sequence:     idp.Sequence,
-		Name:         idp.Name,
-		StylingType:  idpConfigStylingTypeFromDomain(idp.StylingType),
-		State:        idpConfigStateFromDomain(idp.State),
-		IdpConfig:    idpConfigFromDomain(idp),
-	}
-}
-
-func idpFromModel(idp *iam_model.IDPConfig) *management.Idp {
-	creationDate, err := ptypes.TimestampProto(idp.CreationDate)
-	logging.Log("GRPC-8dju8").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(idp.ChangeDate)
-	logging.Log("GRPC-Dsj8i").OnError(err).Debug("date parse failed")
-
-	return &management.Idp{
-		Id:           idp.IDPConfigID,
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Sequence:     idp.Sequence,
-		Name:         idp.Name,
-		StylingType:  idpConfigStylingTypeFromModel(idp.StylingType),
-		State:        idpConfigStateFromModel(idp.State),
-		IdpConfig:    idpConfigFromModel(idp),
+		Id:          idp.IDPConfigID,
+		ChangeDate:  timestamppb.New(idp.ChangeDate),
+		Sequence:    idp.Sequence,
+		Name:        idp.Name,
+		StylingType: idpConfigStylingTypeFromDomain(idp.StylingType),
+		State:       idpConfigStateFromDomain(idp.State),
+		IdpConfig:   idpConfigFromDomain(idp),
 	}
 }
 
