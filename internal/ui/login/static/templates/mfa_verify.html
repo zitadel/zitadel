@@ -22,6 +22,15 @@
 
     {{ template "error-message" .}}
 
+    <div class="lgn-actions">
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </a>
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+    </div>
+
     {{ if .MFAProviders }}
         <div class="lgn-mfa-other">
             <p>{{t "MFA.ChooseOther"}}</p>
@@ -32,15 +41,6 @@
             {{ end }}
         </div>
     {{ end }}
-
-    <div class="lgn-actions">
-        <!-- position element in header -->
-        <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
-            <i class="lgn-icon-arrow-left-solid"></i>
-        </a>
-        <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-    </div>
 </form>
 
 <script src="{{ resourceUrl " scripts/form_submit.js" }}"></script>

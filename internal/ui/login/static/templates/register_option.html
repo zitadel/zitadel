@@ -22,7 +22,7 @@
             formnovalidate>{{t "RegisterOption.RegisterUsernamePassword"}}</button>
         {{end}}
 
-        <p class="text-align-center">{{t "Registration.ExternalLogin"}}</p>
+        <p>{{t "Registration.ExternalLogin"}}</p>
 
         {{if .LoginPolicy.AllowExternalIDP}}
             {{ $reqid := .AuthReqID}}

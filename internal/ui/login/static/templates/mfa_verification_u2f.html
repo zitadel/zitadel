@@ -16,17 +16,17 @@
 
     <p class="wa-no-support error hidden">{{t "WebAuthN.NotSupported"}}</p>
 
-    <div class="lgn-actions" id="webauthn">
-        <span class="fill-space"></span>
-        <a id="btn-login" class="lgn-raised-button lgn-primary wa-support">{{t "Actions.ValidateToken"}}</a>
-    </div>
-
     <div id="wa-error" class="error hidden">
         <span class="cause"></span>
         <span>{{t "WebAuthN.Error.Retry"}}</span>
     </div>
 
     {{ template "error-message" .}}
+
+    <div class="lgn-actions" id="webauthn">
+        <span class="fill-space"></span>
+        <a id="btn-login" class="lgn-raised-button lgn-primary wa-support">{{t "Actions.ValidateToken"}}</a>
+    </div>
 
     {{ if .MFAProviders }}
         <div class="lgn-mfa-other">
