@@ -15,4 +15,8 @@ body.waiting * {
   display: none !important;
 }
 
+.text-align-center {
+  text-align: center;
+}
+
 /*# sourceMappingURL=main.css.map */

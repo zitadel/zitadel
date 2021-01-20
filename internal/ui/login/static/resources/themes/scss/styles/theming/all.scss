@@ -16,6 +16,7 @@
 @import '../select/select_theme.scss';
 @import '../list/list_theme.scss';
 @import '../typography/typography.scss';
+@import '../success_label/success_label_theme.scss';
 @import './theming';
 
 @mixin zitadel-lgn-theme($theme-or-color-config) {
@@ -36,4 +37,5 @@
     @include lgn-select-theme($theme-or-color-config);
     @include lgn-list-theme($theme-or-color-config);
     @include lgn-idp-theme($theme-or-color-config);
+    @include lgn-success-label-theme($theme-or-color-config);
 }

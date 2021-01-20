@@ -417,6 +417,14 @@ a.block {
   display: flex;
   flex-direction: column;
 }
+.content-container .lgn-mfa-other {
+  display: flex;
+  flex-direction: column;
+}
+.content-container .lgn-mfa-other button {
+  width: 100%;
+  margin: 0.5rem 0;
+}
 
 i {
   font-size: 1.2rem;
@@ -837,6 +845,13 @@ i {
   font-style: normal;
   font-weight: 400;
 }
+.lgn-success-label {
+  color: #0e6245;
+  background: #cbf4c9;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
 h1, .lgn-headline, .lgn-typography h1 {
   font: 400 24px/32px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
@@ -1262,6 +1277,11 @@ a:hover, a:active {
   background-color: white;
 }
 
+.lgn-success-label {
+  color: #cbf4c9;
+  background-color: #4f566b;
+}
+
 .lgn-dark-theme .lgn-app-background, .lgn-dark-theme.lgn-app-background {
   background-color: #212224;
   color: white;
@@ -1570,6 +1590,10 @@ a:hover, a:active {
 .lgn-dark-theme .lgn-idp.google {
   color: #8b8d8d;
   background-color: white;
+}
+.lgn-dark-theme .lgn-success-label {
+  color: #cbf4c9;
+  background-color: #4f566b;
 }
 
 .lgn-light-theme .lgn-app-background, .lgn-light-theme.lgn-app-background {
@@ -1880,6 +1904,10 @@ a:hover, a:active {
 .lgn-light-theme .lgn-idp.google {
   color: #8b8d8d;
   background-color: white;
+}
+.lgn-light-theme .lgn-success-label {
+  color: #0e6245;
+  background-color: #cbf4c9;
 }
 
 /*# sourceMappingURL=zitadel.css.map */

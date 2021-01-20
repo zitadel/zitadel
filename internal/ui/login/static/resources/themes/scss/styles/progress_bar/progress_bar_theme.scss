@@ -1,5 +1,5 @@
 @import '../theming/theming.scss';
-@import './input.scss';
+@import './progress_bar.scss';
 
 @mixin lgn-progress-bar-theme($theme-or-color-config) {
     $theme: lgn-private-legacy-get-theme($theme-or-color-config);

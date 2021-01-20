@@ -417,6 +417,14 @@ a.block {
   display: flex;
   flex-direction: column;
 }
+.content-container .lgn-mfa-other {
+  display: flex;
+  flex-direction: column;
+}
+.content-container .lgn-mfa-other button {
+  width: 100%;
+  margin: 0.5rem 0;
+}
 
 i {
   font-size: 1.2rem;
@@ -837,6 +845,13 @@ i {
   font-style: normal;
   font-weight: 400;
 }
+.lgn-success-label {
+  color: #0e6245;
+  background: #cbf4c9;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
 footer {
   width: 100%;
   box-sizing: border-box;
@@ -1255,6 +1270,14 @@ a.block {
   display: flex;
   flex-direction: column;
 }
+.content-container .lgn-mfa-other {
+  display: flex;
+  flex-direction: column;
+}
+.content-container .lgn-mfa-other button {
+  width: 100%;
+  margin: 0.5rem 0;
+}
 
 i {
   font-size: 1.2rem;
@@ -1675,6 +1698,13 @@ i {
   font-style: normal;
   font-weight: 400;
 }
+.lgn-success-label {
+  color: #0e6245;
+  background: #cbf4c9;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
 @font-face {
   font-family: Aileron;
   src: url(../../../fonts/ailerons/ailerons.otf) format("opentype");
@@ -2025,6 +2055,14 @@ i {
 .content-container .lgn-register-options {
   display: flex;
   flex-direction: column;
+}
+.content-container .lgn-mfa-other {
+  display: flex;
+  flex-direction: column;
+}
+.content-container .lgn-mfa-other button {
+  width: 100%;
+  margin: 0.5rem 0;
 }
 
 i {
