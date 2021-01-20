@@ -176,11 +176,8 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("insert unique constraint failed")
 
-				switch e := err.(type) {
-				case *pq.Error:
-					if e.Code == "23505" {
-						return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", uniqueConstraint.ErrorMessage)
-					}
+				if db.isUniqueViolationError(err) {
+					return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", uniqueConstraint.ErrorMessage)
 				}
 
 				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint ")
@@ -314,4 +311,13 @@ func (db *CRDB) placeholder(query string) string {
 		replaced = replaced + "$" + strconv.Itoa(i+1) + query[l[1]:nextIDX]
 	}
 	return replaced
+}
+
+func (db *CRDB) isUniqueViolationError(err error) bool {
+	if pqErr, ok := err.(*pq.Error); ok {
+		if pqErr.Code == "23505" {
+			return true
+		}
+	}
+	return false
 }
