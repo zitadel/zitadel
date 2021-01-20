@@ -22,7 +22,6 @@
         <label class="lgn-label" for="loginName">{{t "Login.Loginname"}}</label>
             <input class="lgn-input lgn-suffix-input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}"
             value="{{ .LoginName }}" {{if .ErrMessage}}shake {{end}} autocomplete="username" autofocus required>
-            <!-- suffix requires parent div 'lgn-field', corresponding input class 'lgn-suffix-input' and its id="default-login-suffix" as well as an offset script -->
     </div>
     {{end}}
 
