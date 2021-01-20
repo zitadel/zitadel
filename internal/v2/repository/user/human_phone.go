@@ -30,7 +30,7 @@ func (e *HumanPhoneChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanPhoneChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPhoneChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -63,7 +63,7 @@ func (e *HumanPhoneRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanPhoneRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPhoneRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -92,7 +92,7 @@ func (e *HumanPhoneVerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanPhoneVerifiedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPhoneVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -120,7 +120,7 @@ func (e *HumanPhoneVerificationFailedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanPhoneVerificationFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPhoneVerificationFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -150,7 +150,7 @@ func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanPhoneCodeAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPhoneCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -189,7 +189,7 @@ func (e *HumanPhoneCodeSentEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanPhoneCodeSentEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPhoneCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

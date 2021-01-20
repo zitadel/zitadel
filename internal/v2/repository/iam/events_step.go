@@ -26,7 +26,7 @@ func (e *SetupStepEvent) Data() interface{} {
 	return e
 }
 
-func (e *SetupStepEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *SetupStepEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

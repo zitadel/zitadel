@@ -80,9 +80,9 @@ type IDPConfigRemovedEvent struct {
 
 func NewIDPConfigRemovedEvent(
 	ctx context.Context,
-	configID string,
+	configID,
+	name string,
 ) *IDPConfigRemovedEvent {
-
 	return &IDPConfigRemovedEvent{
 		IDPConfigRemovedEvent: *idpconfig.NewIDPConfigRemovedEvent(
 			eventstore.NewBaseEventForPush(
@@ -90,6 +90,7 @@ func NewIDPConfigRemovedEvent(
 				IDPConfigRemovedEventType,
 			),
 			configID,
+			name,
 		),
 	}
 }

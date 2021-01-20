@@ -29,7 +29,7 @@ func (e *LoginPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *LoginPolicyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *LoginPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -81,7 +81,7 @@ func (e *LoginPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *LoginPolicyChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *LoginPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -154,7 +154,7 @@ func (e *LoginPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *LoginPolicyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *LoginPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

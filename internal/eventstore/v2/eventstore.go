@@ -82,13 +82,14 @@ func (es *Eventstore) aggregatesToEvents(aggregates []Aggregater) ([]*repository
 				Version:       repository.Version(aggregate.Version()),
 				Data:          data,
 			})
-			if event.UniqueConstraint() != nil {
-				for _, constraint := range event.UniqueConstraint() {
+			if event.UniqueConstraints() != nil {
+				for _, constraint := range event.UniqueConstraints() {
 					uniqueConstraints = append(uniqueConstraints,
 						&repository.UniqueConstraint{
-							TableName:   constraint.TableName(),
-							UniqueField: constraint.UniqueField(),
-							Action:      uniqueConstraintActionToRepository(constraint.Action()),
+							TableName:    constraint.TableName,
+							UniqueField:  constraint.UniqueField,
+							Action:       uniqueConstraintActionToRepository(constraint.Action),
+							ErrorMessage: constraint.ErrorMessage,
 						},
 					)
 				}
@@ -226,7 +227,7 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 	switch action {
 	case UniqueConstraintAdd:
 		return repository.UniqueConstraintAdd
-	case UniqueConstraintRemoved:
+	case UniqueConstraintRemove:
 		return repository.UniqueConstraintRemoved
 	default:
 		return repository.UniqueConstraintAdd

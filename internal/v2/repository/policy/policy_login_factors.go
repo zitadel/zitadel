@@ -51,7 +51,7 @@ func (e *SecondFactorAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *SecondFactorAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *SecondFactorAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -87,7 +87,7 @@ func (e *SecondFactorRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *SecondFactorRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *SecondFactorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -124,7 +124,7 @@ func (e *MultiFactorAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MultiFactorAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *MultiFactorAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -160,6 +160,6 @@ func (e *MultiFactorRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MultiFactorRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *MultiFactorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }

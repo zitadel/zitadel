@@ -25,7 +25,7 @@ func (e *PasswordLockoutPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasswordLockoutPolicyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *PasswordLockoutPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -66,7 +66,7 @@ func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasswordLockoutPolicyChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *PasswordLockoutPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -121,7 +121,7 @@ func (e *PasswordLockoutPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *PasswordLockoutPolicyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *PasswordLockoutPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

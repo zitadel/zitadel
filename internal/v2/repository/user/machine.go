@@ -28,12 +28,8 @@ func (e *MachineAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	uniqueUserName := e.UserName
-	if e.UserLoginMustBeDomain {
-		uniqueUserName = e.UserName + e.ResourceOwner()
-	}
-	return []eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(uniqueUserName)}
+func (e *MachineAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
 }
 
 func NewMachineAddedEvent(
@@ -80,7 +76,7 @@ func (e *MachineChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *MachineChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

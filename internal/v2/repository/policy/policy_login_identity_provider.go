@@ -25,7 +25,7 @@ func (e *IdentityProviderAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *IdentityProviderAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *IdentityProviderAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -65,7 +65,7 @@ func (e *IdentityProviderRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *IdentityProviderRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *IdentityProviderRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

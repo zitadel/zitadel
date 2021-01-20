@@ -28,7 +28,7 @@ func (e *PasswordComplexityPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasswordComplexityPolicyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *PasswordComplexityPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -77,7 +77,7 @@ func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasswordComplexityPolicyChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *PasswordComplexityPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -150,7 +150,7 @@ func (e *PasswordComplexityPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *PasswordComplexityPolicyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *PasswordComplexityPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

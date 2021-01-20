@@ -31,7 +31,7 @@ func (e *ApplicationAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *ApplicationAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

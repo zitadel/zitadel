@@ -24,7 +24,7 @@ func (e *OrgIAMPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *OrgIAMPolicyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *OrgIAMPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -62,7 +62,7 @@ func (e *OrgIAMPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *OrgIAMPolicyChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *OrgIAMPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -111,7 +111,7 @@ func (e *OrgIAMPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *OrgIAMPolicyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *OrgIAMPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

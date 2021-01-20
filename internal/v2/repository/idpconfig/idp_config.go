@@ -12,38 +12,17 @@ const (
 	uniqueIDPConfigNameTable = "unique_idp_config_names"
 )
 
-type IDPConfigNameUniqueConstraint struct {
-	tableName     string
-	idpConfigName string
-	action        eventstore.UniqueConstraintAction
+func NewAddIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueIDPConfigNameTable,
+		idpConfigName+resourceOwner,
+		"Errors.IDPConfig.AlreadyExists")
 }
 
-func NewAddIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *IDPConfigNameUniqueConstraint {
-	return &IDPConfigNameUniqueConstraint{
-		tableName:     uniqueIDPConfigNameTable,
-		idpConfigName: idpConfigName + resourceOwner,
-		action:        eventstore.UniqueConstraintAdd,
-	}
-}
-
-func NewRemoveIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *IDPConfigNameUniqueConstraint {
-	return &IDPConfigNameUniqueConstraint{
-		tableName:     uniqueIDPConfigNameTable,
-		idpConfigName: idpConfigName + resourceOwner,
-		action:        eventstore.UniqueConstraintRemoved,
-	}
-}
-
-func (e *IDPConfigNameUniqueConstraint) TableName() string {
-	return e.tableName
-}
-
-func (e *IDPConfigNameUniqueConstraint) UniqueField() string {
-	return e.idpConfigName
-}
-
-func (e *IDPConfigNameUniqueConstraint) Action() eventstore.UniqueConstraintAction {
-	return e.action
+func NewRemoveIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueIDPConfigNameTable,
+		idpConfigName+resourceOwner)
 }
 
 type IDPConfigAddedEvent struct {
@@ -76,8 +55,8 @@ func (e *IDPConfigAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *IDPConfigAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return []eventstore.EventUniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.ResourceOwner())}
+func (e *IDPConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.ResourceOwner())}
 }
 
 func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
@@ -105,7 +84,7 @@ func (e *IDPConfigChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *IDPConfigChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -151,7 +130,7 @@ func (e *IDPConfigDeactivatedEvent) Data() interface{} {
 	return e
 }
 
-func (e *IDPConfigDeactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *IDPConfigDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -189,7 +168,7 @@ func (e *IDPConfigReactivatedEvent) Data() interface{} {
 	return e
 }
 
-func (e *IDPConfigReactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *IDPConfigReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -230,8 +209,8 @@ func (e *IDPConfigRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *IDPConfigRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return []eventstore.EventUniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.Name, e.ResourceOwner())}
+func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.Name, e.ResourceOwner())}
 }
 
 func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

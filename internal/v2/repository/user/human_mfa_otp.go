@@ -28,7 +28,7 @@ func (e *HumanOTPAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanOTPAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanOTPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -63,7 +63,7 @@ func (e *HumanOTPVerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanOTPVerifiedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanOTPVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -91,7 +91,7 @@ func (e *HumanOTPRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanOTPRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanOTPRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -118,7 +118,7 @@ func (e *HumanOTPCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanOTPCheckSucceededEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanOTPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -145,7 +145,7 @@ func (e *HumanOTPCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanOTPCheckFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanOTPCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

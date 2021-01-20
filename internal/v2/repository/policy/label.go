@@ -24,7 +24,7 @@ func (e *LabelPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *LabelPolicyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *LabelPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -65,7 +65,7 @@ func (e *LabelPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *LabelPolicyChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *LabelPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -120,7 +120,7 @@ func (e *LabelPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *LabelPolicyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *LabelPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

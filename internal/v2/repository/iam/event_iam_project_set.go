@@ -23,7 +23,7 @@ func (e *ProjectSetEvent) Data() interface{} {
 	return e
 }
 
-func (e *ProjectSetEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *ProjectSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

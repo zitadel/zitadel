@@ -25,20 +25,17 @@ type ProjectnameUniqueConstraint struct {
 	action      eventstore.UniqueConstraintAction
 }
 
-func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *ProjectnameUniqueConstraint {
-	return &ProjectnameUniqueConstraint{
-		tableName:   uniqueProjectnameTable,
-		projectName: projectName + resourceOwner,
-		action:      eventstore.UniqueConstraintAdd,
-	}
+func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueProjectnameTable,
+		projectName+resourceOwner,
+		"Errors.Project.AlreadyExists")
 }
 
-func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *ProjectnameUniqueConstraint {
-	return &ProjectnameUniqueConstraint{
-		tableName:   uniqueProjectnameTable,
-		projectName: projectName + resourceOwner,
-		action:      eventstore.UniqueConstraintRemoved,
-	}
+func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueProjectnameTable,
+		projectName+resourceOwner)
 }
 
 func (e *ProjectnameUniqueConstraint) TableName() string {
@@ -65,8 +62,8 @@ func (e *ProjectAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *ProjectAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return []eventstore.EventUniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.ResourceOwner())}
+func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.ResourceOwner())}
 }
 
 func NewProjectAddedEvent(ctx context.Context, name string) *ProjectAddedEvent {

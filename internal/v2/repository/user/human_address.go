@@ -27,7 +27,7 @@ func (e *HumanAddressChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanAddressChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanAddressChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

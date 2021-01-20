@@ -24,20 +24,17 @@ type OrgnameUniqueConstraint struct {
 	action    eventstore.UniqueConstraintAction
 }
 
-func NewAddOrgnameUniqueConstraint(orgName string) *OrgnameUniqueConstraint {
-	return &OrgnameUniqueConstraint{
-		tableName: uniqueOrgnameTable,
-		orgName:   orgName,
-		action:    eventstore.UniqueConstraintAdd,
-	}
+func NewAddOrgnameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueOrgnameTable,
+		orgName,
+		"Errors.Org.AlreadyExists")
 }
 
-func NewRemoveUsernameUniqueConstraint(orgName string) *OrgnameUniqueConstraint {
-	return &OrgnameUniqueConstraint{
-		tableName: uniqueOrgnameTable,
-		orgName:   orgName,
-		action:    eventstore.UniqueConstraintRemoved,
-	}
+func NewRemoveUsernameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueOrgnameTable,
+		orgName)
 }
 
 func (e *OrgnameUniqueConstraint) TableName() string {
@@ -62,8 +59,8 @@ func (e *OrgAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *OrgAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	return []eventstore.EventUniqueConstraint{NewAddOrgnameUniqueConstraint(e.Name)}
+func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddOrgnameUniqueConstraint(e.Name)}
 }
 
 func NewOrgAddedEvent(ctx context.Context, name string) *OrgAddedEvent {
@@ -98,7 +95,7 @@ func (e *OrgChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *OrgChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -132,7 +129,7 @@ func (e *OrgDeactivatedEvent) Data() interface{} {
 	return e
 }
 
-func (e *OrgDeactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *OrgDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -165,7 +162,7 @@ func (e *OrgReactivatedEvent) Data() interface{} {
 	return e
 }
 
-func (e *OrgReactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *OrgReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

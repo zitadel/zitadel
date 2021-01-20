@@ -23,38 +23,25 @@ const (
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
 )
 
-type UsernameUniqueConstraint struct {
-	tableName string
-	userName  string
-	action    eventstore.UniqueConstraintAction
-}
-
-func NewAddUsernameUniqueConstraint(userName string) *UsernameUniqueConstraint {
-	return &UsernameUniqueConstraint{
-		tableName: uniqueUsernameTable,
-		userName:  userName,
-		action:    eventstore.UniqueConstraintAdd,
+func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.EventUniqueConstraint {
+	uniqueUserName := userName
+	if userLoginMustBeDomain {
+		uniqueUserName = userName + resourceOwner
 	}
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueUsernameTable,
+		uniqueUserName,
+		"Errors.User.AlreadyExists")
 }
 
-func NewRemoveUsernameUniqueConstraint(userName string) *UsernameUniqueConstraint {
-	return &UsernameUniqueConstraint{
-		tableName: uniqueUsernameTable,
-		userName:  userName,
-		action:    eventstore.UniqueConstraintRemoved,
+func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.EventUniqueConstraint {
+	uniqueUserName := userName
+	if userLoginMustBeDomain {
+		uniqueUserName = userName + resourceOwner
 	}
-}
-
-func (e *UsernameUniqueConstraint) TableName() string {
-	return e.tableName
-}
-
-func (e *UsernameUniqueConstraint) UniqueField() string {
-	return e.userName
-}
-
-func (e *UsernameUniqueConstraint) Action() eventstore.UniqueConstraintAction {
-	return e.action
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueUsernameTable,
+		uniqueUserName)
 }
 
 type UserLockedEvent struct {
@@ -65,7 +52,7 @@ func (e *UserLockedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *UserLockedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *UserLockedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -92,7 +79,7 @@ func (e *UserUnlockedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *UserUnlockedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *UserUnlockedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -119,7 +106,7 @@ func (e *UserDeactivatedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *UserDeactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *UserDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -146,7 +133,7 @@ func (e *UserReactivatedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *UserReactivatedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *UserReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -176,12 +163,8 @@ func (e *UserRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *UserRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	uniqueUserName := e.UserName
-	if e.UserLoginMustBeDomain {
-		uniqueUserName = e.UserName + e.ResourceOwner()
-	}
-	return []eventstore.EventUniqueConstraint{NewRemoveUsernameUniqueConstraint(uniqueUserName)}
+func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
 }
 
 func NewUserRemovedEvent(ctx context.Context, userName string, userLoginMustBeDomain bool) *UserRemovedEvent {
@@ -217,7 +200,7 @@ func (e *UserTokenAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *UserTokenAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *UserTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -268,7 +251,7 @@ func (e *DomainClaimedEvent) Data() interface{} {
 	return e
 }
 
-func (e *DomainClaimedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -305,7 +288,7 @@ func (e *DomainClaimedSentEvent) Data() interface{} {
 	return nil
 }
 
-func (e *DomainClaimedSentEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *DomainClaimedSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -338,18 +321,10 @@ func (e *UsernameChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *UsernameChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	oldUniqueUsername := e.OldUserName
-	if e.UserLoginMustBeDomain {
-		oldUniqueUsername = e.OldUserName + e.ResourceOwner()
-	}
-	newUniqueUsername := e.UserName
-	if e.UserLoginMustBeDomain {
-		newUniqueUsername = e.UserName + e.ResourceOwner()
-	}
-	return []eventstore.EventUniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(oldUniqueUsername),
-		NewAddUsernameUniqueConstraint(newUniqueUsername),
+func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{
+		NewRemoveUsernameUniqueConstraint(e.OldUserName, e.ResourceOwner(), e.UserLoginMustBeDomain),
+		NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain),
 	}
 }
 

@@ -178,7 +178,7 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 				switch e := err.(type) {
 				case *pq.Error:
 					if e.Code.Name() == "unique_violation" {
-						return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", "unable to create unique constraint")
+						return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", uniqueConstraint.ErrorMessage)
 					}
 				}
 

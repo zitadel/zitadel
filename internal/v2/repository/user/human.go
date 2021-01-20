@@ -54,12 +54,8 @@ func (e *HumanAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	uniqueUserName := e.UserName
-	if e.UserLoginMustBeDomain {
-		uniqueUserName = e.UserName + e.ResourceOwner()
-	}
-	return []eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(uniqueUserName)}
+func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
 }
 
 func (e *HumanAddedEvent) AddAddressData(
@@ -162,12 +158,8 @@ func (e *HumanRegisteredEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanRegisteredEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
-	uniqueUserName := e.UserName
-	if e.UserLoginMustBeDomain {
-		uniqueUserName = e.UserName + e.ResourceOwner()
-	}
-	return []eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(uniqueUserName)}
+func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
 }
 
 func (e *HumanRegisteredEvent) AddAddressData(
@@ -249,7 +241,7 @@ func (e *HumanInitialCodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanInitialCodeAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanInitialCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -288,7 +280,7 @@ func (e *HumanInitialCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanInitialCodeSentEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanInitialCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -315,7 +307,7 @@ func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanInitializedCheckSucceededEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanInitializedCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -342,7 +334,7 @@ func (e *HumanInitializedCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanInitializedCheckFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanInitializedCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -369,7 +361,7 @@ func (e *HumanSignedOutEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanSignedOutEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanSignedOutEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

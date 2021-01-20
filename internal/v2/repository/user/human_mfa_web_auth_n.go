@@ -40,7 +40,7 @@ func (e *HumanWebAuthNAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanWebAuthNAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanWebAuthNAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -101,7 +101,7 @@ func (e *HumanWebAuthNVerifiedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanWebAuthNVerifiedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanWebAuthNVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -177,7 +177,7 @@ func (e *HumanWebAuthNSignCountChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanWebAuthNSignCountChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanWebAuthNSignCountChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -233,7 +233,7 @@ func (e *HumanWebAuthNRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanWebAuthNRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanWebAuthNRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -287,7 +287,7 @@ func (e *HumanWebAuthNBeginLoginEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanWebAuthNBeginLoginEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanWebAuthNBeginLoginEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -343,7 +343,7 @@ func (e *HumanWebAuthNCheckSucceededEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanWebAuthNCheckSucceededEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanWebAuthNCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -387,7 +387,7 @@ func (e *HumanWebAuthNCheckFailedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanWebAuthNCheckFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanWebAuthNCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

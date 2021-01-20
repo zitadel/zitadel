@@ -45,7 +45,7 @@ func (e *OIDCConfigAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *OIDCConfigAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

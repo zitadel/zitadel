@@ -24,7 +24,7 @@ func (e *MemberAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MemberAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *MemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -65,7 +65,7 @@ func (e *MemberChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MemberChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *MemberChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -104,7 +104,7 @@ func (e *MemberRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MemberRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *MemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

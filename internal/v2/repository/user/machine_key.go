@@ -29,7 +29,7 @@ func (e *MachineKeyAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineKeyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *MachineKeyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -74,7 +74,7 @@ func (e *MachineKeyRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineKeyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *MachineKeyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

@@ -19,7 +19,7 @@ func (e *HumanMFAInitSkippedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanMFAInitSkippedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanMFAInitSkippedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

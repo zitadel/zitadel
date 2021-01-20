@@ -83,7 +83,7 @@ func (e *UserAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *UserAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *UserAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -125,7 +125,7 @@ func (e *UserFirstNameChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *UserFirstNameChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *UserFirstNameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -159,7 +159,7 @@ func (e *UserPasswordCheckedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *UserPasswordCheckedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *UserPasswordCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -193,7 +193,7 @@ func (e *UserDeletedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *UserDeletedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *UserDeletedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

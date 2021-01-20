@@ -30,7 +30,7 @@ func (e *HumanProfileChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanProfileChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanProfileChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

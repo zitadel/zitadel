@@ -24,7 +24,7 @@ func (e *PasswordAgePolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasswordAgePolicyAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *PasswordAgePolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -65,7 +65,7 @@ func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasswordAgePolicyChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *PasswordAgePolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -120,7 +120,7 @@ func (e *PasswordAgePolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *PasswordAgePolicyRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *PasswordAgePolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

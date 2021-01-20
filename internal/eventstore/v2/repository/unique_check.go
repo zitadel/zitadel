@@ -11,6 +11,9 @@ type UniqueConstraint struct {
 	//Type describes the cause of the event (e.g. user.added)
 	// it should always be in past-form
 	Action UniqueConstraintAction
+
+	//ErrorMessage is the message key which should be returned if constraint is violated
+	ErrorMessage string
 }
 
 type UniqueConstraintAction int32
@@ -24,16 +27,4 @@ const (
 
 func (f UniqueConstraintAction) Valid() bool {
 	return f >= 0 && f < uniqueConstraintActionCount
-}
-
-func CheckUniqueConstraintActions(uniqueConstraints ...*UniqueConstraint) (add bool, remove bool) {
-	for _, uniqueConstraint := range uniqueConstraints {
-		if uniqueConstraint.Action == UniqueConstraintAdd {
-			add = true
-		}
-		if uniqueConstraint.Action == UniqueConstraintRemoved {
-			remove = true
-		}
-	}
-	return add, remove
 }

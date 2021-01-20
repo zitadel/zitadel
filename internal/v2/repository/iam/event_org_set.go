@@ -23,7 +23,7 @@ func (e *GlobalOrgSetEvent) Data() interface{} {
 	return e
 }
 
-func (e *GlobalOrgSetEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *GlobalOrgSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

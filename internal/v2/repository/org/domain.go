@@ -31,7 +31,7 @@ func (e *DomainAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *DomainAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -69,7 +69,7 @@ func (e *DomainVerificationAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *DomainVerificationAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *DomainVerificationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -111,7 +111,7 @@ func (e *DomainVerificationFailedEvent) Data() interface{} {
 	return e
 }
 
-func (e *DomainVerificationFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *DomainVerificationFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -147,7 +147,7 @@ func (e *DomainVerifiedEvent) Data() interface{} {
 	return e
 }
 
-func (e *DomainVerifiedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -183,7 +183,7 @@ func (e *DomainPrimarySetEvent) Data() interface{} {
 	return e
 }
 
-func (e *DomainPrimarySetEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *DomainPrimarySetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -219,7 +219,7 @@ func (e *DomainRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *DomainRemovedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

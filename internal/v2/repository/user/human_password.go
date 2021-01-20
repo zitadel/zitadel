@@ -32,7 +32,7 @@ func (e *HumanPasswordChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanPasswordChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPasswordChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -77,7 +77,7 @@ func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanPasswordCodeAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPasswordCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -118,7 +118,7 @@ func (e *HumanPasswordCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanPasswordCodeSentEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -145,7 +145,7 @@ func (e *HumanPasswordCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanPasswordCheckSucceededEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPasswordCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -172,7 +172,7 @@ func (e *HumanPasswordCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanPasswordCheckFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanPasswordCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

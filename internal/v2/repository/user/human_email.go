@@ -29,7 +29,7 @@ func (e *HumanEmailChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanEmailChangedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -64,7 +64,7 @@ func (e *HumanEmailVerifiedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanEmailVerifiedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanEmailVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -93,7 +93,7 @@ func (e *HumanEmailVerificationFailedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanEmailVerificationFailedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanEmailVerificationFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -123,7 +123,7 @@ func (e *HumanEmailCodeAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanEmailCodeAddedEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanEmailCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -161,7 +161,7 @@ func (e *HumanEmailCodeSentEvent) Data() interface{} {
 	return nil
 }
 
-func (e *HumanEmailCodeSentEvent) UniqueConstraint() []eventstore.EventUniqueConstraint {
+func (e *HumanEmailCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
