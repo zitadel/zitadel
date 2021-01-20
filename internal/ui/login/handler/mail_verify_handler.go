@@ -61,7 +61,7 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *m
 		userID = authReq.UserID
 		userOrg = authReq.UserOrgID
 	}
-	err := l.authRepo.VerifyEmail(setContext(r.Context(), userOrg), userID, code)
+	err := l.command.VerifyHumanEmail(setContext(r.Context(), userOrg), userID, code, userOrg)
 	if err != nil {
 		l.renderMailVerification(w, r, authReq, userID, err)
 		return

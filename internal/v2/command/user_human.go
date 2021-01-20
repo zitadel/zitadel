@@ -37,11 +37,11 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID string, human *domain.
 	if !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
-	return r.createHuman(ctx, orgID, human, nil, false)
+	return r.createHuman(ctx, orgID, human, nil, nil, false)
 }
 
-func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) (*domain.Human, error) {
-	userAgg, addedHuman, err := r.registerHuman(ctx, orgID, human, externalIDP)
+func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMember *domain.Member) (*domain.Human, error) {
+	userAgg, addedHuman, err := r.registerHuman(ctx, orgID, human, externalIDP, orgMember)
 	if err != nil {
 		return nil, err
 	}
@@ -53,19 +53,20 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *do
 	return writeModelToHuman(addedHuman), nil
 }
 
-func (r *CommandSide) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) (*user.Aggregate, *HumanWriteModel, error) {
+func (r *CommandSide) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMember *domain.Member) (*user.Aggregate, *HumanWriteModel, error) {
 	if !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-9dk45", "Errors.User.Invalid")
 	}
-	return r.createHuman(ctx, orgID, human, externalIDP, true)
+	return r.createHuman(ctx, orgID, human, externalIDP, orgMember, true)
 }
 
-func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister bool) (*user.Aggregate, *HumanWriteModel, error) {
+func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMember *domain.Member, selfregister bool) (*user.Aggregate, *HumanWriteModel, error) {
 	userID, err := r.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
 	human.AggregateID = userID
+	orgMember.UserID = userID
 	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
@@ -121,9 +122,14 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 		userAgg.PushEvents(user.NewHumanPhoneVerifiedEvent(ctx))
 	}
 
+	if orgMember != nil {
+		//TODO: Add org Member
+	}
+
 	return userAgg, addedHuman, nil
 }
 
+//ResendInitialMail resend inital mail and changes email if provided
 func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, resourceowner string) (err error) {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UserIDMissing")
@@ -150,6 +156,23 @@ func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, reso
 	}
 	userAgg.PushEvents(user.NewHumanInitialCodeAddedEvent(ctx, initCode.Code, initCode.Expiry))
 	return r.eventstore.PushAggregate(ctx, existingEmail, userAgg)
+}
+
+func (r *CommandSide) HumanSkipMFAInit(ctx context.Context, userID, resourceowner string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2xpX9", "Errors.User.UserIDMissing")
+	}
+
+	existingHuman, err := r.getHumanWriteModelByID(ctx, userID, resourceowner)
+	if err != nil {
+		return err
+	}
+	if existingHuman.UserState == domain.UserStateUnspecified || existingHuman.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-m9cV8", "Errors.User.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
+	userAgg.PushEvents(user.NewHumanMFAInitSkippedEvent(ctx))
+	return r.eventstore.PushAggregate(ctx, existingHuman, userAgg)
 }
 
 func createAddHumanEvent(ctx context.Context, username string, human *domain.Human) *user.HumanAddedEvent {

@@ -3,30 +3,17 @@ package repository
 import (
 	"context"
 
-	org_model "github.com/caos/zitadel/internal/org/model"
-
 	"github.com/caos/zitadel/internal/user/model"
 )
 
 type UserRepository interface {
-	Register(ctx context.Context, user *model.User, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
-	RegisterExternalUser(ctx context.Context, user *model.User, externalIDP *model.ExternalIDP, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
-
 	myUserRepo
-	SkipMFAInit(ctx context.Context, userID string) error
 
 	RequestPasswordReset(ctx context.Context, username string) error
-	SetPassword(ctx context.Context, userID, code, password, userAgentID string) error
-	ChangePassword(ctx context.Context, userID, old, new, userAgentID string) error
 
-	VerifyEmail(ctx context.Context, userID, code string) error
 	ResendEmailVerificationMail(ctx context.Context, userID string) error
 
 	VerifyInitCode(ctx context.Context, userID, code, password string) error
-	ResendInitVerificationMail(ctx context.Context, userID string) error
-
-	AddMFAOTP(ctx context.Context, userID string) (*model.OTP, error)
-	VerifyMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error
 
 	AddMFAU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
 	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
@@ -34,8 +21,6 @@ type UserRepository interface {
 	GetPasswordless(ctx context.Context, id string) ([]*model.WebAuthNToken, error)
 	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
 	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
-
-	ChangeUsername(ctx context.Context, userID, username string) error
 
 	SignOut(ctx context.Context, agentID string) error
 
@@ -58,8 +43,6 @@ type myUserRepo interface {
 	SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
 
 	MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error)
-
-	AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error)
 
 	GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error)
 

@@ -85,7 +85,7 @@ func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
-	err := l.authRepo.ResendInitVerificationMail(setContext(r.Context(), userOrgID), userID)
+	err := l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID)
 	l.renderInitUser(w, r, authReq, userID, "", showPassword, err)
 }
 

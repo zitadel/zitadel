@@ -36,14 +36,6 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.UserEvents.Health(ctx)
 }
 
-func (repo *UserRepo) Register(ctx context.Context, user *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
-	return repo.registerUser(ctx, user, nil, orgMember, resourceOwner)
-}
-
-func (repo *UserRepo) RegisterExternalUser(ctx context.Context, user *model.User, externalIDP *model.ExternalIDP, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
-	return repo.registerUser(ctx, user, externalIDP, orgMember, resourceOwner)
-}
-
 func (repo *UserRepo) registerUser(ctx context.Context, registerUser *model.User, externalIDP *model.ExternalIDP, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
@@ -133,14 +125,6 @@ func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
 	return user.GetEmail()
 }
 
-func (repo *UserRepo) VerifyEmail(ctx context.Context, userID, code string) error {
-	return repo.UserEvents.VerifyEmail(ctx, userID, code)
-}
-
-func (repo *UserRepo) VerifyMyEmail(ctx context.Context, code string) error {
-	return repo.UserEvents.VerifyEmail(ctx, authz.GetCtxData(ctx).UserID, code)
-}
-
 func (repo *UserRepo) ResendEmailVerificationMail(ctx context.Context, userID string) error {
 	return repo.UserEvents.CreateEmailVerificationCode(ctx, userID)
 }
@@ -195,21 +179,6 @@ func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) err
 	return err
 }
 
-func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new, userAgentID string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return err
-	}
-	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, userID, old, new, userAgentID)
-	return err
-}
-
 func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error) {
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
@@ -225,25 +194,6 @@ func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, err
 	return mfas, nil
 }
 
-func (repo *UserRepo) AddMFAOTP(ctx context.Context, userID string) (*model.OTP, error) {
-	accountName := ""
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		logging.Log("EVENT-Fk93s").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
-	} else {
-		accountName = user.PreferredLoginName
-	}
-	return repo.UserEvents.AddOTP(ctx, userID, accountName)
-}
-
-func (repo *UserRepo) VerifyMFAOTPSetup(ctx context.Context, userID, code, userAgentID string) error {
-	return repo.UserEvents.CheckMFAOTPSetup(ctx, userID, code, userAgentID)
-}
-
-func (repo *UserRepo) RemoveMyMFAOTP(ctx context.Context) error {
-	return repo.UserEvents.RemoveOTP(ctx, authz.GetCtxData(ctx).UserID)
-}
-
 func (repo *UserRepo) AddMFAU2F(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
 	accountName := ""
 	user, err := repo.UserByID(ctx, userID)
@@ -253,18 +203,6 @@ func (repo *UserRepo) AddMFAU2F(ctx context.Context, userID string) (*model.WebA
 		accountName = user.PreferredLoginName
 	}
 	return repo.UserEvents.AddU2F(ctx, userID, accountName, true)
-}
-
-func (repo *UserRepo) AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error) {
-	userID := authz.GetCtxData(ctx).UserID
-	accountName := ""
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		logging.Log("EVENT-Ghwl1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
-	} else {
-		accountName = user.PreferredLoginName
-	}
-	return repo.UserEvents.AddU2F(ctx, userID, accountName, false)
 }
 
 func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
@@ -294,27 +232,6 @@ func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, token
 	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, tokenName, userAgentID, credentialData)
 }
 
-func (repo *UserRepo) RemoveMyPasswordless(ctx context.Context, webAuthNTokenID string) error {
-	return repo.UserEvents.RemovePasswordlessToken(ctx, authz.GetCtxData(ctx).UserID, webAuthNTokenID)
-}
-
-func (repo *UserRepo) ChangeMyUsername(ctx context.Context, username string) error {
-	ctxData := authz.GetCtxData(ctx)
-	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(ctxData.OrgID)
-	if errors.IsNotFound(err) {
-		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return err
-	}
-	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
-	return repo.UserEvents.ChangeUsername(ctx, ctxData.UserID, username, orgPolicyView)
-}
-func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID string) error {
-	_, err := repo.UserEvents.CreateInitializeUserCodeByID(ctx, userID)
-	return err
-}
-
 func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password string) error {
 	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {
@@ -327,28 +244,12 @@ func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password
 	return repo.UserEvents.VerifyInitCode(ctx, pwPolicyView, userID, code, password)
 }
 
-func (repo *UserRepo) SkipMFAInit(ctx context.Context, userID string) error {
-	return repo.UserEvents.SkipMFAInit(ctx, userID)
-}
-
 func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string) error {
 	user, err := repo.View.UserByLoginName(loginname)
 	if err != nil {
 		return err
 	}
 	return repo.UserEvents.RequestSetPassword(ctx, user.ID, model.NotificationTypeEmail)
-}
-
-func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password, userAgentID string) error {
-	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return err
-	}
-	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	return repo.UserEvents.SetPassword(ctx, pwPolicyView, userID, code, password, userAgentID)
 }
 
 func (repo *UserRepo) SignOut(ctx context.Context, agentID string) error {
@@ -403,19 +304,6 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 		}
 	}
 	return changes, nil
-}
-
-func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, username string) error {
-	policyResourceOwner := authz.GetCtxData(ctx).OrgID
-	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
-	if errors.IsNotFound(err) {
-		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return err
-	}
-	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
-	return repo.UserEvents.ChangeUsername(ctx, userID, username, orgPolicyView)
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {

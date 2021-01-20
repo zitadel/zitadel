@@ -1,20 +1,17 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 	"strings"
 
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/rp"
-	"golang.org/x/text/language"
-
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
 func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +77,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	resourceOwner := iam.GlobalOrgID
-	member := &org_model.OrgMember{
+	member := &domain.Member{
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
@@ -94,8 +91,8 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	user, externalIDP := l.mapTokenToLoginUserAndExternalIDP(orgIamPolicy, tokens, idpConfig)
-	_, err = l.authRepo.RegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, member, resourceOwner)
+	user, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(orgIamPolicy, tokens, idpConfig)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, member)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -103,7 +100,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) mapTokenToLoginUserAndExternalIDP(orgIamPolicy *iam_model.OrgIAMPolicyView, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*usr_model.User, *usr_model.ExternalIDP) {
+func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *iam_model.OrgIAMPolicyView, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP) {
 	username := tokens.IDTokenClaims.GetPreferredUsername()
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:
@@ -119,23 +116,22 @@ func (l *Login) mapTokenToLoginUserAndExternalIDP(orgIamPolicy *iam_model.OrgIAM
 		}
 	}
 
-	user := &usr_model.User{
-		UserName: username,
-		Human: &usr_model.Human{
-			Profile: &usr_model.Profile{
-				FirstName:         tokens.IDTokenClaims.GetGivenName(),
-				LastName:          tokens.IDTokenClaims.GetFamilyName(),
-				PreferredLanguage: language.Tag(tokens.IDTokenClaims.GetLocale()),
-				NickName:          tokens.IDTokenClaims.GetNickname(),
-			},
-			Email: &usr_model.Email{
-				EmailAddress:    tokens.IDTokenClaims.GetEmail(),
-				IsEmailVerified: tokens.IDTokenClaims.IsEmailVerified(),
-			},
+	human := &domain.Human{
+		Username: username,
+		Profile: &domain.Profile{
+			FirstName:         tokens.IDTokenClaims.GetGivenName(),
+			LastName:          tokens.IDTokenClaims.GetFamilyName(),
+			PreferredLanguage: tokens.IDTokenClaims.GetLocale(),
+			NickName:          tokens.IDTokenClaims.GetNickname(),
+		},
+		Email: &domain.Email{
+			EmailAddress:    tokens.IDTokenClaims.GetEmail(),
+			IsEmailVerified: tokens.IDTokenClaims.IsEmailVerified(),
 		},
 	}
+
 	if tokens.IDTokenClaims.GetPhoneNumber() != "" {
-		user.Phone = &usr_model.Phone{
+		human.Phone = &domain.Phone{
 			PhoneNumber:     tokens.IDTokenClaims.GetPhoneNumber(),
 			IsPhoneVerified: tokens.IDTokenClaims.IsPhoneNumberVerified(),
 		}
@@ -149,10 +145,10 @@ func (l *Login) mapTokenToLoginUserAndExternalIDP(orgIamPolicy *iam_model.OrgIAM
 		}
 	}
 
-	externalIDP := &usr_model.ExternalIDP{
-		IDPConfigID: idpConfig.IDPConfigID,
-		UserID:      tokens.IDTokenClaims.GetSubject(),
-		DisplayName: displayName,
+	externalIDP := &domain.ExternalIDP{
+		IDPConfigID:    idpConfig.IDPConfigID,
+		ExternalUserID: tokens.IDTokenClaims.GetSubject(),
+		DisplayName:    displayName,
 	}
-	return user, externalIDP
+	return human, externalIDP
 }

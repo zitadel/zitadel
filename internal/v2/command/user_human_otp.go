@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -15,14 +16,17 @@ func (r *CommandSide) AddHumanOTP(ctx context.Context, userID, resourceowner str
 	}
 	human, err := r.getHuman(ctx, userID, resourceowner)
 	if err != nil {
+		logging.Log("COMMAND-DAqe1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get human for loginname")
 		return nil, err
 	}
 	org, err := r.getOrg(ctx, human.ResourceOwner)
 	if err != nil {
+		logging.Log("COMMAND-Cm0ds").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org for loginname")
 		return nil, err
 	}
 	orgPolicy, err := r.getOrgIAMPolicy(ctx, org.AggregateID)
 	if err != nil {
+		logging.Log("COMMAND-y5zv9").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org policy for loginname")
 		return nil, err
 	}
 	otpWriteModel, err := r.otpWriteModelByID(ctx, userID, resourceowner)

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
 	"golang.org/x/text/language"
@@ -8,8 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -68,7 +67,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resourceOwner := iam.GlobalOrgID
-	member := &org_model.OrgMember{
+	member := &domain.Member{
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
@@ -76,7 +75,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		member = nil
 		resourceOwner = authRequest.RequestedOrgID
 	}
-	user, err := l.authRepo.Register(setContext(r.Context(), resourceOwner), data.toUserModel(), member, resourceOwner)
+	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, member)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -142,21 +141,19 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegister], data, funcs)
 }
 
-func (d registerFormData) toUserModel() *usr_model.User {
-	return &usr_model.User{
-		Human: &usr_model.Human{
-			Profile: &usr_model.Profile{
-				FirstName:         d.Firstname,
-				LastName:          d.Lastname,
-				PreferredLanguage: language.Make(d.Language),
-				Gender:            usr_model.Gender(d.Gender),
-			},
-			Password: &usr_model.Password{
-				SecretString: d.Password,
-			},
-			Email: &usr_model.Email{
-				EmailAddress: d.Email,
-			},
+func (d registerFormData) toHumanDomain() *domain.Human {
+	return &domain.Human{
+		Profile: &domain.Profile{
+			FirstName:         d.Firstname,
+			LastName:          d.Lastname,
+			PreferredLanguage: language.Make(d.Language),
+			Gender:            domain.Gender(d.Gender),
+		},
+		Password: &domain.Password{
+			SecretString: d.Password,
+		},
+		Email: &domain.Email{
+			EmailAddress: d.Email,
 		},
 	}
 }

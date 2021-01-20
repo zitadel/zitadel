@@ -29,7 +29,7 @@ func (l *Login) handleMFAPrompt(w http.ResponseWriter, r *http.Request) {
 		l.handleMFACreation(w, r, authReq, mfaVerifyData)
 		return
 	}
-	err = l.authRepo.SkipMFAInit(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
+	err = l.command.HumanSkipMFAInit(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -89,7 +89,7 @@ func (l *Login) handleMFACreation(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) handleOTPCreation(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData) {
-	otp, err := l.authRepo.AddMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
+	otp, err := l.command.AddHumanOTP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

@@ -49,7 +49,7 @@ func (l *Login) handleMFAInitVerify(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleOTPVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaInitVerifyData) *mfaVerifyData {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err := l.authRepo.VerifyMFAOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code, userAgentID)
+	err := l.command.CheckMFAOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code, userAgentID, authReq.UserOrgID)
 	if err == nil {
 		return nil
 	}

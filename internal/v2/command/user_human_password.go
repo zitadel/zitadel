@@ -24,6 +24,31 @@ func (r *CommandSide) SetOneTimePassword(ctx context.Context, orgID, userID, pas
 	return r.changePassword(ctx, orgID, userID, "", password, existingPassword)
 }
 
+func (r *CommandSide) SetPassword(ctx context.Context, orgID, userID, code, passwordString, userAgentID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	existingCode, err := r.passwordWriteModel(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+
+	if existingCode.Code == nil || existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
+	}
+
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.emailVerificationCode)
+	if err != nil {
+		return err
+	}
+
+	password := &domain.Password{
+		SecretString:   passwordString,
+		ChangeRequired: false,
+	}
+	return r.changePassword(ctx, orgID, userID, userAgentID, password, existingCode)
+}
+
 func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
