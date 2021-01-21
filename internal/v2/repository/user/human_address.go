@@ -27,6 +27,10 @@ func (e *HumanAddressChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanAddressChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanAddressChangedEvent(ctx context.Context) *HumanAddressChangedEvent {
 	return &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

@@ -16,7 +16,6 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID string, machine *dom
 	if err != nil {
 		return nil, err
 	}
-	//TODO: Check Unique username
 	machine.AggregateID = userID
 	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
@@ -34,6 +33,7 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID string, machine *dom
 			machine.Username,
 			machine.Name,
 			machine.Description,
+			orgIAMPolicy.UserLoginMustBeDomain,
 		),
 	)
 	err = r.eventstore.PushAggregate(ctx, addedMachine, userAgg)

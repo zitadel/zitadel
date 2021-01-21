@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/lib/pq"
 	"regexp"
 	"strconv"
 
@@ -88,6 +89,18 @@ const (
 		"		FROM data " +
 		"	) " +
 		"RETURNING id, event_sequence, previous_sequence, creation_date, resource_owner"
+	uniqueInsert = `INSERT INTO eventstore.unique_constraints
+					(
+						unique_type,
+						unique_field
+					) 
+					VALUES (  
+						$1,
+						$2
+					)`
+
+	uniqueDelete = `DELETE FROM eventstore.unique_constraints
+					WHERE unique_type = $1 and unique_field = $2`
 )
 
 type CRDB struct {
@@ -102,7 +115,7 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
-func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
+func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 		stmt, err := tx.PrepareContext(ctx, crdbInsert)
 		if err != nil {
@@ -136,6 +149,10 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 			}
 		}
 
+		err = db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 	if err != nil && !errors.Is(err, &caos_errs.CaosError{}) {
@@ -143,6 +160,39 @@ func (db *CRDB) Push(ctx context.Context, events ...*repository.Event) error {
 	}
 
 	return err
+}
+
+// handleUniqueConstraints adds or removes unique constraints
+func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*repository.UniqueConstraint) (err error) {
+	if uniqueConstraints == nil || len(uniqueConstraints) == 0 || (len(uniqueConstraints) == 1 && uniqueConstraints[0] == nil) {
+		return nil
+	}
+
+	for _, uniqueConstraint := range uniqueConstraints {
+		if uniqueConstraint.Action == repository.UniqueConstraintAdd {
+			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
+			if err != nil {
+				logging.LogWithFields("SQL-IP3js",
+					"unique_type", uniqueConstraint.UniqueType,
+					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("insert unique constraint failed")
+
+				if db.isUniqueViolationError(err) {
+					return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", uniqueConstraint.ErrorMessage)
+				}
+
+				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint ")
+			}
+		} else if uniqueConstraint.Action == repository.UniqueConstraintRemoved {
+			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
+			if err != nil {
+				logging.LogWithFields("SQL-M0vsf",
+					"unique_type", uniqueConstraint.UniqueType,
+					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
+				return caos_errs.ThrowInternal(err, "SQL-2M9fs", "unable to remove unique constraint ")
+			}
+		}
+	}
+	return nil
 }
 
 // Filter returns all events matching the given search query
@@ -261,4 +311,13 @@ func (db *CRDB) placeholder(query string) string {
 		replaced = replaced + "$" + strconv.Itoa(i+1) + query[l[1]:nextIDX]
 	}
 	return replaced
+}
+
+func (db *CRDB) isUniqueViolationError(err error) bool {
+	if pqErr, ok := err.(*pq.Error); ok {
+		if pqErr.Code == "23505" {
+			return true
+		}
+	}
+	return false
 }

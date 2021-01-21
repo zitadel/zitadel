@@ -52,19 +52,19 @@ func (wm *OIDCConfigWriteModel) reduceConfigAddedEvent(e *idpconfig.OIDCConfigAd
 }
 
 func (wm *OIDCConfigWriteModel) reduceConfigChangedEvent(e *idpconfig.OIDCConfigChangedEvent) {
-	if e.ClientID != "" {
-		wm.ClientID = e.ClientID
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
 	}
-	if e.Issuer != "" {
-		wm.Issuer = e.Issuer
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
 	}
 	if len(e.Scopes) > 0 {
 		wm.Scopes = e.Scopes
 	}
-	if e.IDPDisplayNameMapping.Valid() {
-		wm.IDPDisplayNameMapping = e.IDPDisplayNameMapping
+	if e.IDPDisplayNameMapping != nil && e.IDPDisplayNameMapping.Valid() {
+		wm.IDPDisplayNameMapping = *e.IDPDisplayNameMapping
 	}
-	if e.UserNameMapping.Valid() {
-		wm.UserNameMapping = e.UserNameMapping
+	if e.UserNameMapping != nil && e.UserNameMapping.Valid() {
+		wm.UserNameMapping = *e.UserNameMapping
 	}
 }

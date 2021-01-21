@@ -51,6 +51,10 @@ func (e *SecondFactorAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *SecondFactorAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 type SecondFactorRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	MFAType              domain.SecondFactorType `json:"mfaType"`
@@ -81,6 +85,10 @@ func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.EventRe
 
 func (e *SecondFactorRemovedEvent) Data() interface{} {
 	return e
+}
+
+func (e *SecondFactorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 type MultiFactorAddedEvent struct {
@@ -116,6 +124,10 @@ func (e *MultiFactorAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *MultiFactorAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 type MultiFactorRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	MFAType              domain.MultiFactorType `json:"mfaType"`
@@ -146,4 +158,8 @@ func MultiFactorRemovedEventMapper(event *repository.Event) (eventstore.EventRea
 
 func (e *MultiFactorRemovedEvent) Data() interface{} {
 	return e
+}
+
+func (e *MultiFactorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }

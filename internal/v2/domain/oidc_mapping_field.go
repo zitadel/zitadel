@@ -3,7 +3,8 @@ package domain
 type OIDCMappingField int32
 
 const (
-	OIDCMappingFieldPreferredLoginName OIDCMappingField = iota + 1
+	OIDCMappingFieldUnspecified OIDCMappingField = iota
+	OIDCMappingFieldPreferredLoginName
 	OIDCMappingFieldEmail
 	// count is for validation purposes
 	oidcMappingFieldCount

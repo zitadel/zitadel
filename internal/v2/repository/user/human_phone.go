@@ -30,6 +30,10 @@ func (e *HumanPhoneChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanPhoneChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanPhoneChangedEvent(ctx context.Context) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -59,6 +63,10 @@ func (e *HumanPhoneRemovedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanPhoneRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanPhoneRemovedEvent(ctx context.Context) *HumanPhoneRemovedEvent {
 	return &HumanPhoneRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -81,6 +89,10 @@ type HumanPhoneVerifiedEvent struct {
 }
 
 func (e *HumanPhoneVerifiedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanPhoneVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -108,6 +120,10 @@ func (e *HumanPhoneVerificationFailedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanPhoneVerificationFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanPhoneVerificationFailedEvent(ctx context.Context) *HumanPhoneVerificationFailedEvent {
 	return &HumanPhoneVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -132,6 +148,10 @@ type HumanPhoneCodeAddedEvent struct {
 
 func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanPhoneCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewHumanPhoneCodeAddedEvent(
@@ -167,6 +187,10 @@ type HumanPhoneCodeSentEvent struct {
 
 func (e *HumanPhoneCodeSentEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanPhoneCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewHumanPhoneCodeSentEvent(ctx context.Context) *HumanPhoneCodeSentEvent {

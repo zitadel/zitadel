@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	uniqueProjectnameTable = "project_names"
 	projectEventTypePrefix = eventstore.EventType("project.")
 	ProjectAdded           = projectEventTypePrefix + "added"
 	ProjectChanged         = projectEventTypePrefix + "changed"
@@ -17,6 +18,19 @@ const (
 	ProjectReactivated     = projectEventTypePrefix + "reactivated"
 	ProjectRemoved         = projectEventTypePrefix + "removed"
 )
+
+func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueProjectnameTable,
+		projectName+resourceOwner,
+		"Errors.Project.AlreadyExists")
+}
+
+func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueProjectnameTable,
+		projectName+resourceOwner)
+}
 
 type ProjectAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -30,11 +44,16 @@ func (e *ProjectAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewProjectAddedEvent(ctx context.Context, name string) *ProjectAddedEvent {
+func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.ResourceOwner())}
+}
+
+func NewProjectAddedEvent(ctx context.Context, name, resourceOwner string) *ProjectAddedEvent {
 	return &ProjectAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			ProjectAdded,
+			resourceOwner,
 		),
 		Name: name,
 	}

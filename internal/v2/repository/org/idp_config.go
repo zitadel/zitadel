@@ -1,8 +1,7 @@
-package iam
+package org
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -10,11 +9,11 @@ import (
 )
 
 const (
-	IDPConfigAddedEventType       eventstore.EventType = "iam.idp.config.added"
-	IDPConfigChangedEventType     eventstore.EventType = "iam.idp.config.changed"
-	IDPConfigRemovedEventType     eventstore.EventType = "iam.idp.config.removed"
-	IDPConfigDeactivatedEventType eventstore.EventType = "iam.idp.config.deactivated"
-	IDPConfigReactivatedEventType eventstore.EventType = "iam.idp.config.reactivated"
+	IDPConfigAddedEventType       eventstore.EventType = "org.idp.config.added"
+	IDPConfigChangedEventType     eventstore.EventType = "org.idp.config.changed"
+	IDPConfigRemovedEventType     eventstore.EventType = "org.idp.config.removed"
+	IDPConfigDeactivatedEventType eventstore.EventType = "org.idp.config.deactivated"
+	IDPConfigReactivatedEventType eventstore.EventType = "org.idp.config.reactivated"
 )
 
 type IDPConfigAddedEvent struct {
@@ -23,6 +22,7 @@ type IDPConfigAddedEvent struct {
 
 func NewIDPConfigAddedEvent(
 	ctx context.Context,
+	resourceOwner,
 	configID,
 	name string,
 	configType domain.IDPConfigType,
@@ -34,7 +34,7 @@ func NewIDPConfigAddedEvent(
 			eventstore.NewBaseEventForPushWithResourceOwner(
 				ctx,
 				IDPConfigAddedEventType,
-				domain.IAMID,
+				resourceOwner,
 			),
 			configID,
 			name,
@@ -92,6 +92,7 @@ func NewIDPConfigRemovedEvent(
 	configID,
 	name string,
 ) *IDPConfigRemovedEvent {
+
 	return &IDPConfigRemovedEvent{
 		IDPConfigRemovedEvent: *idpconfig.NewIDPConfigRemovedEvent(
 			eventstore.NewBaseEventForPushWithResourceOwner(

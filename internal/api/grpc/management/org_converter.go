@@ -23,11 +23,10 @@ import (
 
 func orgFromDomain(org *domain.Org) *management.Org {
 	return &management.Org{
-		ChangeDate:   timestamppb.New(org.ChangeDate),
-		CreationDate: timestamppb.New(org.CreationDate),
-		Id:           org.AggregateID,
-		Name:         org.Name,
-		State:        orgStateFromDomain(org.State),
+		ChangeDate: timestamppb.New(org.ChangeDate),
+		Id:         org.AggregateID,
+		Name:       org.Name,
+		State:      orgStateFromDomain(org.State),
 	}
 }
 
@@ -139,12 +138,11 @@ func removeOrgDomainToDomain(ctx context.Context, ordDomain *management.RemoveOr
 
 func orgDomainFromDomain(orgDomain *domain.OrgDomain) *management.OrgDomain {
 	return &management.OrgDomain{
-		ChangeDate:   timestamppb.New(orgDomain.ChangeDate),
-		CreationDate: timestamppb.New(orgDomain.CreationDate),
-		OrgId:        orgDomain.AggregateID,
-		Domain:       orgDomain.Domain,
-		Verified:     orgDomain.Verified,
-		Primary:      orgDomain.Primary,
+		ChangeDate: timestamppb.New(orgDomain.ChangeDate),
+		OrgId:      orgDomain.AggregateID,
+		Domain:     orgDomain.Domain,
+		Verified:   orgDomain.Verified,
+		Primary:    orgDomain.Primary,
 	}
 }
 

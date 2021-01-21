@@ -31,6 +31,10 @@ func (e *ApplicationAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewApplicationAddedEvent(ctx context.Context, appID, name string, appType domain.AppType) *ApplicationAddedEvent {
 	return &ApplicationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

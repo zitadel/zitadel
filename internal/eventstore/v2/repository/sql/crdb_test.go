@@ -266,11 +266,15 @@ func TestCRDB_columnName(t *testing.T) {
 
 func TestCRDB_Push_OneAggregate(t *testing.T) {
 	type args struct {
-		ctx    context.Context
-		events []*repository.Event
+		ctx               context.Context
+		events            []*repository.Event
+		uniqueConstraints *repository.UniqueConstraint
+		uniqueDataType    string
+		uniqueDataField   string
 	}
 	type eventsRes struct {
 		pushedEventsCount int
+		uniqueCount       int
 		aggType           repository.AggregateType
 		aggID             []string
 	}
@@ -334,26 +338,84 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "push 1 event and add unique constraint",
+			args: args{
+				ctx: context.Background(),
+				events: []*repository.Event{
+					generateEvent(t, "10"),
+				},
+				uniqueConstraints: generateAddUniqueConstraint(t, "usernames", "field"),
+			},
+			res: res{
+				wantErr: false,
+				eventsRes: eventsRes{
+					pushedEventsCount: 1,
+					uniqueCount:       1,
+					aggID:             []string{"10"},
+					aggType:           repository.AggregateType(t.Name()),
+				}},
+		},
+		{
+			name: "push 1 event and remove unique constraint",
+			args: args{
+				ctx: context.Background(),
+				events: []*repository.Event{
+					generateEvent(t, "11"),
+				},
+				uniqueConstraints: generateRemoveUniqueConstraint(t, "usernames", "testremove"),
+				uniqueDataType:    "usernames",
+				uniqueDataField:   "testremove",
+			},
+			res: res{
+				wantErr: false,
+				eventsRes: eventsRes{
+					pushedEventsCount: 1,
+					uniqueCount:       0,
+					aggID:             []string{"11"},
+					aggType:           repository.AggregateType(t.Name()),
+				}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(tt.args.ctx, tt.args.events...); (err != nil) != tt.res.wantErr {
+			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
+				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField)
+				if err != nil {
+					t.Error("unable to prefill insert unique data: ", err)
+					return
+				}
+			}
+			if err := db.Push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
-			countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, pq.Array(tt.res.eventsRes.aggID))
-			var count int
-			err := countRow.Scan(&count)
+			countEventRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, pq.Array(tt.res.eventsRes.aggID))
+			var eventCount int
+			err := countEventRow.Scan(&eventCount)
 			if err != nil {
 				t.Error("unable to query inserted rows: ", err)
 				return
 			}
-			if count != tt.res.eventsRes.pushedEventsCount {
-				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, count)
+			if eventCount != tt.res.eventsRes.pushedEventsCount {
+				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, eventCount)
 			}
+			if tt.args.uniqueConstraints != nil {
+				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField)
+				var uniqueCount int
+				err := countUniqueRow.Scan(&uniqueCount)
+				if err != nil {
+					t.Error("unable to query inserted rows: ", err)
+					return
+				}
+				if uniqueCount != tt.res.eventsRes.uniqueCount {
+					t.Errorf("expected unique count %d got %d", tt.res.eventsRes.uniqueCount, uniqueCount)
+				}
+			}
+
 		})
 	}
 }
@@ -445,7 +507,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events...); (err != nil) != tt.res.wantErr {
+			if err := db.Push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -616,7 +678,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			for _, events := range tt.args.events {
 				wg.Add(1)
 				go func(events []*repository.Event) {
-					err := db.Push(context.Background(), events...)
+					err := db.Push(context.Background(), events)
 					if err != nil {
 						errsMu.Lock()
 						errs = append(errs, err)
@@ -728,7 +790,7 @@ func TestCRDB_Filter(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents...); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -814,7 +876,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents...); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -956,7 +1018,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events...); err != nil {
+			if err := db.Push(context.Background(), tt.args.events); err != nil {
 				t.Errorf("CRDB.Push() error = %v", err)
 			}
 
@@ -1035,4 +1097,26 @@ func generateEventWithData(t *testing.T, aggregateID string, data []byte) *repos
 		Version:       "v1",
 		Data:          data,
 	}
+}
+
+func generateAddUniqueConstraint(t *testing.T, table, uniqueField string) *repository.UniqueConstraint {
+	t.Helper()
+	e := &repository.UniqueConstraint{
+		UniqueType:  table,
+		UniqueField: uniqueField,
+		Action:      repository.UniqueConstraintAdd,
+	}
+
+	return e
+}
+
+func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *repository.UniqueConstraint {
+	t.Helper()
+	e := &repository.UniqueConstraint{
+		UniqueType:  table,
+		UniqueField: uniqueField,
+		Action:      repository.UniqueConstraintRemoved,
+	}
+
+	return e
 }

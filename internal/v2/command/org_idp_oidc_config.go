@@ -6,15 +6,15 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
-func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
-	existingConfig := NewIAMIDPOIDCConfigWriteModel(config.IDPConfigID)
+func (r *CommandSide) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
+	existingConfig := NewOrgIDPOIDCConfigWriteModel(config.IDPConfigID, config.AggregateID)
 	err := r.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-67J9d", "Errors.IAM.IDPConfig.AlreadyExists")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-67J9d", "Errors.Org.IDPConfig.AlreadyExists")
 	}
 
 	changedEvent, hasChanged, err := existingConfig.NewChangedEvent(
@@ -31,13 +31,13 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *do
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&existingConfig.WriteModel)
-	iamAgg.PushEvents(changedEvent)
+	orgAgg := OrgAggregateFromWriteModel(&existingConfig.WriteModel)
+	orgAgg.PushEvents(changedEvent)
 
-	err = r.eventstore.PushAggregate(ctx, existingConfig, iamAgg)
+	err = r.eventstore.PushAggregate(ctx, existingConfig, orgAgg)
 	if err != nil {
 		return nil, err
 	}

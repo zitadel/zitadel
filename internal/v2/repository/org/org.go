@@ -10,12 +10,32 @@ import (
 )
 
 const (
+	uniqueOrgname           = "org_name"
 	OrgAddedEventType       = orgEventTypePrefix + "added"
 	OrgChangedEventType     = orgEventTypePrefix + "changed"
 	OrgDeactivatedEventType = orgEventTypePrefix + "deactivated"
 	OrgReactivatedEventType = orgEventTypePrefix + "reactivated"
 	OrgRemovedEventType     = orgEventTypePrefix + "removed"
 )
+
+type OrgnameUniqueConstraint struct {
+	uniqueType string
+	orgName    string
+	action     eventstore.UniqueConstraintAction
+}
+
+func NewAddOrgnameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueOrgname,
+		orgName,
+		"Errors.Org.AlreadyExists")
+}
+
+func NewRemoveUsernameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueOrgname,
+		orgName)
+}
 
 type OrgAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -25,6 +45,10 @@ type OrgAddedEvent struct {
 
 func (e *OrgAddedEvent) Data() interface{} {
 	return e
+}
+
+func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddOrgnameUniqueConstraint(e.Name)}
 }
 
 func NewOrgAddedEvent(ctx context.Context, name string) *OrgAddedEvent {
@@ -59,6 +83,10 @@ func (e *OrgChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOrgChangedEvent(ctx context.Context, name string) *OrgChangedEvent {
 	return &OrgChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -89,6 +117,10 @@ func (e *OrgDeactivatedEvent) Data() interface{} {
 	return e
 }
 
+func (e *OrgDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOrgDeactivatedEvent(ctx context.Context) *OrgDeactivatedEvent {
 	return &OrgDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -116,6 +148,10 @@ type OrgReactivatedEvent struct {
 
 func (e *OrgReactivatedEvent) Data() interface{} {
 	return e
+}
+
+func (e *OrgReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewOrgReactivatedEvent(ctx context.Context) *OrgReactivatedEvent {

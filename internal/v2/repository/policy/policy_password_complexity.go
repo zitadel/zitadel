@@ -28,6 +28,10 @@ func (e *PasswordComplexityPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *PasswordComplexityPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewPasswordComplexityPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	minLength uint64,
@@ -71,6 +75,10 @@ type PasswordComplexityPolicyChangedEvent struct {
 
 func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *PasswordComplexityPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewPasswordComplexityPolicyChangedEvent(
@@ -139,6 +147,10 @@ type PasswordComplexityPolicyRemovedEvent struct {
 }
 
 func (e *PasswordComplexityPolicyRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *PasswordComplexityPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

@@ -9,7 +9,6 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
@@ -55,7 +54,7 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *domain.ID
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToIDPConfig(addedConfig), nil
+	return writeModelToIDPConfig(&addedConfig.IDPConfigWriteModel), nil
 }
 
 func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
@@ -78,68 +77,49 @@ func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToIDPConfig(existingIDP), nil
+	return writeModelToIDPConfig(&existingIDP.IDPConfigWriteModel), nil
 }
 
-func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
+func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, idpID string) error {
 	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if existingIDP.State != domain.IDPConfigStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotActive")
+		return caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotActive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewIDPConfigDeactivatedEvent(ctx, idpID))
 
-	err = r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToIDPConfig(existingIDP), nil
+	return r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
 }
 
-func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
+func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) error {
 	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if existingIDP.State != domain.IDPConfigStateInactive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
+		return caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewIDPConfigReactivatedEvent(ctx, idpID))
 
-	err = r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToIDPConfig(existingIDP), nil
+	return r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
 }
 
 func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string) error {
-	_, err := r.pushDefaultIDPWriteModel(ctx, idpID, func(a *iam.Aggregate, _ *IAMIDPConfigWriteModel) *iam.Aggregate {
-		a.Aggregate = *a.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, idpID))
-		return a
-	})
-	return err
-}
-
-func (r *CommandSide) pushDefaultIDPWriteModel(ctx context.Context, idpID string, eventSetter func(*iam.Aggregate, *IAMIDPConfigWriteModel) *iam.Aggregate) (*IAMIDPConfigWriteModel, error) {
-	writeModel := NewIAMIDPConfigWriteModel(idpID)
-	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	aggregate := eventSetter(IAMAggregateFromWriteModel(&writeModel.WriteModel), writeModel)
-	err = r.eventstore.PushAggregate(ctx, writeModel, aggregate)
-	if err != nil {
-		return nil, err
+	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
+		return caos_errs.ThrowNotFound(nil, "IAM-4M0xy", "Errors.IAM.IDPConfig.NotExisting")
 	}
+	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
+	iamAgg.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, existingIDP.ResourceOwner, idpID, existingIDP.Name))
 
-	return writeModel, nil
+	return r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
 }
 
 func (r *CommandSide) iamIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *IAMIDPConfigWriteModel, err error) {
