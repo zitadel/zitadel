@@ -42,6 +42,7 @@ func (r *CommandSide) addUserGrant(ctx context.Context, userGrant *domain.UserGr
 	userGrantAgg.PushEvents(
 		usergrant.NewUserGrantAddedEvent(
 			ctx,
+			resourceOwner,
 			addedUserGrant.UserID,
 			addedUserGrant.ProjectID,
 			addedUserGrant.ProjectGrantID,
@@ -202,11 +203,11 @@ func (r *CommandSide) removeUserGrant(ctx context.Context, grantID, resourceOwne
 	userGrantAgg := UserGrantAggregateFromWriteModel(&removeUserGrant.WriteModel)
 	if !cascade {
 		userGrantAgg.PushEvents(
-			usergrant.NewUserGrantRemovedEvent(ctx),
+			usergrant.NewUserGrantRemovedEvent(ctx, existingUserGrant.ResourceOwner, existingUserGrant.UserID, existingUserGrant.ProjectID),
 		)
 	} else {
 		userGrantAgg.PushEvents(
-			usergrant.NewUserGrantCascadeRemovedEvent(ctx),
+			usergrant.NewUserGrantCascadeRemovedEvent(ctx, existingUserGrant.ResourceOwner, existingUserGrant.UserID, existingUserGrant.ProjectID),
 		)
 	}
 

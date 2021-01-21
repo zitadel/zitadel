@@ -245,6 +245,7 @@ Errors:
   Policy:
     AlreadyExists: Policy already exists
   UserGrant:
+    AlreadyExists: User grant already exists
     NotFound: User grant not found
     Invalid: User grant is invalid
     NotChanged: User grant has not been changed

@@ -3,12 +3,14 @@ package usergrant
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
+	uniqueUserGrant             = "user_grant"
 	userGrantEventTypePrefix    = eventstore.EventType("user.grant")
 	UserGrantAddedType          = userGrantEventTypePrefix + "added"
 	UserGrantChangedType        = userGrantEventTypePrefix + "changed"
@@ -18,6 +20,19 @@ const (
 	UserGrantDeactivatedType    = userGrantEventTypePrefix + "deactivated"
 	UserGrantReactivatedType    = userGrantEventTypePrefix + "reactivated"
 )
+
+func NewAddUserGrantUniqueConstraint(resourceOwner, userID, projectID string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueUserGrant,
+		fmt.Sprintf("%s:%s:%s", resourceOwner, userID, projectID),
+		"Errors.UserGrant.AlreadyExists")
+}
+
+func NewRemoveUserGrantUniqueConstraint(resourceOwner, userID, projectID string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueUserGrant,
+		fmt.Sprintf("%s:%s:%s", resourceOwner, userID, projectID))
+}
 
 type UserGrantAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -32,8 +47,13 @@ func (e *UserGrantAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *UserGrantAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddUserGrantUniqueConstraint(e.ResourceOwner(), e.UserID, e.ProjectID)}
+}
+
 func NewUserGrantAddedEvent(
 	ctx context.Context,
+	resourceOwner,
 	userID,
 	projectID,
 	projectGrantID string,
@@ -72,6 +92,10 @@ func (e *UserGrantChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *UserGrantChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewUserGrantChangedEvent(
 	ctx context.Context,
 	roleKeys []string) *UserGrantChangedEvent {
@@ -106,6 +130,10 @@ func (e *UserGrantCascadeChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *UserGrantCascadeChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewUserGrantCascadeChangedEvent(
 	ctx context.Context,
 	roleKeys []string) *UserGrantCascadeChangedEvent {
@@ -133,18 +161,27 @@ func UserGrantCascadeChangedEventMapper(event *repository.Event) (eventstore.Eve
 
 type UserGrantRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	userID               string
+	projectID            string
 }
 
 func (e *UserGrantRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewUserGrantRemovedEvent(ctx context.Context) *UserGrantRemovedEvent {
+func (e *UserGrantRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.ResourceOwner(), e.userID, e.projectID)}
+}
+
+func NewUserGrantRemovedEvent(ctx context.Context, resourceOwner, userID, projectID string) *UserGrantRemovedEvent {
 	return &UserGrantRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			UserGrantRemovedType,
+			resourceOwner,
 		),
+		userID:    userID,
+		projectID: projectID,
 	}
 }
 
@@ -163,18 +200,27 @@ func UserGrantRemovedEventMapper(event *repository.Event) (eventstore.EventReade
 
 type UserGrantCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	userID               string
+	projectID            string
 }
 
 func (e *UserGrantCascadeRemovedEvent) Data() interface{} {
 	return e
 }
 
-func NewUserGrantCascadeRemovedEvent(ctx context.Context) *UserGrantRemovedEvent {
+func (e *UserGrantCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.ResourceOwner(), e.userID, e.projectID)}
+}
+
+func NewUserGrantCascadeRemovedEvent(ctx context.Context, resourceOwner, userID, projectID string) *UserGrantRemovedEvent {
 	return &UserGrantRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			UserGrantRemovedType,
+			resourceOwner,
 		),
+		userID:    userID,
+		projectID: projectID,
 	}
 }
 
@@ -197,6 +243,10 @@ type UserGrantDeactivatedEvent struct {
 
 func (e *UserGrantDeactivatedEvent) Data() interface{} {
 	return e
+}
+
+func (e *UserGrantDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewUserGrantDeactivatedEvent(ctx context.Context) *UserGrantDeactivatedEvent {
@@ -227,6 +277,10 @@ type UserGrantReactivatedEvent struct {
 
 func (e *UserGrantReactivatedEvent) Data() interface{} {
 	return e
+}
+
+func (e *UserGrantReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewUserGrantReactivatedEvent(ctx context.Context) *UserGrantReactivatedEvent {

@@ -248,6 +248,7 @@ Errors:
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:
+    AlreadyExists: Benutzer Berechtigung existiert bereits
     NotFound: Benutzer Berechtigung konnte nicht gefunden werden
     Invalid: Benutzer Berechtigung ist ungültig
     NotChanged: Benutzer Berechtigung wurde nicht verändert
