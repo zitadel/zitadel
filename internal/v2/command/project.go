@@ -29,7 +29,6 @@ func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project
 	if err != nil {
 		return nil, nil, err
 	}
-// TODO: Add uniqueness check
 	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
 
@@ -38,7 +37,7 @@ func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project
 	//	projectRole = domain.RoleProjectOwnerGlobal
 	//}
 	projectAgg.PushEvents(
-		project.NewProjectAddedEvent(ctx, projectAdd.Name),
+		project.NewProjectAddedEvent(ctx, projectAdd.Name, resourceOwner),
 		project.NewMemberAddedEvent(ctx, ownerUserID, projectRole),
 	)
 	return projectAgg, addedProject, nil

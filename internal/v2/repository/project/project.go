@@ -19,12 +19,6 @@ const (
 	ProjectRemoved         = projectEventTypePrefix + "removed"
 )
 
-type ProjectnameUniqueConstraint struct {
-	tableName   string
-	projectName string
-	action      eventstore.UniqueConstraintAction
-}
-
 func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		uniqueProjectnameTable,
@@ -36,18 +30,6 @@ func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *ev
 	return eventstore.NewRemoveEventUniqueConstraint(
 		uniqueProjectnameTable,
 		projectName+resourceOwner)
-}
-
-func (e *ProjectnameUniqueConstraint) TableName() string {
-	return e.tableName
-}
-
-func (e *ProjectnameUniqueConstraint) UniqueField() string {
-	return e.projectName
-}
-
-func (e *ProjectnameUniqueConstraint) Action() eventstore.UniqueConstraintAction {
-	return e.action
 }
 
 type ProjectAddedEvent struct {
@@ -66,11 +48,12 @@ func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstra
 	return []*eventstore.EventUniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.ResourceOwner())}
 }
 
-func NewProjectAddedEvent(ctx context.Context, name string) *ProjectAddedEvent {
+func NewProjectAddedEvent(ctx context.Context, name, resourceOwner string) *ProjectAddedEvent {
 	return &ProjectAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			ProjectAdded,
+			resourceOwner,
 		),
 		Name: name,
 	}
