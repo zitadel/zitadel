@@ -54,6 +54,14 @@ func (r *CommandSide) getProjectByID(ctx context.Context, projectID, resourceOwn
 	return projectWriteModelToProject(projectWriteModel), nil
 }
 
+func (r *CommandSide) checkProjectExists(ctx context.Context, userID, resourceOwner string) (bool, error) {
+	projectWriteModel, err := r.getProjectWriteModelByID(ctx, userID, resourceOwner)
+	if err != nil {
+		return false, err
+	}
+	return projectWriteModel.State != domain.ProjectStateUnspecified && projectWriteModel.State != domain.ProjectStateRemoved, nil
+}
+
 func (r *CommandSide) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectWriteModel, error) {
 	projectWriteModel := NewProjectWriteModel(projectID, resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, projectWriteModel)
