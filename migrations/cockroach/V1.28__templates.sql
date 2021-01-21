@@ -76,3 +76,8 @@ GRANT SELECT ON TABLE management.mail_texts TO notification;
 
 ALTER TABLE management.project_roles ADD COLUMN change_date TIMESTAMPTZ;
 ALTER TABLE auth.project_roles ADD COLUMN change_date TIMESTAMPTZ;
+
+ALTER TABLE management.mail_texts OWNER TO admin;
+ALTER TABLE adminapi.mail_texts OWNER TO admin;
+ALTER TABLE management.mail_templates OWNER TO admin;
+ALTER TABLE adminapi.mail_templates OWNER TO admin;
