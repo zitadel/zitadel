@@ -27,7 +27,7 @@ type HumanAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	UserLoginMustBeDomain bool
+	userLoginMustBeDomain bool
 
 	FirstName         string        `json:"firstName,omitempty"`
 	LastName          string        `json:"lastName,omitempty"`
@@ -55,7 +55,7 @@ func (e *HumanAddedEvent) Data() interface{} {
 }
 
 func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.userLoginMustBeDomain)}
 }
 
 func (e *HumanAddedEvent) AddAddressData(
@@ -88,6 +88,7 @@ func (e *HumanAddedEvent) AddPasswordData(
 
 func NewHumanAddedEvent(
 	ctx context.Context,
+	resourceOwner,
 	userName,
 	firstName,
 	lastName,
@@ -99,9 +100,10 @@ func NewHumanAddedEvent(
 	userLoginMustBeDomain bool,
 ) *HumanAddedEvent {
 	return &HumanAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			HumanAddedType,
+			resourceOwner,
 		),
 		UserName:              userName,
 		FirstName:             firstName,
@@ -111,7 +113,7 @@ func NewHumanAddedEvent(
 		PreferredLanguage:     preferredLanguage,
 		Gender:                gender,
 		EmailAddress:          emailAddress,
-		UserLoginMustBeDomain: userLoginMustBeDomain,
+		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
@@ -131,7 +133,7 @@ type HumanRegisteredEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	UserLoginMustBeDomain bool
+	userLoginMustBeDomain bool
 
 	FirstName         string        `json:"firstName,omitempty"`
 	LastName          string        `json:"lastName,omitempty"`
@@ -159,7 +161,7 @@ func (e *HumanRegisteredEvent) Data() interface{} {
 }
 
 func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.userLoginMustBeDomain)}
 }
 
 func (e *HumanRegisteredEvent) AddAddressData(
@@ -192,6 +194,7 @@ func (e *HumanRegisteredEvent) AddPasswordData(
 
 func NewHumanRegisteredEvent(
 	ctx context.Context,
+	resourceOwner,
 	userName,
 	firstName,
 	lastName,
@@ -203,9 +206,10 @@ func NewHumanRegisteredEvent(
 	userLoginMustBeDomain bool,
 ) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			HumanRegisteredType,
+			resourceOwner,
 		),
 		UserName:              userName,
 		FirstName:             firstName,
@@ -215,7 +219,7 @@ func NewHumanRegisteredEvent(
 		PreferredLanguage:     preferredLanguage,
 		Gender:                gender,
 		EmailAddress:          emailAddress,
-		UserLoginMustBeDomain: userLoginMustBeDomain,
+		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 

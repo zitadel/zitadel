@@ -2732,7 +2732,7 @@ func TestAddOrgIAMPolicy(t *testing.T) {
 				return
 			}
 			if result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
-				t.Errorf("got wrong result UserLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
+				t.Errorf("got wrong result userLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
 			}
 		})
 	}
@@ -2811,7 +2811,7 @@ func TestChangeOrgIAMPolicy(t *testing.T) {
 				return
 			}
 			if result.UserLoginMustBeDomain != tt.res.result.UserLoginMustBeDomain {
-				t.Errorf("got wrong result UserLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
+				t.Errorf("got wrong result userLoginMustBeDomain: expected: %v, actual: %v ", tt.res.result.UserLoginMustBeDomain, result.UserLoginMustBeDomain)
 			}
 		})
 	}
