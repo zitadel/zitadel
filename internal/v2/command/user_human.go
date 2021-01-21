@@ -117,7 +117,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 		if err != nil {
 			return nil, nil, err
 		}
-		user.NewHumanPhoneCodeAddedEvent(ctx, phoneCode.Code, phoneCode.Expiry)
+		userAgg.PushEvents(user.NewHumanPhoneCodeAddedEvent(ctx, phoneCode.Code, phoneCode.Expiry))
 	} else if human.Phone != nil && human.PhoneNumber != "" && human.IsPhoneVerified {
 		userAgg.PushEvents(user.NewHumanPhoneVerifiedEvent(ctx))
 	}
