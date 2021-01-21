@@ -133,7 +133,7 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 		return err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	userAgg.PushEvents(user.NewUserRemovedEvent(ctx, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
+	userAgg.PushEvents(user.NewUserRemovedEvent(ctx, existingUser.ResourceOwner, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
 	//TODO: remove user grants
 
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)

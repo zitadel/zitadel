@@ -33,6 +33,7 @@ func (r *CommandSide) AddIDPConfig(ctx context.Context, config *domain.IDPConfig
 	orgAgg.PushEvents(
 		org_repo.NewIDPConfigAddedEvent(
 			ctx,
+			orgAgg.ResourceOwner(),
 			idpConfigID,
 			config.Name,
 			config.Type,
@@ -121,7 +122,7 @@ func (r *CommandSide) RemoveIDPConfig(ctx context.Context, idpID, orgID string) 
 		return caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	orgAgg.PushEvents(org_repo.NewIDPConfigRemovedEvent(ctx, idpID, existingIDP.Name))
+	orgAgg.PushEvents(org_repo.NewIDPConfigRemovedEvent(ctx, existingIDP.ResourceOwner, idpID, existingIDP.Name))
 
 	return r.eventstore.PushAggregate(ctx, existingIDP, orgAgg)
 }

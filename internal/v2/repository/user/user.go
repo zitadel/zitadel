@@ -167,11 +167,12 @@ func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 	return []*eventstore.EventUniqueConstraint{NewRemoveUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
 }
 
-func NewUserRemovedEvent(ctx context.Context, userName string, userLoginMustBeDomain bool) *UserRemovedEvent {
+func NewUserRemovedEvent(ctx context.Context, resourceOwner, userName string, userLoginMustBeDomain bool) *UserRemovedEvent {
 	return &UserRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			UserRemovedType,
+			resourceOwner,
 		),
 		UserName:              userName,
 		UserLoginMustBeDomain: userLoginMustBeDomain,

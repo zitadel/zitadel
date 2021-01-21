@@ -117,7 +117,7 @@ func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string) 
 		return caos_errs.ThrowNotFound(nil, "IAM-4M0xy", "Errors.IAM.IDPConfig.NotExisting")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, idpID, existingIDP.Name))
+	iamAgg.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, existingIDP.ResourceOwner, idpID, existingIDP.Name))
 
 	return r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
 }

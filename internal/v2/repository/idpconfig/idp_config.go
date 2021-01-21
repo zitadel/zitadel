@@ -37,12 +37,11 @@ type IDPConfigAddedEvent struct {
 
 func NewIDPConfigAddedEvent(
 	base *eventstore.BaseEvent,
-	configID string,
+	configID,
 	name string,
 	configType domain.IDPConfigType,
 	stylingType domain.IDPConfigStylingType,
 ) *IDPConfigAddedEvent {
-
 	return &IDPConfigAddedEvent{
 		BaseEvent:   *base,
 		ConfigID:    configID,
