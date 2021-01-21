@@ -22,7 +22,8 @@ type IDPConfigAddedEvent struct {
 
 func NewIDPConfigAddedEvent(
 	ctx context.Context,
-	configID string,
+	resourceOwner,
+	configID,
 	name string,
 	configType domain.IDPConfigType,
 	stylingType domain.IDPConfigStylingType,
@@ -30,9 +31,10 @@ func NewIDPConfigAddedEvent(
 
 	return &IDPConfigAddedEvent{
 		IDPConfigAddedEvent: *idpconfig.NewIDPConfigAddedEvent(
-			eventstore.NewBaseEventForPush(
+			eventstore.NewBaseEventForPushWithResourceOwner(
 				ctx,
 				IDPConfigAddedEventType,
+				resourceOwner,
 			),
 			configID,
 			name,
@@ -86,16 +88,20 @@ type IDPConfigRemovedEvent struct {
 
 func NewIDPConfigRemovedEvent(
 	ctx context.Context,
-	configID string,
+	resourceOwner,
+	configID,
+	name string,
 ) *IDPConfigRemovedEvent {
 
 	return &IDPConfigRemovedEvent{
 		IDPConfigRemovedEvent: *idpconfig.NewIDPConfigRemovedEvent(
-			eventstore.NewBaseEventForPush(
+			eventstore.NewBaseEventForPushWithResourceOwner(
 				ctx,
 				IDPConfigRemovedEventType,
+				resourceOwner,
 			),
 			configID,
+			name,
 		),
 	}
 }

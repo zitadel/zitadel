@@ -25,6 +25,10 @@ func (e *PasswordLockoutPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *PasswordLockoutPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewPasswordLockoutPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	maxAttempts uint64,
@@ -60,6 +64,10 @@ type PasswordLockoutPolicyChangedEvent struct {
 
 func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *PasswordLockoutPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewPasswordLockoutPolicyChangedEvent(
@@ -110,6 +118,10 @@ type PasswordLockoutPolicyRemovedEvent struct {
 }
 
 func (e *PasswordLockoutPolicyRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *PasswordLockoutPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

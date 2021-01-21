@@ -9,7 +9,6 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/v2/repository/org"
 	org_repo "github.com/caos/zitadel/internal/v2/repository/org"
 )
 
@@ -34,6 +33,7 @@ func (r *CommandSide) AddIDPConfig(ctx context.Context, config *domain.IDPConfig
 	orgAgg.PushEvents(
 		org_repo.NewIDPConfigAddedEvent(
 			ctx,
+			orgAgg.ResourceOwner(),
 			idpConfigID,
 			config.Name,
 			config.Type,
@@ -110,27 +110,21 @@ func (r *CommandSide) ReactivateIDPConfig(ctx context.Context, idpID, orgID stri
 }
 
 func (r *CommandSide) RemoveIDPConfig(ctx context.Context, idpID, orgID string) error {
-	_, err := r.pushIDPWriteModel(ctx, idpID, orgID, func(a *org.Aggregate, _ *OrgIDPConfigWriteModel) *org.Aggregate {
-		a.Aggregate = *a.PushEvents(org_repo.NewIDPConfigRemovedEvent(ctx, idpID))
-		return a
-	})
-	return err
-}
-
-func (r *CommandSide) pushIDPWriteModel(ctx context.Context, idpID, orgID string, eventSetter func(*org.Aggregate, *OrgIDPConfigWriteModel) *org.Aggregate) (*OrgIDPConfigWriteModel, error) {
-	writeModel := NewOrgIDPConfigWriteModel(idpID, orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	existingIDP, err := r.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	aggregate := eventSetter(OrgAggregateFromWriteModel(&writeModel.WriteModel), writeModel)
-	err = r.eventstore.PushAggregate(ctx, writeModel, aggregate)
-	if err != nil {
-		return nil, err
+	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
+		return caos_errs.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
 	}
+	if existingIDP.State != domain.IDPConfigStateInactive {
+		return caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
+	orgAgg.PushEvents(org_repo.NewIDPConfigRemovedEvent(ctx, existingIDP.ResourceOwner, idpID, existingIDP.Name))
 
-	return writeModel, nil
+	return r.eventstore.PushAggregate(ctx, existingIDP, orgAgg)
 }
 
 func (r *CommandSide) orgIDPConfigWriteModelByID(ctx context.Context, idpID, orgID string) (policy *OrgIDPConfigWriteModel, err error) {

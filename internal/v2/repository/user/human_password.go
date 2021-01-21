@@ -32,6 +32,10 @@ func (e *HumanPasswordChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanPasswordChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanPasswordChangedEvent(
 	ctx context.Context,
 	secret *crypto.CryptoValue,
@@ -73,6 +77,10 @@ func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *HumanPasswordCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanPasswordCodeAddedEvent(
 	ctx context.Context,
 	code *crypto.CryptoValue,
@@ -110,6 +118,10 @@ func (e *HumanPasswordCodeSentEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanPasswordCodeSentEvent(ctx context.Context) *HumanPasswordCodeSentEvent {
 	return &HumanPasswordCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -133,6 +145,10 @@ func (e *HumanPasswordCheckSucceededEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanPasswordCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanPasswordCheckSucceededEvent(ctx context.Context) *HumanPasswordCheckSucceededEvent {
 	return &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -153,6 +169,10 @@ type HumanPasswordCheckFailedEvent struct {
 }
 
 func (e *HumanPasswordCheckFailedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanPasswordCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

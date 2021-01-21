@@ -5,6 +5,7 @@ Errors:
   IDMissing: ID fehlt
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    AlreadyExists: Benutzer existierts bereits
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     UserIDMissing: User ID fehlt
@@ -41,6 +42,7 @@ Errors:
     NotMachine: Der Benutzer muss technisch sein
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
     Username:
+      AlreadyExists: Benutzername ist bereits vergeben
       Reservied: Benutzername ist bereits vergeben
     Code:
       Empty: Code ist leer
@@ -64,6 +66,7 @@ Errors:
       IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
       NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
       MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
+      AlreadyExists: External IDP ist bereits vergeben
     MFA:
       OTP:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
@@ -84,6 +87,7 @@ Errors:
       ValidateLoginFailed: Zugangsdaten konnten nicht validiert werden
       CloneWarning: Authentifizierungsdaten wurden möglicherweise geklont
   Org:
+    AlreadyExist: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert
     AlreadyActive: Organisation ist bereits aktiv
@@ -250,6 +254,8 @@ Errors:
     NotActive: Benutzer Berechtigung ist nicht aktiv
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
+  IDPConfig:
+    AlreadyExists: IDP Konfiguration mit diesem Name existiert bereits
   Changes:
     NotFound: Es konnte kein Änderungsverlauf gefunden werden
   Token:

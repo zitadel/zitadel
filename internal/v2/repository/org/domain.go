@@ -31,6 +31,10 @@ func (e *DomainAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewDomainAddedEvent(ctx context.Context, domain string) *DomainAddedEvent {
 	return &DomainAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -63,6 +67,10 @@ type DomainVerificationAddedEvent struct {
 
 func (e *DomainVerificationAddedEvent) Data() interface{} {
 	return e
+}
+
+func (e *DomainVerificationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewDomainVerificationAddedEvent(
@@ -103,6 +111,10 @@ func (e *DomainVerificationFailedEvent) Data() interface{} {
 	return e
 }
 
+func (e *DomainVerificationFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewDomainVerificationFailedEvent(ctx context.Context, domain string) *DomainVerificationFailedEvent {
 	return &DomainVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -133,6 +145,10 @@ type DomainVerifiedEvent struct {
 
 func (e *DomainVerifiedEvent) Data() interface{} {
 	return e
+}
+
+func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewDomainVerifiedEvent(ctx context.Context, domain string) *DomainVerifiedEvent {
@@ -167,6 +183,10 @@ func (e *DomainPrimarySetEvent) Data() interface{} {
 	return e
 }
 
+func (e *DomainPrimarySetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewDomainPrimarySetEvent(ctx context.Context, domain string) *DomainPrimarySetEvent {
 	return &DomainPrimarySetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -197,6 +217,10 @@ type DomainRemovedEvent struct {
 
 func (e *DomainRemovedEvent) Data() interface{} {
 	return e
+}
+
+func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewDomainRemovedEvent(ctx context.Context, domain string) *DomainRemovedEvent {

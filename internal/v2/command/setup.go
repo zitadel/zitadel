@@ -88,7 +88,7 @@ func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider
 
 	_, err = r.eventstore.PushAggregates(ctx, iamAgg)
 	if err != nil {
-		return caos_errs.ThrowPreconditionFailedf(nil, "EVENT-dbG31", "Setup %s failed", step.Step())
+		return caos_errs.ThrowPreconditionFailedf(nil, "EVENT-dbG31", "Setup %v failed", step.Step())
 	}
 	logging.LogWithFields("SETUP-Sg1t1", "step", step.Step()).Info("setup step done")
 	return nil

@@ -9,6 +9,23 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
+const (
+	uniqueIDPConfigNameType = "idp_config_names"
+)
+
+func NewAddIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueIDPConfigNameType,
+		idpConfigName+resourceOwner,
+		"Errors.IDPConfig.AlreadyExists")
+}
+
+func NewRemoveIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueIDPConfigNameType,
+		idpConfigName+resourceOwner)
+}
+
 type IDPConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -20,12 +37,11 @@ type IDPConfigAddedEvent struct {
 
 func NewIDPConfigAddedEvent(
 	base *eventstore.BaseEvent,
-	configID string,
+	configID,
 	name string,
 	configType domain.IDPConfigType,
 	stylingType domain.IDPConfigStylingType,
 ) *IDPConfigAddedEvent {
-
 	return &IDPConfigAddedEvent{
 		BaseEvent:   *base,
 		ConfigID:    configID,
@@ -37,6 +53,10 @@ func NewIDPConfigAddedEvent(
 
 func (e *IDPConfigAddedEvent) Data() interface{} {
 	return e
+}
+
+func (e *IDPConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.ResourceOwner())}
 }
 
 func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
@@ -62,6 +82,10 @@ type IDPConfigChangedEvent struct {
 
 func (e *IDPConfigChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewIDPConfigChangedEvent(
@@ -130,6 +154,10 @@ func (e *IDPConfigDeactivatedEvent) Data() interface{} {
 	return e
 }
 
+func (e *IDPConfigDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &IDPConfigDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -164,6 +192,10 @@ func (e *IDPConfigReactivatedEvent) Data() interface{} {
 	return e
 }
 
+func (e *IDPConfigReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &IDPConfigReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -181,21 +213,28 @@ type IDPConfigRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ConfigID string `json:"idpConfigId"`
+	Name     string
 }
 
 func NewIDPConfigRemovedEvent(
 	base *eventstore.BaseEvent,
 	configID string,
+	name string,
 ) *IDPConfigRemovedEvent {
 
 	return &IDPConfigRemovedEvent{
 		BaseEvent: *base,
 		ConfigID:  configID,
+		Name:      name,
 	}
 }
 
 func (e *IDPConfigRemovedEvent) Data() interface{} {
 	return e
+}
+
+func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.Name, e.ResourceOwner())}
 }
 
 func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

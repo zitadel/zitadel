@@ -27,6 +27,9 @@ func (r *CommandSide) AddHuman(ctx context.Context, orgID string, human *domain.
 	}
 	err = r.eventstore.PushAggregate(ctx, addedHuman, userAgg)
 	if err != nil {
+		if caos_errs.IsErrorAlreadyExists(err) {
+			return nil, caos_errs.ThrowAlreadyExists(err, "COMMAND-4kSff", "Errors.User.AlreadyExists")
+		}
 		return nil, err
 	}
 
@@ -47,6 +50,9 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *do
 	}
 	err = r.eventstore.PushAggregate(ctx, addedHuman, userAgg)
 	if err != nil {
+		if caos_errs.IsErrorAlreadyExists(err) {
+			return nil, caos_errs.ThrowAlreadyExists(err, "COMMAND-4kSff", "Errors.User.AlreadyExists")
+		}
 		return nil, err
 	}
 
@@ -76,7 +82,6 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	}
 
 	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
-	//TODO: Check Unique Username or unique external idp
 	if err := human.CheckOrgIAMPolicy(human.Username, orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}
@@ -88,9 +93,9 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
 	var createEvent eventstore.EventPusher
 	if selfregister {
-		createEvent = createRegisterHumanEvent(ctx, human.Username, human)
+		createEvent = createRegisterHumanEvent(ctx, orgID, human, orgIAMPolicy.UserLoginMustBeDomain)
 	} else {
-		createEvent = createAddHumanEvent(ctx, human.Username, human)
+		createEvent = createAddHumanEvent(ctx, orgID, human, orgIAMPolicy.UserLoginMustBeDomain)
 	}
 	userAgg.PushEvents(createEvent)
 
@@ -152,10 +157,11 @@ func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, reso
 	return r.eventstore.PushAggregate(ctx, existingEmail, userAgg)
 }
 
-func createAddHumanEvent(ctx context.Context, username string, human *domain.Human) *user.HumanAddedEvent {
+func createAddHumanEvent(ctx context.Context, orgID string, human *domain.Human, userLoginMustBeDomain bool) *user.HumanAddedEvent {
 	addEvent := user.NewHumanAddedEvent(
 		ctx,
-		username,
+		orgID,
+		human.Username,
 		human.FirstName,
 		human.LastName,
 		human.NickName,
@@ -163,6 +169,7 @@ func createAddHumanEvent(ctx context.Context, username string, human *domain.Hum
 		human.PreferredLanguage,
 		human.Gender,
 		human.EmailAddress,
+		userLoginMustBeDomain,
 	)
 	if human.Phone != nil {
 		addEvent.AddPhoneData(human.PhoneNumber)
@@ -181,10 +188,11 @@ func createAddHumanEvent(ctx context.Context, username string, human *domain.Hum
 	return addEvent
 }
 
-func createRegisterHumanEvent(ctx context.Context, username string, human *domain.Human) *user.HumanRegisteredEvent {
+func createRegisterHumanEvent(ctx context.Context, orgID string, human *domain.Human, userLoginMustBeDomain bool) *user.HumanRegisteredEvent {
 	addEvent := user.NewHumanRegisteredEvent(
 		ctx,
-		username,
+		orgID,
+		human.Username,
 		human.FirstName,
 		human.LastName,
 		human.NickName,
@@ -192,6 +200,7 @@ func createRegisterHumanEvent(ctx context.Context, username string, human *domai
 		human.PreferredLanguage,
 		human.Gender,
 		human.EmailAddress,
+		userLoginMustBeDomain,
 	)
 	if human.Phone != nil {
 		addEvent.AddPhoneData(human.PhoneNumber)
