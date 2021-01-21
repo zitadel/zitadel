@@ -2,6 +2,8 @@ module github.com/caos/zitadel
 
 go 1.15
 
+replace github.com/caos/orbos => /Users/benz/go/src/github.com/caos/orbos
+
 require (
 	cloud.google.com/go v0.71.0 // indirect
 	github.com/BurntSushi/toml v0.3.1
@@ -69,7 +71,7 @@ require (
 	golang.org/x/text v0.3.4
 	golang.org/x/tools v0.0.0-20201103235415-b653051172e4
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20201103154000-415bd0cd5df6
+	google.golang.org/genproto v0.0.0-20201103154000-415bd0cd5df6 // indirect
 	google.golang.org/grpc v1.34.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1

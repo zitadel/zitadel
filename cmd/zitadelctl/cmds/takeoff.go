@@ -9,7 +9,7 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator/api"
-	"github.com/caos/zitadel/operator/kinds/orb"
+	"github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	"github.com/spf13/cobra"
 )
 

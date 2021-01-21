@@ -10,7 +10,7 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/api"
-	zitadelOrb "github.com/caos/zitadel/operator/kinds/orb"
+	zitadelOrb "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 )
 
 const (

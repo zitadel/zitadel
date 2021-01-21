@@ -2,6 +2,7 @@ package start
 
 import (
 	"context"
+	"github.com/caos/zitadel/operator/zitadel"
 	"runtime/debug"
 	"time"
 
@@ -10,8 +11,7 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	orbconfig "github.com/caos/orbos/pkg/orb"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/kinds/orb"
+	"github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
 )
 
@@ -34,7 +34,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", migrationsPath, version, []string{"operator", "iam"}), k8sClient)
+		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", migrationsPath, version, []string{"operator", "iam"}), k8sClient)
 
 		go func() {
 			started := time.Now()
@@ -66,7 +66,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", migrationsPath, version, []string{"scaledown"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", migrationsPath, version, []string{"scaledown"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -74,7 +74,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "migration", migrationsPath, version, []string{"migration"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "migration", migrationsPath, version, []string{"migration"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -88,7 +88,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		return err
 	}
 
-	if err := operator.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", migrationsPath, version, []string{"scaleup"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", migrationsPath, version, []string{"scaleup"}), k8sClient)(); err != nil {
 		return err
 	}
 
