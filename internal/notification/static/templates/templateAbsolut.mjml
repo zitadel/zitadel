@@ -9,11 +9,10 @@
       <mj-class name="left" align="left" position="absolute" width="50%" />
       <mj-class name="right" align="right" />
       <mj-class name="position" position="absolute" />
-      <mj-class name="body" background-image="url('https://static.zitadel.ch/logo-gsuite-light.png')" />
     </mj-attributes>
   </mj-head>
-  <mj-body mj-class="body">
-    <mj-section background-url="https://static.zitadel.ch/zitadel-logo-outline-dark.png" border="0" background-repeat="no-repeat">
+  <mj-body mj-class="body" border-radius="16px" >
+    <mj-section border="0">
       <mj-group>
         <mj-column>
           <mj-image src="https://static.zitadel.ch/zitadel-logo-dark.png" width="100px" padding="0" mj-class="left" />

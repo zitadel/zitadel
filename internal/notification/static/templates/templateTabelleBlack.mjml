@@ -1,0 +1,44 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-font name="Lato" href="http://fonts.googleapis.com/css?family=Lato:200,300,400,600" />
+      <mj-text align="center" color="#ffffff" font-family="Lato, Arial, Helvetica, sans-serif" />
+      <mj-section padding="0" full-width="full-width" />
+      <mj-body background-color="#212224" width="800px"/>
+      <mj-image padding="0" />
+      <mj-column padding="0" />
+      <mj-wrapper padding-left="0" />
+      <mj-wrapper full-width="full-width" />
+    </mj-attributes>
+    <mj-style>
+      @media (max-width:480px) { 
+          .mobile_hidden { 
+              display:none !important;
+          }
+      }
+      .shadow a {
+        box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+      }
+    </mj-style>
+  </mj-head>
+  <mj-body>
+    <mj-wrapper border="0">
+      <mj-section>
+        <mj-group>
+          <mj-column>
+            <mj-image src="https://static.zitadel.ch/zitadel-logo-light.png" align="center" width="160px" padding="50px 0 50px 0px" />
+          </mj-column>
+        </mj-group>
+      </mj-section>
+      <mj-section>
+        <mj-column width="60%">
+          <mj-text font-size="24px" font-weight="200">{{.Greeting}}</mj-text>
+          <mj-text font-size="16px" line-height="1.5" font-weight="light">{{.Text}}</mj-text>
+          <mj-button css-class="shadow" border-radius="6px" href="{{.URL}}" background-color="#5282C1" font-size="14px" font-weight="500">{{.ButtonText}}</mj-button>
+          <mj-text padding="50px 0 16px 0" color="#757575">
+            <a href="http://www.caos.ch" style="color:#e91e63; text-decoration: none;" target="_blank"> CAOS AG </a> <span style="color: #ffffff; margin: 0 .5rem;">|</span> Teufener Strasse 19 <span style="color: #ffffff; margin: 0 .5rem;">|</span> CH-9000 St. Gallen </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>
