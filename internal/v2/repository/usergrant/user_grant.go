@@ -59,9 +59,10 @@ func NewUserGrantAddedEvent(
 	projectGrantID string,
 	roleKeys []string) *UserGrantAddedEvent {
 	return &UserGrantAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			UserGrantAddedType,
+			resourceOwner,
 		),
 		UserID:         userID,
 		ProjectID:      projectID,

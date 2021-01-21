@@ -35,7 +35,6 @@ func (r *CommandSide) addUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if err != nil {
 		return nil, nil, err
 	}
-	// TODO: Add uniqueness check
 	addedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&addedUserGrant.WriteModel)
 
@@ -43,17 +42,17 @@ func (r *CommandSide) addUserGrant(ctx context.Context, userGrant *domain.UserGr
 		usergrant.NewUserGrantAddedEvent(
 			ctx,
 			resourceOwner,
-			addedUserGrant.UserID,
-			addedUserGrant.ProjectID,
-			addedUserGrant.ProjectGrantID,
-			addedUserGrant.RoleKeys,
+			userGrant.UserID,
+			userGrant.ProjectID,
+			userGrant.ProjectGrantID,
+			userGrant.RoleKeys,
 		),
 	)
 	return userGrantAgg, addedUserGrant, nil
 }
 
-func (r *CommandSide) ChangeUserGrant(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {
-	userGrantAgg, addedUserGrant, err := r.changeUserGrant(ctx, usergrant, resourceOwner, false)
+func (r *CommandSide) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {
+	userGrantAgg, addedUserGrant, err := r.changeUserGrant(ctx, userGrant, resourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
@@ -90,11 +89,11 @@ func (r *CommandSide) changeUserGrant(ctx context.Context, userGrant *domain.Use
 
 	if !cascade {
 		userGrantAgg.PushEvents(
-			usergrant.NewUserGrantChangedEvent(ctx, changedUserGrant.RoleKeys),
+			usergrant.NewUserGrantChangedEvent(ctx, userGrant.RoleKeys),
 		)
 	} else {
 		userGrantAgg.PushEvents(
-			usergrant.NewUserGrantCascadeChangedEvent(ctx, changedUserGrant.RoleKeys),
+			usergrant.NewUserGrantCascadeChangedEvent(ctx, userGrant.RoleKeys),
 		)
 	}
 
