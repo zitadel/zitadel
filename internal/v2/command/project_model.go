@@ -26,12 +26,6 @@ func NewProjectWriteModel(projectID string, resourceOwner string) *ProjectWriteM
 
 func (wm *ProjectWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
-	for _, event := range events {
-		switch e := event.(type) {
-		case *project.ProjectAddedEvent:
-			wm.WriteModel.AppendEvents(e)
-		}
-	}
 }
 
 func (wm *ProjectWriteModel) Reduce() error {

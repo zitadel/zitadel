@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/org"
+	proj_repo "github.com/caos/zitadel/internal/v2/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/v2/repository/user"
 	usr_grant_repo "github.com/caos/zitadel/internal/v2/repository/usergrant"
 	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
@@ -55,6 +56,7 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	org.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
 	usr_grant_repo.RegisterEventMappers(repo.eventstore)
+	proj_repo.RegisterEventMappers(repo.eventstore)
 
 	//TODO: simplify!!!!
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)

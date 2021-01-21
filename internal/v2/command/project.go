@@ -54,8 +54,8 @@ func (r *CommandSide) getProjectByID(ctx context.Context, projectID, resourceOwn
 	return projectWriteModelToProject(projectWriteModel), nil
 }
 
-func (r *CommandSide) checkProjectExists(ctx context.Context, userID, resourceOwner string) (bool, error) {
-	projectWriteModel, err := r.getProjectWriteModelByID(ctx, userID, resourceOwner)
+func (r *CommandSide) checkProjectExists(ctx context.Context, projectID, resourceOwner string) (bool, error) {
+	projectWriteModel, err := r.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return false, err
 	}
