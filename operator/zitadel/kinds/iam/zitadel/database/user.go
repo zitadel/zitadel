@@ -2,8 +2,8 @@ package database
 
 import (
 	"github.com/caos/orbos/mntr"
-	"github.com/caos/orbos/pkg/databases"
 	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/zitadel/pkg/databases"
 )
 
 func (c *Client) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {

@@ -22,11 +22,15 @@ func StartOperator(rv RootValues) *cobra.Command {
 	flags.StringVar(&migrationsPath, "migrations", "./migrations/", "Path to the migration files")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_, monitor, orbConfig, _, version, errFunc := rv()
-		kubeconfig = helpers.PruneHome(kubeconfig)
-		if errFunc != nil {
-			return errFunc(cmd)
+		_, monitor, orbConfig, _, version, errFunc, err := rv()
+		if err != nil {
+			return err
 		}
+		defer func() {
+			err = errFunc(err)
+		}()
+
+		kubeconfig = helpers.PruneHome(kubeconfig)
 
 		k8sClient, err := kubernetes.NewK8sClientWithPath(monitor, kubeconfig)
 		if err != nil {
@@ -39,6 +43,40 @@ func StartOperator(rv RootValues) *cobra.Command {
 				monitor.Error(err)
 				return nil
 			}
+		}
+		return nil
+	}
+	return cmd
+}
+
+func StartDatabase(rv RootValues) *cobra.Command {
+	var (
+		kubeconfig string
+		cmd        = &cobra.Command{
+			Use:   "database",
+			Short: "Launch a database operator",
+			Long:  "Ensures a desired state of the database",
+		}
+	)
+	flags := cmd.Flags()
+	flags.StringVar(&kubeconfig, "kubeconfig", "", "kubeconfig used by zitadel operator")
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
+		_, monitor, orbConfig, _, version, errFunc, err := rv()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			err = errFunc(err)
+		}()
+
+		k8sClient, err := kubernetes.NewK8sClientWithPath(monitor, kubeconfig)
+		if err != nil {
+			return err
+		}
+
+		if k8sClient.Available() {
+			return start.Database(monitor, orbConfig.Path, k8sClient, &version)
 		}
 		return nil
 	}

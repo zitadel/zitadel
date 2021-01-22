@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	"io/ioutil"
 
 	"github.com/caos/zitadel/operator/helpers"
@@ -27,11 +28,14 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 	flags.StringVar(&kubeconfig, "kubeconfig", "~/.kube/config", "Kubeconfig for ZITADEL operator deployment")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_, monitor, orbConfig, gitClient, _, errFunc := rv()
-		kubeconfig = helpers.PruneHome(kubeconfig)
-		if errFunc != nil {
-			return errFunc(cmd)
+		_, monitor, orbConfig, gitClient, _, errFunc, err := rv()
+		if err != nil {
+			return err
 		}
+		defer func() {
+			err = errFunc(err)
+		}()
+		kubeconfig = helpers.PruneHome(kubeconfig)
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
 			monitor.Error(err)
@@ -51,6 +55,14 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 		kubeconfigStr := string(value)
 
 		if err := deployOperator(
+			monitor,
+			gitClient,
+			&kubeconfigStr,
+		); err != nil {
+			monitor.Error(err)
+		}
+
+		if err := deployDatabase(
 			monitor,
 			gitClient,
 			&kubeconfigStr,
@@ -83,6 +95,32 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 			if err := orb.Reconcile(monitor, desiredTree, true)(k8sClient); err != nil {
 				return err
 			}
+		}
+	}
+	return nil
+}
+
+func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string) error {
+	found, err := api.ExistsDatabaseYml(gitClient)
+	if err != nil {
+		return err
+	}
+	if found {
+		k8sClient := kubernetes.NewK8sClient(monitor, kubeconfig)
+
+		if k8sClient.Available() {
+			tree, err := api.ReadDatabaseYml(gitClient)
+			if err != nil {
+				return err
+			}
+
+			if err := orbdb.Reconcile(
+				monitor,
+				tree)(k8sClient); err != nil {
+				return err
+			}
+		} else {
+			monitor.Info("Failed to connect to k8s")
 		}
 	}
 	return nil

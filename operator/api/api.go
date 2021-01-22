@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	zitadelFile = "zitadel.yml"
+	zitadelFile  = "zitadel.yml"
+	databaseFile = "database.yml"
 )
 
 type PushDesiredFunc func(monitor mntr.Monitor) error
@@ -30,6 +31,25 @@ func PushZitadelDesiredFunc(gitClient *git.Client, desired *tree.Tree) PushDesir
 	return func(monitor mntr.Monitor) error {
 		monitor.Info("Writing zitadel desired state")
 		return PushZitadelYml(monitor, "Zitadel desired state written", gitClient, desired)
+	}
+}
+
+func ExistsDatabaseYml(gitClient *git.Client) (bool, error) {
+	return existsFileInGit(gitClient, databaseFile)
+}
+
+func ReadDatabaseYml(gitClient *git.Client) (*tree.Tree, error) {
+	return readFileInGit(gitClient, databaseFile)
+}
+
+func PushDatabaseYml(monitor mntr.Monitor, msg string, gitClient *git.Client, desired *tree.Tree) (err error) {
+	return pushFileInGit(monitor, msg, gitClient, desired, databaseFile)
+}
+
+func PushDatabaseDesiredFunc(gitClient *git.Client, desired *tree.Tree) PushDesiredFunc {
+	return func(monitor mntr.Monitor) error {
+		monitor.Info("Writing database desired state")
+		return PushDatabaseYml(monitor, "Database desired state written", gitClient, desired)
 	}
 }
 

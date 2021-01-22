@@ -2,6 +2,8 @@ package start
 
 import (
 	"context"
+	"github.com/caos/zitadel/operator/database"
+	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	"github.com/caos/zitadel/operator/zitadel"
 	"runtime/debug"
 	"time"
@@ -96,5 +98,58 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		return err
 	}
 
+	return nil
+}
+
+func Database(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, binaryVersion *string) error {
+	takeoffChan := make(chan struct{})
+	go func() {
+		takeoffChan <- struct{}{}
+	}()
+
+	for range takeoffChan {
+		orbConfig, err := orbconfig.ParseOrbConfig(orbConfigPath)
+		if err != nil {
+			monitor.Error(err)
+			return err
+		}
+
+		gitClient := git.New(context.Background(), monitor, "orbos", "orbos@caos.ch")
+		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
+			monitor.Error(err)
+			return err
+		}
+
+		takeoff := database.Takeoff(monitor, gitClient, orbdb.AdaptFunc("", binaryVersion, "database", "backup"), k8sClient)
+
+		go func() {
+			started := time.Now()
+			takeoff()
+
+			monitor.WithFields(map[string]interface{}{
+				"took": time.Since(started),
+			}).Info("Iteration done")
+
+			takeoffChan <- struct{}{}
+		}()
+	}
+
+	return nil
+}
+
+func Backup(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, backup string, binaryVersion *string) error {
+	orbConfig, err := orbconfig.ParseOrbConfig(orbConfigPath)
+	if err != nil {
+		monitor.Error(err)
+		return err
+	}
+
+	gitClient := git.New(context.Background(), monitor, "orbos", "orbos@caos.ch")
+	if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
+		monitor.Error(err)
+		return err
+	}
+
+	database.Takeoff(monitor, gitClient, orbdb.AdaptFunc(backup, binaryVersion, "instantbackup"), k8sClient)()
 	return nil
 }

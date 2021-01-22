@@ -14,20 +14,15 @@ func main() {
 	rootCmd, rootValues := cmds.RootCommand(Version)
 	rootCmd.Version = fmt.Sprintf("%s\n", Version)
 
-	startCmd := cmds.StartOperator(rootValues)
-	takeoffCmd := cmds.TakeoffCommand(rootValues)
-	backuplistCmd := cmds.BackupListCommand(rootValues)
-	restoreCmd := cmds.RestoreCommand(rootValues)
-	readsecretCmd := cmds.ReadSecretCommand(rootValues)
-	writesecretCmd := cmds.WriteSecretCommand(rootValues)
-
 	rootCmd.AddCommand(
-		startCmd,
-		takeoffCmd,
-		backuplistCmd,
-		restoreCmd,
-		readsecretCmd,
-		writesecretCmd,
+		cmds.StartOperator(rootValues),
+		cmds.TakeoffCommand(rootValues),
+		cmds.BackupListCommand(rootValues),
+		cmds.RestoreCommand(rootValues),
+		cmds.ReadSecretCommand(rootValues),
+		cmds.WriteSecretCommand(rootValues),
+		cmds.BackupCommand(rootValues),
+		cmds.StartDatabase(rootValues),
 	)
 
 	if err := rootCmd.Execute(); err != nil {

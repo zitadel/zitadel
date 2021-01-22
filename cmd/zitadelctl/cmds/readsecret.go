@@ -17,11 +17,13 @@ func ReadSecretCommand(rv RootValues) *cobra.Command {
 		Example: `zitadelctl readsecret zitadel.emailappkey > ~/emailappkey`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			_, monitor, orbConfig, gitClient, _, errFunc := rv()
-			if errFunc != nil {
-				return errFunc(cmd)
+			_, monitor, orbConfig, gitClient, _, errFunc, err := rv()
+			if err != nil {
+				return err
 			}
-
+			defer func() {
+				err = errFunc(err)
+			}()
 			if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
 				return err
 			}

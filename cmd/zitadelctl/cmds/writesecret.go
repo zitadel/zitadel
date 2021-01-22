@@ -33,10 +33,13 @@ orbctl writesecret mygceprovider.google_application_credentials_value --value "$
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 
-		_, monitor, orbConfig, gitClient, _, errFunc := rv()
-		if errFunc != nil {
-			return errFunc(cmd)
+		_, monitor, orbConfig, gitClient, _, errFunc, err := rv()
+		if err != nil {
+			return err
 		}
+		defer func() {
+			err = errFunc(err)
+		}()
 
 		s, err := key(value, file, stdin)
 		if err != nil {

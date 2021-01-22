@@ -2,10 +2,9 @@ module github.com/caos/zitadel
 
 go 1.15
 
-replace github.com/caos/orbos => /Users/benz/go/src/github.com/caos/orbos
-
 require (
 	cloud.google.com/go v0.71.0 // indirect
+	cloud.google.com/go/storage v1.10.0
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.13.0
@@ -18,7 +17,7 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.13.2
-	github.com/caos/orbos v1.5.14-0.20201224122934-53e28acdce21
+	github.com/caos/orbos v1.5.14-0.20210122135625-71761f04e0f8
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
 	github.com/ghodss/yaml v1.0.0
@@ -70,6 +69,7 @@ require (
 	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
 	golang.org/x/text v0.3.4
 	golang.org/x/tools v0.0.0-20201103235415-b653051172e4
+	google.golang.org/api v0.34.0
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20201103154000-415bd0cd5df6 // indirect
 	google.golang.org/grpc v1.34.0

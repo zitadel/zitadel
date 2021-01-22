@@ -31,12 +31,15 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 	flags.StringVar(&migrationsPath, "migrations", "./migrations/", "Path to the migration files")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_, monitor, orbConfig, gitClient, version, errFunc := rv()
-		kubeconfig = helpers.PruneHome(kubeconfig)
-
-		if errFunc != nil {
-			return errFunc(cmd)
+		_, monitor, orbConfig, gitClient, version, errFunc, err := rv()
+		if err != nil {
+			return err
 		}
+		defer func() {
+			err = errFunc(err)
+		}()
+
+		kubeconfig = helpers.PruneHome(kubeconfig)
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
 			monitor.Error(err)
