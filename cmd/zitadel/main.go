@@ -97,6 +97,7 @@ func startZitadel(configPaths []string) {
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
+	//TODO: new eventstore config for command sie
 	es, err := es_int.Start(conf.Admin.Eventstore)
 	if err != nil {
 		return

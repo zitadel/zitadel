@@ -12,7 +12,7 @@ import (
 const (
 	uniqueProjectnameType  = "project_names"
 	projectEventTypePrefix = eventstore.EventType("project.")
-	ProjectAdded           = projectEventTypePrefix + "added"
+	ProjectAddedType       = projectEventTypePrefix + "added"
 	ProjectChangedType     = projectEventTypePrefix + "changed"
 	ProjectDeactivatedType = projectEventTypePrefix + "deactivated"
 	ProjectReactivatedType = projectEventTypePrefix + "reactivated"
@@ -52,7 +52,7 @@ func NewProjectAddedEvent(ctx context.Context, name, resourceOwner string) *Proj
 	return &ProjectAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
-			ProjectAdded,
+			ProjectAddedType,
 			resourceOwner,
 		),
 		Name: name,

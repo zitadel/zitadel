@@ -22,10 +22,10 @@ func TestAppendAddGrantEvent(t *testing.T) {
 			name: "append add grant event",
 			args: args{
 				project: &Project{},
-				role:    &ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}},
+				role:    &ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}},
 				event:   &es_models.Event{},
 			},
-			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
+			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
 		},
 	}
 	for _, tt := range tests {
@@ -59,11 +59,11 @@ func TestAppendChangeGrantEvent(t *testing.T) {
 		{
 			name: "append change grant event",
 			args: args{
-				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
-				grant:   &ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"KeyChanged"}},
+				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
+				grant:   &ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"KeyChanged"}},
 				event:   &es_models.Event{},
 			},
-			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"KeyChanged"}}}},
+			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"KeyChanged"}}}},
 		},
 	}
 	for _, tt := range tests {
@@ -97,8 +97,8 @@ func TestAppendRemoveGrantEvent(t *testing.T) {
 		{
 			name: "append remove role event",
 			args: args{
-				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
-				grant:   &ProjectGrant{GrantID: "GrantID"},
+				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
+				grant:   &ProjectGrant{GrantID: "ProjectGrantID"},
 				event:   &es_models.Event{},
 			},
 			result: &Project{Grants: []*ProjectGrant{}},
@@ -133,22 +133,22 @@ func TestAppendGrantStateEvent(t *testing.T) {
 		{
 			name: "append deactivate grant event",
 			args: args{
-				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
-				grant:   &ProjectGrantID{GrantID: "GrantID"},
+				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
+				grant:   &ProjectGrantID{GrantID: "ProjectGrantID"},
 				event:   &es_models.Event{},
 				state:   model.ProjectGrantStateInactive,
 			},
-			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}, State: int32(model.ProjectGrantStateInactive)}}},
+			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}, State: int32(model.ProjectGrantStateInactive)}}},
 		},
 		{
 			name: "append reactivate grant event",
 			args: args{
-				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
-				grant:   &ProjectGrantID{GrantID: "GrantID"},
+				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
+				grant:   &ProjectGrantID{GrantID: "ProjectGrantID"},
 				event:   &es_models.Event{},
 				state:   model.ProjectGrantStateActive,
 			},
-			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}, State: int32(model.ProjectGrantStateActive)}}},
+			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}, State: int32(model.ProjectGrantStateActive)}}},
 		},
 	}
 	for _, tt := range tests {
