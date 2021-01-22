@@ -13,10 +13,10 @@ const (
 	uniqueProjectnameTable = "project_names"
 	projectEventTypePrefix = eventstore.EventType("project.")
 	ProjectAdded           = projectEventTypePrefix + "added"
-	ProjectChanged         = projectEventTypePrefix + "changed"
-	ProjectDeactivated     = projectEventTypePrefix + "deactivated"
-	ProjectReactivated     = projectEventTypePrefix + "reactivated"
-	ProjectRemoved         = projectEventTypePrefix + "removed"
+	ProjectChangedType     = projectEventTypePrefix + "changed"
+	ProjectDeactivatedType = projectEventTypePrefix + "deactivated"
+	ProjectReactivatedType = projectEventTypePrefix + "reactivated"
+	ProjectRemovedType     = projectEventTypePrefix + "removed"
 )
 
 func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
@@ -67,6 +67,161 @@ func ProjectAddedEventMapper(event *repository.Event) (eventstore.EventReader, e
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-Bfg2f", "unable to unmarshal project")
+	}
+
+	return e, nil
+}
+
+type ProjectChangeEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Name                 string `json:"name,omitempty"`
+	ProjectRoleAssertion bool   `json:"projectRoleAssertion,omitempty"`
+	ProjectRoleCheck     bool   `json:"projectRoleCheck,omitempty"`
+}
+
+func (e *ProjectChangeEvent) Data() interface{} {
+	return e
+}
+
+func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewProjectChangeEvent(
+	ctx context.Context,
+	changes []ProjectChanges) (*ProjectChangeEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "IDPCONFIG-ADzr5", "Errors.NoChangesFound")
+	}
+	changeEvent := &ProjectChangeEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			ProjectChangedType,
+		),
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type ProjectChanges func(event *ProjectChangeEvent)
+
+func ProjectChangeEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ProjectChangeEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "PROJECT-M9osd", "unable to unmarshal project")
+	}
+
+	return e, nil
+}
+
+type ProjectDeactivatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *ProjectDeactivatedEvent) Data() interface{} {
+	return e
+}
+
+func (e *ProjectDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewProjectDeactivatedEvent(ctx context.Context) *ProjectDeactivatedEvent {
+	return &ProjectDeactivatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			ProjectDeactivatedType,
+		),
+	}
+}
+
+func ProjectDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ProjectDeactivatedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "PROJECT-2M9yx", "unable to unmarshal project")
+	}
+
+	return e, nil
+}
+
+type ProjectReactivatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *ProjectReactivatedEvent) Data() interface{} {
+	return e
+}
+
+func (e *ProjectReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewProjectReactivatedEvent(ctx context.Context) *ProjectReactivatedEvent {
+	return &ProjectReactivatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			ProjectReactivatedType,
+		),
+	}
+}
+
+func ProjectReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ProjectReactivatedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "PROJECT-Ml0X4", "unable to unmarshal project")
+	}
+
+	return e, nil
+}
+
+type ProjectRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Name string
+}
+
+func (e *ProjectRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.ResourceOwner())}
+}
+
+func NewProjectRemovedEvent(ctx context.Context, name, resourceOwner string) *ProjectRemovedEvent {
+	return &ProjectRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
+			ctx,
+			ProjectRemovedType,
+			resourceOwner,
+		),
+		Name: name,
+	}
+}
+
+func ProjectRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &ProjectRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "PROJECT-1M0pr", "unable to unmarshal project")
 	}
 
 	return e, nil
