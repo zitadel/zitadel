@@ -77,9 +77,9 @@ func RoleAddedEventMapper(event *repository.Event) (eventstore.EventReader, erro
 type RoleChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Key         string `json:"key,omitempty"`
-	DisplayName string `json:"displayName,omitempty"`
-	Group       string `json:"group,omitempty"`
+	Key         *string `json:"key,omitempty"`
+	DisplayName *string `json:"displayName,omitempty"`
+	Group       *string `json:"group,omitempty"`
 }
 
 func (e *RoleChangedEvent) Data() interface{} {
@@ -111,6 +111,23 @@ func NewRoleChangedEvent(
 
 type RoleChanges func(event *RoleChangedEvent)
 
+func ChangeKey(key string) func(event *RoleChangedEvent) {
+	return func(e *RoleChangedEvent) {
+		e.Key = &key
+	}
+}
+
+func ChangeDisplayName(displayName string) func(event *RoleChangedEvent) {
+	return func(e *RoleChangedEvent) {
+		e.DisplayName = &displayName
+	}
+}
+
+func ChangeGroup(group string) func(event *RoleChangedEvent) {
+	return func(e *RoleChangedEvent) {
+		e.Group = &group
+	}
+}
 func RoleChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &RoleChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

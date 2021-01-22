@@ -8,11 +8,6 @@ import (
 
 type ProjectRepository interface {
 	ProjectByID(ctx context.Context, id string) (*model.ProjectView, error)
-	CreateProject(ctx context.Context, project *model.Project) (*model.Project, error)
-	UpdateProject(ctx context.Context, project *model.Project) (*model.Project, error)
-	DeactivateProject(ctx context.Context, id string) (*model.Project, error)
-	ReactivateProject(ctx context.Context, id string) (*model.Project, error)
-	RemoveProject(ctx context.Context, id string) error
 	SearchProjects(ctx context.Context, request *model.ProjectViewSearchRequest) (*model.ProjectViewSearchResponse, error)
 	SearchProjectGrants(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
 	SearchGrantedProjects(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)

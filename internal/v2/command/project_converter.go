@@ -23,3 +23,12 @@ func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) *doma
 		//TODO: OIDC Config
 	}
 }
+
+func roleWriteModelToRole(writeModel *ProjectRoleWriteModel) *domain.ProjectRole {
+	return &domain.ProjectRole{
+		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
+		Key:         writeModel.Key,
+		DisplayName: writeModel.DisplayName,
+		Group:       writeModel.Group,
+	}
+}

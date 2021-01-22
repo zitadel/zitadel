@@ -15,7 +15,7 @@ func (r *CommandSide) AddApplication(ctx context.Context, application *domain.Ap
 	}
 	addedApplication := NewApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
-	err = r.addApplication(ctx, projectAgg, project, application)
+	err = r.addApplication(ctx, projectAgg, project, application, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (r *CommandSide) AddApplication(ctx context.Context, application *domain.Ap
 	return applicationWriteModelToApplication(addedApplication), nil
 }
 
-func (r *CommandSide) addApplication(ctx context.Context, projectAgg *project.Aggregate, proj *domain.Project, application *domain.Application) (err error) {
+func (r *CommandSide) addApplication(ctx context.Context, projectAgg *project.Aggregate, proj *domain.Project, application *domain.Application, resourceOwner string) (err error) {
 	if !application.IsValid(true) {
 		return caos_errs.ThrowPreconditionFailed(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
@@ -36,7 +36,7 @@ func (r *CommandSide) addApplication(ctx context.Context, projectAgg *project.Ag
 		return err
 	}
 
-	projectAgg.PushEvents(project.NewApplicationAddedEvent(ctx, application.AppID, application.Name, application.Type))
+	projectAgg.PushEvents(project.NewApplicationAddedEvent(ctx, application.AppID, application.Name, resourceOwner, application.Type))
 
 	var stringPw string
 	if application.OIDCConfig != nil {

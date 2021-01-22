@@ -167,7 +167,7 @@ type UserGrantRemovedEvent struct {
 }
 
 func (e *UserGrantRemovedEvent) Data() interface{} {
-	return e
+	return nil
 }
 
 func (e *UserGrantRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
@@ -187,16 +187,9 @@ func NewUserGrantRemovedEvent(ctx context.Context, resourceOwner, userID, projec
 }
 
 func UserGrantRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &UserGrantRemovedEvent{
+	return &UserGrantRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := json.Unmarshal(event.Data, e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "UGRANT-M0sdf", "unable to unmarshal user grant")
-	}
-
-	return e, nil
+	}, nil
 }
 
 type UserGrantCascadeRemovedEvent struct {
@@ -206,18 +199,18 @@ type UserGrantCascadeRemovedEvent struct {
 }
 
 func (e *UserGrantCascadeRemovedEvent) Data() interface{} {
-	return e
+	return nil
 }
 
 func (e *UserGrantCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.ResourceOwner(), e.userID, e.projectID)}
 }
 
-func NewUserGrantCascadeRemovedEvent(ctx context.Context, resourceOwner, userID, projectID string) *UserGrantRemovedEvent {
-	return &UserGrantRemovedEvent{
+func NewUserGrantCascadeRemovedEvent(ctx context.Context, resourceOwner, userID, projectID string) *UserGrantCascadeRemovedEvent {
+	return &UserGrantCascadeRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
-			UserGrantRemovedType,
+			UserGrantCascadeRemovedType,
 			resourceOwner,
 		),
 		userID:    userID,
@@ -226,16 +219,9 @@ func NewUserGrantCascadeRemovedEvent(ctx context.Context, resourceOwner, userID,
 }
 
 func UserGrantCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &UserGrantRemovedEvent{
+	return &UserGrantCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := json.Unmarshal(event.Data, e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "UGRANT-E7urs", "unable to unmarshal user grant")
-	}
-
-	return e, nil
+	}, nil
 }
 
 type UserGrantDeactivatedEvent struct {
@@ -243,7 +229,7 @@ type UserGrantDeactivatedEvent struct {
 }
 
 func (e *UserGrantDeactivatedEvent) Data() interface{} {
-	return e
+	return nil
 }
 
 func (e *UserGrantDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
@@ -260,16 +246,9 @@ func NewUserGrantDeactivatedEvent(ctx context.Context) *UserGrantDeactivatedEven
 }
 
 func UserGrantDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &UserGrantDeactivatedEvent{
+	return &UserGrantDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := json.Unmarshal(event.Data, e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "UGRANT-pL0ds", "unable to unmarshal user grant")
-	}
-
-	return e, nil
+	}, nil
 }
 
 type UserGrantReactivatedEvent struct {
@@ -277,7 +256,7 @@ type UserGrantReactivatedEvent struct {
 }
 
 func (e *UserGrantReactivatedEvent) Data() interface{} {
-	return e
+	return nil
 }
 
 func (e *UserGrantReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
@@ -294,14 +273,7 @@ func NewUserGrantReactivatedEvent(ctx context.Context) *UserGrantReactivatedEven
 }
 
 func UserGrantReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &UserGrantReactivatedEvent{
+	return &UserGrantReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := json.Unmarshal(event.Data, e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "UGRANT-M0sdf", "unable to unmarshal user grant")
-	}
-
-	return e, nil
+	}, nil
 }

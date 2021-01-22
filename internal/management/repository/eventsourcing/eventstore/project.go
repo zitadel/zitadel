@@ -68,54 +68,6 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 	return model.ProjectToModel(project), nil
 }
 
-func (repo *ProjectRepo) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
-	ctxData := authz.GetCtxData(ctx)
-	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
-	if err != nil {
-		return nil, err
-	}
-	return repo.ProjectEvents.CreateProject(ctx, project, iam.GlobalOrgID == ctxData.OrgID)
-}
-
-func (repo *ProjectRepo) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
-	return repo.ProjectEvents.UpdateProject(ctx, project)
-}
-
-func (repo *ProjectRepo) DeactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
-	return repo.ProjectEvents.DeactivateProject(ctx, id)
-}
-
-func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
-	return repo.ProjectEvents.ReactivateProject(ctx, id)
-}
-
-func (repo *ProjectRepo) RemoveProject(ctx context.Context, projectID string) error {
-	proj := proj_model.NewProject(projectID)
-	aggregates := make([]*es_models.Aggregate, 0)
-	project, agg, err := repo.ProjectEvents.PrepareRemoveProject(ctx, proj)
-	if err != nil {
-		return err
-	}
-	aggregates = append(aggregates, agg)
-
-	// remove user_grants
-	usergrants, err := repo.View.UserGrantsByProjectID(projectID)
-	if err != nil {
-		return err
-	}
-	for _, grant := range usergrants {
-		_, aggs, err := repo.UserGrantEvents.PrepareRemoveUserGrant(ctx, grant.ID, true)
-		if err != nil {
-			return err
-		}
-		for _, agg := range aggs {
-			aggregates = append(aggregates, agg)
-		}
-	}
-
-	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
-}
-
 func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, sequenceErr := repo.View.GetLatestProjectSequence("")

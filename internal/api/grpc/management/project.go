@@ -12,36 +12,31 @@ import (
 )
 
 func (s *Server) CreateProject(ctx context.Context, in *management.ProjectCreateRequest) (*management.Project, error) {
-	project, err := s.project.CreateProject(ctx, projectCreateToModel(in))
+	ctxData := authz.GetCtxData(ctx)
+	project, err := s.command.AddProject(ctx, projectCreateToDomain(in), ctxData.ResourceOwner, ctxData.UserID)
 	if err != nil {
 		return nil, err
 	}
-	return projectFromModel(project), nil
+	return projectFromDomain(project), nil
 }
 func (s *Server) UpdateProject(ctx context.Context, in *management.ProjectUpdateRequest) (*management.Project, error) {
-	project, err := s.project.UpdateProject(ctx, projectUpdateToModel(in))
+	project, err := s.command.ChangeProject(ctx, projectUpdateToDomain(in), authz.GetCtxData(ctx).ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return projectFromModel(project), nil
+	return projectFromDomain(project), nil
 }
-func (s *Server) DeactivateProject(ctx context.Context, in *management.ProjectID) (*management.Project, error) {
-	project, err := s.project.DeactivateProject(ctx, in.Id)
-	if err != nil {
-		return nil, err
-	}
-	return projectFromModel(project), nil
+func (s *Server) DeactivateProject(ctx context.Context, in *management.ProjectID) (*empty.Empty, error) {
+	err := s.command.DeactivateProject(ctx, in.Id, authz.GetCtxData(ctx).ResourceOwner)
+	return &empty.Empty{}, err
 }
-func (s *Server) ReactivateProject(ctx context.Context, in *management.ProjectID) (*management.Project, error) {
-	project, err := s.project.ReactivateProject(ctx, in.Id)
-	if err != nil {
-		return nil, err
-	}
-	return projectFromModel(project), nil
+func (s *Server) ReactivateProject(ctx context.Context, in *management.ProjectID) (*empty.Empty, error) {
+	err := s.command.ReactivateProject(ctx, in.Id, authz.GetCtxData(ctx).ResourceOwner)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveProject(ctx context.Context, in *management.ProjectID) (*empty.Empty, error) {
-	err := s.project.RemoveProject(ctx, in.Id)
+	err := s.command.RemoveProject(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 
@@ -82,24 +77,24 @@ func (s *Server) GetGrantedProjectByID(ctx context.Context, in *management.Proje
 }
 
 func (s *Server) AddProjectRole(ctx context.Context, in *management.ProjectRoleAdd) (*management.ProjectRole, error) {
-	role, err := s.project.AddProjectRole(ctx, projectRoleAddToModel(in))
+	role, err := s.command.AddProjectRole(ctx, projectRoleAddToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return projectRoleFromModel(role), nil
+	return projectRoleFromDomain(role), nil
 }
 
 func (s *Server) BulkAddProjectRole(ctx context.Context, in *management.ProjectRoleAddBulk) (*empty.Empty, error) {
-	err := s.project.BulkAddProjectRole(ctx, projectRoleAddBulkToModel(in))
+	err := s.command.BulkAddProjectRole(ctx, in.Id, authz.GetCtxData(ctx).OrgID, projectRoleAddBulkToDomain(in))
 	return &empty.Empty{}, err
 }
 
 func (s *Server) ChangeProjectRole(ctx context.Context, in *management.ProjectRoleChange) (*management.ProjectRole, error) {
-	role, err := s.project.ChangeProjectRole(ctx, projectRoleChangeToModel(in))
+	role, err := s.command.ChangeProjectRole(ctx, projectRoleChangeToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return projectRoleFromModel(role), nil
+	return projectRoleFromDomain(role), nil
 }
 
 func (s *Server) RemoveProjectRole(ctx context.Context, in *management.ProjectRoleRemove) (*empty.Empty, error) {

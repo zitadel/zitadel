@@ -159,7 +159,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 			}
 			//create applications
 			for _, app := range proj.OIDCApps {
-				err = setUpApplication(ctx, r, projectAgg, project, app)
+				err = setUpApplication(ctx, r, projectAgg, project, app, orgAgg.ID())
 				if err != nil {
 					return err
 				}
@@ -177,7 +177,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 	return nil
 }
 
-func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.Aggregate, project *domain.Project, oidcApp OIDCApp) error {
+func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.Aggregate, project *domain.Project, oidcApp OIDCApp, resourceOwner string) error {
 	app := &domain.Application{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectAgg.ID(),
@@ -193,7 +193,7 @@ func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.A
 			DevMode:         oidcApp.DevMode,
 		},
 	}
-	err := r.addApplication(ctx, projectAgg, project, app)
+	err := r.addApplication(ctx, projectAgg, project, app, resourceOwner)
 	if err != nil {
 		return err
 	}
