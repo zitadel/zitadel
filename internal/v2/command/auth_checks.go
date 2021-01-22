@@ -12,18 +12,13 @@ func checkExplicitProjectPermission(ctx context.Context, grantID, projectID stri
 		return nil
 	}
 	ids := authz.GetAllPermissionCtxIDs(permissions)
-	containsID := false
-	if grantID != "" {
-		containsID = listContainsID(ids, grantID)
-		if containsID {
-			return nil
-		}
+	if grantID != "" && listContainsID(ids, grantID) {
+		return nil
 	}
-	containsID = listContainsID(ids, projectID)
-	if !containsID {
-		return caos_errors.ThrowPermissionDenied(nil, "EVENT-Shu7e", "Errors.UserGrant.NoPermissionForProject")
+	if listContainsID(ids, projectID) {
+		return nil
 	}
-	return nil
+	return caos_errors.ThrowPermissionDenied(nil, "EVENT-Shu7e", "Errors.UserGrant.NoPermissionForProject")
 }
 
 func listContainsID(ids []string, id string) bool {
