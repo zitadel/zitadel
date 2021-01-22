@@ -16,36 +16,52 @@
             color: #22292f;
             border-radius: 16px;
         }
+        .body img {
+            background: #fafafa;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
 
         .text *{
             color: #22292f;
         }
 
-        .dark-mode {
-            display: none !important;
+        .dark-mode,
+        .dark-mode * {
+            display: none;
         }
 
-        .light-mode {
-            display: block !important;
+        .light-mode,
+        .light-mode * {
+            display: block;
+            margin: auto;
         }
 
         @media (prefers-color-scheme: dark) {
             .body {
                 background-color: #212224;
-                color: #ffffff !important;
+                color: #ffffff;
                 border-radius: 16px;
+            }
+            .body img {
+                background: #212224;
+                padding: 1rem;
+                box-sizing: border-box;
             }
 
             .text * {
-                color: #ffffff !important;
+                color: #ffffff;
             }
             
-            .dark-mode {
-                display: block !important;
+            .dark-mode,
+            .dark-mode * {
+                display: block;
+                margin: auto;
             }
 
-            .light-mode {
-                display: none !important;
+            .light-mode, 
+            .light-mode * {
+                display: none;
             }
         }
 
@@ -59,14 +75,14 @@
       <mj-section>
         <mj-group>
           <mj-column>
-            <mj-image css-class="dark-mode" src="https://static.zitadel.ch/zitadel-logo-light.png" align="center" width="160px" padding="50px 0 50px 0px" />
-            <mj-image css-class="light-mode" src="https://static.zitadel.ch/zitadel-logo-dark.png" align="center" width="160px" padding="50px 0 50px 0px" />
+            <mj-image css-class="dark-mode" src="https://static.zitadel.ch/zitadel-logo-light.png" align="center" width="190px" padding="50px 0 40px 0px" />
+            <mj-image css-class="light-mode" src="https://static.zitadel.ch/zitadel-logo-dark.png" align="center" width="190px" padding="50px 0 40px 0px" />
           </mj-column>
         </mj-group>
       </mj-section>
       <mj-section>
         <mj-column width="60%">
-          <mj-text font-size="24px" font-weight="200" css-class="text">{{.Greeting}}</mj-text>
+          <mj-text font-size="24px" font-weight="200"><span css-class="text">{{.Greeting}}</span></mj-text>
           <mj-text font-size="16px" line-height="1.5" font-weight="light"><span css-class="text">{{.Text}}</span></mj-text>
           <mj-button css-class="shadow" border-radius="6px" href="{{.URL}}" background-color="#5282C1" font-size="14px" font-weight="500">{{.ButtonText}}</mj-button>
           <mj-text padding="50px 0 16px 0" color="#757575">

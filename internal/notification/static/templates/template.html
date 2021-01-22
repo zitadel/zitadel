@@ -94,35 +94,53 @@
       border-radius: 16px;
     }
 
+    .body img {
+      background: #fafafa;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
     .text * {
       color: #22292f;
     }
 
-    .dark-mode {
-      display: none !important;
+    .dark-mode,
+    .dark-mode * {
+      display: none;
     }
 
-    .light-mode {
-      display: block !important;
+    .light-mode,
+    .light-mode * {
+      display: block;
+      margin: auto;
     }
 
     @media (prefers-color-scheme: dark) {
       .body {
         background-color: #212224;
-        color: #ffffff !important;
+        color: #ffffff;
         border-radius: 16px;
       }
 
+      .body img {
+        background: #212224;
+        padding: 1rem;
+        box-sizing: border-box;
+      }
+
       .text * {
-        color: #ffffff !important;
+        color: #ffffff;
       }
 
-      .dark-mode {
-        display: block !important;
+      .dark-mode,
+      .dark-mode * {
+        display: block;
+        margin: auto;
       }
 
-      .light-mode {
-        display: none !important;
+      .light-mode,
+      .light-mode * {
+        display: none;
       }
     }
 
@@ -166,12 +184,12 @@
                                                     <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
                                                       <tbody>
                                                         <tr>
-                                                          <td align="center" class="dark-mode" style="font-size:0px;padding:50px 0 50px 0px;word-break:break-word;">
+                                                          <td align="center" class="dark-mode" style="font-size:0px;padding:50px 0 40px 0px;word-break:break-word;">
                                                             <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                                                               <tbody>
                                                                 <tr>
-                                                                  <td style="width:160px;">
-                                                                    <img height="auto" src="https://static.zitadel.ch/zitadel-logo-light.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="160" />
+                                                                  <td style="width:190px;">
+                                                                    <img height="auto" src="https://static.zitadel.ch/zitadel-logo-light.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="190" />
                                                                   </td>
                                                                 </tr>
                                                               </tbody>
@@ -179,12 +197,12 @@
                                                           </td>
                                                         </tr>
                                                         <tr>
-                                                          <td align="center" class="light-mode" style="font-size:0px;padding:50px 0 50px 0px;word-break:break-word;">
+                                                          <td align="center" class="light-mode" style="font-size:0px;padding:50px 0 40px 0px;word-break:break-word;">
                                                             <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                                                               <tbody>
                                                                 <tr>
-                                                                  <td style="width:160px;">
-                                                                    <img height="auto" src="https://static.zitadel.ch/zitadel-logo-dark.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="160" />
+                                                                  <td style="width:190px;">
+                                                                    <img height="auto" src="https://static.zitadel.ch/zitadel-logo-dark.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="190" />
                                                                   </td>
                                                                 </tr>
                                                               </tbody>
@@ -232,7 +250,7 @@
                                                     <tbody>
                                                       <tr>
                                                         <td align="center" class="text" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                          <div style="font-family:Lato, Arial, Helvetica, sans-serif;font-size:24px;font-weight:200;line-height:1;text-align:center;color:#000000;">{{.Greeting}}</div>
+                                                          <div style="font-family:Lato, Arial, Helvetica, sans-serif;font-size:24px;font-weight:200;line-height:1;text-align:center;color:#000000;"><span css-class="text">{{.Greeting}}</span></div>
                                                         </td>
                                                       </tr>
                                                       <tr>
