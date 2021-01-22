@@ -42,7 +42,7 @@ func (r *CommandSide) addProjectMember(ctx context.Context, projectAgg *project.
 		return errors.ThrowAlreadyExists(nil, "PROJECT-PtXi1", "Errors.Project.Member.AlreadyExists")
 	}
 
-	projectAgg.PushEvents(project.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
+	projectAgg.PushEvents(project.NewProjectMemberAddedEvent(ctx, member.UserID, member.Roles...))
 
 	return nil
 }
@@ -64,7 +64,7 @@ func (r *CommandSide) ChangeProjectMember(ctx context.Context, member *domain.Me
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.RolesNotChanged")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	projectAgg.PushEvents(project.NewMemberChangedEvent(ctx, member.UserID, member.Roles...))
+	projectAgg.PushEvents(project.NewProjectMemberChangedEvent(ctx, member.UserID, member.Roles...))
 
 	events, err := r.eventstore.PushAggregates(ctx, projectAgg)
 	if err != nil {
@@ -89,7 +89,7 @@ func (r *CommandSide) RemoveProjectMember(ctx context.Context, projectID, userID
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	projectAgg.PushEvents(project.NewMemberRemovedEvent(ctx, userID))
+	projectAgg.PushEvents(project.NewProjectMemberRemovedEvent(ctx, userID))
 
 	return r.eventstore.PushAggregate(ctx, m, projectAgg)
 }

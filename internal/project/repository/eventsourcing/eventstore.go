@@ -331,7 +331,7 @@ func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj
 	}
 	for _, role := range roles {
 		if existingProject.ContainsRole(role) {
-			return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-sk35t", "Errors.Project.RoleAlreadyExists")
+			return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-sk35t", "Errors.Project.Role.AlreadyExists")
 		}
 	}
 
@@ -854,7 +854,7 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 		return nil, err
 	}
 	if project.ContainsGrantForOrg(grant.GrantedOrgID) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7ug4g", "Errors.Project.GrantAlreadyExists")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7ug4g", "Errors.Project.Grant.AlreadyExists")
 	}
 	if !project.ContainsRoles(grant.RoleKeys) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "Errors.Project.GrantHasNotExistingRole")

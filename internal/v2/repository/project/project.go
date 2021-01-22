@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	uniqueProjectnameTable = "project_names"
+	uniqueProjectnameType  = "project_names"
 	projectEventTypePrefix = eventstore.EventType("project.")
 	ProjectAdded           = projectEventTypePrefix + "added"
 	ProjectChangedType     = projectEventTypePrefix + "changed"
@@ -21,14 +21,14 @@ const (
 
 func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueProjectnameTable,
+		uniqueProjectnameType,
 		projectName+resourceOwner,
 		"Errors.Project.AlreadyExists")
 }
 
 func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueProjectnameTable,
+		uniqueProjectnameType,
 		projectName+resourceOwner)
 }
 
@@ -92,7 +92,7 @@ func NewProjectChangeEvent(
 	ctx context.Context,
 	changes []ProjectChanges) (*ProjectChangeEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDPCONFIG-ADzr5", "Errors.NoChangesFound")
+		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-mV9xc", "Errors.NoChangesFound")
 	}
 	changeEvent := &ProjectChangeEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

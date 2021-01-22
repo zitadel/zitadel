@@ -38,7 +38,7 @@ func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project
 	//}
 	projectAgg.PushEvents(
 		project.NewProjectAddedEvent(ctx, projectAdd.Name, resourceOwner),
-		project.NewMemberAddedEvent(ctx, ownerUserID, projectRole),
+		project.NewProjectMemberAddedEvent(ctx, ownerUserID, projectRole),
 	)
 	return projectAgg, addedProject, nil
 }

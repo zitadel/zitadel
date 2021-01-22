@@ -24,14 +24,14 @@ type OrgnameUniqueConstraint struct {
 	action     eventstore.UniqueConstraintAction
 }
 
-func NewAddOrgnameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
+func NewAddOrgNameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		uniqueOrgname,
 		orgName,
 		"Errors.Org.AlreadyExists")
 }
 
-func NewRemoveUsernameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
+func NewRemoveOrgNameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
 		uniqueOrgname,
 		orgName)
@@ -48,7 +48,7 @@ func (e *OrgAddedEvent) Data() interface{} {
 }
 
 func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddOrgnameUniqueConstraint(e.Name)}
+	return []*eventstore.EventUniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
 }
 
 func NewOrgAddedEvent(ctx context.Context, name string) *OrgAddedEvent {
@@ -165,6 +165,41 @@ func NewOrgReactivatedEvent(ctx context.Context) *OrgReactivatedEvent {
 
 func OrgReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	orgChanged := &OrgReactivatedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, orgChanged)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "ORG-DAfbs", "unable to unmarshal org deactivated")
+	}
+
+	return orgChanged, nil
+}
+
+type OrgRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	Name                 string
+}
+
+func (e *OrgRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveOrgNameUniqueConstraint(e.Name)}
+}
+
+func NewOrgRemovedEvent(ctx context.Context, name string) *OrgRemovedEvent {
+	return &OrgRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			OrgRemovedEventType,
+		),
+		Name: name,
+	}
+}
+
+func OrgRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	orgChanged := &OrgRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, orgChanged)

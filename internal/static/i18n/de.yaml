@@ -163,7 +163,8 @@ Errors:
     MemberAlreadyExists: Member existiert bereits
     MemberNotExisting: Member existiert nicht
     MinimumOneRoleNeeded: Es muss mindestend eine Rolle hinzugefügt werden
-    RoleAlreadyExists: Rolle existiert bereits
+    Role:
+      AlreadyExists: Rolle existiert bereits
     RoleInvalid: Rolle ist ungültig
     RoleNotExisting: Rolle existiert nicht
     IDMissing: ID fehlt
@@ -174,9 +175,10 @@ Errors:
     AppIsNotOIDC: Applikation ist nicht vom Typ OIDC
     OIDCAuthMethodNoneSecret: OIDC Auth Method None benötigt kein Secret
     RequiredFieldsMissing: Benötigte Felder fehlen
+    Grant:
+      AlreadyExists: Projekt Grant existiert bereits
     GrantNotFound: Grant konnte nicht gefunden werden
     GrantInvalid: Projekt Grant ist ungültig
-    GrantAlreadyExists: Projekt Grant existiert bereits
     GrantNotExists: Projekt Grant existiert nicht
     GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
     UserIDMisisng: User ID fehlt

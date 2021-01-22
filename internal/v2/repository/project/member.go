@@ -3,29 +3,30 @@ package project
 import (
 	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 
 var (
-	MemberAddedEventType   = projectEventTypePrefix + member.AddedEventType
-	MemberChangedEventType = projectEventTypePrefix + member.ChangedEventType
-	MemberRemovedEventType = projectEventTypePrefix + member.RemovedEventType
+	ProjectMemberAddedEventType   = projectEventTypePrefix + member.AddedEventType
+	ProjectMemberChangedEventType = projectEventTypePrefix + member.ChangedEventType
+	ProjectMemberRemovedEventType = projectEventTypePrefix + member.RemovedEventType
 )
 
-type MemberAddedEvent struct {
+type ProjectMemberAddedEvent struct {
 	member.MemberAddedEvent
 }
 
-func NewMemberAddedEvent(
+func NewProjectMemberAddedEvent(
 	ctx context.Context,
 	userID string,
 	roles ...string,
-) *MemberAddedEvent {
-	return &MemberAddedEvent{
+) *ProjectMemberAddedEvent {
+	return &ProjectMemberAddedEvent{
 		MemberAddedEvent: *member.NewMemberAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
-				MemberAddedEventType,
+				ProjectMemberAddedEventType,
 			),
 			userID,
 			roles...,
@@ -33,21 +34,30 @@ func NewMemberAddedEvent(
 	}
 }
 
-type MemberChangedEvent struct {
+func ProjectMemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.MemberAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ProjectMemberAddedEvent{MemberAddedEvent: *e.(*member.MemberAddedEvent)}, nil
+}
+
+type ProjectMemberChangedEvent struct {
 	member.MemberChangedEvent
 }
 
-func NewMemberChangedEvent(
+func NewProjectMemberChangedEvent(
 	ctx context.Context,
 	userID string,
 	roles ...string,
-) *MemberChangedEvent {
+) *ProjectMemberChangedEvent {
 
-	return &MemberChangedEvent{
+	return &ProjectMemberChangedEvent{
 		MemberChangedEvent: *member.NewMemberChangedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
-				MemberChangedEventType,
+				ProjectMemberChangedEventType,
 			),
 			userID,
 			roles...,
@@ -55,22 +65,40 @@ func NewMemberChangedEvent(
 	}
 }
 
-type MemberRemovedEvent struct {
+func ProjectMemberChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.ChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ProjectMemberChangedEvent{MemberChangedEvent: *e.(*member.MemberChangedEvent)}, nil
+}
+
+type ProjectMemberRemovedEvent struct {
 	member.MemberRemovedEvent
 }
 
-func NewMemberRemovedEvent(
+func NewProjectMemberRemovedEvent(
 	ctx context.Context,
 	userID string,
-) *MemberRemovedEvent {
+) *ProjectMemberRemovedEvent {
 
-	return &MemberRemovedEvent{
+	return &ProjectMemberRemovedEvent{
 		MemberRemovedEvent: *member.NewRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
-				MemberRemovedEventType,
+				ProjectMemberRemovedEventType,
 			),
 			userID,
 		),
 	}
+}
+
+func ProjectMemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ProjectMemberRemovedEvent{MemberRemovedEvent: *e.(*member.MemberRemovedEvent)}, nil
 }
