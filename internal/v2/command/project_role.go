@@ -71,7 +71,7 @@ func (r *CommandSide) ChangeProjectRole(ctx context.Context, projectRole *domain
 		return nil, err
 	}
 	if existingRole.State == domain.ProjectRoleStateUnspecified || existingRole.State == domain.ProjectRoleStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-vv8M9", "Errors.Project.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-vv8M9", "Errors.Project.Role.NotExisting")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
@@ -90,6 +90,25 @@ func (r *CommandSide) ChangeProjectRole(ctx context.Context, projectRole *domain
 		return nil, err
 	}
 	return roleWriteModelToRole(existingRole), nil
+}
+
+func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, resourceOwner string) (err error) {
+	if projectID == "" || key == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
+	}
+	existingRole, err := r.getProjectRoleWriteModelByID(ctx, projectID, resourceOwner)
+	if err != nil {
+		return err
+	}
+	if existingRole.State == domain.ProjectRoleStateUnspecified || existingRole.State == domain.ProjectRoleStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-m9vMf", "Errors.Project.Role.NotExisting")
+	}
+
+	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
+	projectAgg.PushEvents(project.NewRoleRemovedEvent(ctx, key, projectID, existingRole.ResourceOwner))
+	//TODO: Update UserGrants
+
+	return r.eventstore.PushAggregate(ctx, existingRole, projectAgg)
 }
 
 func (r *CommandSide) getProjectRoleWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectRoleWriteModel, error) {

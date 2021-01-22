@@ -165,8 +165,8 @@ Errors:
     MinimumOneRoleNeeded: At least one role must be added
     Role:
       AlreadyExists: Role already exists
-    RoleInvalid: Role is invalid
-    RoleNotExisting: Role doesn't exist
+      Invalid: Role is invalid
+      NotExisting: Role doesn't exist
     IDMissing: ID missing
     App:
       AlreadyExists: Application already exists

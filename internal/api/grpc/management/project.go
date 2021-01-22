@@ -98,7 +98,7 @@ func (s *Server) ChangeProjectRole(ctx context.Context, in *management.ProjectRo
 }
 
 func (s *Server) RemoveProjectRole(ctx context.Context, in *management.ProjectRoleRemove) (*empty.Empty, error) {
-	err := s.project.RemoveProjectRole(ctx, in.Id, in.Key)
+	err := s.command.RemoveProjectRole(ctx, in.Id, in.Key, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 

@@ -20,12 +20,9 @@ type ProjectRepository interface {
 	SearchProjectMembers(ctx context.Context, request *model.ProjectMemberSearchRequest) (*model.ProjectMemberSearchResponse, error)
 	GetProjectMemberRoles(ctx context.Context) ([]string, error)
 
-	AddProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
-	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
 	SearchProjectRoles(ctx context.Context, projectId string, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ProjectChanges, error)
-	BulkAddProjectRole(ctx context.Context, role []*model.ProjectRole) error
 
 	ApplicationByID(ctx context.Context, projectID, appID string) (*model.ApplicationView, error)
 	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)

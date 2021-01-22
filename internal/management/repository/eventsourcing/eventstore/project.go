@@ -169,19 +169,6 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 	return result, nil
 }
 
-func (repo *ProjectRepo) AddProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
-	return repo.ProjectEvents.AddProjectRoles(ctx, role)
-}
-
-func (repo *ProjectRepo) BulkAddProjectRole(ctx context.Context, roles []*proj_model.ProjectRole) error {
-	_, err := repo.ProjectEvents.AddProjectRoles(ctx, roles...)
-	return err
-}
-
-func (repo *ProjectRepo) ChangeProjectRole(ctx context.Context, member *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
-	return repo.ProjectEvents.ChangeProjectRole(ctx, member)
-}
-
 func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key string) error {
 	role := proj_model.NewProjectRole(projectID, key)
 	aggregates := make([]*es_models.Aggregate, 0)

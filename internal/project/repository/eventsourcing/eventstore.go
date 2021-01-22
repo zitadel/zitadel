@@ -322,7 +322,7 @@ func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj
 	}
 	for _, role := range roles {
 		if !role.IsValid() {
-			return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-iduG4", "Errors.Project.RoleInvalid")
+			return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-iduG4", "Errors.Project.Role.Invalid")
 		}
 	}
 	existingProject, err := es.ProjectByID(ctx, roles[0].AggregateID)
@@ -354,14 +354,14 @@ func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj
 
 func (es *ProjectEventstore) ChangeProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
 	if !role.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9die3", "Errors.Project.RoleInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9die3", "Errors.Project.Role.Invalid")
 	}
 	existingProject, err := es.ProjectByID(ctx, role.AggregateID)
 	if err != nil {
 		return nil, err
 	}
 	if !existingProject.ContainsRole(role) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die34", "Errors.Project.RoleNotExisting")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die34", "Errors.Project.Role.NotExisting")
 	}
 	repoProject := model.ProjectFromModel(existingProject)
 	repoRole := model.ProjectRoleFromModel(role)
@@ -381,14 +381,14 @@ func (es *ProjectEventstore) ChangeProjectRole(ctx context.Context, role *proj_m
 
 func (es *ProjectEventstore) PrepareRemoveProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*model.Project, *es_models.Aggregate, error) {
 	if role.Key == "" {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-id823", "Errors.Project.RoleInvalid")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-id823", "Errors.Project.Role.Invalid")
 	}
 	existingProject, err := es.ProjectByID(ctx, role.AggregateID)
 	if err != nil {
 		return nil, nil, err
 	}
 	if !existingProject.ContainsRole(role) {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-oe823", "Errors.Project.RoleNotExisting")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-oe823", "Errors.Project.Role.NotExisting")
 	}
 	repoProject := model.ProjectFromModel(existingProject)
 	repoRole := model.ProjectRoleFromModel(role)
