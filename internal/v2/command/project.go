@@ -54,13 +54,15 @@ func (r *CommandSide) getProjectByID(ctx context.Context, projectID, resourceOwn
 	return projectWriteModelToProject(projectWriteModel), nil
 }
 
-func (r *CommandSide) checkProjectExists(ctx context.Context, projectID, resourceOwner string) (bool, error) {
+func (r *CommandSide) checkProjectExists(ctx context.Context, projectID, resourceOwner string) error {
 	projectWriteModel, err := r.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
-		return false, err
+		return err
 	}
-	return projectWriteModel.State != domain.ProjectStateUnspecified && projectWriteModel.State != domain.ProjectStateRemoved, nil
-}
+	if projectWriteModel.State == domain.ProjectStateUnspecified || projectWriteModel.State == domain.ProjectStateRemoved {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.Project.NotFound")
+	}
+	return nil
 
 func (r *CommandSide) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectWriteModel, error) {
 	projectWriteModel := NewProjectWriteModel(projectID, resourceOwner)
