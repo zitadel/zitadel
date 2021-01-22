@@ -88,7 +88,15 @@
     }
   </style>
   <style type="text/css">
-    background-color: #fafafa;
+    .body {
+      background-color: #fafafa;
+      color: #22292f;
+      border-radius: 16px;
+    }
+
+    .text * {
+      color: #22292f;
+    }
 
     .dark-mode {
       display: none !important;
@@ -99,7 +107,15 @@
     }
 
     @media (prefers-color-scheme: dark) {
-      background-color: #212224;
+      .body {
+        background-color: #212224;
+        color: #ffffff !important;
+        border-radius: 16px;
+      }
+
+      .text * {
+        color: #ffffff !important;
+      }
 
       .dark-mode {
         display: block !important;
@@ -117,7 +133,7 @@
 </head>
 
 <body style="word-spacing:normal;">
-  <div style="">
+  <div class="body" style="">
     <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
       <tbody>
         <tr>
@@ -128,12 +144,12 @@
                 <tbody>
                   <tr>
                     <td style="border:0;direction:ltr;font-size:0px;padding:20px 0;padding-left:0;text-align:center;">
-                      <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="dark-mode-outlook" width="800px" ><![endif]-->
-                      <table align="center" class="dark-mode" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+                      <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" width="800px" ><![endif]-->
+                      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
                         <tbody>
                           <tr>
                             <td>
-                              <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="dark-mode-outlook" style="width:800px;" width="800" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+                              <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:800px;" width="800" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
                               <div style="margin:0px auto;max-width:800px;">
                                 <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
                                   <tbody>
@@ -150,7 +166,7 @@
                                                     <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
                                                       <tbody>
                                                         <tr>
-                                                          <td align="center" style="font-size:0px;padding:50px 0 50px 0px;word-break:break-word;">
+                                                          <td align="center" class="dark-mode" style="font-size:0px;padding:50px 0 50px 0px;word-break:break-word;">
                                                             <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                                                               <tbody>
                                                                 <tr>
@@ -162,49 +178,8 @@
                                                             </table>
                                                           </td>
                                                         </tr>
-                                                      </tbody>
-                                                    </table>
-                                                  </td>
-                                                </tr>
-                                              </tbody>
-                                            </table>
-                                          </div>
-                                          <!--[if mso | IE]></td></tr></table><![endif]-->
-                                        </div>
-                                        <!--[if mso | IE]></td></tr></table><![endif]-->
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
-                              <!--[if mso | IE]></td></tr></table><![endif]-->
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <!--[if mso | IE]></td></tr><tr><td class="light-mode-outlook" width="800px" ><![endif]-->
-                      <table align="center" class="light-mode" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
-                        <tbody>
-                          <tr>
-                            <td>
-                              <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="light-mode-outlook" style="width:800px;" width="800" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
-                              <div style="margin:0px auto;max-width:800px;">
-                                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
-                                  <tbody>
-                                    <tr>
-                                      <td style="direction:ltr;font-size:0px;padding:0;text-align:center;">
-                                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="width:800px;" ><![endif]-->
-                                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0;line-height:0;text-align:left;display:inline-block;width:100%;direction:ltr;">
-                                          <!--[if mso | IE]><table border="0" cellpadding="0" cellspacing="0" role="presentation" ><tr><td style="vertical-align:top;width:800px;" ><![endif]-->
-                                          <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
-                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
-                                              <tbody>
-                                                <tr>
-                                                  <td style="vertical-align:top;padding:0;">
-                                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
-                                                      <tbody>
                                                         <tr>
-                                                          <td align="center" style="font-size:0px;padding:50px 0 50px 0px;word-break:break-word;">
+                                                          <td align="center" class="light-mode" style="font-size:0px;padding:50px 0 50px 0px;word-break:break-word;">
                                                             <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                                                               <tbody>
                                                                 <tr>
@@ -256,13 +231,13 @@
                                                   <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
                                                     <tbody>
                                                       <tr>
-                                                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                          <div style="font-family:Lato, Arial, Helvetica, sans-serif;font-size:24px;font-weight:200;line-height:1;text-align:center;color:#ffffff;">{{.Greeting}}</div>
+                                                        <td align="center" class="text" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                          <div style="font-family:Lato, Arial, Helvetica, sans-serif;font-size:24px;font-weight:200;line-height:1;text-align:center;color:#000000;">{{.Greeting}}</div>
                                                         </td>
                                                       </tr>
                                                       <tr>
-                                                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                          <div style="font-family:Lato, Arial, Helvetica, sans-serif;font-size:16px;font-weight:light;line-height:1.5;text-align:center;color:#ffffff;">{{.Text}}</div>
+                                                        <td align="center" class="text" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                          <div style="font-family:Lato, Arial, Helvetica, sans-serif;font-size:16px;font-weight:light;line-height:1.5;text-align:center;color:#000000;"><span css-class="text">{{.Text}}</span></div>
                                                         </td>
                                                       </tr>
                                                       <tr>
@@ -279,8 +254,8 @@
                                                         </td>
                                                       </tr>
                                                       <tr>
-                                                        <td align="center" style="font-size:0px;padding:50px 0 16px 0;word-break:break-word;">
-                                                          <div style="font-family:Lato, Arial, Helvetica, sans-serif;font-size:13px;line-height:1;text-align:center;color:#757575;"><a href="http://www.caos.ch" style="color:#e91e63; text-decoration: none;" target="_blank"> CAOS AG </a> <span style="color: #ffffff; margin: 0 .5rem;">|</span> Teufener Strasse 19 <span style="color: #ffffff; margin: 0 .5rem;">|</span> CH-9000 St. Gallen</div>
+                                                        <td align="center" class="text" style="font-size:0px;padding:50px 0 16px 0;word-break:break-word;">
+                                                          <div style="font-family:Lato, Arial, Helvetica, sans-serif;font-size:13px;line-height:1;text-align:center;color:#757575;"><a href="http://www.caos.ch" style="color:#e91e63; text-decoration: none;" target="_blank"> CAOS AG </a> <span style="margin: 0 .5rem;" css-class="text">|</span> Teufener Strasse 19 <span style="margin: 0 .5rem;" css-class="text">|</span> CH-9000 St. Gallen</div>
                                                         </td>
                                                       </tr>
                                                     </tbody>
