@@ -23,7 +23,7 @@ func TestAppendGrantStateEvent(t *testing.T) {
 			name: "append deactivate grant event",
 			args: args{
 				grant:   &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}},
-				grantID: &UserGrantID{GrantID: "GrantID"},
+				grantID: &UserGrantID{GrantID: "ProjectGrantID"},
 				event:   &es_models.Event{},
 				state:   model.UserGrantStateInactive,
 			},
@@ -33,7 +33,7 @@ func TestAppendGrantStateEvent(t *testing.T) {
 			name: "append reactivate grant event",
 			args: args{
 				grant:   &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}},
-				grantID: &UserGrantID{GrantID: "GrantID"},
+				grantID: &UserGrantID{GrantID: "ProjectGrantID"},
 				event:   &es_models.Event{},
 				state:   model.UserGrantStateActive,
 			},
@@ -43,7 +43,7 @@ func TestAppendGrantStateEvent(t *testing.T) {
 			name: "append remove grant event",
 			args: args{
 				grant:   &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}},
-				grantID: &UserGrantID{GrantID: "GrantID"},
+				grantID: &UserGrantID{GrantID: "ProjectGrantID"},
 				event:   &es_models.Event{},
 				state:   model.UserGrantStateRemoved,
 			},

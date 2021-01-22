@@ -2,44 +2,39 @@ package management
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func usergrantFromModel(grant *grant_model.UserGrant) *management.UserGrant {
-	creationDate, err := ptypes.TimestampProto(grant.CreationDate)
-	logging.Log("GRPC-ki9ds").OnError(err).Debug("unable to parse timestamp")
-
-	changeDate, err := ptypes.TimestampProto(grant.ChangeDate)
-	logging.Log("GRPC-sl9ew").OnError(err).Debug("unable to parse timestamp")
-
+func userGrantFromDomain(grant *domain.UserGrant) *management.UserGrant {
 	return &management.UserGrant{
-		Id:           grant.AggregateID,
-		UserId:       grant.UserID,
-		State:        usergrantStateFromModel(grant.State),
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Sequence:     grant.Sequence,
-		ProjectId:    grant.ProjectID,
-		RoleKeys:     grant.RoleKeys,
+		Id:         grant.AggregateID,
+		UserId:     grant.UserID,
+		State:      usergrantStateFromDomain(grant.State),
+		ChangeDate: timestamppb.New(grant.ChangeDate),
+		Sequence:   grant.Sequence,
+		ProjectId:  grant.ProjectID,
+		RoleKeys:   grant.RoleKeys,
 	}
 }
 
-func userGrantCreateToModel(u *management.UserGrantCreate) *grant_model.UserGrant {
-	return &grant_model.UserGrant{
-		ObjectRoot: models.ObjectRoot{AggregateID: u.UserId},
-		UserID:     u.UserId,
-		ProjectID:  u.ProjectId,
-		RoleKeys:   u.RoleKeys,
-		GrantID:    u.GrantId,
+func userGrantCreateToDomain(u *management.UserGrantCreate) *domain.UserGrant {
+	return &domain.UserGrant{
+		ObjectRoot:     models.ObjectRoot{AggregateID: u.UserId},
+		UserID:         u.UserId,
+		ProjectID:      u.ProjectId,
+		RoleKeys:       u.RoleKeys,
+		ProjectGrantID: u.GrantId,
 	}
 }
 
-func userGrantUpdateToModel(u *management.UserGrantUpdate) *grant_model.UserGrant {
-	return &grant_model.UserGrant{
+func userGrantUpdateToDomain(u *management.UserGrantUpdate) *domain.UserGrant {
+	return &domain.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
 		RoleKeys:   u.RoleKeys,
 	}
@@ -166,6 +161,17 @@ func usergrantStateFromModel(state grant_model.UserGrantState) management.UserGr
 	case grant_model.UserGrantStateActive:
 		return management.UserGrantState_USERGRANTSTATE_ACTIVE
 	case grant_model.UserGrantStateInactive:
+		return management.UserGrantState_USERGRANTSTATE_INACTIVE
+	default:
+		return management.UserGrantState_USERGRANTSTATE_UNSPECIFIED
+	}
+}
+
+func usergrantStateFromDomain(state domain.UserGrantState) management.UserGrantState {
+	switch state {
+	case domain.UserGrantStateActive:
+		return management.UserGrantState_USERGRANTSTATE_ACTIVE
+	case domain.UserGrantStateInactive:
 		return management.UserGrantState_USERGRANTSTATE_INACTIVE
 	default:
 		return management.UserGrantState_USERGRANTSTATE_UNSPECIFIED

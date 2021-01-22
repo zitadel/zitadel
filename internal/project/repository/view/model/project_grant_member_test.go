@@ -27,18 +27,18 @@ func TestGrantedProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append added member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantMemberAdded, ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: pq.StringArray{"Role"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantMemberAdded, ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: pq.StringArray{"Role"}})},
 				member: &ProjectGrantMemberView{},
 			},
-			result: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "GrantID", Roles: pq.StringArray{"Role"}},
+			result: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "ProjectGrantID", Roles: pq.StringArray{"Role"}},
 		},
 		{
 			name: "append changed member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantMemberAdded, ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "GrantID", Roles: pq.StringArray{"RoleChanged"}})},
-				member: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "GrantID", Roles: pq.StringArray{"Role"}},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantMemberAdded, ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", Roles: pq.StringArray{"RoleChanged"}})},
+				member: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "ProjectGrantID", Roles: pq.StringArray{"Role"}},
 			},
-			result: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "GrantID", Roles: pq.StringArray{"RoleChanged"}},
+			result: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "ProjectGrantID", Roles: pq.StringArray{"RoleChanged"}},
 		},
 	}
 	for _, tt := range tests {
@@ -51,7 +51,7 @@ func TestGrantedProjectMemberAppendEvent(t *testing.T) {
 				t.Errorf("got wrong result userID: expected: %v, actual: %v ", tt.result.UserID, tt.args.member.UserID)
 			}
 			if tt.args.member.GrantID != tt.result.GrantID {
-				t.Errorf("got wrong result GrantID: expected: %v, actual: %v ", tt.result.GrantID, tt.args.member.GrantID)
+				t.Errorf("got wrong result ProjectGrantID: expected: %v, actual: %v ", tt.result.GrantID, tt.args.member.GrantID)
 			}
 			if !reflect.DeepEqual(tt.args.member.Roles, tt.result.Roles) {
 				t.Errorf("got wrong result Roles: expected: %v, actual: %v ", tt.result.Roles, tt.args.member.Roles)
