@@ -84,9 +84,9 @@
         <mj-column width="60%">
           <mj-text font-size="24px" font-weight="200"><span css-class="text">{{.Greeting}}</span></mj-text>
           <mj-text font-size="16px" line-height="1.5" font-weight="light"><span css-class="text">{{.Text}}</span></mj-text>
-          <mj-button css-class="shadow" border-radius="6px" href="{{.URL}}" background-color="#5282C1" font-size="14px" font-weight="500">{{.ButtonText}}</mj-button>
+          <mj-button css-class="shadow" border-radius="6px" href="{{.URL}}" background-color="{{.PrimaryColor}}" font-size="14px" font-weight="500">{{.ButtonText}}</mj-button>
           <mj-text padding="50px 0 16px 0" color="#757575">
-            <a href="http://www.caos.ch" style="color:#e91e63; text-decoration: none;" target="_blank"> CAOS AG </a> <span style="margin: 0 .5rem;" css-class="text">|</span> Teufener Strasse 19 <span style="margin: 0 .5rem;" css-class="text">|</span> CH-9000 St. Gallen </mj-text>
+            <a href="http://www.caos.ch" style="color:{{.SecondaryColor}}; text-decoration: none;" target="_blank"> CAOS AG </a> <span style="margin: 0 .5rem;" css-class="text">|</span> Teufener Strasse 19 <span style="margin: 0 .5rem;" css-class="text">|</span> CH-9000 St. Gallen </mj-text>
         </mj-column>
       </mj-section>
     </mj-wrapper>
