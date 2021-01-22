@@ -168,6 +168,8 @@ Errors:
     RoleInvalid: Role is invalid
     RoleNotExisting: Role doesn't exist
     IDMissing: ID missing
+    App:
+      AlreadyExists: Application already exists
     AppNotFound: Application not found
     AppInvalid: Application invalid
     AppNotExisting: Application doesn't exist

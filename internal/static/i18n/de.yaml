@@ -168,6 +168,8 @@ Errors:
     RoleInvalid: Rolle ist ungültig
     RoleNotExisting: Rolle existiert nicht
     IDMissing: ID fehlt
+    App:
+      AlreadyExists: Applikation existiert bereits
     AppNotFound: Applikation nicht gefunden
     AppInvalid: Applikation ist ungültig
     AppNotExisting: Applikation exisitert nicht
