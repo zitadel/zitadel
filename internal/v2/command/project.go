@@ -63,6 +63,7 @@ func (r *CommandSide) checkProjectExists(ctx context.Context, projectID, resourc
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.Project.NotFound")
 	}
 	return nil
+}
 
 func (r *CommandSide) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectWriteModel, error) {
 	projectWriteModel := NewProjectWriteModel(projectID, resourceOwner)
