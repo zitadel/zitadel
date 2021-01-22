@@ -22,12 +22,10 @@ func checkExplicitProjectPermission(ctx context.Context, grantID, projectID stri
 }
 
 func listContainsID(ids []string, id string) bool {
-	containsID := false
 	for _, i := range ids {
 		if i == id {
-			containsID = true
-			break
+			return true
 		}
 	}
-	return containsID
+	return false
 }
