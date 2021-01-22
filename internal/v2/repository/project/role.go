@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	uniqueRoleType       = "project_role"
-	roleEventTypePrefix  = projectEventTypePrefix + "role."
-	RoleAddedEventType   = roleEventTypePrefix + "added"
-	RoleChangedEventType = roleEventTypePrefix + "changed"
-	RoleRemovedEventType = roleEventTypePrefix + "removed"
+	uniqueRoleType      = "project_role"
+	roleEventTypePrefix = projectEventTypePrefix + "role."
+	RoleAddedType       = roleEventTypePrefix + "added"
+	RoleChangedType     = roleEventTypePrefix + "changed"
+	RoleRemovedType     = roleEventTypePrefix + "removed"
 )
 
 func NewAddProjectRoleUniqueConstraint(roleKey, projectID, resourceOwner string) *eventstore.EventUniqueConstraint {
@@ -51,7 +51,7 @@ func NewRoleAddedEvent(ctx context.Context, key, displayName, group, projectID, 
 	return &RoleAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
-			RoleAddedEventType,
+			RoleAddedType,
 			resourceOwner,
 		),
 		Key:         key,
@@ -100,7 +100,7 @@ func NewRoleChangedEvent(
 	changeEvent := &RoleChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			RoleChangedEventType,
+			RoleChangedType,
 		),
 	}
 	for _, change := range changes {
@@ -143,7 +143,7 @@ func NewRoleRemovedEvent(ctx context.Context, key, projectID, resourceOwner stri
 	return &RoleRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
-			RoleRemovedEventType,
+			RoleRemovedType,
 			resourceOwner,
 		),
 		Key:       key,

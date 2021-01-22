@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	ProjectMemberAddedEventType   = projectEventTypePrefix + member.AddedEventType
-	ProjectMemberChangedEventType = projectEventTypePrefix + member.ChangedEventType
-	ProjectMemberRemovedEventType = projectEventTypePrefix + member.RemovedEventType
+	ProjectMemberAddedType   = projectEventTypePrefix + member.AddedEventType
+	ProjectMemberChangedType = projectEventTypePrefix + member.ChangedEventType
+	ProjectMemberRemovedType = projectEventTypePrefix + member.RemovedEventType
 )
 
 type ProjectMemberAddedEvent struct {
@@ -26,7 +26,7 @@ func NewProjectMemberAddedEvent(
 		MemberAddedEvent: *member.NewMemberAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
-				ProjectMemberAddedEventType,
+				ProjectMemberAddedType,
 			),
 			userID,
 			roles...,
@@ -57,7 +57,7 @@ func NewProjectMemberChangedEvent(
 		MemberChangedEvent: *member.NewMemberChangedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
-				ProjectMemberChangedEventType,
+				ProjectMemberChangedType,
 			),
 			userID,
 			roles...,
@@ -87,7 +87,7 @@ func NewProjectMemberRemovedEvent(
 		MemberRemovedEvent: *member.NewRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
-				ProjectMemberRemovedEventType,
+				ProjectMemberRemovedType,
 			),
 			userID,
 		),

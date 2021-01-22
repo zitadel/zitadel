@@ -10,14 +10,14 @@ import (
 )
 
 var (
-	uniqueGrantType              = "project_Grant"
-	grantEventTypePrefix         = projectEventTypePrefix + "grant."
-	GrantAddedEventType          = grantEventTypePrefix + "added"
-	GrantChangedEventType        = grantEventTypePrefix + "changed"
-	GrantCascadeChangedEventType = grantEventTypePrefix + "cascade.changed"
-	GrantDeactivatedEventType    = grantEventTypePrefix + "deactivated"
-	GrantReactivatedEventType    = grantEventTypePrefix + "reactivated"
-	GrantRemovedEventType        = grantEventTypePrefix + "removed"
+	uniqueGrantType         = "project_Grant"
+	grantEventTypePrefix    = projectEventTypePrefix + "grant."
+	GrantAddedType          = grantEventTypePrefix + "added"
+	GrantChangedType        = grantEventTypePrefix + "changed"
+	GrantCascadeChangedType = grantEventTypePrefix + "cascade.changed"
+	GrantDeactivatedType    = grantEventTypePrefix + "deactivated"
+	GrantReactivatedType    = grantEventTypePrefix + "reactivated"
+	GrantRemovedType        = grantEventTypePrefix + "removed"
 )
 
 func NewAddProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.EventUniqueConstraint {
@@ -54,7 +54,7 @@ func NewGrantAddedEvent(ctx context.Context, grantID, grantedOrgID, projectID st
 	return &GrantAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			GrantAddedEventType,
+			GrantAddedType,
 		),
 		GrantID:      grantID,
 		GrantedOrgID: grantedOrgID,
@@ -95,7 +95,7 @@ func NewGrantChangedEvent(ctx context.Context, grantID string, roleKeys []string
 	return &GrantChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			GrantChangedEventType,
+			GrantChangedType,
 		),
 		GrantID:  grantID,
 		RoleKeys: roleKeys,
@@ -134,7 +134,7 @@ func NewGrantCascadeChangedEvent(ctx context.Context, grantID string, roleKeys [
 	return &GrantCascadeChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			GrantCascadeChangedEventType,
+			GrantCascadeChangedType,
 		),
 		GrantID:  grantID,
 		RoleKeys: roleKeys,
@@ -172,7 +172,7 @@ func NewGrantDeactivateEvent(ctx context.Context, grantID string) *GrantDeactiva
 	return &GrantDeactivateEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			GrantDeactivatedEventType,
+			GrantDeactivatedType,
 		),
 		GrantID: grantID,
 	}
@@ -209,7 +209,7 @@ func NewGrantReactivatedEvent(ctx context.Context, grantID string) *GrantReactiv
 	return &GrantReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			GrantReactivatedEventType,
+			GrantReactivatedType,
 		),
 		GrantID: grantID,
 	}
@@ -248,7 +248,7 @@ func NewGrantRemovedEvent(ctx context.Context, grantID, grantedOrgID, projectID 
 	return &GrantRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			GrantRemovedEventType,
+			GrantRemovedType,
 		),
 		GrantID:      grantID,
 		projectID:    projectID,
