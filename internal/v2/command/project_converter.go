@@ -33,7 +33,7 @@ func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) *doma
 	}
 }
 
-func oidcWriteModelToOIDCConfig(writeModel *ApplicationOIDCConfigWriteModel) *domain.OIDCApp {
+func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.OIDCApp {
 	return &domain.OIDCApp{
 		ObjectRoot:               writeModelToObjectRoot(writeModel.WriteModel),
 		AppID:                    writeModel.AggregateID,

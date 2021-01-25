@@ -108,22 +108,22 @@ func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader
 type OIDCConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Version                  domain.OIDCVersion         `json:"oidcVersion,omitempty"`
-	AppID                    string                     `json:"appId"`
-	ClientID                 string                     `json:"clientId,omitempty"`
-	ClientSecret             *crypto.CryptoValue        `json:"clientSecret,omitempty"`
-	RedirectUris             []string                   `json:"redirectUris,omitempty"`
-	ResponseTypes            []domain.OIDCResponseType  `json:"responseTypes,omitempty"`
-	GrantTypes               []domain.OIDCGrantType     `json:"grantTypes,omitempty"`
-	ApplicationType          domain.OIDCApplicationType `json:"applicationType,omitempty"`
-	AuthMethodType           domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
-	PostLogoutRedirectUris   []string                   `json:"postLogoutRedirectUris,omitempty"`
-	DevMode                  bool                       `json:"devMode,omitempty"`
-	AccessTokenType          domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
-	AccessTokenRoleAssertion bool                       `json:"accessTokenRoleAssertion,omitempty"`
-	IDTokenRoleAssertion     bool                       `json:"idTokenRoleAssertion,omitempty"`
-	IDTokenUserinfoAssertion bool                       `json:"idTokenUserinfoAssertion,omitempty"`
-	ClockSkew                time.Duration              `json:"clockSkew,omitempty"`
+	Version                  *domain.OIDCVersion         `json:"oidcVersion,omitempty"`
+	AppID                    string                      `json:"appId"`
+	ClientID                 *string                     `json:"clientId,omitempty"`
+	ClientSecret             *crypto.CryptoValue         `json:"clientSecret,omitempty"`
+	RedirectUris             *[]string                   `json:"redirectUris,omitempty"`
+	ResponseTypes            *[]domain.OIDCResponseType  `json:"responseTypes,omitempty"`
+	GrantTypes               *[]domain.OIDCGrantType     `json:"grantTypes,omitempty"`
+	ApplicationType          *domain.OIDCApplicationType `json:"applicationType,omitempty"`
+	AuthMethodType           *domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
+	PostLogoutRedirectUris   *[]string                   `json:"postLogoutRedirectUris,omitempty"`
+	DevMode                  *bool                       `json:"devMode,omitempty"`
+	AccessTokenType          *domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
+	AccessTokenRoleAssertion *bool                       `json:"accessTokenRoleAssertion,omitempty"`
+	IDTokenRoleAssertion     *bool                       `json:"idTokenRoleAssertion,omitempty"`
+	IDTokenUserinfoAssertion *bool                       `json:"idTokenUserinfoAssertion,omitempty"`
+	ClockSkew                *time.Duration              `json:"clockSkew,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Data() interface{} {
@@ -157,6 +157,90 @@ func NewOIDCConfigChangedEvent(
 }
 
 type OIDCConfigChanges func(event *OIDCConfigChangedEvent)
+
+func ChangeVersion(version domain.OIDCVersion) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.Version = &version
+	}
+}
+
+func ChangeClientID(clientID string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.ClientID = &clientID
+	}
+}
+
+func ChangeRedirectURIs(uris []string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.RedirectUris = &uris
+	}
+}
+
+func ChangeResponseTypes(responseTypes []domain.OIDCResponseType) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.ResponseTypes = &responseTypes
+	}
+}
+
+func ChangeGrantTypes(grantTypes []domain.OIDCGrantType) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.GrantTypes = &grantTypes
+	}
+}
+
+func ChangeApplicationType(appType domain.OIDCApplicationType) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.ApplicationType = &appType
+	}
+}
+
+func ChangeAuthMethodType(authMethodType domain.OIDCAuthMethodType) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.AuthMethodType = &authMethodType
+	}
+}
+
+func ChangePostLogoutRedirectURIs(logoutRedirects []string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.PostLogoutRedirectUris = &logoutRedirects
+	}
+}
+
+func ChangeDevMode(devMode bool) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.DevMode = &devMode
+	}
+}
+
+func ChangeAccessTokenType(accessTokenType domain.OIDCTokenType) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.AccessTokenType = &accessTokenType
+	}
+}
+
+func ChangeAccessTokenRoleAssertion(accessTokenRoleAssertion bool) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.AccessTokenRoleAssertion = &accessTokenRoleAssertion
+	}
+}
+
+func ChangeIDTokenRoleAssertion(idTokenRoleAssertion bool) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.IDTokenRoleAssertion = &idTokenRoleAssertion
+	}
+}
+
+func ChangeIDTokenUserinfoAssertion(idTokenUserinfoAssertion bool) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.IDTokenUserinfoAssertion = &idTokenUserinfoAssertion
+	}
+}
+
+func ChangeClockSkew(clockSkew time.Duration) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.ClockSkew = &clockSkew
+	}
+}
 
 func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &OIDCConfigChangedEvent{

@@ -151,20 +151,20 @@ func appUpdateToDomain(app *management.ApplicationUpdate) *domain.Application {
 	}
 }
 
-func oidcConfigUpdateToModel(app *management.OIDCConfigUpdate) *proj_model.OIDCConfig {
-	return &proj_model.OIDCConfig{
+func oidcConfigUpdateToDomain(app *management.OIDCConfigUpdate) *domain.OIDCApp {
+	return &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
 		},
 		AppID:                    app.ApplicationId,
 		RedirectUris:             app.RedirectUris,
-		ResponseTypes:            oidcResponseTypesToModel(app.ResponseTypes),
-		GrantTypes:               oidcGrantTypesToModel(app.GrantTypes),
-		ApplicationType:          oidcApplicationTypeToModel(app.ApplicationType),
-		AuthMethodType:           oidcAuthMethodTypeToModel(app.AuthMethodType),
+		ResponseTypes:            oidcResponseTypesToDomain(app.ResponseTypes),
+		GrantTypes:               oidcGrantTypesToDomain(app.GrantTypes),
+		ApplicationType:          oidcApplicationTypeToDomain(app.ApplicationType),
+		AuthMethodType:           oidcAuthMethodTypeToDomain(app.AuthMethodType),
 		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
 		DevMode:                  app.DevMode,
-		AccessTokenType:          oidcTokenTypeToModel(app.AccessTokenType),
+		AccessTokenType:          oidcTokenTypeToDomain(app.AccessTokenType),
 		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
 		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
@@ -293,26 +293,6 @@ func oidcResponseTypesToDomain(responseTypes []management.OIDCResponseType) []do
 	return oidcResponseTypes
 }
 
-func oidcResponseTypesToModel(responseTypes []management.OIDCResponseType) []proj_model.OIDCResponseType {
-	if responseTypes == nil || len(responseTypes) == 0 {
-		return []proj_model.OIDCResponseType{proj_model.OIDCResponseTypeCode}
-	}
-	oidcResponseTypes := make([]proj_model.OIDCResponseType, len(responseTypes))
-
-	for i, responseType := range responseTypes {
-		switch responseType {
-		case management.OIDCResponseType_OIDCRESPONSETYPE_CODE:
-			oidcResponseTypes[i] = proj_model.OIDCResponseTypeCode
-		case management.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN:
-			oidcResponseTypes[i] = proj_model.OIDCResponseTypeIDToken
-		case management.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN_TOKEN:
-			oidcResponseTypes[i] = proj_model.OIDCResponseTypeIDTokenToken
-		}
-	}
-
-	return oidcResponseTypes
-}
-
 func oidcResponseTypesFromDomain(responseTypes []domain.OIDCResponseType) []management.OIDCResponseType {
 	oidcResponseTypes := make([]management.OIDCResponseType, len(responseTypes))
 
@@ -365,25 +345,6 @@ func oidcGrantTypesToDomain(grantTypes []management.OIDCGrantType) []domain.OIDC
 	return oidcGrantTypes
 }
 
-func oidcGrantTypesToModel(grantTypes []management.OIDCGrantType) []proj_model.OIDCGrantType {
-	if grantTypes == nil || len(grantTypes) == 0 {
-		return []proj_model.OIDCGrantType{proj_model.OIDCGrantTypeAuthorizationCode}
-	}
-	oidcGrantTypes := make([]proj_model.OIDCGrantType, len(grantTypes))
-
-	for i, grantType := range grantTypes {
-		switch grantType {
-		case management.OIDCGrantType_OIDCGRANTTYPE_AUTHORIZATION_CODE:
-			oidcGrantTypes[i] = proj_model.OIDCGrantTypeAuthorizationCode
-		case management.OIDCGrantType_OIDCGRANTTYPE_IMPLICIT:
-			oidcGrantTypes[i] = proj_model.OIDCGrantTypeImplicit
-		case management.OIDCGrantType_OIDCGRANTTYPE_REFRESH_TOKEN:
-			oidcGrantTypes[i] = proj_model.OIDCGrantTypeRefreshToken
-		}
-	}
-	return oidcGrantTypes
-}
-
 func oidcGrantTypesFromDomain(grantTypes []domain.OIDCGrantType) []management.OIDCGrantType {
 	oidcGrantTypes := make([]management.OIDCGrantType, len(grantTypes))
 
@@ -426,17 +387,6 @@ func oidcApplicationTypeToDomain(appType management.OIDCApplicationType) domain.
 		return domain.OIDCApplicationTypeNative
 	}
 	return domain.OIDCApplicationTypeWeb
-}
-func oidcApplicationTypeToModel(appType management.OIDCApplicationType) proj_model.OIDCApplicationType {
-	switch appType {
-	case management.OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB:
-		return proj_model.OIDCApplicationTypeWeb
-	case management.OIDCApplicationType_OIDCAPPLICATIONTYPE_USER_AGENT:
-		return proj_model.OIDCApplicationTypeUserAgent
-	case management.OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE:
-		return proj_model.OIDCApplicationTypeNative
-	}
-	return proj_model.OIDCApplicationTypeWeb
 }
 
 func oidcVersionToDomain(version management.OIDCVersion) domain.OIDCVersion {
@@ -486,19 +436,6 @@ func oidcAuthMethodTypeToDomain(authType management.OIDCAuthMethodType) domain.O
 	}
 }
 
-func oidcAuthMethodTypeToModel(authType management.OIDCAuthMethodType) proj_model.OIDCAuthMethodType {
-	switch authType {
-	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC:
-		return proj_model.OIDCAuthMethodTypeBasic
-	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST:
-		return proj_model.OIDCAuthMethodTypePost
-	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
-		return proj_model.OIDCAuthMethodTypeNone
-	default:
-		return proj_model.OIDCAuthMethodTypeBasic
-	}
-}
-
 func oidcAuthMethodTypeFromDomain(authType domain.OIDCAuthMethodType) management.OIDCAuthMethodType {
 	switch authType {
 	case domain.OIDCAuthMethodTypeBasic:
@@ -533,17 +470,6 @@ func oidcTokenTypeToDomain(tokenType management.OIDCTokenType) domain.OIDCTokenT
 		return domain.OIDCTokenTypeJWT
 	default:
 		return domain.OIDCTokenTypeBearer
-	}
-}
-
-func oidcTokenTypeToModel(tokenType management.OIDCTokenType) proj_model.OIDCTokenType {
-	switch tokenType {
-	case management.OIDCTokenType_OIDCTokenType_Bearer:
-		return proj_model.OIDCTokenTypeBearer
-	case management.OIDCTokenType_OIDCTokenType_JWT:
-		return proj_model.OIDCTokenTypeJWT
-	default:
-		return proj_model.OIDCTokenTypeBearer
 	}
 }
 

@@ -54,15 +54,15 @@ func (s *Server) RemoveApplication(ctx context.Context, in *management.Applicati
 }
 
 func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *management.OIDCConfigUpdate) (*management.OIDCConfig, error) {
-	config, err := s.project.ChangeOIDCConfig(ctx, oidcConfigUpdateToModel(in))
+	config, err := s.command.ChangeOIDCApplication(ctx, oidcConfigUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return oidcConfigFromModel(config), nil
+	return oidcConfigFromDomain(config), nil
 }
 
 func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *management.ApplicationID) (*management.ClientSecret, error) {
-	config, err := s.project.ChangeOIDConfigSecret(ctx, in.ProjectId, in.Id)
+	config, err := s.command.ChangeOIDCApplicationSecret(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

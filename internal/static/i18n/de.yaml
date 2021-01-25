@@ -177,7 +177,7 @@ Errors:
       IsNotOIDC: Applikation ist nicht vom Typ OIDC
       NotActive: Applikation ist nicht aktiv
       NotInactive: Applikation ist nickt inaktiv
-    OIDCConfigInvalid: OIDC Konfiguration ist ungültig
+      OIDCConfigInvalid: OIDC Konfiguration ist ungültig
     OIDCAuthMethodNoneSecret: OIDC Auth Method None benötigt kein Secret
     RequiredFieldsMissing: Benötigte Felder fehlen
     Grant:

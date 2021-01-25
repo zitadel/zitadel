@@ -720,7 +720,7 @@ func (es *ProjectEventstore) ReactivateApplication(ctx context.Context, projectI
 
 func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
 	if config == nil || !config.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-du834", "Errors.Project.OIDCConfigInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-du834", "Errors.Project.App.OIDCConfigInvalid")
 	}
 	existingProject, err := es.ProjectByID(ctx, config.AggregateID)
 	if err != nil {
@@ -750,7 +750,7 @@ func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_
 
 func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
 	if appID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7ue34", "Errors.Project.OIDCConfigInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7ue34", "Errors.Project.App.OIDCConfigInvalid")
 	}
 	existingProject, err := es.ProjectByID(ctx, projectID)
 	if err != nil {

@@ -268,10 +268,6 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appI
 	return changes, nil
 }
 
-func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
-	return repo.ProjectEvents.ChangeOIDCConfig(ctx, config)
-}
-
 func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
 	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
 }

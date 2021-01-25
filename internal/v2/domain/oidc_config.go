@@ -119,13 +119,21 @@ func (c *OIDCApp) GenerateClientSecretIfNeeded(generator crypto.Generator) (stri
 }
 
 func (c *OIDCApp) GenerateNewClientSecret(generator crypto.Generator) (string, error) {
-	cryptoValue, stringSecret, err := crypto.NewCode(generator)
+	cryptoValue, stringSecret, err := NewClientSecret(generator)
 	if err != nil {
-		logging.Log("MODEL-UpnTI").OnError(err).Error("unable to create client secret")
-		return "", errors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
+		return "", err
 	}
 	c.ClientSecret = cryptoValue
 	return stringSecret, nil
+}
+
+func NewClientSecret(generator crypto.Generator) (*crypto.CryptoValue, string, error) {
+	cryptoValue, stringSecret, err := crypto.NewCode(generator)
+	if err != nil {
+		logging.Log("MODEL-UpnTI").OnError(err).Error("unable to create client secret")
+		return nil, "", errors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
+	}
+	return cryptoValue, stringSecret, nil
 }
 
 func (c *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
