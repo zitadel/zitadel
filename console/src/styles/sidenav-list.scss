@@ -16,18 +16,23 @@
     box-shadow: inset 1px 0 if($is-dark-theme, #303131, #e3e8ee);
   }
 
+  .sidenav {
+    box-shadow: inset -1px 0 if($is-dark-theme, #303131, #e3e8ee);
+
+  }
+
   .nav-item {
     color: mat-color($foreground, text) !important;
 
     &:hover {
-      background-color: $sec-dark;
+      background-color: if($is-dark-theme, $sec-dark, rgb(84 105 212 / 6%));
       border-top-right-radius: 1.5rem;
       border-bottom-right-radius: 1.5rem;
     }
 
     &.active {
       color: $primary-color !important;
-      background-color: rgba($color: $primary-color, $alpha: .1) !important;
+      background-color: if($is-dark-theme, rgba($color: $primary-color, $alpha: .1), rgb(84 105 212 / 6%)) !important;
     }
 
     .c_label {

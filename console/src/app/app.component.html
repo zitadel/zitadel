@@ -1,7 +1,8 @@
 <ng-container *ngIf="(authService.user | async) || {} as user">
     <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
         <mat-toolbar class="root-header">
-            <button aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
+            <button *ngIf="authenticationService.authenticated" aria-label="Toggle sidenav" mat-icon-button
+                (click)="drawer.toggle()">
                 <i class="icon las la-bars"></i>
             </button>
             <a *ngIf="(isHandset$ | async) == false" class="title" [routerLink]="['/']">
@@ -37,8 +38,8 @@
                     </button>
                 </div>
 
-                <button class="show-all" mat-menu-item
-                    [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button>
+                <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
+                    translate}}</button>
 
                 <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
                     <button mat-menu-item [routerLink]="[ '/org/create' ]">
@@ -49,8 +50,8 @@
             </mat-menu>
             <span class="fill-space"></span>
 
-            <a class="doc-link" href="https://docs.zitadel.ch" mat-stroked-button
-                target="_blank">{{'MENU.DOCUMENTATION' | translate}}</a>
+            <a class="doc-link" href="https://docs.zitadel.ch" mat-stroked-button target="_blank">{{'MENU.DOCUMENTATION'
+                | translate}}</a>
             <div (clickOutside)="closeAccountCard()" class="icon-container">
                 <app-avatar *ngIf="user && (user.displayName || (user.firstName && user.lastName))"
                     class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"
@@ -63,7 +64,7 @@
         </mat-toolbar>
         <mat-drawer-container class="main-container">
             <mat-drawer #drawer class="sidenav" [mode]="(isHandset$ | async) ? 'over' : 'side'"
-                [opened]="!(isHandset$ | async)">
+                [opened]="!(isHandset$ | async) && authenticationService.authenticated">
                 <div class="side-column">
                     <div class="list">
                         <ng-container *ngIf="authenticationService.authenticationChanged | async">

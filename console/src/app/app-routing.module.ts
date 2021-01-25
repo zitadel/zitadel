@@ -12,6 +12,12 @@ const routes: Routes = [
         canActivate: [AuthGuard],
     },
     {
+        path: 'firststeps',
+        loadChildren: () => import('./modules/onboarding/onboarding.module')
+            .then(m => m.OnboardingModule),
+        // canActivate: [AuthGuard], // show for everybody 
+    },
+    {
         path: 'granted-projects',
         loadChildren: () => import('./pages/projects/granted-projects/granted-projects.module')
             .then(m => m.GrantedProjectsModule),

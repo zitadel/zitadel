@@ -1,0 +1,35 @@
+<div class="split">
+    <div class="left">
+        <!-- *ngIf="(authenticationService?.authenticationChanged | async) == false" -->
+        <p class="firststeps">{{'ONBOARDING.HEADER' | translate}}</p>
+        <h1>{{'ONBOARDING.TITLE' | translate}}</h1>
+        <!-- <p>{{'ONBOARDING.LOGINDESC' | translate}}</p>
+        <button (click)="authenticationService.authenticate()" mat-raised-button>{{'ONBOARDING.LOGIN' |
+            translate}}</button> -->
+        <div class="logo-cloud">
+            <i class="lab la-angular"></i>
+            <i class="lab la-react"></i>
+            <i class="lab la-android"></i>
+            <i class="lab la-app-store-ios"></i>
+        </div>
+    </div>
+    <div class="right">
+        <p class="desc">{{'ONBOARDING.DESCRIPTION' | translate}}</p>
+
+        <h2>{{'ONBOARDING.STEPS_TITLE' | translate}}</h2>
+        <div class="row" *ngFor="let step of steps; index as i">
+            <div class="prev">{{i}}</div>
+            <div>
+                <h3>{{step.titleI18nKey | translate}}</h3>
+                <p>{{step.descI18nKey | translate}}</p>
+            </div>
+            <span class="fill-space"></span>
+            <a *ngIf="step?.docs" [href]="step.docs" alt="Zitadel Docs" target="_blank"
+                class="goto docs">{{'ONBOARDING.DOCS' |
+                translate}}
+                <i class="las la-external-link-alt"></i>
+            </a>
+            <span class="goto">{{'ONBOARDING.START' | translate}}</span>
+        </div>
+    </div>
+</div>

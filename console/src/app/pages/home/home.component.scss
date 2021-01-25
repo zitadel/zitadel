@@ -1,6 +1,7 @@
 
 .wrapper {
   padding-bottom: 100px;
+  position: relative;
 
   .header {
     display: flex;
@@ -30,6 +31,51 @@
     flex-wrap: wrap;
     margin: -1rem;
     justify-content: space-evenly;
+
+    .onboard {
+        text-decoration: none;
+        cursor: pointer;
+        box-sizing: border-box;
+        flex: 1 0 45%;
+        position: relative;
+        border-radius: 0.5rem;
+        margin: 1rem;
+        padding: 1.5rem;
+        background: linear-gradient(40deg, rgb(80, 66, 121),rgb(177, 59, 122),rgb(225,53,81), rgb(230,107,86));
+        box-shadow: 0 3px 8px 0 rgb(0 0 0 / 6%);
+
+        h2 {
+            color: white;
+        }
+
+        p {
+            color: #fad6e3;
+        }
+
+        .first-steps {
+            text-transform: uppercase;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .close {
+            visibility: hidden;
+            position: absolute;
+            top: 0;
+            right: 0;
+
+            i {
+                color: white;
+                font-size: 1rem;
+            }
+        }
+
+        &:hover {
+            .close {
+                visibility: visible;
+            }
+        }
+    }
 
     .item {
       flex: 1 0 45%;

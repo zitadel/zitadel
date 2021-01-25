@@ -1,5 +1,33 @@
 {
     "APP_NAME": "ZITADEL",
+    "ONBOARDING": {
+        "HEADER":"First Steps",
+        "TITLE":"Learn how to use ZITADEL",
+        "LOGINDESC":"You need to log in to control your ZITADEL settings.",
+        "LOGIN":"Login",
+        "DESCRIPTION":"We at ZITADEL attach great importance to security and performance. Carry out the following steps and adapt ZITADEL optimally to your needs.",
+        "STEPS_TITLE":"Complete the following steps in the order you want:",
+        "STEPS": {
+            "1": {
+                "TITLE":"Erscheinungsbild Ihrer Organisation",
+                "DESC":"Personalisieren Sie das Erscheinungsbild der Login UIs sowie der Benachrichtigungsmails."
+            },
+            "2": {
+                "TITLE":"Projekt erstellen",
+                "DESC":"Erstellen Sie Ihr erstes Projekt und legen Sie Zugangsberechtigungen eventueller Mitarbeiter fest."
+            },
+            "3": {
+                "TITLE":"Applikation erstellen",
+                "DESC":"Erstellen Sie eine Applikation innerhalb Ihres Projektes und legen Sie dessen Eigenschaften fest."
+            },
+            "4": {
+                "TITLE":"Sicherheit verbessern",
+                "DESC":"Erweitern Sie die Zugangsrichtlinien und erhöhen Sie dadurch die Sicherheit ihrer Benutzer."
+            }
+        },
+        "START":"Start",
+        "DOCS":"Docs"
+    },
     "HOME": {
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Data Protection and Personalisation",
