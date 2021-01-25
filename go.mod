@@ -17,7 +17,7 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.13.2
-	github.com/caos/orbos v1.5.14-0.20210114174609-0c13338e7be2
+	github.com/caos/orbos v1.5.14-0.20210125105511-7018b746a785
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
 	github.com/ghodss/yaml v1.0.0
