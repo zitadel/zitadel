@@ -74,6 +74,10 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			defaults,
 			repos.IamEvents,
 			repos.OrgEvents),
+		newMailTemplate(
+			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
+		newMailText(
+			handler{view, bulkLimit, configs.cycleDuration("MailText"), errorCount, es}),
 	}
 }
 

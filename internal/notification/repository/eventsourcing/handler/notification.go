@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -24,10 +25,19 @@ import (
 )
 
 const (
-	notificationTable   = "notification.notifications"
-	NotifyUserID        = "NOTIFICATION"
-	labelPolicyTableOrg = "management.label_policies"
-	labelPolicyTableDef = "adminapi.label_policies"
+	notificationTable         = "notification.notifications"
+	NotifyUserID              = "NOTIFICATION"
+	labelPolicyTableOrg       = "management.label_policies"
+	labelPolicyTableDef       = "adminapi.label_policies"
+	mailTemplateTableOrg      = "management.mail_templates"
+	mailTemplateTableDef      = "adminapi.mail_templates"
+	mailTextTableOrg          = "management.mail_texts"
+	mailTextTableDef          = "adminapi.mail_texts"
+	mailTextTypeDomainClaimed = "DomainClaimed"
+	mailTextTypeInitCode      = "InitCode"
+	mailTextTypePasswordReset = "PasswordReset"
+	mailTextTypeVerifyEmail   = "VerifyEmail"
+	mailTextTypeVerifyPhone   = "VerifyPhone"
 )
 
 type Notification struct {
@@ -135,11 +145,22 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
+	template, err := n.getMailTemplate(context.Background())
+	if err != nil {
+		return err
+	}
+
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendUserInitCode(n.statikDir, n.i18n, user, initCode, n.systemDefaults, n.AesCrypto, colors)
+
+	text, err := n.getMailText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	if err != nil {
+		return err
+	}
+
+	err = types.SendUserInitCode(string(template.Template), text, user, initCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -163,11 +184,21 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
+	template, err := n.getMailTemplate(context.Background())
+	if err != nil {
+		return err
+	}
+
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(n.statikDir, n.i18n, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
+
+	text, err := n.getMailText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	if err != nil {
+		return err
+	}
+	err = types.SendPasswordCode(string(template.Template), text, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -191,11 +222,22 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
+	template, err := n.getMailTemplate(context.Background())
+	if err != nil {
+		return err
+	}
+
 	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendEmailVerificationCode(n.statikDir, n.i18n, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
+
+	text, err := n.getMailText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	if err != nil {
+		return err
+	}
+
+	err = types.SendEmailVerificationCode(string(template.Template), text, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
 	if err != nil {
 		return err
 	}
@@ -238,7 +280,21 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendDomainClaimed(n.statikDir, n.i18n, user, data["userName"], n.systemDefaults)
+	colors, err := n.getLabelPolicy(context.Background())
+	if err != nil {
+		return err
+	}
+
+	template, err := n.getMailTemplate(context.Background())
+	if err != nil {
+		return err
+	}
+
+	text, err := n.getMailText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	if err != nil {
+		return err
+	}
+	err = types.SendDomainClaimed(string(template.Template), text, user, data["userName"], n.systemDefaults, colors)
 	if err != nil {
 		return err
 	}
@@ -305,4 +361,40 @@ func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPoli
 		return nil, err
 	}
 	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+// Read organization specific template
+func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
+	// read from Org
+	template, err := n.view.MailTemplateByAggregateID(authz.GetCtxData(ctx).OrgID, mailTemplateTableOrg)
+	if errors.IsNotFound(err) {
+		// read from default
+		template, err = n.view.MailTemplateByAggregateID(n.systemDefaults.IamID, mailTemplateTableDef)
+		if err != nil {
+			return nil, err
+		}
+		template.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTemplateViewToModel(template), err
+}
+
+// Read organization specific texts
+func (n *Notification) getMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
+	// read from Org
+	mailText, err := n.view.MailTextByIDs(authz.GetCtxData(ctx).OrgID, textType, language, mailTextTableOrg)
+	if errors.IsNotFound(err) {
+		// read from default
+		mailText, err = n.view.MailTextByIDs(n.systemDefaults.IamID, textType, language, mailTextTableDef)
+		if err != nil {
+			return nil, err
+		}
+		mailText.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTextViewToModel(mailText), err
 }
