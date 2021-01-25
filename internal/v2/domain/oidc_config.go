@@ -13,10 +13,11 @@ import (
 	"github.com/caos/zitadel/internal/id"
 )
 
-type OIDCConfig struct {
+type OIDCApp struct {
 	models.ObjectRoot
 
 	AppID                    string
+	AppName                  string
 	ClientID                 string
 	ClientSecret             *crypto.CryptoValue
 	ClientSecretString       string
@@ -34,6 +35,8 @@ type OIDCConfig struct {
 	IDTokenRoleAssertion     bool
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
+
+	State AppState
 }
 
 type OIDCVersion int32
@@ -86,7 +89,7 @@ const (
 	OIDCTokenTypeJWT
 )
 
-func (c *OIDCConfig) IsValid() bool {
+func (c *OIDCApp) IsValid() bool {
 	grantTypes := c.getRequiredGrantTypes()
 	for _, grantType := range grantTypes {
 		ok := containsOIDCGrantType(c.GrantTypes, grantType)
@@ -98,7 +101,7 @@ func (c *OIDCConfig) IsValid() bool {
 }
 
 //ClientID random_number@projectname (eg. 495894098234@zitadel)
-func (c *OIDCConfig) GenerateNewClientID(idGenerator id.Generator, project *Project) error {
+func (c *OIDCApp) GenerateNewClientID(idGenerator id.Generator, project *Project) error {
 	rndID, err := idGenerator.Next()
 	if err != nil {
 		return err
@@ -108,14 +111,14 @@ func (c *OIDCConfig) GenerateNewClientID(idGenerator id.Generator, project *Proj
 	return nil
 }
 
-func (c *OIDCConfig) GenerateClientSecretIfNeeded(generator crypto.Generator) (string, error) {
+func (c *OIDCApp) GenerateClientSecretIfNeeded(generator crypto.Generator) (string, error) {
 	if c.AuthMethodType == OIDCAuthMethodTypeNone {
 		return "", nil
 	}
 	return c.GenerateNewClientSecret(generator)
 }
 
-func (c *OIDCConfig) GenerateNewClientSecret(generator crypto.Generator) (string, error) {
+func (c *OIDCApp) GenerateNewClientSecret(generator crypto.Generator) (string, error) {
 	cryptoValue, stringSecret, err := crypto.NewCode(generator)
 	if err != nil {
 		logging.Log("MODEL-UpnTI").OnError(err).Error("unable to create client secret")
@@ -125,7 +128,7 @@ func (c *OIDCConfig) GenerateNewClientSecret(generator crypto.Generator) (string
 	return stringSecret, nil
 }
 
-func (c *OIDCConfig) getRequiredGrantTypes() []OIDCGrantType {
+func (c *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
 	grantTypes := make([]OIDCGrantType, 0)
 	implicit := false
 	for _, r := range c.ResponseTypes {

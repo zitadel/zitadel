@@ -11,7 +11,7 @@ type Application struct {
 	State      AppState
 	Name       string
 	Type       AppType
-	OIDCConfig *OIDCConfig
+	OIDCConfig *OIDCApp
 }
 
 type AppState int32

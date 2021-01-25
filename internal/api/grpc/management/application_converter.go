@@ -25,20 +25,27 @@ func appFromDomain(app *domain.Application) *management.Application {
 		ChangeDate: timestamppb.New(app.ChangeDate),
 		Name:       app.Name,
 		Sequence:   app.Sequence,
-		AppConfig:  appConfigFromDomain(app),
 	}
 }
 
-func appConfigFromDomain(app *domain.Application) management.AppConfig {
-	if app.Type == domain.AppTypeOIDC {
-		return &management.Application_OidcConfig{
-			OidcConfig: oidcConfigFromDomain(app.OIDCConfig),
-		}
+func oidcAppFromDomain(app *domain.OIDCApp) *management.Application {
+	return &management.Application{
+		Id:         app.AppID,
+		State:      appStateFromDomain(app.State),
+		ChangeDate: timestamppb.New(app.ChangeDate),
+		Name:       app.AppName,
+		Sequence:   app.Sequence,
+		AppConfig:  oidcAppConfigFromDomain(app),
 	}
-	return nil
 }
 
-func oidcConfigFromDomain(config *domain.OIDCConfig) *management.OIDCConfig {
+func oidcAppConfigFromDomain(app *domain.OIDCApp) management.AppConfig {
+	return &management.Application_OidcConfig{
+		OidcConfig: oidcConfigFromDomain(app),
+	}
+}
+
+func oidcConfigFromDomain(config *domain.OIDCApp) *management.OIDCConfig {
 	return &management.OIDCConfig{
 		RedirectUris:             config.RedirectUris,
 		ResponseTypes:            oidcResponseTypesFromDomain(config.ResponseTypes),
@@ -112,28 +119,25 @@ func complianceProblemsToLocalizedMessages(problems []string) []*message.Localiz
 
 }
 
-func oidcAppCreateToDomain(app *management.OIDCApplicationCreate) *domain.Application {
-	return &domain.Application{
+func oidcAppCreateToDomain(app *management.OIDCApplicationCreate) *domain.OIDCApp {
+	return &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
 		},
-		Name: app.Name,
-		Type: domain.AppTypeOIDC,
-		OIDCConfig: &domain.OIDCConfig{
-			OIDCVersion:              oidcVersionToDomain(app.Version),
-			RedirectUris:             app.RedirectUris,
-			ResponseTypes:            oidcResponseTypesToDomain(app.ResponseTypes),
-			GrantTypes:               oidcGrantTypesToDomain(app.GrantTypes),
-			ApplicationType:          oidcApplicationTypeToDomain(app.ApplicationType),
-			AuthMethodType:           oidcAuthMethodTypeToDomain(app.AuthMethodType),
-			PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
-			DevMode:                  app.DevMode,
-			AccessTokenType:          oidcTokenTypeToDomain(app.AccessTokenType),
-			AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
-			IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
-			IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
-			ClockSkew:                app.ClockSkew.AsDuration(),
-		},
+		AppName:                  app.Name,
+		OIDCVersion:              oidcVersionToDomain(app.Version),
+		RedirectUris:             app.RedirectUris,
+		ResponseTypes:            oidcResponseTypesToDomain(app.ResponseTypes),
+		GrantTypes:               oidcGrantTypesToDomain(app.GrantTypes),
+		ApplicationType:          oidcApplicationTypeToDomain(app.ApplicationType),
+		AuthMethodType:           oidcAuthMethodTypeToDomain(app.AuthMethodType),
+		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
+		DevMode:                  app.DevMode,
+		AccessTokenType:          oidcTokenTypeToDomain(app.AccessTokenType),
+		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
+		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
+		ClockSkew:                app.ClockSkew.AsDuration(),
 	}
 }
 

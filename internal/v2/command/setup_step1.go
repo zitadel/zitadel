@@ -2,11 +2,11 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/models"
 
 	"github.com/caos/logging"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
@@ -178,26 +178,24 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 }
 
 func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.Aggregate, project *domain.Project, oidcApp OIDCApp, resourceOwner string) error {
-	app := &domain.Application{
+	app := &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectAgg.ID(),
 		},
-		Name: oidcApp.Name,
-		Type: domain.AppTypeOIDC,
-		OIDCConfig: &domain.OIDCConfig{
-			RedirectUris:    oidcApp.RedirectUris,
-			ResponseTypes:   getOIDCResponseTypes(oidcApp.ResponseTypes),
-			GrantTypes:      getOIDCGrantTypes(oidcApp.GrantTypes),
-			ApplicationType: getOIDCApplicationType(oidcApp.ApplicationType),
-			AuthMethodType:  getOIDCAuthMethod(oidcApp.AuthMethodType),
-			DevMode:         oidcApp.DevMode,
-		},
+		AppName:         oidcApp.Name,
+		RedirectUris:    oidcApp.RedirectUris,
+		ResponseTypes:   getOIDCResponseTypes(oidcApp.ResponseTypes),
+		GrantTypes:      getOIDCGrantTypes(oidcApp.GrantTypes),
+		ApplicationType: getOIDCApplicationType(oidcApp.ApplicationType),
+		AuthMethodType:  getOIDCAuthMethod(oidcApp.AuthMethodType),
+		DevMode:         oidcApp.DevMode,
 	}
-	err := r.addApplication(ctx, projectAgg, project, app, resourceOwner)
+
+	err := r.addOIDCApplication(ctx, projectAgg, project, app, resourceOwner)
 	if err != nil {
 		return err
 	}
-	logging.LogWithFields("SETUP-Edgw4", "name", app.Name, "clientID", app.OIDCConfig.ClientID).Info("application set up")
+	logging.LogWithFields("SETUP-Edgw4", "name", app.AppName, "clientID", app.ClientID).Info("application set up")
 	return nil
 }
 

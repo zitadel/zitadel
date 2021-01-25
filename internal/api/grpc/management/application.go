@@ -26,11 +26,11 @@ func (s *Server) ApplicationByID(ctx context.Context, in *management.Application
 }
 
 func (s *Server) CreateOIDCApplication(ctx context.Context, in *management.OIDCApplicationCreate) (*management.Application, error) {
-	app, err := s.command.AddApplication(ctx, oidcAppCreateToDomain(in), authz.GetCtxData(ctx).OrgID)
+	app, err := s.command.AddOIDCApplication(ctx, oidcAppCreateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return appFromDomain(app), nil
+	return oidcAppFromDomain(app), nil
 }
 func (s *Server) UpdateApplication(ctx context.Context, in *management.ApplicationUpdate) (*management.Application, error) {
 	app, err := s.command.ChangeApplication(ctx, appUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)

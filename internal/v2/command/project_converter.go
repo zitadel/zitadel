@@ -30,7 +30,31 @@ func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) *doma
 		State:      writeModel.State,
 		Name:       writeModel.Name,
 		Type:       writeModel.Type,
-		//TODO: OIDC Config
+	}
+}
+
+func oidcWriteModelToOIDCConfig(writeModel *ApplicationOIDCConfigWriteModel) *domain.OIDCApp {
+	return &domain.OIDCApp{
+		ObjectRoot:               writeModelToObjectRoot(writeModel.WriteModel),
+		AppID:                    writeModel.AggregateID,
+		AppName:                  writeModel.AppName,
+		State:                    writeModel.State,
+		ClientID:                 writeModel.ClientID,
+		ClientSecret:             writeModel.ClientSecret,
+		RedirectUris:             writeModel.RedirectUris,
+		ResponseTypes:            writeModel.ResponseTypes,
+		GrantTypes:               writeModel.GrantTypes,
+		ApplicationType:          writeModel.ApplicationType,
+		AuthMethodType:           writeModel.AuthMethodType,
+		PostLogoutRedirectUris:   writeModel.PostLogoutRedirectUris,
+		OIDCVersion:              writeModel.OIDCVersion,
+		Compliance:               writeModel.Compliance,
+		DevMode:                  writeModel.DevMode,
+		AccessTokenType:          writeModel.AccessTokenType,
+		AccessTokenRoleAssertion: writeModel.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:     writeModel.IDTokenRoleAssertion,
+		IDTokenUserinfoAssertion: writeModel.IDTokenUserinfoAssertion,
+		ClockSkew:                writeModel.ClockSkew,
 	}
 }
 
