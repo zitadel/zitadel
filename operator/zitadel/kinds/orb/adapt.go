@@ -47,7 +47,7 @@ func AdaptFunc(
 			orbMonitor = orbMonitor.Verbose()
 		}
 
-		operatorLabels := mustDatabaseOperator(binaryVersion)
+		operatorLabels := mustZITADELOperator(binaryVersion)
 
 		iamCurrent := &tree.Tree{}
 		queryIAM, destroyIAM, zitadelSecrets, err := iam.GetQueryAndDestroyFuncs(
@@ -60,7 +60,7 @@ func AdaptFunc(
 			orbconfig,
 			action,
 			migrationsPath,
-			binaryVersion,
+			&desiredKind.Spec.Version,
 			features,
 		)
 		if err != nil {
@@ -72,7 +72,7 @@ func AdaptFunc(
 		queriers := make([]operator.QueryFunc, 0)
 		for _, feature := range features {
 			switch feature {
-			case "iam":
+			case "iam", "migration", "scaleup", "scaledown":
 				queriers = append(queriers, queryIAM)
 				destroyers = append(destroyers, destroyIAM)
 			case "operator":

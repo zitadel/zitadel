@@ -1,8 +1,9 @@
 package migration
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	"strings"
+
+	corev1 "k8s.io/api/core/v1"
 )
 
 func getMigrationContainer(

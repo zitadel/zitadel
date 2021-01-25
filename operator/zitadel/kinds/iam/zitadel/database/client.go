@@ -9,6 +9,8 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 )
 
+var _ ClientInt = (*Client)(nil)
+
 type ClientInt interface {
 	GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, error)
 	DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error

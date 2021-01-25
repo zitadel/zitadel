@@ -80,9 +80,6 @@ func AdaptFunc(
 
 			allScripts := getMigrationFiles(localMigrationsPath)
 
-			initContainers := getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName)
-			initContainers = append(initContainers, getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users))
-
 			nameLabels := labels.MustForNameK8SMap(componentLabels, jobName)
 			jobDef := &batchv1.Job{
 				ObjectMeta: metav1.ObjectMeta{
@@ -100,9 +97,10 @@ func AdaptFunc(
 							NodeSelector:    nodeselector,
 							Tolerations:     tolerations,
 							SecurityContext: &corev1.PodSecurityContext{},
-							InitContainers:  initContainers,
-							Containers:      getPostContainers(dbHost, dbPort, migrationUser, secretPasswordName),
-
+							InitContainers:  getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName),
+							Containers: []corev1.Container{
+								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users),
+							},
 							RestartPolicy:                 "Never",
 							DNSPolicy:                     "ClusterFirst",
 							SchedulerName:                 "default-scheduler",
