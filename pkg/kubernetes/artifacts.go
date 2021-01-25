@@ -20,6 +20,7 @@ func EnsureZitadelOperatorArtifacts(
 	version string,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
+	imageRegistry string,
 ) error {
 
 	monitor.WithFields(map[string]interface{}{
@@ -97,7 +98,7 @@ func EnsureZitadelOperatorArtifacts(
 					Containers: []core.Container{{
 						Name:            "zitadel",
 						ImagePullPolicy: core.PullIfNotPresent,
-						Image:           fmt.Sprintf("ghcr.io/caos/zitadel-operator:%s", version),
+						Image:           fmt.Sprintf("%s/caos/zitadel-operator:%s", imageRegistry, version),
 						Command:         []string{"/zitadelctl", "operator", "-f", "/secrets/orbconfig"},
 						Args:            []string{},
 						Ports: []core.ContainerPort{{
@@ -246,7 +247,7 @@ func EnsureDatabaseArtifacts(
 					Containers: []core.Container{{
 						Name:            "database",
 						ImagePullPolicy: core.PullIfNotPresent,
-						Image:           fmt.Sprintf("%s/caos/orbos:%s", imageRegistry, version),
+						Image:           fmt.Sprintf("%s/caos/zitadel-operator:%s", imageRegistry, version),
 						Command:         []string{"/orbctl", "takeoff", "database", "-f", "/secrets/orbconfig"},
 						Args:            []string{},
 						Ports: []core.ContainerPort{{
