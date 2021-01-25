@@ -248,7 +248,7 @@ func EnsureDatabaseArtifacts(
 						Name:            "database",
 						ImagePullPolicy: core.PullIfNotPresent,
 						Image:           fmt.Sprintf("%s/caos/zitadel-operator:%s", imageRegistry, version),
-						Command:         []string{"/orbctl", "takeoff", "database", "-f", "/secrets/orbconfig"},
+						Command:         []string{"/zitadelctl", "database", "-f", "/secrets/orbconfig"},
 						Args:            []string{},
 						Ports: []core.ContainerPort{{
 							Name:          "metrics",

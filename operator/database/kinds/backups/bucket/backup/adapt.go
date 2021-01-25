@@ -20,7 +20,7 @@ const (
 	backupNameEnv                    = "BACKUP_NAME"
 	cronJobNamePrefix                = "backup-"
 	internalSecretName               = "client-certs"
-	image                            = "ghcr.io/caos/crbackup"
+	image                            = "ghcr.io/caos/zitadel-crbackup"
 	rootSecretName                   = "cockroachdb.client.root"
 	timeout            time.Duration = 60
 	Normal                           = "backup"

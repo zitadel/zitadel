@@ -17,7 +17,7 @@ const (
 	certPath                         = "/cockroach/cockroach-certs"
 	secretPath                       = "/secrets/sa.json"
 	internalSecretName               = "client-certs"
-	image                            = "ghcr.io/caos/crbackup"
+	image                            = "ghcr.io/caos/zitadel-crbackup"
 	rootSecretName                   = "cockroachdb.client.root"
 	jobPrefix                        = "backup-"
 	jobSuffix                        = "-clean"

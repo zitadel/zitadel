@@ -14,7 +14,7 @@ func getMigrationContainer(
 ) corev1.Container {
 	return corev1.Container{
 		Name:  "db-migration",
-		Image: "flyway/flyway:6.5.0",
+		Image: "flyway/flyway:7.5.1",
 		Args: []string{
 			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + rootUserPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
 			"-locations=filesystem:" + migrationsPath,

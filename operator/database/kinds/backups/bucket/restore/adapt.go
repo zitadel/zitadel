@@ -18,7 +18,7 @@ const (
 	secretPath                       = "/secrets/sa.json"
 	jobPrefix                        = "backup-"
 	jobSuffix                        = "-restore"
-	image                            = "ghcr.io/caos/crbackup"
+	image                            = "ghcr.io/caos/zitadel-crbackup"
 	internalSecretName               = "client-certs"
 	rootSecretName                   = "cockroachdb.client.root"
 	timeout            time.Duration = 60
