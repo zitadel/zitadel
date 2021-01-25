@@ -6,9 +6,9 @@ import (
 
 	"github.com/caos/zitadel/operator/helpers"
 
-	"github.com/caos/orbos/pkg/databases"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator/start"
+	"github.com/caos/zitadel/pkg/databases"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )

@@ -26,7 +26,7 @@ func getPreContainer(
 		},
 		{
 			Name:  "create-flyway-user",
-			Image: "cockroachdb/cockroach:v20.1.5",
+			Image: "cockroachdb/cockroach:v20.2.3",
 			Env:   baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
 			VolumeMounts: []corev1.VolumeMount{{
 				Name:      rootUserInternal,

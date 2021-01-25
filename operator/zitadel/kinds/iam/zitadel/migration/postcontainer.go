@@ -14,7 +14,7 @@ func getPostContainers(
 	return []corev1.Container{
 		{
 			Name:    "delete-flyway-user",
-			Image:   "cockroachdb/cockroach:v20.1.5",
+			Image:   "cockroachdb/cockroach:v20.2.3",
 			Command: []string{"/bin/bash", "-c", "--"},
 			Args: []string{
 				strings.Join([]string{

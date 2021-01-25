@@ -95,16 +95,16 @@ jobs:
             ARCH=${{ matrix.goarch }}
             VERSION=${{ steps.version.outputs.version }}
       - uses: docker/build-push-action@v2
-          if: ${{ matrix.goos == 'linux' && matrix.goarch == 'amd64' }}
-          name: buildandpush
-          with:
-            context: .
-            file: ./build/cr-backup/Dockerfile
-            platforms: linux/amd64
-            tags: ${{ env.REGISTRY }}/${{ env.BACKUP_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.BACKUP_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
-            push: true
-            cache-from: type=local,src=/tmp/.buildx-cache
-            cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+        if: ${{ matrix.goos == 'linux' && matrix.goarch == 'amd64' }}
+        name: buildandpushcrbackup
+        with:
+          context: .
+          file: ./build/cr-backup/Dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ env.BACKUP_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.BACKUP_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
+          push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
   release:
     runs-on: ubuntu-18.04

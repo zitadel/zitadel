@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/caos/orbos/mntr"
-	"github.com/caos/orbos/pkg/databases"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/zitadel/pkg/databases"
 )
 
 var _ ClientInt = (*Client)(nil)

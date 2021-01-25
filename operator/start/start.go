@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/caos/orbos/mntr"
-	"github.com/caos/orbos/pkg/databases"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	orbconfig "github.com/caos/orbos/pkg/orb"
 	"github.com/caos/zitadel/operator/zitadel/kinds/orb"
+	"github.com/caos/zitadel/pkg/databases"
 	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
 )
 
