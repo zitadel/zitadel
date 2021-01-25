@@ -28,7 +28,7 @@
     "@types/google-protobuf": "^3.7.4",
     "@types/uuid": "^8.3.0",
     "angular-oauth2-oidc": "^10.0.3",
-    "angularx-qrcode": "^10.0.11",
+    "angularx-qrcode": "^11.0.0",
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
     "google-proto-files": "^2.4.0",
