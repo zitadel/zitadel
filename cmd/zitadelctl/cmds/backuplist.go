@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/caos/orbos/pkg/databases"
+	"github.com/caos/zitadel/pkg/databases"
 	"github.com/spf13/cobra"
 )
 
