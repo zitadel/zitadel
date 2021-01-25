@@ -18,7 +18,7 @@
 
   .sidenav {
     box-shadow: inset -1px 0 if($is-dark-theme, #303131, #e3e8ee);
-
+    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
   }
 
   .nav-item {
@@ -59,7 +59,7 @@
   .root-header {
     box-shadow: inset 0 -1px #e3e8ee;
     background-color: $primary-dark !important;
-    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+    transition: all .3s cubic-bezier(.645, .045, .355, 1);
   }
 
   .admin-line {

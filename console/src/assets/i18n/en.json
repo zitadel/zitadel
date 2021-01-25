@@ -5,7 +5,7 @@
         "TITLE":"Learn how to use ZITADEL",
         "LOGINDESC":"You need to log in to control your ZITADEL settings.",
         "LOGIN":"Login",
-        "DESCRIPTION":"We at ZITADEL attach great importance to security and performance. Carry out the following steps and adapt ZITADEL optimally to your needs.",
+        "DESCRIPTION":"We at ZITADEL care a lot about security and performance. Carry out the following steps and adapt ZITADEL optimally to your needs.",
         "STEPS_TITLE":"Complete the following steps in the order you want:",
         "STEPS": {
             "1": {
@@ -82,6 +82,7 @@
         "SHOWORGS":"Show All Organisations",
         "GRANTSECTION":"Authorization Section",
         "GRANTS":"Authorizations",
+        "TOC":"Privacy Policy and TOC",
         "TOOLTIP": {
             "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
             "IAMPOLICIES":"Manage ZITADELs global Access policies und elect ZITADEL Managers",

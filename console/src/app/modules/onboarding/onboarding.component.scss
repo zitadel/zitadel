@@ -90,6 +90,7 @@
                 border: 1px solid #ffffff50;
                 border-radius: .5rem;
                 margin: 0.5rem;
+                color: white;
             }
         }
     }
@@ -139,15 +140,21 @@
             .fill-space {
                 flex: 1;
             }
+            .action-row {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                justify-content: flex-end;
 
-            .goto {
-                background-color: white;
-                padding: 2px 1rem;
-                color: black;
-                border-radius: 50vw;
-                font-size: 12px; 
-                margin-left: 1rem;
-                white-space: nowrap;
+                .goto {
+                    background-color: white;
+                    padding: 2px 1rem;
+                    color: black;
+                    border-radius: 50vw;
+                    font-size: 12px; 
+                    margin: .5rem 0 .5rem 1rem;
+                    white-space: nowrap;
+                }
             }
         }
     }

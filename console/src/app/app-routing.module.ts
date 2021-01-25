@@ -15,7 +15,7 @@ const routes: Routes = [
         path: 'firststeps',
         loadChildren: () => import('./modules/onboarding/onboarding.module')
             .then(m => m.OnboardingModule),
-        // canActivate: [AuthGuard], // show for everybody 
+        canActivate: [AuthGuard],
     },
     {
         path: 'granted-projects',

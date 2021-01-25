@@ -82,6 +82,7 @@
         "SHOWORGS":"Alle Organisationen anzeigen",
         "GRANTSECTION":"Berechtigungssektion",
         "GRANTS":"Berechtigungen",
+        "TOC":"Datenschutz und AGB",
         "TOOLTIP": {
             "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
             "IAMPOLICIES":"Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",
