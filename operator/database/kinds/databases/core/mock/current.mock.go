@@ -6,8 +6,8 @@ package coremock
 
 import (
 	rsa "crypto/rsa"
-	core "github.com/caos/orbos/internal/operator/core"
 	kubernetes "github.com/caos/orbos/pkg/kubernetes"
+	operator "github.com/caos/zitadel/operator"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
