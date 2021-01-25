@@ -9,11 +9,21 @@ import (
 type ApplicationWriteModel struct {
 	eventstore.WriteModel
 
-	AppID      string
-	State      domain.AppState
-	Name       string
-	Type       domain.AppType
-	OIDCConfig *domain.OIDCConfig
+	AppID string
+	State domain.AppState
+	Name  string
+	Type  domain.AppType
+	//OIDCConfig *domain.OIDCConfig
+}
+
+func NewApplicationWriteModelWithAppIDC(projectID, appID, resourceOwner string) *ApplicationWriteModel {
+	return &ApplicationWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   projectID,
+			ResourceOwner: resourceOwner,
+		},
+		AppID: appID,
+	}
 }
 
 func NewApplicationWriteModel(projectID, resourceOwner string) *ApplicationWriteModel {
@@ -24,12 +34,35 @@ func NewApplicationWriteModel(projectID, resourceOwner string) *ApplicationWrite
 		},
 	}
 }
-
 func (wm *ApplicationWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:
+			if e.AppID != wm.AppID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *project.ApplicationChangedEvent:
+			if e.AppID != wm.AppID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *project.ApplicationDeactivatedEvent:
+			if e.AppID != wm.AppID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *project.ApplicationReactivatedEvent:
+			if e.AppID != wm.AppID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *project.ApplicationRemovedEvent:
+			if e.AppID != wm.AppID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *project.ProjectRemovedEvent:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -41,8 +74,22 @@ func (wm *ApplicationWriteModel) Reduce() error {
 		case *project.ApplicationAddedEvent:
 			wm.Name = e.Name
 			wm.State = domain.AppStateActive
-			//case *project.ApplicationChangedEvent:
-			//	wm.Name = e.Name
+		case *project.ApplicationChangedEvent:
+			wm.Name = e.Name
+		case *project.ApplicationDeactivatedEvent:
+			if wm.State == domain.AppStateRemoved {
+				continue
+			}
+			wm.State = domain.AppStateInactive
+		case *project.ApplicationReactivatedEvent:
+			if wm.State == domain.AppStateRemoved {
+				continue
+			}
+			wm.State = domain.AppStateActive
+		case *project.ApplicationRemovedEvent:
+			wm.State = domain.AppStateRemoved
+		case *project.ProjectRemovedEvent:
+			wm.State = domain.AppStateRemoved
 		}
 	}
 	return nil
@@ -51,5 +98,13 @@ func (wm *ApplicationWriteModel) Reduce() error {
 func (wm *ApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			project.ApplicationAddedType,
+			project.ApplicationChangedType,
+			project.ApplicationDeactivatedType,
+			project.ApplicationReactivatedType,
+			project.ApplicationRemovedType,
+			project.ProjectRemovedType,
+		)
 }

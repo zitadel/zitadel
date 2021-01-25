@@ -17,7 +17,7 @@ func ProjectMemberByIDs(db *gorm.DB, table, projectID, userID string) (*model.Pr
 	query := repository.PrepareGetByQuery(table, projectIDQuery, userIDQuery)
 	err := query(db, role)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-EgWQ2", "Errors.Project.MemberNotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-EgWQ2", "Errors.Project.Member.NotExisting")
 	}
 	return role, err
 }

@@ -3,12 +3,24 @@ package management
 import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
+
+func projectGrantMemberFromDomain(member *domain.ProjectGrantMember) *management.ProjectGrantMember {
+	return &management.ProjectGrantMember{
+		CreationDate: timestamppb.New(member.CreationDate),
+		ChangeDate:   timestamppb.New(member.ChangeDate),
+		Sequence:     member.Sequence,
+		UserId:       member.UserID,
+		Roles:        member.Roles,
+	}
+}
 
 func projectGrantMemberFromModel(member *proj_model.ProjectGrantMember) *management.ProjectGrantMember {
 	creationDate, err := ptypes.TimestampProto(member.CreationDate)
@@ -26,8 +38,8 @@ func projectGrantMemberFromModel(member *proj_model.ProjectGrantMember) *managem
 	}
 }
 
-func projectGrantMemberAddToModel(member *management.ProjectGrantMemberAdd) *proj_model.ProjectGrantMember {
-	return &proj_model.ProjectGrantMember{
+func projectGrantMemberAddToDomain(member *management.ProjectGrantMemberAdd) *domain.ProjectGrantMember {
+	return &domain.ProjectGrantMember{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: member.ProjectId,
 		},
@@ -37,8 +49,8 @@ func projectGrantMemberAddToModel(member *management.ProjectGrantMemberAdd) *pro
 	}
 }
 
-func projectGrantMemberChangeToModel(member *management.ProjectGrantMemberChange) *proj_model.ProjectGrantMember {
-	return &proj_model.ProjectGrantMember{
+func projectGrantMemberChangeToDomain(member *management.ProjectGrantMemberChange) *domain.ProjectGrantMember {
+	return &domain.ProjectGrantMember{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: member.ProjectId,
 		},

@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/golang/protobuf/ptypes/empty"
 
@@ -25,36 +26,30 @@ func (s *Server) ApplicationByID(ctx context.Context, in *management.Application
 }
 
 func (s *Server) CreateOIDCApplication(ctx context.Context, in *management.OIDCApplicationCreate) (*management.Application, error) {
-	app, err := s.project.AddApplication(ctx, oidcAppCreateToModel(in))
+	app, err := s.command.AddApplication(ctx, oidcAppCreateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return appFromModel(app), nil
+	return appFromDomain(app), nil
 }
 func (s *Server) UpdateApplication(ctx context.Context, in *management.ApplicationUpdate) (*management.Application, error) {
-	app, err := s.project.ChangeApplication(ctx, appUpdateToModel(in))
+	app, err := s.command.ChangeApplication(ctx, appUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return appFromModel(app), nil
+	return appFromDomain(app), nil
 }
-func (s *Server) DeactivateApplication(ctx context.Context, in *management.ApplicationID) (*management.Application, error) {
-	app, err := s.project.DeactivateApplication(ctx, in.ProjectId, in.Id)
-	if err != nil {
-		return nil, err
-	}
-	return appFromModel(app), nil
+func (s *Server) DeactivateApplication(ctx context.Context, in *management.ApplicationID) (*empty.Empty, error) {
+	err := s.command.DeactivateApplication(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
-func (s *Server) ReactivateApplication(ctx context.Context, in *management.ApplicationID) (*management.Application, error) {
-	app, err := s.project.ReactivateApplication(ctx, in.ProjectId, in.Id)
-	if err != nil {
-		return nil, err
-	}
-	return appFromModel(app), nil
+func (s *Server) ReactivateApplication(ctx context.Context, in *management.ApplicationID) (*empty.Empty, error) {
+	err := s.command.ReactivateApplication(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveApplication(ctx context.Context, in *management.ApplicationID) (*empty.Empty, error) {
-	err := s.project.RemoveApplication(ctx, in.ProjectId, in.Id)
+	err := s.command.RemoveApplication(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
 

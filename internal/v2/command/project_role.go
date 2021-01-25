@@ -13,7 +13,7 @@ func (r *CommandSide) AddProjectRole(ctx context.Context, projectRole *domain.Pr
 		return nil, err
 	}
 
-	roleWriteModel := NewProjectRoleWriteModel(projectRole.AggregateID, resourceOwner)
+	roleWriteModel := NewProjectRoleWriteModelWithKey(projectRole.Key, projectRole.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
 	r.addProjectRoles(ctx, projectAgg, projectRole.AggregateID, resourceOwner, projectRole)
 
@@ -66,7 +66,7 @@ func (r *CommandSide) ChangeProjectRole(ctx context.Context, projectRole *domain
 		return nil, err
 	}
 
-	existingRole, err := r.getProjectRoleWriteModelByID(ctx, projectRole.AggregateID, resourceOwner)
+	existingRole, err := r.getProjectRoleWriteModelByID(ctx, projectRole.Key, projectRole.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, res
 	if projectID == "" || key == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
 	}
-	existingRole, err := r.getProjectRoleWriteModelByID(ctx, projectID, resourceOwner)
+	existingRole, err := r.getProjectRoleWriteModelByID(ctx, key, projectID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -106,13 +106,13 @@ func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, res
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
 	projectAgg.PushEvents(project.NewRoleRemovedEvent(ctx, key, projectID, existingRole.ResourceOwner))
-	//TODO: Update UserGrants
+	//TODO: Update UserGrants (remove roles if on usergrants)
 
 	return r.eventstore.PushAggregate(ctx, existingRole, projectAgg)
 }
 
-func (r *CommandSide) getProjectRoleWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectRoleWriteModel, error) {
-	projectRoleWriteModel := NewProjectRoleWriteModel(projectID, resourceOwner)
+func (r *CommandSide) getProjectRoleWriteModelByID(ctx context.Context, key, projectID, resourceOwner string) (*ProjectRoleWriteModel, error) {
+	projectRoleWriteModel := NewProjectRoleWriteModelWithKey(key, projectID, resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, projectRoleWriteModel)
 	if err != nil {
 		return nil, err

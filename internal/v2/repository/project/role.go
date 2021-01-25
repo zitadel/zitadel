@@ -77,7 +77,7 @@ func RoleAddedEventMapper(event *repository.Event) (eventstore.EventReader, erro
 type RoleChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Key         *string `json:"key,omitempty"`
+	Key         string  `json:"key,omitempty"`
 	DisplayName *string `json:"displayName,omitempty"`
 	Group       *string `json:"group,omitempty"`
 }
@@ -87,7 +87,6 @@ func (e *RoleChangedEvent) Data() interface{} {
 }
 
 func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	//TODO: if key changes, unique constraint should be changed, how?
 	return nil
 }
 
@@ -113,7 +112,7 @@ type RoleChanges func(event *RoleChangedEvent)
 
 func ChangeKey(key string) func(event *RoleChangedEvent) {
 	return func(e *RoleChangedEvent) {
-		e.Key = &key
+		e.Key = key
 	}
 }
 

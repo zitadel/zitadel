@@ -13,6 +13,16 @@ func projectWriteModelToProject(writeModel *ProjectWriteModel) *domain.Project {
 	}
 }
 
+func projectGrantWriteModelToProjectGrant(writeModel *ProjectGrantWriteModel) *domain.ProjectGrant {
+	return &domain.ProjectGrant{
+		ObjectRoot:   writeModelToObjectRoot(writeModel.WriteModel),
+		GrantID:      writeModel.GrantID,
+		GrantedOrgID: writeModel.GrantedOrgID,
+		RoleKeys:     writeModel.RoleKeys,
+		State:        writeModel.State,
+	}
+}
+
 func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) *domain.Application {
 	return &domain.Application{
 		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel),
@@ -30,5 +40,14 @@ func roleWriteModelToRole(writeModel *ProjectRoleWriteModel) *domain.ProjectRole
 		Key:         writeModel.Key,
 		DisplayName: writeModel.DisplayName,
 		Group:       writeModel.Group,
+	}
+}
+
+func memberWriteModelToProjectGrantMember(writeModel *ProjectGrantMemberWriteModel) *domain.ProjectGrantMember {
+	return &domain.ProjectGrantMember{
+		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel),
+		Roles:      writeModel.Roles,
+		GrantID:    writeModel.GrantID,
+		UserID:     writeModel.UserID,
 	}
 }

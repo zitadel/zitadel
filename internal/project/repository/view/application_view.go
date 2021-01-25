@@ -40,7 +40,7 @@ func ApplicationByOIDCClientID(db *gorm.DB, table, clientID string) (*model.Appl
 	query := repository.PrepareGetByQuery(table, clientIDQuery)
 	err := query(db, app)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-DG1qh", "Errors.Project.AppNotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-DG1qh", "Errors.Project.App.NotFound")
 	}
 	return app, err
 }
@@ -52,7 +52,7 @@ func ApplicationByProjectIDAndAppName(db *gorm.DB, table, projectID, appName str
 	query := repository.PrepareGetByQuery(table, projectIDQuery, appNameQuery)
 	err := query(db, app)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Jqw1z", "Errors.Project.AppNotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Jqw1z", "Errors.Project.App.NotFound")
 	}
 	return app, err
 }

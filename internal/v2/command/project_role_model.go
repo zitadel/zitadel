@@ -16,7 +16,17 @@ type ProjectRoleWriteModel struct {
 	State       domain.ProjectRoleState
 }
 
-func NewProjectRoleWriteModel(projectID string, resourceOwner string) *ProjectRoleWriteModel {
+func NewProjectRoleWriteModelWithKey(key, projectID, resourceOwner string) *ProjectRoleWriteModel {
+	return &ProjectRoleWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   projectID,
+			ResourceOwner: resourceOwner,
+		},
+		Key: key,
+	}
+}
+
+func NewProjectRoleWriteModel(projectID, resourceOwner string) *ProjectRoleWriteModel {
 	return &ProjectRoleWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   projectID,
@@ -26,7 +36,24 @@ func NewProjectRoleWriteModel(projectID string, resourceOwner string) *ProjectRo
 }
 
 func (wm *ProjectRoleWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
+	for _, event := range events {
+		switch e := event.(type) {
+		case *project.RoleAddedEvent:
+			if e.Key == wm.Key {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *project.RoleChangedEvent:
+			if e.Key == wm.Key {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *project.RoleRemovedEvent:
+			if e.Key == wm.Key {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *project.ProjectRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
 }
 
 func (wm *ProjectRoleWriteModel) Reduce() error {
@@ -38,9 +65,7 @@ func (wm *ProjectRoleWriteModel) Reduce() error {
 			wm.Group = e.Group
 			wm.State = domain.ProjectRoleStateActive
 		case *project.RoleChangedEvent:
-			if e.Key != nil {
-				wm.Key = *e.Key
-			}
+			wm.Key = e.Key
 			if e.DisplayName != nil {
 				wm.DisplayName = *e.DisplayName
 			}
@@ -71,10 +96,8 @@ func (wm *ProjectRoleWriteModel) NewProjectRoleChangedEvent(
 ) (*project.RoleChangedEvent, bool, error) {
 	changes := make([]project.RoleChanges, 0)
 	var err error
+	changes = append(changes, project.ChangeKey(key))
 
-	if wm.Key != key {
-		changes = append(changes, project.ChangeKey(key))
-	}
 	if wm.DisplayName != displayName {
 		changes = append(changes, project.ChangeDisplayName(displayName))
 	}

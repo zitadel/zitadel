@@ -31,7 +31,7 @@ func (r *CommandSide) addProjectMember(ctx context.Context, projectAgg *project.
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
-		return caos_errs.ThrowPreconditionFailed(nil, "PROJECT-W8m4l", "Errors.Project.MemberInvalid")
+		return caos_errs.ThrowPreconditionFailed(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
 	}
 
 	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
@@ -52,7 +52,7 @@ func (r *CommandSide) ChangeProjectMember(ctx context.Context, member *domain.Me
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.MemberInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.Invalid")
 	}
 
 	existingMember, err := r.projectMemberWriteModelByID(ctx, member.AggregateID, member.UserID, resourceOwner)
