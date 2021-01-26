@@ -2397,14 +2397,20 @@ message ProjectMemberRemove {
 
 message ProjectRoleAdd {
   string id = 1 [(validate.rules).string = {min_len: 1}];
-  string key = 2;
+  string key = 2 [(validate.rules).string = {min_len: 1}];
   string display_name = 3;
   string group = 4;
 }
 
 message ProjectRoleAddBulk {
   string id = 1 [(validate.rules).string = {min_len: 1}];
-  repeated ProjectRoleAdd project_roles = 2;
+  repeated ProjectRoleBulkAdd project_roles = 2;
+}
+
+message ProjectRoleBulkAdd {
+  string key = 1 [(validate.rules).string = {min_len: 1}];
+  string display_name = 2;
+  string group = 3;
 }
 
 message ProjectRoleChange {

@@ -82,10 +82,16 @@ func (wm *ProjectRoleWriteModel) Reduce() error {
 }
 
 func (wm *ProjectRoleWriteModel) Query() *eventstore.SearchQueryBuilder {
+	//types := []eventstore.EventType{
+	//	project.RoleAddedType,
+	//	project.RoleChangedType,
+	//	project.RoleRemovedType,
+	//	project.ProjectRemovedType,
+	//}
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner).
-		EventTypes(project.RoleAddedType, project.RoleChangedType, project.RoleRemovedType, project.ProjectRemovedType)
+		ResourceOwner(wm.ResourceOwner)
+	//EventTypes(types...)
 }
 
 func (wm *ProjectRoleWriteModel) NewProjectRoleChangedEvent(
