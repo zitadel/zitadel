@@ -42,14 +42,10 @@ func (r *CommandSide) AddProjectGrant(ctx context.Context, grant *domain.Project
 }
 
 func (r *CommandSide) ChangeProjectGrant(ctx context.Context, grant *domain.ProjectGrant, resourceOwner string) (_ *domain.ProjectGrant, err error) {
-	if !grant.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-1j83s", "Errors.Project.Grant.Invalid")
+	if grant.GrantID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-1j83s", "Errors.IDMissing")
 	}
 	err = r.checkProjectExists(ctx, grant.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	err = r.checkOrgExists(ctx, grant.GrantedOrgID)
 	if err != nil {
 		return nil, err
 	}
