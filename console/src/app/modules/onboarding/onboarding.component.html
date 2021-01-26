@@ -17,7 +17,7 @@
         <p class="desc">{{'ONBOARDING.DESCRIPTION' | translate}}</p>
 
         <h2>{{'ONBOARDING.STEPS_TITLE' | translate}}</h2>
-        <div class="row" *ngFor="let step of steps; index as i">
+        <div class="onboarding-row" *ngFor="let step of steps; index as i">
             <div class="prev">{{i + 1}}</div>
             <div>
                 <h3>{{step.titleI18nKey | translate}}</h3>
