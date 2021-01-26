@@ -91,7 +91,7 @@ func (wm *ApplicationWriteModel) Reduce() error {
 			wm.State = domain.AppStateRemoved
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *ApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {

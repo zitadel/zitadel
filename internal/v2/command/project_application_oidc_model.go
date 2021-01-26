@@ -132,7 +132,7 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 			wm.State = domain.AppStateRemoved
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAddedEvent) {

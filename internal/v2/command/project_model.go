@@ -61,7 +61,7 @@ func (wm *ProjectWriteModel) Reduce() error {
 			wm.State = domain.ProjectStateRemoved
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {

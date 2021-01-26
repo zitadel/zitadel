@@ -78,7 +78,7 @@ func (wm *ProjectRoleWriteModel) Reduce() error {
 			wm.State = domain.ProjectRoleStateRemoved
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *ProjectRoleWriteModel) Query() *eventstore.SearchQueryBuilder {
