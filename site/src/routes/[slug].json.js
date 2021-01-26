@@ -30,6 +30,7 @@ export function get(req, res) {
 
             const docs = generate_docs('docs/', slug, localecode);
             json = JSON.stringify({ docs, seo }); // TODO it errors if I send the non-stringified value
+
             // });
         });
     }

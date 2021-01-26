@@ -78,21 +78,6 @@
         button {
             width: 100%;
         }
-
-        .logo-cloud {
-            display: flex;
-            flex-wrap: wrap;
-            margin: -0.5rem;
-            
-            i {
-                font-size: 40px;
-                padding: .5rem;
-                border: 1px solid #ffffff50;
-                border-radius: .5rem;
-                margin: 0.5rem;
-                color: white;
-            }
-        }
     }
 
     .right {
@@ -140,6 +125,7 @@
             .fill-space {
                 flex: 1;
             }
+
             .action-row {
                 display: flex;
                 align-items: center;

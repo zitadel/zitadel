@@ -249,28 +249,6 @@
       width: 100%;
     }
 
-    .sidebar .home {
-      position: fixed;
-      top: 0;
-      left: calc(var(--sidebar-w)/2);
-      margin: 2rem 0;
-      transform: translateX(-50%);
-      border-bottom: none;
-      display: flex;
-      align-items: center;
-      font-size: 22px;
-      padding: 0;
-    }
-
-    .sidebar .home img {
-        width: 170px;
-    }
-
-    .sidebar .home span {
-        margin-left: 3px;
-        color: var(--second);
-    }
-
     .sidebar :global(.language-switcher) {
         display: flex;
         position: fixed;
@@ -518,11 +496,6 @@
 
 <aside bind:this={aside} class="sidebar-container" class:open={show_contents}>
   <div class="sidebar" on:click={() => (show_contents = false)}>
-    <a rel="prefetch" href="." class="home" title="Zitadel Docs">
-      <img src="logos/zitadel-logo-light.svg" alt="zitadel-logo" />
-      <span>DOCS</span>
-    </a>
-
     <SearchTrigger on:click={handleSearch}/>
 
     <!-- scroll container -->

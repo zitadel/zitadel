@@ -60,9 +60,15 @@
         "WELCOME":"Willkommen",
         "WELCOMESENTENCE":"Hier findest Du die empfohlenen Aktionen basierend auf Deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass Du möglicherweise Deine Organisation in der Kopfzeile wechseln musst.",
         "DISCLAIMER":"Du kannst nur die Einstellungen Deiner aktuellen Organisation, die in der Kopfzeile angegeben ist, sehen. ZITADEL behandelt Deine Daten vertraulich und sicher.",
-        "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit"
+        "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit",
+        "QUICKSTARTS": {
+            "LABEL":"Erste Schritte",
+            "TITLE":"Quickstarts",
+            "DESCRIPTION":"Mit ZITADEL schnell durchstarten."
+        }
     },
     "MENU": {
+        "DASHBOARD":"Übersicht",
         "PERSONAL_INFO": "Persönliche Informationen",
         "DOCUMENTATION":"Dokumentation",
         "IAMPOLICIES":"IAM",

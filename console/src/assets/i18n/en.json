@@ -60,9 +60,15 @@
         "WELCOME":"Welcome",
         "WELCOMESENTENCE":"Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
         "DISCLAIMER":"You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
-        "DISCLAIMERLINK":"Further information"
+        "DISCLAIMERLINK":"Further information",
+        "QUICKSTARTS": {
+            "LABEL":"First Steps",
+            "TITLE":"Quickstarts",
+            "DESCRIPTION":"Get started with ZITADEL quickly."
+        }
     },
     "MENU": {
+        "DASHBOARD":"Overview",
         "PERSONAL_INFO": "Personal Information",
         "DOCUMENTATION":"Documentation",
         "IAMPOLICIES":"IAM",

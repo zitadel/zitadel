@@ -16,11 +16,27 @@
     </div>
 
     <div class="container">
-        <a *ngIf="!firstStepsDismissed" class="onboard" [routerLink]="['/firststeps']">
+        <a matRipple *ngIf="!firstStepsDismissed" class="onboard" [routerLink]="['/firststeps']">
             <p class="first-steps">{{'ONBOARDING.HEADER' | translate}}</p>
             <h2>{{'ONBOARDING.TITLE' | translate}}</h2>
             <p class="desc">{{'ONBOARDING.DESCRIPTION' | translate}}</p>
             <button matTooltip="{{'ACTIONS.CLOSE' | translate}}" (click)="dismissFirstSteps($event)" mat-icon-button
+                class="close">
+                <i class="las la-times"></i>
+            </button>
+        </a>
+
+        <a matRipple *ngIf="!firstStepsDismissed" class="quickstart" href="https://zitadel.ch/quickstarts">
+            <p class="first-steps">{{'HOME.QUICKSTARTS.LABEL' | translate}}</p>
+            <h2>{{'HOME.QUICKSTARTS.TITLE' | translate}}</h2>
+            <p class="desc">{{'HOME.QUICKSTARTS.DESCRIPTION' | translate}}</p>
+            <div class="logo-cloud">
+                <i class="lab la-angular"></i>
+                <i class="lab la-react"></i>
+                <i class="lab la-android"></i>
+                <i class="lab la-app-store-ios"></i>
+            </div>
+            <button matTooltip="{{'ACTIONS.CLOSE' | translate}}" (click)="dismissQuickstarts($event)" mat-icon-button
                 class="close">
                 <i class="las la-times"></i>
             </button>

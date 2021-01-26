@@ -1,5 +1,13 @@
 {
     "title": "ZITADEL Identity and Access Management",
+    "nav_start":"Get Started",
+    "nav_quickstarts":"Quickstarts",
+    "nav_administrate":"Adminstrate",
+    "nav_apis":"APIs",
+    "nav_architecture":"Architecture",
+    "nav_doc":"Dokumentation",
+    "nav_login":"Anmelden",
+    "nav_register":"Registrieren",
     "description":"Die meisten Applikationen müssen die Identität eines Benutzers kennen, um Benutzerdaten sicher zu speichern und auf allen Geräten des Benutzers dieselbe personalisierte Erfahrung zu bieten.",
     "description2":"Die Authentifizierung von ZITADEL bietet Backend-Dienste, benutzerfreundliche SDKs und vorgefertigte UI-Bibliotheken zur Authentifizierung von Benutzern in Ihrer Applikation. Es unterstützt die Authentifizierung mithilfe von Passwörtern und bietet weitere Sicherheitsmechanismen, wie einen zweiten Faktor beispielsweise über OTP, um einen sicheren Zugang zu gewährleisten.",
     "description3":"ZITADEL nutzt Industriestandards wie OAuth 2.0 und OpenID Connect, die leicht in Ihr benutzerdefiniertes Backend integriert werden können.",

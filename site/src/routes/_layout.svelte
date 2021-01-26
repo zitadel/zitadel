@@ -7,6 +7,8 @@
   import PhotoSwipe from '../components/PhotoSwipe.svelte';
   const { page } = stores();
   export let segment;
+
+  import { _ } from 'svelte-i18n';
 </script>
 
 <script context="module">
@@ -24,6 +26,14 @@
     overflow-x: hidden;
   }
 </style>
+
+<Nav title="Zitadel docs" {segment} {page} logo="logos/zitadel-logo-light.svg">
+    <NavItem segment="start">{$_('nav_start')}</NavItem>
+    <NavItem segment="quickstarts">{$_('nav_quickstarts')}</NavItem>
+    <NavItem segment="administrate">{$_('nav_administrate')}</NavItem>
+    <NavItem segment="apis">{$_('nav_apis')}</NavItem>
+    <NavItem segment="architecture">{$_('nav_architecture')}</NavItem>
+</Nav>
 
 <main>
   <slot />

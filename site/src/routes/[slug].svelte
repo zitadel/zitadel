@@ -7,7 +7,6 @@
 </script>
 
 <script>
-    import DocsHeader from '../components/DocsHeader.svelte';
     import manifest from '../../static/manifest.json';
     import Docs from "../components/Docs.svelte";
     export let slug;
@@ -37,5 +36,4 @@
    {/if}
 </svelte:head>
 
-<DocsHeader {slug}></DocsHeader>
 <Docs {sections} dir="{slug}"/>

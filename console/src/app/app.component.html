@@ -62,7 +62,7 @@
                     class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"
                     [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)" [size]="38">
                 </app-avatar>
-                <app-accounts-card @accounts class="a_card  mat-elevation-z5" *ngIf="showAccount"
+                <app-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount"
                     (close)="showAccount = false" [profile]="profile" [iamuser]="iamuser$ | async">
                 </app-accounts-card>
             </div>
@@ -72,6 +72,13 @@
                 [opened]="!(isHandset$ | async) && authenticationService.authenticated">
                 <div class="side-column">
                     <div class="list">
+                        <a @navitem matTooltip="{{'MENU.TOOLTIP.PERSONAL' | translate}}" class="nav-item"
+                            [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
+                            [routerLink]="['/']">
+                            <i class="icon las la-home"></i>
+                            <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
+                        </a>
+
                         <ng-container *ngIf="authenticationService.authenticationChanged | async">
                             <a @navitem matTooltip="{{'MENU.TOOLTIP.PERSONAL' | translate}}" class="nav-item"
                                 [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"

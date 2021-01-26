@@ -32,7 +32,8 @@
     margin: -1rem;
     justify-content: space-evenly;
 
-    .onboard {
+    .onboard,
+    .quickstart {
         text-decoration: none;
         cursor: pointer;
         box-sizing: border-box;
@@ -41,15 +42,10 @@
         border-radius: 0.5rem;
         margin: 1rem;
         padding: 1.5rem;
-        background: linear-gradient(40deg, rgb(80, 66, 121),rgb(177, 59, 122),rgb(225,53,81), rgb(230,107,86));
         box-shadow: 0 3px 8px 0 rgb(0 0 0 / 6%);
 
         h2 {
             color: white;
-        }
-
-        p {
-            color: #fad6e3;
         }
 
         .first-steps {
@@ -73,6 +69,37 @@
         &:hover {
             .close {
                 visibility: visible;
+            }
+        }
+    }
+
+    .onboard {
+        background: linear-gradient(40deg, rgb(80, 66, 121),rgb(177, 59, 122),rgb(225,53,81), rgb(230,107,86));
+
+        p {
+            color: #fad6e3;
+        }
+    }
+
+    .quickstart {
+        background: linear-gradient(30deg, #2283a6,#6c8f59);
+
+        p {
+            color: #d6f3fa;
+        }
+
+        .logo-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            margin: -0.5rem;
+            
+            i {
+                font-size: 40px;
+                padding: .5rem;
+                border: 1px solid #ffffff50;
+                border-radius: .5rem;
+                margin: 0.5rem;
+                color: white;
             }
         }
     }

@@ -152,6 +152,7 @@
         .section .caos-back {
             display: block;
             margin: 50px;
+            max-width: 400px;
         }
 
         .doc-container {
@@ -209,8 +210,6 @@
     <meta name="twitter:description" content="{$_('home_seo.description')}" />
     <meta name="twitter:image" content="https://www.zitadel.ch/zitadel-social-preview25.png">
 </svelte:head>
-    <Nav {segment} title="Zitadel docs" logo="logos/zitadel-logo-light.svg"></Nav>
-
     <Section>
         <div class="section">
             <div class="left">

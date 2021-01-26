@@ -62,7 +62,7 @@
     transition: all .3s cubic-bezier(.645, .045, .355, 1);
 
     .slash {
-        color: if($is-dark-theme, #303131, #e3e8ee);
+        color: if($is-dark-theme, #525454, #d1d5d9);
     }
 
     .org-button {
