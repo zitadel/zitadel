@@ -1,5 +1,9 @@
 <mjml>
   <mj-head>
+    <mj-raw>
+        <meta name="color-scheme" content="light dark">
+        <meta name="supported-color-schemes" content="light dark">
+    </mj-raw>
     <mj-attributes>
       <mj-font name="Lato" href="http://fonts.googleapis.com/css?family=Lato:200,300,400,600"/>
       <mj-text align="center" font-family="Lato, Arial, Helvetica, sans-serif" css-class="text"/>
@@ -11,13 +15,19 @@
       <mj-wrapper full-width="full-width" />
     </mj-attributes>
     <mj-style>
+        :root {
+            color-scheme: light dark;
+            supported-color-schemes:light dark;
+        }
+
         .body {
             background-color: #fafafa;
             color: #22292f;
             border-radius: 16px;
         }
+
         .body img {
-            background: #fafafa;
+            background: #fafafa !important;
             padding: 1rem;
             box-sizing: border-box;
         }
@@ -39,7 +49,7 @@
 
         @media (prefers-color-scheme: dark) {
             .body {
-                background-color: #212224;
+                background-color: #212224 !important;
                 color: #ffffff;
                 border-radius: 16px;
             }
@@ -75,8 +85,8 @@
       <mj-section>
         <mj-group>
           <mj-column>
-            <mj-image css-class="dark-mode" src="https://static.zitadel.ch/zitadel-logo-light.png" align="center" width="190px" padding="50px 0 40px 0px" />
-            <mj-image css-class="light-mode" src="https://static.zitadel.ch/zitadel-logo-dark.png" align="center" width="190px" padding="50px 0 40px 0px" />
+            <mj-image css-class="dark-mode" src="https://static.zitadel.ch/zitadel-logo-light.png" align="center" width="190px" padding="0px 0 40px 0px" />
+            <mj-image css-class="light-mode" src="https://static.zitadel.ch/zitadel-logo-dark.png" align="center" width="190px" padding="0px 0 40px 0px" />
           </mj-column>
         </mj-group>
       </mj-section>
