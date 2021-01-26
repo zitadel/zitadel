@@ -152,7 +152,7 @@ func (e *RoleRemovedEvent) Data() interface{} {
 }
 
 func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.projectID, e.ResourceOwner())}
+	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.projectID, e.ResourceOwner())}
 }
 
 func NewRoleRemovedEvent(ctx context.Context, key, projectID, resourceOwner string) *RoleRemovedEvent {

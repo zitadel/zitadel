@@ -34,7 +34,11 @@ func (r *CommandSide) addProjectMember(ctx context.Context, projectAgg *project.
 		return caos_errs.ThrowPreconditionFailed(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
 	}
 
-	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err := r.checkUserExists(ctx, addedMember.UserID, "")
+	if err != nil {
+		return err
+	}
+	err = r.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return err
 	}

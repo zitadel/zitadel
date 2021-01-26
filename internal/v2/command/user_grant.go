@@ -31,12 +31,9 @@ func (r *CommandSide) addUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if !userGrant.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.UserGrant.Invalid")
 	}
-	exists, err := r.checkUserExists(ctx, userGrant.UserID, resourceOwner)
+	err = r.checkUserExists(ctx, userGrant.UserID, "")
 	if err != nil {
 		return nil, nil, err
-	}
-	if !exists {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.User.NotFound")
 	}
 	err = r.checkProjectExists(ctx, userGrant.ProjectID, resourceOwner)
 	if err != nil {

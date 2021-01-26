@@ -15,8 +15,12 @@ func (r *CommandSide) AddProjectGrantMember(ctx context.Context, member *domain.
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-8fi7G", "Errors.Project.Member.Invalid")
 	}
+	err := r.checkUserExists(ctx, member.UserID, "")
+	if err != nil {
+		return nil, err
+	}
 	addedMember := NewProjectGrantMemberWriteModel(member.AggregateID, member.UserID, member.GrantID, resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err = r.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}

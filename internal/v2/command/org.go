@@ -47,12 +47,9 @@ func (r *CommandSide) AddOrg(ctx context.Context, name, userID, resourceOwner st
 		return nil, err
 	}
 
-	active, err := r.checkUserExists(ctx, userID, resourceOwner)
+	err = r.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
-	}
-	if !active {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "ORG-HBR2z", "Errors.User.NotFound")
 	}
 	addedMember := NewOrgMemberWriteModel(orgAgg.ID(), userID)
 	err = r.addOrgMember(ctx, orgAgg, addedMember, domain.NewMember(orgAgg.ID(), userID, domain.RoleOrgOwner))

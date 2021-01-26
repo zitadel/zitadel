@@ -32,7 +32,7 @@ func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project
 	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
 
-	projectRole := domain.RoleOrgOwner
+	projectRole := domain.RoleProjectOwner
 	iam, err := r.GetIAM(ctx)
 	if err != nil {
 		return nil, nil, err
