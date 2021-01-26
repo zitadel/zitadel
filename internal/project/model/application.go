@@ -1,7 +1,11 @@
 package model
 
 import (
+	"time"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
+
 	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
@@ -59,4 +63,14 @@ func (a *Application) IsValid(includeConfig bool) bool {
 		return false
 	}
 	return true
+}
+
+type ApplicationKey struct {
+	es_models.ObjectRoot
+
+	AppID          string
+	KeyID          string
+	Type           key_model.AuthNKeyType
+	ExpirationDate time.Time
+	PrivateKey     []byte
 }

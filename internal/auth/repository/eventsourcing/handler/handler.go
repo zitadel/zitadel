@@ -71,7 +71,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			repos.OrgEvents,
 			repos.IamEvents,
 			systemDefaults.IamID),
-		newMachineKeys(
+		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
 		newLoginPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
@@ -99,7 +99,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 3 * time.Minute
+		return 30 * time.Second
 	}
 	return c.MinimumCycleDuration.Duration
 }

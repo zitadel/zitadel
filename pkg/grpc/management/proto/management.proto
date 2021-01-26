@@ -1016,6 +1016,52 @@ service ManagementService {
     };
   }
 
+  rpc AddApplicationKey(AddApplicationKeyRequest) returns (AddApplicationKeyResponse){
+    option (google.api.http) = {
+      put: "/projects/{project_id}/applications/{application_id}/keys"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc DeleteApplicationKey(ApplicationKeyIDRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/projects/{project_id}/applications/{application_id}/keys/{key_id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc SearchApplicationKeys(ApplicationKeySearchRequest) returns (ApplicationKeySearchResponse) {
+    option (google.api.http) = {
+      post: "/projects/{project_id}/applications/{application_id}/keys/_search"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.read"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc GetApplicationKey(ApplicationKeyIDRequest) returns (ApplicationKeyView) {
+    option (google.api.http) = {
+      get: "/projects/{project_id}/applications/{application_id}/keys/{key_id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.read"
+      check_field_name: "ProjectId"
+    };
+  }
+
   rpc SearchProjectGrants(ProjectGrantSearchRequest) returns (ProjectGrantSearchResponse) {
     option (google.api.http) = {
       post: "/projects/{project_id}/grants/_search"
@@ -2672,6 +2718,60 @@ message ApplicationSearchQuery {
 enum ApplicationSearchKey {
   APPLICATIONSERACHKEY_UNSPECIFIED = 0;
   APPLICATIONSEARCHKEY_APP_NAME = 1;
+}
+
+message AddApplicationKeyRequest {
+  string project_id = 1 [(validate.rules).string.min_len = 1];
+  string application_id = 2 [(validate.rules).string.min_len = 1];
+  ApplicationKeyType type = 3 [(validate.rules).enum = {not_in: [0]}];
+  google.protobuf.Timestamp expiration_date = 4;
+}
+
+message AddApplicationKeyResponse {
+  string id = 1;
+  google.protobuf.Timestamp creation_date = 2;
+  uint64 sequence = 3;
+
+  ApplicationKeyType type = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+  bytes key_details = 6;
+}
+
+message ApplicationKeyIDRequest {
+  string project_id = 1 [(validate.rules).string.min_len = 1];
+  string application_id = 2 [(validate.rules).string.min_len = 1];
+  string key_id = 3 [(validate.rules).string.min_len = 1];
+}
+
+message ApplicationKeyView {
+  string id = 1;
+  ApplicationKeyType type = 2;
+  uint64 sequence = 3;
+
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+}
+
+enum ApplicationKeyType {
+  APPLICATIONKEY_UNSPECIFIED = 0;
+  APPLICATIONKEY_JSON = 1;
+}
+
+message ApplicationKeySearchRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  bool asc = 3;
+  string project_id = 4 [(validate.rules).string.min_len = 1];
+  string application_id = 5 [(validate.rules).string.min_len = 1];
+}
+
+message ApplicationKeySearchResponse {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated ApplicationKeyView result = 4;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message ProjectGrant {

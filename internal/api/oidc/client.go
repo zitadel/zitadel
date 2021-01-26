@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/auth_request/model"
+	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
@@ -55,13 +56,17 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 }
 
 func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
+	return o.GetKeyByIDAndUserID(ctx, keyID, userID)
+}
+
+func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	key, err := o.repo.MachineKeyByID(ctx, keyID)
 	if err != nil {
 		return nil, err
 	}
-	if key.UserID != userID {
+	if key.ObjectID != issuer {
 		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
 	}
 	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)
@@ -73,6 +78,28 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 		Use:   "sig",
 		Key:   publicKey,
 	}, nil
+}
+
+func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, userID string, scopes oidc.Scopes) (oidc.Scopes, error) {
+	user, err := o.repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	for i := len(scopes) - 1; i >= 0; i-- {
+		scope := scopes[i]
+		if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
+			org, err := o.repo.OrgByPrimaryDomain(strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
+			if err != nil {
+				return nil, err
+			}
+			if org.ID != user.ResourceOwner {
+				scopes[i] = scopes[len(scopes)-1]
+				scopes[len(scopes)-1] = ""
+				scopes = scopes[:len(scopes)-1]
+			}
+		}
+	}
+	return scopes, nil
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) (err error) {

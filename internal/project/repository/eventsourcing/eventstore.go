@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"strings"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -828,6 +829,36 @@ func (es *ProjectEventstore) setOIDCClientSecretCheckResult(ctx context.Context,
 		return err
 	}
 	es.projectCache.cacheProject(repoProject)
+	return nil
+}
+
+func (es *ProjectEventstore) AddApplicationKey(ctx context.Context, key *proj_model.ApplicationKey) (*proj_model.ApplicationKey, error) {
+	existingProject, err := es.ProjectByID(ctx, key.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	var app *proj_model.Application
+	if _, app = existingProject.GetApp(key.AppID); app == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dbf32", "Errors.Project.AppNoExisting")
+	}
+	key.KeyID, err = es.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	if key.ExpirationDate.IsZero() {
+		key.ExpirationDate, err = time.Parse(yearLayout, defaultExpirationDate)
+		if err != nil {
+			logging.Log("EVENT-Adgf2").WithError(err).Warn("unable to set default date")
+			return nil, errors.ThrowInternal(err, "EVENT-j68fg", "Errors.Internal")
+		}
+	}
+	if key.ExpirationDate.Before(time.Now()) {
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-C6YV5", "Errors.MachineKey.ExpireBeforeNow")
+	}
+	return nil, nil
+}
+
+func (es *ProjectEventstore) RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID string) error {
 	return nil
 }
 
