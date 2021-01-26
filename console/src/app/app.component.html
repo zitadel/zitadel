@@ -5,16 +5,21 @@
                 (click)="drawer.toggle()">
                 <i class="icon las la-bars"></i>
             </button>
-            <a *ngIf="(isHandset$ | async) == false" class="title" [routerLink]="['/']">
+            <a class="title" [routerLink]="['/']">
                 <img class="logo" alt="zitadel logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
-                    src="../assets/images/zitadel-logo-light.svg" />
+                    src="../assets/images/zitadel-logo-solo-light.svg" />
                 <ng-template #lighttheme>
-                    <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-dark.svg" />
+                    <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />
                 </ng-template>
             </a>
 
-            <button (click)="loadOrgs()" *ngIf="profile?.id && org" mat-button [matMenuTriggerFor]="menu"
-                (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
+            <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
+                stroke-linecap="round" stroke-linejoin="round" fill="none" shape-rendering="geometricPrecision">
+                <path d="M16.88 3.549L7.12 20.451"></path>
+            </svg>
+
+            <button class="org-button" (click)="loadOrgs()" *ngIf="profile?.id && org" mat-button
+                [matMenuTriggerFor]="menu" (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
                 <mat-icon>
                     arrow_drop_down</mat-icon>
             </button>

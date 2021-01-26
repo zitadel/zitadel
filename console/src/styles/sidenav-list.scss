@@ -60,6 +60,15 @@
     box-shadow: inset 0 -1px #e3e8ee;
     background-color: $primary-dark !important;
     transition: all .3s cubic-bezier(.645, .045, .355, 1);
+
+    .slash {
+        color: if($is-dark-theme, #303131, #e3e8ee);
+    }
+
+    .org-button {
+        border: 1px solid if($is-dark-theme, #303131, #e3e8ee);
+        transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+    }
   }
 
   .admin-line {

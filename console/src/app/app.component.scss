@@ -11,9 +11,14 @@
   left: 0;
   right: 0;
 
+  .org-button {
+      font-weight: bold;
+      padding-right: .5rem;
+  }
+
   .logo {
-    max-height: 50px;
-    width: 160px;
+    max-height: 40px;
+    width: 40px;
   }
 
   .title {
@@ -22,7 +27,6 @@
     font-size: 1.2rem;
     font-weight: 400;
     line-height: 1.2rem;
-    margin-right: 1rem;
   }
 
   .context-menu {
