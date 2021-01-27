@@ -14,7 +14,7 @@ func (r *CommandSide) AddOIDCApplication(ctx context.Context, application *domai
 	}
 	addedApplication := NewOIDCApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
-	err = r.addOIDCApplication(ctx, projectAgg, project, application, resourceOwner)
+	stringPw, err := r.addOIDCApplication(ctx, projectAgg, project, application, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -25,17 +25,18 @@ func (r *CommandSide) AddOIDCApplication(ctx context.Context, application *domai
 	}
 
 	result := oidcWriteModelToOIDCConfig(addedApplication)
+	result.ClientSecretString = stringPw
 	result.FillCompliance()
 	return result, nil
 }
 
-func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *project.Aggregate, proj *domain.Project, oidcApp *domain.OIDCApp, resourceOwner string) (err error) {
+func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *project.Aggregate, proj *domain.Project, oidcApp *domain.OIDCApp, resourceOwner string) (stringPW string, err error) {
 	if !oidcApp.IsValid() {
-		return caos_errs.ThrowPreconditionFailed(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
+		return "", caos_errs.ThrowPreconditionFailed(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
 	oidcApp.AppID, err = r.idGenerator.Next()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	projectAgg.PushEvents(project.NewApplicationAddedEvent(ctx, oidcApp.AppID, oidcApp.AppName, resourceOwner, domain.AppTypeOIDC))
@@ -43,11 +44,11 @@ func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *projec
 	var stringPw string
 	err = oidcApp.GenerateNewClientID(r.idGenerator, proj)
 	if err != nil {
-		return err
+		return "", err
 	}
 	stringPw, err = oidcApp.GenerateClientSecretIfNeeded(r.applicationSecretGenerator)
 	if err != nil {
-		return err
+		return "", err
 	}
 	projectAgg.PushEvents(project.NewOIDCConfigAddedEvent(ctx,
 		oidcApp.OIDCVersion,
@@ -67,9 +68,7 @@ func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *projec
 		oidcApp.IDTokenUserinfoAssertion,
 		oidcApp.ClockSkew))
 
-	_ = stringPw
-
-	return nil
+	return stringPw, nil
 }
 
 func (r *CommandSide) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
