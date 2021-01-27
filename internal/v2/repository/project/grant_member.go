@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	uniqueProjectGrantType        = "project_grant"
-	ProjectGrantMemberAddedType   = grantEventTypePrefix + member.AddedEventType
-	ProjectGrantMemberChangedType = grantEventTypePrefix + member.ChangedEventType
-	ProjectGrantMemberRemovedType = grantEventTypePrefix + member.RemovedEventType
+	uniqueProjectGrantType = "project_grant"
+	GrantMemberAddedType   = grantEventTypePrefix + member.AddedEventType
+	GrantMemberChangedType = grantEventTypePrefix + member.ChangedEventType
+	GrantMemberRemovedType = grantEventTypePrefix + member.RemovedEventType
 )
 
 func NewAddProjectGrantMemberUniqueConstraint(projectID, userID, grantID string) *eventstore.EventUniqueConstraint {
@@ -31,7 +31,7 @@ func NewRemoveProjectGrantMemberUniqueConstraint(projectID, userID, grantID stri
 	)
 }
 
-type ProjectGrantMemberAddedEvent struct {
+type GrantMemberAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Roles     []string `json:"roles"`
@@ -40,11 +40,11 @@ type ProjectGrantMemberAddedEvent struct {
 	projectID string
 }
 
-func (e *ProjectGrantMemberAddedEvent) Data() interface{} {
+func (e *GrantMemberAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *ProjectGrantMemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GrantMemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewAddProjectGrantMemberUniqueConstraint(e.projectID, e.UserID, e.GrantID)}
 }
 
@@ -54,11 +54,11 @@ func NewProjectGrantMemberAddedEvent(
 	userID,
 	grantID string,
 	roles ...string,
-) *ProjectGrantMemberAddedEvent {
-	return &ProjectGrantMemberAddedEvent{
+) *GrantMemberAddedEvent {
+	return &GrantMemberAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			ProjectGrantMemberAddedType,
+			GrantMemberAddedType,
 		),
 		projectID: projectID,
 		UserID:    userID,
@@ -67,8 +67,8 @@ func NewProjectGrantMemberAddedEvent(
 	}
 }
 
-func ProjectGrantMemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &ProjectGrantMemberAddedEvent{
+func GrantMemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &GrantMemberAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -80,7 +80,7 @@ func ProjectGrantMemberAddedEventMapper(event *repository.Event) (eventstore.Eve
 	return e, nil
 }
 
-type ProjectGrantMemberChangedEvent struct {
+type GrantMemberChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Roles   []string `json:"roles"`
@@ -88,11 +88,11 @@ type ProjectGrantMemberChangedEvent struct {
 	UserID  string   `json:"userId"`
 }
 
-func (e *ProjectGrantMemberChangedEvent) Data() interface{} {
+func (e *GrantMemberChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *ProjectGrantMemberChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GrantMemberChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -101,11 +101,11 @@ func NewProjectGrantMemberChangedEvent(
 	userID,
 	grantID string,
 	roles ...string,
-) *ProjectGrantMemberChangedEvent {
-	return &ProjectGrantMemberChangedEvent{
+) *GrantMemberChangedEvent {
+	return &GrantMemberChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			ProjectGrantMemberAddedType,
+			GrantMemberAddedType,
 		),
 		UserID:  userID,
 		GrantID: grantID,
@@ -113,8 +113,8 @@ func NewProjectGrantMemberChangedEvent(
 	}
 }
 
-func ProjectGrantMemberChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &ProjectGrantMemberChangedEvent{
+func GrantMemberChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &GrantMemberChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -126,7 +126,7 @@ func ProjectGrantMemberChangedEventMapper(event *repository.Event) (eventstore.E
 	return e, nil
 }
 
-type ProjectGrantMemberRemovedEvent struct {
+type GrantMemberRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserID    string `json:"userId"`
@@ -134,11 +134,11 @@ type ProjectGrantMemberRemovedEvent struct {
 	projectID string
 }
 
-func (e *ProjectGrantMemberRemovedEvent) Data() interface{} {
+func (e *GrantMemberRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *ProjectGrantMemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GrantMemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.projectID, e.UserID, e.GrantID)}
 }
 
@@ -147,11 +147,11 @@ func NewProjectGrantMemberRemovedEvent(
 	projectID,
 	userID,
 	grantID string,
-) *ProjectGrantMemberRemovedEvent {
-	return &ProjectGrantMemberRemovedEvent{
+) *GrantMemberRemovedEvent {
+	return &GrantMemberRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			ProjectGrantMemberAddedType,
+			GrantMemberAddedType,
 		),
 		UserID:    userID,
 		GrantID:   grantID,
@@ -159,8 +159,8 @@ func NewProjectGrantMemberRemovedEvent(
 	}
 }
 
-func ProjectGrantMemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &ProjectGrantMemberRemovedEvent{
+func GrantMemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &GrantMemberRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

@@ -10,9 +10,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(ProjectDeactivatedType, ProjectDeactivatedEventMapper).
 		RegisterFilterEventMapper(ProjectReactivatedType, ProjectReactivatedEventMapper).
 		RegisterFilterEventMapper(ProjectRemovedType, ProjectRemovedEventMapper).
-		RegisterFilterEventMapper(ProjectMemberAddedType, ProjectMemberAddedEventMapper).
-		RegisterFilterEventMapper(ProjectMemberChangedType, ProjectMemberChangedEventMapper).
-		RegisterFilterEventMapper(ProjectMemberRemovedType, ProjectMemberRemovedEventMapper).
+		RegisterFilterEventMapper(MemberAddedType, MemberAddedEventMapper).
+		RegisterFilterEventMapper(MemberChangedType, MemberChangedEventMapper).
+		RegisterFilterEventMapper(MemberRemovedType, MemberRemovedEventMapper).
 		RegisterFilterEventMapper(RoleAddedType, RoleAddedEventMapper).
 		RegisterFilterEventMapper(RoleChangedType, RoleChangedEventMapper).
 		RegisterFilterEventMapper(RoleRemovedType, RoleRemovedEventMapper).
@@ -22,9 +22,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(GrantDeactivatedType, GrantDeactivateEventMapper).
 		RegisterFilterEventMapper(GrantReactivatedType, GrantReactivatedEventMapper).
 		RegisterFilterEventMapper(GrantRemovedType, GrantRemovedEventMapper).
-		RegisterFilterEventMapper(ProjectGrantMemberAddedType, ProjectGrantMemberAddedEventMapper).
-		RegisterFilterEventMapper(ProjectGrantMemberChangedType, ProjectGrantMemberChangedEventMapper).
-		RegisterFilterEventMapper(ProjectGrantMemberRemovedType, ProjectGrantMemberRemovedEventMapper).
+		RegisterFilterEventMapper(GrantMemberAddedType, GrantMemberAddedEventMapper).
+		RegisterFilterEventMapper(GrantMemberChangedType, GrantMemberChangedEventMapper).
+		RegisterFilterEventMapper(GrantMemberRemovedType, GrantMemberRemovedEventMapper).
 		RegisterFilterEventMapper(ApplicationAddedType, ApplicationAddedEventMapper).
 		RegisterFilterEventMapper(ApplicationChangedType, ApplicationAddedEventMapper).
 		RegisterFilterEventMapper(ApplicationRemovedType, ApplicationRemovedEventMapper).

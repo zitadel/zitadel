@@ -177,7 +177,7 @@ func OrgReactivatedEventMapper(event *repository.Event) (eventstore.EventReader,
 
 type OrgRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	Name                 string
+	name                 string
 }
 
 func (e *OrgRemovedEvent) Data() interface{} {
@@ -185,7 +185,7 @@ func (e *OrgRemovedEvent) Data() interface{} {
 }
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveOrgNameUniqueConstraint(e.Name)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveOrgNameUniqueConstraint(e.name)}
 }
 
 func NewOrgRemovedEvent(ctx context.Context, name string) *OrgRemovedEvent {
@@ -194,7 +194,7 @@ func NewOrgRemovedEvent(ctx context.Context, name string) *OrgRemovedEvent {
 			ctx,
 			OrgRemovedEventType,
 		),
-		Name: name,
+		name: name,
 	}
 }
 

@@ -29,17 +29,17 @@ func NewProjectGrantMemberWriteModel(projectID, userID, grantID, resourceOwner s
 func (wm *ProjectGrantMemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *project.ProjectGrantMemberAddedEvent:
+		case *project.GrantMemberAddedEvent:
 			if e.UserID != wm.UserID || e.GrantID != wm.GrantID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *project.ProjectGrantMemberChangedEvent:
+		case *project.GrantMemberChangedEvent:
 			if e.UserID != wm.UserID || e.GrantID != wm.GrantID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *project.ProjectGrantMemberRemovedEvent:
+		case *project.GrantMemberRemovedEvent:
 			if e.UserID != wm.UserID || e.GrantID != wm.GrantID {
 				continue
 			}
@@ -56,12 +56,12 @@ func (wm *ProjectGrantMemberWriteModel) AppendEvents(events ...eventstore.EventR
 func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *project.ProjectGrantMemberAddedEvent:
+		case *project.GrantMemberAddedEvent:
 			wm.Roles = e.Roles
 			wm.State = domain.MemberStateActive
-		case *project.ProjectGrantMemberChangedEvent:
+		case *project.GrantMemberChangedEvent:
 			wm.Roles = e.Roles
-		case *project.ProjectGrantMemberRemovedEvent:
+		case *project.GrantMemberRemovedEvent:
 			wm.State = domain.MemberStateRemoved
 		case *project.GrantRemovedEvent, *project.ProjectRemovedEvent:
 			wm.State = domain.MemberStateRemoved
@@ -75,9 +75,9 @@ func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID)
 	//	ResourceOwner(wm.ResourceOwner)
 	//EventTypes(
-	//	project.ProjectGrantMemberAddedType,
-	//	project.ProjectGrantMemberChangedType,
-	//	project.ProjectGrantMemberRemovedType,
+	//	project.GrantMemberAddedType,
+	//	project.GrantMemberChangedType,
+	//	project.GrantMemberRemovedType,
 	//	project.GrantRemovedType,
 	//	project.ProjectRemovedType)
 }

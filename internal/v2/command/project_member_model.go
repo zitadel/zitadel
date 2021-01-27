@@ -24,17 +24,17 @@ func NewProjectMemberWriteModel(projectID, userID, resourceOwner string) *Projec
 func (wm *ProjectMemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *project.ProjectMemberAddedEvent:
+		case *project.MemberAddedEvent:
 			if e.UserID != wm.MemberWriteModel.UserID {
 				continue
 			}
 			wm.MemberWriteModel.AppendEvents(&e.MemberAddedEvent)
-		case *project.ProjectMemberChangedEvent:
+		case *project.MemberChangedEvent:
 			if e.UserID != wm.MemberWriteModel.UserID {
 				continue
 			}
 			wm.MemberWriteModel.AppendEvents(&e.MemberChangedEvent)
-		case *project.ProjectMemberRemovedEvent:
+		case *project.MemberRemovedEvent:
 			if e.UserID != wm.MemberWriteModel.UserID {
 				continue
 			}
