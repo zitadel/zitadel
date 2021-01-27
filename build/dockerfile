@@ -62,11 +62,7 @@ RUN npm run prodbuild
 #######################
 FROM golang:1.15 as go-base
 WORKDIR src/github.com/caos/zitadel/
-COPY . .
-#Migrations for cockroach-secure
-RUN go install github.com/rakyll/statik
-RUN ./build/operator/prebuild.sh ./migrations
-
+COPY go.mod go.sum ./
 RUN go mod download
 COPY --from=base /.tmp .tmp/protos/
 COPY --from=base /.tmp/bin /usr/local/bin/
@@ -92,6 +88,11 @@ COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
 
 ## Go test
 FROM go-base as go-test
+COPY . .
+#Migrations for cockroach-secure
+RUN go install github.com/rakyll/statik
+RUN ./build/operator/prebuild.sh ./migrations
+
 RUN go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
 
 ## Go test
