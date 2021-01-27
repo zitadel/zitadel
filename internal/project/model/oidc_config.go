@@ -40,6 +40,7 @@ type OIDCConfig struct {
 	IDTokenRoleAssertion     bool
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
+	ApplicationKey           []ApplicationKey
 }
 
 type OIDCVersion int32

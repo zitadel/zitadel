@@ -7,6 +7,11 @@ import (
 	"github.com/caos/zitadel/internal/model"
 )
 
+const (
+	yearLayout            = "2006-01-02"
+	defaultExpirationDate = "9999-01-01"
+)
+
 type AuthNKeyView struct {
 	ID             string
 	ObjectID       string
@@ -77,4 +82,8 @@ func (r *AuthNKeySearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {
 		r.Limit = limit
 	}
+}
+
+func DefaultExpiration() (time.Time, error) {
+	return time.Parse(yearLayout, defaultExpirationDate)
 }
