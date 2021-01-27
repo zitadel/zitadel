@@ -68,7 +68,7 @@ func (r *CommandSide) ReactivateApplication(ctx context.Context, projectID, appI
 		return caos_errs.ThrowNotFound(nil, "COMMAND-ov9d3", "Errors.Project.App.NotExisting")
 	}
 	if existingApp.State != domain.AppStateInactive {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-1n8cM", "Errors.Project.App.NotInactive")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1n8cM", "Errors.Project.App.NotInactive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 	projectAgg.PushEvents(project.NewApplicationReactivatedEvent(ctx, appID))
