@@ -104,13 +104,6 @@
         padding: 0;
     }
 
-    .home:hover {
-        color: inherit;
-        text-decoration:none;
-        border: none;
-        padding: 0;
-    }
-
 	.primary {
 		list-style: none;
 		margin: 0;
@@ -207,6 +200,10 @@
         color: var(--second); 
         white-space: nowrap;
     }
+
+    ul :global(i) {
+        color: var(--second);
+    }
     
 	.modal-background {
 		position: fixed;
@@ -215,16 +212,16 @@
 		left: 0;
 		top: 0;
 		/* background-color: rgba(255, 255, 255, 0.9); */
-	}
+    }
+    
 	a {
 		color: inherit;
 		border-bottom: none;
         transition: none;
     }
-    
-    :global(i) {
-        color:var(--second);
-        margin-right: .5rem;
+
+    .show-if-desktop {
+        display: none;
     }
 
 	@media (min-width: 1040px) {
@@ -279,6 +276,10 @@
         
 		.hide-if-desktop {
 			display: none !important;
+        }
+
+        .show-if-desktop {
+            display: block;
         }
     }
 
@@ -347,11 +348,17 @@
 			on:mouseleave="{() => open = false}">
 			<!-- <li class:active="{!segment}"><a rel="prefetch" href="."><i class="bars las la-bars"></i>{home}</a></li> -->
 			<slot></slot>
+
+            <!-- <a class="show-if-desktop" href='https://console.zitadel.ch'>
+                <button>
+                    <span>{$_('login')}</span>
+                </button>
+            </a> -->
 		</ul>
 
-        <span class="fill-space"></span>
+        <span class="fill-space show-if-desktop"></span>
 
-        <a href='https://console.zitadel.ch'>
+        <a class="show-if-desktop" href='https://console.zitadel.ch'>
             <button>
                 <span>{$_('login')}</span>
             </button>

@@ -326,11 +326,6 @@ a:hover {
 	color: var(--flash);
 }
 
-a:hover {
-	padding: 0;
-	border-bottom: 2px solid currentColor;
-}
-
 a.no-underline {
 	border-bottom: none;
 	padding: 0;

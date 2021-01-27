@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import GuideContents from "./GuideContents.svelte"; // TODO rename
+  import GuideContents from "./GuideContents.svelte";
   import Icon from "./Icon.svelte";
   import manifest from '../../static/manifest.json';
   export let owner = "caos";
@@ -201,7 +201,7 @@
   .content {
     width: 100%;
     margin: 0;
-    padding: var(--top-offset) var(--side-nav);
+    padding: calc(var(--top-offset) + 100px) var(--side-nav);
     tab-size: 2;
     -moz-tab-size: 2;
   }

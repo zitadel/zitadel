@@ -33,6 +33,7 @@
     <NavItem segment="administrate">{$_('nav_administrate')}</NavItem>
     <NavItem segment="apis">{$_('nav_apis')}</NavItem>
     <NavItem segment="architecture">{$_('nav_architecture')}</NavItem>
+    <NavItem segment="use">{$_('nav_use')}</NavItem>
 </Nav>
 
 <main>
