@@ -24,7 +24,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(GrantRemovedType, GrantRemovedEventMapper).
 		RegisterFilterEventMapper(ProjectGrantMemberAddedType, ProjectGrantMemberAddedEventMapper).
 		RegisterFilterEventMapper(ProjectGrantMemberChangedType, ProjectGrantMemberChangedEventMapper).
-		RegisterFilterEventMapper(ProjectGrantMemberRemovedType, ProjectGrantMemberChangedEventMapper).
+		RegisterFilterEventMapper(ProjectGrantMemberRemovedType, ProjectGrantMemberRemovedEventMapper).
 		RegisterFilterEventMapper(ApplicationAddedType, ApplicationAddedEventMapper).
 		RegisterFilterEventMapper(ApplicationChangedType, ApplicationAddedEventMapper).
 		RegisterFilterEventMapper(ApplicationRemovedType, ApplicationRemovedEventMapper).

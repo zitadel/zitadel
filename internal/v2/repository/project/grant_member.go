@@ -160,7 +160,7 @@ func NewProjectGrantMemberRemovedEvent(
 }
 
 func ProjectGrantMemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &ProjectGrantMemberChangedEvent{
+	e := &ProjectGrantMemberRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
