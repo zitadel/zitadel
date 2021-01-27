@@ -1,10 +1,10 @@
 {
     "title": "ZITADEL Identity and Access Management",
-    "nav_start":"Get Started",
+    "nav_start":"Start",
     "nav_quickstarts":"Quickstarts",
-    "nav_administrate":"Adminstrate",
+    "nav_administrate":"Administrieren",
     "nav_apis":"APIs",
-    "nav_architecture":"Architecture",
+    "nav_architecture":"Architektur",
     "nav_doc":"Dokumentation",
     "nav_use":"Handbuch",
     "nav_login":"Anmelden",

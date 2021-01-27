@@ -7,8 +7,8 @@
   import PhotoSwipe from '../components/PhotoSwipe.svelte';
   const { page } = stores();
   export let segment;
-  import { _ } from 'svelte-i18n';
-
+  import { _ , locale} from 'svelte-i18n';
+  $: console.log($locale);
 </script>
 
 <script context="module">
@@ -28,12 +28,12 @@
 </style>
 
 <Nav title="Zitadel docs" {segment} {page} logo="logos/zitadel-logo-light.svg">
-    <NavItem segment="start">{$_('nav_start')}</NavItem>
-    <NavItem segment="quickstarts">{$_('nav_quickstarts')}</NavItem>
-    <NavItem segment="administrate">{$_('nav_administrate')}</NavItem>
-    <NavItem segment="apis">{$_('nav_apis')}</NavItem>
-    <NavItem segment="architecture">{$_('nav_architecture')}</NavItem>
-    <NavItem segment="use">{$_('nav_use')}</NavItem>
+    <NavItem segment="{$locale}/start">{$_('nav_start')}</NavItem>
+    <NavItem segment="{$locale}/quickstarts">{$_('nav_quickstarts')}</NavItem>
+    <NavItem segment="{$locale}/administrate">{$_('nav_administrate')}</NavItem>
+    <NavItem segment="{$locale}/apis">{$_('nav_apis')}</NavItem>
+    <NavItem segment="{$locale}/architecture">{$_('nav_architecture')}</NavItem>
+    <NavItem segment="{$locale}/use">{$_('nav_use')}</NavItem>
 </Nav>
 
 <main>

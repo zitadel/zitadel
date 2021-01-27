@@ -178,76 +178,86 @@
   <title>
     ZITADEL • Documentation
   </title>
-	<title>ZITADEL • Dokumentation</title>
-    <meta property="description" content="Erfahren Sie mehr über ZITADEL, das Cloud-Native IAM aus der Schweiz" />
+	<title>ZITADEL • Documentation</title>
+    <meta property="description" content="Learn more about the ZITADEL, the cloud native IAM from switzerland." />
 
     <meta property="og:url" content="https://docs.zitadel.ch" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="ZITADEL • Dokumentation" />
-    <meta property="og:description" content="Erfahren Sie mehr über ZITADEL, das Cloud-Native IAM aus der Schweiz" />
+    <meta property="og:title" content="ZITADEL • Documentation" />
+    <meta property="og:description" content="Learn more about the ZITADEL, the cloud native IAM from switzerland." />
     <meta property="og:image"
         content="https://www.zitadel.ch/zitadel-social-preview25.png" />
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@caos_ch">
-    <meta name="twitter:title" content="ZITADEL • Dokumentation" />
-    <meta name="twitter:description" content="Erfahren Sie mehr über ZITADEL, das Cloud-Native IAM aus der Schweiz" />
+    <meta name="twitter:title" content="ZITADEL • Documentation" />
+    <meta name="twitter:description" content="Learn more about the ZITADEL, the cloud native IAM from switzerland." />
     <meta name="twitter:image" content="https://www.zitadel.ch/zitadel-social-preview25.png">
 </svelte:head>
     <Section>
         <div class="section">
             <div class="left">
                 <blockquote>
-                    <p>Diese Website ist auch verfügbar in:
-                        <a href="/">English'</a>
+                
+                    <p>This site is also available in:
+                
+                    <a href="/de" alt="Docs Deutsch">Deutsch (WIP)</a>
                     </p>
                 </blockquote>
                 <h2>ZITADEL Identity and Access Management</h2>
-                <p>Die meisten Applikationen müssen die Identität eines Benutzers kennen, um Benutzerdaten sicher zu speichern und auf allen Geräten des Benutzers dieselbe personalisierte Erfahrung zu bieten.</p>
-                <p>Die Authentifizierung von ZITADEL bietet Backend-Dienste, benutzerfreundliche SDKs und vorgefertigte UI-Bibliotheken zur Authentifizierung von Benutzern in Ihrer Applikation. Es unterstützt die Authentifizierung mithilfe von Passwörtern und bietet weitere Sicherheitsmechanismen, wie einen zweiten Faktor beispielsweise über OTP, um einen sicheren Zugang zu gewährleisten.</p>
-                <p>ZITADEL nutzt Industriestandards wie OAuth 2.0 und OpenID Connect, die leicht in Ihr benutzerdefiniertes Backend integriert werden können.</p>
+                <p>Most applications need to know the identity of a user allowing to securely store user data in the cloud and provide the same personalised experience across all of the user's devices.</p>
+                <p>ZITADEL's authentication provides backend services, easy-to-use SDKs, and ready-made UI libraries to authenticate users in your applicqtion. It supports authentication using passwords and applies additional security wirh the help of a second factor, for example OTP, to ensure a safe and secure access.</p>
+                <p>ZITADEL's authentication leverages industry standards like OAuth 2.0 and OpenID Connect so that it can be easily integrated in your custom backend.</p>
             </div>
             <img class="caos-back" src="logos/zitadel-logo-solo-darkdesign.svg" alt="caos logo">
         </div>
 
         <div class="subsection">
-            <h3>Erfahren Sie hier, wie Sie starten</h3>
-            <p>Befolgen Sie diese Anleitung, um mit ZITADEL im Allgemeinen zu beginnen.</p>
+            <h3>Start using ZITADEL</h3>
+            <p>Follow this guide to get started with ZITADEL in general.
 
-            <a href="/de/start" class="getstarted-btn"> 
+</p>
+
+            <a href="/start" class="getstarted-btn"> 
                 <Button selected style="margin: 2rem 0;">
-                    Erfahren Sie hier, wie Sie starten
+                    Start using ZITADEL
                     <i class="las la-arrow-right"></i>
                 </Button>
             </a>
-
             <div class="sublinks">
-                <a class="sublink" href="de/start#Use_ORBOS_to_install_ZITADEL">Orbos verwenden um ZITADEL zu installieren</a>
-                <a class="sublink" href="de/start#Use_ORBOS_to_install_ZITADEL">Applikation erstellen</a>
+                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">Verwenden Sie Orbos um ZITADEL zu installieren</a>
+                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">Applikation erstellen</a>
             </div>
         </div>
 
         <div class="doc-container">
             <div class="doc">
                 <div class="text">
-                    <h4>Quickstarts</h4>
-                    <p>Erfahren Sie, wie Sie Ihre Anwendungen integrieren und sichere Applikationen und Schnittstellen erstellen.</p>
-                    <a href="/de/quickstarts">>Mehr erfahren><i class="las la-arrow-right"></i></a>
+                    <h4>Integration</h4>
+                    <p>Learn how to integrate your applications and build secure workflows and APIs with ZITADEL</p>
+                    <a href="/quickstarts">Learn more<i class="las la-arrow-right"></i></a>
+
+                    <p class="section">In this section</p>
+                    <div class="sectionlinks">
+                        <a class="link" href="quickstarts#Single_Page_Application">Single Page Applications</a>
+                        <a class="link" href="quickstarts#Server_Side_Application">Serverside rendered Applications</a>
+                        <a class="link" href="quickstarts#Mobile_App_Native_App">Native Applications</a>
+                    </div>
                 </div>
                 <img src="img/develop2.png" alt="Develop" />
             </div>
 
             <div class="doc">
                 <div class="text">
-                    <h4>Administrieren</h4>
-                    <p>Erfahren Sie, wie Sie Ihre Daten und Rollenzuordnungen in ZITADEL verwalten</p>
-                    <a href="/de/administrate">Mehr erfahren<i class="las la-arrow-right"></i></a>
+                    <h4>Administration</h4>
+                    <p>Learn how to manage your data and role associations in ZITADEL</p>
+                    <a href="/administrate">Learn more<i class="las la-arrow-right"></i></a>
 
-                    <p class="section">In dieser Sektion</p>
+                    <p class="section">In this section</p>
                     
                     <div class="sectionlinks">
-                        <a class="link" href="de/administrate#Organisationen">Organisationen bearbeiten</a>
-                        <a class="link" href="de/administrate#Projekte">Projekte bearbeiten</a>
+                        <a class="link" href="administrate#Organisations">Manage Organisations</a>
+                        <a class="link" href="administrate#Projects">Manage Projects</a>
                     </div>
                 </div>
                 <img src="img/projects2.png" alt="Develop" />
@@ -255,41 +265,41 @@
 
             <div class="doc">
                 <div class="text">
-                    <h4>ZITADEL APIs</h4>
-                    <p>Erfahren Sie mehr über die ZITADEL-APIs und wie Sie mit ihnen entwickeln können.</p>
-                    <a href="de/apis">Mehr erfahren<i class="las la-arrow-right"></i></a>
+                    <h4>Authentication API</h4>
+                    <p>^Management API</p>
+                    <a href="/apis">Learn more<i class="las la-arrow-right"></i></a>
 
-                    <p class="section">In dieser Sektion</p>
-
+                    <p class="section">In this section</p>
+                    
                     <div class="sectionlinks">
-                        <a class="link" href="de/apis#Authentication_API">Authentication API</a>
-                        <a class="link" href="de/apis#Management_API">Management API</a>
-                        <a class="link" href="de/apis#Admin_API">Admin API</a>
+                        <a class="link" href="apis#Authentication_API">Authentication API</a>
+                        <a class="link" href="apis#Management_API">Management API</a>
+                        <a class="link" href="apis#Admin_API">Admin API</a>
+                    </div>
+                
+                </div>
+            </div>
+
+            <div class="doc">
+                <div class="text">
+                    <h4>Architecture and Technologies</h4>
+                    <p>Learn more about engineering and design principles, ZITADELs architecture and used technologies.</p>
+                    <a href="/architecture" >Learn more<i class="las la-arrow-right"></i></a>
+
+                    <p class="section">In this section</p>
+                    <div class="sectionlinks">
+                        <a class="link" href="architecture#Principles">Principles</a>
+                        <a class="link" href="architecture#Architecture">Architecture</a>
+                        <a class="link" href="architecture#OpenID_Connect_1_0_and_OAuth_2_0">OIDC & OAuth 2.0</a>
                     </div>
                 </div>
             </div>
 
             <div class="doc">
                 <div class="text">
-                    <h4>Architektur und Technologien</h4>
-                    <p>Erfahren Sie mehr über Konstruktion- und Designprinzipien und eingesetzte Technologien</p>
-                    <a href="de/architecture" >Mehr erfahren<i class="las la-arrow-right"></i></a>
-
-                    <p class="section">In dieser Sektion</p>
-                  
-                    <div class="sectionlinks">
-                        <a class="link" href="de/architecture#Prinzipien">Prinzipien</a>
-                        <a class="link" href="de/architecture#Architektur">Architektur</a>
-                        <a class="link" href="de/architecture#OpenID_Connect_1_0_and_OAuth_2_0">OIDC & OAuth 2.0</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="doc">
-                <div class="text">
-                    <h4>Benutzer Handbuch</h4>
-                    <p>Erfahren Sie hier, wie Sie als Benutzer ZITADEL verwenden können.</p>
-                    <a href="de/use" >Mehr erfahren<i class="las la-arrow-right"></i></a>
+                    <h4>User Manuals</h4>
+                    <p>Follow this guide to get started with ZITADEL as a user.</p>
+                    <a href="/use" >Learn more<i class="las la-arrow-right"></i></a>
                 </div>
 
                 <img src="img/personal2.png" alt="Develop" />

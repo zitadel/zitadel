@@ -2,10 +2,11 @@
     import { goto } from '@sapper/app';
     import { docLanguages } from '../modules/language-store.js'
     import {LANGUAGES} from '../../config.js';
-    let group = 'en';
 </script>
 
 <script>
+    import { locale } from 'svelte-i18n';
+    let group = $locale;
 
     function reload(language) {
         if (typeof window !== 'undefined') {
