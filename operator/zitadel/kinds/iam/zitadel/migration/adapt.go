@@ -4,7 +4,8 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
+	"github.com/pkg/errors"
+	"github.com/rakyll/statik/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -21,6 +22,8 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	_ "github.com/caos/zitadel/statik"
 )
 
 const (
@@ -46,7 +49,6 @@ func AdaptFunc(
 	users []string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
-	localMigrationsPath string,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -78,7 +80,7 @@ func AdaptFunc(
 			dbHost := dbCurrent.Host
 			dbPort := dbCurrent.Port
 
-			allScripts := getMigrationFiles(localMigrationsPath)
+			allScripts := getMigrationFiles(monitor, "/cockroach/")
 
 			nameLabels := labels.MustForNameK8SMap(componentLabels, jobName)
 			jobDef := &batchv1.Job{
@@ -190,16 +192,21 @@ type migration struct {
 
 const migrationFileRegex = `(V|U)(\.|\d)+(__)(\w|\_|\ )+(\.sql)`
 
-func getMigrationFiles(root string) []migration {
+func getMigrationFiles(monitor mntr.Monitor, root string) []migration {
 	migrations := make([]migration, 0)
 	files := []string{}
+	/*
+		absPath, err := filepath.Abs(root)
+		if err != nil {
+			return migrations
+		}*/
 
-	absPath, err := filepath.Abs(root)
+	statikFS, err := fs.New()
 	if err != nil {
+		monitor.Error(errors.Wrap(err, "failed to load migration files"))
 		return migrations
 	}
-
-	err = filepath.Walk(absPath, func(path string, info os.FileInfo, err error) error {
+	err = fs.Walk(statikFS, root, func(path string, info os.FileInfo, err error) error {
 		matched, err := regexp.MatchString(migrationFileRegex, info.Name())
 		if err != nil {
 			return err
@@ -215,9 +222,10 @@ func getMigrationFiles(root string) []migration {
 	sort.Strings(files)
 
 	for _, file := range files {
+
 		fullName := filepath.Join(root, file)
 
-		data, err := ioutil.ReadFile(fullName)
+		data, err := fs.ReadFile(statikFS, fullName)
 		if err != nil || data == nil || len(data) == 0 {
 			continue
 		}

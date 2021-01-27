@@ -17,7 +17,7 @@ import (
 	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
 )
 
-func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, migrationsPath string, version *string) error {
+func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, version *string) error {
 	takeoffChan := make(chan struct{})
 	go func() {
 		takeoffChan <- struct{}{}
@@ -36,7 +36,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", migrationsPath, version, []string{"operator", "iam"}), k8sClient)
+		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", version, []string{"operator", "iam"}), k8sClient)
 
 		go func() {
 			started := time.Now()
@@ -54,7 +54,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 	return nil
 }
 
-func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb, k8sClient *kubernetes.Client, backup, migrationsPath string, version *string) error {
+func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb, k8sClient *kubernetes.Client, backup string, version *string) error {
 	databasesList := []string{
 		"notification",
 		"adminapi",
@@ -68,7 +68,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		return err
 	}
 
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", migrationsPath, version, []string{"scaledown"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", version, []string{"scaledown"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -76,7 +76,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		return err
 	}
 
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "migration", migrationsPath, version, []string{"migration"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "migration", version, []string{"migration"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -90,7 +90,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		return err
 	}
 
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", migrationsPath, version, []string{"scaleup"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", version, []string{"scaleup"}), k8sClient)(); err != nil {
 		return err
 	}
 

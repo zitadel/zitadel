@@ -36,7 +36,6 @@ func main() {
 		monitor,
 		helpers.PruneHome(*orbconfig),
 		kubernetes.NewK8sClient(monitor, strPtr(string(kc))),
-		"./migrations/cockroach/",
 		strPtr("local-debugging"),
 	); err != nil {
 		panic(err)

@@ -12,9 +12,14 @@ WORKDIR src/github.com/caos/zitadel/
 COPY go.mod go.sum ./
 RUN go mod download
 
+
 ## Go test
 FROM go-base as go-test
 COPY . .
+#Migrations for cockroach-secure
+RUN go install github.com/rakyll/statik
+RUN ./build/operator/prebuild.sh ./migrations
+
 RUN go test -race -v -coverprofile=profile.cov ./operator/...
 
 ## Go test
@@ -23,6 +28,8 @@ COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 
 ## Go prod build
 FROM go-test as prod-go-build
+
+
 ARG ARCH=amd64
 ARG OS=linux
 ARG VERSION=none
@@ -43,16 +50,10 @@ ARG OS=linux
 COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadelctl /app/zitadelctl
 RUN chmod a+x /app/zitadelctl
 
-#Migrations for cockroach-secure
-COPY migrations/cockroach /migrations
-RUN ls /migrations
-
-
 ## Scratch Image
 FROM scratch as final
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /app /
-COPY --from=artifact /migrations /migrations
 USER zitadel
 HEALTHCHECK NONE
 ENTRYPOINT ["/zitadelctl"]

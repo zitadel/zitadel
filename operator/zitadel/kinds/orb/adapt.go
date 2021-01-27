@@ -14,7 +14,6 @@ import (
 func AdaptFunc(
 	orbconfig *orb.Orb,
 	action string,
-	migrationsPath string,
 	binaryVersion *string,
 	features []string,
 ) operator.AdaptFunc {
@@ -59,7 +58,6 @@ func AdaptFunc(
 			desiredKind.Spec.Tolerations,
 			orbconfig,
 			action,
-			migrationsPath,
 			&desiredKind.Spec.Version,
 			features,
 		)
