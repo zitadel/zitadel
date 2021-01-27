@@ -21,7 +21,7 @@ func (r *CommandSide) ChangeApplication(ctx context.Context, appChange *domain.A
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-28di9", "Errors.Project.App.NotExisting")
 	}
 	if existingApp.Name == appChange.Name {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 	projectAgg.PushEvents(project.NewApplicationChangedEvent(ctx, appChange.AppID, existingApp.Name, appChange.Name, appChange.AggregateID))
