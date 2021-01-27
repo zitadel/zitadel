@@ -9,12 +9,16 @@ ARG ENV=prod
 FROM golang:1.15 as go-base
 
 WORKDIR src/github.com/caos/zitadel/
-COPY go.mod go.sum ./
+COPY . .
 RUN go mod download
+
+#Migrations for cockroach-secure
+RUN go install github.com/rakyll/statik
+RUN chmod +x ./build/operator/prebuild.sh
+RUN ./build/operator/prebuild.sh ./migrations
 
 ## Go test
 FROM go-base as go-test
-COPY . .
 RUN go test -race -v -coverprofile=profile.cov ./operator/...
 
 ## Go test
@@ -24,10 +28,6 @@ COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 ## Go prod build
 FROM go-test as prod-go-build
 
-#Migrations for cockroach-secure
-RUN go install github.com/rakyll/statik
-RUN chmod +x ./build/operator/prebuild.sh
-RUN ./build/operator/prebuild.sh ./migrations
 
 ARG ARCH=amd64
 ARG OS=linux
