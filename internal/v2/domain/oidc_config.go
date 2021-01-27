@@ -13,6 +13,13 @@ import (
 	"github.com/caos/zitadel/internal/id"
 )
 
+const (
+	http           = "http://"
+	httpLocalhost  = "http://localhost:"
+	httpLocalhost2 = "http://localhost/"
+	https          = "https://"
+)
+
 type OIDCApp struct {
 	models.ObjectRoot
 
@@ -160,4 +167,153 @@ func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) 
 		}
 	}
 	return false
+}
+
+func (c *OIDCApp) FillCompliance() {
+	c.Compliance = GetOIDCCompliance(c.OIDCVersion, c.ApplicationType, c.GrantTypes, c.ResponseTypes, c.AuthMethodType, c.RedirectUris)
+}
+
+func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTypes []OIDCGrantType, responseTypes []OIDCResponseType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+	switch version {
+	case OIDCVersionV1:
+		return GetOIDCV1Compliance(appType, grantTypes, authMethod, redirectUris)
+	}
+	return nil
+}
+
+func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+	compliance := &Compliance{NoneCompliant: false}
+	if redirectUris == nil || len(redirectUris) == 0 {
+		compliance.NoneCompliant = true
+		compliance.Problems = append([]string{"Application.OIDC.V1.NoRedirectUris"}, compliance.Problems...)
+	}
+	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) && containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+		CheckRedirectUrisImplicitAndCode(compliance, appType, redirectUris)
+	} else {
+		if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) {
+			CheckRedirectUrisImplicit(compliance, appType, redirectUris)
+		}
+		if containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+			CheckRedirectUrisCode(compliance, appType, redirectUris)
+		}
+	}
+
+	switch appType {
+	case OIDCApplicationTypeNative:
+		GetOIDCV1NativeApplicationCompliance(compliance, authMethod)
+	case OIDCApplicationTypeUserAgent:
+		GetOIDCV1UserAgentApplicationCompliance(compliance, authMethod)
+	}
+	if compliance.NoneCompliant {
+		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
+	}
+	return compliance
+}
+
+func GetOIDCV1NativeApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
+	if authMethod != OIDCAuthMethodTypeNone {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.AuthMethodType.NotNone")
+	}
+}
+
+func GetOIDCV1UserAgentApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
+	if authMethod != OIDCAuthMethodTypeNone {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.AuthMethodType.NotNone")
+	}
+}
+
+func CheckRedirectUrisCode(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
+	if urlsAreHttps(redirectUris) {
+		return
+	}
+	if urlContainsPrefix(redirectUris, http) && appType != OIDCApplicationTypeWeb {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+	}
+	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.CustomOnlyForNative")
+	}
+}
+
+func CheckRedirectUrisImplicit(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
+	if urlsAreHttps(redirectUris) {
+		return
+	}
+	if containsCustom(redirectUris) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
+	}
+	if urlContainsPrefix(redirectUris, http) {
+		if appType == OIDCApplicationTypeNative {
+			if !onlyLocalhostIsHttp(redirectUris) {
+				compliance.NoneCompliant = true
+				compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.NativeShouldBeHttpLocalhost")
+			}
+			return
+		}
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.HttpNotAllowed")
+	}
+}
+
+func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
+	if urlsAreHttps(redirectUris) {
+		return
+	}
+	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
+	}
+	if (urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeNative {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.HttpLocalhostOnlyForNative")
+	}
+	if urlContainsPrefix(redirectUris, http) && !(urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeWeb {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+	}
+	if !compliance.NoneCompliant {
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.NotAllCombinationsAreAllowed")
+	}
+}
+
+func urlsAreHttps(uris []string) bool {
+	for _, uri := range uris {
+		if !strings.HasPrefix(uri, https) {
+			return false
+		}
+	}
+	return true
+}
+
+func urlContainsPrefix(uris []string, prefix string) bool {
+	for _, uri := range uris {
+		if strings.HasPrefix(uri, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func containsCustom(uris []string) bool {
+	for _, uri := range uris {
+		if !strings.HasPrefix(uri, http) && !strings.HasPrefix(uri, https) {
+			return true
+		}
+	}
+	return false
+}
+
+func onlyLocalhostIsHttp(uris []string) bool {
+	for _, uri := range uris {
+		if strings.HasPrefix(uri, http) {
+			if !strings.HasPrefix(uri, httpLocalhost) && !strings.HasPrefix(uri, httpLocalhost2) {
+				return false
+			}
+		}
+	}
+	return true
 }

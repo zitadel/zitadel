@@ -20,7 +20,6 @@ func (r *CommandSide) ChangeApplication(ctx context.Context, appChange *domain.A
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-28di9", "Errors.Project.App.NotExisting")
 	}
-
 	if existingApp.Name == appChange.Name {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
@@ -47,7 +46,7 @@ func (r *CommandSide) DeactivateApplication(ctx context.Context, projectID, appI
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-ov9d3", "Errors.Project.App.NotExisting")
 	}
-	if existingApp.State == domain.AppStateActive {
+	if existingApp.State != domain.AppStateActive {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-ov9d3", "Errors.Project.App.NotActive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
@@ -68,7 +67,7 @@ func (r *CommandSide) ReactivateApplication(ctx context.Context, projectID, appI
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-ov9d3", "Errors.Project.App.NotExisting")
 	}
-	if existingApp.State == domain.AppStateInactive {
+	if existingApp.State != domain.AppStateInactive {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-1n8cM", "Errors.Project.App.NotInactive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)

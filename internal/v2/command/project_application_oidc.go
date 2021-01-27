@@ -24,7 +24,9 @@ func (r *CommandSide) AddOIDCApplication(ctx context.Context, application *domai
 		return nil, err
 	}
 
-	return oidcWriteModelToOIDCConfig(addedApplication), nil
+	result := oidcWriteModelToOIDCConfig(addedApplication)
+	result.FillCompliance()
+	return result, nil
 }
 
 func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *project.Aggregate, proj *domain.Project, oidcApp *domain.OIDCApp, resourceOwner string) (err error) {
@@ -112,8 +114,9 @@ func (r *CommandSide) ChangeOIDCApplication(ctx context.Context, oidc *domain.OI
 	if err != nil {
 		return nil, err
 	}
-
-	return oidcWriteModelToOIDCConfig(existingOIDC), nil
+	result := oidcWriteModelToOIDCConfig(existingOIDC)
+	result.FillCompliance()
+	return result, nil
 }
 
 func (r *CommandSide) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.OIDCApp, error) {

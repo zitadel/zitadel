@@ -26,7 +26,7 @@ func projectGrantWriteModelToProjectGrant(writeModel *ProjectGrantWriteModel) *d
 func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) *domain.Application {
 	return &domain.Application{
 		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel),
-		AppID:      writeModel.AggregateID,
+		AppID:      writeModel.AppID,
 		State:      writeModel.State,
 		Name:       writeModel.Name,
 		Type:       writeModel.Type,
@@ -48,7 +48,6 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		AuthMethodType:           writeModel.AuthMethodType,
 		PostLogoutRedirectUris:   writeModel.PostLogoutRedirectUris,
 		OIDCVersion:              writeModel.OIDCVersion,
-		Compliance:               writeModel.Compliance,
 		DevMode:                  writeModel.DevMode,
 		AccessTokenType:          writeModel.AccessTokenType,
 		AccessTokenRoleAssertion: writeModel.AccessTokenRoleAssertion,
