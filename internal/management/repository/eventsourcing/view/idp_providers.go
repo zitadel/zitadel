@@ -57,8 +57,8 @@ func (v *View) DeleteIDPProvidersByAggregateID(aggregateID string, event *models
 	return v.ProcessedIDPProviderSequence(event)
 }
 
-func (v *View) GetLatestIDPProviderSequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(idpProviderTable, aggregateType)
+func (v *View) GetLatestIDPProviderSequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(idpProviderTable)
 }
 
 func (v *View) ProcessedIDPProviderSequence(event *models.Event) error {

@@ -48,7 +48,7 @@ func (p *OrgIAMPolicy) AggregateTypes() []es_models.AggregateType {
 }
 
 func (p *OrgIAMPolicy) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestOrgIAMPolicySequence("")
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -57,8 +57,8 @@ func (p *OrgIAMPolicy) EventQuery() (*es_models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (p *OrgIAMPolicy) CurrentSequence(event *es_models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestOrgIAMPolicySequence(string(event.AggregateType))
+func (p *OrgIAMPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
 	if err != nil {
 		return 0, err
 	}

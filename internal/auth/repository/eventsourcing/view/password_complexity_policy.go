@@ -32,8 +32,8 @@ func (v *View) DeletePasswordComplexityPolicy(aggregateID string, event *models.
 	return v.ProcessedPasswordComplexityPolicySequence(event)
 }
 
-func (v *View) GetLatestPasswordComplexityPolicySequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(passwordComplexityPolicyTable, aggregateType)
+func (v *View) GetLatestPasswordComplexityPolicySequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(passwordComplexityPolicyTable)
 }
 
 func (v *View) ProcessedPasswordComplexityPolicySequence(event *models.Event) error {

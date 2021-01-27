@@ -29,7 +29,7 @@ func (h *testHandler) AggregateTypes() []models.AggregateType {
 	return nil
 }
 
-func (h *testHandler) CurrentSequence(event *models.Event) (uint64, error) {
+func (h *testHandler) CurrentSequence() (uint64, error) {
 	return 0, nil
 }
 

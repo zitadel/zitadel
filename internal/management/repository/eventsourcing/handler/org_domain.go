@@ -47,8 +47,8 @@ func (_ *OrgDomain) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate}
 }
 
-func (p *OrgDomain) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestOrgDomainSequence(string(event.AggregateType))
+func (p *OrgDomain) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgDomainSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -56,7 +56,7 @@ func (p *OrgDomain) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := d.view.GetLatestOrgDomainSequence("")
+	sequence, err := d.view.GetLatestOrgDomainSequence()
 	if err != nil {
 		return nil, err
 	}
