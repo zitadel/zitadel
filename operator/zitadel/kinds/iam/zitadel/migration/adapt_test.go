@@ -58,7 +58,7 @@ func TestMigration_GetMigrationFiles(t *testing.T) {
 		},
 	}
 
-	files := getMigrationFiles("./testfiles")
+	files := getMigrationFiles(mntr.Monitor{}, "/testfiles/")
 	assert.ElementsMatch(t, equals, files)
 }
 
@@ -73,9 +73,8 @@ func TestMigration_AdaptFunc(t *testing.T) {
 	tolerations := []corev1.Toleration{}
 	dbHost := "test"
 	dbPort := "test"
-	localMigrationsPath := "./testfiles"
 
-	allScripts := getMigrationFiles(localMigrationsPath)
+	allScripts := getMigrationFiles(mntr.Monitor{}, "/cockroach/")
 
 	componentLabels := mocklabels.Component
 	jobName := labels.MustForName(componentLabels, jobNamePrefix+reason)
@@ -160,7 +159,6 @@ func TestMigration_AdaptFunc(t *testing.T) {
 		users,
 		nodeselector,
 		tolerations,
-		localMigrationsPath,
 	)
 
 	queried := map[string]interface{}{}
