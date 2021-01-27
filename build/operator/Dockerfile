@@ -23,6 +23,10 @@ COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 
 ## Go prod build
 FROM go-test as prod-go-build
+
+#Migrations for cockroach-secure
+RUN ./build/operator/prebuild.sh ./migrations
+
 ARG ARCH=amd64
 ARG OS=linux
 ARG VERSION=none
@@ -42,11 +46,6 @@ ARG ARCH=amd64
 ARG OS=linux
 COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadelctl /app/zitadelctl
 RUN chmod a+x /app/zitadelctl
-
-#Migrations for cockroach-secure
-COPY migrations/cockroach /migrations
-RUN ls /migrations
-
 
 ## Scratch Image
 FROM scratch as final

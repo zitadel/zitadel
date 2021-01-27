@@ -30,7 +30,6 @@ func AdaptFunc(
 	tolerations []core.Toleration,
 	orbconfig *orb.Orb,
 	action string,
-	migrationsPath string,
 	version *string,
 	features []string,
 ) operator.AdaptFunc {
@@ -150,7 +149,6 @@ func AdaptFunc(
 			allZitadelUsers,
 			nodeselector,
 			tolerations,
-			migrationsPath,
 		)
 		if err != nil {
 			return nil, nil, allSecrets, err
@@ -231,6 +229,8 @@ func AdaptFunc(
 					queryC,
 					//migration
 					queryM,
+					//wait until migration is completed
+					operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespaceStr, action)),
 				)
 				destroyers = append(destroyers,
 					destroyM,

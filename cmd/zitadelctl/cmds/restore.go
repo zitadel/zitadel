@@ -15,10 +15,9 @@ import (
 
 func RestoreCommand(rv RootValues) *cobra.Command {
 	var (
-		backup         string
-		kubeconfig     string
-		migrationsPath string
-		cmd            = &cobra.Command{
+		backup     string
+		kubeconfig string
+		cmd        = &cobra.Command{
 			Use:   "restore",
 			Short: "Restore from backup",
 			Long:  "Restore from backup",
@@ -28,7 +27,6 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 	flags := cmd.Flags()
 	flags.StringVar(&backup, "backup", "", "Backup used for db restore")
 	flags.StringVar(&kubeconfig, "kubeconfig", "~/.kube/config", "Kubeconfig for ZITADEL operator deployment")
-	flags.StringVar(&migrationsPath, "migrations", "./migrations/", "Path to the migration files")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		_, monitor, orbConfig, gitClient, version, errFunc, err := rv()
@@ -91,7 +89,7 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 				return nil
 			}
 
-			if err := start.Restore(monitor, gitClient, orbConfig, k8sClient, backup, migrationsPath, &version); err != nil {
+			if err := start.Restore(monitor, gitClient, orbConfig, k8sClient, backup, &version); err != nil {
 				monitor.Error(err)
 			}
 			return nil
