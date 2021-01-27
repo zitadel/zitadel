@@ -19,7 +19,7 @@ func (r *CommandSide) AddProjectGrantMember(ctx context.Context, member *domain.
 	if err != nil {
 		return nil, err
 	}
-	addedMember := NewProjectGrantMemberWriteModel(member.AggregateID, member.UserID, member.GrantID, resourceOwner)
+	addedMember := NewProjectGrantMemberWriteModel(member.AggregateID, member.UserID, member.GrantID)
 	err = r.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (r *CommandSide) ChangeProjectGrantMember(ctx context.Context, member *doma
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-109fs", "Errors.Project.Member.Invalid")
 	}
 
-	existingMember, err := r.projectGrantMemberWriteModelByID(ctx, member.AggregateID, member.UserID, member.GrantID, resourceOwner)
+	existingMember, err := r.projectGrantMemberWriteModelByID(ctx, member.AggregateID, member.UserID, member.GrantID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,12 +71,9 @@ func (r *CommandSide) ChangeProjectGrantMember(ctx context.Context, member *doma
 }
 
 func (r *CommandSide) RemoveProjectGrantMember(ctx context.Context, projectID, userID, grantID, resourceOwner string) error {
-	m, err := r.projectGrantMemberWriteModelByID(ctx, projectID, userID, grantID, resourceOwner)
-	if err != nil && !errors.IsNotFound(err) {
+	m, err := r.projectGrantMemberWriteModelByID(ctx, projectID, userID, grantID)
+	if err != nil {
 		return err
-	}
-	if errors.IsNotFound(err) {
-		return nil
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.WriteModel)
@@ -85,11 +82,11 @@ func (r *CommandSide) RemoveProjectGrantMember(ctx context.Context, projectID, u
 	return r.eventstore.PushAggregate(ctx, m, projectAgg)
 }
 
-func (r *CommandSide) projectGrantMemberWriteModelByID(ctx context.Context, projectID, userID, grantID, resourceOwner string) (member *ProjectGrantMemberWriteModel, err error) {
+func (r *CommandSide) projectGrantMemberWriteModelByID(ctx context.Context, projectID, userID, grantID string) (member *ProjectGrantMemberWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewProjectGrantMemberWriteModel(projectID, userID, grantID, resourceOwner)
+	writeModel := NewProjectGrantMemberWriteModel(projectID, userID, grantID)
 	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

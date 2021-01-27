@@ -16,13 +16,13 @@ type ProjectGrantMemberWriteModel struct {
 	State domain.MemberState
 }
 
-func NewProjectGrantMemberWriteModel(projectID, userID, grantID, resourceOwner string) *ProjectGrantMemberWriteModel {
+func NewProjectGrantMemberWriteModel(projectID, userID, grantID string) *ProjectGrantMemberWriteModel {
 	return &ProjectGrantMemberWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   projectID,
-			ResourceOwner: resourceOwner,
+			AggregateID: projectID,
 		},
-		UserID: userID,
+		UserID:  userID,
+		GrantID: grantID,
 	}
 }
 
@@ -73,7 +73,6 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
 		AggregateIDs(wm.AggregateID)
-	//	ResourceOwner(wm.ResourceOwner)
 	//EventTypes(
 	//	project.GrantMemberAddedType,
 	//	project.GrantMemberChangedType,

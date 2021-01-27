@@ -191,7 +191,7 @@ func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.A
 		DevMode:         oidcApp.DevMode,
 	}
 
-	err := r.addOIDCApplication(ctx, projectAgg, project, app, resourceOwner)
+	_, err := r.addOIDCApplication(ctx, projectAgg, project, app, resourceOwner)
 	if err != nil {
 		return err
 	}

@@ -151,7 +151,7 @@ func NewProjectGrantMemberRemovedEvent(
 	return &GrantMemberRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			GrantMemberAddedType,
+			GrantMemberRemovedType,
 		),
 		UserID:    userID,
 		GrantID:   grantID,
