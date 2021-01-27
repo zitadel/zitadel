@@ -16,7 +16,7 @@ type passwordFormData struct {
 }
 
 func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
-	var errType, errMessage string;
+	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
