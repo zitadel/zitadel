@@ -14,7 +14,6 @@ RUN go mod download
 
 #Migrations for cockroach-secure
 RUN go install github.com/rakyll/statik
-RUN chmod +x ./build/operator/prebuild.sh
 RUN ./build/operator/prebuild.sh ./migrations
 
 ## Go test
