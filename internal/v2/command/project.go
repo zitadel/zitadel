@@ -135,7 +135,7 @@ func (r *CommandSide) ReactivateProject(ctx context.Context, projectID string, r
 		return caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 	if existingProject.State != domain.ProjectStateInactive {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-5M9bs", "Errors.Project.NotInctive")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInctive")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
