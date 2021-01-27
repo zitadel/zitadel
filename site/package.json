@@ -20,8 +20,8 @@
 		"highlight.js": "^10.3.1",
 		"marked": "^1.2.2",
 		"polka": "^0.5.2",
-		"svelte-i18n": "^3.1.0",
-		"sirv": "^1.0.7"
+		"sirv": "^1.0.7",
+		"svelte-i18n": "^3.3.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.3",

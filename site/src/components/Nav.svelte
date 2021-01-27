@@ -14,11 +14,9 @@
 	let open = false;
 	let visible = true;
     // hide nav whenever we navigate
-    // if (page) {
-        page.subscribe(() => {
-            open = false;
-        });
-    // }
+    page.subscribe(() => {
+        open = false;
+    });
 	function intercept_touchstart(event) {
 		if (!open) {
 			event.preventDefault();

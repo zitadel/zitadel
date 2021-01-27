@@ -8,7 +8,6 @@
   const { page } = stores();
   export let segment;
 
-  import { _ } from 'svelte-i18n';
 </script>
 
 <script context="module">

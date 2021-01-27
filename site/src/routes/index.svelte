@@ -5,11 +5,7 @@
 </script>
 
 <script>
-    import Split from "../components/Split.svelte";
     import Section from '../components/Section.svelte';
-    import LanguageSwitcher from '../components/LanguageSwitcher.svelte';
-    import Nav from '../components/Nav.svelte';
-    import {LANGUAGES} from '../../config.js';
     import Button from '../components/Button.svelte';
 </script>
 
