@@ -5,12 +5,15 @@
 </script>
 
 <script>
-     import Split from "../../components/Split.svelte";
+    import Split from "../../components/Split.svelte";
     import Section from '../../components/Section.svelte';
     import LanguageSwitcher from '../../components/LanguageSwitcher.svelte';
     import Nav from '../../components/Nav.svelte';
     import {LANGUAGES} from '../../../config.js';
     import Button from '../../components/Button.svelte';
+    import {locale} from 'svelte-i18n';
+
+    locale.set('de');
 </script>
 
 <style>
@@ -218,7 +221,7 @@
             <h3>Erfahren Sie hier, wie Sie starten</h3>
             <p>Befolgen Sie diese Anleitung, um mit ZITADEL im Allgemeinen zu beginnen.</p>
 
-            <a href="/start" class="getstarted-btn"> 
+            <a href="/de/start" class="getstarted-btn"> 
                 <Button selected style="margin: 2rem 0;">
                     Erfahren Sie hier, wie Sie starten
                     <i class="las la-arrow-right"></i>
@@ -226,8 +229,8 @@
             </a>
 
             <div class="sublinks">
-                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">Orbos verwenden um ZITADEL zu installieren</a>
-                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">Applikation erstellen</a>
+                <a class="sublink" href="de/start#Use_ORBOS_to_install_ZITADEL">Orbos verwenden um ZITADEL zu installieren</a>
+                <a class="sublink" href="de/start#Use_ORBOS_to_install_ZITADEL">Applikation erstellen</a>
             </div>
         </div>
 
@@ -236,7 +239,7 @@
                 <div class="text">
                     <h4>Quickstarts</h4>
                     <p>Erfahren Sie, wie Sie Ihre Anwendungen integrieren und sichere Applikationen und Schnittstellen erstellen.</p>
-                    <a href="/quickstarts">>Mehr erfahren><i class="las la-arrow-right"></i></a>
+                    <a href="/de/quickstarts">>Mehr erfahren><i class="las la-arrow-right"></i></a>
                 </div>
                 <img src="img/develop2.png" alt="Develop" />
             </div>
@@ -245,13 +248,13 @@
                 <div class="text">
                     <h4>Administrieren</h4>
                     <p>Erfahren Sie, wie Sie Ihre Daten und Rollenzuordnungen in ZITADEL verwalten</p>
-                    <a href="/administrate">Mehr erfahren<i class="las la-arrow-right"></i></a>
+                    <a href="/de/administrate">Mehr erfahren<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In dieser Sektion</p>
                     
                     <div class="sectionlinks">
-                        <a class="link" href="administrate#Organisationen">Organisationen bearbeiten</a>
-                        <a class="link" href="administrate#Projekte">Projekte bearbeiten</a>
+                        <a class="link" href="de/administrate#Organisationen">Organisationen bearbeiten</a>
+                        <a class="link" href="de/administrate#Projekte">Projekte bearbeiten</a>
                     </div>
                 </div>
                 <img src="img/projects2.png" alt="Develop" />
@@ -261,14 +264,14 @@
                 <div class="text">
                     <h4>ZITADEL APIs</h4>
                     <p>Erfahren Sie mehr über die ZITADEL-APIs und wie Sie mit ihnen entwickeln können.</p>
-                    <a href="/apis">Mehr erfahren<i class="las la-arrow-right"></i></a>
+                    <a href="de/apis">Mehr erfahren<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In dieser Sektion</p>
 
                     <div class="sectionlinks">
-                        <a class="link" href="apis#Authentication_API">Authentication API</a>
-                        <a class="link" href="apis#Management_API">Management API</a>
-                        <a class="link" href="apis#Admin_API">Admin API</a>
+                        <a class="link" href="de/apis#Authentication_API">Authentication API</a>
+                        <a class="link" href="de/apis#Management_API">Management API</a>
+                        <a class="link" href="de/apis#Admin_API">Admin API</a>
                     </div>
                 </div>
             </div>
@@ -277,14 +280,14 @@
                 <div class="text">
                     <h4>Architektur und Technologien</h4>
                     <p>Erfahren Sie mehr über Konstruktion- und Designprinzipien und eingesetzte Technologien</p>
-                    <a href="/architecture" >Mehr erfahren<i class="las la-arrow-right"></i></a>
+                    <a href="de/architecture" >Mehr erfahren<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In dieser Sektion</p>
                   
                     <div class="sectionlinks">
-                        <a class="link" href="architecture#Prinzipien">Prinzipien</a>
-                        <a class="link" href="architecture#Architektur">Architektur</a>
-                        <a class="link" href="architecture#OpenID_Connect_1_0_and_OAuth_2_0">OIDC & OAuth 2.0</a>
+                        <a class="link" href="de/architecture#Prinzipien">Prinzipien</a>
+                        <a class="link" href="de/architecture#Architektur">Architektur</a>
+                        <a class="link" href="de/architecture#OpenID_Connect_1_0_and_OAuth_2_0">OIDC & OAuth 2.0</a>
                     </div>
                 </div>
             </div>
@@ -293,7 +296,7 @@
                 <div class="text">
                     <h4>Benutzer Handbuch</h4>
                     <p>Erfahren Sie hier, wie Sie als Benutzer ZITADEL verwenden können.</p>
-                    <a href="/use" >Mehr erfahren<i class="las la-arrow-right"></i></a>
+                    <a href="de/use" >Mehr erfahren<i class="las la-arrow-right"></i></a>
                 </div>
 
                 <img src="img/personal2.png" alt="Develop" />

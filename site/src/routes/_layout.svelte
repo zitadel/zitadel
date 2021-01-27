@@ -7,6 +7,7 @@
   import PhotoSwipe from '../components/PhotoSwipe.svelte';
   const { page } = stores();
   export let segment;
+  import { _ } from 'svelte-i18n';
 
 </script>
 

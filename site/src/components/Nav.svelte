@@ -41,6 +41,14 @@
 	$: $current = segment;
 </script>
 
+
+<script context="module">
+  import { waitLocale } from 'svelte-i18n';
+  export async function preload(page) {
+    return waitLocale();
+  }
+</script>
+
 <style>
 	header {
         box-sizing: border-box;

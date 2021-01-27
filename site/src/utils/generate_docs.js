@@ -20,18 +20,17 @@ const block_types = [
     'tablecell'
 ];
 
-export default function generate_docs(dirpath, dir, lang) {
+export default function generate_docs(dirpath, dir) {
     const make_slug = make_session_slug_processor({
         separator: SLUG_SEPARATOR,
         preserve_unicode: SLUG_PRESERVE_UNICODE
     });
 
-    console.log('using language: ' + lang);
 
     return fs
         .readdirSync(`${dirpath}${dir}`)
         .filter((file) => {
-            return file[0] !== '.' && path.extname(file) === '.md' && file.endsWith(`.${lang}.md`);
+            return file[0] !== '.' && path.extname(file) === '.md' && file.endsWith(`.md`);
         })
         .map((file) => {
             const markdown = fs.readFileSync(`${dirpath}${dir}/${file}`, 'utf-8');
