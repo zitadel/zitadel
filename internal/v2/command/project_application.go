@@ -8,23 +8,25 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/project"
 )
 
-func (r *CommandSide) ChangeApplication(ctx context.Context, appChange *domain.Application, resourceOwner string) (*domain.Application, error) {
-	if !appChange.IsValid(false) {
+func (r *CommandSide) ChangeApplication(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (domain.Application, error) {
+	if appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
 	}
 
-	existingApp, err := r.getApplicationWriteModel(ctx, appChange.AggregateID, appChange.AppID, resourceOwner)
+	existingApp, err := r.getApplicationWriteModel(ctx, projectID, appChange.GetAppID(), resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-28di9", "Errors.Project.App.NotExisting")
 	}
-	if existingApp.Name == appChange.Name {
+	if existingApp.Name == appChange.GetApplicationName() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	projectAgg.PushEvents(project.NewApplicationChangedEvent(ctx, appChange.AppID, existingApp.Name, appChange.Name, appChange.AggregateID))
+	projectAgg.PushEvents(
+		project.NewApplicationChangedEvent(ctx, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName(), projectID),
+	)
 
 	err = r.eventstore.PushAggregate(ctx, existingApp, projectAgg)
 	if err != nil {

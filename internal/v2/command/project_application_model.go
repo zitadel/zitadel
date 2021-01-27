@@ -12,7 +12,6 @@ type ApplicationWriteModel struct {
 	AppID string
 	State domain.AppState
 	Name  string
-	Type  domain.AppType
 }
 
 func NewApplicationWriteModelWithAppIDC(projectID, appID, resourceOwner string) *ApplicationWriteModel {

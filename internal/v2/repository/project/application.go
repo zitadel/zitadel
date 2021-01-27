@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 const (
@@ -37,9 +36,8 @@ func NewRemoveApplicationUniqueConstraint(name, projectID string) *eventstore.Ev
 type ApplicationAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID     string         `json:"appId,omitempty"`
-	Name      string         `json:"name,omitempty"`
-	AppType   domain.AppType `json:"appType,omitempty"`
+	AppID     string `json:"appId,omitempty"`
+	Name      string `json:"name,omitempty"`
 	projectID string
 }
 
@@ -51,7 +49,7 @@ func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return []*eventstore.EventUniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.projectID)}
 }
 
-func NewApplicationAddedEvent(ctx context.Context, appID, name, projectID string, appType domain.AppType) *ApplicationAddedEvent {
+func NewApplicationAddedEvent(ctx context.Context, appID, name, projectID string) *ApplicationAddedEvent {
 	return &ApplicationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -59,7 +57,6 @@ func NewApplicationAddedEvent(ctx context.Context, appID, name, projectID string
 		),
 		AppID:     appID,
 		Name:      name,
-		AppType:   appType,
 		projectID: projectID,
 	}
 }

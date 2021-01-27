@@ -33,7 +33,7 @@ func (s *Server) CreateOIDCApplication(ctx context.Context, in *management.OIDCA
 	return oidcAppFromDomain(app), nil
 }
 func (s *Server) UpdateApplication(ctx context.Context, in *management.ApplicationUpdate) (*management.Application, error) {
-	app, err := s.command.ChangeApplication(ctx, appUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
+	app, err := s.command.ChangeApplication(ctx, in.ProjectId, appUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

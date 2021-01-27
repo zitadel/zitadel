@@ -39,7 +39,7 @@ func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *projec
 		return "", err
 	}
 
-	projectAgg.PushEvents(project.NewApplicationAddedEvent(ctx, oidcApp.AppID, oidcApp.AppName, resourceOwner, domain.AppTypeOIDC))
+	projectAgg.PushEvents(project.NewApplicationAddedEvent(ctx, oidcApp.AppID, oidcApp.AppName, resourceOwner))
 
 	var stringPw string
 	err = oidcApp.GenerateNewClientID(r.idGenerator, proj)

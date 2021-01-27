@@ -18,13 +18,11 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func appFromDomain(app *domain.Application) *management.Application {
+func appFromDomain(app domain.Application) *management.Application {
 	return &management.Application{
-		Id:         app.AppID,
-		State:      appStateFromDomain(app.State),
-		ChangeDate: timestamppb.New(app.ChangeDate),
-		Name:       app.Name,
-		Sequence:   app.Sequence,
+		Id:    app.GetAppID(),
+		State: appStateFromDomain(app.GetState()),
+		Name:  app.GetApplicationName(),
 	}
 }
 
@@ -60,28 +58,6 @@ func oidcConfigFromDomain(config *domain.OIDCApp) *management.OIDCConfig {
 		ComplianceProblems:       complianceProblemsToLocalizedMessages(config.Compliance.Problems),
 		DevMode:                  config.DevMode,
 		AccessTokenType:          oidcTokenTypeFromDomain(config.AccessTokenType),
-		AccessTokenRoleAssertion: config.AccessTokenRoleAssertion,
-		IdTokenRoleAssertion:     config.IDTokenRoleAssertion,
-		IdTokenUserinfoAssertion: config.IDTokenUserinfoAssertion,
-		ClockSkew:                durationpb.New(config.ClockSkew),
-	}
-}
-
-func oidcConfigFromModel(config *proj_model.OIDCConfig) *management.OIDCConfig {
-	return &management.OIDCConfig{
-		RedirectUris:             config.RedirectUris,
-		ResponseTypes:            oidcResponseTypesFromModel(config.ResponseTypes),
-		GrantTypes:               oidcGrantTypesFromModel(config.GrantTypes),
-		ApplicationType:          oidcApplicationTypeFromModel(config.ApplicationType),
-		ClientId:                 config.ClientID,
-		ClientSecret:             config.ClientSecretString,
-		AuthMethodType:           oidcAuthMethodTypeFromModel(config.AuthMethodType),
-		PostLogoutRedirectUris:   config.PostLogoutRedirectUris,
-		Version:                  oidcVersionFromModel(config.OIDCVersion),
-		NoneCompliant:            config.Compliance.NoneCompliant,
-		ComplianceProblems:       complianceProblemsToLocalizedMessages(config.Compliance.Problems),
-		DevMode:                  config.DevMode,
-		AccessTokenType:          oidcTokenTypeFromModel(config.AccessTokenType),
 		AccessTokenRoleAssertion: config.AccessTokenRoleAssertion,
 		IdTokenRoleAssertion:     config.IDTokenRoleAssertion,
 		IdTokenUserinfoAssertion: config.IDTokenUserinfoAssertion,
@@ -141,13 +117,10 @@ func oidcAppCreateToDomain(app *management.OIDCApplicationCreate) *domain.OIDCAp
 	}
 }
 
-func appUpdateToDomain(app *management.ApplicationUpdate) *domain.Application {
-	return &domain.Application{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: app.ProjectId,
-		},
-		AppID: app.Id,
-		Name:  app.Name,
+func appUpdateToDomain(app *management.ApplicationUpdate) domain.Application {
+	return &domain.ChangeApp{
+		AppID:   app.Id,
+		AppName: app.Name,
 	}
 }
 

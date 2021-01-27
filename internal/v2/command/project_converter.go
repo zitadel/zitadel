@@ -23,13 +23,11 @@ func projectGrantWriteModelToProjectGrant(writeModel *ProjectGrantWriteModel) *d
 	}
 }
 
-func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) *domain.Application {
-	return &domain.Application{
-		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel),
-		AppID:      writeModel.AppID,
-		State:      writeModel.State,
-		Name:       writeModel.Name,
-		Type:       writeModel.Type,
+func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) domain.Application {
+	return &domain.ChangeApp{
+		AppID:   writeModel.AppID,
+		AppName: writeModel.Name,
+		State:   writeModel.State,
 	}
 }
 

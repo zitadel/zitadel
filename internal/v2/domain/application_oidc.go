@@ -46,6 +46,14 @@ type OIDCApp struct {
 	State AppState
 }
 
+func (h OIDCApp) GetUsername() string {
+	return h.AppName
+}
+
+func (h OIDCApp) GetState() AppState {
+	return h.State
+}
+
 type OIDCVersion int32
 
 const (
