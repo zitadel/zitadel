@@ -6,7 +6,6 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -50,8 +49,8 @@ func (_ *MachineKeys) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.UserAggregate}
 }
 
-func (k *MachineKeys) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := k.view.GetLatestMachineKeySequence(string(event.AggregateType))
+func (k *MachineKeys) CurrentSequence() (uint64, error) {
+	sequence, err := k.view.GetLatestMachineKeySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -59,7 +58,7 @@ func (k *MachineKeys) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (k *MachineKeys) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := k.view.GetLatestMachineKeySequence("")
+	sequence, err := k.view.GetLatestMachineKeySequence()
 	if err != nil {
 		return nil, err
 	}

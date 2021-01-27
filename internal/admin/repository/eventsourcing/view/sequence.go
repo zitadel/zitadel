@@ -12,11 +12,11 @@ const (
 )
 
 func (v *View) saveCurrentSequence(viewName string, event *models.Event) error {
-	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, string(event.AggregateType), event.Sequence, event.CreationDate)
+	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, event.Sequence, event.CreationDate)
 }
 
-func (v *View) latestSequence(viewName, aggregateType string) (*repository.CurrentSequence, error) {
-	return repository.LatestSequence(v.Db, sequencesTable, viewName, aggregateType)
+func (v *View) latestSequence(viewName string) (*repository.CurrentSequence, error) {
+	return repository.LatestSequence(v.Db, sequencesTable, viewName)
 }
 
 func (v *View) AllCurrentSequences(db string) ([]*repository.CurrentSequence, error) {
@@ -24,7 +24,7 @@ func (v *View) AllCurrentSequences(db string) ([]*repository.CurrentSequence, er
 }
 
 func (v *View) updateSpoolerRunSequence(viewName string) error {
-	currentSequence, err := repository.LatestSequence(v.Db, sequencesTable, viewName, "")
+	currentSequence, err := repository.LatestSequence(v.Db, sequencesTable, viewName)
 	if err != nil {
 		return err
 	}
@@ -38,10 +38,10 @@ func (v *View) updateSpoolerRunSequence(viewName string) error {
 	return repository.UpdateCurrentSequence(v.Db, sequencesTable, currentSequence)
 }
 
-func (v *View) GetCurrentSequence(db, viewName, aggregateType string) (*repository.CurrentSequence, error) {
+func (v *View) GetCurrentSequence(db, viewName string) (*repository.CurrentSequence, error) {
 	sequenceTable := db + ".current_sequences"
 	fullView := db + "." + viewName
-	return repository.LatestSequence(v.Db, sequenceTable, fullView, aggregateType)
+	return repository.LatestSequence(v.Db, sequenceTable, fullView)
 }
 
 func (v *View) ClearView(db, viewName string) error {

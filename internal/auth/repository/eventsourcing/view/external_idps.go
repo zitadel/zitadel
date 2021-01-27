@@ -65,8 +65,8 @@ func (v *View) DeleteExternalIDPsByUserID(userID string, event *models.Event) er
 	return v.ProcessedExternalIDPSequence(event)
 }
 
-func (v *View) GetLatestExternalIDPSequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(externalIDPTable, aggregateType)
+func (v *View) GetLatestExternalIDPSequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(externalIDPTable)
 }
 
 func (v *View) ProcessedExternalIDPSequence(event *models.Event) error {

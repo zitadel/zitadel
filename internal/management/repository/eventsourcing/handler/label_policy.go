@@ -48,8 +48,8 @@ func (_ *LabelPolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (m *LabelPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := m.view.GetLatestLabelPolicySequence(string(event.AggregateType))
+func (m *LabelPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := m.view.GetLatestLabelPolicySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -57,7 +57,7 @@ func (m *LabelPolicy) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *LabelPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestLabelPolicySequence("")
+	sequence, err := m.view.GetLatestLabelPolicySequence()
 	if err != nil {
 		return nil, err
 	}

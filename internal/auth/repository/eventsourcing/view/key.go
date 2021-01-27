@@ -57,8 +57,8 @@ func (v *View) DeleteKeyPair(keyID string, event *models.Event) error {
 	return v.ProcessedKeySequence(event)
 }
 
-func (v *View) GetLatestKeySequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(keyTable, aggregateType)
+func (v *View) GetLatestKeySequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(keyTable)
 }
 
 func (v *View) ProcessedKeySequence(event *models.Event) error {

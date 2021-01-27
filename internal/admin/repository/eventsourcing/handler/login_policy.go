@@ -48,7 +48,7 @@ func (p *LoginPolicy) AggregateTypes() []models.AggregateType {
 }
 
 func (p *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestLoginPolicySequence("")
+	sequence, err := p.view.GetLatestLoginPolicySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -57,8 +57,8 @@ func (p *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (p *LoginPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestLoginPolicySequence(string(event.AggregateType))
+func (p *LoginPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestLoginPolicySequence()
 	if err != nil {
 		return 0, err
 	}

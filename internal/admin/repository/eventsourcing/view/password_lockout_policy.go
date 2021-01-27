@@ -32,8 +32,8 @@ func (v *View) DeletePasswordLockoutPolicy(aggregateID string, event *models.Eve
 	return v.ProcessedPasswordLockoutPolicySequence(event)
 }
 
-func (v *View) GetLatestPasswordLockoutPolicySequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(passwordLockoutPolicyTable, aggregateType)
+func (v *View) GetLatestPasswordLockoutPolicySequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(passwordLockoutPolicyTable)
 }
 
 func (v *View) ProcessedPasswordLockoutPolicySequence(event *models.Event) error {

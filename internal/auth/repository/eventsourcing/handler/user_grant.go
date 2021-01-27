@@ -82,8 +82,8 @@ func (_ *UserGrant) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{grant_es_model.UserGrantAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate}
 }
 
-func (u *UserGrant) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := u.view.GetLatestUserGrantSequence(string(event.AggregateType))
+func (u *UserGrant) CurrentSequence() (uint64, error) {
+	sequence, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -97,7 +97,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 			return nil, err
 		}
 	}
-	sequence, err := u.view.GetLatestUserGrantSequence("")
+	sequence, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
 		return nil, err
 	}

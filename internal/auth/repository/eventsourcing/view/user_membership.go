@@ -77,8 +77,8 @@ func (v *View) DeleteUserMembershipsByAggregateIDAndObjectID(aggregateID, object
 	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) GetLatestUserMembershipSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(userMembershipTable, aggregateType)
+func (v *View) GetLatestUserMembershipSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(userMembershipTable)
 }
 
 func (v *View) ProcessedUserMembershipSequence(event *models.Event) error {
