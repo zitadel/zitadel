@@ -58,7 +58,7 @@ func AdaptFunc(
 	httpPorts := []service.Port{
 		{Name: "http", Port: httpPort, TargetPort: "http"},
 	}
-	queryHTTP, err := service.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, httpServiceName), httpPorts, "", zitadelPodSelector, false, "", "")
+	queryHTTP, err := service.AdaptFuncToEnsure(namespace, labels.AsSelectable(labels.MustForName(componentLabels, httpServiceName)), httpPorts, "", zitadelPodSelector, false, "", "")
 	if err != nil {
 		return nil, nil, err
 	}
