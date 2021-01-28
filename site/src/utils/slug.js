@@ -78,7 +78,6 @@ export const make_session_slug_processor = ({
 
         if (seen.has(slug)) throw new Error(`Duplicate slug ${slug}`);
         seen.add(slug);
-
         return slug;
     };
 };

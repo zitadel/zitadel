@@ -7,6 +7,7 @@
   export let path = "docs";
   export let project = "zitadel";	
   export let dir = "";
+  export let language = "en";
   export let edit_title = "edit this section";
   export let sections;
   import SearchSelector from './SearchSelector.svelte';
@@ -137,22 +138,6 @@
     z-index: 2;
   }
 
-  aside::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 3em;
-    background: linear-gradient(
-      to bottom,
-       #1a1f3600 0%,
-       #1a1f3680 50%,
-      #1a1f36 100%
-    );
-    pointer-events: none;
-  }
-
   .sidebar {
     position: absolute;
     font-family: var(--font);
@@ -165,10 +150,6 @@
 
   .sidebar :global(.language-switcher) {
         position: relative;
-  }
-
-  aside.open .sidebar .home {
-      display: none;
   }
 
   aside .sidebar :global(.search-trigger) {
@@ -224,12 +205,6 @@
 
     aside.open::before {
       display: none;
-    }
-
-    aside::after {
-      content: "";
-      bottom: 0;
-      height: var(--top-offset);
     }
 
     aside button {
@@ -475,12 +450,12 @@
       <h2>
         <span class="offset-anchor" id={section.slug} />
         <!-- svelte-ignore a11y-missing-content -->
-        <a href="{dir}#{section.slug}" class="anchor" aria-hidden />
+        <a href="{language}/{dir}#{section.slug}" class="anchor" aria-hidden />
 
         {@html section.metadata.title}
         <small>
           <a
-            href="https://github.com/{owner}/{project}/edit/master/site/{path}/{dir}/{section.file}"
+            href="https://github.com/{owner}/{project}/edit/master/site/{path}/{language}/{dir}/{section.file}"
             title={edit_title}>
             <Icon name="las la-external-link-alt" size="24px" />
           </a>
@@ -499,9 +474,7 @@
     <SearchTrigger on:click={handleSearch}/>
 
     <!-- scroll container -->
-    <GuideContents {dir} {sections} {active_section} {show_contents} />
-
-    <LanguageSwitcher></LanguageSwitcher>
+    <GuideContents {language} {dir} {sections} {active_section} {show_contents} />
   </div>
 
   <button on:click={() => (show_contents = !show_contents)}>

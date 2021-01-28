@@ -1,3 +1,4 @@
+import { goto } from '@sapper/app';
 import { getLocaleFromNavigator, init, locale as $locale, register } from 'svelte-i18n';
 
 import { LANGUAGES } from '../config.js';
@@ -26,6 +27,8 @@ $locale.subscribe((value) => {
     if (typeof window !== 'undefined') {
         setCookie('locale', value);
     }
+
+    goto(value);
 });
 
 // initialize the i18n library in client

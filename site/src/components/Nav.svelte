@@ -1,13 +1,21 @@
+<script context="module">
+  import { waitLocale } from 'svelte-i18n';
+  export async function preload(page) {
+    return waitLocale();
+  }
+</script>
+
 <script>
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Icon from './Icon.svelte';
+    import LanguageSwitcher from './LanguageSwitcher.svelte';
 	export let segment;
     export let page;
     export let title;
 	export let logo;
     // export let home = 'Home';
-    import { _ } from 'svelte-i18n';
+    import { _, locale } from 'svelte-i18n';
 
 	const current = writable(null);
 	setContext('nav', current);
@@ -39,14 +47,6 @@
 		hash_changed = false;
 	}
 	$: $current = segment;
-</script>
-
-
-<script context="module">
-  import { waitLocale } from 'svelte-i18n';
-  export async function preload(page) {
-    return waitLocale();
-  }
 </script>
 
 <style>
@@ -105,9 +105,9 @@
     }
 
     a img {
-        width: 160px;
         max-height: 45px;
         padding: 0;
+        width: 160px;
     }
 
 	.primary {
@@ -194,7 +194,7 @@
     }
     
 	.home {
-        width: 160px;
+        margin-right: 1rem;
     }
 
     .home img {
@@ -317,9 +317,6 @@
         text-align: center;
         margin: auto;
     }
-
-
-
 </style>
 
 <svelte:window on:hashchange={handle_hashchange} on:scroll={handle_scroll} />
@@ -328,7 +325,7 @@
 	<nav>
 		<a
 			rel="prefetch"
-			href="."
+			href={$locale}
 			class="home"
 			title="{title}"
 		>
@@ -343,6 +340,8 @@
 		{#if open}
 			<div class="modal-background hide-if-desktop" on:click="{() => open = false}"></div>
 		{/if}
+
+        <LanguageSwitcher></LanguageSwitcher>
 
         <span class="fill-space"></span>
 

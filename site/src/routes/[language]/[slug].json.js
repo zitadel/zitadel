@@ -11,7 +11,7 @@ export function get(req, res) {
         console.log('lang', language);
         const localecode = language ? language : 'en';
         const seo = generate_seo(`docs/${localecode}/`, slug);
-        const docs = generate_docs(`docs/${localecode}/`, slug);
+        const docs = generate_docs(`docs/${localecode}/`, slug, localecode);
         json = JSON.stringify({ docs, seo }); // TODO it errors if I send the non-stringified value
     }
 

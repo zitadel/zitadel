@@ -1,55 +1,51 @@
-<script context="module">
-    import { goto } from '@sapper/app';
-    import { docLanguages } from '../modules/language-store.js'
-    import {LANGUAGES} from '../../config.js';
-</script>
-
 <script>
+    import Select from 'svelte-select';
+    const items = [
+		{value: 'en', label: 'English', group: 'lang'},
+        {value: 'de', label: 'Deutsch', group: 'lang'},
+	];
     import { locale } from 'svelte-i18n';
-    let group = $locale;
 
-    function reload(language) {
-        if (typeof window !== 'undefined') {
-            locale.set(language);
-            location.reload();
+    let language = 'en';
+    $: setLocale(language);
+
+    function setLocale(lang) {
+        if (lang && lang.value) {
+            locale.set(lang.value);
         }
     }
+
+    $: language = items.find(item => item.value == $locale);
 </script>
 
 <style>
     :root {
-        --speed3: cubic-bezier(0.26, 0.48, 0.08, 0.9);
-        --height: 30px;
+        --purple: rgb(15, 16, 34);
+        --highlight: #222544;
     }
 
     .language-switcher {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        z-index: 1;
-        justify-content: center;
-    }
-
-    button {
-        height: var(--height);
-        margin: .5rem 1rem;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        justify-content: center;
-        border: none;
-    }
-
-    button.current {
-        color: var(--grey-text);
+        display: inline-block;
+        position: relative;
+        --height: 36px;
+        --indicatorHeight: 18px;
+        --indicatorTop: 8px;
+        --background: var(--back);
+        --itemColor: white;
+         --itemHoverBG: #3c4361;
+        /* --itemHoverColor: white; */
+        --itemIsActiveBG: #ffffff20;
+        --itemIsActiveColor: #ffffff80;
+        --listBackground: #2a2f45;
+        --border: 1px solid #ffffff20;
+        --borderHoverColor: var(--grey-text);
+        --borderFocusColor: var(--grey-text);
+        --borderRadius: 6px;
+        min-width: 100px;
+        font-size: 14px;
     }
 </style>
 
 <div class="language-switcher">
-	{#each LANGUAGES as lang}
-        <button on:click="{() => reload(lang)}" disabled="{lang == group}" class="{lang == group ? 'current': ''}">{lang == 'de'? 'Deutsch' : 'English'}</button>
-	{/each}
+    <Select {items} bind:selectedValue={language} isClearable={false} isSearchable={false}></Select>
 </div>

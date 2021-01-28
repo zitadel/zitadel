@@ -1,13 +1,8 @@
 <script context="module">
-    import {locale} from 'svelte-i18n';
-
     export async function preload({params}) {
         const {language, slug} = params;
-
-                locale.set(language);
-
         const {docs, seo} = await this.fetch(`${language}/${slug}.json`).then(r => r.json());
-        return { sections: docs, seo, slug };
+        return { sections: docs, seo, slug, language };
     }
 </script>
 
@@ -17,6 +12,7 @@
     export let slug;
     export let sections;
     export let seo;
+    export let language;
     import { onMount } from 'svelte';
     import { initPhotoSwipeFromDOM } from '../../utils/photoswipe.js';
 
@@ -41,4 +37,4 @@
    {/if}
 </svelte:head>
 
-<Docs {sections} dir="{slug}"/>
+<Docs {sections} {language} dir="{slug}"/>

@@ -218,15 +218,15 @@
 
 </p>
 
-            <a href="/start" class="getstarted-btn"> 
-                <Button selected style="margin: 2rem 0;">
+            <a href="en/start" class="getstarted-btn"> 
+                <Button selected style="margin: 2rem 0; padding: 16px 25px; height: auto;">
                     Start using ZITADEL
                     <i class="las la-arrow-right"></i>
                 </Button>
             </a>
             <div class="sublinks">
-                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">Verwenden Sie Orbos um ZITADEL zu installieren</a>
-                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">Applikation erstellen</a>
+                <a class="sublink" href="en/start#Use_ORBOS_to_install_ZITADEL">Use ORBOS to install ZITADEL</a>
+                <a class="sublink" href="en/start#Use_ORBOS_to_install_ZITADEL">Create application</a>
             </div>
         </div>
 
@@ -235,13 +235,13 @@
                 <div class="text">
                     <h4>Integration</h4>
                     <p>Learn how to integrate your applications and build secure workflows and APIs with ZITADEL</p>
-                    <a href="/quickstarts">Learn more<i class="las la-arrow-right"></i></a>
+                    <a href="en/quickstarts">Learn more<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In this section</p>
                     <div class="sectionlinks">
-                        <a class="link" href="quickstarts#Single_Page_Application">Single Page Applications</a>
-                        <a class="link" href="quickstarts#Server_Side_Application">Serverside rendered Applications</a>
-                        <a class="link" href="quickstarts#Mobile_App_Native_App">Native Applications</a>
+                        <a class="link" href="en/quickstarts#Single_Page_Application">Single Page Applications</a>
+                        <a class="link" href="en/quickstarts#Server_Side_Application">Serverside rendered Applications</a>
+                        <a class="link" href="en/quickstarts#Mobile_App_Native_App">Native Applications</a>
                     </div>
                 </div>
                 <img src="img/develop2.png" alt="Develop" />
@@ -251,13 +251,13 @@
                 <div class="text">
                     <h4>Administration</h4>
                     <p>Learn how to manage your data and role associations in ZITADEL</p>
-                    <a href="/administrate">Learn more<i class="las la-arrow-right"></i></a>
+                    <a href="en/administrate">Learn more<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In this section</p>
                     
                     <div class="sectionlinks">
-                        <a class="link" href="administrate#Organisations">Manage Organisations</a>
-                        <a class="link" href="administrate#Projects">Manage Projects</a>
+                        <a class="link" href="en/administrate#Organisations">Manage Organisations</a>
+                        <a class="link" href="en/administrate#Projects">Manage Projects</a>
                     </div>
                 </div>
                 <img src="img/projects2.png" alt="Develop" />
@@ -267,14 +267,14 @@
                 <div class="text">
                     <h4>Authentication API</h4>
                     <p>^Management API</p>
-                    <a href="/apis">Learn more<i class="las la-arrow-right"></i></a>
+                    <a href="en/apis">Learn more<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In this section</p>
                     
                     <div class="sectionlinks">
-                        <a class="link" href="apis#Authentication_API">Authentication API</a>
-                        <a class="link" href="apis#Management_API">Management API</a>
-                        <a class="link" href="apis#Admin_API">Admin API</a>
+                        <a class="link" href="en/apis#Authentication_API">Authentication API</a>
+                        <a class="link" href="en/apis#Management_API">Management API</a>
+                        <a class="link" href="en/apis#Admin_API">Admin API</a>
                     </div>
                 
                 </div>
@@ -284,13 +284,13 @@
                 <div class="text">
                     <h4>Architecture and Technologies</h4>
                     <p>Learn more about engineering and design principles, ZITADELs architecture and used technologies.</p>
-                    <a href="/architecture" >Learn more<i class="las la-arrow-right"></i></a>
+                    <a href="en/architecture" >Learn more<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In this section</p>
                     <div class="sectionlinks">
-                        <a class="link" href="architecture#Principles">Principles</a>
-                        <a class="link" href="architecture#Architecture">Architecture</a>
-                        <a class="link" href="architecture#OpenID_Connect_1_0_and_OAuth_2_0">OIDC & OAuth 2.0</a>
+                        <a class="link" href="en/architecture#Principles">Principles</a>
+                        <a class="link" href="en/architecture#Architecture">Architecture</a>
+                        <a class="link" href="en/architecture#OpenID_Connect_1_0_and_OAuth_2_0">OIDC & OAuth 2.0</a>
                     </div>
                 </div>
             </div>
@@ -299,7 +299,7 @@
                 <div class="text">
                     <h4>User Manuals</h4>
                     <p>Follow this guide to get started with ZITADEL as a user.</p>
-                    <a href="/use" >Learn more<i class="las la-arrow-right"></i></a>
+                    <a href="en/use" >Learn more<i class="las la-arrow-right"></i></a>
                 </div>
 
                 <img src="img/personal2.png" alt="Develop" />

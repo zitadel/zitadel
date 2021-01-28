@@ -8,7 +8,6 @@
   const { page } = stores();
   export let segment;
   import { _ , locale} from 'svelte-i18n';
-  $: console.log($locale);
 </script>
 
 <script context="module">

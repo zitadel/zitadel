@@ -199,7 +199,7 @@
             <div class="left">
                 <blockquote>
                     <p>Diese Website ist auch verfügbar in:
-                        <a href="/">English'</a>
+                        <a href="/en">English'</a>
                     </p>
                 </blockquote>
                 <h2>ZITADEL Identity and Access Management</h2>
@@ -214,7 +214,7 @@
             <h3>Erfahren Sie hier, wie Sie starten</h3>
             <p>Befolgen Sie diese Anleitung, um mit ZITADEL im Allgemeinen zu beginnen.</p>
 
-            <a href="/de/start" class="getstarted-btn"> 
+            <a href="de/start" class="getstarted-btn"> 
                 <Button selected style="margin: 2rem 0;">
                     Erfahren Sie hier, wie Sie starten
                     <i class="las la-arrow-right"></i>
@@ -232,7 +232,7 @@
                 <div class="text">
                     <h4>Quickstarts</h4>
                     <p>Erfahren Sie, wie Sie Ihre Anwendungen integrieren und sichere Applikationen und Schnittstellen erstellen.</p>
-                    <a href="/de/quickstarts">>Mehr erfahren><i class="las la-arrow-right"></i></a>
+                    <a href="de/quickstarts">Mehr erfahren><i class="las la-arrow-right"></i></a>
                 </div>
                 <img src="img/develop2.png" alt="Develop" />
             </div>
@@ -241,7 +241,7 @@
                 <div class="text">
                     <h4>Administrieren</h4>
                     <p>Erfahren Sie, wie Sie Ihre Daten und Rollenzuordnungen in ZITADEL verwalten</p>
-                    <a href="/de/administrate">Mehr erfahren<i class="las la-arrow-right"></i></a>
+                    <a href="de/administrate">Mehr erfahren<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In dieser Sektion</p>
                     
