@@ -57,7 +57,7 @@ func (v *View) DeleteApplicationsByProjectID(projectID string) error {
 }
 
 func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(applicationTable, "")
+	return v.latestSequence(applicationTable)
 }
 
 func (v *View) ProcessedApplicationSequence(event *models.Event) error {

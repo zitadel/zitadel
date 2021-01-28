@@ -31,6 +31,8 @@ type IAM struct {
 	IDPs                            []*IDPConfig              `json:"-"`
 	DefaultLoginPolicy              *LoginPolicy              `json:"-"`
 	DefaultLabelPolicy              *LabelPolicy              `json:"-"`
+	DefaultMailTemplate             *MailTemplate             `json:"-"`
+	DefaultMailTexts                []*MailText               `json:"-"`
 	DefaultOrgIAMPolicy             *OrgIAMPolicy             `json:"-"`
 	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy `json:"-"`
 	DefaultPasswordAgePolicy        *PasswordAgePolicy        `json:"-"`
@@ -40,20 +42,25 @@ type IAM struct {
 func IAMFromModel(iam *model.IAM) *IAM {
 	members := IAMMembersFromModel(iam.Members)
 	idps := IDPConfigsFromModel(iam.IDPs)
+	mailTexts := MailTextsFromModel(iam.DefaultMailTexts)
 	converted := &IAM{
-		ObjectRoot:   iam.ObjectRoot,
-		SetUpStarted: Step(iam.SetUpStarted),
-		SetUpDone:    Step(iam.SetUpDone),
-		GlobalOrgID:  iam.GlobalOrgID,
-		IAMProjectID: iam.IAMProjectID,
-		Members:      members,
-		IDPs:         idps,
+		ObjectRoot:       iam.ObjectRoot,
+		SetUpStarted:     Step(iam.SetUpStarted),
+		SetUpDone:        Step(iam.SetUpDone),
+		GlobalOrgID:      iam.GlobalOrgID,
+		IAMProjectID:     iam.IAMProjectID,
+		Members:          members,
+		IDPs:             idps,
+		DefaultMailTexts: mailTexts,
 	}
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyFromModel(iam.DefaultLoginPolicy)
 	}
 	if iam.DefaultLabelPolicy != nil {
 		converted.DefaultLabelPolicy = LabelPolicyFromModel(iam.DefaultLabelPolicy)
+	}
+	if iam.DefaultMailTemplate != nil {
+		converted.DefaultMailTemplate = MailTemplateFromModel(iam.DefaultMailTemplate)
 	}
 	if iam.DefaultPasswordComplexityPolicy != nil {
 		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyFromModel(iam.DefaultPasswordComplexityPolicy)
@@ -73,20 +80,25 @@ func IAMFromModel(iam *model.IAM) *IAM {
 func IAMToModel(iam *IAM) *model.IAM {
 	members := IAMMembersToModel(iam.Members)
 	idps := IDPConfigsToModel(iam.IDPs)
+	mailTexts := MailTextsToModel(iam.DefaultMailTexts)
 	converted := &model.IAM{
-		ObjectRoot:   iam.ObjectRoot,
-		SetUpStarted: model.Step(iam.SetUpStarted),
-		SetUpDone:    model.Step(iam.SetUpDone),
-		GlobalOrgID:  iam.GlobalOrgID,
-		IAMProjectID: iam.IAMProjectID,
-		Members:      members,
-		IDPs:         idps,
+		ObjectRoot:       iam.ObjectRoot,
+		SetUpStarted:     model.Step(iam.SetUpStarted),
+		SetUpDone:        model.Step(iam.SetUpDone),
+		GlobalOrgID:      iam.GlobalOrgID,
+		IAMProjectID:     iam.IAMProjectID,
+		Members:          members,
+		IDPs:             idps,
+		DefaultMailTexts: mailTexts,
 	}
 	if iam.DefaultLoginPolicy != nil {
 		converted.DefaultLoginPolicy = LoginPolicyToModel(iam.DefaultLoginPolicy)
 	}
 	if iam.DefaultLabelPolicy != nil {
 		converted.DefaultLabelPolicy = LabelPolicyToModel(iam.DefaultLabelPolicy)
+	}
+	if iam.DefaultMailTemplate != nil {
+		converted.DefaultMailTemplate = MailTemplateToModel(iam.DefaultMailTemplate)
 	}
 	if iam.DefaultPasswordComplexityPolicy != nil {
 		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyToModel(iam.DefaultPasswordComplexityPolicy)
@@ -180,6 +192,14 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendAddLabelPolicyEvent(event)
 	case LabelPolicyChanged:
 		return i.appendChangeLabelPolicyEvent(event)
+	case MailTemplateAdded:
+		return i.appendAddMailTemplateEvent(event)
+	case MailTemplateChanged:
+		return i.appendChangeMailTemplateEvent(event)
+	case MailTextAdded:
+		return i.appendAddMailTextEvent(event)
+	case MailTextChanged:
+		return i.appendChangeMailTextEvent(event)
 	case PasswordComplexityPolicyAdded:
 		return i.appendAddPasswordComplexityPolicyEvent(event)
 	case PasswordComplexityPolicyChanged:

@@ -964,3 +964,118 @@ func (es *IAMEventstore) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_mod
 	es.iamCache.cacheIAM(repoIam)
 	return model.OrgIAMPolicyToModel(repoIam.DefaultOrgIAMPolicy), nil
 }
+
+func (es *IAMEventstore) PrepareAddMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*model.IAM, *models.Aggregate, error) {
+	if template == nil || !template.IsValid() {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-j9l18", "Errors.IAM.MailTemplate.Empty")
+	}
+	iam, err := es.IAMByID(ctx, template.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	mailTemplate := model.MailTemplateFromModel(template)
+
+	addAggregate := MailTemplateAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, mailTemplate)
+	aggregate, err := addAggregate(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, aggregate, nil
+}
+
+func (es *IAMEventstore) AddMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
+	repoIam, addAggregate, err := es.PrepareAddMailTemplate(ctx, template)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.MailTemplateToModel(repoIam.DefaultMailTemplate), nil
+}
+
+func (es *IAMEventstore) ChangeMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
+	if template == nil || !template.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-gCnCs", "Errors.IAM.MailTemplateInvalid")
+	}
+	iam, err := es.IAMByID(ctx, template.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	repoMailTemplate := model.MailTemplateFromModel(template)
+
+	addAggregate := MailTemplateChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMailTemplate)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+	return model.MailTemplateToModel(repoIam.DefaultMailTemplate), nil
+}
+
+func (es *IAMEventstore) PrepareAddMailText(ctx context.Context, text *iam_model.MailText) (*model.IAM, *models.Aggregate, error) {
+	if text == nil || !text.IsValid() {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-j9l18", "Errors.IAM.MailText.Empty")
+	}
+	iam, err := es.IAMByID(ctx, text.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoIam := model.IAMFromModel(iam)
+	mailText := model.MailTextFromModel(text)
+
+	addAggregate := MailTextAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, mailText)
+	aggregate, err := addAggregate(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoIam, aggregate, nil
+}
+
+func (es *IAMEventstore) AddMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	repoIam, addAggregate, err := es.PrepareAddMailText(ctx, text)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIAM(repoIam)
+
+	if _, m := model.GetMailText(repoIam.DefaultMailTexts, text.MailTextType, text.Language); m != nil {
+		return model.MailTextToModel(m), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-9AwUm", "Errors.Internal")
+}
+
+func (es *IAMEventstore) ChangeMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	if !text.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-J5xbB", "Errors.IAM.MailTextInvalid")
+	}
+	existing, err := es.IAMByID(ctx, text.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, m := existing.GetDefaultMailText(text.MailTextType, text.Language); m == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-0CTV3", "Errors.IAM.MailTextNotExisting")
+	}
+	repoIam := model.IAMFromModel(existing)
+	repoMember := model.MailTextFromModel(text)
+
+	projectAggregate := MailTextChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, projectAggregate)
+	es.iamCache.cacheIAM(repoIam)
+
+	if _, m := model.GetMailText(repoIam.DefaultMailTexts, text.MailTextType, text.Language); m != nil {
+		return model.MailTextToModel(m), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-HawVx", "Errors.Internal")
+}

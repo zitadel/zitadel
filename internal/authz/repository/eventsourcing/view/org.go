@@ -36,8 +36,8 @@ func (v *View) ProcessedOrgFailedEvent(failedEvent *repository.FailedEvent) erro
 	return v.saveFailedEvent(failedEvent)
 }
 
-func (v *View) GetLatestOrgSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(orgTable, aggregateType)
+func (v *View) GetLatestOrgSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(orgTable)
 }
 
 func (v *View) ProcessedOrgSequence(event *models.Event) error {

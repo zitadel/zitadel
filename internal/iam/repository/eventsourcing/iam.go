@@ -232,6 +232,7 @@ func OIDCIDPConfigChangedAggregate(aggCreator *es_models.AggregateCreator, exist
 		return agg.AppendEvent(model.OIDCIDPConfigChanged, changes)
 	}
 }
+
 func LabelPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, policy *model.LabelPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
@@ -675,6 +676,101 @@ func checkExistingLoginPolicyIDPProviderValidation(idpConfigID string) func(...*
 			}
 		}
 		return nil
+	}
+}
+
+func MailTemplateAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, template *model.MailTemplate) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if template == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ZCfDS", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(model.IAMAggregate).
+			EventTypesFilter(model.MailTemplateAdded).
+			AggregateIDFilter(existing.AggregateID)
+
+		validation := checkExistingMailTemplateValidation()
+		agg.SetPrecondition(validationQuery, validation)
+		return agg.AppendEvent(model.MailTemplateAdded, template)
+	}
+}
+
+func checkExistingMailTemplateValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		for _, event := range events {
+			switch event.Type {
+			case model.MailTemplateAdded:
+				return errors.ThrowPreconditionFailed(nil, "EVENT-uKPiJ", "Errors.IAM.MailTemplate.AlreadyExists")
+			}
+		}
+		return nil
+	}
+}
+
+func MailTemplateChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, template *model.MailTemplate) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if template == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-s4PVD", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.DefaultMailTemplate.Changes(template)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-hxxSm", "Errors.NoChangesFound")
+		}
+		return agg.AppendEvent(model.MailTemplateChanged, changes)
+	}
+}
+
+func MailTextAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.IAM, text *model.MailText) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if text == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ZCfDS", "Errors.Internal")
+		}
+		agg, err := IAMAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(model.IAMAggregate).
+			EventTypesFilter(model.MailTextAdded).
+			AggregateIDFilter(existing.AggregateID)
+
+		validation := checkExistingMailTextValidation()
+		agg.SetPrecondition(validationQuery, validation)
+		return agg.AppendEvent(model.MailTextAdded, text)
+	}
+}
+
+func checkExistingMailTextValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		for _, event := range events {
+			switch event.Type {
+			case model.MailTextAdded:
+				return errors.ThrowPreconditionFailed(nil, "EVENT-ijzeq", "Errors.IAM.MailText.AlreadyExists")
+			}
+		}
+		return nil
+	}
+}
+
+func MailTextChangedAggregate(aggCreator *es_models.AggregateCreator, existingIAM *model.IAM, text *model.MailText) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if text == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-mgYpV", "Errors.Internal")
+		}
+
+		agg, err := IAMAggregate(ctx, aggCreator, existingIAM)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.MailTextChanged, text)
 	}
 }
 

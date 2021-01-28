@@ -49,8 +49,8 @@ func (_ *AuthNKeys) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.UserAggregate}
 }
 
-func (k *AuthNKeys) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := k.view.GetLatestAuthNKeySequence(string(event.AggregateType))
+func (k *AuthNKeys) CurrentSequence() (uint64, error) {
+	sequence, err := k.view.GetLatestAuthNKeySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -58,7 +58,7 @@ func (k *AuthNKeys) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (d *AuthNKeys) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := d.view.GetLatestAuthNKeySequence("")
+	sequence, err := d.view.GetLatestAuthNKeySequence()
 	if err != nil {
 		return nil, err
 	}

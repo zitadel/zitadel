@@ -99,10 +99,13 @@ func projectRoleViewsFromModel(roles []*proj_model.ProjectRoleView) []*managemen
 func projectRoleViewFromModel(role *proj_model.ProjectRoleView) *management.ProjectRoleView {
 	creationDate, err := ptypes.TimestampProto(role.CreationDate)
 	logging.Log("GRPC-dlso3").OnError(err).Debug("unable to parse timestamp")
+	changeDate, err := ptypes.TimestampProto(role.ChangeDate)
+	logging.Log("MANAG-BRr8Y").OnError(err).Debug("unable to parse timestamp")
 
 	return &management.ProjectRoleView{
 		ProjectId:    role.ProjectID,
 		CreationDate: creationDate,
+		ChangeDate:   changeDate,
 		Key:          role.Key,
 		Group:        role.Group,
 		DisplayName:  role.DisplayName,

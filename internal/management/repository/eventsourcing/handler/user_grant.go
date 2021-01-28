@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -68,8 +68,8 @@ func (_ *UserGrant) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{grant_es_model.UserGrantAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate}
 }
 
-func (u *UserGrant) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := u.view.GetLatestUserGrantSequence(string(event.AggregateType))
+func (u *UserGrant) CurrentSequence() (uint64, error) {
+	sequence, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -77,7 +77,7 @@ func (u *UserGrant) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (u *UserGrant) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserGrantSequence("")
+	sequence, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
 		return nil, err
 	}

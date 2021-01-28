@@ -52,8 +52,8 @@ func (v *View) DeleteUserSessions(userID string, event *models.Event) error {
 	return v.ProcessedUserSessionSequence(event)
 }
 
-func (v *View) GetLatestUserSessionSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(userSessionTable, aggregateType)
+func (v *View) GetLatestUserSessionSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(userSessionTable)
 }
 
 func (v *View) ProcessedUserSessionSequence(event *models.Event) error {

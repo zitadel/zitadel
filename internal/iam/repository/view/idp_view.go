@@ -11,8 +11,8 @@ import (
 
 func IDPByID(db *gorm.DB, table, idpID string) (*model.IDPConfigView, error) {
 	idp := new(model.IDPConfigView)
-	userIDQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyIdpConfigID, Value: idpID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, userIDQuery)
+	idpIDQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyIdpConfigID, Value: idpID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, idpIDQuery)
 	err := query(db, idp)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.IAM.IdpNotExisting")

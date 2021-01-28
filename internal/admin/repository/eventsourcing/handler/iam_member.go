@@ -45,8 +45,8 @@ func (m *IAMMember) subscribe() {
 	}()
 }
 
-func (m *IAMMember) CurrentSequence(event *es_models.Event) (uint64, error) {
-	sequence, err := m.view.GetLatestIAMMemberSequence(string(event.AggregateType))
+func (m *IAMMember) CurrentSequence() (uint64, error) {
+	sequence, err := m.view.GetLatestIAMMemberSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -62,7 +62,7 @@ func (m *IAMMember) AggregateTypes() []es_models.AggregateType {
 }
 
 func (m *IAMMember) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestIAMMemberSequence("")
+	sequence, err := m.view.GetLatestIAMMemberSequence()
 	if err != nil {
 		return nil, err
 	}

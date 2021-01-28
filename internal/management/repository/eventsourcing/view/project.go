@@ -37,8 +37,8 @@ func (v *View) DeleteProject(projectID string, event *models.Event) error {
 	return v.ProcessedProjectSequence(event)
 }
 
-func (v *View) GetLatestProjectSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(projectTable, aggregateType)
+func (v *View) GetLatestProjectSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(projectTable)
 }
 
 func (v *View) ProcessedProjectSequence(event *models.Event) error {

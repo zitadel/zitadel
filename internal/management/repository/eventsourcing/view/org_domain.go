@@ -53,8 +53,8 @@ func (v *View) DeleteOrgDomain(orgID, domain string, event *models.Event) error 
 	return v.ProcessedOrgDomainSequence(event)
 }
 
-func (v *View) GetLatestOrgDomainSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(orgDomainTable, aggregateType)
+func (v *View) GetLatestOrgDomainSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(orgDomainTable)
 }
 
 func (v *View) ProcessedOrgDomainSequence(event *models.Event) error {
