@@ -87,7 +87,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	}
 
 	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
-	if err := human.CheckOrgIAMPolicy(human.Username, orgIAMPolicy); err != nil {
+	if err := human.CheckOrgIAMPolicy(orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}
 	human.SetNamesAsDisplayname()

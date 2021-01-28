@@ -218,15 +218,6 @@ func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password
 	return repo.UserEvents.VerifyInitCode(ctx, pwPolicyView, userID, code, password)
 }
 
-func (repo *UserRepo) UserByLoginName(ctx context.Context, loginname string) (*model.UserView, error) {
-	user, err := repo.View.UserByLoginName(loginname)
-	if err != nil {
-		return nil, err
-	}
-
-	return usr_view_model.UserToModel(user), nil
-}
-
 func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string) error {
 	user, err := repo.View.UserByLoginName(loginname)
 	if err != nil {
@@ -269,6 +260,27 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 	return usr_view_model.UserToModel(&userCopy), nil
 }
 
+func (repo *UserRepo) UserByLoginName(ctx context.Context, loginname string) (*model.UserView, error) {
+	user, err := repo.View.UserByLoginName(loginname)
+	if err != nil {
+		return nil, err
+	}
+	events, err := repo.UserEvents.UserEventsByID(ctx, user.ID, user.Sequence)
+	if err != nil {
+		logging.Log("EVENT-PSoc3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
+		return usr_view_model.UserToModel(user), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return usr_view_model.UserToModel(user), nil
+		}
+	}
+	if userCopy.State == int32(model.UserStateDeleted) {
+		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
+	}
+	return usr_view_model.UserToModel(&userCopy), nil
+}
 func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error) {
 	changes, err := repo.UserEvents.UserChanges(ctx, authz.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending)
 	if err != nil {

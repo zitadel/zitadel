@@ -60,15 +60,15 @@ func (u *Human) IsValid() bool {
 	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
 }
 
-func (u *Human) CheckOrgIAMPolicy(userName string, policy *OrgIAMPolicy) error {
+func (u *Human) CheckOrgIAMPolicy(policy *OrgIAMPolicy) error {
 	if policy == nil {
 		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-zSH7j", "Errors.Users.OrgIamPolicyNil")
 	}
-	if policy.UserLoginMustBeDomain && strings.Contains(userName, "@") {
+	if policy.UserLoginMustBeDomain && strings.Contains(u.Username, "@") {
 		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-se4sJ", "Errors.User.EmailAsUsernameNotAllowed")
 	}
-	if !policy.UserLoginMustBeDomain && u.Profile != nil && userName == "" && u.Email != nil {
-		userName = u.EmailAddress
+	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.Username == "" && u.Email != nil {
+		u.Username = u.EmailAddress
 	}
 	return nil
 }
