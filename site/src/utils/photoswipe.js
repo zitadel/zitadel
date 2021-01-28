@@ -20,13 +20,13 @@ export function initPhotoSwipeFromDOM(gallerySelector) {
                 continue;
             }
 
-            linkEl = figureEl.children[0]; // <a> element
+            linkEl = figureEl.children[0]; // <img> element
 
             size = linkEl.getAttribute('data-size').split('x');
 
             // create slide object
             item = {
-                src: linkEl.getAttribute('href'),
+                src: linkEl.getAttribute('src'),
                 w: parseInt(size[0], 10),
                 h: parseInt(size[1], 10)
             };

@@ -38,7 +38,7 @@ There is even a possibility to regenerate a read model.
     </figure>
 </div>
 
-> Additional infos to the architecture of ZITADEL is located in [Architecture Docs](documentation#Architecture)
+> Additional infos to the architecture of ZITADEL is located in [Architecture Docs](architecture#Architecture)
 
 ### Secret Handling
 

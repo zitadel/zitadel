@@ -13,4 +13,4 @@ This Integration guide gives you recommendations on how to integrate different C
 - Native App
 - Reverse Proxy
 
-For more details about how **ZITADEL** treats [scopes](documentation#Scopes) and [claims](documentation#Claims) see the [documentations](documentation).
+For more details about how **ZITADEL** treats [scopes](architecture#Scopes) and [claims](architecture#Claims) see the [documentations](architecture).

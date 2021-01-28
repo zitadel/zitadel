@@ -1,3 +1,9 @@
+<script context="module">
+  export async function preload(page) {
+    return;
+  }
+</script>
+
 <script>
   import { stores } from "@sapper/app";
   import Nav from "../components/Nav.svelte";
@@ -27,5 +33,6 @@
 
 <main>
   <slot />
-  <PhotoSwipe/>
 </main>
+
+<PhotoSwipe/>

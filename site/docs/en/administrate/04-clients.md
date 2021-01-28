@@ -13,7 +13,7 @@ Typical types of applications are:
 * User Agent (Single-Page-Application)
 * Native
 
-Check out our [Integration Guide](integrate#Overview) for more information.
+Check out our [Integration Guide](quickstarts#Overview) for more information.
 
 ### Manage clients
 

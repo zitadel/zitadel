@@ -11,14 +11,14 @@ Under normal circumstances **ZITADEL** need four domain names to operate properl
 | Domain Name | Example               | Description                                                                                                                          |
 |:------------|:----------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | issuer      | `issuer.zitadel.ch`   | Provides the [OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery)                                                   |
-| api         | `api.zitadel.ch`      | All ZITADEL API's are located under this domain see [API explanation](develop#APIs) for details                                      |
+| api         | `api.zitadel.ch`      | All ZITADEL API's are located under this domain see [API explanation](apis#APIs) for details                                      |
 | login       | `accounts.zitadel.ch` | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
 | console     | `console.zitadel.ch`  | With the console.* domain we serve the assets for the management gui                                                                 |
 
 #### OpenID Connect 1.0 Discovery
 
 The OpenID Connect Discovery Endpoint is located within the issuer domain.
-For example with [zitadel.ch](zitadel.ch) this would be the domain [issuer.zitadel.ch](issuer.zitadel.ch). This would give us [https://issuer.zitadel.ch/.well-known/openid-configuration](https://issuer.zitadel.ch/.well-known/openid-configuration).
+For example with [zitadel.ch](https://zitadel.ch), issuer.zitadel.ch would be the domain. This would give us [https://issuer.zitadel.ch/.well-known/openid-configuration](https://issuer.zitadel.ch/.well-known/openid-configuration).
 
 **Link to spec.** [OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
 

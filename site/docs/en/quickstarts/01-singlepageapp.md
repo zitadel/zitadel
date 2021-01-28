@@ -5,7 +5,7 @@ description: ...
 
 ### SPA Protocol and Flow recommendation
 
-If your [client](administrate#Clients) is a single page application (SPA) we recommend that you use [Authorization Code](documentation#Authorization_Code) in combination with [Proof Key for Code Exchange](documentation#Proof_Key_for_Code_Exchange).
+If your [client](administrate#Clients) is a single page application (SPA) we recommend that you use [Authorization Code](architecture#Authorization_Code) in combination with [Proof Key for Code Exchange](architecture#Proof_Key_for_Code_Exchange).
 
 This flow has great support with most modern languages and frameworks and is the recommended default.
 

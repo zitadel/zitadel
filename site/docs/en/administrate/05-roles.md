@@ -10,7 +10,7 @@ title: Roles
 
 For more information about how **roles** can be consumed, have a look the protocol specific information.
 
-- [OpenID Connect / OAuth](integrate#How_to_consume_authorizations_in_your_application_or_service)
+- [OpenID Connect / OAuth](quickstarts#How_to_consume_authorizations_in_your_application_or_service)
 
 ### Manage Roles
 

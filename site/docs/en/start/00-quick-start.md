@@ -20,9 +20,7 @@ After accepting the TOS and filling out all the required fields you will receive
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-        <a href="img/accounts_org_register.png" itemprop="contentUrl" data-size="1472x1000">
-            <img src="img/accounts_org_register.png" itemprop="thumbnail" alt="Organisation Overview" />
-        </a>
+        <img src="img/accounts_org_register.png" itemprop="thumbnail" alt="Organisation Overview" data-size="1472x1000" />
         <figcaption itemprop="caption description">Organisation Register</figcaption>
     </figure>
 </div>
@@ -43,7 +41,7 @@ First [create a project](administrate#Create_a_project)
 
 Then create within this [project](administrate#Projects) a [new client](administrate#Create_a_client)
 
-The wizard should provide some guidance what client is the proper for you. If you are still unsure consult our [Integration Guide](integrate#Overview)
+The wizard should provide some guidance what client is the proper for you. If you are still unsure consult our [Integration Guide](quickstarts#Overview)
 
 ### Use ORBOS to install ZITADEL
 
