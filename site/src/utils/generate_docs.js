@@ -26,7 +26,6 @@ export default function generate_docs(dirpath, dir) {
         preserve_unicode: SLUG_PRESERVE_UNICODE
     });
 
-
     return fs
         .readdirSync(`${dirpath}${dir}`)
         .filter((file) => {
