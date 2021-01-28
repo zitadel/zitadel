@@ -1,6 +1,5 @@
 <script>
     import { getContext } from 'svelte';
-    import { locale } from 'svelte-i18n';
     export let segment = null;
     export let active = false;
 	export let external = null;

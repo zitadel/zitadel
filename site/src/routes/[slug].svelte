@@ -1,20 +1,19 @@
 <script context="module">
     export async function preload({params}) {
-        const {language, slug} = params;
-        const {docs, seo} = await this.fetch(`${language}/${slug}.json`).then(r => r.json());
-        return { sections: docs, seo, slug, language };
+        const { slug } = params;
+        const {docs, seo} = await this.fetch(`${slug}.json`).then(r => r.json());
+        return { sections: docs, seo, slug };
     }
 </script>
 
 <script>
-    import manifest from '../../../static/manifest.json';
-    import Docs from "../../components/Docs.svelte";
+    import manifest from '../../static/manifest.json';
+    import Docs from "../components/Docs.svelte";
     export let slug;
     export let sections;
     export let seo;
-    export let language;
     import { onMount } from 'svelte';
-    import { initPhotoSwipeFromDOM } from '../../utils/photoswipe.js';
+    import { initPhotoSwipeFromDOM } from '../utils/photoswipe.js';
 
     onMount(() => {
         initPhotoSwipeFromDOM('.zitadel-gallery');
@@ -37,4 +36,4 @@
    {/if}
 </svelte:head>
 
-<Docs {sections} {language} dir="{slug}"/>
+<Docs {sections} dir="{slug}"/>

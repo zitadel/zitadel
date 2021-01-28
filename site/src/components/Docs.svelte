@@ -7,12 +7,10 @@
   export let path = "docs";
   export let project = "zitadel";	
   export let dir = "";
-  export let language = "en";
   export let edit_title = "edit this section";
   export let sections;
   import SearchSelector from './SearchSelector.svelte';
   import SearchTrigger from './SearchTrigger.svelte';
-  import LanguageSwitcher from './LanguageSwitcher.svelte';
   let searchEnabled = false;
   let active_section;
 
@@ -450,12 +448,12 @@
       <h2>
         <span class="offset-anchor" id={section.slug} />
         <!-- svelte-ignore a11y-missing-content -->
-        <a href="{language}/{dir}#{section.slug}" class="anchor" aria-hidden />
+        <a href="{dir}#{section.slug}" class="anchor" aria-hidden />
 
         {@html section.metadata.title}
         <small>
           <a
-            href="https://github.com/{owner}/{project}/edit/master/site/{path}/{language}/{dir}/{section.file}"
+            href="https://github.com/{owner}/{project}/edit/master/site/{path}/{dir}/{section.file}"
             title={edit_title}>
             <Icon name="las la-external-link-alt" size="24px" />
           </a>
@@ -474,7 +472,7 @@
     <SearchTrigger on:click={handleSearch}/>
 
     <!-- scroll container -->
-    <GuideContents {language} {dir} {sections} {active_section} {show_contents} />
+    <GuideContents {dir} {sections} {active_section} {show_contents} />
   </div>
 
   <button on:click={() => (show_contents = !show_contents)}>

@@ -20,7 +20,7 @@ const block_types = [
     'tablecell'
 ];
 
-export default function generate_docs(dirpath, dir, language) {
+export default function generate_docs(dirpath, dir) {
     const make_slug = make_session_slug_processor({
         separator: SLUG_SEPARATOR,
         preserve_unicode: SLUG_PRESERVE_UNICODE
@@ -117,7 +117,7 @@ export default function generate_docs(dirpath, dir, language) {
                 return `
 					<h${level}>
 						<span id="${slug}" class="offset-anchor" ${level > 4 ? 'data-scrollignore' : ''}></span>
-						<a href="${language}/${dir}#${slug}" class="anchor" aria-hidden="true"> <i class="las la-link"></i> </a>
+						<a href="${dir}#${slug}" class="anchor" aria-hidden="true"> <i class="las la-link"></i> </a>
 						${text}
 					</h${level}>`;
             };

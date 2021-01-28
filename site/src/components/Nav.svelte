@@ -1,21 +1,11 @@
-<script context="module">
-  import { waitLocale } from 'svelte-i18n';
-  export async function preload(page) {
-    return waitLocale();
-  }
-</script>
-
 <script>
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Icon from './Icon.svelte';
-    import LanguageSwitcher from './LanguageSwitcher.svelte';
 	export let segment;
     export let page;
     export let title;
 	export let logo;
-    // export let home = 'Home';
-    import { _, locale } from 'svelte-i18n';
 
 	const current = writable(null);
 	setContext('nav', current);
@@ -325,7 +315,7 @@
 	<nav>
 		<a
 			rel="prefetch"
-			href={$locale}
+			href="."
 			class="home"
 			title="{title}"
 		>
@@ -341,8 +331,6 @@
 			<div class="modal-background hide-if-desktop" on:click="{() => open = false}"></div>
 		{/if}
 
-        <LanguageSwitcher></LanguageSwitcher>
-
         <span class="fill-space"></span>
 
 		<ul
@@ -351,31 +339,15 @@
 			on:touchstart|capture={intercept_touchstart}
 			on:mouseenter="{() => open = true}"
 			on:mouseleave="{() => open = false}">
-			<!-- <li class:active="{!segment}"><a rel="prefetch" href="."><i class="bars las la-bars"></i>{home}</a></li> -->
 			<slot></slot>
-
-            <!-- <a class="show-if-desktop" href='https://console.zitadel.ch'>
-                <button>
-                    <span>{$_('login')}</span>
-                </button>
-            </a> -->
 		</ul>
 
         <span class="fill-space show-if-desktop"></span>
 
         <a class="show-if-desktop" href='https://console.zitadel.ch'>
             <button>
-                <span>{$_('login')}</span>
+                <span>LOGIN</span>
             </button>
         </a>
-
-        <!-- <a href='https://accounts.zitadel.ch/register'>
-            <button style="border-color: var(--second); margin-left: 0;">
-                <span>{$_('register')}</span>
-            </button>
-        </a> -->
-   
-        <!-- <a class="login-button" rel=prefetch href='https://console.zitadel.ch' target="_blank"><button>{$_('nav_login')}</button></a> -->
-
 	</nav>
 </header>
