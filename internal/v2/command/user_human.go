@@ -53,7 +53,7 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *do
 	orgAgg := OrgAggregateFromWriteModel(&orgMemberWriteModel.WriteModel)
 	r.addOrgMember(ctx, orgAgg, orgMemberWriteModel, orgMember)
 
-	aggregates[0] = orgAgg
+	aggregates[1] = orgAgg
 
 	eventReader, err := r.eventstore.PushAggregates(ctx, aggregates...)
 	if err != nil {
@@ -134,34 +134,6 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	return userAgg, addedHuman, nil
 }
 
-//ResendInitialMail resend inital mail and changes email if provided
-func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, resourceowner string) (err error) {
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UserIDMissing")
-	}
-
-	existingEmail, err := r.emailWriteModel(ctx, userID, resourceowner)
-	if err != nil {
-		return err
-	}
-	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9df", "Errors.User.NotFound")
-	}
-	if existingEmail.UserState != domain.UserStateInitial {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.AlreadyInitialised")
-	}
-	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
-	if email != "" && existingEmail.Email != email {
-		changedEvent, _ := existingEmail.NewChangedEvent(ctx, email)
-		userAgg.PushEvents(changedEvent)
-	}
-	initCode, err := domain.NewInitUserCode(r.initializeUserCode)
-	if err != nil {
-		return err
-	}
-	userAgg.PushEvents(user.NewHumanInitialCodeAddedEvent(ctx, initCode.Code, initCode.Expiry))
-	return r.eventstore.PushAggregate(ctx, existingEmail, userAgg)
-}
 func (r *CommandSide) HumanSkipMFAInit(ctx context.Context, userID, resourceowner string) (err error) {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2xpX9", "Errors.User.UserIDMissing")

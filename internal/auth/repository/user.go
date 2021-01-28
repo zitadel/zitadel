@@ -9,16 +9,9 @@ import (
 type UserRepository interface {
 	myUserRepo
 
-	ResendEmailVerificationMail(ctx context.Context, userID string) error
-
-	VerifyInitCode(ctx context.Context, userID, code, password string) error
-
-	AddMFAU2F(ctx context.Context, id string) (*model.WebAuthNToken, error)
 	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
 
 	GetPasswordless(ctx context.Context, id string) ([]*model.WebAuthNToken, error)
-	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
-	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
 
 	UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error)
 

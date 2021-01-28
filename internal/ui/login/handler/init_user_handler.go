@@ -72,7 +72,7 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
-	err = l.authRepo.VerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, data.Code, data.Password)
+	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, data.Code, data.Password, userOrgID)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
 		return

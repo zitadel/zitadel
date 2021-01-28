@@ -194,17 +194,6 @@ func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, err
 	return mfas, nil
 }
 
-func (repo *UserRepo) AddMFAU2F(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
-	accountName := ""
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		logging.Log("EVENT-DAqe1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
-	} else {
-		accountName = user.PreferredLoginName
-	}
-	return repo.UserEvents.AddU2F(ctx, userID, accountName, true)
-}
-
 func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
 	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, userAgentID, credentialData)
 }
@@ -213,23 +202,8 @@ func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*mo
 	return repo.UserEvents.GetPasswordless(ctx, userID)
 }
 
-func (repo *UserRepo) AddPasswordless(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
-	accountName := ""
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		logging.Log("EVENT-Vj2k1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
-	} else {
-		accountName = user.PreferredLoginName
-	}
-	return repo.UserEvents.AddPasswordless(ctx, userID, accountName, true)
-}
-
 func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error) {
 	return repo.UserEvents.GetPasswordless(ctx, authz.GetCtxData(ctx).UserID)
-}
-
-func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
-	return repo.UserEvents.VerifyPasswordlessSetup(ctx, userID, tokenName, userAgentID, credentialData)
 }
 
 func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password string) error {

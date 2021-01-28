@@ -21,7 +21,8 @@ func (r *CommandSide) SetOneTimePassword(ctx context.Context, orgID, userID, pas
 		SecretString:   passwordString,
 		ChangeRequired: true,
 	}
-	return r.changePassword(ctx, orgID, userID, "", password, existingPassword)
+	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
+	return r.changePassword(ctx, orgID, userID, "", password, userAgg, existingPassword)
 }
 
 func (r *CommandSide) SetPassword(ctx context.Context, orgID, userID, code, passwordString, userAgentID string) (err error) {
@@ -46,7 +47,8 @@ func (r *CommandSide) SetPassword(ctx context.Context, orgID, userID, code, pass
 		SecretString:   passwordString,
 		ChangeRequired: false,
 	}
-	return r.changePassword(ctx, orgID, userID, userAgentID, password, existingCode)
+	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
+	return r.changePassword(ctx, orgID, userID, userAgentID, password, userAgg, existingCode)
 }
 
 func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (err error) {
@@ -71,10 +73,12 @@ func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPass
 		SecretString:   newPassword,
 		ChangeRequired: true,
 	}
-	return r.changePassword(ctx, orgID, userID, userAgentID, password, existingPassword)
+
+	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
+	return r.changePassword(ctx, orgID, userID, userAgentID, password, userAgg, existingPassword)
 }
 
-func (r *CommandSide) changePassword(ctx context.Context, orgID, userID, userAgentID string, password *domain.Password, existingPassword *HumanPasswordWriteModel) (err error) {
+func (r *CommandSide) changePassword(ctx context.Context, orgID, userID, userAgentID string, password *domain.Password, userAgg *user.Aggregate, existingPassword *HumanPasswordWriteModel) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -94,7 +98,6 @@ func (r *CommandSide) changePassword(ctx context.Context, orgID, userID, userAge
 	if err := password.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg); err != nil {
 		return err
 	}
-	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
 	userAgg.PushEvents(user.NewHumanPasswordChangedEvent(ctx, password.SecretCrypto, password.ChangeRequired, userAgentID))
 	return r.eventstore.PushAggregate(ctx, existingPassword, userAgg)
 }

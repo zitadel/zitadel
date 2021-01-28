@@ -51,7 +51,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	err = l.authRepo.ResendEmailVerificationMail(setContext(r.Context(), userOrg), data.UserID)
+	err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg)
 	l.renderMailVerification(w, r, authReq, data.UserID, err)
 }
 
