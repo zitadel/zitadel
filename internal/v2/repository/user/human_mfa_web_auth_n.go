@@ -1,32 +1,11 @@
 package user
 
 import (
-	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
-)
-
-const (
-	u2fEventPrefix                    = mfaEventPrefix + "u2f.token."
-	HumanU2FTokenAddedType            = u2fEventPrefix + "added"
-	HumanU2FTokenVerifiedType         = u2fEventPrefix + "verified"
-	HumanU2FTokenSignCountChangedType = u2fEventPrefix + "signcount.changed"
-	HumanU2FTokenRemovedType          = u2fEventPrefix + "removed"
-	HumanU2FTokenBeginLoginType       = u2fEventPrefix + "begin.login"
-	HumanU2FTokenCheckSucceededType   = u2fEventPrefix + "check.succeeded"
-	HumanU2FTokenCheckFailedType      = u2fEventPrefix + "check.failed"
-
-	passwordlessEventPrefix                    = humanEventPrefix + "passwordless.token."
-	HumanPasswordlessTokenAddedType            = passwordlessEventPrefix + "added"
-	HumanPasswordlessTokenVerifiedType         = passwordlessEventPrefix + "verified"
-	HumanPasswordlessTokenSignCountChangedType = passwordlessEventPrefix + "signcount.changed"
-	HumanPasswordlessTokenRemovedType          = passwordlessEventPrefix + "removed"
-	HumanPasswordlessTokenBeginLoginType       = passwordlessEventPrefix + "begin.login"
-	HumanPasswordlessTokenCheckSucceededType   = passwordlessEventPrefix + "check.succeeded"
-	HumanPasswordlessTokenCheckFailedType      = passwordlessEventPrefix + "check.failed"
 )
 
 type HumanWebAuthNAddedEvent struct {
@@ -44,37 +23,19 @@ func (e *HumanWebAuthNAddedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func NewHumanU2FAddedEvent(
-	ctx context.Context,
+func NewHumanWebAuthNAddedEvent(
+	base *eventstore.BaseEvent,
 	webAuthNTokenID,
 	challenge string,
 ) *HumanWebAuthNAddedEvent {
 	return &HumanWebAuthNAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanU2FTokenAddedType,
-		),
+		BaseEvent:       *base,
 		WebAuthNTokenID: webAuthNTokenID,
 		Challenge:       challenge,
 	}
 }
 
-func NewHumanPasswordlessAddedEvent(
-	ctx context.Context,
-	webAuthNTokenID,
-	challenge string,
-) *HumanWebAuthNAddedEvent {
-	return &HumanWebAuthNAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanPasswordlessTokenAddedType,
-		),
-		WebAuthNTokenID: webAuthNTokenID,
-		Challenge:       challenge,
-	}
-}
-
-func WebAuthNAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanWebAuthNAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	webAuthNAdded := &HumanWebAuthNAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -105,8 +66,8 @@ func (e *HumanWebAuthNVerifiedEvent) UniqueConstraints() []*eventstore.EventUniq
 	return nil
 }
 
-func NewHumanU2FVerifiedEvent(
-	ctx context.Context,
+func NewHumanWebAuthNVerifiedEvent(
+	base *eventstore.BaseEvent,
 	webAuthNTokenID,
 	webAuthNTokenName,
 	attestationType string,
@@ -116,35 +77,7 @@ func NewHumanU2FVerifiedEvent(
 	signCount uint32,
 ) *HumanWebAuthNVerifiedEvent {
 	return &HumanWebAuthNVerifiedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanU2FTokenVerifiedType,
-		),
-		WebAuthNTokenID:   webAuthNTokenID,
-		KeyID:             keyID,
-		PublicKey:         publicKey,
-		AttestationType:   attestationType,
-		AAGUID:            aaguid,
-		SignCount:         signCount,
-		WebAuthNTokenName: webAuthNTokenName,
-	}
-}
-
-func NewHumanPasswordlessVerifiedEvent(
-	ctx context.Context,
-	webAuthNTokenID,
-	webAuthNTokenName,
-	attestationType string,
-	keyID,
-	publicKey,
-	aaguid []byte,
-	signCount uint32,
-) *HumanWebAuthNVerifiedEvent {
-	return &HumanWebAuthNVerifiedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanPasswordlessTokenVerifiedType,
-		),
+		BaseEvent:         *base,
 		WebAuthNTokenID:   webAuthNTokenID,
 		KeyID:             keyID,
 		PublicKey:         publicKey,
@@ -181,31 +114,13 @@ func (e *HumanWebAuthNSignCountChangedEvent) UniqueConstraints() []*eventstore.E
 	return nil
 }
 
-func NewHumanU2FSignCountChangedEvent(
-	ctx context.Context,
+func NewHumanWebAuthNSignCountChangedEvent(
+	base *eventstore.BaseEvent,
 	webAuthNTokenID string,
 	signCount uint32,
 ) *HumanWebAuthNSignCountChangedEvent {
 	return &HumanWebAuthNSignCountChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanU2FTokenSignCountChangedType,
-		),
-		WebAuthNTokenID: webAuthNTokenID,
-		SignCount:       signCount,
-	}
-}
-
-func NewHumanPasswordlessSignCountChangedEvent(
-	ctx context.Context,
-	webAuthNTokenID string,
-	signCount uint32,
-) *HumanWebAuthNSignCountChangedEvent {
-	return &HumanWebAuthNSignCountChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanPasswordlessTokenSignCountChangedType,
-		),
+		BaseEvent:       *base,
 		WebAuthNTokenID: webAuthNTokenID,
 		SignCount:       signCount,
 	}
@@ -237,28 +152,12 @@ func (e *HumanWebAuthNRemovedEvent) UniqueConstraints() []*eventstore.EventUniqu
 	return nil
 }
 
-func NewHumanU2FRemovedEvent(
-	ctx context.Context,
+func NewHumanWebAuthNRemovedEvent(
+	base *eventstore.BaseEvent,
 	webAuthNTokenID string,
 ) *HumanWebAuthNRemovedEvent {
 	return &HumanWebAuthNRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanU2FTokenRemovedType,
-		),
-		WebAuthNTokenID: webAuthNTokenID,
-	}
-}
-
-func NewHumanPasswordlessRemovedEvent(
-	ctx context.Context,
-	webAuthNTokenID string,
-) *HumanWebAuthNRemovedEvent {
-	return &HumanWebAuthNRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanPasswordlessTokenRemovedType,
-		),
+		BaseEvent:       *base,
 		WebAuthNTokenID: webAuthNTokenID,
 	}
 }
@@ -291,31 +190,13 @@ func (e *HumanWebAuthNBeginLoginEvent) UniqueConstraints() []*eventstore.EventUn
 	return nil
 }
 
-func NewHumanU2FBeginLoginEvent(
-	ctx context.Context,
+func NewHumanWebAuthNBeginLoginEvent(
+	base *eventstore.BaseEvent,
 	webAuthNTokenID,
 	challenge string,
 ) *HumanWebAuthNBeginLoginEvent {
 	return &HumanWebAuthNBeginLoginEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanU2FTokenRemovedType,
-		),
-		WebAuthNTokenID: webAuthNTokenID,
-		Challenge:       challenge,
-	}
-}
-
-func NewHumanPasswordlessBeginLoginEvent(
-	ctx context.Context,
-	webAuthNTokenID,
-	challenge string,
-) *HumanWebAuthNBeginLoginEvent {
-	return &HumanWebAuthNBeginLoginEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanPasswordlessTokenRemovedType,
-		),
+		BaseEvent:       *base,
 		WebAuthNTokenID: webAuthNTokenID,
 		Challenge:       challenge,
 	}
@@ -347,21 +228,9 @@ func (e *HumanWebAuthNCheckSucceededEvent) UniqueConstraints() []*eventstore.Eve
 	return nil
 }
 
-func NewHumanU2FCheckSucceededEvent(ctx context.Context) *HumanWebAuthNCheckSucceededEvent {
+func NewHumanWebAuthNCheckSucceededEvent(base *eventstore.BaseEvent) *HumanWebAuthNCheckSucceededEvent {
 	return &HumanWebAuthNCheckSucceededEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanU2FTokenCheckSucceededType,
-		),
-	}
-}
-
-func NewHumanPasswordlessCheckSucceededEvent(ctx context.Context) *HumanWebAuthNCheckSucceededEvent {
-	return &HumanWebAuthNCheckSucceededEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanPasswordlessTokenCheckSucceededType,
-		),
+		BaseEvent: *base,
 	}
 }
 
@@ -391,21 +260,9 @@ func (e *HumanWebAuthNCheckFailedEvent) UniqueConstraints() []*eventstore.EventU
 	return nil
 }
 
-func NewHumanU2FCheckFailedEvent(ctx context.Context) *HumanWebAuthNCheckFailedEvent {
+func NewHumanWebAuthNCheckFailedEvent(base *eventstore.BaseEvent) *HumanWebAuthNCheckFailedEvent {
 	return &HumanWebAuthNCheckFailedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanU2FTokenCheckFailedType,
-		),
-	}
-}
-
-func NewHumanPasswordlessCheckFailedEvent(ctx context.Context) *HumanWebAuthNCheckFailedEvent {
-	return &HumanWebAuthNCheckFailedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			HumanPasswordlessTokenCheckFailedType,
-		),
+		BaseEvent: *base,
 	}
 }
 

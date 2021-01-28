@@ -64,7 +64,7 @@ func (r *CommandSide) AddHumanPasswordless(ctx context.Context, userID, resource
 	if err != nil {
 		return nil, err
 	}
-	userAgg.PushEvents(usr_repo.NewHumanU2FAddedEvent(ctx, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
+	userAgg.PushEvents(usr_repo.NewHumanPasswordlessAddedEvent(ctx, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
 
 	err = r.eventstore.PushAggregate(ctx, addWebAuthN, userAgg)
 	if err != nil {
@@ -149,7 +149,7 @@ func (r *CommandSide) VerifyHumanPasswordless(ctx context.Context, userID, resou
 		return err
 	}
 	userAgg.PushEvents(
-		usr_repo.NewHumanU2FVerifiedEvent(
+		usr_repo.NewHumanPasswordlessVerifiedEvent(
 			ctx,
 			verifyWebAuthN.WebauthNTokenID,
 			webAuthN.WebAuthNTokenName,
