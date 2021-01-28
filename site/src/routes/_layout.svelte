@@ -1,16 +1,17 @@
-<script context="module">
-  export async function preload(page) {
-    return;
-  }
-</script>
-
 <script>
-  import { stores } from "@sapper/app";
-  import Nav from "../components/Nav.svelte";
-  import NavItem from "../components/NavItem.svelte";
-  import PhotoSwipe from '../components/PhotoSwipe.svelte';
-  const { page } = stores();
-  export let segment;
+    import { stores } from "@sapper/app";
+    import Nav from "../components/Nav.svelte";
+    import NavItem from "../components/NavItem.svelte";
+    import PhotoSwipe from '../components/PhotoSwipe.svelte';
+    const { page } = stores();
+    export let segment;
+
+    import { onMount } from 'svelte';
+    import { initPhotoSwipeFromDOM } from '../utils/photoswipe.js';
+
+    onMount(() => {
+        initPhotoSwipeFromDOM('.zitadel-gallery');
+    });
 </script>
 
 <style>
