@@ -53,8 +53,8 @@ func (v *View) DeleteAuthNKeysByObjectID(userID string, event *models.Event) err
 	return v.ProcessedAuthNKeySequence(event)
 }
 
-func (v *View) GetLatestAuthNKeySequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(authNKeyTable, aggregateType)
+func (v *View) GetLatestAuthNKeySequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(authNKeyTable)
 }
 
 func (v *View) ProcessedAuthNKeySequence(event *models.Event) error {

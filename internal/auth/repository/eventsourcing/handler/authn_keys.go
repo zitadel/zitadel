@@ -6,12 +6,12 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	key_model "github.com/caos/zitadel/internal/key/repository/view/model"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	user_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 const (
@@ -47,11 +47,11 @@ func (k *AuthNKeys) ViewModel() string {
 }
 
 func (_ *AuthNKeys) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{model.UserAggregate}
+	return []es_models.AggregateType{user_model.UserAggregate, proj_model.ProjectAggregate}
 }
 
-func (k *AuthNKeys) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := k.view.GetLatestAuthNKeySequence(string(event.AggregateType))
+func (k *AuthNKeys) CurrentSequence() (uint64, error) {
+	sequence, err := k.view.GetLatestAuthNKeySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -59,7 +59,7 @@ func (k *AuthNKeys) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (k *AuthNKeys) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := k.view.GetLatestAuthNKeySequence("")
+	sequence, err := k.view.GetLatestAuthNKeySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,8 @@ func (k *AuthNKeys) EventQuery() (*es_models.SearchQuery, error) {
 
 func (k *AuthNKeys) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
-	case model.UserAggregate:
+	case user_model.UserAggregate,
+		proj_model.ProjectAggregate:
 		err = k.processAuthNKeys(event)
 	}
 	return err
@@ -79,18 +80,21 @@ func (k *AuthNKeys) Reduce(event *es_models.Event) (err error) {
 func (k *AuthNKeys) processAuthNKeys(event *es_models.Event) (err error) {
 	key := new(key_model.AuthNKeyView)
 	switch event.Type {
-	case model.MachineKeyAdded:
+	case user_model.MachineKeyAdded,
+		proj_model.ClientKeyAdded:
 		err = key.AppendEvent(event)
 		if key.ExpirationDate.Before(time.Now()) {
 			return k.view.ProcessedAuthNKeySequence(event)
 		}
-	case model.MachineKeyRemoved:
+	case user_model.MachineKeyRemoved,
+		proj_model.ClientKeyRemoved:
 		err = key.SetData(event)
 		if err != nil {
 			return err
 		}
 		return k.view.DeleteAuthNKey(key.ID, event)
-	case model.UserRemoved:
+	case user_model.UserRemoved,
+		proj_model.ApplicationRemoved:
 		return k.view.DeleteAuthNKeysByObjectID(event.AggregateID, event)
 	default:
 		return k.view.ProcessedAuthNKeySequence(event)

@@ -61,6 +61,7 @@ type ObjectType int32
 
 const (
 	AuthNKeyObjectTypeUser ObjectType = iota
+	AuthNKeyObjectTypeApplication
 )
 
 type AuthNKeySearchQuery struct {

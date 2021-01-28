@@ -409,7 +409,7 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appI
 
 func (repo *ProjectRepo) SearchClientKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, sequenceErr := repo.View.GetLatestAuthNKeySequence("")
+	sequence, sequenceErr := repo.View.GetLatestAuthNKeySequence()
 	logging.Log("EVENT-ADwgw").OnError(sequenceErr).Warn("could not read latest authn key sequence")
 	keys, count, err := repo.View.SearchAuthNKeys(request)
 	if err != nil {

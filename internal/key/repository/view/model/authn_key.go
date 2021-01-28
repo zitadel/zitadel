@@ -9,7 +9,8 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/key/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	user_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 const (
@@ -22,7 +23,7 @@ type AuthNKeyView struct {
 	ID             string    `json:"keyId" gorm:"column:key_id;primary_key"`
 	ObjectID       string    `json:"-" gorm:"column:object_id;primary_key"`
 	ObjectType     int32     `json:"-" gorm:"column:object_type;primary_key"`
-	Type           int32     `json:"type" gorm:"column:machine_type"`
+	Type           int32     `json:"type" gorm:"column:key_type"`
 	ExpirationDate time.Time `json:"expirationDate" gorm:"column:expiration_date"`
 	Sequence       uint64    `json:"-" gorm:"column:sequence"`
 
@@ -67,7 +68,8 @@ func AuthNKeysToModel(keys []*AuthNKeyView) []*model.AuthNKeyView {
 func (k *AuthNKeyView) AppendEvent(event *models.Event) (err error) {
 	k.Sequence = event.Sequence
 	switch event.Type {
-	case es_model.MachineKeyAdded:
+	case user_model.MachineKeyAdded,
+		proj_model.ClientKeyAdded:
 		k.setRootData(event)
 		k.CreationDate = event.CreationDate
 		err = k.SetData(event)
@@ -77,6 +79,12 @@ func (k *AuthNKeyView) AppendEvent(event *models.Event) (err error) {
 
 func (k *AuthNKeyView) setRootData(event *models.Event) {
 	k.ObjectID = event.AggregateID
+	switch event.AggregateType {
+	case user_model.UserAggregate:
+		k.ObjectType = int32(model.AuthNKeyObjectTypeUser)
+	case proj_model.ProjectAggregate:
+		k.ObjectType = int32(model.AuthNKeyObjectTypeApplication)
+	}
 }
 
 func (r *AuthNKeyView) SetData(event *models.Event) error {

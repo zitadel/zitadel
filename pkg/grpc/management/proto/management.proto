@@ -1018,7 +1018,7 @@ service ManagementService {
 
   rpc AddClientKey(AddClientKeyRequest) returns (AddClientKeyResponse){
     option (google.api.http) = {
-      put: "/projects/{project_id}/applications/{application_id}/keys"
+      post: "/projects/{project_id}/applications/{application_id}/keys"
       body: "*"
     };
 
