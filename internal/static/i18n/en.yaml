@@ -158,27 +158,35 @@ Errors:
     NotInactive: Project is not deactivated
     NotFound: Porject not found
     UserIDMissing: User ID missing
-    MemberNotFound: Project member not found
-    MemberInvalid: Project member is invalid
-    MemberAlreadyExists: Project member already exists
-    MemberNotExisting: Project member doesn't exist
+    Member:
+      NotFound: Project member not found
+      Invalid: Project member is invalid
+      AlreadyExists: Project member already exists
+      NotExisting: Project member doesn't exist
     MinimumOneRoleNeeded: At least one role must be added
-    RoleAlreadyExists: Role already exists
-    RoleInvalid: Role is invalid
-    RoleNotExisting: Role doesn't exist
+    Role:
+      AlreadyExists: Role already exists
+      Invalid: Role is invalid
+      NotExisting: Role doesn't exist
     IDMissing: ID missing
-    AppNotFound: Application not found
-    AppInvalid: Application invalid
-    AppNotExisting: Application doesn't exist
+    App:
+      AlreadyExists: Application already exists
+      Invalid: Application invalid
+      NotExisting: Application doesn't exist
+      IsNotOIDC: Application is not type oidc
+      NotActive:: Application is not active
+      NotInactive: Application is not inactive
     OIDCConfigInvalid: OIDC configuration is invalid
-    AppIsNotOIDC: Application is not type oidc
     OIDCAuthMethodNoneSecret: OIDC Auth Method None does not require a secret
     RequiredFieldsMissing: Some required fields are missing
-    GrantNotFound: Grant not found
-    GrantInvalid: Project grant is invalid
-    GrantAlreadyExists: Project grant already exists
-    GrantNotExists: Project grant doesn't exist
-    GrantHasNotExistingRole: One role doesn't exist on project
+    Grant:
+      AlreadyExists: Project grant already exists
+      NotFound: Grant not found
+      Invalid: Project grant is invalid
+      NotExisting: Project grant doesn't exist
+      HasNotExistingRole: One role doesn't exist on project
+      NotActive: Project grant is not active
+      NotInactive: Project grant is not inactive
     UserIDMisisng: User ID missing
     OIDCSecretInvalid: Client Secret is invalid
   IAM:

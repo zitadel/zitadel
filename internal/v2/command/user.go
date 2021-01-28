@@ -139,12 +139,15 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
 
-func (r *CommandSide) checkUserExists(ctx context.Context, userID, resourceOwner string) (bool, error) {
+func (r *CommandSide) checkUserExists(ctx context.Context, userID, resourceOwner string) error {
 	userWriteModel, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return false, err
+		return err
 	}
-	return userWriteModel.UserState != domain.UserStateUnspecified && userWriteModel.UserState != domain.UserStateDeleted, nil
+	if userWriteModel.UserState == domain.UserStateUnspecified || userWriteModel.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.User.NotFound")
+	}
+	return nil
 }
 
 func (r *CommandSide) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {

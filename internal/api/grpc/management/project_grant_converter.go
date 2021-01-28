@@ -2,6 +2,8 @@ package management
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/v2/domain"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/golang/protobuf/ptypes"
 
@@ -10,6 +12,19 @@ import (
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
+
+func projectGrantFromDomain(grant *domain.ProjectGrant) *management.ProjectGrant {
+	return &management.ProjectGrant{
+		Id:           grant.GrantID,
+		State:        projectGrantStateFromDomain(grant.State),
+		CreationDate: timestamppb.New(grant.CreationDate),
+		ChangeDate:   timestamppb.New(grant.ChangeDate),
+		GrantedOrgId: grant.GrantedOrgID,
+		RoleKeys:     grant.RoleKeys,
+		Sequence:     grant.Sequence,
+		ProjectId:    grant.AggregateID,
+	}
+}
 
 func projectGrantFromModel(grant *proj_model.ProjectGrant) *management.ProjectGrant {
 	creationDate, err := ptypes.TimestampProto(grant.CreationDate)
@@ -30,8 +45,8 @@ func projectGrantFromModel(grant *proj_model.ProjectGrant) *management.ProjectGr
 	}
 }
 
-func projectGrantCreateToModel(grant *management.ProjectGrantCreate) *proj_model.ProjectGrant {
-	return &proj_model.ProjectGrant{
+func projectGrantCreateToDomain(grant *management.ProjectGrantCreate) *domain.ProjectGrant {
+	return &domain.ProjectGrant{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: grant.ProjectId,
 		},
@@ -40,8 +55,8 @@ func projectGrantCreateToModel(grant *management.ProjectGrantCreate) *proj_model
 	}
 }
 
-func projectGrantUpdateToModel(grant *management.ProjectGrantUpdate) *proj_model.ProjectGrant {
-	return &proj_model.ProjectGrant{
+func projectGrantUpdateToDomain(grant *management.ProjectGrantUpdate) *domain.ProjectGrant {
+	return &domain.ProjectGrant{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: grant.ProjectId,
 		},
@@ -134,6 +149,16 @@ func projectGrantFromGrantedProjectModel(project *proj_model.ProjectGrantView) *
 	}
 }
 
+func projectGrantStateFromDomain(state domain.ProjectGrantState) management.ProjectGrantState {
+	switch state {
+	case domain.ProjectGrantStateActive:
+		return management.ProjectGrantState_PROJECTGRANTSTATE_ACTIVE
+	case domain.ProjectGrantStateInactive:
+		return management.ProjectGrantState_PROJECTGRANTSTATE_INACTIVE
+	default:
+		return management.ProjectGrantState_PROJECTGRANTSTATE_UNSPECIFIED
+	}
+}
 func projectGrantStateFromModel(state proj_model.ProjectGrantState) management.ProjectGrantState {
 	switch state {
 	case proj_model.ProjectGrantStateActive:

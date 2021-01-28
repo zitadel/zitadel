@@ -29,36 +29,30 @@ func (s *Server) ProjectGrantByID(ctx context.Context, in *management.ProjectGra
 }
 
 func (s *Server) CreateProjectGrant(ctx context.Context, in *management.ProjectGrantCreate) (*management.ProjectGrant, error) {
-	grant, err := s.project.AddProjectGrant(ctx, projectGrantCreateToModel(in))
+	grant, err := s.command.AddProjectGrant(ctx, projectGrantCreateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return projectGrantFromModel(grant), nil
+	return projectGrantFromDomain(grant), nil
 }
 func (s *Server) UpdateProjectGrant(ctx context.Context, in *management.ProjectGrantUpdate) (*management.ProjectGrant, error) {
-	grant, err := s.project.ChangeProjectGrant(ctx, projectGrantUpdateToModel(in))
+	grant, err := s.command.ChangeProjectGrant(ctx, projectGrantUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return projectGrantFromModel(grant), nil
+	return projectGrantFromDomain(grant), nil
 }
-func (s *Server) DeactivateProjectGrant(ctx context.Context, in *management.ProjectGrantID) (*management.ProjectGrant, error) {
-	grant, err := s.project.DeactivateProjectGrant(ctx, in.ProjectId, in.Id)
-	if err != nil {
-		return nil, err
-	}
-	return projectGrantFromModel(grant), nil
+func (s *Server) DeactivateProjectGrant(ctx context.Context, in *management.ProjectGrantID) (*empty.Empty, error) {
+	err := s.command.DeactivateProjectGrant(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
-func (s *Server) ReactivateProjectGrant(ctx context.Context, in *management.ProjectGrantID) (*management.ProjectGrant, error) {
-	grant, err := s.project.ReactivateProjectGrant(ctx, in.ProjectId, in.Id)
-	if err != nil {
-		return nil, err
-	}
-	return projectGrantFromModel(grant), nil
+func (s *Server) ReactivateProjectGrant(ctx context.Context, in *management.ProjectGrantID) (*empty.Empty, error) {
+	err := s.command.ReactivateProjectGrant(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveProjectGrant(ctx context.Context, in *management.ProjectGrantID) (*empty.Empty, error) {
-	err := s.project.RemoveProjectGrant(ctx, in.ProjectId, in.Id)
+	err := s.command.RemoveProjectGrant(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }

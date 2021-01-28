@@ -68,9 +68,12 @@ func (wm *UserWriteModel) Reduce() error {
 }
 
 func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+		AggregateIDs(wm.AggregateID)
+	if wm.ResourceOwner != "" {
+		query.ResourceOwner(wm.ResourceOwner)
+	}
+	return query
 }
 
 func UserAggregateFromWriteModel(wm *eventstore.WriteModel) *user.Aggregate {

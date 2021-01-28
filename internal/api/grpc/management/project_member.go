@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/golang/protobuf/ptypes/empty"
 
@@ -27,22 +28,22 @@ func (s *Server) SearchProjectMembers(ctx context.Context, in *management.Projec
 }
 
 func (s *Server) AddProjectMember(ctx context.Context, in *management.ProjectMemberAdd) (*management.ProjectMember, error) {
-	member, err := s.project.AddProjectMember(ctx, projectMemberAddToModel(in))
+	member, err := s.command.AddProjectMember(ctx, projectMemberAddToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return projectMemberFromModel(member), nil
+	return projectMemberFromDomain(member), nil
 }
 
 func (s *Server) ChangeProjectMember(ctx context.Context, in *management.ProjectMemberChange) (*management.ProjectMember, error) {
-	member, err := s.project.ChangeProjectMember(ctx, projectMemberChangeToModel(in))
+	member, err := s.command.ChangeProjectMember(ctx, projectMemberChangeToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return projectMemberFromModel(member), nil
+	return projectMemberFromDomain(member), nil
 }
 
 func (s *Server) RemoveProjectMember(ctx context.Context, in *management.ProjectMemberRemove) (*empty.Empty, error) {
-	err := s.project.RemoveProjectMember(ctx, in.Id, in.UserId)
+	err := s.command.RemoveProjectMember(ctx, in.Id, in.UserId, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }

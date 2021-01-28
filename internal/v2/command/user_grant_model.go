@@ -58,7 +58,7 @@ func (wm *UserGrantWriteModel) Reduce() error {
 			wm.State = domain.UserGrantStateRemoved
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *UserGrantWriteModel) Query() *eventstore.SearchQueryBuilder {

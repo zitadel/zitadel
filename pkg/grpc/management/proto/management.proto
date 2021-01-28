@@ -723,7 +723,7 @@ service ManagementService {
     };
   }
 
-  rpc DeactivateProject(ProjectID) returns (Project) {
+  rpc DeactivateProject(ProjectID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/projects/{id}/_deactivate"
       body: "*"
@@ -735,7 +735,7 @@ service ManagementService {
     };
   }
 
-  rpc ReactivateProject(ProjectID) returns (Project) {
+  rpc ReactivateProject(ProjectID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/projects/{id}/_reactivate"
       body: "*"
@@ -957,7 +957,7 @@ service ManagementService {
     };
   }
 
-  rpc DeactivateApplication(ApplicationID) returns (Application) {
+  rpc DeactivateApplication(ApplicationID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/projects/{project_id}/applications/{id}/_deactivate"
       body: "*"
@@ -969,7 +969,7 @@ service ManagementService {
     };
   }
 
-  rpc ReactivateApplication(ApplicationID) returns (Application) {
+  rpc ReactivateApplication(ApplicationID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/projects/{project_id}/applications/{id}/_reactivate"
       body: "*"
@@ -1060,7 +1060,7 @@ service ManagementService {
     };
   }
 
-  rpc DeactivateProjectGrant(ProjectGrantID) returns (ProjectGrant) {
+  rpc DeactivateProjectGrant(ProjectGrantID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/projects/{project_id}/grants/{id}/_deactivate"
       body: "*"
@@ -1071,7 +1071,7 @@ service ManagementService {
     };
   }
 
-  rpc ReactivateProjectGrant(ProjectGrantID) returns (ProjectGrant) {
+  rpc ReactivateProjectGrant(ProjectGrantID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/projects/{project_id}/grants/{id}/_reactivate"
       body: "*"
@@ -2355,10 +2355,9 @@ message Project {
   string name = 2;
   ProjectState state = 3;
   google.protobuf.Timestamp change_date = 4;
-  google.protobuf.Timestamp creation_date = 5;
-  uint64 sequence = 6;
-  bool project_role_assertion = 7;
-  bool project_role_check = 8;
+  uint64 sequence = 5;
+  bool project_role_assertion = 6;
+  bool project_role_check = 7;
 }
 
 enum ProjectState {
@@ -2398,14 +2397,20 @@ message ProjectMemberRemove {
 
 message ProjectRoleAdd {
   string id = 1 [(validate.rules).string = {min_len: 1}];
-  string key = 2;
+  string key = 2 [(validate.rules).string = {min_len: 1}];
   string display_name = 3;
   string group = 4;
 }
 
 message ProjectRoleAddBulk {
   string id = 1 [(validate.rules).string = {min_len: 1}];
-  repeated ProjectRoleAdd project_roles = 2;
+  repeated ProjectRoleBulkAdd project_roles = 2;
+}
+
+message ProjectRoleBulkAdd {
+  string key = 1 [(validate.rules).string = {min_len: 1}];
+  string display_name = 2;
+  string group = 3;
 }
 
 message ProjectRoleChange {
@@ -2419,10 +2424,9 @@ message ProjectRole {
   string project_id = 1;
   string key = 2;
   string display_name = 3;
-  google.protobuf.Timestamp creation_date = 4;
-  google.protobuf.Timestamp change_date = 5;
-  string group = 6;
-  uint64 sequence = 7;
+  google.protobuf.Timestamp change_date = 4;
+  string group = 5;
+  uint64 sequence = 6;
 }
 
 message ProjectRoleView {

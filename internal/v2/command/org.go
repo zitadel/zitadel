@@ -14,10 +14,21 @@ func (r *CommandSide) getOrg(ctx context.Context, orgID string) (*domain.Org, er
 	if err != nil {
 		return nil, err
 	}
-	if writeModel.State == domain.OrgStateActive {
+	if writeModel.State == domain.OrgStateUnspecified || writeModel.State == domain.OrgStateRemoved {
 		return nil, caos_errs.ThrowInternal(err, "COMMAND-4M9sf", "Errors.Org.NotFound")
 	}
 	return orgWriteModelToOrg(writeModel), nil
+}
+
+func (r *CommandSide) checkOrgExists(ctx context.Context, orgID string) error {
+	orgWriteModel, err := r.getOrgWriteModelByID(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.Org.NotFound")
+	}
+	return nil
 }
 
 func (r *CommandSide) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human) error {
@@ -36,12 +47,9 @@ func (r *CommandSide) AddOrg(ctx context.Context, name, userID, resourceOwner st
 		return nil, err
 	}
 
-	active, err := r.checkUserExists(ctx, userID, resourceOwner)
+	err = r.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
-	}
-	if !active {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "ORG-HBR2z", "Errors.User.NotFound")
 	}
 	addedMember := NewOrgMemberWriteModel(orgAgg.ID(), userID)
 	err = r.addOrgMember(ctx, orgAgg, addedMember, domain.NewMember(orgAgg.ID(), userID, domain.RoleOrgOwner))

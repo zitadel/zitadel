@@ -18,7 +18,7 @@ func ProjectRoleByIDs(db *gorm.DB, table, projectID, orgID, key string) (*model.
 	query := repository.PrepareGetByQuery(table, projectIDQuery, grantIDQuery, keyQuery)
 	err := query(db, role)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Wtg72", "Errors.Project.RoleNotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Wtg72", "Errors.Project.Role.NotExisting")
 	}
 	return role, err
 }

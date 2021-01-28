@@ -158,27 +158,36 @@ Errors:
     NotInactive: Projekt ist nicht deaktiviert
     NotFound: Project konnte nicht gefunden werden
     UserIDMissing: User ID fehlt
-    MemberNotFound: Member konnte nicht gefunden werden
-    MemberInvalid: Member ist ungültig
-    MemberAlreadyExists: Member existiert bereits
-    MemberNotExisting: Member existiert nicht
+    Member:
+      Invalid: Member ist ungültig
+      AlreadyExists: Member existiert bereits
+      NotExisting: Member existiert nicht
+      NotFound: Member konnte nicht gefunden werden
     MinimumOneRoleNeeded: Es muss mindestend eine Rolle hinzugefügt werden
-    RoleAlreadyExists: Rolle existiert bereits
-    RoleInvalid: Rolle ist ungültig
-    RoleNotExisting: Rolle existiert nicht
+    Role:
+      AlreadyExists: Rolle existiert bereits
+      Invalid: Rolle ist ungültig
+      NotExisting: Rolle existiert nicht
     IDMissing: ID fehlt
-    AppNotFound: Applikation nicht gefunden
-    AppInvalid: Applikation ist ungültig
-    AppNotExisting: Applikation exisitert nicht
-    OIDCConfigInvalid: OIDC Konfiguration ist ungültig
-    AppIsNotOIDC: Applikation ist nicht vom Typ OIDC
+    App:
+      AlreadyExists: Applikation existiert bereits
+      NotFound: Applikation nicht gefunden
+      Invalid: Applikation ist ungültig
+      NotExisting: Applikation exisitert nicht
+      IsNotOIDC: Applikation ist nicht vom Typ OIDC
+      NotActive: Applikation ist nicht aktiv
+      NotInactive: Applikation ist nickt inaktiv
+      OIDCConfigInvalid: OIDC Konfiguration ist ungültig
     OIDCAuthMethodNoneSecret: OIDC Auth Method None benötigt kein Secret
     RequiredFieldsMissing: Benötigte Felder fehlen
-    GrantNotFound: Grant konnte nicht gefunden werden
-    GrantInvalid: Projekt Grant ist ungültig
-    GrantAlreadyExists: Projekt Grant existiert bereits
-    GrantNotExists: Projekt Grant existiert nicht
-    GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
+    Grant:
+      AlreadyExists: Projekt Grant existiert bereits
+      Invalid: Projekt Grant ist ungültig
+      NotFound: Grant konnte nicht gefunden werden
+      NotExisting: Projekt Grant existiert nicht
+      HasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
+      NotActive: Projekt Grant ist nicht aktiv
+      NotInactive: Projekt Grant ist nicht inaktiv
     UserIDMisisng: User ID fehlt
     OIDCSecretInvalid: Client Secret ist ungültig
   IAM:
