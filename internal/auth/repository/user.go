@@ -9,8 +9,6 @@ import (
 type UserRepository interface {
 	myUserRepo
 
-	RequestPasswordReset(ctx context.Context, loginname string) error
-
 	ResendEmailVerificationMail(ctx context.Context, userID string) error
 
 	VerifyInitCode(ctx context.Context, userID, code, password string) error
@@ -25,6 +23,7 @@ type UserRepository interface {
 	UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error)
 
 	UserByID(ctx context.Context, userID string) (*model.UserView, error)
+	UserByLoginName(ctx context.Context, loginName string) (*model.UserView, error)
 
 	MachineKeyByID(ctx context.Context, keyID string) (*model.MachineKeyView, error)
 }

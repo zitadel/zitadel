@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -82,7 +83,12 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	err := l.authRepo.RequestPasswordReset(setContext(r.Context(), userOrg), authReq.LoginName)
+	user, err := l.authRepo.UserByLoginName(setContext(r.Context(), userOrg), authReq.LoginName)
+	if err != nil {
+		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
+		return
+	}
+	err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), user.ID, userOrg, domain.NotificationTypeEmail)
 	l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 }
 

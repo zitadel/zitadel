@@ -244,6 +244,15 @@ func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password
 	return repo.UserEvents.VerifyInitCode(ctx, pwPolicyView, userID, code, password)
 }
 
+func (repo *UserRepo) UserByLoginName(ctx context.Context, loginname string) (*model.UserView, error) {
+	user, err := repo.View.UserByLoginName(loginname)
+	if err != nil {
+		return nil, err
+	}
+
+	return usr_view_model.UserToModel(user), nil
+}
+
 func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string) error {
 	user, err := repo.View.UserByLoginName(loginname)
 	if err != nil {
