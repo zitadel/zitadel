@@ -17,7 +17,7 @@ func ProjectGrantByProjectAndOrg(db *gorm.DB, table, projectID, orgID string) (*
 	query := repository.PrepareGetByQuery(table, projectIDQuery, orgIDQuery)
 	err := query(db, projectGrant)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-WR3z2", "Errors.Project.GrantNotExists")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-WR3z2", "Errors.Project.Grant.NotExisting")
 	}
 	return projectGrant, err
 }
@@ -28,7 +28,7 @@ func ProjectGrantByID(db *gorm.DB, table, grantID string) (*model.ProjectGrantVi
 	query := repository.PrepareGetByQuery(table, grantIDQuery)
 	err := query(db, projectGrant)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-EGdh4", "Errors.Project.GrantNotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-EGdh4", "Errors.Project.Grant.NotFound")
 	}
 	return projectGrant, err
 }

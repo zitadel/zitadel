@@ -24,6 +24,10 @@ func (e *PasswordAgePolicyAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *PasswordAgePolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewPasswordAgePolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	expireWarnDays,
@@ -59,6 +63,10 @@ type PasswordAgePolicyChangedEvent struct {
 
 func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *PasswordAgePolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewPasswordAgePolicyChangedEvent(
@@ -109,6 +117,10 @@ type PasswordAgePolicyRemovedEvent struct {
 }
 
 func (e *PasswordAgePolicyRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *PasswordAgePolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

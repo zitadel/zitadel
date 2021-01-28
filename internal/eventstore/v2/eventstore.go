@@ -50,12 +50,12 @@ func (es *Eventstore) PushAggregate(ctx context.Context, writeModel queryReducer
 //PushAggregates maps the events of all aggregates to an eventstore event
 // based on the pushMapper
 func (es *Eventstore) PushAggregates(ctx context.Context, aggregates ...Aggregater) ([]EventReader, error) {
-	events, err := es.aggregatesToEvents(aggregates)
+	events, uniqueConstraints, err := es.aggregatesToEvents(aggregates)
 	if err != nil {
 		return nil, err
 	}
 
-	err = es.repo.Push(ctx, events...)
+	err = es.repo.Push(ctx, events, uniqueConstraints...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,13 +63,14 @@ func (es *Eventstore) PushAggregates(ctx context.Context, aggregates ...Aggregat
 	return es.mapEvents(events)
 }
 
-func (es *Eventstore) aggregatesToEvents(aggregates []Aggregater) ([]*repository.Event, error) {
+func (es *Eventstore) aggregatesToEvents(aggregates []Aggregater) ([]*repository.Event, []*repository.UniqueConstraint, error) {
 	events := make([]*repository.Event, 0, len(aggregates))
+	uniqueConstraints := make([]*repository.UniqueConstraint, 0)
 	for _, aggregate := range aggregates {
 		for _, event := range aggregate.Events() {
 			data, err := eventData(event)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			events = append(events, &repository.Event{
 				AggregateID:   aggregate.ID(),
@@ -81,9 +82,21 @@ func (es *Eventstore) aggregatesToEvents(aggregates []Aggregater) ([]*repository
 				Version:       repository.Version(aggregate.Version()),
 				Data:          data,
 			})
+			if event.UniqueConstraints() != nil {
+				for _, constraint := range event.UniqueConstraints() {
+					uniqueConstraints = append(uniqueConstraints,
+						&repository.UniqueConstraint{
+							UniqueType:   constraint.UniqueType,
+							UniqueField:  constraint.UniqueField,
+							Action:       uniqueConstraintActionToRepository(constraint.Action),
+							ErrorMessage: constraint.ErrorMessage,
+						},
+					)
+				}
+			}
 		}
 	}
-	return events, nil
+	return events, uniqueConstraints, nil
 }
 
 //FilterEvents filters the stored events based on the searchQuery
@@ -208,4 +221,15 @@ func eventData(event EventPusher) ([]byte, error) {
 		return dataBytes, nil
 	}
 	return nil, errors.ThrowInvalidArgument(nil, "V2-91NRm", "wrong type of event data")
+}
+
+func uniqueConstraintActionToRepository(action UniqueConstraintAction) repository.UniqueConstraintAction {
+	switch action {
+	case UniqueConstraintAdd:
+		return repository.UniqueConstraintAdd
+	case UniqueConstraintRemove:
+		return repository.UniqueConstraintRemoved
+	default:
+		return repository.UniqueConstraintAdd
+	}
 }

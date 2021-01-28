@@ -1950,11 +1950,11 @@ func TestProjectGrantByID(t *testing.T) {
 			name: "get grant",
 			args: args{
 				es:    GetMockProjectGrantByIDsOK(ctrl),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID"},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "ProjectGrantID"},
 			},
 			res: res{
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
+					GrantID:      "ProjectGrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
 				},
@@ -1964,7 +1964,7 @@ func TestProjectGrantByID(t *testing.T) {
 			name: "no events for project",
 			args: args{
 				es:    GetMockProjectByIDNoEvents(ctrl),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID"},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "ProjectGrantID"},
 			},
 			res: res{
 				wantErr: true,
@@ -2024,14 +2024,14 @@ func TestAddProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProjectWithRole(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
+					GrantID:      "ProjectGrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
 				},
 			},
 			res: res{
 				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
+					GrantID:      "ProjectGrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
 				},
@@ -2043,7 +2043,7 @@ func TestAddProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProject(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 			res: res{
@@ -2057,7 +2057,7 @@ func TestAddProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
+					GrantID:      "ProjectGrantID",
 					GrantedOrgID: "GrantedOrgID",
 				},
 			},
@@ -2072,7 +2072,7 @@ func TestAddProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProject(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
+					GrantID:      "ProjectGrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
 				},
@@ -2088,7 +2088,7 @@ func TestAddProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
+					GrantID:      "ProjectGrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
 				},
@@ -2135,7 +2135,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 		},
@@ -2157,7 +2157,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProject(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 			res: res{
@@ -2171,7 +2171,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 			res: res{
@@ -2217,12 +2217,12 @@ func TestDeactivateProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 			res: res{
 				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					State:   model.ProjectGrantStateInactive,
 				},
 			},
@@ -2245,7 +2245,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProject(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 			res: res{
@@ -2259,7 +2259,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 			res: res{
@@ -2311,12 +2311,12 @@ func TestReactivateProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 			res: res{
 				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					State:   model.ProjectGrantStateActive,
 				},
 			},
@@ -2339,7 +2339,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProject(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 			res: res{
@@ -2353,7 +2353,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 				},
 			},
 			res: res{
@@ -2402,17 +2402,17 @@ func TestProjectGrantMemberByIDs(t *testing.T) {
 			name: "projectgrant  member from events, ok",
 			args: args{
 				es:     GetMockProjectGrantMemberByIDsOK(ctrl),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID"},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "ProjectGrantID", UserID: "UserID"},
 			},
 			res: res{
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"Role"}},
 			},
 		},
 		{
 			name: "no project events",
 			args: args{
 				es:     GetMockProjectByIDNoEvents(ctrl),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID"},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "ProjectGrantID", UserID: "UserID"},
 			},
 			res: res{
 				wantErr: true,
@@ -2475,14 +2475,14 @@ func TestAddProjectGrantMember(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrantExistingRole(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
 				},
 			},
 			res: res{
 				result: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
 				},
@@ -2508,7 +2508,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
 				},
@@ -2524,7 +2524,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrantMember(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
 				},
@@ -2543,7 +2543,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.GrantID != tt.res.result.GrantID {
-				t.Errorf("got wrong result GrantID: expected: %v, actual: %v ", tt.res.result.GrantID, result.GrantID)
+				t.Errorf("got wrong result ProjectGrantID: expected: %v, actual: %v ", tt.res.result.GrantID, result.GrantID)
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -2575,14 +2575,14 @@ func TestChangeProjectGrantMember(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrantMember(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"RoleChanged"},
 				},
 			},
 			res: res{
 				result: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"RoleChanged"},
 				},
@@ -2608,7 +2608,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
 				},
@@ -2624,7 +2624,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
 				},
@@ -2643,7 +2643,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.GrantID != tt.res.result.GrantID {
-				t.Errorf("got wrong result GrantID: expected: %v, actual: %v ", tt.res.result.GrantID, result.GrantID)
+				t.Errorf("got wrong result ProjectGrantID: expected: %v, actual: %v ", tt.res.result.GrantID, result.GrantID)
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -2674,7 +2674,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrantMember(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"RoleChanged"},
 				},
@@ -2700,7 +2700,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
 				},
@@ -2716,7 +2716,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID: "GrantID",
+					GrantID: "ProjectGrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
 				},

@@ -21,17 +21,17 @@ func TestAppendAddGrantMemberEvent(t *testing.T) {
 			name: "append add grant member",
 			args: args{
 				project: &Project{Grants: []*ProjectGrant{
-					&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
-				member: &ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}},
+					&ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
+				member: &ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"Role"}},
 				event:  &es_models.Event{},
 			},
 			result: &Project{
 				Grants: []*ProjectGrant{
 					&ProjectGrant{
-						GrantID:      "GrantID",
+						GrantID:      "ProjectGrantID",
 						GrantedOrgID: "OrgID",
 						RoleKeys:     []string{"Key"},
-						Members:      []*ProjectGrantMember{&ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}}}}},
+						Members:      []*ProjectGrantMember{&ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"Role"}}}}},
 			},
 		},
 	}
@@ -69,21 +69,21 @@ func TestAppendChangeGrantMemberEvent(t *testing.T) {
 				project: &Project{
 					Grants: []*ProjectGrant{
 						&ProjectGrant{
-							GrantID:      "GrantID",
+							GrantID:      "ProjectGrantID",
 							GrantedOrgID: "OrgID",
 							RoleKeys:     []string{"Key"},
-							Members:      []*ProjectGrantMember{&ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}}}}},
+							Members:      []*ProjectGrantMember{&ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"Role"}}}}},
 				},
-				member: &ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"RoleChanged"}},
+				member: &ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"RoleChanged"}},
 				event:  &es_models.Event{},
 			},
 			result: &Project{
 				Grants: []*ProjectGrant{
 					&ProjectGrant{
-						GrantID:      "GrantID",
+						GrantID:      "ProjectGrantID",
 						GrantedOrgID: "OrgID",
 						RoleKeys:     []string{"Key"},
-						Members:      []*ProjectGrantMember{&ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"RoleChanged"}}}}},
+						Members:      []*ProjectGrantMember{&ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"RoleChanged"}}}}},
 			},
 		},
 	}
@@ -120,12 +120,12 @@ func TestAppendRemoveGrantMemberEvent(t *testing.T) {
 				project: &Project{
 					Grants: []*ProjectGrant{
 						&ProjectGrant{
-							GrantID:      "GrantID",
+							GrantID:      "ProjectGrantID",
 							GrantedOrgID: "OrgID",
 							RoleKeys:     []string{"Key"},
-							Members:      []*ProjectGrantMember{&ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}}}}},
+							Members:      []*ProjectGrantMember{&ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"Role"}}}}},
 				},
-				member: &ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"RoleChanged"}},
+				member: &ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"RoleChanged"}},
 				event:  &es_models.Event{},
 			},
 		},

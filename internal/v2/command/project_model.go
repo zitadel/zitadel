@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/project"
@@ -26,12 +27,6 @@ func NewProjectWriteModel(projectID string, resourceOwner string) *ProjectWriteM
 
 func (wm *ProjectWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
-	for _, event := range events {
-		switch e := event.(type) {
-		case *project.ProjectAddedEvent:
-			wm.WriteModel.AppendEvents(e)
-		}
-	}
 }
 
 func (wm *ProjectWriteModel) Reduce() error {
@@ -39,18 +34,68 @@ func (wm *ProjectWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *project.ProjectAddedEvent:
 			wm.Name = e.Name
+			wm.ProjectRoleAssertion = e.ProjectRoleAssertion
+			wm.ProjectRoleCheck = e.ProjectRoleCheck
 			wm.State = domain.ProjectStateActive
-			//case *project.ProjectChangedEvent:
-			//	wm.Name = e.Name
+		case *project.ProjectChangeEvent:
+			if e.Name != nil {
+				wm.Name = *e.Name
+			}
+			if e.ProjectRoleAssertion != nil {
+				wm.ProjectRoleAssertion = *e.ProjectRoleAssertion
+			}
+			if e.ProjectRoleCheck != nil {
+				wm.ProjectRoleCheck = *e.ProjectRoleCheck
+			}
+		case *project.ProjectDeactivatedEvent:
+			if wm.State == domain.ProjectStateRemoved {
+				continue
+			}
+			wm.State = domain.ProjectStateInactive
+		case *project.ProjectReactivatedEvent:
+			if wm.State == domain.ProjectStateRemoved {
+				continue
+			}
+			wm.State = domain.ProjectStateActive
+		case *project.ProjectRemovedEvent:
+			wm.State = domain.ProjectStateRemoved
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		ResourceOwner(wm.ResourceOwner)
+}
+
+func (wm *ProjectWriteModel) NewChangedEvent(
+	ctx context.Context,
+	name string,
+	projectRoleAssertion,
+	projectRoleCheck bool,
+) (*project.ProjectChangeEvent, bool, error) {
+	changes := make([]project.ProjectChanges, 0)
+	var err error
+
+	if wm.Name != name {
+		changes = append(changes, project.ChangeName(name))
+	}
+	if wm.ProjectRoleAssertion != projectRoleAssertion {
+		changes = append(changes, project.ChangeProjectRoleAssertion(projectRoleAssertion))
+	}
+	if wm.ProjectRoleCheck != projectRoleCheck {
+		changes = append(changes, project.ChangeProjectRoleCheck(projectRoleCheck))
+	}
+	if len(changes) == 0 {
+		return nil, false, nil
+	}
+	changeEvent, err := project.NewProjectChangeEvent(ctx, changes)
+	if err != nil {
+		return nil, false, err
+	}
+	return changeEvent, true, nil
 }
 
 func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *project.Aggregate {

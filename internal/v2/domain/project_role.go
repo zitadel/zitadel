@@ -12,6 +12,14 @@ type ProjectRole struct {
 	Group       string
 }
 
+type ProjectRoleState int32
+
+const (
+	ProjectRoleStateUnspecified ProjectRoleState = iota
+	ProjectRoleStateActive
+	ProjectRoleStateRemoved
+)
+
 func NewProjectRole(projectID, key string) *ProjectRole {
 	return &ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: projectID}, Key: key}
 }

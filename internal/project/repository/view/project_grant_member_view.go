@@ -17,7 +17,7 @@ func ProjectGrantMemberByIDs(db *gorm.DB, table, grantID, userID string) (*model
 	query := repository.PrepareGetByQuery(table, grantIDQuery, userIDQuery)
 	err := query(db, grant)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Sgr32", "Errors.Project.MemberNotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Sgr32", "Errors.Project.Member.NotExisting")
 	}
 	return grant, err
 }

@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	uniqueUsername            = "usernames"
 	userEventTypePrefix       = eventstore.EventType("user.")
 	UserLockedType            = userEventTypePrefix + "locked"
 	UserUnlockedType          = userEventTypePrefix + "unlocked"
@@ -22,11 +23,36 @@ const (
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
 )
 
+func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.EventUniqueConstraint {
+	uniqueUserName := userName
+	if userLoginMustBeDomain {
+		uniqueUserName = userName + resourceOwner
+	}
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueUsername,
+		uniqueUserName,
+		"Errors.User.AlreadyExists")
+}
+
+func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.EventUniqueConstraint {
+	uniqueUserName := userName
+	if userLoginMustBeDomain {
+		uniqueUserName = userName + resourceOwner
+	}
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueUsername,
+		uniqueUserName)
+}
+
 type UserLockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
 func (e *UserLockedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *UserLockedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -53,6 +79,10 @@ func (e *UserUnlockedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *UserUnlockedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewUserUnlockedEvent(ctx context.Context) *UserUnlockedEvent {
 	return &UserUnlockedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -73,6 +103,10 @@ type UserDeactivatedEvent struct {
 }
 
 func (e *UserDeactivatedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *UserDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -99,6 +133,10 @@ func (e *UserReactivatedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *UserReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewUserReactivatedEvent(ctx context.Context) *UserReactivatedEvent {
 	return &UserReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -116,18 +154,28 @@ func UserReactivatedEventMapper(event *repository.Event) (eventstore.EventReader
 
 type UserRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	UserName              string
+	UserLoginMustBeDomain bool
 }
 
 func (e *UserRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func NewUserRemovedEvent(ctx context.Context) *UserRemovedEvent {
+func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
+}
+
+func NewUserRemovedEvent(ctx context.Context, resourceOwner, userName string, userLoginMustBeDomain bool) *UserRemovedEvent {
 	return &UserRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			UserRemovedType,
+			resourceOwner,
 		),
+		UserName:              userName,
+		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
@@ -153,6 +201,10 @@ func (e *UserTokenAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *UserTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewUserTokenAddedEvent(
 	ctx context.Context,
 	tokenID,
@@ -168,12 +220,13 @@ func NewUserTokenAddedEvent(
 			ctx,
 			UserTokenAddedType,
 		),
-		TokenID:       tokenID,
-		ApplicationID: applicationID,
-		UserAgentID:   userAgentID,
-		Audience:      audience,
-		Scopes:        scopes,
-		Expiration:    expiration,
+		TokenID:           tokenID,
+		ApplicationID:     applicationID,
+		UserAgentID:       userAgentID,
+		Audience:          audience,
+		Scopes:            scopes,
+		Expiration:        expiration,
+		PreferredLanguage: preferredLanguage,
 	}
 }
 
@@ -197,6 +250,10 @@ type DomainClaimedEvent struct {
 
 func (e *DomainClaimedEvent) Data() interface{} {
 	return e
+}
+
+func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewDomainClaimedEvent(
@@ -232,6 +289,10 @@ func (e *DomainClaimedSentEvent) Data() interface{} {
 	return nil
 }
 
+func (e *DomainClaimedSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewDomainClaimedSentEvent(
 	ctx context.Context,
 ) *DomainClaimedSentEvent {
@@ -252,23 +313,36 @@ func DomainClaimedSentEventMapper(event *repository.Event) (eventstore.EventRead
 type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName string `json:"userName"`
+	UserName              string `json:"userName"`
+	OldUserName           string
+	UserLoginMustBeDomain bool
 }
 
 func (e *UsernameChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{
+		NewRemoveUsernameUniqueConstraint(e.OldUserName, e.ResourceOwner(), e.UserLoginMustBeDomain),
+		NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain),
+	}
+}
+
 func NewUsernameChangedEvent(
 	ctx context.Context,
-	userName string,
+	oldUserName,
+	newUserName string,
+	userLoginMustBeDomain bool,
 ) *UsernameChangedEvent {
 	return &UsernameChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserUserNameChangedType,
 		),
-		UserName: userName,
+		UserName:              newUserName,
+		OldUserName:           oldUserName,
+		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 

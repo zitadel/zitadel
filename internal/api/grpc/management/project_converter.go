@@ -2,6 +2,8 @@ package management
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/v2/domain"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -14,18 +16,11 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func projectFromModel(project *proj_model.Project) *management.Project {
-	creationDate, err := ptypes.TimestampProto(project.CreationDate)
-	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
-
-	changeDate, err := ptypes.TimestampProto(project.ChangeDate)
-	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
-
+func projectFromDomain(project *domain.Project) *management.Project {
 	return &management.Project{
 		Id:                   project.AggregateID,
-		State:                projectStateFromModel(project.State),
-		CreationDate:         creationDate,
-		ChangeDate:           changeDate,
+		State:                projectStateFromDomain(project.State),
+		ChangeDate:           timestamppb.New(project.ChangeDate),
 		Name:                 project.Name,
 		Sequence:             project.Sequence,
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
@@ -110,6 +105,17 @@ func projectRoleViewFromModel(role *proj_model.ProjectRoleView) *management.Proj
 	}
 }
 
+func projectStateFromDomain(state domain.ProjectState) management.ProjectState {
+	switch state {
+	case domain.ProjectStateActive:
+		return management.ProjectState_PROJECTSTATE_ACTIVE
+	case domain.ProjectStateInactive:
+		return management.ProjectState_PROJECTSTATE_INACTIVE
+	default:
+		return management.ProjectState_PROJECTSTATE_UNSPECIFIED
+	}
+}
+
 func projectStateFromModel(state proj_model.ProjectState) management.ProjectState {
 	switch state {
 	case proj_model.ProjectStateActive:
@@ -121,16 +127,16 @@ func projectStateFromModel(state proj_model.ProjectState) management.ProjectStat
 	}
 }
 
-func projectCreateToModel(project *management.ProjectCreateRequest) *proj_model.Project {
-	return &proj_model.Project{
+func projectCreateToDomain(project *management.ProjectCreateRequest) *domain.Project {
+	return &domain.Project{
 		Name:                 project.Name,
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
 		ProjectRoleCheck:     project.ProjectRoleCheck,
 	}
 }
 
-func projectUpdateToModel(project *management.ProjectUpdateRequest) *proj_model.Project {
-	return &proj_model.Project{
+func projectUpdateToDomain(project *management.ProjectUpdateRequest) *domain.Project {
+	return &domain.Project{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: project.Id,
 		},
@@ -140,27 +146,20 @@ func projectUpdateToModel(project *management.ProjectUpdateRequest) *proj_model.
 	}
 }
 
-func projectRoleFromModel(role *proj_model.ProjectRole) *management.ProjectRole {
-	creationDate, err := ptypes.TimestampProto(role.CreationDate)
-	logging.Log("GRPC-due83").OnError(err).Debug("unable to parse timestamp")
-
-	changeDate, err := ptypes.TimestampProto(role.ChangeDate)
-	logging.Log("GRPC-id93s").OnError(err).Debug("unable to parse timestamp")
-
+func projectRoleFromDomain(role *domain.ProjectRole) *management.ProjectRole {
 	return &management.ProjectRole{
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
-		Sequence:     role.Sequence,
-		Key:          role.Key,
-		DisplayName:  role.DisplayName,
-		Group:        role.Group,
+		ChangeDate:  timestamppb.New(role.ChangeDate),
+		Sequence:    role.Sequence,
+		Key:         role.Key,
+		DisplayName: role.DisplayName,
+		Group:       role.Group,
 	}
 }
 
-func projectRoleAddBulkToModel(bulk *management.ProjectRoleAddBulk) []*proj_model.ProjectRole {
-	roles := make([]*proj_model.ProjectRole, len(bulk.ProjectRoles))
+func projectRoleAddBulkToDomain(bulk *management.ProjectRoleAddBulk) []*domain.ProjectRole {
+	roles := make([]*domain.ProjectRole, len(bulk.ProjectRoles))
 	for i, role := range bulk.ProjectRoles {
-		roles[i] = &proj_model.ProjectRole{
+		roles[i] = &domain.ProjectRole{
 			ObjectRoot: models.ObjectRoot{
 				AggregateID: bulk.Id,
 			},
@@ -172,8 +171,8 @@ func projectRoleAddBulkToModel(bulk *management.ProjectRoleAddBulk) []*proj_mode
 	return roles
 }
 
-func projectRoleAddToModel(role *management.ProjectRoleAdd) *proj_model.ProjectRole {
-	return &proj_model.ProjectRole{
+func projectRoleAddToDomain(role *management.ProjectRoleAdd) *domain.ProjectRole {
+	return &domain.ProjectRole{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: role.Id,
 		},
@@ -183,8 +182,8 @@ func projectRoleAddToModel(role *management.ProjectRoleAdd) *proj_model.ProjectR
 	}
 }
 
-func projectRoleChangeToModel(role *management.ProjectRoleChange) *proj_model.ProjectRole {
-	return &proj_model.ProjectRole{
+func projectRoleChangeToDomain(role *management.ProjectRoleChange) *domain.ProjectRole {
+	return &domain.ProjectRole{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: role.Id,
 		},

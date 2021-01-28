@@ -32,9 +32,7 @@ func (r *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userNam
 		return err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	userAgg.PushEvents(user.NewUsernameChangedEvent(ctx, userName))
-	//TODO: Check Uniqueness
-	//TODO: release old username, set new unique username
+	userAgg.PushEvents(user.NewUsernameChangedEvent(ctx, existingUser.UserName, userName, orgIAMPolicy.UserLoginMustBeDomain))
 
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
@@ -130,20 +128,26 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 	}
+	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
+	if err != nil {
+		return err
+	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	userAgg.PushEvents(user.NewUserRemovedEvent(ctx))
-	//TODO: release unqie username
+	userAgg.PushEvents(user.NewUserRemovedEvent(ctx, existingUser.ResourceOwner, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
 	//TODO: remove user grants
 
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
 
-func (r *CommandSide) checkUserExists(ctx context.Context, userID, resourceOwner string) (bool, error) {
+func (r *CommandSide) checkUserExists(ctx context.Context, userID, resourceOwner string) error {
 	userWriteModel, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return false, err
+		return err
 	}
-	return userWriteModel.UserState != domain.UserStateUnspecified && userWriteModel.UserState != domain.UserStateDeleted, nil
+	if userWriteModel.UserState == domain.UserStateUnspecified || userWriteModel.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.User.NotFound")
+	}
+	return nil
 }
 
 func (r *CommandSide) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {

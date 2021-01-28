@@ -17,7 +17,8 @@ const (
 type MachineAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName string `json:"userName"`
+	UserName              string `json:"userName"`
+	UserLoginMustBeDomain bool
 
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
@@ -27,20 +28,26 @@ func (e *MachineAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *MachineAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
+}
+
 func NewMachineAddedEvent(
 	ctx context.Context,
 	userName,
 	name,
 	description string,
+	userLoginMustBeDomain bool,
 ) *MachineAddedEvent {
 	return &MachineAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			MachineAddedEventType,
 		),
-		UserName:    userName,
-		Name:        name,
-		Description: description,
+		UserName:              userName,
+		Name:                  name,
+		Description:           description,
+		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
@@ -67,6 +74,10 @@ type MachineChangedEvent struct {
 
 func (e *MachineChangedEvent) Data() interface{} {
 	return e
+}
+
+func (e *MachineChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewMachineChangedEvent(

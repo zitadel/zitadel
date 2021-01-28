@@ -26,6 +26,10 @@ func (e *SetupStepEvent) Data() interface{} {
 	return e
 }
 
+func (e *SetupStepEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func SetupStepMapper(event *repository.Event) (eventstore.EventReader, error) {
 	step := &SetupStepEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

@@ -5,6 +5,7 @@ Errors:
   IDMissing: ID missing
   User:
     NotFound: User could not be found
+    AlreadyExists: User already exists
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
     UserIDMissing: User ID missing
@@ -41,6 +42,7 @@ Errors:
     NotMachine: The User must be technical
     NotAllowedToLink: User is not allowed to link with external login provider
     Username:
+      AlreadyExists:  Username already taken
       Reservied: Username is already taken
     Code:
       Empty: Code is empty
@@ -64,6 +66,7 @@ Errors:
       IDPConfigNotExisting: IDP provider invalid for this organisation
       NotAllowed: External IDP not allowed on this organisation
       MinimumExternalIDPNeeded: At least one IDP must be added
+      AlreadyExists: External IDP already taken
     MFA:
       OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
@@ -84,6 +87,7 @@ Errors:
       ValidateLoginFailed: Error on validate login credentials
       CloneWarning: Credentials may be cloned
   Org:
+    AlreadyExist: Organisationname already taken
     Invalid: Organisation is invalid
     AlreadyDeactivated: Organisation is already deactivated
     AlreadyActive: Organisation is already ative
@@ -154,27 +158,35 @@ Errors:
     NotInactive: Project is not deactivated
     NotFound: Porject not found
     UserIDMissing: User ID missing
-    MemberNotFound: Project member not found
-    MemberInvalid: Project member is invalid
-    MemberAlreadyExists: Project member already exists
-    MemberNotExisting: Project member doesn't exist
+    Member:
+      NotFound: Project member not found
+      Invalid: Project member is invalid
+      AlreadyExists: Project member already exists
+      NotExisting: Project member doesn't exist
     MinimumOneRoleNeeded: At least one role must be added
-    RoleAlreadyExists: Role already exists
-    RoleInvalid: Role is invalid
-    RoleNotExisting: Role doesn't exist
+    Role:
+      AlreadyExists: Role already exists
+      Invalid: Role is invalid
+      NotExisting: Role doesn't exist
     IDMissing: ID missing
-    AppNotFound: Application not found
-    AppInvalid: Application invalid
-    AppNotExisting: Application doesn't exist
+    App:
+      AlreadyExists: Application already exists
+      Invalid: Application invalid
+      NotExisting: Application doesn't exist
+      IsNotOIDC: Application is not type oidc
+      NotActive:: Application is not active
+      NotInactive: Application is not inactive
     OIDCConfigInvalid: OIDC configuration is invalid
-    AppIsNotOIDC: Application is not type oidc
     OIDCAuthMethodNoneSecret: OIDC Auth Method None does not require a secret
     RequiredFieldsMissing: Some required fields are missing
-    GrantNotFound: Grant not found
-    GrantInvalid: Project grant is invalid
-    GrantAlreadyExists: Project grant already exists
-    GrantNotExists: Project grant doesn't exist
-    GrantHasNotExistingRole: One role doesn't exist on project
+    Grant:
+      AlreadyExists: Project grant already exists
+      NotFound: Grant not found
+      Invalid: Project grant is invalid
+      NotExisting: Project grant doesn't exist
+      HasNotExistingRole: One role doesn't exist on project
+      NotActive: Project grant is not active
+      NotInactive: Project grant is not inactive
     UserIDMisisng: User ID missing
     OIDCSecretInvalid: Client Secret is invalid
   IAM:
@@ -241,12 +253,16 @@ Errors:
   Policy:
     AlreadyExists: Policy already exists
   UserGrant:
+    AlreadyExists: User grant already exists
     NotFound: User grant not found
     Invalid: User grant is invalid
+    NotChanged: User grant has not been changed
     IDMissing: Id missing
     NotActive: User grant is not active
     NotInactive: User grant is not deactivated
     NoPermissionForProject: User has no permissions on this project
+  IDPConfig:
+    AlreadyExists: IDP Configuration with this name already exists
   Changes:
     NotFound: No history found
   Token:

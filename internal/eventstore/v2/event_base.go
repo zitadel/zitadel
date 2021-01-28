@@ -81,3 +81,13 @@ func NewBaseEventForPush(ctx context.Context, typ EventType) *BaseEvent {
 		EventType: typ,
 	}
 }
+
+func NewBaseEventForPushWithResourceOwner(ctx context.Context, typ EventType, resourceOwner string) *BaseEvent {
+	svcName := service.FromContext(ctx)
+	return &BaseEvent{
+		User:          authz.GetCtxData(ctx).UserID,
+		Service:       svcName,
+		EventType:     typ,
+		resourceOwner: resourceOwner,
+	}
+}

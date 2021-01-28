@@ -10,12 +10,32 @@ import (
 )
 
 const (
+	uniqueOrgname           = "org_name"
 	OrgAddedEventType       = orgEventTypePrefix + "added"
 	OrgChangedEventType     = orgEventTypePrefix + "changed"
 	OrgDeactivatedEventType = orgEventTypePrefix + "deactivated"
 	OrgReactivatedEventType = orgEventTypePrefix + "reactivated"
 	OrgRemovedEventType     = orgEventTypePrefix + "removed"
 )
+
+type OrgnameUniqueConstraint struct {
+	uniqueType string
+	orgName    string
+	action     eventstore.UniqueConstraintAction
+}
+
+func NewAddOrgNameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueOrgname,
+		orgName,
+		"Errors.Org.AlreadyExists")
+}
+
+func NewRemoveOrgNameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueOrgname,
+		orgName)
+}
 
 type OrgAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -25,6 +45,10 @@ type OrgAddedEvent struct {
 
 func (e *OrgAddedEvent) Data() interface{} {
 	return e
+}
+
+func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
 }
 
 func NewOrgAddedEvent(ctx context.Context, name string) *OrgAddedEvent {
@@ -59,6 +83,10 @@ func (e *OrgChangedEvent) Data() interface{} {
 	return e
 }
 
+func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOrgChangedEvent(ctx context.Context, name string) *OrgChangedEvent {
 	return &OrgChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -87,6 +115,10 @@ type OrgDeactivatedEvent struct {
 
 func (e *OrgDeactivatedEvent) Data() interface{} {
 	return e
+}
+
+func (e *OrgDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewOrgDeactivatedEvent(ctx context.Context) *OrgDeactivatedEvent {
@@ -118,6 +150,10 @@ func (e *OrgReactivatedEvent) Data() interface{} {
 	return e
 }
 
+func (e *OrgReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewOrgReactivatedEvent(ctx context.Context) *OrgReactivatedEvent {
 	return &OrgReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -129,6 +165,41 @@ func NewOrgReactivatedEvent(ctx context.Context) *OrgReactivatedEvent {
 
 func OrgReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	orgChanged := &OrgReactivatedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, orgChanged)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "ORG-DAfbs", "unable to unmarshal org deactivated")
+	}
+
+	return orgChanged, nil
+}
+
+type OrgRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	name                 string
+}
+
+func (e *OrgRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveOrgNameUniqueConstraint(e.name)}
+}
+
+func NewOrgRemovedEvent(ctx context.Context, name string) *OrgRemovedEvent {
+	return &OrgRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			OrgRemovedEventType,
+		),
+		name: name,
+	}
+}
+
+func OrgRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	orgChanged := &OrgRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, orgChanged)

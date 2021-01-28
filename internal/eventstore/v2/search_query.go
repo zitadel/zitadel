@@ -115,7 +115,7 @@ func (factory *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 	}
 
 	return &repository.SearchQuery{
-		Columns: repository.Columns(factory.columns),
+		Columns: factory.columns,
 		Limit:   factory.limit,
 		Desc:    factory.desc,
 		Filters: filters,

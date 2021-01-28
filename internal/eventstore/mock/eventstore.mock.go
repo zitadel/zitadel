@@ -8,6 +8,7 @@ import (
 	context "context"
 	eventstore "github.com/caos/zitadel/internal/eventstore"
 	models "github.com/caos/zitadel/internal/eventstore/models"
+	eventstore0 "github.com/caos/zitadel/internal/eventstore/v2"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -128,4 +129,18 @@ func (m *MockEventstore) Subscribe(arg0 ...models.AggregateType) *eventstore.Sub
 func (mr *MockEventstoreMockRecorder) Subscribe(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockEventstore)(nil).Subscribe), arg0...)
+}
+
+// V2 mocks base method
+func (m *MockEventstore) V2() *eventstore0.Eventstore {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "V2")
+	ret0, _ := ret[0].(*eventstore0.Eventstore)
+	return ret0
+}
+
+// V2 indicates an expected call of V2
+func (mr *MockEventstoreMockRecorder) V2() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "V2", reflect.TypeOf((*MockEventstore)(nil).V2))
 }

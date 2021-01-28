@@ -26,7 +26,8 @@ const (
 type HumanAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName string `json:"userName"`
+	UserName              string `json:"userName"`
+	userLoginMustBeDomain bool
 
 	FirstName         string        `json:"firstName,omitempty"`
 	LastName          string        `json:"lastName,omitempty"`
@@ -51,6 +52,10 @@ type HumanAddedEvent struct {
 
 func (e *HumanAddedEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.userLoginMustBeDomain)}
 }
 
 func (e *HumanAddedEvent) AddAddressData(
@@ -83,6 +88,7 @@ func (e *HumanAddedEvent) AddPasswordData(
 
 func NewHumanAddedEvent(
 	ctx context.Context,
+	resourceOwner,
 	userName,
 	firstName,
 	lastName,
@@ -91,20 +97,23 @@ func NewHumanAddedEvent(
 	preferredLanguage language.Tag,
 	gender domain.Gender,
 	emailAddress string,
+	userLoginMustBeDomain bool,
 ) *HumanAddedEvent {
 	return &HumanAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			HumanAddedType,
+			resourceOwner,
 		),
-		UserName:          userName,
-		FirstName:         firstName,
-		LastName:          lastName,
-		NickName:          nickName,
-		DisplayName:       displayName,
-		PreferredLanguage: preferredLanguage,
-		Gender:            gender,
-		EmailAddress:      emailAddress,
+		UserName:              userName,
+		FirstName:             firstName,
+		LastName:              lastName,
+		NickName:              nickName,
+		DisplayName:           displayName,
+		PreferredLanguage:     preferredLanguage,
+		Gender:                gender,
+		EmailAddress:          emailAddress,
+		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
@@ -123,7 +132,8 @@ func HumanAddedEventMapper(event *repository.Event) (eventstore.EventReader, err
 type HumanRegisteredEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName string `json:"userName"`
+	UserName              string `json:"userName"`
+	userLoginMustBeDomain bool
 
 	FirstName         string        `json:"firstName,omitempty"`
 	LastName          string        `json:"lastName,omitempty"`
@@ -148,6 +158,10 @@ type HumanRegisteredEvent struct {
 
 func (e *HumanRegisteredEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.userLoginMustBeDomain)}
 }
 
 func (e *HumanRegisteredEvent) AddAddressData(
@@ -180,6 +194,7 @@ func (e *HumanRegisteredEvent) AddPasswordData(
 
 func NewHumanRegisteredEvent(
 	ctx context.Context,
+	resourceOwner,
 	userName,
 	firstName,
 	lastName,
@@ -188,20 +203,23 @@ func NewHumanRegisteredEvent(
 	preferredLanguage language.Tag,
 	gender domain.Gender,
 	emailAddress string,
+	userLoginMustBeDomain bool,
 ) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			HumanRegisteredType,
+			resourceOwner,
 		),
-		UserName:          userName,
-		FirstName:         firstName,
-		LastName:          lastName,
-		NickName:          nickName,
-		DisplayName:       displayName,
-		PreferredLanguage: preferredLanguage,
-		Gender:            gender,
-		EmailAddress:      emailAddress,
+		UserName:              userName,
+		FirstName:             firstName,
+		LastName:              lastName,
+		NickName:              nickName,
+		DisplayName:           displayName,
+		PreferredLanguage:     preferredLanguage,
+		Gender:                gender,
+		EmailAddress:          emailAddress,
+		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
@@ -225,6 +243,10 @@ type HumanInitialCodeAddedEvent struct {
 
 func (e *HumanInitialCodeAddedEvent) Data() interface{} {
 	return e
+}
+
+func (e *HumanInitialCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewHumanInitialCodeAddedEvent(
@@ -262,6 +284,10 @@ func (e *HumanInitialCodeSentEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanInitialCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanInitialCodeSentEvent(ctx context.Context) *HumanInitialCodeSentEvent {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -282,6 +308,10 @@ type HumanInitializedCheckSucceededEvent struct {
 }
 
 func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanInitializedCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
@@ -308,6 +338,10 @@ func (e *HumanInitializedCheckFailedEvent) Data() interface{} {
 	return nil
 }
 
+func (e *HumanInitializedCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewHumanInitializedCheckFailedEvent(ctx context.Context) *HumanInitializedCheckFailedEvent {
 	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -330,6 +364,10 @@ type HumanSignedOutEvent struct {
 }
 
 func (e *HumanSignedOutEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanSignedOutEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 

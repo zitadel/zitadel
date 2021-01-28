@@ -25,6 +25,10 @@ func (e *IdentityProviderAddedEvent) Data() interface{} {
 	return e
 }
 
+func (e *IdentityProviderAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
 func NewIdentityProviderAddedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID string,
@@ -59,6 +63,10 @@ type IdentityProviderRemovedEvent struct {
 
 func (e *IdentityProviderRemovedEvent) Data() interface{} {
 	return e
+}
+
+func (e *IdentityProviderRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func NewIdentityProviderRemovedEvent(

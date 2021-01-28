@@ -2,31 +2,27 @@ package management
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func projectMemberFromModel(member *proj_model.ProjectMember) *management.ProjectMember {
-	creationDate, err := ptypes.TimestampProto(member.CreationDate)
-	logging.Log("GRPC-kd8re").OnError(err).Debug("unable to parse timestamp")
-
-	changeDate, err := ptypes.TimestampProto(member.ChangeDate)
-	logging.Log("GRPC-dlei3").OnError(err).Debug("unable to parse timestamp")
-
+func projectMemberFromDomain(member *domain.Member) *management.ProjectMember {
 	return &management.ProjectMember{
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
+		CreationDate: timestamppb.New(member.CreationDate),
+		ChangeDate:   timestamppb.New(member.ChangeDate),
 		Sequence:     member.Sequence,
 		UserId:       member.UserID,
 		Roles:        member.Roles,
 	}
 }
 
-func projectMemberAddToModel(member *management.ProjectMemberAdd) *proj_model.ProjectMember {
-	return &proj_model.ProjectMember{
+func projectMemberAddToDomain(member *management.ProjectMemberAdd) *domain.Member {
+	return &domain.Member{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: member.Id,
 		},
@@ -35,8 +31,8 @@ func projectMemberAddToModel(member *management.ProjectMemberAdd) *proj_model.Pr
 	}
 }
 
-func projectMemberChangeToModel(member *management.ProjectMemberChange) *proj_model.ProjectMember {
-	return &proj_model.ProjectMember{
+func projectMemberChangeToDomain(member *management.ProjectMemberChange) *domain.Member {
+	return &domain.Member{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: member.Id,
 		},
