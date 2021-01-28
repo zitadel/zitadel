@@ -9,5 +9,5 @@ func mustDatabaseOperator(binaryVersion *string) *labels.Operator {
 		version = *binaryVersion
 	}
 
-	return labels.MustForOperator("ORBOS", "database.caos.ch", version)
+	return labels.MustForOperator("ZITADEL", "database.caos.ch", version)
 }
