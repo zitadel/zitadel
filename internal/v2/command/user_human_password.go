@@ -122,6 +122,19 @@ func (r *CommandSide) RequestSetPassword(ctx context.Context, userID, resourceOw
 	return r.eventstore.PushAggregate(ctx, existingHuman, userAgg)
 }
 
+func (r *CommandSide) PasswordCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	existingPassword, err := r.passwordWriteModel(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Email.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
+	userAgg.PushEvents(user.NewHumanPasswordCodeSentEvent(ctx))
+	return r.eventstore.PushAggregate(ctx, existingPassword, userAgg)
+}
+
 func (r *CommandSide) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

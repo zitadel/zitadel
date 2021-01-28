@@ -166,19 +166,6 @@ func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
 	return user.GetAddress()
 }
 
-func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
-	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return err
-	}
-	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	_, err = repo.UserEvents.ChangePassword(ctx, pwPolicyView, authz.GetCtxData(ctx).UserID, old, new, "")
-	return err
-}
-
 func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error) {
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
@@ -216,14 +203,6 @@ func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password
 	}
 	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
 	return repo.UserEvents.VerifyInitCode(ctx, pwPolicyView, userID, code, password)
-}
-
-func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string) error {
-	user, err := repo.View.UserByLoginName(loginname)
-	if err != nil {
-		return err
-	}
-	return repo.UserEvents.RequestSetPassword(ctx, user.ID, model.NotificationTypeEmail)
 }
 
 func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error) {

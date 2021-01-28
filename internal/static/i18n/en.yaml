@@ -38,6 +38,9 @@ Errors:
     Address:
       NotFound: Address not found
       NotChanged: Address not changed
+    Machine:
+      Key:
+        NotFound: Machine key not found
     NotHuman: The User must be personal
     NotMachine: The User must be technical
     NotAllowedToLink: User is not allowed to link with external login provider

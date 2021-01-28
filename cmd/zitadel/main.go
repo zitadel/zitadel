@@ -123,7 +123,7 @@ func startZitadel(configPaths []string) {
 	startUI(ctx, conf, authRepo, command, query)
 
 	if *notificationEnabled {
-		notification.Start(ctx, conf.Notification, conf.SystemDefaults)
+		notification.Start(ctx, conf.Notification, conf.SystemDefaults, command)
 	}
 
 	<-ctx.Done()

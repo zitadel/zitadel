@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/v2/command"
 	"net/http"
 	"time"
 
@@ -32,6 +33,7 @@ const (
 
 type Notification struct {
 	handler
+	command        *command.CommandSide
 	userEvents     *usr_event.UserEventstore
 	systemDefaults sd.SystemDefaults
 	AesCrypto      crypto.EncryptionAlgorithm
@@ -42,6 +44,7 @@ type Notification struct {
 
 func newNotification(
 	handler handler,
+	command *command.CommandSide,
 	userEvents *usr_event.UserEventstore,
 	defaults sd.SystemDefaults,
 	aesCrypto crypto.EncryptionAlgorithm,
@@ -50,6 +53,7 @@ func newNotification(
 ) *Notification {
 	h := &Notification{
 		handler:        handler,
+		command:        command,
 		userEvents:     userEvents,
 		systemDefaults: defaults,
 		i18n:           translator,
@@ -171,7 +175,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return n.userEvents.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.command.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handleEmailVerificationCode(event *models.Event) (err error) {

@@ -77,6 +77,15 @@ func writeModelToMachine(wm *MachineWriteModel) *domain.Machine {
 	}
 }
 
+func keyWriteModelToMachineKey(wm *MachineKeyWriteModel) *domain.MachineKey {
+	return &domain.MachineKey{
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
+		KeyID:          wm.KeyID,
+		Type:           wm.KeyType,
+		ExpirationDate: wm.ExpirationDate,
+	}
+}
+
 func readModelToU2FTokens(wm *HumanU2FTokensReadModel) []*domain.WebAuthNToken {
 	tokens := make([]*domain.WebAuthNToken, len(wm.WebAuthNTokens))
 	for i, token := range wm.WebAuthNTokens {

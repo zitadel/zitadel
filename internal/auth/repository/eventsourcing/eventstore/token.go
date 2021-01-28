@@ -2,12 +2,8 @@ package eventstore
 
 import (
 	"context"
-	"strings"
-
 	"github.com/caos/logging"
-	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -20,34 +16,6 @@ import (
 type TokenRepo struct {
 	UserEvents *user_event.UserEventstore
 	View       *view.View
-}
-
-func (repo *TokenRepo) CreateToken(ctx context.Context, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*usr_model.Token, error) {
-	preferredLanguage := ""
-	user, _ := repo.View.UserByID(userID)
-	if user != nil {
-		preferredLanguage = user.PreferredLanguage
-	}
-
-	for _, scope := range scopes {
-		if strings.HasPrefix(scope, auth_req_model.ProjectIDScope) && strings.HasSuffix(scope, auth_req_model.AudSuffix) {
-			audience = append(audience, strings.TrimSuffix(strings.TrimPrefix(scope, auth_req_model.ProjectIDScope), auth_req_model.AudSuffix))
-		}
-	}
-
-	now := time.Now().UTC()
-	token := &usr_model.Token{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: userID,
-		},
-		UserAgentID:       agentID,
-		ApplicationID:     clientID,
-		Audience:          audience,
-		Scopes:            scopes,
-		Expiration:        now.Add(lifetime),
-		PreferredLanguage: preferredLanguage,
-	}
-	return repo.UserEvents.TokenAdded(ctx, token)
 }
 
 func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error) {
