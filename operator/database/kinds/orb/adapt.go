@@ -18,7 +18,7 @@ const (
 )
 
 func OperatorSelector() *labels.Selector {
-	return labels.OpenOperatorSelector("database.caos.ch")
+	return labels.OpenOperatorSelector("ZITADEL", "database.caos.ch")
 }
 
 func AdaptFunc(timestamp string, binaryVersion *string, features ...string) operator.AdaptFunc {

@@ -17,7 +17,7 @@ const (
 )
 
 func ComponentSelector() *labels.Selector {
-	return labels.OpenComponentSelector(component)
+	return labels.OpenComponentSelector("ZITADEL", component)
 }
 
 func GetQueryAndDestroyFuncs(
