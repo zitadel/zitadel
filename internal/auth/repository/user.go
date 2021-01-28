@@ -9,8 +9,6 @@ import (
 type UserRepository interface {
 	myUserRepo
 
-	VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
-
 	GetPasswordless(ctx context.Context, id string) ([]*model.WebAuthNToken, error)
 
 	UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error)

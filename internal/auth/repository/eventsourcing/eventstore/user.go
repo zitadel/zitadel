@@ -125,10 +125,6 @@ func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
 	return user.GetEmail()
 }
 
-func (repo *UserRepo) ResendEmailVerificationMail(ctx context.Context, userID string) error {
-	return repo.UserEvents.CreateEmailVerificationCode(ctx, userID)
-}
-
 func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
@@ -138,21 +134,6 @@ func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DTWJb", "Errors.User.NotHuman")
 	}
 	return user.GetPhone()
-}
-
-func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*model.Phone, error) {
-	if err := checkIDs(ctx, phone.ObjectRoot); err != nil {
-		return nil, err
-	}
-	return repo.UserEvents.ChangePhone(ctx, phone)
-}
-
-func (repo *UserRepo) RemoveMyPhone(ctx context.Context) error {
-	return repo.UserEvents.RemovePhone(ctx, authz.GetCtxData(ctx).UserID)
-}
-
-func (repo *UserRepo) VerifyMyPhone(ctx context.Context, code string) error {
-	return repo.UserEvents.VerifyPhone(ctx, authz.GetCtxData(ctx).UserID, code)
 }
 
 func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
@@ -179,10 +160,6 @@ func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, err
 		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name, ID: u2f.TokenID})
 	}
 	return mfas, nil
-}
-
-func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
-	return repo.UserEvents.VerifyU2FSetup(ctx, userID, tokenName, userAgentID, credentialData)
 }
 
 func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error) {

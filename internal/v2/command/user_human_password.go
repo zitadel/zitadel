@@ -128,7 +128,7 @@ func (r *CommandSide) PasswordCodeSent(ctx context.Context, orgID, userID string
 		return err
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Email.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Phone.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
 	userAgg.PushEvents(user.NewHumanPasswordCodeSentEvent(ctx))

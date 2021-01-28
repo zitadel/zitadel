@@ -33,7 +33,7 @@ func (r *CommandSide) getHumanPasswordlessTokens(ctx context.Context, userID, re
 	return readModelToPasswordlessTokens(tokenReadModel), nil
 }
 
-func (r *CommandSide) AddHumanU2F(ctx context.Context, userID, resourceowner string, isLoginUI bool) (*domain.WebAuthNToken, error) {
+func (r *CommandSide) AddHumanU2FSetup(ctx context.Context, userID, resourceowner string, isLoginUI bool) (*domain.WebAuthNToken, error) {
 	u2fTokens, err := r.getHumanU2FTokens(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (r *CommandSide) AddHumanU2F(ctx context.Context, userID, resourceowner str
 	return createdWebAuthN, nil
 }
 
-func (r *CommandSide) AddHumanPasswordless(ctx context.Context, userID, resourceowner string, isLoginUI bool) (*domain.WebAuthNToken, error) {
+func (r *CommandSide) AddHumanPasswordlessSetup(ctx context.Context, userID, resourceowner string, isLoginUI bool) (*domain.WebAuthNToken, error) {
 	passwordlessTokens, err := r.getHumanPasswordlessTokens(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func (r *CommandSide) addHumanWebAuthN(ctx context.Context, userID, resourceowne
 	return addWebAuthN, userAgg, webAuthN, nil
 }
 
-func (r *CommandSide) VerifyHumanU2F(ctx context.Context, userID, resourceowner, tokenName, userAgentID string, credentialData []byte) error {
+func (r *CommandSide) VerifyHumanU2FSetup(ctx context.Context, userID, resourceowner, tokenName, userAgentID string, credentialData []byte) error {
 	u2fTokens, err := r.getHumanU2FTokens(ctx, userID, resourceowner)
 	if err != nil {
 		return err
@@ -139,7 +139,7 @@ func (r *CommandSide) VerifyHumanU2F(ctx context.Context, userID, resourceowner,
 	return r.eventstore.PushAggregate(ctx, verifyWebAuthN, userAgg)
 }
 
-func (r *CommandSide) VerifyHumanPasswordless(ctx context.Context, userID, resourceowner, tokenName, userAgentID string, credentialData []byte) error {
+func (r *CommandSide) VerifyHumanPasswordlessSetup(ctx context.Context, userID, resourceowner, tokenName, userAgentID string, credentialData []byte) error {
 	u2fTokens, err := r.getHumanPasswordlessTokens(ctx, userID, resourceowner)
 	if err != nil {
 		return err

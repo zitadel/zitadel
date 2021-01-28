@@ -203,7 +203,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	return n.userEvents.EmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.command.HumanEmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
@@ -225,7 +225,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	return n.userEvents.PhoneVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.command.HumanPhoneVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
@@ -246,7 +246,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return n.userEvents.DomainClaimedSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.command.UserDomainClaimedSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) checkIfCodeAlreadyHandledOrExpired(event *models.Event, expiry time.Duration, eventTypes ...models.EventType) (bool, error) {

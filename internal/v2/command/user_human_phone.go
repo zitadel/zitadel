@@ -107,6 +107,19 @@ func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, user
 	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
 }
 
+func (r *CommandSide) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	existingPhone, err := r.phoneWriteModelByID(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-66n8J", "Errors.User.Phone.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
+	userAgg.PushEvents(user.NewHumanPhoneCodeSentEvent(ctx))
+	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
+}
+
 func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.UserIDMissing")

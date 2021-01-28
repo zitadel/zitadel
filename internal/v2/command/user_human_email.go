@@ -103,6 +103,19 @@ func (r *CommandSide) CreateHumanEmailVerificationCode(ctx context.Context, user
 	return r.eventstore.PushAggregate(ctx, existingEmail, userAgg)
 }
 
+func (r *CommandSide) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	existingEmail, err := r.emailWriteModel(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-6n8uH", "Errors.User.Email.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
+	userAgg.PushEvents(user.NewHumanEmailCodeSentEvent(ctx))
+	return r.eventstore.PushAggregate(ctx, existingEmail, userAgg)
+}
+
 func (r *CommandSide) emailWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanEmailWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

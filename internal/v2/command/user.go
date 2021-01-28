@@ -189,6 +189,19 @@ func (r *CommandSide) CreateUserToken(ctx context.Context, orgID, agentID, clien
 	}, nil
 }
 
+func (r *CommandSide) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {
+	existingUser, err := r.userWriteModelByID(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-5m9gK", "Errors.User.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
+	userAgg.PushEvents(user.NewDomainClaimedSentEvent(ctx))
+	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
+}
+
 func (r *CommandSide) checkUserExists(ctx context.Context, userID, resourceOwner string) error {
 	userWriteModel, err := r.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
