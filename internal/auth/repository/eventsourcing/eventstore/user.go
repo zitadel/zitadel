@@ -252,16 +252,16 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string
 	return repo.UserEvents.RequestSetPassword(ctx, user.ID, model.NotificationTypeEmail)
 }
 
-func (repo *UserRepo) SignOut(ctx context.Context, agentID string) error {
+func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error) {
 	userSessions, err := repo.View.UserSessionsByAgentID(agentID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	userIDs := make([]string, len(userSessions))
 	for i, session := range userSessions {
 		userIDs[i] = session.UserID
 	}
-	return repo.UserEvents.SignOut(ctx, agentID, userIDs)
+	return userIDs, nil
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView, error) {

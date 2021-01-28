@@ -113,7 +113,11 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
-	return o.repo.SignOut(ctx, userAgentID)
+	userIDs, err := o.repo.UserSessionUserIDsByAgentID(ctx, userAgentID)
+	if err != nil {
+		return err
+	}
+	return o.command.HumansSignOut(ctx, userAgentID, userIDs)
 }
 
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, errCh chan<- error, timer <-chan time.Time) {

@@ -325,18 +325,21 @@ func HumanInitializedCheckFailedEventMapper(event *repository.Event) (eventstore
 
 type HumanSignedOutEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	UserAgentID string `json:"userAgentID"`
 }
 
 func (e *HumanSignedOutEvent) Data() interface{} {
 	return nil
 }
 
-func NewHumanSignedOutEvent(ctx context.Context) *HumanSignedOutEvent {
+func NewHumanSignedOutEvent(ctx context.Context, userAgentID string) *HumanSignedOutEvent {
 	return &HumanSignedOutEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanSignedOutType,
 		),
+		UserAgentID: userAgentID,
 	}
 }
 

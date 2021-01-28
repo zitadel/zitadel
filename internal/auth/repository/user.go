@@ -22,7 +22,7 @@ type UserRepository interface {
 	AddPasswordless(ctx context.Context, id string) (*model.WebAuthNToken, error)
 	VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error
 
-	SignOut(ctx context.Context, agentID string) error
+	UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error)
 
 	UserByID(ctx context.Context, userID string) (*model.UserView, error)
 
