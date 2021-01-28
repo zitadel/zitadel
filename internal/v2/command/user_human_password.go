@@ -59,7 +59,7 @@ func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPass
 	if err != nil {
 		return err
 	}
-	if existingPassword.Secret != nil {
+	if existingPassword.Secret == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Fds3s", "Errors.User.Password.Empty")
 	}
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
@@ -71,7 +71,7 @@ func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPass
 	}
 	password := &domain.Password{
 		SecretString:   newPassword,
-		ChangeRequired: true,
+		ChangeRequired: false,
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
