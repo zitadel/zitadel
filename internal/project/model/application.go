@@ -1,12 +1,9 @@
 package model
 
 import (
-	"time"
+	"github.com/golang/protobuf/ptypes/timestamp"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	key_model "github.com/caos/zitadel/internal/key/model"
-
-	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type Application struct {
@@ -65,12 +62,14 @@ func (a *Application) IsValid(includeConfig bool) bool {
 	return true
 }
 
-type ApplicationKey struct {
-	es_models.ObjectRoot
-
-	AppID          string
-	KeyID          string
-	Type           key_model.AuthNKeyType
-	ExpirationDate time.Time
-	PrivateKey     []byte
+func (a *Application) GetKey(keyID string) (int, *ClientKey) {
+	if a.OIDCConfig == nil {
+		return -1, nil
+	}
+	for i, k := range a.OIDCConfig.ClientKeys {
+		if k.KeyID == keyID {
+			return i, k
+		}
+	}
+	return -1, nil
 }

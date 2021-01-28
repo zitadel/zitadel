@@ -1,27 +1,3 @@
--- ALTER TABLE auth.machine_keys
---     ADD COLUMN object_type STRING;
--- ALTER TABLE management.machine_key
---     ADD COLUMN object_type STRING;
---
--- ALTER TABLE auth.machine_keys
---     RENAME COLUMN user_id TO object_id;
--- ALTER TABLE management.machine_keys
---     RENAME COLUMN user_id TO object_id;
---
--- BEGIN;
---
--- ALTER TABLE auth.machine_keys
---     DROP CONSTRAINT "primary";
--- ALTER TABLE management.machine_keys
---     DROP CONSTRAINT "primary";
---
--- ALTER TABLE auth.machine_keys
---     ADD CONSTRAINT "primary" PRIMARY KEY (id, object_id, object_type);
--- ALTER TABLE management.machine_keys
---     ADD CONSTRAINT "primary" PRIMARY KEY (id, object_id, object_type);
---
--- COMMIT;
-
 CREATE TABLE auth.authn_keys
 (
     key_id          TEXT,

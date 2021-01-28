@@ -435,31 +435,31 @@ func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*management
 	return result
 }
 
-func applicationKeyViewsFromModel(keys ...*key_model.AuthNKeyView) []*management.ApplicationKeyView {
-	keyViews := make([]*management.ApplicationKeyView, len(keys))
+func clientKeyViewsFromModel(keys ...*key_model.AuthNKeyView) []*management.ClientKeyView {
+	keyViews := make([]*management.ClientKeyView, len(keys))
 	for i, key := range keys {
-		keyViews[i] = applicationKeyViewFromModel(key)
+		keyViews[i] = clientKeyViewFromModel(key)
 	}
 	return keyViews
 }
 
-func applicationKeyViewFromModel(key *key_model.AuthNKeyView) *management.ApplicationKeyView {
+func clientKeyViewFromModel(key *key_model.AuthNKeyView) *management.ClientKeyView {
 	creationDate, err := ptypes.TimestampProto(key.CreationDate)
 	logging.Log("MANAG-DAs2t").OnError(err).Debug("unable to parse timestamp")
 
 	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
 	logging.Log("MANAG-BDgh4").OnError(err).Debug("unable to parse timestamp")
 
-	return &management.ApplicationKeyView{
+	return &management.ClientKeyView{
 		Id:             key.ID,
 		CreationDate:   creationDate,
 		ExpirationDate: expirationDate,
 		Sequence:       key.Sequence,
-		Type:           applicationKeyTypeFromModel(key.Type),
+		Type:           authNKeyTypeFromModel(key.Type),
 	}
 }
 
-func addApplicationKeyToModel(key *management.AddApplicationKeyRequest) *proj_model.ApplicationKey {
+func addClientKeyToModel(key *management.AddClientKeyRequest) *proj_model.ClientKey {
 	expirationDate := time.Time{}
 	if key.ExpirationDate != nil {
 		var err error
@@ -467,15 +467,15 @@ func addApplicationKeyToModel(key *management.AddApplicationKeyRequest) *proj_mo
 		logging.Log("MANAG-Dgt42").OnError(err).Debug("unable to parse expiration date")
 	}
 
-	return &proj_model.ApplicationKey{
+	return &proj_model.ClientKey{
 		ExpirationDate: expirationDate,
-		Type:           applicationKeyTypeToModel(key.Type),
+		Type:           authNKeyTypeToModel(key.Type),
 		AppID:          key.ApplicationId,
 		ObjectRoot:     models.ObjectRoot{AggregateID: key.ProjectId},
 	}
 }
 
-func addApplicationKeyFromModel(key *proj_model.ApplicationKey) *management.AddApplicationKeyResponse {
+func addClientKeyFromModel(key *proj_model.ClientKey) *management.AddClientKeyResponse {
 	creationDate, err := ptypes.TimestampProto(key.CreationDate)
 	logging.Log("MANAG-FBzz4").OnError(err).Debug("unable to parse cretaion date")
 
@@ -495,35 +495,35 @@ func addApplicationKeyFromModel(key *proj_model.ApplicationKey) *management.AddA
 	})
 	logging.Log("MANAG-adt42").OnError(err).Warn("unable to marshall key")
 
-	return &management.AddApplicationKeyResponse{
+	return &management.AddClientKeyResponse{
 		Id:             key.KeyID,
 		CreationDate:   creationDate,
 		ExpirationDate: expirationDate,
 		Sequence:       key.Sequence,
 		KeyDetails:     detail,
-		Type:           applicationKeyTypeFromModel(key.Type),
+		Type:           authNKeyTypeFromModel(key.Type),
 	}
 }
 
-func applicationKeyTypeToModel(typ management.ApplicationKeyType) key_model.AuthNKeyType {
+func authNKeyTypeToModel(typ management.AuthNKeyType) key_model.AuthNKeyType {
 	switch typ {
-	case management.ApplicationKeyType_APPLICATIONKEY_JSON:
+	case management.AuthNKeyType_AUTHNKEY_JSON:
 		return key_model.AuthNKeyTypeJSON
 	default:
 		return key_model.AuthNKeyTypeNONE
 	}
 }
 
-func applicationKeyTypeFromModel(typ key_model.AuthNKeyType) management.ApplicationKeyType {
+func authNKeyTypeFromModel(typ key_model.AuthNKeyType) management.AuthNKeyType {
 	switch typ {
 	case key_model.AuthNKeyTypeJSON:
-		return management.ApplicationKeyType_APPLICATIONKEY_JSON
+		return management.AuthNKeyType_AUTHNKEY_JSON
 	default:
-		return management.ApplicationKeyType_APPLICATIONKEY_UNSPECIFIED
+		return management.AuthNKeyType_AUTHNKEY_UNSPECIFIED
 	}
 }
 
-func applicationKeySearchRequestToModel(req *management.ApplicationKeySearchRequest) *key_model.AuthNKeySearchRequest {
+func clientKeySearchRequestToModel(req *management.ClientKeySearchRequest) *key_model.AuthNKeySearchRequest {
 	return &key_model.AuthNKeySearchRequest{
 		Offset: req.Offset,
 		Limit:  req.Limit,
@@ -542,16 +542,16 @@ func applicationKeySearchRequestToModel(req *management.ApplicationKeySearchRequ
 	}
 }
 
-func applicationKeySearchResponseFromModel(req *key_model.AuthNKeySearchResponse) *management.ApplicationKeySearchResponse {
+func clientKeySearchResponseFromModel(req *key_model.AuthNKeySearchResponse) *management.ClientKeySearchResponse {
 	viewTimestamp, err := ptypes.TimestampProto(req.Timestamp)
 	logging.Log("MANAG-Sk9ds").OnError(err).Debug("unable to parse cretaion date")
 
-	return &management.ApplicationKeySearchResponse{
+	return &management.ClientKeySearchResponse{
 		Offset:            req.Offset,
 		Limit:             req.Limit,
 		TotalResult:       req.TotalResult,
 		ProcessedSequence: req.Sequence,
 		ViewTimestamp:     viewTimestamp,
-		Result:            applicationKeyViewsFromModel(req.Result...),
+		Result:            clientKeyViewsFromModel(req.Result...),
 	}
 }

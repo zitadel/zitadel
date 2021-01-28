@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/id"
+	key_model "github.com/caos/zitadel/internal/key/model"
 )
 
 const (
@@ -40,7 +41,7 @@ type OIDCConfig struct {
 	IDTokenRoleAssertion     bool
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
-	ApplicationKey           []ApplicationKey
+	ClientKeys               []*ClientKey
 }
 
 type OIDCVersion int32
@@ -92,6 +93,16 @@ const (
 	OIDCTokenTypeBearer OIDCTokenType = iota
 	OIDCTokenTypeJWT
 )
+
+type ClientKey struct {
+	es_models.ObjectRoot
+
+	AppID          string
+	KeyID          string
+	Type           key_model.AuthNKeyType
+	ExpirationDate time.Time
+	PrivateKey     []byte
+}
 
 func (c *OIDCConfig) IsValid() bool {
 	grantTypes := c.getRequiredGrantTypes()

@@ -407,7 +407,7 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appI
 	return changes, nil
 }
 
-func (repo *ProjectRepo) SearchApplicationKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error) {
+func (repo *ProjectRepo) SearchClientKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, sequenceErr := repo.View.GetLatestAuthNKeySequence("")
 	logging.Log("EVENT-ADwgw").OnError(sequenceErr).Warn("could not read latest authn key sequence")
@@ -428,7 +428,7 @@ func (repo *ProjectRepo) SearchApplicationKeys(ctx context.Context, request *key
 	return result, nil
 }
 
-func (repo *ProjectRepo) GetApplicationKey(ctx context.Context, projectID, applicationID, keyID string) (*key_model.AuthNKeyView, error) {
+func (repo *ProjectRepo) GetClientKey(ctx context.Context, projectID, applicationID, keyID string) (*key_model.AuthNKeyView, error) {
 	key, err := repo.View.AuthNKeyByIDs(applicationID, keyID)
 	if err != nil {
 		return nil, err
@@ -436,11 +436,11 @@ func (repo *ProjectRepo) GetApplicationKey(ctx context.Context, projectID, appli
 	return key_view_model.AuthNKeyToModel(key), nil
 }
 
-func (repo *ProjectRepo) AddApplicationKey(ctx context.Context, key *proj_model.ApplicationKey) (*proj_model.ApplicationKey, error) {
-	return repo.ProjectEvents.AddApplicationKey(ctx, key)
+func (repo *ProjectRepo) AddClientKey(ctx context.Context, key *proj_model.ClientKey) (*proj_model.ClientKey, error) {
+	return repo.ProjectEvents.AddClientKey(ctx, key)
 }
 
-func (repo *ProjectRepo) RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID string) error {
+func (repo *ProjectRepo) RemoveClientKey(ctx context.Context, projectID, applicationID, keyID string) error {
 	return repo.ProjectEvents.RemoveApplicationKey(ctx, projectID, applicationID, keyID)
 }
 

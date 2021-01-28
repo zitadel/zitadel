@@ -82,31 +82,31 @@ func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *managem
 	return appChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }
 
-func (s *Server) SearchApplicationKeys(ctx context.Context, req *management.ApplicationKeySearchRequest) (*management.ApplicationKeySearchResponse, error) {
-	result, err := s.project.SearchApplicationKeys(ctx, applicationKeySearchRequestToModel(req))
+func (s *Server) SearchClientKeys(ctx context.Context, req *management.ClientKeySearchRequest) (*management.ClientKeySearchResponse, error) {
+	result, err := s.project.SearchClientKeys(ctx, clientKeySearchRequestToModel(req))
 	if err != nil {
 		return nil, err
 	}
-	return applicationKeySearchResponseFromModel(result), nil
+	return clientKeySearchResponseFromModel(result), nil
 }
 
-func (s *Server) GetApplicationKey(ctx context.Context, req *management.ApplicationKeyIDRequest) (*management.ApplicationKeyView, error) {
-	key, err := s.project.GetApplicationKey(ctx, req.ProjectId, req.ApplicationId, req.KeyId)
+func (s *Server) GetClientKey(ctx context.Context, req *management.ClientKeyIDRequest) (*management.ClientKeyView, error) {
+	key, err := s.project.GetClientKey(ctx, req.ProjectId, req.ApplicationId, req.KeyId)
 	if err != nil {
 		return nil, err
 	}
-	return applicationKeyViewFromModel(key), nil
+	return clientKeyViewFromModel(key), nil
 }
 
-func (s *Server) AddApplicationKey(ctx context.Context, req *management.AddApplicationKeyRequest) (*management.AddApplicationKeyResponse, error) {
-	key, err := s.project.AddApplicationKey(ctx, addApplicationKeyToModel(req))
+func (s *Server) AddClientKey(ctx context.Context, req *management.AddClientKeyRequest) (*management.AddClientKeyResponse, error) {
+	key, err := s.project.AddClientKey(ctx, addClientKeyToModel(req))
 	if err != nil {
 		return nil, err
 	}
-	return addApplicationKeyFromModel(key), nil
+	return addClientKeyFromModel(key), nil
 }
 
-func (s *Server) DeleteApplicationKey(ctx context.Context, req *management.ApplicationKeyIDRequest) (*empty.Empty, error) {
-	err := s.project.RemoveApplicationKey(ctx, req.ProjectId, req.ApplicationId, req.KeyId)
+func (s *Server) DeleteClientKey(ctx context.Context, req *management.ClientKeyIDRequest) (*empty.Empty, error) {
+	err := s.project.RemoveClientKey(ctx, req.ProjectId, req.ApplicationId, req.KeyId)
 	return &empty.Empty{}, err
 }

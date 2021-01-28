@@ -43,10 +43,10 @@ type ProjectRepository interface {
 	ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
 	SearchApplications(ctx context.Context, request *model.ApplicationSearchRequest) (*model.ApplicationSearchResponse, error)
 	ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ApplicationChanges, error)
-	SearchApplicationKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error)
-	GetApplicationKey(ctx context.Context, projectID, applicationID, keyID string) (*key_model.AuthNKeyView, error)
-	AddApplicationKey(ctx context.Context, key *model.ApplicationKey) (*model.ApplicationKey, error)
-	RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID string) error
+	SearchClientKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error)
+	GetClientKey(ctx context.Context, projectID, applicationID, keyID string) (*key_model.AuthNKeyView, error)
+	AddClientKey(ctx context.Context, key *model.ClientKey) (*model.ClientKey, error)
+	RemoveClientKey(ctx context.Context, projectID, applicationID, keyID string) error
 
 	ProjectGrantByID(ctx context.Context, grantID string) (*model.ProjectGrantView, error)
 	AddProjectGrant(ctx context.Context, grant *model.ProjectGrant) (*model.ProjectGrant, error)

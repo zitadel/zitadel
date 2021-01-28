@@ -19,7 +19,7 @@ const (
 )
 
 type AuthNKeyView struct {
-	ID             string    `json:"keyId" gorm:"column:id;primary_key"`
+	ID             string    `json:"keyId" gorm:"column:key_id;primary_key"`
 	ObjectID       string    `json:"-" gorm:"column:object_id;primary_key"`
 	ObjectType     int32     `json:"-" gorm:"column:object_type;primary_key"`
 	Type           int32     `json:"type" gorm:"column:machine_type"`

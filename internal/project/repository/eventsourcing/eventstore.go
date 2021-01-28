@@ -32,10 +32,11 @@ const (
 
 type ProjectEventstore struct {
 	es_int.Eventstore
-	projectCache *ProjectCache
-	passwordAlg  crypto.HashAlgorithm
-	pwGenerator  crypto.Generator
-	idGenerator  id.Generator
+	projectCache  *ProjectCache
+	passwordAlg   crypto.HashAlgorithm
+	pwGenerator   crypto.Generator
+	idGenerator   id.Generator
+	ClientKeySize int
 }
 
 type ProjectConfig struct {
@@ -51,11 +52,12 @@ func StartProject(conf ProjectConfig, systemDefaults sd.SystemDefaults) (*Projec
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
 	pwGenerator := crypto.NewHashGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
 	return &ProjectEventstore{
-		Eventstore:   conf.Eventstore,
-		projectCache: projectCache,
-		passwordAlg:  passwordAlg,
-		pwGenerator:  pwGenerator,
-		idGenerator:  id.SonyFlakeGenerator,
+		Eventstore:    conf.Eventstore,
+		projectCache:  projectCache,
+		passwordAlg:   passwordAlg,
+		pwGenerator:   pwGenerator,
+		idGenerator:   id.SonyFlakeGenerator,
+		ClientKeySize: int(systemDefaults.SecretGenerators.ClientKeySize),
 	}, nil
 }
 
@@ -833,7 +835,7 @@ func (es *ProjectEventstore) setOIDCClientSecretCheckResult(ctx context.Context,
 	return nil
 }
 
-func (es *ProjectEventstore) AddApplicationKey(ctx context.Context, key *proj_model.ApplicationKey) (*proj_model.ApplicationKey, error) {
+func (es *ProjectEventstore) AddClientKey(ctx context.Context, key *proj_model.ClientKey) (*proj_model.ClientKey, error) {
 	existingProject, err := es.ProjectByID(ctx, key.AggregateID)
 	if err != nil {
 		return nil, err
@@ -861,8 +863,8 @@ func (es *ProjectEventstore) AddApplicationKey(ctx context.Context, key *proj_mo
 	}
 
 	repoProject := model.ProjectFromModel(existingProject)
-	repoKey := model.ApplicationKeyFromModel(key)
-	err = repoKey.GenerateMachineKeyPair(es.MachineKeySize, es.MachineKeyAlg)
+	repoKey := model.ClientKeyFromModel(key)
+	err = repoKey.GenerateClientKeyPair(es.ClientKeySize)
 	if err != nil {
 		return nil, err
 	}
@@ -872,7 +874,8 @@ func (es *ProjectEventstore) AddApplicationKey(ctx context.Context, key *proj_mo
 		return nil, err
 	}
 	es.projectCache.cacheProject(repoProject)
-	return nil, nil
+
+	return model.ClientKeyToModel(repoKey), nil
 }
 
 func (es *ProjectEventstore) RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID string) error {
@@ -891,8 +894,7 @@ func (es *ProjectEventstore) RemoveApplicationKey(ctx context.Context, projectID
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-D2Sff", "Errors.Project.AppKeyNotExisting")
 	}
 	repoProject := model.ProjectFromModel(existingProject)
-	repoKey := model.ApplicationKeyFromModel(key)
-	agg := OIDCApplicationKeyRemovedAggregate(es.AggregateCreator(), repoProject, repoKey)
+	agg := OIDCApplicationKeyRemovedAggregate(es.AggregateCreator(), repoProject, keyID)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, agg)
 	if err != nil {
 		return err

@@ -8,7 +8,9 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/project/model"
 )
 
@@ -172,5 +174,73 @@ func (o *OIDCConfig) setData(event *es_models.Event) error {
 		logging.Log("EVEN-d8e3s").WithError(err).Error("could not unmarshal event data")
 		return err
 	}
+	return nil
+}
+
+type ClientKey struct {
+	es_models.ObjectRoot `json:"-"`
+	AppID                string    `json:"appId,omitempty"`
+	KeyID                string    `json:"keyId,omitempty"`
+	Type                 int32     `json:"type,omitempty"`
+	ExpirationDate       time.Time `json:"expirationDate,omitempty"`
+	PublicKey            []byte    `json:"publicKey,omitempty"`
+	privateKey           []byte
+}
+
+func (key *ClientKey) AppendEvents(events ...*es_models.Event) error {
+	for _, event := range events {
+		err := key.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (key *ClientKey) AppendEvent(event *es_models.Event) (err error) {
+	key.ObjectRoot.AppendEvent(event)
+	switch event.Type {
+	case ClientKeyAdded:
+		err = json.Unmarshal(event.Data, key)
+		if err != nil {
+			return errors.ThrowInternal(err, "MODEL-Fetg3", "Errors.Internal")
+		}
+	case ClientKeyRemoved:
+		key.ExpirationDate = event.CreationDate
+	}
+	return err
+}
+
+func ClientKeyFromModel(key *model.ClientKey) *ClientKey {
+	return &ClientKey{
+		ObjectRoot:     key.ObjectRoot,
+		ExpirationDate: key.ExpirationDate,
+		AppID:          key.AppID,
+		KeyID:          key.KeyID,
+		Type:           int32(key.Type),
+	}
+}
+
+func ClientKeyToModel(key *ClientKey) *model.ClientKey {
+	return &model.ClientKey{
+		ObjectRoot:     key.ObjectRoot,
+		ExpirationDate: key.ExpirationDate,
+		AppID:          key.AppID,
+		KeyID:          key.KeyID,
+		PrivateKey:     key.privateKey,
+		Type:           key_model.AuthNKeyType(key.Type),
+	}
+}
+
+func (key *ClientKey) GenerateClientKeyPair(keySize int) error {
+	privateKey, publicKey, err := crypto.GenerateKeyPair(keySize)
+	if err != nil {
+		return err
+	}
+	key.PublicKey, err = crypto.PublicKeyToBytes(publicKey)
+	if err != nil {
+		return err
+	}
+	key.privateKey = crypto.PrivateKeyToBytes(privateKey)
 	return nil
 }

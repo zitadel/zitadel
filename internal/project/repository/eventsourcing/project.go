@@ -368,6 +368,33 @@ func OIDCClientSecretCheckFailedAggregate(aggCreator *es_models.AggregateCreator
 	}
 }
 
+func OIDCApplicationKeyAddedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, key *model.ClientKey) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.ClientKeyAdded, key)
+
+		return agg, nil
+	}
+}
+
+func OIDCApplicationKeyRemovedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, keyID string) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := ProjectAggregate(ctx, aggCreator, existingProject)
+		if err != nil {
+			return nil, err
+		}
+		changes := make(map[string]interface{}, 1)
+		changes["keyId"] = keyID
+
+		agg.AppendEvent(model.ClientKeyRemoved, changes)
+
+		return agg, nil
+	}
+}
+
 func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, project *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {

@@ -1016,7 +1016,7 @@ service ManagementService {
     };
   }
 
-  rpc AddApplicationKey(AddApplicationKeyRequest) returns (AddApplicationKeyResponse){
+  rpc AddClientKey(AddClientKeyRequest) returns (AddClientKeyResponse){
     option (google.api.http) = {
       put: "/projects/{project_id}/applications/{application_id}/keys"
       body: "*"
@@ -1028,7 +1028,7 @@ service ManagementService {
     };
   }
 
-  rpc DeleteApplicationKey(ApplicationKeyIDRequest) returns (google.protobuf.Empty) {
+  rpc DeleteClientKey(ClientKeyIDRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/projects/{project_id}/applications/{application_id}/keys/{key_id}"
     };
@@ -1039,7 +1039,7 @@ service ManagementService {
     };
   }
 
-  rpc SearchApplicationKeys(ApplicationKeySearchRequest) returns (ApplicationKeySearchResponse) {
+  rpc SearchClientKeys(ClientKeySearchRequest) returns (ClientKeySearchResponse) {
     option (google.api.http) = {
       post: "/projects/{project_id}/applications/{application_id}/keys/_search"
       body: "*"
@@ -1051,7 +1051,7 @@ service ManagementService {
     };
   }
 
-  rpc GetApplicationKey(ApplicationKeyIDRequest) returns (ApplicationKeyView) {
+  rpc GetClientKey(ClientKeyIDRequest) returns (ClientKeyView) {
     option (google.api.http) = {
       get: "/projects/{project_id}/applications/{application_id}/keys/{key_id}"
     };
@@ -2720,44 +2720,44 @@ enum ApplicationSearchKey {
   APPLICATIONSEARCHKEY_APP_NAME = 1;
 }
 
-message AddApplicationKeyRequest {
+message AddClientKeyRequest {
   string project_id = 1 [(validate.rules).string.min_len = 1];
   string application_id = 2 [(validate.rules).string.min_len = 1];
-  ApplicationKeyType type = 3 [(validate.rules).enum = {not_in: [0]}];
+  AuthNKeyType type = 3 [(validate.rules).enum = {not_in: [0]}];
   google.protobuf.Timestamp expiration_date = 4;
 }
 
-message AddApplicationKeyResponse {
+message AddClientKeyResponse {
   string id = 1;
   google.protobuf.Timestamp creation_date = 2;
   uint64 sequence = 3;
 
-  ApplicationKeyType type = 4;
+  AuthNKeyType type = 4;
   google.protobuf.Timestamp expiration_date = 5;
   bytes key_details = 6;
 }
 
-message ApplicationKeyIDRequest {
+message ClientKeyIDRequest {
   string project_id = 1 [(validate.rules).string.min_len = 1];
   string application_id = 2 [(validate.rules).string.min_len = 1];
   string key_id = 3 [(validate.rules).string.min_len = 1];
 }
 
-message ApplicationKeyView {
+message ClientKeyView {
   string id = 1;
-  ApplicationKeyType type = 2;
+  AuthNKeyType type = 2;
   uint64 sequence = 3;
 
   google.protobuf.Timestamp creation_date = 4;
   google.protobuf.Timestamp expiration_date = 5;
 }
 
-enum ApplicationKeyType {
-  APPLICATIONKEY_UNSPECIFIED = 0;
-  APPLICATIONKEY_JSON = 1;
+enum AuthNKeyType {
+  AUTHNKEY_UNSPECIFIED = 0;
+  AUTHNKEY_JSON = 1;
 }
 
-message ApplicationKeySearchRequest {
+message ClientKeySearchRequest {
   uint64 offset = 1;
   uint64 limit = 2;
   bool asc = 3;
@@ -2765,11 +2765,11 @@ message ApplicationKeySearchRequest {
   string application_id = 5 [(validate.rules).string.min_len = 1];
 }
 
-message ApplicationKeySearchResponse {
+message ClientKeySearchResponse {
   uint64 offset = 1;
   uint64 limit = 2;
   uint64 total_result = 3;
-  repeated ApplicationKeyView result = 4;
+  repeated ClientKeyView result = 4;
   uint64 processed_sequence = 5;
   google.protobuf.Timestamp view_timestamp = 6;
 }
