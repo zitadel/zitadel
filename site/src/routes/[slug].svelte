@@ -12,6 +12,13 @@
     export let slug;
     export let sections;
     export let seo;
+
+    import { onMount } from 'svelte';
+    import { initPhotoSwipeFromDOM } from '../utils/photoswipe.js';
+
+    onMount(() => {
+        initPhotoSwipeFromDOM('.zitadel-gallery');
+    });
 </script>
 
 <style>

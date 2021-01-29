@@ -89,8 +89,6 @@
     <!-- This contains the contents of the <svelte:head> component, if
 	     the current page has one -->
     %sapper.head%
-
-    %sapper.scripts%
 </head>
 
 <body>
@@ -100,7 +98,8 @@
 
     <!-- Sapper creates a <script> tag containing `app/client.js`
 	     and anything else it needs to hydrate the app and
-	     initialise the router -->
+         initialise the router -->
+    %sapper.scripts%
 </body>
 
 </html>

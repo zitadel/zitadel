@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import GuideContents from "./GuideContents.svelte";
   import Icon from "./Icon.svelte";
-  import manifest from '../../static/manifest.json';
   export let owner = "caos";
   export let path = "docs";
   export let project = "zitadel";	
