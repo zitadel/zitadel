@@ -61,7 +61,7 @@
 				<p>Please try reloading the page.</p>
 			{/if}
 
-			<p>If the error persists, let us know or raise an issue on <a href="https://github.com/caos/site">GitHub</a>. Thanks!</p>
+			<p>If the error persists, let us know or raise an issue on <a rel="external" href="https://github.com/caos/site">GitHub</a>. Thanks!</p>
 		{/if}
 	{:else}
 		<h1>It looks like you're offline</h1>

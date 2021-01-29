@@ -64,6 +64,12 @@ export const unicodeSafeProcessor = (string, opts) => {
         .join(separator);
 };
 
+/* processor */
+
+export const makeSlugProcessor = (preserveUnicode = false) => preserveUnicode
+    ? unicodeSafeProcessor
+    : urlsafeSlugProcessor;
+
 /* session processor */
 
 export const make_session_slug_processor = ({
