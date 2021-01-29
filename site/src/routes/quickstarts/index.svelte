@@ -27,12 +27,11 @@
 		<article class='quickstart'>
             <div>
                 <p class="sub">{qs.metadata.subtitle}</p>
-                <a class="anchor" sapper:prefetch href='{qs.fragment}' title='{qs.metadata.title}'>
-                <h2>
-                    <span id={qs.fragment} class="offset-anchor"></span>
-                     
-                    {qs.metadata.title}
-                </h2>
+                <a class="anchor" sapper:prefetch href={qs.fragment} title='{qs.metadata.title}'>
+                    <h2>
+                        <span id={qs.fragment} class="offset-anchor"></span>
+                        {qs.metadata.title}
+                    </h2>
                 </a>
                 <p>{@html qs.description}</p>
                 <p class="info">{qs.metadata.date} • {qs.metadata.readingtime}</p>
