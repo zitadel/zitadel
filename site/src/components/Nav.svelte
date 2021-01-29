@@ -344,7 +344,7 @@
 
         <span class="fill-space show-if-desktop"></span>
 
-        <a class="show-if-desktop" href='https://console.zitadel.ch'>
+        <a class="show-if-desktop" href="https://console.zitadel.ch">
             <button>
                 <span>LOGIN</span>
             </button>
