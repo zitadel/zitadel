@@ -62,3 +62,8 @@ func UserAggregateFromReadModel(rm *UserReadModel) *user.Aggregate {
 		),
 	}
 }
+
+func NewUserEventSearchQuery(userID, orgID string, sequence uint64) *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+		AggregateIDs(userID).ResourceOwner(orgID).SequenceGreater(sequence)
+}

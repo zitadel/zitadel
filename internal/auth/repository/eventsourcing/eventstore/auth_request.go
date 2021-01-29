@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"time"
 
 	"github.com/caos/logging"
@@ -9,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
+	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -30,6 +33,7 @@ import (
 )
 
 type AuthRequestRepo struct {
+	Command      *command.CommandSide
 	UserEvents   *user_event.UserEventstore
 	OrgEvents    *org_event.OrgEventstore
 	AuthRequests cache.AuthRequestCache
@@ -37,6 +41,7 @@ type AuthRequestRepo struct {
 
 	UserSessionViewProvider userSessionViewProvider
 	UserViewProvider        userViewProvider
+	UserCommandProvider     userCommandProvider
 	UserEventProvider       userEventProvider
 	OrgViewProvider         orgViewProvider
 	LoginPolicyViewProvider loginPolicyViewProvider
@@ -72,7 +77,10 @@ type idpProviderViewProvider interface {
 
 type userEventProvider interface {
 	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
-	BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error
+}
+
+type userCommandProvider interface {
+	BulkAddedHumanExternalIDP(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.ExternalIDP) error
 }
 
 type orgViewProvider interface {
@@ -92,7 +100,7 @@ func (repo *AuthRequestRepo) Health(ctx context.Context) error {
 	return repo.AuthRequests.Health(ctx)
 }
 
-func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *model.AuthRequest) (_ *model.AuthRequest, err error) {
+func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *domain.AuthRequest) (_ *domain.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	reqID, err := repo.IdGenerator.Next()
@@ -124,13 +132,13 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id, userAgentID string) (_ *model.AuthRequest, err error) {
+func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id, userAgentID string) (_ *domain.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, false)
 }
 
-func (repo *AuthRequestRepo) AuthRequestByIDCheckLoggedIn(ctx context.Context, id, userAgentID string) (_ *model.AuthRequest, err error) {
+func (repo *AuthRequestRepo) AuthRequestByIDCheckLoggedIn(ctx context.Context, id, userAgentID string) (_ *domain.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, true)
@@ -147,7 +155,7 @@ func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAge
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string) (_ *model.AuthRequest, err error) {
+func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string) (_ *domain.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.AuthRequests.GetAuthRequestByCode(ctx, code)
@@ -200,7 +208,7 @@ func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, i
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *model.ExternalUser, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
@@ -218,14 +226,14 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 		return err
 	}
 
-	err = repo.UserEvents.ExternalLoginChecked(ctx, request.UserID, request.WithCurrentInfo(info))
+	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserID, request.UserOrgID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *model.AuthRequest, externalUser *model.ExternalUser) error {
+func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
 	request.LinkingUsers = append(request.LinkingUsers, externalUser)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
@@ -248,27 +256,27 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, resourceOwner, password, userAgentID string, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequestEnsureUser(ctx, id, userAgentID, userID)
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
+	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, userID, code, userAgentID string, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, userID, resourceOwner, code, userAgentID string, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.CheckMFAOTP(ctx, userID, code, request.WithCurrentInfo(info))
+	return repo.Command.HumanCheckMFAOTP(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
+func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -276,51 +284,51 @@ func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, authR
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.BeginU2FLogin(ctx, userID, request, true)
+	return repo.Command.HumanBeginU2FLogin(ctx, userID, resourceOwner, request, true)
 }
 
-func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.VerifyMFAU2F(ctx, userID, credentialData, request, true)
+	return repo.Command.HumanFinishU2FLogin(ctx, userID, resourceOwner, credentialData, request, true)
 }
 
-func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, authRequestID, userAgentID string) (login *user_model.WebAuthNLogin, err error) {
+func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.BeginPasswordlessLogin(ctx, userID, request, true)
+	return repo.Command.HumanBeginPasswordlessLogin(ctx, userID, resourceOwner, request, true)
 }
 
-func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.VerifyPasswordless(ctx, userID, credentialData, request, true)
+	return repo.Command.HumanFinishPasswordlessLogin(ctx, userID, resourceOwner, credentialData, request, true)
 }
 
-func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
-	err = linkExternalIDPs(ctx, repo.UserEventProvider, request)
+	err = linkExternalIDPs(ctx, repo.UserCommandProvider, request)
 	if err != nil {
 		return err
 	}
-	err = repo.UserEvents.ExternalLoginChecked(ctx, request.UserID, request.WithCurrentInfo(info))
+	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserID, request.UserOrgID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
@@ -338,7 +346,7 @@ func (repo *AuthRequestRepo) ResetLinkingUsers(ctx context.Context, authReqID, u
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *user_model.User, externalIDP *user_model.ExternalIDP, orgMember *org_model.OrgMember, authReqID, userAgentID, resourceOwner string, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *user_model.User, externalIDP *user_model.ExternalIDP, orgMember *org_model.OrgMember, authReqID, userAgentID, resourceOwner string, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
@@ -386,14 +394,14 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	request.UserOrgID = user.ResourceOwner
 	request.SelectedIDPConfigID = externalIDP.IDPConfigID
 	request.LinkingUsers = nil
-	err = repo.UserEvents.ExternalLoginChecked(ctx, request.UserID, request.WithCurrentInfo(info))
+	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserID, request.UserOrgID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, userAgentID string, checkLoggedIn bool) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, userAgentID string, checkLoggedIn bool) (*domain.AuthRequest, error) {
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return nil, err
@@ -406,7 +414,7 @@ func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, us
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authRequestID, userAgentID, userID string) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authRequestID, userAgentID, userID string) (*domain.AuthRequest, error) {
 	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
 	if err != nil {
 		return nil, err
@@ -417,7 +425,7 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID string) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID string) (*domain.AuthRequest, error) {
 	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -432,22 +440,24 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, []*iam_model.IDPProviderView, error) {
+func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, orgID string) (*domain.LoginPolicy, []*domain.IDPProvider, error) {
 	policy, err := repo.getLoginPolicy(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
 	}
 	if !policy.AllowExternalIDP {
-		return policy, nil, nil
+		return policy.ToLoginPolicyDomain(), nil, nil
 	}
 	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, repo.IAMID, orgID, policy.Default)
 	if err != nil {
 		return nil, nil, err
 	}
-	return policy, idpProviders, nil
+
+	providers := iam_model.IdpProviderViewsToDomain(idpProviders)
+	return policy.ToLoginPolicyDomain(), providers, nil
 }
 
-func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model.AuthRequest) error {
+func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *domain.AuthRequest) error {
 	orgID := request.RequestedOrgID
 	if orgID == "" {
 		orgID = request.UserOrgID
@@ -467,7 +477,7 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model
 	return nil
 }
 
-func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.AuthRequest, loginName string) (err error) {
+func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain.AuthRequest, loginName string) (err error) {
 	user := new(user_view_model.UserView)
 	if request.RequestedOrgID != "" {
 		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, request.RequestedOrgID)
@@ -488,7 +498,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.
 	return nil
 }
 
-func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *model.AuthRequest, user *user_view_model.UserView) error {
+func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, user *user_view_model.UserView) error {
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, user.ResourceOwner)
 	if err != nil {
 		return err
@@ -507,7 +517,7 @@ func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Contex
 	return nil
 }
 
-func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *model.AuthRequest, idpConfigID string) error {
+func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthRequest, idpConfigID string) error {
 	for _, externalIDP := range request.AllowedExternalIDPs {
 		if externalIDP.IDPConfigID == idpConfigID {
 			request.SelectedIDPConfigID = idpConfigID
@@ -517,7 +527,7 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *model.AuthRequest
 	return errors.ThrowNotFound(nil, "LOGIN-Nsm8r", "Errors.User.ExternalIDP.NotAllowed")
 }
 
-func (repo *AuthRequestRepo) checkExternalUserLogin(request *model.AuthRequest, idpConfigID, externalUserID string) (err error) {
+func (repo *AuthRequestRepo) checkExternalUserLogin(request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
 	externalIDP := new(user_view_model.ExternalIDPView)
 	if request.RequestedOrgID != "" {
 		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID)
@@ -531,27 +541,27 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(request *model.AuthRequest, 
 	return nil
 }
 
-func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthRequest, checkLoggedIn bool) ([]model.NextStep, error) {
+func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.AuthRequest, checkLoggedIn bool) ([]domain.NextStep, error) {
 	if request == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
 	}
-	steps := make([]model.NextStep, 0)
-	if !checkLoggedIn && request.Prompt == model.PromptNone {
-		return append(steps, &model.RedirectToCallbackStep{}), nil
+	steps := make([]domain.NextStep, 0)
+	if !checkLoggedIn && request.Prompt == domain.PromptNone {
+		return append(steps, &domain.RedirectToCallbackStep{}), nil
 	}
 	if request.UserID == "" {
 		if request.LinkingUsers != nil && len(request.LinkingUsers) > 0 {
-			steps = append(steps, new(model.ExternalNotFoundOptionStep))
+			steps = append(steps, new(domain.ExternalNotFoundOptionStep))
 			return steps, nil
 		}
-		steps = append(steps, new(model.LoginStep))
-		if request.Prompt == model.PromptSelectAccount || request.Prompt == model.PromptUnspecified {
+		steps = append(steps, new(domain.LoginStep))
+		if request.Prompt == domain.PromptSelectAccount || request.Prompt == domain.PromptUnspecified {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err
 			}
-			if len(users) > 0 || request.Prompt == model.PromptSelectAccount {
-				steps = append(steps, &model.SelectUserStep{Users: users})
+			if len(users) > 0 || request.Prompt == domain.PromptSelectAccount {
+				steps = append(steps, &domain.SelectUserStep{Users: users})
 			}
 		}
 		return steps, nil
@@ -572,7 +582,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		if selectedIDPConfigID == "" {
 			selectedIDPConfigID = userSession.SelectedIDPConfigID
 		}
-		return append(steps, &model.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}), nil
+		return append(steps, &domain.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}), nil
 	}
 	if isInternalLogin || (!isInternalLogin && len(request.LinkingUsers) > 0) {
 		step := repo.firstFactorChecked(request, user, userSession)
@@ -590,13 +600,13 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 	}
 
 	if user.PasswordChangeRequired {
-		steps = append(steps, &model.ChangePasswordStep{})
+		steps = append(steps, &domain.ChangePasswordStep{})
 	}
 	if !user.IsEmailVerified {
-		steps = append(steps, &model.VerifyEMailStep{})
+		steps = append(steps, &domain.VerifyEMailStep{})
 	}
 	if user.UsernameChangeRequired {
-		steps = append(steps, &model.ChangeUsernameStep{})
+		steps = append(steps, &domain.ChangeUsernameStep{})
 	}
 
 	if user.PasswordChangeRequired || !user.IsEmailVerified || user.UsernameChangeRequired {
@@ -604,7 +614,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 	}
 
 	if request.LinkingUsers != nil && len(request.LinkingUsers) != 0 {
-		return append(steps, &model.LinkUsersStep{}), nil
+		return append(steps, &domain.LinkUsersStep{}), nil
 
 	}
 	//PLANNED: consent step
@@ -614,46 +624,46 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 	if missing {
-		return append(steps, &model.GrantRequiredStep{}), nil
+		return append(steps, &domain.GrantRequiredStep{}), nil
 	}
 
-	return append(steps, &model.RedirectToCallbackStep{}), nil
+	return append(steps, &domain.RedirectToCallbackStep{}), nil
 }
 
-func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) ([]model.UserSelection, error) {
+func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) ([]domain.UserSelection, error) {
 	userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
 	if err != nil {
 		return nil, err
 	}
-	users := make([]model.UserSelection, len(userSessions))
+	users := make([]domain.UserSelection, len(userSessions))
 	for i, session := range userSessions {
-		users[i] = model.UserSelection{
+		users[i] = domain.UserSelection{
 			UserID:            session.UserID,
 			DisplayName:       session.DisplayName,
 			LoginName:         session.LoginName,
-			UserSessionState:  session.State,
+			UserSessionState:  auth_req_model.UserSessionStateToDomain(session.State),
 			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
 		}
 	}
 	return users, nil
 }
 
-func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user *user_model.UserView, userSession *user_model.UserSessionView) model.NextStep {
+func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, user *user_model.UserView, userSession *user_model.UserSessionView) domain.NextStep {
 	if user.InitRequired {
-		return &model.InitUserStep{PasswordSet: user.PasswordSet}
+		return &domain.InitUserStep{PasswordSet: user.PasswordSet}
 	}
 
-	var step model.NextStep
-	if request.LoginPolicy.PasswordlessType != iam_model.PasswordlessTypeNotAllowed && user.IsPasswordlessReady() {
+	var step domain.NextStep
+	if request.LoginPolicy.PasswordlessType != domain.PasswordlessTypeNotAllowed && user.IsPasswordlessReady() {
 		if checkVerificationTime(userSession.PasswordlessVerification, repo.MultiFactorCheckLifeTime) {
 			request.AuthTime = userSession.PasswordlessVerification
 			return nil
 		}
-		step = &model.PasswordlessStep{}
+		step = &domain.PasswordlessStep{}
 	}
 
 	if !user.PasswordSet {
-		return &model.InitPasswordStep{}
+		return &domain.InitPasswordStep{}
 	}
 
 	if checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
@@ -664,13 +674,13 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *model.AuthRequest, user
 	if step != nil {
 		return step
 	}
-	return &model.PasswordStep{}
+	return &domain.PasswordStep{}
 }
 
-func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool, error) {
+func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView) (domain.NextStep, bool, error) {
 	mfaLevel := request.MFALevel()
 	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy)
-	promptRequired := (user.MFAMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
+	promptRequired := (auth_req_model.MFALevelToDomain(user.MFAMaxSetUp) < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
 		types := user.MFATypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
@@ -679,7 +689,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		if len(types) == 0 {
 			return nil, true, nil
 		}
-		return &model.MFAPromptStep{
+		return &domain.MFAPromptStep{
 			Required:     promptRequired,
 			MFAProviders: types,
 		}, false, nil
@@ -687,26 +697,26 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 	switch mfaLevel {
 	default:
 		fallthrough
-	case model.MFALevelNotSetUp:
+	case domain.MFALevelNotSetUp:
 		if len(allowedProviders) == 0 {
 			return nil, true, nil
 		}
 		fallthrough
-	case model.MFALevelSecondFactor:
+	case domain.MFALevelSecondFactor:
 		if checkVerificationTime(userSession.SecondFactorVerification, repo.SecondFactorCheckLifeTime) {
-			request.MFAsVerified = append(request.MFAsVerified, userSession.SecondFactorVerificationType)
+			request.MFAsVerified = append(request.MFAsVerified, auth_req_model.MFATypeToDomain(userSession.SecondFactorVerificationType))
 			request.AuthTime = userSession.SecondFactorVerification
 			return nil, true, nil
 		}
 		fallthrough
-	case model.MFALevelMultiFactor:
+	case domain.MFALevelMultiFactor:
 		if checkVerificationTime(userSession.MultiFactorVerification, repo.MultiFactorCheckLifeTime) {
-			request.MFAsVerified = append(request.MFAsVerified, userSession.MultiFactorVerificationType)
+			request.MFAsVerified = append(request.MFAsVerified, auth_req_model.MFATypeToDomain(userSession.MultiFactorVerificationType))
 			request.AuthTime = userSession.MultiFactorVerification
 			return nil, true, nil
 		}
 	}
-	return &model.MFAVerificationStep{
+	return &domain.MFAVerificationStep{
 		MFAProviders: allowedProviders,
 	}, false, nil
 }
@@ -733,7 +743,7 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 	return iam_es_model.LoginPolicyViewToModel(policy), err
 }
 
-func setOrgID(orgViewProvider orgViewProvider, request *model.AuthRequest) error {
+func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
 	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	if primaryDomain == "" {
 		return nil
@@ -881,14 +891,14 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	return user_view_model.UserToModel(&userCopy), nil
 }
 
-func linkExternalIDPs(ctx context.Context, userEventProvider userEventProvider, request *model.AuthRequest) error {
-	externalIDPs := make([]*user_model.ExternalIDP, len(request.LinkingUsers))
+func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvider, request *domain.AuthRequest) error {
+	externalIDPs := make([]*domain.ExternalIDP, len(request.LinkingUsers))
 	for i, linkingUser := range request.LinkingUsers {
-		externalIDP := &user_model.ExternalIDP{
-			ObjectRoot:  es_models.ObjectRoot{AggregateID: request.UserID},
-			IDPConfigID: linkingUser.IDPConfigID,
-			UserID:      linkingUser.ExternalUserID,
-			DisplayName: linkingUser.DisplayName,
+		externalIDP := &domain.ExternalIDP{
+			ObjectRoot:     es_models.ObjectRoot{AggregateID: request.UserID},
+			IDPConfigID:    linkingUser.IDPConfigID,
+			ExternalUserID: linkingUser.ExternalUserID,
+			DisplayName:    linkingUser.DisplayName,
 		}
 		externalIDPs[i] = externalIDP
 	}
@@ -896,10 +906,10 @@ func linkExternalIDPs(ctx context.Context, userEventProvider userEventProvider, 
 		UserID: "LOGIN",
 		OrgID:  request.UserOrgID,
 	}
-	return userEventProvider.BulkAddExternalIDPs(authz.SetCtxData(ctx, data), request.UserID, externalIDPs)
+	return userCommandProvider.BulkAddedHumanExternalIDP(authz.SetCtxData(ctx, data), request.UserID, request.UserOrgID, externalIDPs)
 }
 
-func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*model.ExternalUser, idpProviders []*iam_model.IDPProviderView) bool {
+func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, idpProviders []*domain.IDPProvider) bool {
 	for _, linkingUser := range linkingUsers {
 		exists := false
 		for _, idp := range idpProviders {
@@ -914,10 +924,10 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*model.ExternalUser, i
 	}
 	return true
 }
-func userGrantRequired(ctx context.Context, request *model.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
+func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
 	var app *project_view_model.ApplicationView
 	switch request.Request.Type() {
-	case model.AuthRequestTypeOIDC:
+	case domain.AuthRequestTypeOIDC:
 		app, err = userGrantProvider.ApplicationByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err

@@ -1,17 +1,17 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
 	queryAuthRequestID = "authRequestID"
 )
 
-func (l *Login) getAuthRequest(r *http.Request) (*model.AuthRequest, error) {
+func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
 	authRequestID := r.FormValue(queryAuthRequestID)
 	if authRequestID == "" {
 		return nil, nil
@@ -20,7 +20,7 @@ func (l *Login) getAuthRequest(r *http.Request) (*model.AuthRequest, error) {
 	return l.authRepo.AuthRequestByID(r.Context(), authRequestID, userAgentID)
 }
 
-func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*model.AuthRequest, error) {
+func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*domain.AuthRequest, error) {
 	authReq, err := l.getAuthRequest(r)
 	if err != nil {
 		return nil, err

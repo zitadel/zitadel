@@ -139,54 +139,70 @@ func HumanPasswordCodeSentEventMapper(event *repository.Event) (eventstore.Event
 
 type HumanPasswordCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
 }
 
 func (e *HumanPasswordCheckSucceededEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanPasswordCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewHumanPasswordCheckSucceededEvent(ctx context.Context) *HumanPasswordCheckSucceededEvent {
+func NewHumanPasswordCheckSucceededEvent(ctx context.Context, info *AuthRequestInfo) *HumanPasswordCheckSucceededEvent {
 	return &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordCheckSucceededType,
 		),
+		AuthRequestInfo: info,
 	}
 }
 
 func HumanPasswordCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanPasswordCheckSucceededEvent{
+	humanAdded := &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+	err := json.Unmarshal(event.Data, humanAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-5M9sd", "unable to unmarshal human password check succeeded")
+	}
+
+	return humanAdded, nil
 }
 
 type HumanPasswordCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
 }
 
 func (e *HumanPasswordCheckFailedEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanPasswordCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewHumanPasswordCheckFailedEvent(ctx context.Context) *HumanPasswordCheckFailedEvent {
+func NewHumanPasswordCheckFailedEvent(ctx context.Context, info *AuthRequestInfo) *HumanPasswordCheckFailedEvent {
 	return &HumanPasswordCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanPasswordCheckFailedType,
 		),
+		AuthRequestInfo: info,
 	}
 }
 
 func HumanPasswordCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanPasswordCheckFailedEvent{
+	humanAdded := &HumanPasswordCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+	err := json.Unmarshal(event.Data, humanAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-4m9fs", "unable to unmarshal human password check failed")
+	}
+
+	return humanAdded, nil
 }

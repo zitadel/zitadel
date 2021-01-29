@@ -176,10 +176,8 @@ func HumanWebAuthNRemovedEventMapper(event *repository.Event) (eventstore.EventR
 type HumanWebAuthNBeginLoginEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	WebAuthNTokenID string `json:"webAuthNTokenId"`
-	Challenge       string `json:"challenge"`
-	//TODO: Handle Auth Req??
-	//*AuthRequest
+	Challenge string `json:"challenge"`
+	*AuthRequestInfo
 }
 
 func (e *HumanWebAuthNBeginLoginEvent) Data() interface{} {
@@ -192,13 +190,13 @@ func (e *HumanWebAuthNBeginLoginEvent) UniqueConstraints() []*eventstore.EventUn
 
 func NewHumanWebAuthNBeginLoginEvent(
 	base *eventstore.BaseEvent,
-	webAuthNTokenID,
 	challenge string,
+	info *AuthRequestInfo,
 ) *HumanWebAuthNBeginLoginEvent {
 	return &HumanWebAuthNBeginLoginEvent{
 		BaseEvent:       *base,
-		WebAuthNTokenID: webAuthNTokenID,
 		Challenge:       challenge,
+		AuthRequestInfo: info,
 	}
 }
 

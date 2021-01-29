@@ -153,8 +153,7 @@ func (rm *HumanU2FTokensReadModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			user.HumanU2FTokenAddedType,
 			user.HumanU2FTokenVerifiedType,
-			user.HumanU2FTokenRemovedType,
-			user.UserV1MFAOTPRemovedType)
+			user.HumanU2FTokenRemovedType)
 
 }
 
@@ -222,8 +221,7 @@ func (rm *HumanPasswordlessTokensReadModel) Query() *eventstore.SearchQueryBuild
 		EventTypes(
 			user.HumanPasswordlessTokenAddedType,
 			user.HumanPasswordlessTokenVerifiedType,
-			user.HumanPasswordlessTokenRemovedType,
-			user.UserV1MFAOTPRemovedType)
+			user.HumanPasswordlessTokenRemovedType)
 
 }
 
@@ -234,4 +232,115 @@ func (wm *HumanPasswordlessTokensReadModel) WebAuthNTokenByID(id string) (idx in
 		}
 	}
 	return -1, nil
+}
+
+type HumanU2FLoginReadModel struct {
+	eventstore.WriteModel
+
+	AuthReqID string
+	Challenge string
+	State     domain.UserState
+}
+
+func NewHumanU2FLoginReadModel(userID, authReqID, resourceOwner string) *HumanU2FLoginReadModel {
+	return &HumanU2FLoginReadModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
+		},
+		AuthReqID: authReqID,
+	}
+}
+
+func (wm *HumanU2FLoginReadModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *user.HumanU2FBeginLoginEvent:
+			if e.AuthRequestInfo.ID != wm.AuthReqID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.UserRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *HumanU2FLoginReadModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanU2FBeginLoginEvent:
+			wm.Challenge = e.Challenge
+			wm.State = domain.UserStateActive
+		case *user.UserRemovedEvent:
+			wm.State = domain.UserStateDeleted
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (rm *HumanU2FLoginReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+		AggregateIDs(rm.AggregateID).
+		ResourceOwner(rm.ResourceOwner).
+		EventTypes(
+			user.HumanU2FTokenBeginLoginType,
+			user.UserRemovedType,
+		)
+}
+
+type HumanPasswordlessLoginReadModel struct {
+	eventstore.WriteModel
+
+	AuthReqID string
+	Challenge string
+	State     domain.UserState
+}
+
+func NewHumanPasswordlessLoginReadModel(userID, authReqID, resourceOwner string) *HumanPasswordlessLoginReadModel {
+	return &HumanPasswordlessLoginReadModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
+		},
+		AuthReqID: authReqID,
+	}
+}
+
+func (wm *HumanPasswordlessLoginReadModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *user.HumanPasswordlessBeginLoginEvent:
+			if e.AuthRequestInfo.ID != wm.AuthReqID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.UserRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *HumanPasswordlessLoginReadModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanPasswordlessBeginLoginEvent:
+			wm.Challenge = e.Challenge
+			wm.State = domain.UserStateActive
+		case *user.UserRemovedEvent:
+			wm.State = domain.UserStateDeleted
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (rm *HumanPasswordlessLoginReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+		AggregateIDs(rm.AggregateID).
+		ResourceOwner(rm.ResourceOwner).
+		EventTypes(
+			user.HumanPasswordlessTokenBeginLoginType,
+			user.UserRemovedType,
+		)
+
 }

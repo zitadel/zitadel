@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"html/template"
 	"net/http"
 	"path"
@@ -167,7 +168,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 	return r
 }
 
-func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 	if err != nil {
@@ -181,7 +182,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	l.chooseNextStep(w, r, authReq, 0, nil)
 }
 
-func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
+func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	if authReq == nil || len(authReq.PossibleSteps) == 0 {
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
 		return
@@ -189,54 +190,54 @@ func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authReq *mod
 	l.chooseNextStep(w, r, authReq, 0, err)
 }
 
-func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, stepNumber int, err error) {
+func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, stepNumber int, err error) {
 	switch step := authReq.PossibleSteps[stepNumber].(type) {
-	case *model.LoginStep:
+	case *domain.LoginStep:
 		if len(authReq.PossibleSteps) > 1 {
 			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
 		l.renderLogin(w, r, authReq, err)
-	case *model.SelectUserStep:
+	case *domain.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
-	case *model.InitPasswordStep:
+	case *domain.InitPasswordStep:
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
-	case *model.PasswordStep:
+	case *domain.PasswordStep:
 		l.renderPassword(w, r, authReq, nil)
-	case *model.PasswordlessStep:
+	case *domain.PasswordlessStep:
 		l.renderPasswordlessVerification(w, r, authReq, nil)
-	case *model.MFAVerificationStep:
+	case *domain.MFAVerificationStep:
 		l.renderMFAVerify(w, r, authReq, step, err)
-	case *model.RedirectToCallbackStep:
+	case *domain.RedirectToCallbackStep:
 		if len(authReq.PossibleSteps) > 1 {
 			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
 		l.redirectToCallback(w, r, authReq)
-	case *model.ChangePasswordStep:
+	case *domain.ChangePasswordStep:
 		l.renderChangePassword(w, r, authReq, err)
-	case *model.VerifyEMailStep:
+	case *domain.VerifyEMailStep:
 		l.renderMailVerification(w, r, authReq, "", err)
-	case *model.MFAPromptStep:
+	case *domain.MFAPromptStep:
 		l.renderMFAPrompt(w, r, authReq, step, err)
-	case *model.InitUserStep:
+	case *domain.InitUserStep:
 		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
-	case *model.ChangeUsernameStep:
+	case *domain.ChangeUsernameStep:
 		l.renderChangeUsername(w, r, authReq, nil)
-	case *model.LinkUsersStep:
+	case *domain.LinkUsersStep:
 		l.linkUsers(w, r, authReq, err)
-	case *model.ExternalNotFoundOptionStep:
+	case *domain.ExternalNotFoundOptionStep:
 		l.renderExternalNotFoundOption(w, r, authReq, err)
-	case *model.ExternalLoginStep:
+	case *domain.ExternalLoginStep:
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
-	case *model.GrantRequiredStep:
+	case *domain.GrantRequiredStep:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
 }
 
-func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
+func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var msg string
 	if err != nil {
 		msg = err.Error()
@@ -245,7 +246,7 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getUserData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) userData {
+func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) userData {
 	userData := userData{
 		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
 		profileData: l.getProfileData(authReq),
@@ -256,7 +257,7 @@ func (l *Login) getUserData(r *http.Request, authReq *model.AuthRequest, title s
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) baseData {
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
 	baseData := baseData{
 		errorData: errorData{
 			ErrType:    errType,
@@ -279,7 +280,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 	return baseData
 }
 
-func (l *Login) getProfileData(authReq *model.AuthRequest) profileData {
+func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
 	var loginName, displayName string
 	if authReq != nil {
 		loginName = authReq.LoginName
@@ -309,7 +310,7 @@ func (l *Login) getThemeMode(r *http.Request) string {
 	return "" //TODO: impl
 }
 
-func (l *Login) getOrgID(authReq *model.AuthRequest) string {
+func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
 	if authReq == nil {
 		return ""
 	}
@@ -319,14 +320,14 @@ func (l *Login) getOrgID(authReq *model.AuthRequest) string {
 	return authReq.UserOrgID
 }
 
-func (l *Login) getOrgName(authReq *model.AuthRequest) string {
+func (l *Login) getOrgName(authReq *domain.AuthRequest) string {
 	if authReq == nil {
 		return ""
 	}
 	return authReq.RequestedOrgName
 }
 
-func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
+func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
 	}
@@ -357,8 +358,8 @@ type baseData struct {
 	AuthReqID    string
 	CSRF         template.HTML
 	Nonce        string
-	LoginPolicy  *iam_model.LoginPolicyView
-	IDPProviders []*iam_model.IDPProviderView
+	LoginPolicy  *iam_model.LoginPolicy
+	IDPProviders []*iam_model.IDPProvider
 }
 
 type errorData struct {
@@ -393,7 +394,7 @@ type passwordData struct {
 
 type userSelectionData struct {
 	baseData
-	Users   []model.UserSelection
+	Users   []domain.UserSelection
 	Linking bool
 }
 

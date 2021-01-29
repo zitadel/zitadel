@@ -105,11 +105,10 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	userAgg.PushEvents(createEvent)
 
 	if externalIDP != nil {
-		if !externalIDP.IsValid() {
-			return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4Dj9s", "Errors.User.ExternalIDP.Invalid")
+		err = r.addHumanExternalIDP(ctx, userAgg, externalIDP)
+		if err != nil {
+			return nil, nil, err
 		}
-		//TODO: check if idpconfig exists
-		userAgg.PushEvents(user.NewHumanExternalIDPAddedEvent(ctx, externalIDP.IDPConfigID, externalIDP.DisplayName))
 	}
 	if human.IsInitialState() {
 		initCode, err := domain.NewInitUserCode(r.initializeUserCode)

@@ -170,18 +170,6 @@ func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNT
 	return repo.UserEvents.GetPasswordless(ctx, authz.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password string) error {
-	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return err
-	}
-	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(policy)
-	return repo.UserEvents.VerifyInitCode(ctx, pwPolicyView, userID, code, password)
-}
-
 func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error) {
 	userSessions, err := repo.View.UserSessionsByAgentID(agentID)
 	if err != nil {

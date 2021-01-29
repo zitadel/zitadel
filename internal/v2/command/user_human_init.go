@@ -81,6 +81,19 @@ func (r *CommandSide) HumanVerifyInitCode(ctx context.Context, userID, code, pas
 	return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
 }
 
+func (r *CommandSide) HumanInitCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	existingInitCode, err := r.getHumanInitWriteModelByID(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingInitCode.UserState == domain.UserStateUnspecified || existingInitCode.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-556zg", "Errors.User.Code.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingInitCode.WriteModel)
+	userAgg.PushEvents(user.NewHumanInitialCodeSentEvent(ctx))
+	return r.eventstore.PushAggregate(ctx, existingInitCode, userAgg)
+}
+
 func (r *CommandSide) getHumanInitWriteModelByID(ctx context.Context, userID, resourceowner string) (*HumanInitCodeWriteModel, error) {
 	initWriteModel := NewHumanInitCodeWriteModel(userID, resourceowner)
 	err := r.eventstore.FilterToQueryReducer(ctx, initWriteModel)

@@ -157,27 +157,36 @@ func HumanExternalIDPCascadeRemovedEventMapper(event *repository.Event) (eventst
 
 type HumanExternalIDPCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
 }
 
 func (e *HumanExternalIDPCheckSucceededEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanExternalIDPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewHumanExternalIDPCheckSucceededEvent(ctx context.Context) *HumanExternalIDPCheckSucceededEvent {
+func NewHumanExternalIDPCheckSucceededEvent(ctx context.Context, info *AuthRequestInfo) *HumanExternalIDPCheckSucceededEvent {
 	return &HumanExternalIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalLoginCheckSucceededType,
 		),
+		AuthRequestInfo: info,
 	}
 }
 
 func HumanExternalIDPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanExternalIDPCheckSucceededEvent{
+	e := &HumanExternalIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-2M0sd", "unable to unmarshal user external idp check succeeded")
+	}
+
+	return e, nil
 }

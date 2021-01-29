@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/caos/zitadel/internal/v2/domain"
 
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/config/types"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
@@ -34,19 +34,19 @@ func (c *AuthRequestCache) Health(ctx context.Context) error {
 	return c.client.PingContext(ctx)
 }
 
-func (c *AuthRequestCache) GetAuthRequestByID(_ context.Context, id string) (*model.AuthRequest, error) {
+func (c *AuthRequestCache) GetAuthRequestByID(_ context.Context, id string) (*domain.AuthRequest, error) {
 	return c.getAuthRequest("id", id)
 }
 
-func (c *AuthRequestCache) GetAuthRequestByCode(_ context.Context, code string) (*model.AuthRequest, error) {
+func (c *AuthRequestCache) GetAuthRequestByCode(_ context.Context, code string) (*domain.AuthRequest, error) {
 	return c.getAuthRequest("code", code)
 }
 
-func (c *AuthRequestCache) SaveAuthRequest(_ context.Context, request *model.AuthRequest) error {
+func (c *AuthRequestCache) SaveAuthRequest(_ context.Context, request *domain.AuthRequest) error {
 	return c.saveAuthRequest(request, "INSERT INTO auth.auth_requests (id, request, request_type) VALUES($1, $2, $3)", request.Request.Type())
 }
 
-func (c *AuthRequestCache) UpdateAuthRequest(_ context.Context, request *model.AuthRequest) error {
+func (c *AuthRequestCache) UpdateAuthRequest(_ context.Context, request *domain.AuthRequest) error {
 	return c.saveAuthRequest(request, "UPDATE auth.auth_requests SET request = $2, code = $3 WHERE id = $1", request.Code)
 }
 
@@ -58,9 +58,9 @@ func (c *AuthRequestCache) DeleteAuthRequest(_ context.Context, id string) error
 	return nil
 }
 
-func (c *AuthRequestCache) getAuthRequest(key, value string) (*model.AuthRequest, error) {
+func (c *AuthRequestCache) getAuthRequest(key, value string) (*domain.AuthRequest, error) {
 	var b []byte
-	var requestType model.AuthRequestType
+	var requestType domain.AuthRequestType
 	query := fmt.Sprintf("SELECT request, request_type FROM auth.auth_requests WHERE %s = $1", key)
 	err := c.client.QueryRow(query, value).Scan(&b, &requestType)
 	if err != nil {
@@ -69,7 +69,7 @@ func (c *AuthRequestCache) getAuthRequest(key, value string) (*model.AuthRequest
 		}
 		return nil, caos_errs.ThrowInternal(err, "CACHE-as3kj", "Errors.Internal")
 	}
-	request, err := model.NewAuthRequestFromType(requestType)
+	request, err := domain.NewAuthRequestFromType(requestType)
 	if err == nil {
 		err = json.Unmarshal(b, request)
 	}
@@ -79,7 +79,7 @@ func (c *AuthRequestCache) getAuthRequest(key, value string) (*model.AuthRequest
 	return request, nil
 }
 
-func (c *AuthRequestCache) saveAuthRequest(request *model.AuthRequest, query string, param interface{}) error {
+func (c *AuthRequestCache) saveAuthRequest(request *domain.AuthRequest, query string, param interface{}) error {
 	b, err := json.Marshal(request)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-os0GH", "Errors.Internal")

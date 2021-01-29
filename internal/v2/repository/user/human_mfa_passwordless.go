@@ -151,8 +151,8 @@ type HumanPasswordlessBeginLoginEvent struct {
 
 func NewHumanPasswordlessBeginLoginEvent(
 	ctx context.Context,
-	webAuthNTokenID,
 	challenge string,
+	info *AuthRequestInfo,
 ) *HumanPasswordlessBeginLoginEvent {
 	return &HumanPasswordlessBeginLoginEvent{
 		HumanWebAuthNBeginLoginEvent: *NewHumanWebAuthNBeginLoginEvent(
@@ -160,8 +160,8 @@ func NewHumanPasswordlessBeginLoginEvent(
 				ctx,
 				HumanPasswordlessTokenVerifiedType,
 			),
-			webAuthNTokenID,
 			challenge,
+			info,
 		),
 	}
 }

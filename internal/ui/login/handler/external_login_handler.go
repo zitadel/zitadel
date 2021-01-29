@@ -12,6 +12,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 	"strings"
 	"time"
@@ -41,7 +42,7 @@ type externalNotFoundOptionData struct {
 	baseData
 }
 
-func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, selectedIDPConfigID string) {
+func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, selectedIDPConfigID string) {
 	for _, idp := range authReq.AllowedExternalIDPs {
 		if idp.IDPConfigID == selectedIDPConfigID {
 			l.handleIDP(w, r, authReq, selectedIDPConfigID)
@@ -65,7 +66,7 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 	l.handleIDP(w, r, authReq, data.IDPConfigID)
 }
 
-func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, selectedIDPConfigID string) {
+func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, selectedIDPConfigID string) {
 	idpConfig, err := l.getIDPConfigByID(r, selectedIDPConfigID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -84,7 +85,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *model
 	l.handleOIDCAuthorize(w, r, authReq, idpConfig, EndpointExternalLoginCallback)
 }
 
-func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) {
+func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) {
 	provider := l.getRPConfig(w, r, authReq, idpConfig, callbackEndpoint)
 	http.Redirect(w, r, rp.AuthURL(authReq.ID, provider, rp.WithPrompt(oidc.PromptSelectAccount)), http.StatusFound)
 }
@@ -116,7 +117,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
 }
 
-func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.RelayingParty {
+func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.RelayingParty {
 	oidcClientSecret, err := crypto.DecryptString(idpConfig.OIDCClientSecret, l.IDPConfigAesCrypto)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -130,9 +131,9 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *mod
 	return provider
 }
 
-func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
+func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	err := l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, model.BrowserInfoFromRequest(r))
+	err := l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
 			err = nil
@@ -143,7 +144,7 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
+func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -176,7 +177,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	l.handleAutoRegister(w, r, authReq)
 }
 
-func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	iam, err := l.authRepo.GetIAM(r.Context())
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
@@ -216,7 +217,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *model.ExternalUser {
+func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *domain.ExternalUser {
 	displayName := tokens.IDTokenClaims.GetPreferredUsername()
 	if displayName == "" && tokens.IDTokenClaims.GetEmail() != "" {
 		displayName = tokens.IDTokenClaims.GetEmail()
@@ -228,7 +229,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 		}
 	}
 
-	externalUser := &model.ExternalUser{
+	externalUser := &domain.ExternalUser{
 		IDPConfigID:       idpConfig.IDPConfigID,
 		ExternalUserID:    tokens.IDTokenClaims.GetSubject(),
 		PreferredUsername: tokens.IDTokenClaims.GetPreferredUsername(),

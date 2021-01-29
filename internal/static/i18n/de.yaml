@@ -56,6 +56,7 @@ Errors:
       NotFound: Password nicht gefunden
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
+      NotSet: Benutzer hat kein Passwort gesetzt
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz

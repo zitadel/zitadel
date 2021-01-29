@@ -12,7 +12,7 @@ import (
 func loginPolicyToDomain(policy *admin.DefaultLoginPolicyRequest) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowExternalIdp:      policy.AllowExternalIdp,
+		AllowExternalIDP:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
 		ForceMFA:              policy.ForceMfa,
 		PasswordlessType:      passwordlessTypeToDomain(policy.PasswordlessType),
@@ -22,7 +22,7 @@ func loginPolicyToDomain(policy *admin.DefaultLoginPolicyRequest) *domain.LoginP
 func loginPolicyFromDomain(policy *domain.LoginPolicy) *admin.DefaultLoginPolicy {
 	return &admin.DefaultLoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowExternalIdp:      policy.AllowExternalIdp,
+		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
 		ForceMfa:              policy.ForceMFA,
 		PasswordlessType:      passwordlessTypeFromDomain(policy.PasswordlessType),

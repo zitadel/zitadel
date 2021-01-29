@@ -20,7 +20,7 @@ func loginPolicyRequestToDomain(ctx context.Context, policy *management.LoginPol
 			AggregateID: authz.GetCtxData(ctx).OrgID,
 		},
 		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowExternalIdp:      policy.AllowExternalIdp,
+		AllowExternalIDP:      policy.AllowExternalIdp,
 		AllowRegister:         policy.AllowRegister,
 		ForceMFA:              policy.ForceMfa,
 		PasswordlessType:      passwordlessTypeToDomain(policy.PasswordlessType),
@@ -30,7 +30,7 @@ func loginPolicyRequestToDomain(ctx context.Context, policy *management.LoginPol
 func loginPolicyFromDomain(policy *domain.LoginPolicy) *management.LoginPolicy {
 	return &management.LoginPolicy{
 		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowExternalIdp:      policy.AllowExternalIdp,
+		AllowExternalIdp:      policy.AllowExternalIDP,
 		AllowRegister:         policy.AllowRegister,
 		ChangeDate:            timestamppb.New(policy.ChangeDate),
 		ForceMfa:              policy.ForceMFA,

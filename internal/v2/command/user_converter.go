@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
 func writeModelToHuman(wm *HumanWriteModel) *domain.Human {
@@ -115,4 +116,20 @@ func writeModelToWebAuthN(wm *HumanWebAuthNWriteModel) *domain.WebAuthNToken {
 		WebAuthNTokenName: wm.WebAuthNTokenName,
 		State:             wm.State,
 	}
+}
+
+func authRequestDomainToAuthRequestInfo(authRequest *domain.AuthRequest) *user.AuthRequestInfo {
+	info := &user.AuthRequestInfo{
+		ID:                  authRequest.ID,
+		UserAgentID:         authRequest.AgentID,
+		SelectedIDPConfigID: authRequest.SelectedIDPConfigID,
+	}
+	if authRequest.BrowserInfo != nil {
+		info.BrowserInfo = &user.BrowserInfo{
+			UserAgent:      authRequest.BrowserInfo.UserAgent,
+			AcceptLanguage: authRequest.BrowserInfo.AcceptLanguage,
+			RemoteIP:       authRequest.BrowserInfo.RemoteIP,
+		}
+	}
+	return info
 }

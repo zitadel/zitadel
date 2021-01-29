@@ -20,6 +20,7 @@ import (
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/v2/command"
 	"github.com/caos/zitadel/internal/v2/query"
 )
 
@@ -46,7 +47,7 @@ type EsRepository struct {
 	eventstore.IAMRepository
 }
 
-func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
+func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.CommandSide, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -131,12 +132,14 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, au
 			SystemDefaults: systemDefaults,
 		},
 		eventstore.AuthRequestRepo{
+			Command:                    command,
 			UserEvents:                 user,
 			OrgEvents:                  org,
 			AuthRequests:               authReq,
 			View:                       view,
 			UserSessionViewProvider:    view,
 			UserViewProvider:           view,
+			UserCommandProvider:        command,
 			UserEventProvider:          user,
 			OrgViewProvider:            view,
 			IDPProviderViewProvider:    view,

@@ -1,6 +1,9 @@
 package domain
 
-import es_models "github.com/caos/zitadel/internal/eventstore/models"
+import (
+	"bytes"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+)
 
 type WebAuthNToken struct {
 	es_models.ObjectRoot
@@ -51,6 +54,15 @@ func GetTokenToVerify(tokens []*WebAuthNToken) (int, *WebAuthNToken) {
 	for i, u2f := range tokens {
 		if u2f.State == MFAStateNotReady {
 			return i, u2f
+		}
+	}
+	return -1, nil
+}
+
+func GetTokenByKeyID(tokens []*WebAuthNToken, keyID []byte) (int, *WebAuthNToken) {
+	for i, token := range tokens {
+		if bytes.Compare(token.KeyID, keyID) == 0 {
+			return i, token
 		}
 	}
 	return -1, nil

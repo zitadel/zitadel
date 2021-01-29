@@ -151,8 +151,8 @@ type HumanU2FBeginLoginEvent struct {
 
 func NewHumanU2FBeginLoginEvent(
 	ctx context.Context,
-	webAuthNTokenID,
 	challenge string,
+	info *AuthRequestInfo,
 ) *HumanU2FBeginLoginEvent {
 	return &HumanU2FBeginLoginEvent{
 		HumanWebAuthNBeginLoginEvent: *NewHumanWebAuthNBeginLoginEvent(
@@ -160,8 +160,8 @@ func NewHumanU2FBeginLoginEvent(
 				ctx,
 				HumanU2FTokenVerifiedType,
 			),
-			webAuthNTokenID,
 			challenge,
+			info,
 		),
 	}
 }

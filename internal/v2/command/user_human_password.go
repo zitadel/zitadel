@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -128,11 +129,46 @@ func (r *CommandSide) PasswordCodeSent(ctx context.Context, orgID, userID string
 		return err
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Phone.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Password.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
 	userAgg.PushEvents(user.NewHumanPasswordCodeSentEvent(ctx))
 	return r.eventstore.PushAggregate(ctx, existingPassword, userAgg)
+}
+
+func (r *CommandSide) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if password == "" {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3n8fs", "Errors.User.Password.Empty")
+	}
+
+	existingPassword, err := r.passwordWriteModel(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Password.NotFound")
+	}
+
+	if existingPassword.Secret == nil {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Password.NotSet")
+	}
+
+	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
+	err = crypto.CompareHash(existingPassword.Secret, []byte(password), r.userPasswordAlg)
+	spanPasswordComparison.EndWithError(err)
+	if err == nil {
+		userAgg.PushEvents(user.NewHumanPasswordCheckSucceededEvent(ctx, authRequestDomainToAuthRequestInfo(authRequest)))
+		return r.eventstore.PushAggregate(ctx, existingPassword, userAgg)
+	}
+
+	userAgg.PushEvents(user.NewHumanPasswordCheckFailedEvent(ctx, authRequestDomainToAuthRequestInfo(authRequest)))
+	err = r.eventstore.PushAggregate(ctx, existingPassword, userAgg)
+	logging.Log("COMMAND-9fj7s").OnError(err).Error("error create password check failed event")
+	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-452ad", "Errors.User.Password.Invalid")
 }
 
 func (r *CommandSide) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {

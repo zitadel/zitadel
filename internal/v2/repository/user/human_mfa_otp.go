@@ -112,54 +112,68 @@ func HumanOTPRemovedEventMapper(event *repository.Event) (eventstore.EventReader
 
 type HumanOTPCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
 }
 
 func (e *HumanOTPCheckSucceededEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanOTPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewHumanOTPCheckSucceededEvent(ctx context.Context) *HumanOTPCheckSucceededEvent {
+func NewHumanOTPCheckSucceededEvent(ctx context.Context, info *AuthRequestInfo) *HumanOTPCheckSucceededEvent {
 	return &HumanOTPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanMFAOTPCheckSucceededType,
 		),
+		AuthRequestInfo: info,
 	}
 }
 
 func HumanOTPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanOTPCheckSucceededEvent{
+	otpAdded := &HumanOTPCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+	err := json.Unmarshal(event.Data, otpAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check succeeded")
+	}
+	return otpAdded, nil
 }
 
 type HumanOTPCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
 }
 
 func (e *HumanOTPCheckFailedEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanOTPCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewHumanOTPCheckFailedEvent(ctx context.Context) *HumanOTPCheckFailedEvent {
+func NewHumanOTPCheckFailedEvent(ctx context.Context, info *AuthRequestInfo) *HumanOTPCheckFailedEvent {
 	return &HumanOTPCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanMFAOTPCheckFailedType,
 		),
+		AuthRequestInfo: info,
 	}
 }
 
 func HumanOTPCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanOTPCheckFailedEvent{
+	otpAdded := &HumanOTPCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+	err := json.Unmarshal(event.Data, otpAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check failed")
+	}
+	return otpAdded, nil
 }
