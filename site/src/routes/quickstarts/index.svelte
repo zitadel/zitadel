@@ -1,8 +1,6 @@
 <script context="module">
 	export async function preload() {
         const qss = await this.fetch(`quickstarts.json`).then(r => r.json());
-        console.log(qss);
-        console.log('quickstarts: '+qss.length);
 		return { qss };
 	}
 </script>

@@ -3,7 +3,6 @@
         const { slug } = params;
         const {sections, seo} = await this.fetch(`${slug}.json`).then(r => r.json());
 
-        console.log('docs: '+ sections.length)
         return { sections, seo, slug };
     }
 </script>
