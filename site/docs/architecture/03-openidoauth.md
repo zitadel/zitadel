@@ -3,14 +3,13 @@ title: OpenID Connect 1.0 & OAuth 2.0
 ---
 
 ### Endpoints and Domains
-
-This chapter documents the [OpenID Connect 1.0](https://openid.net/connect/) and [OAuth 2.0](https://oauth.net/2/) features provided by **ZITADEL**.
+<!-- This chapter documents the [OpenID Connect 1.0](https://openid.net/connect/) and [OAuth 2.0](https://oauth.net/2/) features provided by **ZITADEL**.
 
 Under normal circumstances **ZITADEL** need four domain names to operate properly.
 
 | Domain Name | Example               | Description                                                                                                                          |
 |:------------|:----------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| issuer      | `issuer.zitadel.ch`   | Provides the [OpenID Connect 1.0 Discovery Endpoint](#openid-connect-10-discovery)                                                   |
+| issuer      | `issuer.zitadel.ch`   | Provides the [OpenID Connect 1.0 Discovery Endpoint](#OpenID_Connect_1_0_Discovery)                                                   |
 | api         | `api.zitadel.ch`      | All ZITADEL API's are located under this domain see [API explanation](apis#APIs) for details                                      |
 | login       | `accounts.zitadel.ch` | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
 | console     | `console.zitadel.ch`  | With the console.* domain we serve the assets for the management gui                                                                 |
@@ -50,7 +49,7 @@ For example with [zitadel.ch](https://zitadel.ch), issuer.zitadel.ch would be th
 
 #### OAuth 2.0 Metadata
 
-**ZITADEL** does not yet provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](#openid-connect-10-discovery).
+**ZITADEL** does not yet provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](#OpenID_Connect_1_0_Discovery).
 
 ### Scopes
 
@@ -286,4 +285,4 @@ curl --request POST \
 
 #### Security Assertion Markup Language (SAML) 2.0 Profile
 
-**Link to spec.** [Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7522)
+**Link to spec.** [Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7522) -->

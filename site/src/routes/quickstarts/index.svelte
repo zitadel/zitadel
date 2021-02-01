@@ -20,6 +20,10 @@
 
 <div class='quickstarts stretch'>
 	<h1>Quickstarts</h1>
+    <a style="display: none;" href="/angular" alt="angular">&nbsp;</a>
+    <a style="display: none;" href="/dart" alt="dart">&nbsp;</a>
+    <a style="display: none;" href="/go" alt="go">&nbsp;</a>
+
 	{#each qss as qs}
 
 		<article class='quickstart'>
