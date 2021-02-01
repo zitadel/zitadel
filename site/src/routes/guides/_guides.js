@@ -9,7 +9,7 @@ import { makeSlugProcessor } from '../../utils/slug';
 
 const makeSlug = makeSlugProcessor(SLUG_PRESERVE_UNICODE);
 
-export default function get_quickstarts() {
+export default function get_guides() {
     return fs
         .readdirSync('quickstarts')
         .map(file => {
@@ -36,7 +36,7 @@ export default function get_quickstarts() {
                 return `
 					<h${level}>
 						<span id="${fragment}" class="offset-anchor"></span>
-						<a href="quickstarts#${fragment}" class="anchor" aria-hidden="true"></a>
+						<a href="guides#${fragment}" class="anchor" aria-hidden="true"></a>
 						${text}
 					</h${level}>`;
             };

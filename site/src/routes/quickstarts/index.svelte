@@ -19,29 +19,22 @@
 </svelte:head>
 
 <div class='quickstarts stretch'>
-	<h1>Quickstarts</h1>
-    <a style="display: none;" href="/angular" alt="angular">&nbsp;</a>
-    <a style="display: none;" href="/dart" alt="dart">&nbsp;</a>
-    <a style="display: none;" href="/go" alt="go">&nbsp;</a>
-
+	<h1>Quickstarts ZITADEL</h1>
 	{#each qss as qs}
 
-		<article class='quickstart'>
-            <div>
-                <p class="sub">{qs.metadata.subtitle}</p>
-                <a class="anchor" sapper:prefetch href={qs.fragment} title='{qs.metadata.title}'>
-                    <h2>
-                        <span id={qs.fragment} class="offset-anchor"></span>
-                        {qs.metadata.title}
-                    </h2>
-                </a>
-                <p>{@html qs.description}</p>
-                <p class="info">{qs.metadata.date} • {qs.metadata.readingtime}</p>
-            </div>
-            <img src={qs.metadata.img} alt="article img" />
-		</article>
+    <article class='quickstart'>
+        <div>
+        	<h2>
+			<span id={qs.fragment} class="offset-anchor"></span>
+			<a class="anchor" sapper:prefetch href='faq#{qs.fragment}' title='{qs.title}'>&nbsp;</a>
+			{qs.metadata.title}
+			</h2>
+			<p>{@html qs.answer}</p>
+        </div>
+        <img src={qs.metadata.img} alt="article img" />
+    </article>
 	{/each}
-	<p class="disclaimer">See also our Github page <a href="https://github.com/caos/zitadel" rel="external">ZITADEL </a> for questions regarding the sourcecode.</p>
+	<p>See also the <a href="https://svelte.dev/faq" rel="external">Svelte FAQ</a> for questions relating to Svelte directly.</p>
 </div>
 
 <style>

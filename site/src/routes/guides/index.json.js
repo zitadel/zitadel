@@ -1,21 +1,21 @@
 import send from '@polka/send';
 
-import get_quickstarts from './_quickstarts.js';
+import get_guides from './_guides.js';
 
 let json;
 
 export function get(req, res) {
     if (!json || process.env.NODE_ENV !== 'production') {
-        const qss = get_quickstarts()
-            .map(qs => {
+        const guides = get_guides()
+            .map(guide => {
                 return {
-                    fragment: qs.fragment,
-                    answer: qs.answer,
-                    metadata: qs.metadata
+                    fragment: guide.fragment,
+                    answer: guide.answer,
+                    metadata: guide.metadata
                 };
             });
 
-        json = JSON.stringify(qss);
+        json = JSON.stringify(guides);
     }
 
     send(res, 200, json, {
