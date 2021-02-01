@@ -78,7 +78,7 @@ func GetExpectedService(
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      httpServiceName.Name(),
 				Namespace: namespace,
-				Labels:    labels.MustK8sMap(httpServiceName),
+				Labels:    labels.MustK8sMap(labels.AsSelectable(httpServiceName)),
 			},
 			Spec: corev1.ServiceSpec{
 				Ports:                    httpPorts,
