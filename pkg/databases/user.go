@@ -22,7 +22,7 @@ func ListUsers(
 	}
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil, "database")(monitor, desired, current)
+	query, _, _, err := orbdb.AdaptFunc("", nil)(monitor, desired, current)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func AddUser(
 	}
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil, "database")(monitor, desired, current)
+	query, _, _, err := orbdb.AdaptFunc("", nil)(monitor, desired, current)
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func DeleteUser(
 	}
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil, "database")(monitor, desired, current)
+	query, _, _, err := orbdb.AdaptFunc("", nil)(monitor, desired, current)
 	if err != nil {
 		return err
 	}
