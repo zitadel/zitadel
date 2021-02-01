@@ -49,8 +49,8 @@ func (_ *MailText) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *MailText) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestMailTextSequence(string(event.AggregateType))
+func (p *MailText) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestMailTextSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -58,7 +58,7 @@ func (p *MailText) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *MailText) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestMailTextSequence("")
+	sequence, err := m.view.GetLatestMailTextSequence()
 	if err != nil {
 		return nil, err
 	}

@@ -454,7 +454,7 @@ func (repo *IAMRepository) ChangeDefaultMailTemplate(ctx context.Context, templa
 
 func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestIAMMemberSequence("")
+	sequence, err := repo.View.GetLatestIAMMemberSequence()
 	logging.Log("EVENT-Slkci").OnError(err).Warn("could not read latest iam sequence")
 	members, count, err := repo.View.SearchIAMMembers(request)
 	if err != nil {
