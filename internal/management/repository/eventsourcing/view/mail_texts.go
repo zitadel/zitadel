@@ -36,8 +36,8 @@ func (v *View) DeleteMailText(aggregateID string, textType string, language stri
 	return v.ProcessedMailTextSequence(event)
 }
 
-func (v *View) GetLatestMailTextSequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(mailTextTable, aggregateType)
+func (v *View) GetLatestMailTextSequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(mailTextTable)
 }
 
 func (v *View) ProcessedMailTextSequence(event *models.Event) error {
