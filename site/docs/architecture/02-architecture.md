@@ -4,7 +4,7 @@ title: Architecture
 
 > Images in better quality follow soon.
 
-<!-- ### Software Architecture
+### Software Architecture
 
 **ZITADEL** is built with two essential patterns. Eventsourcing and CQRS. Due to the nature of eventsourcing **ZITADEL** provides the unique capability to generate a strong audit trail of ALL the things that happen to its resources, without compromising on storage cost or audit trail length.
 
@@ -96,4 +96,5 @@ With this design even the outage of a whole data-center would have a minimal imp
         </a>
         <figcaption itemprop="caption description">Multi-Cluster Architecture</figcaption>
     </figure>
-</div> -->
+</div>
+
