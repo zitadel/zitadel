@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
 	auth_model "github.com/caos/zitadel/internal/auth/model"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -78,7 +78,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 	l.renderNextStep(w, r, authRequest)
 }
 
-func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRequest *model.AuthRequest, formData *registerOrgFormData, err error) {
+func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerOrgFormData, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)

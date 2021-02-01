@@ -1,9 +1,8 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
-
-	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
@@ -55,7 +54,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 	l.renderMailVerification(w, r, authReq, data.UserID, err)
 }
 
-func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string) {
+func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string) {
 	userOrg := login
 	if authReq != nil {
 		userID = authReq.UserID
@@ -69,7 +68,7 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *m
 	l.renderMailVerified(w, r, authReq)
 }
 
-func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID string, err error) {
+func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -85,7 +84,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMailVerification], data, nil)
 }
 
-func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	data := mailVerificationData{
 		baseData:    l.getBaseData(r, authReq, "Mail Verified", "", ""),
 		profileData: l.getProfileData(authReq),

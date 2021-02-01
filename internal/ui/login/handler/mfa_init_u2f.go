@@ -18,7 +18,7 @@ type u2fInitData struct {
 	MFAType model.MFAType
 }
 
-func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
+func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var errType, errMessage, credentialData string
 	var u2f *domain.WebAuthNToken
 	if err == nil {
@@ -59,7 +59,7 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	done := &mfaDoneData{
-		MFAType: model.MFATypeU2F,
+		MFAType: domain.MFATypeU2F,
 	}
 	l.renderMFAInitDone(w, r, authReq, done)
 }

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	user_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 
@@ -18,15 +17,15 @@ type AuthRequestRepository interface {
 	CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, user *domain.ExternalUser, info *domain.BrowserInfo) error
 	SelectUser(ctx context.Context, id, userID, userAgentID string) error
 	SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error
-	VerifyPassword(ctx context.Context, id, userID, password, userAgentID string, info *domain.BrowserInfo) error
+	VerifyPassword(ctx context.Context, id, userID, resourceOwner, password, userAgentID string, info *domain.BrowserInfo) error
 
-	VerifyMFAOTP(ctx context.Context, agentID, authRequestID, code, userAgentID string, info *domain.BrowserInfo) error
-	BeginMFAU2FLogin(ctx context.Context, userID, authRequestID, userAgentID string) (*domain.WebAuthNLogin, error)
-	VerifyMFAU2F(ctx context.Context, userID, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) error
+	VerifyMFAOTP(ctx context.Context, authRequestID, userID, resourceOwner, code, userAgentID string, info *domain.BrowserInfo) error
+	BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (*domain.WebAuthNLogin, error)
+	VerifyMFAU2F(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) error
 	BeginPasswordlessLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (*domain.WebAuthNLogin, error)
 	VerifyPasswordless(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) error
 
 	LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *domain.BrowserInfo) error
-	AutoRegisterExternalUser(ctx context.Context, user *user_model.User, externalIDP *domain.ExternalIDP, member *domain.Member, authReqID, userAgentID, resourceOwner string, info *domain.BrowserInfo) error
+	AutoRegisterExternalUser(ctx context.Context, user *domain.Human, externalIDP *domain.ExternalIDP, member *domain.Member, authReqID, userAgentID, resourceOwner string, info *domain.BrowserInfo) error
 	ResetLinkingUsers(ctx context.Context, authReqID, userAgentID string) error
 }

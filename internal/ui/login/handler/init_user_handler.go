@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 	"strconv"
 
-	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
@@ -62,7 +62,7 @@ func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
 	l.checkUserInitCode(w, r, authReq, data, nil)
 }
 
-func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *initUserFormData, err error) {
+func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *initUserFormData, err error) {
 	if data.Password != data.PasswordConfirm {
 		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-fsdfd", "Errors.User.Password.ConfirmationWrong")
 		l.renderInitUser(w, r, authReq, data.UserID, data.Code, data.PasswordSet, err)
@@ -80,7 +80,7 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 	l.renderInitUserDone(w, r, authReq)
 }
 
-func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID string, showPassword bool) {
+func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, showPassword bool) {
 	userOrgID := login
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
@@ -89,7 +89,7 @@ func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *
 	l.renderInitUser(w, r, authReq, userID, "", showPassword, err)
 }
 
-func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string, passwordSet bool, err error) {
+func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, passwordSet bool, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -124,7 +124,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUser], data, nil)
 }
 
-func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	data := l.getUserData(r, authReq, "User Init Done", "", "")
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUserDone], data, nil)
 }

@@ -106,11 +106,11 @@ func NewHumanU2FTokensReadModel(userID, resourceOwner string) *HumanU2FTokensRea
 func (wm *HumanU2FTokensReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *user.HumanWebAuthNAddedEvent:
+		case *user.HumanU2FAddedEvent:
 			wm.WriteModel.AppendEvents(e)
-		case *user.HumanWebAuthNVerifiedEvent:
+		case *user.HumanU2FVerifiedEvent:
 			wm.WriteModel.AppendEvents(e)
-		case *user.HumanWebAuthNRemovedEvent:
+		case *user.HumanU2FRemovedEvent:
 			wm.WriteModel.AppendEvents(e)
 		case *user.UserRemovedEvent:
 			wm.WriteModel.AppendEvents(e)
@@ -121,17 +121,26 @@ func (wm *HumanU2FTokensReadModel) AppendEvents(events ...eventstore.EventReader
 func (wm *HumanU2FTokensReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.HumanWebAuthNAddedEvent:
+		case *user.HumanU2FAddedEvent:
 			token := &HumanWebAuthNWriteModel{}
-			token.appendAddedEvent(e)
-			wm.WebAuthNTokens = append(wm.WebAuthNTokens, token)
-		case *user.HumanWebAuthNVerifiedEvent:
+			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
+			replaced := false
+			for i, existingTokens := range wm.WebAuthNTokens {
+				if existingTokens.State == domain.MFAStateNotReady {
+					wm.WebAuthNTokens[i] = token
+					replaced = true
+				}
+			}
+			if !replaced {
+				wm.WebAuthNTokens = append(wm.WebAuthNTokens, token)
+			}
+		case *user.HumanU2FVerifiedEvent:
 			idx, token := wm.WebAuthNTokenByID(e.WebAuthNTokenID)
 			if idx < 0 {
 				continue
 			}
-			token.appendVerifiedEvent(e)
-		case *user.HumanWebAuthNRemovedEvent:
+			token.appendVerifiedEvent(&e.HumanWebAuthNVerifiedEvent)
+		case *user.HumanU2FRemovedEvent:
 			idx, _ := wm.WebAuthNTokenByID(e.WebAuthNTokenID)
 			if idx < 0 {
 				continue
@@ -189,17 +198,26 @@ func (wm *HumanPasswordlessTokensReadModel) AppendEvents(events ...eventstore.Ev
 func (wm *HumanPasswordlessTokensReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.HumanWebAuthNAddedEvent:
+		case *user.HumanPasswordlessAddedEvent:
 			token := &HumanWebAuthNWriteModel{}
-			token.appendAddedEvent(e)
-			wm.WebAuthNTokens = append(wm.WebAuthNTokens, token)
-		case *user.HumanWebAuthNVerifiedEvent:
+			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
+			replaced := false
+			for i, existingTokens := range wm.WebAuthNTokens {
+				if existingTokens.State == domain.MFAStateNotReady {
+					wm.WebAuthNTokens[i] = token
+					replaced = true
+				}
+			}
+			if !replaced {
+				wm.WebAuthNTokens = append(wm.WebAuthNTokens, token)
+			}
+		case *user.HumanPasswordlessVerifiedEvent:
 			idx, token := wm.WebAuthNTokenByID(e.WebAuthNTokenID)
 			if idx < 0 {
 				continue
 			}
-			token.appendVerifiedEvent(e)
-		case *user.HumanWebAuthNRemovedEvent:
+			token.appendVerifiedEvent(&e.HumanWebAuthNVerifiedEvent)
+		case *user.HumanPasswordlessRemovedEvent:
 			idx, _ := wm.WebAuthNTokenByID(e.WebAuthNTokenID)
 			if idx < 0 {
 				continue

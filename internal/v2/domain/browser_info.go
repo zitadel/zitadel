@@ -2,7 +2,7 @@ package domain
 
 import (
 	"net"
-	"net/http"
+	net_http "net/http"
 
 	http_util "github.com/caos/zitadel/internal/api/http"
 )
@@ -13,7 +13,7 @@ type BrowserInfo struct {
 	RemoteIP       net.IP
 }
 
-func BrowserInfoFromRequest(r *http.Request) *BrowserInfo {
+func BrowserInfoFromRequest(r *net_http.Request) *BrowserInfo {
 	return &BrowserInfo{
 		UserAgent:      r.Header.Get(http_util.UserAgentHeader),
 		AcceptLanguage: r.Header.Get(http_util.AcceptLanguage),

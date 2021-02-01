@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
@@ -15,7 +15,7 @@ type passwordFormData struct {
 	Password string `schema:"password"`
 }
 
-func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
+func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -32,7 +32,7 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Password, userAgentID, model.BrowserInfoFromRequest(r))
+	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Password, userAgentID, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderPassword(w, r, authReq, err)
 		return

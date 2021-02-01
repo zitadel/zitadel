@@ -2,11 +2,10 @@ package handler
 
 import (
 	"encoding/base64"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
-	user_model "github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -15,21 +14,21 @@ const (
 
 type mfaU2FData struct {
 	webAuthNData
-	MFAProviders     []model.MFAType
-	SelectedProvider model.MFAType
+	MFAProviders     []domain.MFAType
+	SelectedProvider domain.MFAType
 }
 
 type mfaU2FFormData struct {
 	webAuthNFormData
-	SelectedProvider model.MFAType `schema:"provider"`
+	SelectedProvider domain.MFAType `schema:"provider"`
 }
 
-func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, providers []model.MFAType, err error) {
+func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, providers []domain.MFAType, err error) {
 	var errType, errMessage, credentialData string
-	var webAuthNLogin *user_model.WebAuthNLogin
+	var webAuthNLogin *domain.WebAuthNLogin
 	if err == nil {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		webAuthNLogin, err = l.authRepo.BeginMFAU2FLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID)
+		webAuthNLogin, err = l.authRepo.BeginMFAU2FLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID)
 	}
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -55,7 +54,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	step, ok := authReq.PossibleSteps[0].(*model.MFAVerificationStep)
+	step, ok := authReq.PossibleSteps[0].(*domain.MFAVerificationStep)
 	if !ok {
 		l.renderError(w, r, authReq, err)
 		return
@@ -70,7 +69,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.VerifyMFAU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.ID, userAgentID, credData, model.BrowserInfoFromRequest(r))
+	err = l.authRepo.VerifyMFAU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID, credData, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderU2FVerification(w, r, authReq, step.MFAProviders, err)
 		return

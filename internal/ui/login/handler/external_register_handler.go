@@ -8,7 +8,6 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/rp"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -70,7 +69,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 	l.handleExternalUserRegister(w, r, authReq, idpConfig, userAgentID, tokens)
 }
 
-func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
+func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	iam, err := l.authRepo.GetIAM(r.Context())
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)

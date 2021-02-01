@@ -15,7 +15,6 @@ import (
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -287,7 +286,7 @@ func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resou
 	return repo.Command.HumanBeginU2FLogin(ctx, userID, resourceOwner, request, true)
 }
 
-func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
@@ -307,7 +306,7 @@ func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID,
 	return repo.Command.HumanBeginPasswordlessLogin(ctx, userID, resourceOwner, request, true)
 }
 
-func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *model.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
@@ -346,52 +345,19 @@ func (repo *AuthRequestRepo) ResetLinkingUsers(ctx context.Context, authReqID, u
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *user_model.User, externalIDP *user_model.ExternalIDP, orgMember *org_model.OrgMember, authReqID, userAgentID, resourceOwner string, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *domain.Human, externalIDP *domain.ExternalIDP, orgMember *domain.Member, authReqID, userAgentID, resourceOwner string, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
-	policyResourceOwner := authz.GetCtxData(ctx).OrgID
-	if resourceOwner != "" {
-		policyResourceOwner = resourceOwner
-	}
-	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
-	if errors.IsNotFound(err) {
-		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.IAMID)
-	}
+	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMember)
 	if err != nil {
 		return err
 	}
-	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
-	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
-	if errors.IsNotFound(err) {
-		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.IAMID)
-	}
-	if err != nil {
-		return err
-	}
-	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicyView, orgPolicyView, resourceOwner)
-	if err != nil {
-		return err
-	}
-	if orgMember != nil {
-		orgMember.UserID = user.AggregateID
-		_, memberAggregate, err := repo.OrgEvents.PrepareAddOrgMember(ctx, orgMember, policyResourceOwner)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, memberAggregate)
-	}
-
-	err = sdk.PushAggregates(ctx, repo.UserEvents.PushAggregates, user.AppendEvents, aggregates...)
-	if err != nil {
-		return err
-	}
-	request.UserID = user.AggregateID
-	request.UserOrgID = user.ResourceOwner
+	request.UserID = human.AggregateID
+	request.UserOrgID = human.ResourceOwner
 	request.SelectedIDPConfigID = externalIDP.IDPConfigID
 	request.LinkingUsers = nil
 	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserID, request.UserOrgID, request.WithCurrentInfo(info))

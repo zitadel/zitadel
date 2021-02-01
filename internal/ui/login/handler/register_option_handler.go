@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 )
 
@@ -27,7 +27,7 @@ func (l *Login) handleRegisterOption(w http.ResponseWriter, r *http.Request) {
 	l.renderRegisterOption(w, r, authRequest, nil)
 }
 
-func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
+func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)

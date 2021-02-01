@@ -11,7 +11,6 @@ import (
 	"golang.org/x/text/language"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -204,13 +203,13 @@ func ResponseTypeToBusiness(responseType oidc.ResponseType) domain.OIDCResponseT
 	}
 }
 
-func ResponseTypeToOIDC(responseType model.OIDCResponseType) oidc.ResponseType {
+func ResponseTypeToOIDC(responseType domain.OIDCResponseType) oidc.ResponseType {
 	switch responseType {
-	case model.OIDCResponseTypeCode:
+	case domain.OIDCResponseTypeCode:
 		return oidc.ResponseTypeCode
-	case model.OIDCResponseTypeIdTokenToken:
+	case domain.OIDCResponseTypeIDTokenToken:
 		return oidc.ResponseTypeIDToken
-	case model.OIDCResponseTypeIdToken:
+	case domain.OIDCResponseTypeIDToken:
 		return oidc.ResponseTypeIDTokenOnly
 	default:
 		return oidc.ResponseTypeCode
@@ -231,12 +230,12 @@ func CodeChallengeToBusiness(challenge string, method oidc.CodeChallengeMethod) 
 	}
 }
 
-func CodeChallengeToOIDC(challenge *model.OIDCCodeChallenge) *oidc.CodeChallenge {
+func CodeChallengeToOIDC(challenge *domain.OIDCCodeChallenge) *oidc.CodeChallenge {
 	if challenge == nil {
 		return nil
 	}
 	challengeMethod := oidc.CodeChallengeMethodPlain
-	if challenge.Method == model.CodeChallengeMethodS256 {
+	if challenge.Method == domain.CodeChallengeMethodS256 {
 		challengeMethod = oidc.CodeChallengeMethodS256
 	}
 	return &oidc.CodeChallenge{
@@ -245,12 +244,12 @@ func CodeChallengeToOIDC(challenge *model.OIDCCodeChallenge) *oidc.CodeChallenge
 	}
 }
 
-func AMRFromMFAType(mfaType model.MFAType) string {
+func AMRFromMFAType(mfaType domain.MFAType) string {
 	switch mfaType {
-	case model.MFATypeOTP:
+	case domain.MFATypeOTP:
 		return amrOTP
-	case model.MFATypeU2F,
-		model.MFATypeU2FUserVerification:
+	case domain.MFATypeU2F,
+		domain.MFATypeU2FUserVerification:
 		return amrUserPresence
 	default:
 		return ""

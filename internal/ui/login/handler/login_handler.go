@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (

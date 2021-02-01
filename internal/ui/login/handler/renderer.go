@@ -358,8 +358,8 @@ type baseData struct {
 	AuthReqID    string
 	CSRF         template.HTML
 	Nonce        string
-	LoginPolicy  *iam_model.LoginPolicy
-	IDPProviders []*iam_model.IDPProvider
+	LoginPolicy  *domain.LoginPolicy
+	IDPProviders []*domain.IDPProvider
 }
 
 type errorData struct {
@@ -371,8 +371,8 @@ type userData struct {
 	baseData
 	profileData
 	PasswordChecked     string
-	MFAProviders        []model.MFAType
-	SelectedMFAProvider model.MFAType
+	MFAProviders        []domain.MFAType
+	SelectedMFAProvider domain.MFAType
 	Linking             bool
 }
 
@@ -401,21 +401,21 @@ type userSelectionData struct {
 type mfaData struct {
 	baseData
 	profileData
-	MFAProviders []model.MFAType
+	MFAProviders []domain.MFAType
 	MFARequired  bool
 }
 
 type mfaVerifyData struct {
 	baseData
 	profileData
-	MFAType model.MFAType
+	MFAType domain.MFAType
 	otpData
 }
 
 type mfaDoneData struct {
 	baseData
 	profileData
-	MFAType model.MFAType
+	MFAType domain.MFAType
 }
 
 type otpData struct {

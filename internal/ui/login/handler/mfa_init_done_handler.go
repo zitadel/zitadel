@@ -1,9 +1,8 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
-
-	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
@@ -13,7 +12,7 @@ const (
 type mfaInitDoneData struct {
 }
 
-func (l *Login) renderMFAInitDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaDoneData) {
+func (l *Login) renderMFAInitDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaDoneData) {
 	var errType, errMessage string
 	data.baseData = l.getBaseData(r, authReq, "MFA Init Done", errType, errMessage)
 	data.profileData = l.getProfileData(authReq)

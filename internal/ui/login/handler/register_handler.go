@@ -6,7 +6,6 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
@@ -88,7 +87,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	l.renderNextStep(w, r, authRequest)
 }
 
-func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *model.AuthRequest, formData *registerFormData, err error) {
+func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerFormData, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)

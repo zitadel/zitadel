@@ -4,14 +4,11 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/rp"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 	"strings"
@@ -185,7 +182,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	resourceOwner := iam.GlobalOrgID
-	member := &org_model.OrgMember{
+	member := &domain.Member{
 		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
 		Roles:      []string{orgProjectCreatorRole},
 	}
@@ -209,7 +206,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, member, authReq.ID, userAgentID, resourceOwner, model.BrowserInfoFromRequest(r))
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, member, authReq.ID, userAgentID, resourceOwner, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
@@ -247,7 +244,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 	}
 	return externalUser
 }
-func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *model.ExternalUser, idpConfig *iam_model.IDPConfigView) (*usr_model.User, *usr_model.ExternalIDP) {
+func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP) {
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:
@@ -263,23 +260,21 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyV
 		}
 	}
 
-	user := &usr_model.User{
-		UserName: username,
-		Human: &usr_model.Human{
-			Profile: &usr_model.Profile{
-				FirstName:         linkingUser.FirstName,
-				LastName:          linkingUser.LastName,
-				PreferredLanguage: linkingUser.PreferredLanguage,
-				NickName:          linkingUser.NickName,
-			},
-			Email: &usr_model.Email{
-				EmailAddress:    linkingUser.Email,
-				IsEmailVerified: linkingUser.IsEmailVerified,
-			},
+	human := &domain.Human{
+		Username: username,
+		Profile: &domain.Profile{
+			FirstName:         linkingUser.FirstName,
+			LastName:          linkingUser.LastName,
+			PreferredLanguage: linkingUser.PreferredLanguage,
+			NickName:          linkingUser.NickName,
+		},
+		Email: &domain.Email{
+			EmailAddress:    linkingUser.Email,
+			IsEmailVerified: linkingUser.IsEmailVerified,
 		},
 	}
 	if linkingUser.Phone != "" {
-		user.Phone = &usr_model.Phone{
+		human.Phone = &domain.Phone{
 			PhoneNumber:     linkingUser.Phone,
 			IsPhoneVerified: linkingUser.IsPhoneVerified,
 		}
@@ -293,10 +288,10 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyV
 		}
 	}
 
-	externalIDP := &usr_model.ExternalIDP{
-		IDPConfigID: idpConfig.IDPConfigID,
-		UserID:      linkingUser.ExternalUserID,
-		DisplayName: displayName,
+	externalIDP := &domain.ExternalIDP{
+		IDPConfigID:    idpConfig.IDPConfigID,
+		ExternalUserID: linkingUser.ExternalUserID,
+		DisplayName:    displayName,
 	}
-	return user, externalIDP
+	return human, externalIDP
 }
