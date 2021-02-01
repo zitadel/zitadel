@@ -1,5 +1,5 @@
 --- 
-title: Setup Angular asdf
+title: Setup Angular
 ---
 
 ### Install Angular dependencies

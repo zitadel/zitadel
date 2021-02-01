@@ -1,5 +1,5 @@
 ---
-title: Configure Zitadel asd
+title: Configure Zitadel Application
 ---
 
 ### Setup Application and get Keys
