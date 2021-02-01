@@ -841,12 +841,13 @@ func (es *ProjectEventstore) AddClientKey(ctx context.Context, key *proj_model.C
 		return nil, err
 	}
 	var app *proj_model.Application
-	if _, app = existingProject.GetApp(key.AppID); app == nil {
+	if _, app = existingProject.GetApp(key.ApplicationID); app == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dbf32", "Errors.Project.AppNoExisting")
 	}
 	if app.Type != proj_model.AppTypeOIDC {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dff54", "Errors.Project.AppIsNotOIDC")
 	}
+	key.ClientID = app.OIDCConfig.ClientID
 	key.KeyID, err = es.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -901,6 +902,26 @@ func (es *ProjectEventstore) RemoveApplicationKey(ctx context.Context, projectID
 	}
 	es.projectCache.cacheProject(repoProject)
 	return nil
+}
+
+func (es *ProjectEventstore) TokenAdded(ctx context.Context, token *proj_model.Token) (*proj_model.Token, error) {
+	existingProject, err := es.ProjectByID(ctx, token.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	token.TokenID, err = es.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	repoProject := model.ProjectFromModel(existingProject)
+	repoToken := model.TokenFromModel(token)
+	agg := OIDCApplicationTokenAddedAggregate(es.AggregateCreator(), repoProject, repoToken)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoToken.AppendEvents, agg)
+	if err != nil {
+		return nil, err
+	}
+	es.projectCache.cacheProject(repoProject)
+	return model.TokenToModel(repoToken), nil
 }
 
 func (es *ProjectEventstore) ProjectGrantByIDs(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {

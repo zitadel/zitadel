@@ -89,11 +89,7 @@ func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (_ str
 		userAgentID = authReq.AgentID
 		applicationID = authReq.ApplicationID
 	}
-	resp, err := o.repo.CreateToken(ctx, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
-	if err != nil {
-		return "", time.Time{}, err
-	}
-	return resp.TokenID, resp.Expiration, nil
+	return o.repo.CreateToken(ctx, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 }
 
 func grantsToScopes(grants []*grant_model.UserGrantView) []string {

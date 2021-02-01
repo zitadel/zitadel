@@ -5,9 +5,11 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
@@ -76,8 +78,9 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 func (t *TokenView) AppendEventIfMyToken(event *models.Event) (err error) {
 	view := new(TokenView)
 	switch event.Type {
-	case usr_es_model.UserTokenAdded:
-		view.setRootData(event)
+	case usr_es_model.UserTokenAdded,
+		proj_es_model.TokenAdded:
+		view.setUserRootData(event)
 		err = view.setData(event)
 	case usr_es_model.UserRemoved,
 		usr_es_model.UserDeactivated,
@@ -104,17 +107,24 @@ func (t *TokenView) AppendEvent(event *es_models.Event) error {
 	t.Sequence = event.Sequence
 	switch event.Type {
 	case usr_es_model.UserTokenAdded:
-		t.setRootData(event)
+		t.setUserRootData(event)
 		err := t.setData(event)
 		if err != nil {
 			return err
 		}
 		t.CreationDate = event.CreationDate
+	case proj_es_model.TokenAdded:
+		err := t.setData(event)
+		if err != nil {
+			return err
+		}
+		t.ResourceOwner = event.ResourceOwner
+		t.CreationDate = event.CreationDate
 	}
 	return nil
 }
 
-func (t *TokenView) setRootData(event *models.Event) {
+func (t *TokenView) setUserRootData(event *models.Event) {
 	t.UserID = event.AggregateID
 	t.ResourceOwner = event.ResourceOwner
 }

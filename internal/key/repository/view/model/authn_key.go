@@ -23,6 +23,7 @@ type AuthNKeyView struct {
 	ID             string    `json:"keyId" gorm:"column:key_id;primary_key"`
 	ObjectID       string    `json:"-" gorm:"column:object_id;primary_key"`
 	ObjectType     int32     `json:"-" gorm:"column:object_type;primary_key"`
+	AuthIdentifier string    `json:"-" gorm:"column:auth_identifier;primary_key"`
 	Type           int32     `json:"type" gorm:"column:key_type"`
 	ExpirationDate time.Time `json:"expirationDate" gorm:"column:expiration_date"`
 	Sequence       uint64    `json:"-" gorm:"column:sequence"`
@@ -49,6 +50,7 @@ func AuthNKeyToModel(key *AuthNKeyView) *model.AuthNKeyView {
 		ID:             key.ID,
 		ObjectID:       key.ObjectID,
 		ObjectType:     model.ObjectType(key.ObjectType),
+		AuthIdentifier: key.AuthIdentifier,
 		Type:           model.AuthNKeyType(key.Type),
 		ExpirationDate: key.ExpirationDate,
 		Sequence:       key.Sequence,
@@ -68,29 +70,48 @@ func AuthNKeysToModel(keys []*AuthNKeyView) []*model.AuthNKeyView {
 func (k *AuthNKeyView) AppendEvent(event *models.Event) (err error) {
 	k.Sequence = event.Sequence
 	switch event.Type {
-	case user_model.MachineKeyAdded,
-		proj_model.ClientKeyAdded:
+	case user_model.MachineKeyAdded:
 		k.setRootData(event)
 		k.CreationDate = event.CreationDate
-		err = k.SetData(event)
+		err = k.SetUserData(event)
+	case proj_model.ClientKeyAdded:
+		k.setRootData(event)
+		k.CreationDate = event.CreationDate
+		err = k.SetClientData(event)
 	}
 	return err
 }
 
 func (k *AuthNKeyView) setRootData(event *models.Event) {
-	k.ObjectID = event.AggregateID
 	switch event.AggregateType {
 	case user_model.UserAggregate:
 		k.ObjectType = int32(model.AuthNKeyObjectTypeUser)
+		k.ObjectID = event.AggregateID
+		k.AuthIdentifier = event.AggregateID
 	case proj_model.ProjectAggregate:
 		k.ObjectType = int32(model.AuthNKeyObjectTypeApplication)
 	}
 }
 
-func (r *AuthNKeyView) SetData(event *models.Event) error {
+func (r *AuthNKeyView) SetUserData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-Sj90d").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lub6s", "Could not unmarshal data")
 	}
+	return nil
+}
+
+func (r *AuthNKeyView) SetClientData(event *models.Event) error {
+	key := new(proj_model.ClientKey)
+	if err := json.Unmarshal(event.Data, key); err != nil {
+		logging.Log("EVEN-Dgsgg").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(err, "MODEL-ADbfz", "Could not unmarshal data")
+	}
+	r.ObjectID = key.ApplicationID
+	r.AuthIdentifier = key.ClientID
+	r.ID = key.KeyID
+	r.ExpirationDate = key.ExpirationDate
+	r.PublicKey = key.PublicKey
+	r.Type = key.Type
 	return nil
 }

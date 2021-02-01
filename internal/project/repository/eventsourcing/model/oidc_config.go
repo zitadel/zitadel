@@ -179,7 +179,8 @@ func (o *OIDCConfig) setData(event *es_models.Event) error {
 
 type ClientKey struct {
 	es_models.ObjectRoot `json:"-"`
-	AppID                string    `json:"appId,omitempty"`
+	ApplicationID        string    `json:"applicationID,omitempty"`
+	ClientID             string    `json:"clientId,omitempty"`
 	KeyID                string    `json:"keyId,omitempty"`
 	Type                 int32     `json:"type,omitempty"`
 	ExpirationDate       time.Time `json:"expirationDate,omitempty"`
@@ -215,7 +216,8 @@ func ClientKeyFromModel(key *model.ClientKey) *ClientKey {
 	return &ClientKey{
 		ObjectRoot:     key.ObjectRoot,
 		ExpirationDate: key.ExpirationDate,
-		AppID:          key.AppID,
+		ApplicationID:  key.ApplicationID,
+		ClientID:       key.ClientID,
 		KeyID:          key.KeyID,
 		Type:           int32(key.Type),
 	}
@@ -225,7 +227,8 @@ func ClientKeyToModel(key *ClientKey) *model.ClientKey {
 	return &model.ClientKey{
 		ObjectRoot:     key.ObjectRoot,
 		ExpirationDate: key.ExpirationDate,
-		AppID:          key.AppID,
+		ApplicationID:  key.ApplicationID,
+		ClientID:       key.ClientID,
 		KeyID:          key.KeyID,
 		PrivateKey:     key.privateKey,
 		Type:           key_model.AuthNKeyType(key.Type),
@@ -242,5 +245,68 @@ func (key *ClientKey) GenerateClientKeyPair(keySize int) error {
 		return err
 	}
 	key.privateKey = crypto.PrivateKeyToBytes(privateKey)
+	return nil
+}
+
+type Token struct {
+	es_models.ObjectRoot
+
+	TokenID       string    `json:"tokenId" gorm:"column:token_id"`
+	ApplicationID string    `json:"applicationId" gorm:"column:application_id"`
+	Audience      []string  `json:"audience" gorm:"column:audience"`
+	Scopes        []string  `json:"scopes" gorm:"column:scopes"`
+	Expiration    time.Time `json:"expiration" gorm:"column:expiration"`
+}
+
+func TokenFromModel(token *model.Token) *Token {
+	return &Token{
+		ObjectRoot:    token.ObjectRoot,
+		TokenID:       token.TokenID,
+		ApplicationID: token.ClientID,
+		Audience:      token.Audience,
+		Scopes:        token.Scopes,
+		Expiration:    token.Expiration,
+	}
+}
+
+func TokenToModel(token *Token) *model.Token {
+	return &model.Token{
+		ObjectRoot: token.ObjectRoot,
+		TokenID:    token.TokenID,
+		ClientID:   token.ApplicationID,
+		Audience:   token.Audience,
+		Scopes:     token.Scopes,
+		Expiration: token.Expiration,
+	}
+}
+
+func (t *Token) AppendEvents(events ...*es_models.Event) error {
+	for _, event := range events {
+		if err := t.AppendEvent(event); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (t *Token) AppendEvent(event *es_models.Event) error {
+	switch event.Type {
+	case TokenAdded:
+		err := t.setData(event)
+		if err != nil {
+			return err
+		}
+		t.CreationDate = event.CreationDate
+	}
+	return nil
+}
+
+func (t *Token) setData(event *es_models.Event) error {
+	t.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, t); err != nil {
+		logging.Log("EVEN-DAsfh").WithError(err).Error("could not unmarshal event data")
+		return errors.ThrowInternal(err, "MODEL-SDbz4", "could not unmarshal event")
+	}
 	return nil
 }

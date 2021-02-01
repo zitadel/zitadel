@@ -44,4 +44,6 @@ const (
 
 	ClientKeyAdded   models.EventType = "project.application.oidc.key.added"
 	ClientKeyRemoved models.EventType = "project.application.oidc.key.removed"
+
+	TokenAdded models.EventType = "project.application.oidc.token.added"
 )

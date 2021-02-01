@@ -86,9 +86,14 @@ func (k *AuthNKeys) processAuthNKeys(event *es_models.Event) (err error) {
 		if key.ExpirationDate.Before(time.Now()) {
 			return k.view.ProcessedAuthNKeySequence(event)
 		}
-	case user_model.MachineKeyRemoved,
-		proj_model.ClientKeyRemoved:
-		err = key.SetData(event)
+	case user_model.MachineKeyRemoved:
+		err = key.SetUserData(event)
+		if err != nil {
+			return err
+		}
+		return k.view.DeleteAuthNKey(key.ID, event)
+	case proj_model.ClientKeyRemoved:
+		err = key.SetClientData(event)
 		if err != nil {
 			return err
 		}

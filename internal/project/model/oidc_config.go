@@ -97,11 +97,22 @@ const (
 type ClientKey struct {
 	es_models.ObjectRoot
 
-	AppID          string
+	ApplicationID  string
+	ClientID       string
 	KeyID          string
 	Type           key_model.AuthNKeyType
 	ExpirationDate time.Time
 	PrivateKey     []byte
+}
+
+type Token struct {
+	es_models.ObjectRoot
+
+	TokenID    string
+	ClientID   string
+	Audience   []string
+	Expiration time.Time
+	Scopes     []string
 }
 
 func (c *OIDCConfig) IsValid() bool {

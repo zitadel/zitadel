@@ -16,6 +16,7 @@ type AuthNKeyView struct {
 	ID             string
 	ObjectID       string
 	ObjectType     ObjectType
+	AuthIdentifier string
 	Type           AuthNKeyType
 	Sequence       uint64
 	CreationDate   time.Time
@@ -60,7 +61,8 @@ const (
 type ObjectType int32
 
 const (
-	AuthNKeyObjectTypeUser ObjectType = iota
+	AuthNKeyObjectTypeUnspecified ObjectType = iota
+	AuthNKeyObjectTypeUser
 	AuthNKeyObjectTypeApplication
 )
 

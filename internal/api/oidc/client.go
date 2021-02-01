@@ -56,7 +56,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 }
 
 func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
-	return o.GetKeyByIDAndUserID(ctx, keyID, userID)
+	return o.GetKeyByIDAndIssuer(ctx, keyID, userID)
 }
 
 func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
@@ -66,7 +66,8 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 	if err != nil {
 		return nil, err
 	}
-	if key.ObjectID != issuer {
+	//key.ObjectID = "91981737608983070@zitadel"
+	if key.AuthIdentifier != issuer {
 		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
 	}
 	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)

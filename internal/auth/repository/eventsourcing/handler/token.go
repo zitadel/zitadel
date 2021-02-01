@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -71,9 +72,6 @@ func (t *Token) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(user_es_model.UserAggregate, project_es_model.ProjectAggregate).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
@@ -81,7 +79,8 @@ func (t *Token) EventQuery() (*models.SearchQuery, error) {
 
 func (t *Token) Reduce(event *models.Event) (err error) {
 	switch event.Type {
-	case user_es_model.UserTokenAdded:
+	case user_es_model.UserTokenAdded,
+		project_es_model.TokenAdded:
 		token := new(view_model.TokenView)
 		err := token.AppendEvent(event)
 		if err != nil {

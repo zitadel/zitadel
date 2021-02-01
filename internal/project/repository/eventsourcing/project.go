@@ -36,6 +36,14 @@ func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreato
 	return aggCreator.NewAggregate(ctx, project.AggregateID, model.ProjectAggregate, model.ProjectVersion, project.Sequence)
 }
 
+func ProjectAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.AggregateCreator, project *model.Project, resourceOwnerID string, userID string) (*es_models.Aggregate, error) {
+	if project == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ADv2r", "Errors.Internal")
+	}
+
+	return aggCreator.NewAggregate(ctx, project.AggregateID, model.ProjectAggregate, model.ProjectVersion, project.Sequence, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(userID))
+}
+
 func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if project == nil || member == nil {
@@ -390,6 +398,19 @@ func OIDCApplicationKeyRemovedAggregate(aggCreator *es_models.AggregateCreator, 
 		changes["keyId"] = keyID
 
 		agg.AppendEvent(model.ClientKeyRemoved, changes)
+
+		return agg, nil
+	}
+}
+
+func OIDCApplicationTokenAddedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, token *model.Token) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := ProjectAggregateOverwriteContext(ctx, aggCreator, existingProject, existingProject.ResourceOwner, existingProject.AggregateID) //TODO: !!!!
+		if err != nil {
+			return nil, err
+		}
+
+		agg.AppendEvent(model.TokenAdded, token)
 
 		return agg, nil
 	}

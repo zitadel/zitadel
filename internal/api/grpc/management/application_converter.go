@@ -470,7 +470,7 @@ func addClientKeyToModel(key *management.AddClientKeyRequest) *proj_model.Client
 	return &proj_model.ClientKey{
 		ExpirationDate: expirationDate,
 		Type:           authNKeyTypeToModel(key.Type),
-		AppID:          key.ApplicationId,
+		ApplicationID:  key.ApplicationId,
 		ObjectRoot:     models.ObjectRoot{AggregateID: key.ProjectId},
 	}
 }
@@ -483,15 +483,16 @@ func addClientKeyFromModel(key *proj_model.ClientKey) *management.AddClientKeyRe
 	logging.Log("MANAG-sag21").OnError(err).Debug("unable to parse cretaion date")
 
 	detail, err := json.Marshal(struct {
-		Type  string `json:"type"`
-		KeyID string `json:"keyId"`
-		Key   string `json:"key"`
-		AppID string `json:"appId"`
+		Type     string `json:"type"`
+		KeyID    string `json:"keyId"`
+		Key      string `json:"key"`
+		AppID    string `json:"appId"`
+		ClientID string `json:"clientID"`
 	}{
 		Type:  "application",
 		KeyID: key.KeyID,
 		Key:   string(key.PrivateKey),
-		AppID: key.AppID,
+		AppID: key.ApplicationID,
 	})
 	logging.Log("MANAG-adt42").OnError(err).Warn("unable to marshall key")
 
