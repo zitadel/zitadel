@@ -38,10 +38,6 @@
         margin-bottom: 2rem;
     }
 
-    .doc-container .doc img{
-        display: none;
-    }
-
     .doc-container .doc .text{
         top: 180px;
     }
@@ -62,9 +58,21 @@
         margin: .5rem 0;
     }
 
+    .doc-container .doc .text .logo-cloud {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+     .doc-container .doc .text .logo-cloud img {
+         max-width: 60px;
+         margin: .5rem;
+         object-fit: contain;
+     }
+
     .doc-container .doc a {
         display: block;
-        font-size: 1.5rem;
+        font-size: 1.7rem;
         border: none;
         margin-bottom: 1rem;
         padding: 0;
@@ -106,21 +114,24 @@
         white-space: nowrap;
     }
 
-    @media screen and (min-width: 768px) {
+    @media screen and (min-width: 899px) {
         .section {
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
         }
 
-        .section .left,
+        .section .left {
+            flex: 2;
+        }
+
         .section .caos-back {
             flex: 1;
         }
 
         .section .caos-back {
             display: block;
-            margin: 50px;
+            margin: 50px 0 50px 20px;
             max-width: 400px;
         }
 
@@ -133,7 +144,6 @@
         .doc-container .doc {
             display: flex;
             margin: 1rem;
-            max-width: 500px;
             flex: 1 0 auto;
             max-height: 350px;
             transition: box-shadow .2 ease;
@@ -141,20 +151,6 @@
 
         .doc-container .doc:hover {
             box-shadow: 0 1px 8px rgba(0,0,0,0.2);
-        }
-
-        .doc-container .doc img{
-            display: block;
-            width: 180px;
-            height: auto;
-            margin-left: 1rem;
-            object-fit: cover;
-            margin-right: -1.5rem;
-            margin-top: -1.5rem;
-            margin-bottom: -1.5rem;
-            border-top-right-radius: 10px;
-            border-bottom-right-radius: 10px;
-            object-position: 0 0;
         }
     }
 </style>
@@ -211,6 +207,13 @@
                 <div class="text">
                     <h4>Integration</h4>
                     <p>Learn how to integrate your applications and build secure workflows and APIs with ZITADEL</p>
+
+                    <div class="logo-cloud">
+                        <img src="tech/react.png" alt="react" />
+                        <img src="tech/angular.svg" alt="angular" />
+                        <img style="padding: .6rem;" src="tech/dart.svg" alt="dart" />
+                        <img src="tech/golang.svg" alt="golang" />
+                    </div>
                     <a href="quickstarts">Learn more<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In this section</p>
@@ -220,7 +223,6 @@
                         <a class="link" href="quickstarts#Mobile_App_Native_App">Native Applications</a>
                     </div>
                 </div>
-                <img src="img/develop2.png" alt="Develop" />
             </div>
 
             <div class="doc">
@@ -236,13 +238,12 @@
                         <a class="link" href="administrate#Projects">Manage Projects</a>
                     </div>
                 </div>
-                <img src="img/projects2.png" alt="Develop" />
             </div>
 
             <div class="doc">
                 <div class="text">
                     <h4>Authentication API</h4>
-                    <p>^Management API</p>
+                    <p>Management API</p>
                     <a href="apis">Learn more<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In this section</p>
@@ -277,8 +278,6 @@
                     <p>Follow this guide to get started with ZITADEL as a user.</p>
                     <a href="use" >Learn more<i class="las la-arrow-right"></i></a>
                 </div>
-
-                <img src="img/personal2.png" alt="Develop" />
             </div>
         </div>
     </Section>

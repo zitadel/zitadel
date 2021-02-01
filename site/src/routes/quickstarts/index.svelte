@@ -1,7 +1,8 @@
 <script context="module">
 	export async function preload() {
         const qss = await this.fetch(`quickstarts.json`).then(r => r.json());
-		return { qss };
+        console.log(qss);
+        return { qss };
 	}
 </script>
 
@@ -24,18 +25,20 @@
 
     <article class='quickstart'>
         <div>
+            <p class="sub">{qs.metadata.subtitle}</p>
         	<h2>
-			<span id={qs.fragment} class="offset-anchor"></span>
-			<a class="anchor" sapper:prefetch href='faq#{qs.fragment}' title='{qs.title}'>&nbsp;</a>
-			{qs.metadata.title}
+                <span id={qs.fragment} class="offset-anchor"></span>
+                <a class="anchor" sapper:prefetch href='quickstarts#{qs.fragment}' title='{qs.title}'><i class="las la-link"></i></a>
+                {qs.metadata.title}
 			</h2>
 			<p>{@html qs.answer}</p>
+            <a class="link" href="{qs.fragment}" sapper:prefetch>Read Quickstart <i class="las la-arrow-right"></i></a>
+            <p class="info">{qs.metadata.date} • {qs.metadata.readingtime}</p>
         </div>
         <img src={qs.metadata.img} alt="article img" />
     </article>
 	{/each}
-	<p>See also the <a href="https://svelte.dev/faq" rel="external">Svelte FAQ</a> for questions relating to Svelte directly.</p>
-</div>
+<p class="disclaimer">See also our Github page <a href="https://github.com/caos/zitadel" rel="external">ZITADEL </a> for questions regarding the sourcecode.</p></div>
 
 <style>
 	.quickstarts {
@@ -45,8 +48,10 @@
 		padding: var(--top-offset) var(--side-nav) 6rem var(--side-nav);
 		max-width: var(--main-width);
         margin: 0 auto 0 auto;
-	}
+    }
+    
 	h2 {
+        position: relative;
 		display: inline-block;
 		color: white;
 		max-width: 18em;
@@ -60,6 +65,23 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+    }
+
+    .quickstart .anchor {
+        position: absolute;
+        display: block;
+        background-size: 30px 30px;
+        width: 30px;
+        height: 30px;
+        left: -1.3em;
+        opacity: 0;
+        color: white;
+        transition: opacity 0.2s;
+        border: none !important;
+    }
+
+    h2:hover .anchor {
+        opacity: 1;
     }
 
     .quickstart img {
@@ -81,7 +103,13 @@
         font-size: bold;
         text-transform: uppercase;
         color: var(--dark-text);
-        margin: 0;
+        margin: 1rem 0 0 0;
+    }
+
+    .quickstart .link,
+    .quickstart .link i{
+        color: var(--prime);
+        text-decoration: none;
     }
 
 	.quickstart:first-child {
