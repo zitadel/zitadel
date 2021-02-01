@@ -119,7 +119,8 @@ func (w *WebAuthN) FinishRegistration(user *domain.Human, webAuthN *domain.WebAu
 		&webUser{
 			Human: user,
 		},
-		sessionData, credentialData)
+		sessionData,
+		credentialData)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-3Vb9s", "Errors.User.WebAuthN.CreateCredentialFailed")
 	}

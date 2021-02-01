@@ -104,18 +104,7 @@ func NewHumanU2FTokensReadModel(userID, resourceOwner string) *HumanU2FTokensRea
 }
 
 func (wm *HumanU2FTokensReadModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *user.HumanU2FAddedEvent:
-			wm.WriteModel.AppendEvents(e)
-		case *user.HumanU2FVerifiedEvent:
-			wm.WriteModel.AppendEvents(e)
-		case *user.HumanU2FRemovedEvent:
-			wm.WriteModel.AppendEvents(e)
-		case *user.UserRemovedEvent:
-			wm.WriteModel.AppendEvents(e)
-		}
-	}
+	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanU2FTokensReadModel) Reduce() error {
@@ -124,6 +113,9 @@ func (wm *HumanU2FTokensReadModel) Reduce() error {
 		case *user.HumanU2FAddedEvent:
 			token := &HumanWebAuthNWriteModel{}
 			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
+			token.WriteModel = eventstore.WriteModel{
+				AggregateID: e.AggregateID(),
+			}
 			replaced := false
 			for i, existingTokens := range wm.WebAuthNTokens {
 				if existingTokens.State == domain.MFAStateNotReady {
@@ -201,6 +193,9 @@ func (wm *HumanPasswordlessTokensReadModel) Reduce() error {
 		case *user.HumanPasswordlessAddedEvent:
 			token := &HumanWebAuthNWriteModel{}
 			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
+			token.WriteModel = eventstore.WriteModel{
+				AggregateID: e.AggregateID(),
+			}
 			replaced := false
 			for i, existingTokens := range wm.WebAuthNTokens {
 				if existingTokens.State == domain.MFAStateNotReady {
