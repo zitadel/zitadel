@@ -1,10 +1,7 @@
 ---
-title:  Further Information
-description: ...
+title:  Completion
 ---
 
-### Completion
+### What next?
 
 You have successfully integrated ZITADEL in your Angular Application. If your need further information on how to retrieve roles or other Authentication Flows consider reading the following doc pages:
-
-....

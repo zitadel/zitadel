@@ -1,17 +1,12 @@
 ---
 title: Angular Login
-description: ...
 ---
 
-> All documentations are under active work and subject to change soon!
+<img src="tech/angular.svg" height="200px" alt="angular"/>
+
+### Setup
 
 This Integration guide shows you the recommended way on how to integrate **ZITADEL** into your Angular Application.
-It demonstrates how to add a user login, your requirements are a active logged in user.
+It demonstrates how to add a user login to your application, your requirements are an active user on zitadel.ch.
 
-- Single Page Application
-- Server Side Application
-- Mobile App
-- Native App
-- Reverse Proxy
-
-For more details about how **ZITADEL** treats [scopes](architecture#Scopes) and [claims](architecture#Claims) see the [documentations](architecture).
+At the end you should be able to login as a user and read the user profile. 

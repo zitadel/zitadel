@@ -1,5 +1,5 @@
 ---
-title: Quick-Start
+title: Welcome to ZITADEL
 description: A quick-start reference for the impatient reader.
 ---
 

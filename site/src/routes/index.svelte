@@ -131,7 +131,7 @@
 
         .section .caos-back {
             display: block;
-            margin: 50px 0 50px 20px;
+            margin: 50px 0 20px 20px;
             max-width: 400px;
         }
 
@@ -187,7 +187,6 @@
         </div>
 
         <div class="subsection">
-            <h3>Start using ZITADEL</h3>
             <p>Follow this guide to get started with ZITADEL in general.</p>
 
             <a href="start" class="getstarted-btn"> 
