@@ -40,8 +40,8 @@ func (v *View) DeleteSessionTokens(agentID, userID string, event *models.Event) 
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) GetLatestTokenSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(tokenTable, aggregateType)
+func (v *View) GetLatestTokenSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(tokenTable)
 }
 
 func (v *View) ProcessedTokenSequence(event *models.Event) error {

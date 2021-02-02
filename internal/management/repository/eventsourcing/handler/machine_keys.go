@@ -49,8 +49,8 @@ func (_ *MachineKeys) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.UserAggregate}
 }
 
-func (k *MachineKeys) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := k.view.GetLatestMachineKeySequence(string(event.AggregateType))
+func (k *MachineKeys) CurrentSequence() (uint64, error) {
+	sequence, err := k.view.GetLatestMachineKeySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -58,7 +58,7 @@ func (k *MachineKeys) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (d *MachineKeys) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := d.view.GetLatestMachineKeySequence("")
+	sequence, err := d.view.GetLatestMachineKeySequence()
 	if err != nil {
 		return nil, err
 	}

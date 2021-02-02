@@ -32,8 +32,8 @@ func (v *View) DeleteMailTemplate(aggregateID string, event *models.Event) error
 	return v.ProcessedMailTemplateSequence(event)
 }
 
-func (v *View) GetLatestMailTemplateSequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(mailTemplateTable, aggregateType)
+func (v *View) GetLatestMailTemplateSequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(mailTemplateTable)
 }
 
 func (v *View) ProcessedMailTemplateSequence(event *models.Event) error {

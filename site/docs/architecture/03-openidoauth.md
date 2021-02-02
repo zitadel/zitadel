@@ -225,17 +225,17 @@ Key JSON
 
 JWT
 
-| Claim | Example                       | Description                                                                      |
-|:------|:------------------------------|:---------------------------------------------------------------------------------|
-| aud   | `"https://issuer.zitadel.ch"` | String or Array of intended audiences MUST include ZITADEL's issuing domain      |
-| exp   | `1605183582`                  | Unix timestamp of the expiry, MUST NOT be longer than 1h                         |
-| iat   | `1605179982`                  | Unix timestamp of the creation singing time of the JWT                           |
-| iss   | `"http://localhost:50003"`    | String which represents the requesting party                                     |
-| sub   | `"77479219772321307"`         | The subject ID of the service user, normally the `userId` from the json key file |
+| Claim | Example                       | Description                                                                                                   |
+|:------|:------------------------------|:--------------------------------------------------------------------------------------------------------------|
+| aud   | `"https://issuer.zitadel.ch"` | String or Array of intended audiences MUST include ZITADEL's issuing domain                                   |
+| exp   | `1605183582`                  | Unix timestamp of the expiry, MUST NOT be longer than 1h                                                      |
+| iat   | `1605179982`                  | Unix timestamp of the creation singing time of the JWT                                                        |
+| iss   | `"77479219772321307"`         | String which represents the requesting party (owner of the key), normally the `userId` from the json key file |
+| sub   | `"77479219772321307"`         | The subject ID of the service user, normally the `userId` from the json key file                              |
 
 ```JSON
 {
-	"iss": "http://localhost:50003",
+	"iss": "77479219772321307",
 	"sub": "77479219772321307",
 	"aud": "https://issuer.zitadel.ch",
 	"exp": 1605183582,

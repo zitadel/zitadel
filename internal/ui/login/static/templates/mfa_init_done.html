@@ -1,6 +1,8 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
+    <h1>{{t "MFAInitDone.Title"}}</h1>
+
     {{ template "user-profile" . }}
 
     <p>{{t "MFAInitDone.Description"}}</p>
@@ -13,14 +15,14 @@
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
     <input type="hidden" name="mfaType" value="{{ .MFAType }}" />
 
-    <div class="actions">
-        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
-        <a class="button secondary" href="{{ loginUrl }}">
+    <div class="lgn-actions">
+        <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
 
 
 {{template "main-bottom" .}}
- 

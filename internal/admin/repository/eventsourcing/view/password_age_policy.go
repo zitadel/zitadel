@@ -32,8 +32,8 @@ func (v *View) DeletePasswordAgePolicy(aggregateID string, event *models.Event) 
 	return v.ProcessedPasswordAgePolicySequence(event)
 }
 
-func (v *View) GetLatestPasswordAgePolicySequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(passwordAgePolicyTable, aggregateType)
+func (v *View) GetLatestPasswordAgePolicySequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(passwordAgePolicyTable)
 }
 
 func (v *View) ProcessedPasswordAgePolicySequence(event *models.Event) error {

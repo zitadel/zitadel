@@ -57,8 +57,8 @@ func (v *View) DeleteOrgMembersByUserID(userID string, event *models.Event) erro
 	return v.ProcessedOrgMemberSequence(event)
 }
 
-func (v *View) GetLatestOrgMemberSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(orgMemberTable, aggregateType)
+func (v *View) GetLatestOrgMemberSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(orgMemberTable)
 }
 
 func (v *View) ProcessedOrgMemberSequence(event *models.Event) error {

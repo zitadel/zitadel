@@ -1,6 +1,8 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
+    <p>{{t "InitUserDone.Title"}}</p>
+
     {{ template "user-profile" . }}
 
     <p>{{t "InitUserDone.Description"}}</p>
@@ -12,9 +14,10 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    <div class="actions">
-        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
-        <a class="button secondary" href="{{ loginUrl }}">
+    <div class="lgn-actions lgn-reverse-order">
+        <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
+        <span class="fill-space"></span>
+        <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
     </div>
@@ -22,4 +25,3 @@
 
 
 {{template "main-bottom" .}}
- 

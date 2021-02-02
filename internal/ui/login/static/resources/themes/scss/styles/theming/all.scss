@@ -1,0 +1,41 @@
+@import '../core/core.scss';
+@import '../footer/footer_theme.scss';
+@import '../header/header_theme.scss';
+@import '../button/button_theme.scss';
+@import '../input/input_theme.scss';
+@import '../label/label_theme.scss';
+@import '../radio/radio_theme.scss';
+@import '../a/a_theme.scss';
+@import '../identity_provider/identity_provider_theme.scss';
+@import '../error/error_theme.scss';
+@import '../qrcode/qrcode_theme.scss';
+@import '../container/container_theme.scss';
+@import '../account_selection/account_selection_theme.scss';
+@import '../avatar/avatar_theme.scss';
+@import '../checkbox/checkbox_theme.scss';
+@import '../select/select_theme.scss';
+@import '../list/list_theme.scss';
+@import '../typography/typography.scss';
+@import '../success_label/success_label_theme.scss';
+@import './theming';
+
+@mixin zitadel-lgn-theme($theme-or-color-config) {
+    @include lgn-core-theme($theme-or-color-config);
+    @include lgn-header-theme($theme-or-color-config);
+    @include lgn-button-theme($theme-or-color-config);
+    @include lgn-input-theme($theme-or-color-config);
+    @include lgn-radio-theme($theme-or-color-config);
+    @include lgn-checkbox-theme($theme-or-color-config);
+    @include lgn-label-theme($theme-or-color-config);
+    @include lgn-footer-theme($theme-or-color-config);
+    @include lgn-a-theme($theme-or-color-config);
+    @include lgn-error-theme($theme-or-color-config);
+    @include lgn-qrcode-theme($theme-or-color-config);
+    @include lgn-container-theme($theme-or-color-config);
+    @include lgn-account-selection-theme($theme-or-color-config);
+    @include lgn-avatar-theme($theme-or-color-config);
+    @include lgn-select-theme($theme-or-color-config);
+    @include lgn-list-theme($theme-or-color-config);
+    @include lgn-idp-theme($theme-or-color-config);
+    @include lgn-success-label-theme($theme-or-color-config);
+}
