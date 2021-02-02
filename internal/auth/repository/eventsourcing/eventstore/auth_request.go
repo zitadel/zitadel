@@ -225,7 +225,7 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 		return err
 	}
 
-	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserID, request.UserOrgID, request.WithCurrentInfo(info))
+	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
@@ -327,7 +327,7 @@ func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, u
 	if err != nil {
 		return err
 	}
-	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserID, request.UserOrgID, request.WithCurrentInfo(info))
+	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
@@ -360,7 +360,7 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	request.UserOrgID = human.ResourceOwner
 	request.SelectedIDPConfigID = externalIDP.IDPConfigID
 	request.LinkingUsers = nil
-	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserID, request.UserOrgID, request.WithCurrentInfo(info))
+	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
