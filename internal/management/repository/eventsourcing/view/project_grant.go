@@ -60,8 +60,8 @@ func (v *View) DeleteProjectGrantsByProjectID(projectID string) error {
 	return view.DeleteProjectGrantsByProjectID(v.Db, grantedProjectTable, projectID)
 }
 
-func (v *View) GetLatestProjectGrantSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(grantedProjectTable, aggregateType)
+func (v *View) GetLatestProjectGrantSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(grantedProjectTable)
 }
 
 func (v *View) ProcessedProjectGrantSequence(event *models.Event) error {

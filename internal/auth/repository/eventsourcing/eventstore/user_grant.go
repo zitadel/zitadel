@@ -29,7 +29,7 @@ type UserGrantRepo struct {
 
 func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestUserGrantSequence("")
+	sequence, err := repo.View.GetLatestUserGrantSequence()
 	logging.Log("EVENT-Hd7s3").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest user grant sequence")
 	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).UserID})
 	grants, count, err := repo.View.SearchUserGrants(request)

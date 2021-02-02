@@ -49,8 +49,8 @@ func (p *PasswordComplexityPolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *PasswordComplexityPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence(string(event.AggregateType))
+func (p *PasswordComplexityPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -58,7 +58,7 @@ func (p *PasswordComplexityPolicy) CurrentSequence(event *models.Event) (uint64,
 }
 
 func (p *PasswordComplexityPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence("")
+	sequence, err := p.view.GetLatestPasswordComplexityPolicySequence()
 	if err != nil {
 		return nil, err
 	}

@@ -57,8 +57,8 @@ func (v *View) DeleteIAMMembersByUserID(userID string, event *models.Event) erro
 	return v.ProcessedIAMMemberSequence(event)
 }
 
-func (v *View) GetLatestIAMMemberSequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(iamMemberTable, aggregateType)
+func (v *View) GetLatestIAMMemberSequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(iamMemberTable)
 }
 
 func (v *View) ProcessedIAMMemberSequence(event *models.Event) error {

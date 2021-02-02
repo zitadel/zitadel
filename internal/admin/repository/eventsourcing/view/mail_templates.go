@@ -23,8 +23,8 @@ func (v *View) PutMailTemplate(template *model.MailTemplateView, event *models.E
 	return v.ProcessedMailTemplateSequence(event)
 }
 
-func (v *View) GetLatestMailTemplateSequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(mailTemplateTable, aggregateType)
+func (v *View) GetLatestMailTemplateSequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(mailTemplateTable)
 }
 
 func (v *View) ProcessedMailTemplateSequence(event *models.Event) error {

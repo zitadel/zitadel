@@ -32,8 +32,8 @@ func (v *View) DeleteOrgIAMPolicy(aggregateID string, event *models.Event) error
 	return v.ProcessedOrgIAMPolicySequence(event)
 }
 
-func (v *View) GetLatestOrgIAMPolicySequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(orgIAMPolicyTable, aggregateType)
+func (v *View) GetLatestOrgIAMPolicySequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(orgIAMPolicyTable)
 }
 
 func (v *View) ProcessedOrgIAMPolicySequence(event *models.Event) error {

@@ -306,7 +306,7 @@ func (l *Login) getTheme(r *http.Request) string {
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
-	return "" //TODO: impl
+	return "lgn-dark-theme" //TODO: impl
 }
 
 func (l *Login) getOrgID(authReq *model.AuthRequest) string {

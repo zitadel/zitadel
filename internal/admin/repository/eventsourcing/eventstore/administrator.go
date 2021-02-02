@@ -48,7 +48,7 @@ func (repo *AdministratorRepo) GetViews() ([]*view_model.View, error) {
 }
 
 func (repo *AdministratorRepo) GetSpoolerDiv(database, view string) int64 {
-	sequence, err := repo.View.GetCurrentSequence(database, view, "")
+	sequence, err := repo.View.GetCurrentSequence(database, view)
 	if err != nil {
 
 		return 0
