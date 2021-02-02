@@ -11,7 +11,7 @@ import (
 
 const (
 	uniqueUserGrant             = "user_grant"
-	userGrantEventTypePrefix    = eventstore.EventType("user.grant")
+	userGrantEventTypePrefix    = eventstore.EventType("user.grant.")
 	UserGrantAddedType          = userGrantEventTypePrefix + "added"
 	UserGrantChangedType        = userGrantEventTypePrefix + "changed"
 	UserGrantCascadeChangedType = userGrantEventTypePrefix + "cascade.changed"

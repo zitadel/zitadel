@@ -177,3 +177,11 @@ func usergrantStateFromDomain(state domain.UserGrantState) management.UserGrantS
 		return management.UserGrantState_USERGRANTSTATE_UNSPECIFIED
 	}
 }
+
+func userGrantsToIDs(userGrants []*grant_model.UserGrantView) []string {
+	converted := make([]string, len(userGrants))
+	for i, grant := range userGrants {
+		converted[i] = grant.ID
+	}
+	return converted
+}
