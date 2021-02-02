@@ -2,7 +2,6 @@
     export async function preload({params}) {
         const { slug } = params;
         const {sections, seo} = await this.fetch(`${slug}.json`).then(r => r.json());
-
         return { sections, seo, slug };
     }
 </script>

@@ -262,7 +262,7 @@
                     <h4>Architecture and Technologies</h4>
                     <i class="las la-project-diagram" style="font-size: 100px; height: 100px; color:#6c8eef"></i>
                     <p>Learn more about engineering and design principles, ZITADELs architecture and used technologies.</p>
-                    <a href="architecture" >Learn more<i class="las la-arrow-right"></i></a>
+                    <a href="architecture" sapper:prefetch>Learn more<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In this section</p>
                     <div class="sectionlinks">
@@ -279,7 +279,7 @@
                     <i class="las la-book-reader" style="font-size: 100px; height: 100px; color:#6c8eef"></i>
 
                     <p>Follow this guide to get started with ZITADEL as a user.</p>
-                    <a href="use" >Learn more<i class="las la-arrow-right"></i></a>
+                    <a href="use" sapper:prefetch>Learn more<i class="las la-arrow-right"></i></a>
                 </div>
             </div>
         </div>

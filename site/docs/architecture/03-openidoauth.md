@@ -3,7 +3,7 @@ title: OpenID Connect 1.0 & OAuth 2.0
 ---
 
 ### Endpoints and Domains
-<!-- This chapter documents the [OpenID Connect 1.0](https://openid.net/connect/) and [OAuth 2.0](https://oauth.net/2/) features provided by **ZITADEL**.
+This chapter documents the [OpenID Connect 1.0](https://openid.net/connect/) and [OAuth 2.0](https://oauth.net/2/) features provided by **ZITADEL**.
 
 Under normal circumstances **ZITADEL** need four domain names to operate properly.
 
@@ -285,4 +285,5 @@ curl --request POST \
 
 #### Security Assertion Markup Language (SAML) 2.0 Profile
 
-**Link to spec.** [Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7522) -->
+**Link to spec.** [Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7522)
+
