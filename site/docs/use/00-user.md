@@ -2,6 +2,7 @@
 title: User Manual
 ---
 
+<i class="las la-book-reader" style="font-size: 100px; height: 100px; color:#6c8eef"></i>
 > All documentations are under active work and subject to change soon!
 
 ### Self Register User

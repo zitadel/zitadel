@@ -9,7 +9,9 @@
 	// the page first loads
 	let online = typeof navigator !== 'undefined'
 		? navigator.onLine
-		: true;
+        : true;
+        
+    console.error(error);
 </script>
 
 <style>

@@ -11,6 +11,8 @@ title: Angular Login
 ### Setup
 
 This Integration guide shows you the recommended way on how to integrate **ZITADEL** into your Angular Application.
-It demonstrates how to add a user login to your application, your requirements are an active user on zitadel.ch.
+It demonstrates how to add a user login to your application and fetch some data from the user info endpoint.
 
 At the end you should be able to login as a user and read the user profile. 
+
+> Note that our **ZITADEL Console** is also written in Angular an can therefore be used as an example.

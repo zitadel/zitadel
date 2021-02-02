@@ -241,8 +241,9 @@
 
             <div class="doc">
                 <div class="text">
-                    <h4>Authentication API</h4>
-                    <p>Management API</p>
+                    <h4>APIs</h4>
+                    <i class="las la-code" style="font-size: 100px; height: 100px; color:#6c8eef" ></i>
+                    <p>Learn more about our APIs and how to integrate them in your apps.</p>
                     <a href="apis">Learn more<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In this section</p>
@@ -259,6 +260,7 @@
             <div class="doc">
                 <div class="text">
                     <h4>Architecture and Technologies</h4>
+                    <i class="las la-project-diagram" style="font-size: 100px; height: 100px; color:#6c8eef"></i>
                     <p>Learn more about engineering and design principles, ZITADELs architecture and used technologies.</p>
                     <a href="architecture" >Learn more<i class="las la-arrow-right"></i></a>
 
@@ -274,6 +276,8 @@
             <div class="doc">
                 <div class="text">
                     <h4>User Manuals</h4>
+                    <i class="las la-book-reader" style="font-size: 100px; height: 100px; color:#6c8eef"></i>
+
                     <p>Follow this guide to get started with ZITADEL as a user.</p>
                     <a href="use" >Learn more<i class="las la-arrow-right"></i></a>
                 </div>
