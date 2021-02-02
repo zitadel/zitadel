@@ -166,7 +166,7 @@ func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwne
 	for _, grantID := range cascadingGrantIDs {
 		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
-			return err
+			continue
 		}
 		aggregates = append(aggregates, grantAgg)
 	}

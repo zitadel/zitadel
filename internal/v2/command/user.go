@@ -4,6 +4,7 @@ import (
 	"context"
 	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"strings"
 	"time"
 
@@ -121,7 +122,7 @@ func (r *CommandSide) UnlockUser(ctx context.Context, userID, resourceOwner stri
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
 
-func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner string) error {
+func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingGrantIDs ...string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
@@ -136,11 +137,21 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	if err != nil {
 		return err
 	}
+	aggregates := make([]eventstore.Aggregater, 0)
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 	userAgg.PushEvents(user.NewUserRemovedEvent(ctx, existingUser.ResourceOwner, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
-	//TODO: remove user grants
+	aggregates = append(aggregates, userAgg)
 
-	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
+	for _, grantID := range cascadingGrantIDs {
+		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
+		if err != nil {
+			continue
+		}
+		aggregates = append(aggregates, grantAgg)
+	}
+
+	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	return err
 }
 
 func (r *CommandSide) CreateUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {

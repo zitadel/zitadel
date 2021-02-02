@@ -197,10 +197,13 @@ func (r *CommandSide) removeUserGrant(ctx context.Context, grantID, resourceOwne
 	if err != nil {
 		return nil, nil, err
 	}
-	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
-	if err != nil {
-		return nil, nil, err
+	if !cascade {
+		err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
+
 	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
 		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1My0t", "Errors.UserGrant.NotFound")
 	}
