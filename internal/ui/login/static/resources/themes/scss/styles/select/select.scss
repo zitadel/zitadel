@@ -1,0 +1,5 @@
+@import './select_base.scss';
+
+.lgn-select, select {
+  @include lgn-select-base;
+}

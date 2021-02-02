@@ -1,0 +1,55 @@
+@import '../theming/theming.scss';
+@import './checkbox.scss';
+
+@mixin lgn-checkbox-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    $color: lgn-get-color-config($theme);
+
+    @if $color != null {
+        @include lgn-checkbox-color($color);
+    }
+}
+
+@mixin lgn-checkbox-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+    $warn: map-get($config, warn);
+    $background: map-get($config, background);
+    $foreground: map-get($config, foreground);
+
+    input[type='checkbox'] {
+        position: absolute;
+        top: 4px;
+        left: 0;
+        width: 16px;
+        height: 16px;
+        opacity: 0;    
+        z-index: 0;
+    }
+    
+    // Unchecked
+    .lgn-checkbox label {            
+        &:before {
+            background-color: transparent;
+            border: 2px solid lgn-color($foreground, input-border);
+        }
+        
+        &:after {
+            border-bottom: 2px solid transparent;
+            border-right: 2px solid transparent;
+            background: transparent;
+        }
+    }
+    
+    // Checked
+    input[type='checkbox']:checked + label {
+        &:before {
+            background-color: lgn-color($primary, default);
+            border-color: lgn-color($primary, default);
+        }
+        
+        &:after {
+            border-color: #fff;
+        }
+    }
+}

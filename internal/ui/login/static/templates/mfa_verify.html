@@ -1,6 +1,8 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
+    <h1>{{t "MFAVerify.Title"}}</h1>
+
     {{ template "user-profile" . }}
 
     <p>{{t "MFAVerify.Description"}}</p>
@@ -14,32 +16,33 @@
     <input type="hidden" name="mfaType" value="{{ .SelectedMFAProvider }}" />
 
     <div class="fields">
-        <div class="field">
-            <label class="label" for="code">{{t "MFAVerify.Code"}}</label>
-            <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
-        </div>
+        <label class="lgn-label" for="code">{{t "MFAVerify.Code"}}</label>
+        <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
     </div>
 
     {{ template "error-message" .}}
 
-    <div class="actions">
-        <button class="primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-        {{ if .MFAProviders }}
-            <div class="mfa-other">
-                <p>{{t "MFA.ChooseOther"}}</p>
-                {{ range $provider := .MFAProviders}}
-                    {{ $providerName := (t (printf "MFA.Provider%v" $provider)) }}
-                    <button class="secondary" type="submit" name="provider" value="{{$provider}}" formnovalidate>{{$providerName}}</button>
-                {{ end }}
-            </div>
-        {{ end }}
-        <a class="button secondary" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+    <div class="lgn-actions">
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
         </a>
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
     </div>
+
+    {{ if .MFAProviders }}
+        <div class="lgn-mfa-other">
+            <p>{{t "MFA.ChooseOther"}}</p>
+            {{ range $provider := .MFAProviders}}
+            {{ $providerName := (t (printf "MFA.Provider%v" $provider)) }}
+            <button class="lgn-stroked-button lgn-primary" type="submit" name="provider" value="{{$provider}}"
+                formnovalidate>{{$providerName}}</button>
+            {{ end }}
+        </div>
+    {{ end }}
 </form>
 
-<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
-<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+<script src="{{ resourceUrl " scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl " scripts/default_form_validation.js" }}"></script>
 {{template "main-bottom" .}}
- 

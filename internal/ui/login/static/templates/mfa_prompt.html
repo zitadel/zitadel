@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "MFAPrompt.Description"}}</p>
@@ -11,28 +11,30 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
-    
+
     <div class="fields">
         {{ range $provider := .MFAProviders}}
         {{ $providerName := (t (printf "MFAPrompt.Provider%v" $provider)) }}
-            <div class="field radio-button">
+            <div class="lgn-radio block">
                 <input id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
                 <label for="{{ $provider }}">{{ $providerName }}</label>
             </div>
         {{ end }}
     </div>
 
-    <div class="actions">
-        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
-        {{if not .MFARequired}}
-        <button class="default right" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
-        {{end}}
-        <a class="button secondary" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+    <div class="lgn-actions">
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
         </a>
+
+        {{if not .MFARequired}}
+        <button class="lgn-stroked-button lgn-primary" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
+        {{end}}
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
 
 
 {{template "main-bottom" .}}
- 

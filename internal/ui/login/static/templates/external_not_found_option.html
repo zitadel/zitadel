@@ -1,7 +1,6 @@
-
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     <h1>{{t "ExternalNotFoundOption.Title"}}</h1>
     <p>{{t "ExternalNotFoundOption.Description"}}</p>
 </div>
@@ -12,10 +11,17 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    <div class="actions">
-        <button class="secondary right" name="link" value="true" formnovalidate>{{t "ExternalNotFoundOption.Link"}}</button>
-        <button class="secondary right" name="autoregister" value="true" formnovalidate>{{t "ExternalNotFoundOption.AutoRegister"}}</button>
-        <button class="secondary right" name="resetlinking" value="true" formnovalidate>{{t "Actions.Back"}}</button>
+    <div class="lgn-actions">
+        <button class="lgn-icon-button lgn-left-action" name="resetlinking" value="true"
+            formnovalidate>
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </button>
+        
+        <button class="lgn-raised-button lgn-primary" name="link" value="true"
+            formnovalidate>{{t "ExternalNotFoundOption.Link"}}</button>
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" name="autoregister" value="true"
+            formnovalidate>{{t "ExternalNotFoundOption.AutoRegister"}}</button>
     </div>
 
     {{template "error-message" .}}
@@ -26,4 +32,3 @@
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 
 {{template "main-bottom" .}}
- 
