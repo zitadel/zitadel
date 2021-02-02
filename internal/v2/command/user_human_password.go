@@ -49,7 +49,7 @@ func (r *CommandSide) SetPassword(ctx context.Context, orgID, userID, code, pass
 		ChangeRequired: false,
 	}
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	return r.changePassword(ctx, orgID, userID, userAgentID, password, userAgg, existingCode)
+	return r.changePassword(ctx, existingCode.ResourceOwner, userID, userAgentID, password, userAgg, existingCode)
 }
 
 func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (err error) {

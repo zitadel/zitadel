@@ -10,12 +10,12 @@ import (
 )
 
 //ResendInitialMail resend inital mail and changes email if provided
-func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, resourceowner string) (err error) {
+func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, resourceOwner string) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UserIDMissing")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
 	}
 
-	existingCode, err := r.getHumanInitWriteModelByID(ctx, userID, resourceowner)
+	existingCode, err := r.getHumanInitWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, reso
 	return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
 }
 
-func (r *CommandSide) HumanVerifyInitCode(ctx context.Context, userID, code, passwordString, resourceowner string) error {
+func (r *CommandSide) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, passwordString string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
 	}
@@ -46,7 +46,7 @@ func (r *CommandSide) HumanVerifyInitCode(ctx context.Context, userID, code, pas
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-44G8s", "Errors.User.Code.Empty")
 	}
 
-	existingCode, err := r.getHumanInitWriteModelByID(ctx, userID, resourceowner)
+	existingCode, err := r.getHumanInitWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -68,12 +68,12 @@ func (r *CommandSide) HumanVerifyInitCode(ctx context.Context, userID, code, pas
 		userAgg.PushEvents(user.NewHumanEmailVerifiedEvent(ctx))
 	}
 	if passwordString != "" {
-		passwordWriteModel := NewHumanPasswordWriteModel(userID, resourceowner)
+		passwordWriteModel := NewHumanPasswordWriteModel(userID, existingCode.ResourceOwner)
 		password := &domain.Password{
 			SecretString:   passwordString,
 			ChangeRequired: true,
 		}
-		err = r.changePassword(ctx, resourceowner, userID, "", password, userAgg, passwordWriteModel)
+		err = r.changePassword(ctx, existingCode.ResourceOwner, userID, "", password, userAgg, passwordWriteModel)
 		if err != nil {
 			return err
 		}

@@ -93,7 +93,7 @@ func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, user
 		return err
 	}
 	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9fs", "Errors.User.Phone.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-2b7Hf", "Errors.User.Phone.NotFound")
 	}
 	if existingPhone.IsPhoneVerified {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sf", "Errors.User.Phone.AlreadyVerified")

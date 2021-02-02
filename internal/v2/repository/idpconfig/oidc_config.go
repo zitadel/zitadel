@@ -22,7 +22,7 @@ type OIDCConfigAddedEvent struct {
 	ClientID     string              `json:"clientId,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	Issuer       string              `json:"issuer,omitempty"`
-	Scopes       []string            `json:"scpoes,omitempty"`
+	Scopes       []string            `json:"scopes,omitempty"`
 
 	IDPDisplayNameMapping domain.OIDCMappingField `json:"idpDisplayNameMapping,omitempty"`
 	UserNameMapping       domain.OIDCMappingField `json:"usernameMapping,omitempty"`
@@ -80,7 +80,7 @@ type OIDCConfigChangedEvent struct {
 	ClientID     *string             `json:"clientId,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	Issuer       *string             `json:"issuer,omitempty"`
-	Scopes       []string            `json:"scpoes,omitempty"`
+	Scopes       []string            `json:"scopes,omitempty"`
 
 	IDPDisplayNameMapping *domain.OIDCMappingField `json:"idpDisplayNameMapping,omitempty"`
 	UserNameMapping       *domain.OIDCMappingField `json:"usernameMapping,omitempty"`

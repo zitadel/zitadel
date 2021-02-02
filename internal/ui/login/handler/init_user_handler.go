@@ -68,11 +68,11 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitUser(w, r, authReq, data.UserID, data.Code, data.PasswordSet, err)
 		return
 	}
-	userOrgID := login
+	userOrgID := ""
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
-	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, data.Code, data.Password, userOrgID)
+	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
 		return
@@ -81,7 +81,7 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, showPassword bool) {
-	userOrgID := login
+	userOrgID := ""
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}

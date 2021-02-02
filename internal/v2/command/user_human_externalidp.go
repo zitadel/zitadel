@@ -33,7 +33,7 @@ func (r *CommandSide) addHumanExternalIDP(ctx context.Context, userAgg *user.Agg
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid")
 	}
 	//TODO: check if idpconfig exists
-	userAgg.PushEvents(user.NewHumanExternalIDPAddedEvent(ctx, externalIDP.IDPConfigID, externalIDP.DisplayName))
+	userAgg.PushEvents(user.NewHumanExternalIDPAddedEvent(ctx, externalIDP.IDPConfigID, externalIDP.DisplayName, externalIDP.ExternalUserID))
 	return nil
 }
 

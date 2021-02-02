@@ -39,6 +39,8 @@ func (wm *UserWriteModel) Reduce() error {
 		case *user.HumanRegisteredEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateInitial
+		case *user.HumanInitializedCheckSucceededEvent:
+			wm.UserState = domain.UserStateActive
 		case *user.MachineAddedEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive

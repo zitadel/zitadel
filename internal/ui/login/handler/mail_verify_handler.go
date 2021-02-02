@@ -46,7 +46,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 		l.checkMailCode(w, r, authReq, data.UserID, data.Code)
 		return
 	}
-	userOrg := login
+	userOrg := ""
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
@@ -55,7 +55,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 }
 
 func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string) {
-	userOrg := login
+	userOrg := ""
 	if authReq != nil {
 		userID = authReq.UserID
 		userOrg = authReq.UserOrgID

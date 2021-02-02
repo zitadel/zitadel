@@ -64,7 +64,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 		l.renderInitPassword(w, r, authReq, data.UserID, data.Code, err)
 		return
 	}
-	userOrg := login
+	userOrg := ""
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
@@ -87,7 +87,7 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
 	}
-	err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), user.ID, userOrg, domain.NotificationTypeEmail)
+	err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), user.ID, user.ResourceOwner, domain.NotificationTypeEmail)
 	l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 }
 

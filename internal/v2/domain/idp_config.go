@@ -89,3 +89,12 @@ const (
 func (f IDPConfigStylingType) Valid() bool {
 	return f >= 0 && f < idpConfigStylingTypeCount
 }
+
+func (st IDPConfigStylingType) GetCSSClass() string {
+	switch st {
+	case IDPConfigStylingTypeGoogle:
+		return "google"
+	default:
+		return ""
+	}
+}

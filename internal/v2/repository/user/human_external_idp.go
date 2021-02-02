@@ -13,10 +13,6 @@ const (
 	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
 	externalLoginEventPrefix = humanEventPrefix + "externallogin."
 
-	//TODO: Handle unique Aggregate
-	HumanExternalIDPReservedType = externalIDPEventPrefix + "reserved"
-	HumanExternalIDPReleasedType = externalIDPEventPrefix + "released"
-
 	HumanExternalIDPAddedType          = externalIDPEventPrefix + "added"
 	HumanExternalIDPRemovedType        = externalIDPEventPrefix + "removed"
 	HumanExternalIDPCascadeRemovedType = externalIDPEventPrefix + "cascade.removed"
@@ -53,7 +49,7 @@ func (e *HumanExternalIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniq
 	return []*eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
 }
 
-func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName string) *HumanExternalIDPAddedEvent {
+func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName, externalUserID string) *HumanExternalIDPAddedEvent {
 	return &HumanExternalIDPAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -61,6 +57,7 @@ func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName
 		),
 		IDPConfigID: idpConfigID,
 		DisplayName: displayName,
+		UserID:      externalUserID,
 	}
 }
 

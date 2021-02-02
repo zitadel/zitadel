@@ -24,7 +24,7 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 	}
 	changedEvent, hasChanged := existingEmail.NewChangedEvent(ctx, email.EmailAddress)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Email.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2b7fM", "Errors.User.Email.NotChanged")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 	userAgg.PushEvents(changedEvent)
@@ -60,7 +60,7 @@ func (r *CommandSide) VerifyHumanEmail(ctx context.Context, userID, code, resour
 		return err
 	}
 	if existingCode.Code == nil || existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3n8ud", "Errors.User.Code.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)

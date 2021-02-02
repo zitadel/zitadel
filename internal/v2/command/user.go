@@ -25,7 +25,7 @@ func (r *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userNam
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5N9ds", "Errors.User.NotFound")
 	}
 	if existingUser.UserName == userName {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.UsernameNotChanged")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
 	}
 
 	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, orgID)
@@ -93,7 +93,7 @@ func (r *CommandSide) LockUser(ctx context.Context, userID, resourceOwner string
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5M9fs", "Errors.User.NotFound")
 	}
 	if existingUser.UserState != domain.UserStateActive && existingUser.UserState != domain.UserStateInitial {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.ShouldBeActiveOrInitial")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 	userAgg.PushEvents(user.NewUserLockedEvent(ctx))

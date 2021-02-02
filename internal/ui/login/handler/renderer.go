@@ -16,7 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/renderer"
 )
 
@@ -154,7 +153,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"hasExternalLogin": func() bool {
 			return false
 		},
-		"idpProviderClass": func(stylingType iam_model.IDPStylingType) string {
+		"idpProviderClass": func(stylingType domain.IDPConfigStylingType) string {
 			return stylingType.GetCSSClass()
 		},
 	}

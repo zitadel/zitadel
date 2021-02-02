@@ -78,7 +78,7 @@ func UserGrantAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "UGRANT-2M9fs", "unable to unmarshal user grant")
+		return nil, errors.ThrowInternal(err, "UGRANT-0p9ol", "unable to unmarshal user grant")
 	}
 
 	return e, nil

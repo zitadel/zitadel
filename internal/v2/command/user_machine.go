@@ -51,7 +51,7 @@ func (r *CommandSide) ChangeMachine(ctx context.Context, machine *domain.Machine
 
 	changedEvent, hasChanged := existingUser.NewChangedEvent(ctx, machine.Name, machine.Description)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Email.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.Email.NotChanged")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 	userAgg.PushEvents(changedEvent)

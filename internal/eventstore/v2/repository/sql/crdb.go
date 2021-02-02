@@ -188,7 +188,7 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 				logging.LogWithFields("SQL-M0vsf",
 					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
-				return caos_errs.ThrowInternal(err, "SQL-2M9fs", "unable to remove unique constraint ")
+				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint ")
 			}
 		}
 	}
