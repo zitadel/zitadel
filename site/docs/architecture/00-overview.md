@@ -2,6 +2,8 @@
 title: Overview
 ---
 
+<i class="las la-project-diagram" style="font-size: 100px; height: 100px; color:#6c8eef"></i>
+
 > All documentations are under active work and subject to change soon!
 
 This part of the **ZITADEL** documentation comprises three major subject areas:

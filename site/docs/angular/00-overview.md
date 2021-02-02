@@ -2,7 +2,11 @@
 title: Angular Login
 ---
 
-<img src="tech/angular.svg" height="200px" alt="angular"/>
+<div style="display: flex; align-items: center;">
+    <img src="logos/zitadel-logo-solo-darkdesign.svg" height="160px" alt="zitadel"/>
+    <i style="font-size: 40px; height: 40px;  margin: 0 15px;" class="las la-arrow-right"></i>
+    <img src="tech/angular.svg" height="200px" alt="angular"/>
+</div>
 
 ### Setup
 
