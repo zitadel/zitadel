@@ -1,7 +1,6 @@
 <script context="module">
 	export async function preload() {
         const qss = await this.fetch(`quickstarts.json`).then(r => r.json());
-        console.log(qss);
         return { qss };
 	}
 </script>
@@ -22,21 +21,22 @@
 <div class='quickstarts stretch'>
 	<h1>Quickstarts ZITADEL</h1>
 	{#each qss as qs}
-
-    <article class='quickstart'>
-        <div>
-            <p class="sub">{qs.metadata.subtitle}</p>
-        	<h2>
-                <span id={qs.fragment} class="offset-anchor"></span>
-                <a class="anchor" sapper:prefetch href='quickstarts#{qs.fragment}' title='{qs.title}'><i class="las la-link"></i></a>
-                {qs.metadata.title}
-			</h2>
-			<p>{@html qs.answer}</p>
-            <a class="link" href="{qs.fragment}" sapper:prefetch>Read Quickstart <i class="las la-arrow-right"></i></a>
-            <p class="info">{qs.metadata.date} • {qs.metadata.readingtime}</p>
-        </div>
-        <img src={qs.metadata.img} alt="article img" />
-    </article>
+        {#if qs.metadata.visible == 'true'} 
+        <article class='quickstart'>
+            <div>
+                <p class="sub">{qs.metadata.subtitle}</p>
+                <h2>
+                    <span id={qs.fragment} class="offset-anchor"></span>
+                    <a class="anchor" sapper:prefetch href='quickstarts#{qs.fragment}' title='{qs.title}'><i class="las la-link"></i></a>
+                    {qs.metadata.title}
+                </h2>
+                <p>{@html qs.answer}</p>
+                <a class="link" href="{qs.fragment}" sapper:prefetch>Read Quickstart <i class="las la-arrow-right"></i></a>
+                <p class="info">{qs.metadata.date} • {qs.metadata.readingtime}</p>
+            </div>
+            <img src={qs.metadata.img} alt="article img" />
+        </article>
+        {/if}
 	{/each}
 <p class="disclaimer">See also our Github page <a href="https://github.com/caos/zitadel" rel="external">ZITADEL </a> for questions regarding the sourcecode.</p></div>
 

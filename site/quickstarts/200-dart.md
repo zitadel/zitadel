@@ -1,10 +1,11 @@
 ---
-title: Native Apps
-subtitle: Backend
+title: Dart / Flutter
+subtitle: Native Apps
 img: tech/dart.svg
 date: 29 January 2021
 readingtime: 15min
 route: dart
+visible: true
 ---
 
 This Integration guide shows you the recommended way on how to integrate **ZITADEL** into your Flutter Application.

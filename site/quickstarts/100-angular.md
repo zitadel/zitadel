@@ -5,6 +5,7 @@ img: tech/angular.svg
 date: 29 January 2021
 readingtime: 6min
 route: angular
+visible: true
 ---
 
 
