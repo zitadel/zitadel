@@ -1,0 +1,11 @@
+$lgn-label-font-size: 12px !default;
+$lgn-label-margin: 0 0 2px 0;
+$lgn-label-font-weight: 400;
+
+@mixin lgn-label-base {
+    display: block;
+    font-size: $lgn-label-font-size;
+    transition: color .2s ease;
+    margin: $lgn-label-margin;
+    font-weight: $lgn-label-font-weight;
+}

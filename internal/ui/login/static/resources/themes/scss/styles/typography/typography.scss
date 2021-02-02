@@ -1,0 +1,225 @@
+@import './faces/ailerons_font_faces.scss';
+@import './faces/lato_font_faces.scss';
+@import './faces/roboto_font_faces.scss';
+@import './faces/raleway_font_faces.scss';
+@import './faces/pt_sans_font_faces.scss';
+
+@mixin zitadel-lgn-typography($config-or-theme: null) {
+    $config: if(lgn-private-is-theme-object($config-or-theme),
+      lgn-get-typography-config($config-or-theme), $config-or-theme);
+
+    @if not $config {
+        $config: lgn-typography-config();
+    }
+
+    @include lgn-base-typography($config);
+}
+
+@function lgn-typography-config(
+  $font-family:   'Lato, -apple-system, BlinkMacSystemFont, sans-serif',
+  $display-4:     lgn-typography-level(112px, 112px, 300, $letter-spacing: -0.05em),
+  $display-3:     lgn-typography-level(56px, 56px, 400, $letter-spacing: -0.02em),
+  $display-2:     lgn-typography-level(45px, 48px, 400, $letter-spacing: -0.005em),
+  $display-1:     lgn-typography-level(34px, 40px, 400),
+  $headline:      lgn-typography-level(24px, 32px, 400),
+  $title:         lgn-typography-level(20px, 32px, 500),
+  $subheading-2:  lgn-typography-level(16px, 28px, 400),
+  $subheading-1:  lgn-typography-level(15px, 24px, 400),
+  $body-2:        lgn-typography-level(14px, 24px, 500),
+  $body-1:        lgn-typography-level(14px, 20px, 400),
+  $caption-1:     lgn-typography-level(12px, 20px, 400),
+  $button:        lgn-typography-level(14px, 36px, 500),
+  $input:         lgn-typography-level(inherit, 1.125, 400),
+) {
+  $config: (
+    display-4:      $display-4,
+    display-3:      $display-3,
+    display-2:      $display-2,
+    display-1:      $display-1,
+    headline:       $headline,
+    title:          $title,
+    subheading-2:   $subheading-2,
+    subheading-1:   $subheading-1,
+    body-2:         $body-2,
+    body-1:         $body-1,
+    caption-1:      $caption-1,
+    button:         $button,
+    input:          $input,
+  );
+
+  // Loop through the levels and set the `font-family` of the ones that don't have one to the base.
+  @each $key, $level in $config {
+    @if map-get($level, font-family) == null {
+      $new-level: map-merge($level, (font-family: $font-family));
+      $config: map-merge($config, ($key: $new-level));
+    }
+  }
+
+  // Add the base font family to the config.
+  @return map-merge($config, (font-family: $font-family));
+}
+
+@function lgn-typography-level(
+  $font-size,
+  $line-height: $font-size,
+  $font-weight: 400,
+  $font-family: null,
+  $letter-spacing: normal) {
+
+  @return (
+    font-size: $font-size,
+    line-height: $line-height,
+    font-weight: $font-weight,
+    font-family: $font-family,
+    letter-spacing: $letter-spacing
+  );
+}
+
+// Converts a typography level into CSS styles.
+@mixin lgn-typography-level-to-styles($config, $level) {
+    $font-size: lgn-font-size($config, $level);
+    $font-weight: lgn-font-weight($config, $level);
+    $line-height: lgn-line-height($config, $level);
+    $font-family: lgn-font-family($config, $level);
+  
+    @include lgn-typography-font-shorthand($font-size, $font-weight, $line-height, $font-family);
+    letter-spacing: lgn-letter-spacing($config, $level);
+}
+
+// Utility for fetching a nested value from a typography config.
+@function _lgn-get-type-value($config, $level, $name) {
+    @return map-get(map-get($config, $level), $name);
+}
+  
+// Gets the font size for a level inside a typography config.
+@function lgn-font-size($config, $level) {
+    @return _lgn-get-type-value($config, $level, font-size);
+}
+
+// Gets the line height for a level inside a typography config.
+@function lgn-line-height($config, $level) {
+    @return _lgn-get-type-value($config, $level, line-height);
+}
+
+// Gets the font weight for a level inside a typography config.
+@function lgn-font-weight($config, $level) {
+    @return _lgn-get-type-value($config, $level, font-weight);
+}
+
+// Gets the letter spacing for a level inside a typography config.
+@function lgn-letter-spacing($config, $level) {
+    @return _lgn-get-type-value($config, $level, letter-spacing);
+}  
+
+@function lgn-font-family($config, $level: null) {
+    $font-family: map-get($config, font-family);
+  
+    @if $level != null {
+      $font-family: _lgn-get-type-value($config, $level, font-family);
+    }
+  
+    // Guard against unquoting non-string values, because it's deprecated.
+    @return if(type-of($font-family) == string, unquote($font-family), $font-family);
+}
+  
+  // Outputs the shorthand `font` CSS property, based on a set of typography values. Falls back to
+// the individual properties if a value that isn't allowed in the shorthand is passed in.
+@mixin lgn-typography-font-shorthand($font-size, $font-weight, $line-height, $font-family) {
+    // If any of the values are set to `inherit`, we can't use the shorthand
+    // so we fall back to passing in the individual properties.
+    @if ($font-size == inherit or
+         $font-weight == inherit or
+         $line-height == inherit or
+         $font-family == inherit or
+         $font-size == null or
+         $font-weight == null or
+         $line-height == null or
+         $font-family == null) {
+  
+      font-size: $font-size;
+      font-weight: $font-weight;
+      line-height: $line-height;
+      font-family: $font-family;
+    }
+    @else {
+      // Otherwise use the shorthand `font`, because it's the least amount of bytes. Note
+      // that we need to use interpolation for `font-size/line-height` in order to prevent
+      // Sass from dividing the two values.
+      font: $font-weight #{$font-size}/#{$line-height} $font-family;
+    }
+}
+
+@mixin lgn-base-typography($config, $selector: '.lgn-typography') {
+    h1, .lgn-headline, #{$selector} h1 {
+      @include lgn-typography-level-to-styles($config, headline);
+      margin: 0 0 16px;
+    }
+  
+    h2, .lgn-title, #{$selector} h2 {
+      @include lgn-typography-level-to-styles($config, title);
+      margin: 0 0 16px;
+    }
+  
+    h3, .lgn-subheading-2, #{$selector} h3 {
+      @include lgn-typography-level-to-styles($config, subheading-2);
+      margin: 0 0 16px;
+    }
+  
+    h4, .lgn-subheading-1, #{$selector} h4 {
+      @include lgn-typography-level-to-styles($config, subheading-1);
+      margin: 0 0 16px;
+    }
+  
+    .lgn-body-strong, .lgn-body-2 {
+      @include lgn-typography-level-to-styles($config, body-2);
+    }
+  
+    p, .lgn-body, .lgn-body-1, #{$selector} {
+      @include lgn-typography-level-to-styles($config, body-1);
+  
+      p {
+        margin: 0 0 12px;
+      }
+    }
+
+    button, .lgn-button, .lgn-raised-button, .lgn-stroked-button {
+        @include lgn-typography-level-to-styles($config, button);
+    }
+
+    span {
+        @include lgn-typography-level-to-styles($config, body-1);
+    }
+
+    a, .lgn-a {
+        @include lgn-typography-level-to-styles($config, body-1);
+    }
+  
+    small .lgn-small, .lgn-caption {
+      @include lgn-typography-level-to-styles($config, caption-1);
+    }
+
+    label, .lgn-label, #{$selector} .lgn-label, #{$selector} label {
+        @include lgn-typography-level-to-styles($config, caption-1);
+        margin: 0 0 2px 0;
+    }
+  
+    .lgn-display-4, #{$selector} .lgn-display-4 {
+      @include lgn-typography-level-to-styles($config, display-4);
+      margin: 0 0 56px;
+    }
+  
+    .lgn-display-3, #{$selector} .lgn-display-3 {
+      @include lgn-typography-level-to-styles($config, display-3);
+      margin: 0 0 64px;
+    }
+  
+    .lgn-display-2, #{$selector} .lgn-display-2 {
+      @include lgn-typography-level-to-styles($config, display-2);
+      margin: 0 0 64px;
+    }
+  
+    .lgn-display-1, #{$selector} .lgn-display-1 {
+      @include lgn-typography-level-to-styles($config, display-1);
+      margin: 0 0 64px;
+    }
+  }

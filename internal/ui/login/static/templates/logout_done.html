@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     <h1>{{t "LogoutDone.Title"}}</h1>
     <p> {{t "LogoutDone.Description"}}</p>
 </div>
@@ -8,11 +8,11 @@
 
     {{ .CSRF }}
 
-    <div class="actions">
+    <div class="lgn-actions">
+        <span class="fill-space"></span>
         <button class="primary right" type="submit">{{t "Actions.Login"}}</button>
     </div>
 </form>
 
 
 {{template "main-bottom" .}}
- 

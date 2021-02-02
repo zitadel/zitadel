@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "UsernameChange.Description"}}</p>
@@ -12,20 +12,21 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    <div class="fields">
-        <div class="field">
-            <label class="label" for="username">{{t "UsernameChange.Username"}}</label>
-            <input class="input" type="text" id="username" name="username" autocomplete="username" autofocus required>
-        </div>
+    <div class="field">
+        <label class="lgn-label" for="username">{{t "UsernameChange.Username"}}</label>
+        <input class="lgn-input" type="text" id="username" name="username" autocomplete="username" autofocus required>
     </div>
 
     {{ template "error-message" .}}
 
-    <div class="actions">
-        <button type="submit" id="submit-button" value="false" class="primary right">{{t "Actions.Next"}}</button>
-        <a class="button secondary" href="{{ loginUrl }}">
+    <div class="lgn-actions">
+        <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
+        <span class="fill-space"></span>
+        <button type="submit" id="submit-button" value="false"
+            class="lgn-raised-button lgn-primary">{{t "Actions.Next"}}</button>
+
     </div>
 </form>
 
@@ -34,4 +35,3 @@
 
 
 {{template "main-bottom" .}}
- 

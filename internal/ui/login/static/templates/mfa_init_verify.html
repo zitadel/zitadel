@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "MFAInitVerify.Description"}}</p>
@@ -16,35 +16,39 @@
     <input type="hidden" name="secret" value="{{ .Secret }}" />
 
     {{if (eq .MFAType 0) }}
-        <p>{{t "MFAInitVerify.OTPDescription"}}</p>
-        <div id="qrcode">
-            {{.QrCode}}
-        </div>
-        <div class="fields">
-            <div class="field">
-                <span class="label" for="secret">{{t "MFAInitVerify.Secret"}}</span>
-                <span class="input" id="secret">
-                    {{.Secret}}
-                    <span class="copy material-icons" data-copy="{{ .Secret }}" >content_copy</span>
-                </span>
-            </div>
-            <div class="field">
-               <label class="label" for="code">{{t "MFAInitVerify.Code"}}</label>
-                <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
+    <p>{{t "MFAInitVerify.OTPDescription"}}</p>
+    <div class="lgn-qrcode" id="qrcode">
+        {{.QrCode}}
+    </div>
+    <div class="fields">
+        <div class="field">
+            <span class="lgn-label" for="secret">{{t "MFAInitVerify.Secret"}}</span>
+            <div class="lgn-row">
+                <span id="secret"> {{.Secret}} </span>
+                <span class="fill-space"></span>
+                <button id="copy" data-copy="{{ .Secret }}" class="lgn-icon-button">
+                    <i class="lgn-icon-clipboard"></i>
+                </button>
             </div>
         </div>
+        <div class="field">
+            <label class="lgn-label" for="code">{{t "MFAInitVerify.Code"}}</label>
+            <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
+        </div>
+    </div>
     {{end}}
 
-    {{ template "error-message" .}}
-
-    <div class="actions">
-        <button class="primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
-        <a class="button secondary" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
-            {{t "Actions.Back"}}
+    <div class="lgn-actions">
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
         </a>
-        <a class="button secondary" href="{{ loginUrl }}">
+        
+        <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
             {{t "Actions.Cancel"}}
         </a>
+        <span class="fill-space"></span>
+        <button class="lgn-primary lgn-raised-button" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
 
@@ -53,4 +57,3 @@
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 
 {{template "main-bottom" .}}
- 
