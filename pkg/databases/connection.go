@@ -22,7 +22,7 @@ func GetConnectionInfo(
 	}
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil, "database")(monitor, desired, current)
+	query, _, _, err := orbdb.AdaptFunc("", nil)(monitor, desired, current)
 	if err != nil {
 		return "", "", err
 	}
