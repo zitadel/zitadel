@@ -49,8 +49,8 @@ func (p *PasswordAgePolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *PasswordAgePolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestPasswordAgePolicySequence(string(event.AggregateType))
+func (p *PasswordAgePolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestPasswordAgePolicySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -58,7 +58,7 @@ func (p *PasswordAgePolicy) CurrentSequence(event *models.Event) (uint64, error)
 }
 
 func (p *PasswordAgePolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestPasswordAgePolicySequence("")
+	sequence, err := p.view.GetLatestPasswordAgePolicySequence()
 	if err != nil {
 		return nil, err
 	}

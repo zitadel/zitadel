@@ -1,5 +1,29 @@
 {
     "APP_NAME": "ZITADEL",
+    "ONBOARDING": {
+        "HEADER":"Erste Schritte",
+        "TITLE":"Lernen Sie unsere ZITADEL Console kennen.",
+        "LOGINDESC":"Melden Sie sich an um Zugriff auf Funktionen von Zitadel zu erhalten",
+        "LOGIN":"Anmelden",
+        "DESCRIPTION":"Führen Sie die folgenden Schritte aus und passen Sie ZITADEL optimal an Ihre Bedürfnisse an.",
+        "STEPS_TITLE":"Führen Sie die folgenden Schritte in gewünschter Reihenfolge aus:",
+        "STEPS": {
+            "1": {
+                "TITLE":"Projekt erstellen",
+                "DESC":"Erstellen Sie Ihr erstes Projekt und legen Sie Zugangsberechtigungen eventueller Mitarbeiter fest."
+            },
+            "2": {
+                "TITLE":"Applikation erstellen",
+                "DESC":"Erstellen Sie eine Applikation innerhalb Ihres Projektes und legen Sie dessen Eigenschaften fest."
+            },
+            "3": {
+                "TITLE":"Sicherheit verbessern",
+                "DESC":"Erweitern Sie die Zugangsrichtlinien und erhöhen Sie dadurch die Sicherheit ihrer Benutzer."
+            }
+        },
+        "START":"Start",
+        "DOCS":"Docs"
+    },
     "HOME": {
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
@@ -32,9 +56,15 @@
         "WELCOME":"Willkommen",
         "WELCOMESENTENCE":"Hier findest Du die empfohlenen Aktionen basierend auf Deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass Du möglicherweise Deine Organisation in der Kopfzeile wechseln musst.",
         "DISCLAIMER":"Du kannst nur die Einstellungen Deiner aktuellen Organisation, die in der Kopfzeile angegeben ist, sehen. ZITADEL behandelt Deine Daten vertraulich und sicher.",
-        "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit"
+        "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit",
+        "QUICKSTARTS": {
+            "LABEL":"Erste Schritte",
+            "TITLE":"Quickstarts",
+            "DESCRIPTION":"Mit ZITADEL schnell durchstarten."
+        }
     },
     "MENU": {
+        "DASHBOARD":"Übersicht",
         "PERSONAL_INFO": "Persönliche Informationen",
         "DOCUMENTATION":"Dokumentation",
         "IAMPOLICIES":"IAM",
@@ -54,6 +84,7 @@
         "SHOWORGS":"Alle Organisationen anzeigen",
         "GRANTSECTION":"Berechtigungssektion",
         "GRANTS":"Berechtigungen",
+        "TOC":"Datenschutz und AGB",
         "TOOLTIP": {
             "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
             "IAMPOLICIES":"Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",

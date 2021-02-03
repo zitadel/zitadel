@@ -1,0 +1,34 @@
+@import '../theming/theming.scss';
+@import './list.scss';
+
+@mixin lgn-list-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    $color: lgn-get-color-config($theme);
+
+    @if $color != null {
+        @include lgn-list-color($color);
+    }
+}
+
+@mixin lgn-list-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+    $warn: map-get($config, warn);
+
+    $is-dark-theme: map-get($config, is-dark);
+    .lgn-list, ul {
+        li::before {
+            color: lgn-color($primary, default);
+        }
+    
+       li i {
+            &.lgn-warn {
+                color: lgn-color($warn, default);
+            }
+    
+            &.lgn-valid {
+                color: #85d996;
+            }
+        }
+    }
+}

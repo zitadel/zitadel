@@ -51,8 +51,8 @@ func (v *View) DeleteApplication(appID string, event *models.Event) error {
 	return v.ProcessedApplicationSequence(event)
 }
 
-func (v *View) GetLatestApplicationSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(applicationTable, aggregateType)
+func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(applicationTable)
 }
 
 func (v *View) ProcessedApplicationSequence(event *models.Event) error {

@@ -61,8 +61,8 @@ func (_ *ProjectGrant) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.ProjectAggregate}
 }
 
-func (p *ProjectGrant) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestProjectGrantSequence(string(event.AggregateType))
+func (p *ProjectGrant) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestProjectGrantSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -70,7 +70,7 @@ func (p *ProjectGrant) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (p *ProjectGrant) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectGrantSequence("")
+	sequence, err := p.view.GetLatestProjectGrantSequence()
 	if err != nil {
 		return nil, err
 	}

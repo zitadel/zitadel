@@ -89,8 +89,8 @@ func (_ *Notification) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.UserAggregate}
 }
 
-func (n *Notification) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := n.view.GetLatestNotificationSequence(string(event.AggregateType))
+func (n *Notification) CurrentSequence() (uint64, error) {
+	sequence, err := n.view.GetLatestNotificationSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -98,7 +98,7 @@ func (n *Notification) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (n *Notification) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := n.view.GetLatestNotificationSequence("")
+	sequence, err := n.view.GetLatestNotificationSequence()
 	if err != nil {
 		return nil, err
 	}

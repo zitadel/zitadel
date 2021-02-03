@@ -1,0 +1,20 @@
+$column-gap: .5rem;
+
+.lgn-register {
+    .double-col {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -.5rem;
+
+        .lgn-field {
+            margin: 0 $column-gap;
+            flex: 1;
+            box-sizing: border-box;
+            margin-bottom: .5rem;
+        }
+    }
+
+    .lgn-field {
+        margin-bottom: .5rem;
+    }
+}

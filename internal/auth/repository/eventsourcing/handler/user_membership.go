@@ -64,8 +64,8 @@ func (_ *UserMembership) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate}
 }
 
-func (m *UserMembership) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := m.view.GetLatestUserMembershipSequence(string(event.AggregateType))
+func (m *UserMembership) CurrentSequence() (uint64, error) {
+	sequence, err := m.view.GetLatestUserMembershipSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -73,7 +73,7 @@ func (m *UserMembership) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *UserMembership) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestUserMembershipSequence("")
+	sequence, err := m.view.GetLatestUserMembershipSequence()
 	if err != nil {
 		return nil, err
 	}

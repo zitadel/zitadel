@@ -49,15 +49,15 @@ func (o *Org) AggregateTypes() []es_models.AggregateType {
 }
 
 func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := o.view.GetLatestOrgSequence("")
+	sequence, err := o.view.GetLatestOrgSequence()
 	if err != nil {
 		return nil, err
 	}
 	return eventsourcing.OrgQuery(sequence.CurrentSequence), nil
 }
 
-func (o *Org) CurrentSequence(event *es_models.Event) (uint64, error) {
-	sequence, err := o.view.GetLatestOrgSequence(string(event.AggregateType))
+func (o *Org) CurrentSequence() (uint64, error) {
+	sequence, err := o.view.GetLatestOrgSequence()
 	if err != nil {
 		return 0, err
 	}

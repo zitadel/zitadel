@@ -194,7 +194,7 @@ code {
 	position: relative;
 	border-radius: .3em;
 	white-space: nowrap;
-	color: var(--text);
+	/* color: var(--text); */
     -webkit-font-smoothing: initial;
     font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
@@ -326,11 +326,6 @@ a:hover {
 	color: var(--flash);
 }
 
-a:hover {
-	padding: 0;
-	border-bottom: 2px solid currentColor;
-}
-
 a.no-underline {
 	border-bottom: none;
 	padding: 0;
@@ -405,7 +400,7 @@ td,
 th {
 	text-align: left;
 	border-bottom: 1px solid #eee;
-	padding: 0.4rem 0.8rem 0.4rem 0;
+	padding: 4px 8px 4px 0;
 }
 
 td[align='right'] {

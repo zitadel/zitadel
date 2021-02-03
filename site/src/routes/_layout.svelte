@@ -1,19 +1,10 @@
 <script>
-  import { stores } from "@sapper/app";
-  import Icon from "../components/Icon.svelte";
-  import Nav from "../components/Nav.svelte";
-  import NavItem from "../components/NavItem.svelte";
-  import manifest from '../../static/manifest.json';
-  import PhotoSwipe from '../components/PhotoSwipe.svelte';
-  const { page } = stores();
-  export let segment;
-</script>
-
-<script context="module">
-  import { waitLocale } from 'svelte-i18n';
-  export async function preload(page) {
-    return waitLocale();
-  }
+    import { stores } from "@sapper/app";
+    import Nav from "../components/Nav.svelte";
+    import NavItem from "../components/NavItem.svelte";
+    import PhotoSwipe from '../components/PhotoSwipe.svelte';
+    const { page } = stores();
+    export let segment;
 </script>
 
 <style>
@@ -25,7 +16,18 @@
   }
 </style>
 
+<Nav title="Zitadel docs" {segment} {page} logo="logos/zitadel-logo-light.svg">
+    <NavItem segment="start" prefetch>Get started</NavItem>
+    <NavItem segment="quickstarts">Quickstarts</NavItem>
+    <!-- <NavItem segment="guides">Guides</NavItem> -->
+    <NavItem segment="administrate" prefetch>Administrate</NavItem>
+    <NavItem segment="apis" prefetch>APIs</NavItem>
+    <NavItem segment="architecture" prefetch>Architecture</NavItem>
+    <NavItem segment="use" prefetch>Manual</NavItem>
+</Nav>
+
 <main>
   <slot />
-  <PhotoSwipe/>
 </main>
+
+<PhotoSwipe/>

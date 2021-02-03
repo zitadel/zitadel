@@ -12,15 +12,15 @@ const (
 )
 
 func (v *View) saveCurrentSequence(viewName string, event *models.Event) error {
-	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, string(event.AggregateType), event.Sequence, event.CreationDate)
+	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, event.Sequence, event.CreationDate)
 }
 
-func (v *View) latestSequence(viewName, aggregateType string) (*repository.CurrentSequence, error) {
-	return repository.LatestSequence(v.Db, sequencesTable, viewName, aggregateType)
+func (v *View) latestSequence(viewName string) (*repository.CurrentSequence, error) {
+	return repository.LatestSequence(v.Db, sequencesTable, viewName)
 }
 
 func (v *View) updateSpoolerRunSequence(viewName string) error {
-	currentSequence, err := repository.LatestSequence(v.Db, sequencesTable, viewName, "")
+	currentSequence, err := repository.LatestSequence(v.Db, sequencesTable, viewName)
 	if err != nil {
 		return err
 	}

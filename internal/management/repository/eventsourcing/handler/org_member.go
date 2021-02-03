@@ -57,8 +57,8 @@ func (_ *OrgMember) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, usr_es_model.UserAggregate}
 }
 
-func (p *OrgMember) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestOrgMemberSequence(string(event.AggregateType))
+func (p *OrgMember) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgMemberSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -66,7 +66,7 @@ func (p *OrgMember) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *OrgMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestOrgMemberSequence("")
+	sequence, err := m.view.GetLatestOrgMemberSequence()
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,5 @@
+@import './list_base.scss';
+
+.lgn-list, ul {
+  @include lgn-list-base;
+}
