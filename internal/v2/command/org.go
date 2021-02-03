@@ -117,7 +117,7 @@ func (r *CommandSide) setUpOrg(ctx context.Context, organisation *domain.Org, ad
 	return orgAgg, userAgg, orgMemberAgg, nil
 }
 
-func (r *CommandSide) addOrg(ctx context.Context, organisation *domain.Org) (_ *org.Aggregate, _ *OrgWriteModel, err error) {
+func (r *CommandSide) addOrg(ctx context.Context, organisation *domain.Org, claimedUserIDs ...string) (_ *org.Aggregate, _ *OrgWriteModel, err error) {
 	if organisation == nil || !organisation.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMM-deLSk", "Errors.Org.Invalid")
 	}
@@ -132,7 +132,7 @@ func (r *CommandSide) addOrg(ctx context.Context, organisation *domain.Org) (_ *
 	orgAgg := OrgAggregateFromWriteModel(&addedOrg.WriteModel)
 	orgAgg.PushEvents(org.NewOrgAddedEvent(ctx, organisation.Name))
 	for _, orgDomain := range organisation.Domains {
-		if err := r.addOrgDomain(ctx, orgAgg, NewOrgDomainWriteModel(orgAgg.ID(), orgDomain.Domain), orgDomain); err != nil {
+		if _, err := r.addOrgDomain(ctx, orgAgg, NewOrgDomainWriteModel(orgAgg.ID(), orgDomain.Domain), orgDomain, claimedUserIDs...); err != nil {
 			return nil, nil, err
 		}
 	}

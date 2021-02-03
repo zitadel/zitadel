@@ -21,7 +21,6 @@ func (r *CommandSide) AddIDPConfig(ctx context.Context, config *domain.IDPConfig
 	if err != nil {
 		return nil, err
 	}
-	//TODO: check name unique on aggregate
 	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, config.AggregateID)
 
 	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), r.idpConfigSecretCrypto)

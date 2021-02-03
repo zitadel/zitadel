@@ -18,12 +18,6 @@ const (
 	OrgRemovedEventType     = orgEventTypePrefix + "removed"
 )
 
-type OrgnameUniqueConstraint struct {
-	uniqueType string
-	orgName    string
-	action     eventstore.UniqueConstraintAction
-}
-
 func NewAddOrgNameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		uniqueOrgname,

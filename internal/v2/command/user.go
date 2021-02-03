@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -198,6 +199,25 @@ func (r *CommandSide) CreateUserToken(ctx context.Context, orgID, agentID, clien
 		Expiration:        now.Add(lifetime),
 		PreferredLanguage: preferredLanguage,
 	}, nil
+}
+
+func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (_ *user.Aggregate, _ *UserWriteModel, err error) {
+	existingUser, err := r.userWriteModelByID(ctx, userID, "")
+	if err != nil {
+		return nil, nil, err
+	}
+	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.USer.NotFound")
+	}
+	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
+	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)
+
+	id, err := r.idGenerator.Next()
+	if err != nil {
+		return nil, nil, err
+	}
+	userAgg.PushEvents(user.NewDomainClaimedEvent(ctx, fmt.Sprintf("%s@temporary.%s", id, r.iamDomain)))
+	return userAgg, changedUserGrant, nil
 }
 
 func (r *CommandSide) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {

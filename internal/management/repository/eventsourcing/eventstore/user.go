@@ -78,6 +78,10 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	return result, nil
 }
 
+func (repo *UserRepo) UserIDsByDomain(ctx context.Context, domain string) ([]string, error) {
+	return repo.View.UserIDsByDomain(domain)
+}
+
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
 	changes, err := repo.UserEvents.UserChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {

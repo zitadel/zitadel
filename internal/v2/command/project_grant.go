@@ -164,7 +164,7 @@ func (r *CommandSide) ReactivateProjectGrant(ctx context.Context, projectID, gra
 	return r.eventstore.PushAggregate(ctx, existingGrant, projectAgg)
 }
 
-func (r *CommandSide) RemoveProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string) (err error) {
+func (r *CommandSide) RemoveProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string, cascadeUserGrantIDs ...string) (err error) {
 	if grantID == "" || projectID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "PROJECT-1m9fJ", "Errors.IDMissing")
 	}
@@ -176,10 +176,20 @@ func (r *CommandSide) RemoveProjectGrant(ctx context.Context, projectID, grantID
 	if err != nil {
 		return err
 	}
+	aggregates := make([]eventstore.Aggregater, 0)
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
 	projectAgg.PushEvents(project.NewGrantRemovedEvent(ctx, grantID, existingGrant.GrantedOrgID, projectID))
-	//TODO: Cascade Remove usergrants
-	return r.eventstore.PushAggregate(ctx, existingGrant, projectAgg)
+	aggregates = append(aggregates, projectAgg)
+
+	for _, userGrantID := range cascadeUserGrantIDs {
+		grantAgg, _, err := r.removeUserGrant(ctx, userGrantID, "", true)
+		if err != nil {
+			continue
+		}
+		aggregates = append(aggregates, grantAgg)
+	}
+	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	return err
 }
 
 func (r *CommandSide) projectGrantWriteModelByID(ctx context.Context, grantID, projectID, resourceOwner string) (member *ProjectGrantWriteModel, err error) {
