@@ -1,11 +1,7 @@
 <div class="split">
     <div class="left">
-        <!-- *ngIf="(authenticationService?.authenticationChanged | async) == false" -->
         <p class="firststeps">{{'ONBOARDING.HEADER' | translate}}</p>
         <h1>{{'ONBOARDING.TITLE' | translate}}</h1>
-        <!-- <p>{{'ONBOARDING.LOGINDESC' | translate}}</p>
-        <button (click)="authenticationService.authenticate()" mat-raised-button>{{'ONBOARDING.LOGIN' |
-            translate}}</button> -->
     </div>
     <div class="right">
         <p class="desc">{{'ONBOARDING.DESCRIPTION' | translate}}</p>
@@ -24,7 +20,7 @@
                     translate}}
                     <i class="las la-external-link-alt"></i>
                 </a>
-                <span class="goto">{{'ONBOARDING.START' | translate}}</span>
+                <a *ngIf="step.link" class="goto" [routerLink]="step.link">{{'ONBOARDING.START' | translate}}</a>
             </div>
         </div>
     </div>
