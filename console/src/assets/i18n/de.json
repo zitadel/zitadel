@@ -5,22 +5,18 @@
         "TITLE":"Lernen Sie unsere ZITADEL Console kennen.",
         "LOGINDESC":"Melden Sie sich an um Zugriff auf Funktionen von Zitadel zu erhalten",
         "LOGIN":"Anmelden",
-        "DESCRIPTION":"Wir von ZITADEL legen enormen Wert auf Sicherheit und Performance. Führen Sie die folgenden Schritte aus und passen Sie ZITADEL optimal an Ihre Bedürfnisse an.",
+        "DESCRIPTION":"Führen Sie die folgenden Schritte aus und passen Sie ZITADEL optimal an Ihre Bedürfnisse an.",
         "STEPS_TITLE":"Führen Sie die folgenden Schritte in gewünschter Reihenfolge aus:",
         "STEPS": {
             "1": {
-                "TITLE":"Erscheinungsbild Ihrer Organisation",
-                "DESC":"Personalisieren Sie das Erscheinungsbild der Login UIs sowie der Benachrichtigungsmails."
-            },
-            "2": {
                 "TITLE":"Projekt erstellen",
                 "DESC":"Erstellen Sie Ihr erstes Projekt und legen Sie Zugangsberechtigungen eventueller Mitarbeiter fest."
             },
-            "3": {
+            "2": {
                 "TITLE":"Applikation erstellen",
                 "DESC":"Erstellen Sie eine Applikation innerhalb Ihres Projektes und legen Sie dessen Eigenschaften fest."
             },
-            "4": {
+            "3": {
                 "TITLE":"Sicherheit verbessern",
                 "DESC":"Erweitern Sie die Zugangsrichtlinien und erhöhen Sie dadurch die Sicherheit ihrer Benutzer."
             }

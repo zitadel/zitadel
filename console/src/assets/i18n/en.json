@@ -8,19 +8,15 @@
         "DESCRIPTION":"We at ZITADEL care a lot about security and performance. Carry out the following steps and adapt ZITADEL optimally to your needs.",
         "STEPS_TITLE":"Complete the following steps in the order you want:",
         "STEPS": {
-            "1": {
-                "TITLE":"Erscheinungsbild Ihrer Organisation",
-                "DESC":"Personalisieren Sie das Erscheinungsbild der Login UIs sowie der Benachrichtigungsmails."
-            },
-            "2": {
+            "0": {
                 "TITLE":"Projekt erstellen",
                 "DESC":"Erstellen Sie Ihr erstes Projekt und legen Sie Zugangsberechtigungen eventueller Mitarbeiter fest."
             },
-            "3": {
+            "1": {
                 "TITLE":"Applikation erstellen",
                 "DESC":"Erstellen Sie eine Applikation innerhalb Ihres Projektes und legen Sie dessen Eigenschaften fest."
             },
-            "4": {
+            "2": {
                 "TITLE":"Sicherheit verbessern",
                 "DESC":"Erweitern Sie die Zugangsrichtlinien und erhöhen Sie dadurch die Sicherheit ihrer Benutzer."
             }

@@ -164,15 +164,41 @@
         flex: 1 1 auto;
       }
 
-      .toc {
-          font-size: 12px;
-          color: var(--grey);
-          text-decoration: none;
-          margin: 2rem 2rem;
+      .toc-line {
+        margin: 2rem 2rem;
 
-          &:hover {
-              text-decoration: underline;
-          }
+        .toc {
+            font-size: 12px;
+            color: var(--grey);
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        .sp-status {
+            font-size: 12px;
+            color: var(--grey);
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        .sp-status .sp-status-badge.sp-status-ok { 
+            background: darkgreen; 
+        }
+        .sp-status .sp-status-badge.sp-status-scheduled { 
+            background: darkblue; 
+        }
+        .sp-status .sp-status-badge.sp-status-minor { 
+            background: darkorange; 
+        }
+        .sp-status .sp-status-badge.sp-status-major { 
+            background: darkred; 
+        }
       }
 
       .logout-button {

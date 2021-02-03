@@ -11,7 +11,6 @@ export class OnboardingComponent implements OnInit {
         { titleI18nKey: 'ONBOARDING.STEPS.1.TITLE', descI18nKey: 'ONBOARDING.STEPS.1.DESC', docs: "https://docs.zitadel.ch/use" },
         { titleI18nKey: 'ONBOARDING.STEPS.2.TITLE', descI18nKey: 'ONBOARDING.STEPS.2.DESC', docs: "https://docs.zitadel.ch/use" },
         { titleI18nKey: 'ONBOARDING.STEPS.3.TITLE', descI18nKey: 'ONBOARDING.STEPS.3.DESC' },
-        { titleI18nKey: 'ONBOARDING.STEPS.4.TITLE', descI18nKey: 'ONBOARDING.STEPS.4.DESC' },
     ];
     constructor(public authenticationService: AuthenticationService) { }
 
