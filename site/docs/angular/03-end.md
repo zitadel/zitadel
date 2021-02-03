@@ -4,4 +4,4 @@ title:  Completion
 
 ### What next?
 
-You have successfully integrated ZITADEL in your Angular Application. If your need further information on how to retrieve roles or other Authentication Flows consider reading the following doc pages:
+You have successfully integrated ZITADEL in your Angular Application. Now your can proceed implementing our APIs to include Authorization. Refer to our [Docs](apis) or checkout our Console Code on [Github](https://github.com/caos/zitadel) which is using GRPC to access data.
