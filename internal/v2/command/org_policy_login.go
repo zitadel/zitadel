@@ -99,9 +99,17 @@ func (r *CommandSide) RemoveIDPProviderFromLoginPolicy(ctx context.Context, idpP
 		return caos_errs.ThrowNotFound(nil, "Org-39fjs", "Errors.Org.LoginPolicy.IDP.NotExisting")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
-	orgAgg.PushEvents(org.NewIdentityProviderRemovedEvent(ctx, idpProvider.IDPConfigID))
+	r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false)
 
 	return r.eventstore.PushAggregate(ctx, idpModel, orgAgg)
+}
+
+func (r *CommandSide) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *org.Aggregate, idpConfigID string, cascade bool) {
+	if cascade {
+		orgAgg.PushEvents(org.NewIdentityProviderCascadeRemovedEvent(ctx, idpConfigID))
+		return
+	}
+	orgAgg.PushEvents(org.NewIdentityProviderRemovedEvent(ctx, idpConfigID))
 }
 
 func (r *CommandSide) AddSecondFactorToLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) (domain.SecondFactorType, error) {

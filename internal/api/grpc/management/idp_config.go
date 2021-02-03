@@ -44,7 +44,15 @@ func (s *Server) ReactivateIdpConfig(ctx context.Context, id *management.IdpID) 
 }
 
 func (s *Server) RemoveIdpConfig(ctx context.Context, id *management.IdpID) (*empty.Empty, error) {
-	err := s.command.RemoveIDPConfig(ctx, id.Id, authz.GetCtxData(ctx).OrgID)
+	externalIdps, err := s.user.ExternalIDPsByIDPConfigID(ctx, id.Id)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	providers, err := s.org.GetIDPProvidersByIDPConfigID(ctx, authz.GetCtxData(ctx).OrgID, id.Id)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	err = s.command.RemoveIDPConfig(ctx, id.Id, authz.GetCtxData(ctx).OrgID, len(providers) > 0, externalIDPViewsToDomain(externalIdps)...)
 	return &empty.Empty{}, err
 }
 

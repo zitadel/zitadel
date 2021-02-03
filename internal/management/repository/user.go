@@ -23,6 +23,7 @@ type UserRepository interface {
 	GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error)
 
 	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
+	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*model.ExternalIDPView, error)
 
 	SearchMachineKeys(ctx context.Context, request *model.MachineKeySearchRequest) (*model.MachineKeySearchResponse, error)
 	GetMachineKey(ctx context.Context, userID, keyID string) (*model.MachineKeyView, error)

@@ -361,6 +361,14 @@ func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.Login
 	return iam_es_model.LoginPolicyViewToModel(policy), nil
 }
 
+func (repo *OrgRepository) GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
+	idpProviders, err := repo.View.IDPProvidersByIdpConfigID(aggregateID, idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_view_model.IDPProviderViewsToModel(idpProviders), err
+}
+
 func (repo *OrgRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
 	policy, viewErr := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {

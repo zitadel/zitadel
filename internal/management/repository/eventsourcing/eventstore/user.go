@@ -168,6 +168,14 @@ func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model
 	return result, nil
 }
 
+func (repo *UserRepo) ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
+}
+
 func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (*usr_model.MachineKeyView, error) {
 	key, err := repo.View.MachineKeyByIDs(userID, keyID)
 	if err != nil {
