@@ -400,7 +400,7 @@ td,
 th {
 	text-align: left;
 	border-bottom: 1px solid #eee;
-	padding: 0.4rem 0.8rem 0.4rem 0;
+	padding: 4px 8px 4px 0;
 }
 
 td[align='right'] {

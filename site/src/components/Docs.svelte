@@ -246,7 +246,7 @@
   }
 
   .content h2 {
-    margin-top: 4rem;
+    margin-top: 8rem;
     padding: 2rem 1.6rem 4rem 0.2rem;
     border-top: var(--border-w) solid #6767785b; /* based on --second */
     color: var(--heading);

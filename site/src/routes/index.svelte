@@ -204,7 +204,7 @@
         <div class="doc-container">
             <div class="doc">
                 <div class="text">
-                    <h4>Integration</h4>
+                    <h4>Quickstarts</h4>
                     <p>Learn how to integrate your applications and build secure workflows and APIs with ZITADEL</p>
 
                     <div class="logo-cloud">
@@ -212,6 +212,7 @@
                         <img src="tech/angular.svg" alt="angular" />
                         <img style="padding: .6rem;" src="tech/dart.svg" alt="dart" />
                         <img src="tech/golang.svg" alt="golang" />
+                        <img style="padding: .5rem" src="tech/aspnet.png" alt="aspnet" />
                     </div>
                     <a href="quickstarts">Learn more<i class="las la-arrow-right"></i></a>
 
