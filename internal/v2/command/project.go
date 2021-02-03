@@ -145,7 +145,7 @@ func (r *CommandSide) ReactivateProject(ctx context.Context, projectID string, r
 	return r.eventstore.PushAggregate(ctx, existingProject, projectAgg)
 }
 
-func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingGrantIDs ...string) error {
+func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingUserGrantIDs ...string) error {
 	if projectID == "" || resourceOwner == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-66hM9", "Errors.Project.ProjectIDMissing")
 	}
@@ -163,7 +163,7 @@ func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwne
 	projectAgg.PushEvents(project.NewProjectRemovedEvent(ctx, existingProject.Name, existingProject.ResourceOwner))
 	aggregates = append(aggregates, projectAgg)
 
-	for _, grantID := range cascadingGrantIDs {
+	for _, grantID := range cascadingUserGrantIDs {
 		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
 			continue

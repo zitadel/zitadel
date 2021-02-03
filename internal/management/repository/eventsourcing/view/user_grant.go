@@ -29,6 +29,10 @@ func (v *View) UserGrantsByProjectID(projectID string) ([]*model.UserGrantView, 
 	return view.UserGrantsByProjectID(v.Db, userGrantTable, projectID)
 }
 
+func (v *View) UserGrantsByProjectAndGrantID(projectID, grantID string) ([]*model.UserGrantView, error) {
+	return view.UserGrantsByProjectAndGrantID(v.Db, userGrantTable, projectID, grantID)
+}
+
 func (v *View) UserGrantsByOrgID(orgID string) ([]*model.UserGrantView, error) {
 	return view.UserGrantsByOrgID(v.Db, userGrantTable, orgID)
 }

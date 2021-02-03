@@ -9,6 +9,8 @@ import (
 type ProjectRepository interface {
 	ProjectByID(ctx context.Context, id string) (*model.ProjectView, error)
 	SearchProjects(ctx context.Context, request *model.ProjectViewSearchRequest) (*model.ProjectViewSearchResponse, error)
+
+	ProjectGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) ([]*model.ProjectGrantView, error)
 	SearchProjectGrants(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
 	SearchGrantedProjects(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
 	ProjectGrantViewByID(ctx context.Context, grantID string) (*model.ProjectGrantView, error)

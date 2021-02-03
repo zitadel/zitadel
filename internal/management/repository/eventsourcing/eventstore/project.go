@@ -280,6 +280,14 @@ func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (
 	return model.ProjectGrantToModel(grant), nil
 }
 
+func (repo *ProjectRepo) ProjectGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) ([]*proj_model.ProjectGrantView, error) {
+	grants, err := repo.View.ProjectGrantsByProjectIDAndRoleKey(projectID, roleKey)
+	if err != nil {
+		return nil, err
+	}
+	return model.ProjectGrantsToModel(grants), nil
+}
+
 func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_model.ProjectGrantViewSearchRequest) (*proj_model.ProjectGrantViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, sequenceErr := repo.View.GetLatestProjectGrantSequence("")

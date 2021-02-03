@@ -101,7 +101,15 @@ func (s *Server) ChangeProjectRole(ctx context.Context, in *management.ProjectRo
 }
 
 func (s *Server) RemoveProjectRole(ctx context.Context, in *management.ProjectRoleRemove) (*empty.Empty, error) {
-	err := s.command.RemoveProjectRole(ctx, in.Id, in.Key, authz.GetCtxData(ctx).OrgID)
+	userGrants, err := s.usergrant.UserGrantsByProjectIDAndRoleKey(ctx, in.Id, in.Key)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	projectGrants, err := s.project.ProjectGrantsByProjectIDAndRoleKey(ctx, in.Id, in.Key)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	err = s.command.RemoveProjectRole(ctx, in.Id, in.Key, authz.GetCtxData(ctx).OrgID, projectGrantsToIDs(projectGrants), userGrantsToIDs(userGrants)...)
 	return &empty.Empty{}, err
 }
 
