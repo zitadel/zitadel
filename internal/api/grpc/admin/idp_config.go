@@ -42,7 +42,15 @@ func (s *Server) ReactivateIdpConfig(ctx context.Context, id *admin.IdpID) (*emp
 }
 
 func (s *Server) RemoveIdpConfig(ctx context.Context, id *admin.IdpID) (*empty.Empty, error) {
-	err := s.command.RemoveDefaultIDPConfig(ctx, id.Id)
+	idpProviders, err := s.iam.IDPProvidersByIDPConfigID(ctx, id.Id)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	externalIDPs, err := s.iam.ExternalIDPsByIDPConfigID(ctx, id.Id)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	err = s.command.RemoveDefaultIDPConfig(ctx, id.Id, idpProviderViewsToDomain(idpProviders), externalIDPViewsToDomain(externalIDPs)...)
 	return &empty.Empty{}, err
 }
 

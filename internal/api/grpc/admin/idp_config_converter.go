@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
@@ -256,4 +257,27 @@ func idpConfigStylingTypeToDomain(stylingType admin.IdpStylingType) domain.IDPCo
 	default:
 		return domain.IDPConfigStylingTypeUnspecified
 	}
+}
+
+func idpConfigTypeToDomain(idpType iam_model.IDPProviderType) domain.IdentityProviderType {
+	switch idpType {
+	case iam_model.IDPProviderTypeOrg:
+		return domain.IdentityProviderTypeOrg
+	default:
+		return domain.IdentityProviderTypeSystem
+	}
+}
+
+func idpProviderViewsToDomain(idps []*iam_model.IDPProviderView) []*domain.IDPProvider {
+	idpProvider := make([]*domain.IDPProvider, len(idps))
+	for i, idp := range idps {
+		idpProvider[i] = &domain.IDPProvider{
+			ObjectRoot: models.ObjectRoot{
+				AggregateID: idp.AggregateID,
+			},
+			IDPConfigID: idp.IDPConfigID,
+			Type:        idpConfigTypeToDomain(idp.IDPProviderType),
+		}
+	}
+	return idpProvider
 }

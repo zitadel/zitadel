@@ -112,8 +112,17 @@ func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Contex
 	}
 	iamAgg := IAMAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewIdentityProviderRemovedEvent(ctx, idpProvider.IDPConfigID))
+	r.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, false)
 
 	return r.eventstore.PushAggregate(ctx, idpModel, iamAgg)
+}
+
+func (r *CommandSide) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, idpProvider *domain.IDPProvider, cascade bool) {
+	if cascade {
+		iamAgg.PushEvents(iam_repo.NewIdentityProviderCascadeRemovedEvent(ctx, idpProvider.IDPConfigID))
+		return
+	}
+	iamAgg.PushEvents(iam_repo.NewIdentityProviderRemovedEvent(ctx, idpProvider.IDPConfigID))
 }
 
 func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) (domain.SecondFactorType, error) {

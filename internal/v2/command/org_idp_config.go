@@ -125,17 +125,13 @@ func (r *CommandSide) RemoveIDPConfig(ctx context.Context, idpID, orgID string, 
 	aggregates := make([]eventstore.Aggregater, 0)
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
 	orgAgg.PushEvents(org_repo.NewIDPConfigRemovedEvent(ctx, existingIDP.ResourceOwner, idpID, existingIDP.Name))
+
+	userAggregates := make([]eventstore.Aggregater, 0)
 	if cascadeRemoveProvider {
-		r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true)
+		userAggregates = r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true, cascadeExternalIDPs...)
 	}
 	aggregates = append(aggregates, orgAgg)
-	for _, idp := range cascadeExternalIDPs {
-		userAgg, _, err := r.removeHumanExternalIDP(ctx, idp, true)
-		if err != nil {
-			continue
-		}
-		aggregates = append(aggregates, userAgg)
-	}
+	aggregates = append(aggregates, userAggregates...)
 
 	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
 	return err

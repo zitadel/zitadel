@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -107,7 +108,7 @@ func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID stri
 	return r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
 }
 
-func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string) error {
+func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.ExternalIDP) error {
 	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return err
@@ -115,10 +116,30 @@ func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string) 
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
 		return caos_errs.ThrowNotFound(nil, "IAM-4M0xy", "Errors.IAM.IDPConfig.NotExisting")
 	}
+
+	aggregates := make([]eventstore.Aggregater, 0)
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, existingIDP.ResourceOwner, idpID, existingIDP.Name))
 
-	return r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
+	for _, idpProvider := range idpProviders {
+		if idpProvider.AggregateID == domain.IAMID {
+			r.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, true)
+		}
+		orgAgg := OrgAggregateFromWriteModel(&NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpID).WriteModel)
+		r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true)
+	}
+
+	for _, externalIDP := range externalIDPs {
+		userAgg, _, err := r.removeHumanExternalIDP(ctx, externalIDP, true)
+		if err != nil {
+			continue
+		}
+		aggregates = append(aggregates, userAgg)
+	}
+
+	aggregates = append(aggregates, iamAgg)
+	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	return err
 }
 
 func (r *CommandSide) iamIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *IAMIDPConfigWriteModel, err error) {

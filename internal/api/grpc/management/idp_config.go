@@ -44,7 +44,7 @@ func (s *Server) ReactivateIdpConfig(ctx context.Context, id *management.IdpID) 
 }
 
 func (s *Server) RemoveIdpConfig(ctx context.Context, id *management.IdpID) (*empty.Empty, error) {
-	externalIdps, err := s.user.ExternalIDPsByIDPConfigID(ctx, id.Id)
+	externalIdps, err := s.user.ExternalIDPsByIDPConfigIDAndResourceOwner(ctx, id.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return &empty.Empty{}, err
 	}

@@ -176,6 +176,14 @@ func (repo *UserRepo) ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID
 	return model.ExternalIDPViewsToModel(externalIDPs), nil
 }
 
+func (repo *UserRepo) ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Context, idpConfigID, resourceOwner string) ([]*usr_model.ExternalIDPView, error) {
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigIDAndResourceOwner(idpConfigID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
+}
+
 func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (*usr_model.MachineKeyView, error) {
 	key, err := repo.View.MachineKeyByIDs(userID, keyID)
 	if err != nil {

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
@@ -17,6 +18,9 @@ type IAMRepository interface {
 	SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	SearchDefaultSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error)
 	SearchDefaultMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error)
+
+	IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error)
+	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
 
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -89,7 +90,7 @@ func (r *CommandSide) AddIDPProviderToLoginPolicy(ctx context.Context, idpProvid
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (r *CommandSide) RemoveIDPProviderFromLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) error {
+func (r *CommandSide) RemoveIDPProviderFromLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) error {
 	idpModel := NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
@@ -98,18 +99,35 @@ func (r *CommandSide) RemoveIDPProviderFromLoginPolicy(ctx context.Context, idpP
 	if idpModel.State == domain.IdentityProviderStateUnspecified || idpModel.State == domain.IdentityProviderStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "Org-39fjs", "Errors.Org.LoginPolicy.IDP.NotExisting")
 	}
-	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
-	r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false)
 
-	return r.eventstore.PushAggregate(ctx, idpModel, orgAgg)
+	aggregates := make([]eventstore.Aggregater, 0)
+	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
+	userAggregates := r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false, cascadeExternalIDPs...)
+
+	aggregates = append(aggregates, orgAgg)
+	aggregates = append(aggregates, userAggregates...)
+
+	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	return err
 }
 
-func (r *CommandSide) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *org.Aggregate, idpConfigID string, cascade bool) {
+func (r *CommandSide) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *org.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.ExternalIDP) []eventstore.Aggregater {
 	if cascade {
 		orgAgg.PushEvents(org.NewIdentityProviderCascadeRemovedEvent(ctx, idpConfigID))
-		return
+
+	} else {
+		orgAgg.PushEvents(org.NewIdentityProviderRemovedEvent(ctx, idpConfigID))
 	}
-	orgAgg.PushEvents(org.NewIdentityProviderRemovedEvent(ctx, idpConfigID))
+
+	userAggregates := make([]eventstore.Aggregater, 0)
+	for _, idp := range cascadeExternalIDPs {
+		userAgg, _, err := r.removeHumanExternalIDP(ctx, idp, true)
+		if err != nil {
+			continue
+		}
+		userAggregates = append(userAggregates, userAgg)
+	}
+	return userAggregates
 }
 
 func (r *CommandSide) AddSecondFactorToLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) (domain.SecondFactorType, error) {
