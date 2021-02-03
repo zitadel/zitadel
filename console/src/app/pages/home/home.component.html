@@ -16,15 +16,17 @@
     </div>
 
     <div class="container">
-        <a matRipple *ngIf="!firstStepsDismissed" class="onboard" [routerLink]="['/firststeps']">
-            <p class="first-steps">{{'ONBOARDING.HEADER' | translate}}</p>
-            <h2>{{'ONBOARDING.TITLE' | translate}}</h2>
-            <p class="desc">{{'ONBOARDING.DESCRIPTION' | translate}}</p>
-            <button matTooltip="{{'ACTIONS.CLOSE' | translate}}" (click)="dismissFirstSteps($event)" mat-icon-button
-                class="close">
-                <i class="las la-times"></i>
-            </button>
-        </a>
+        <ng-template appHasRole [appHasRole]="['iam.write']">
+            <a matRipple *ngIf="!firstStepsDismissed" class="onboard" [routerLink]="['/firststeps']">
+                <p class="first-steps">{{'ONBOARDING.HEADER' | translate}}</p>
+                <h2>{{'ONBOARDING.TITLE' | translate}}</h2>
+                <p class="desc">{{'ONBOARDING.DESCRIPTION' | translate}}</p>
+                <button matTooltip="{{'ACTIONS.CLOSE' | translate}}" (click)="dismissFirstSteps($event)" mat-icon-button
+                    class="close">
+                    <i class="las la-times"></i>
+                </button>
+            </a>
+        </ng-template>
 
         <a matRipple *ngIf="!firstStepsDismissed" class="quickstart" target="_blank"
             href="https://docs.zitadel.ch/quickstarts">
