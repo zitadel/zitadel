@@ -212,7 +212,7 @@
                         <img src="tech/angular.svg" alt="angular" />
                         <img style="padding: .6rem;" src="tech/dart.svg" alt="dart" />
                         <img src="tech/golang.svg" alt="golang" />
-                        <img style="padding: .5rem" src="tech/aspnet.png" alt="aspnet" />
+                        <img style="padding: .5rem" src="tech/net.svg" alt="aspnet" />
                     </div>
                     <a href="quickstarts">Learn more<i class="las la-arrow-right"></i></a>
 

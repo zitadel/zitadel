@@ -4,7 +4,7 @@ title: Angular Setup
 
 ### Install Angular dependencies
 
-You need to install an oauth client to connect with ZITADEL. Run the following command:
+You need to install an oauth / oidc client to connect with ZITADEL. Run the following command:
 
 ```bash
 npm install angular-oauth2-oidc

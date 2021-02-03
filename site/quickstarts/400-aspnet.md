@@ -1,7 +1,7 @@
 ---
 title: ASP.NET
 subtitle: Backend
-img: tech/aspnet.png
+img: tech/net.svg
 date: 29 January 2021
 readingtime: 5min
 route: aspnet
