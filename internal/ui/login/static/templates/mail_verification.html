@@ -24,11 +24,11 @@
         <button type="submit" id="submit-button" name="resend" value="false"
         class="lgn-primary lgn-raised-button">{{t "Actions.Next"}}
         </button>
-        
+
         <span class="fill-space"></span>
 
         {{ if .UserID }}
-        <button type="submit" name="resend" value="true" class="lgn-button lgn-primary block" formnovalidate>{{t "Actions.Resend"}}</button>
+        <button type="submit" name="resend" value="true" class="lgn-stroked-button lgn-primary" formnovalidate>{{t "Actions.Resend"}}</button>
         {{ end }}
 
         <a class="lgn-icon-button lgn-left-action" name="resetlinking" value="true" href="{{ loginUrl }}"
