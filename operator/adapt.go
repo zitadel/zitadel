@@ -111,3 +111,17 @@ func DestroyersToDestroyFunc(monitor mntr.Monitor, destroyers []DestroyFunc) Des
 		return nil
 	}
 }
+
+func DestroyerToQueryFunc(destroyer DestroyFunc) QueryFunc {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (ensureFunc EnsureFunc, err error) {
+		return EnsureFunc(destroyer), nil
+	}
+}
+
+func DestroyersToQueryFuncs(destroyers []DestroyFunc) []QueryFunc {
+	queriers := make([]QueryFunc, len(destroyers))
+	for i, destroyer := range destroyers {
+		queriers[i] = DestroyerToQueryFunc(destroyer)
+	}
+	return queriers
+}

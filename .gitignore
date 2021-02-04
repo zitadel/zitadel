@@ -47,3 +47,6 @@ console/src/app/proto/generated/
 pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
 pkg/grpc/*/mock/*.mock.go
+
+# dev
+sandbox.go

@@ -1,7 +1,10 @@
 package ui
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/controllers/ambassador"
 
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
@@ -94,7 +97,9 @@ func SetMappingsEmpty(
 func TestUi_Adapt(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	uiURL := "url"
+	service := "service"
+	var port uint16 = 8080
+	url := fmt.Sprintf("%s:%d", service, port)
 	dns := &configuration.DNS{
 		Domain:    "",
 		TlsSecret: "",
@@ -115,10 +120,10 @@ func TestUi_Adapt(t *testing.T) {
 		namespace,
 		labels.MustForName(componentLabels, AccountsName),
 		labels.MustForName(componentLabels, ConsoleName),
-		uiURL,
+		url,
 	)
 
-	query, _, err := AdaptFunc(monitor, componentLabels, namespace, uiURL, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMapping, ambassador.DestroyMapping)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)
@@ -129,7 +134,9 @@ func TestUi_Adapt(t *testing.T) {
 func TestUi_Adapt2(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	uiURL := "url"
+	service := "service"
+	var port uint16 = 8080
+	url := fmt.Sprintf("%s:%d", service, port)
 	dns := &configuration.DNS{
 		Domain:    "domain",
 		TlsSecret: "tls",
@@ -165,7 +172,7 @@ func TestUi_Adapt2(t *testing.T) {
 				"host":               "accounts.domain",
 				"prefix":             "/",
 				"rewrite":            "/login/",
-				"service":            uiURL,
+				"service":            url,
 				"timeout_ms":         30000,
 			},
 		},
@@ -187,14 +194,14 @@ func TestUi_Adapt2(t *testing.T) {
 				"host":    "console.domain",
 				"prefix":  "/",
 				"rewrite": "/console/",
-				"service": uiURL,
+				"service": url,
 			},
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ConsoleName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ConsoleName, console).Times(1)
 
-	query, _, err := AdaptFunc(monitor, componentLabels, namespace, uiURL, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMapping, ambassador.DestroyMapping)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)

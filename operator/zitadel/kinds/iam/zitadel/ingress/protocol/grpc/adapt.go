@@ -3,24 +3,29 @@ package grpc
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/core"
 )
 
 const (
-	AdminMName = "admin-grpc-v1"
-	AuthMName  = "auth-grpc-v1"
-	MgmtMName  = "mgmt-grpc-v1"
+	AdminIName = "admin-grpc-v1"
+	AuthIName  = "auth-grpc-v1"
+	MgmtIName  = "mgmt-grpc-v1"
 )
 
 func AdaptFunc(
 	monitor mntr.Monitor,
 	componentLabels *labels.Component,
 	namespace string,
-	grpcURL string,
+	ingressDefinitionSuffix string,
+	grpcService string,
+	grpcPort uint16,
 	dns *configuration.DNS,
+	controllerSpecifics map[string]interface{},
+	queryIngress core.IngressDefinitionQueryFunc,
+	destroyIngress core.IngressDefinitionDestroyFunc,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -28,15 +33,19 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("part", "grpc")
 
-	destroyAdminG, err := mapping.AdaptFuncToDestroy(namespace, AdminMName)
+	fullAdminIName := AdminIName + ingressDefinitionSuffix
+	fullAuthIName := AuthIName + ingressDefinitionSuffix
+	fullMgmtIName := MgmtIName + ingressDefinitionSuffix
+
+	destroyAdminG, err := destroyIngress(namespace, fullAdminIName)
 	if err != nil {
 		return nil, nil, err
 	}
-	destroyAuthG, err := mapping.AdaptFuncToDestroy(namespace, AuthMName)
+	destroyAuthG, err := destroyIngress(namespace, fullAuthIName)
 	if err != nil {
 		return nil, nil, err
 	}
-	destroyMgmtGRPC, err := mapping.AdaptFuncToDestroy(namespace, MgmtMName)
+	destroyMgmtGRPC, err := destroyIngress(namespace, fullMgmtIName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -57,7 +66,7 @@ func AdaptFunc(
 			consoleDomain := dns.Subdomains.Console + "." + dns.Domain
 			_ = consoleDomain
 
-			cors := &mapping.CORS{
+			cors := &core.CORS{
 				Origins:        "*",
 				Methods:        "POST, GET, OPTIONS, DELETE, PUT",
 				Headers:        "*",
@@ -66,52 +75,55 @@ func AdaptFunc(
 				MaxAge:         "86400",
 			}
 
-			queryAdminG, err := mapping.AdaptFuncToEnsure(
+			queryAdminG, err := queryIngress(
 				namespace,
-				AdminMName,
-				labels.MustForNameK8SMap(componentLabels, AdminMName),
+				labels.MustForName(componentLabels, fullAdminIName),
 				true,
 				apiDomain,
 				"/caos.zitadel.admin.api.v1.AdminService/",
-				"",
-				grpcURL,
-				"30000",
-				"30000",
+				"/caos.zitadel.admin.api.v1.AdminService/",
+				grpcService,
+				grpcPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err
 			}
 
-			queryAuthG, err := mapping.AdaptFuncToEnsure(
+			queryAuthG, err := queryIngress(
 				namespace,
-				AuthMName,
-				labels.MustForNameK8SMap(componentLabels, AuthMName),
+				labels.MustForName(componentLabels, fullAuthIName),
 				true,
 				apiDomain,
 				"/caos.zitadel.auth.api.v1.AuthService/",
-				"",
-				grpcURL,
-				"30000",
-				"30000",
+				"/caos.zitadel.auth.api.v1.AuthService/",
+				grpcService,
+				grpcPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err
 			}
 
-			queryMgmtGRPC, err := mapping.AdaptFuncToEnsure(
+			queryMgmtGRPC, err := queryIngress(
 				namespace,
-				MgmtMName,
-				labels.MustForNameK8SMap(componentLabels, MgmtMName),
+				labels.MustForName(componentLabels, fullMgmtIName),
 				true,
 				apiDomain,
 				"/caos.zitadel.management.api.v1.ManagementService/",
-				"",
-				grpcURL,
-				"30000",
-				"30000",
+				"/caos.zitadel.management.api.v1.ManagementService/",
+				grpcService,
+				grpcPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err

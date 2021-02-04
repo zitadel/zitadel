@@ -3,10 +3,10 @@ package ui
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/core"
 )
 
 const (
@@ -18,8 +18,13 @@ func AdaptFunc(
 	monitor mntr.Monitor,
 	componentLabels *labels.Component,
 	namespace string,
-	uiURL string,
+	ingressDefinitionSuffix string,
+	uiService string,
+	uiPort uint16,
 	dns *configuration.DNS,
+	controllerSpecifics map[string]interface{},
+	queryIngress core.IngressDefinitionQueryFunc,
+	destroyIngress core.IngressDefinitionDestroyFunc,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -27,12 +32,15 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("part", "ui")
 
-	destroyAcc, err := mapping.AdaptFuncToDestroy(namespace, AccountsName)
+	fullConsoleName := ConsoleName + ingressDefinitionSuffix
+	fullAccountsName := AccountsName + ingressDefinitionSuffix
+
+	destroyAcc, err := destroyIngress(namespace, fullAccountsName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyConsole, err := mapping.AdaptFuncToDestroy(namespace, ConsoleName)
+	destroyConsole, err := destroyIngress(namespace, fullConsoleName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -51,35 +59,37 @@ func AdaptFunc(
 			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
 			consoleDomain := dns.Subdomains.Console + "." + dns.Domain
 
-			queryConsole, err := mapping.AdaptFuncToEnsure(
+			queryConsole, err := queryIngress(
 				namespace,
-				ConsoleName,
-				labels.MustForNameK8SMap(componentLabels, ConsoleName),
+				labels.MustForName(componentLabels, fullConsoleName),
 				false,
 				consoleDomain,
 				"/",
 				"/console/",
-				uiURL,
-				"",
-				"",
+				uiService,
+				uiPort,
+				0,
+				0,
 				nil,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err
 			}
 
-			queryAcc, err := mapping.AdaptFuncToEnsure(
+			queryAcc, err := queryIngress(
 				namespace,
-				AccountsName,
-				labels.MustForNameK8SMap(componentLabels, AccountsName),
+				labels.MustForName(componentLabels, fullAccountsName),
 				false,
 				accountsDomain,
 				"/",
 				"/login/",
-				uiURL,
-				"30000",
-				"30000",
+				uiService,
+				uiPort,
+				30000,
+				30000,
 				nil,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err

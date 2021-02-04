@@ -1,7 +1,10 @@
 package http
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/controllers/ambassador"
 
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
@@ -36,7 +39,9 @@ func SetReturnResourceVersion(
 func TestHttp_Adapt(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	url := "url"
+	service := "service"
+	var port uint16 = 8080
+	url := fmt.Sprintf("%s:%d", service, port)
 	dns := &configuration.DNS{
 		Domain:    "",
 		TlsSecret: "",
@@ -233,7 +238,7 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).Times(1)
 
-	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMapping, ambassador.DestroyMapping)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)
@@ -244,7 +249,9 @@ func TestHttp_Adapt(t *testing.T) {
 func TestHttp_Adapt2(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	url := "url"
+	service := "service"
+	var port uint16 = 8080
+	url := fmt.Sprintf("%s:%d", service, port)
 	dns := &configuration.DNS{
 		Domain:    "domain",
 		TlsSecret: "tls",
@@ -442,7 +449,7 @@ func TestHttp_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).Times(1)
 
-	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMapping, ambassador.DestroyMapping)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)

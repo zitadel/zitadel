@@ -3,10 +3,10 @@ package http
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/core"
 )
 
 const (
@@ -23,8 +23,13 @@ func AdaptFunc(
 	monitor mntr.Monitor,
 	componentLabels *labels.Component,
 	namespace string,
-	httpUrl string,
+	ingressDefinitionSuffix string,
+	httpService string,
+	httpPort uint16,
 	dns *configuration.DNS,
+	controllerSpecifics map[string]interface{},
+	queryIngress core.IngressDefinitionQueryFunc,
+	destroyIngress core.IngressDefinitionDestroyFunc,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -32,37 +37,45 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("part", "http")
 
-	destroyAdminR, err := mapping.AdaptFuncToDestroy(namespace, AdminRName)
+	fulladminRName := AdminRName + ingressDefinitionSuffix
+	fullmgmtName := MgmtName + ingressDefinitionSuffix
+	fulloauthName := OauthName + ingressDefinitionSuffix
+	fullauthRName := AuthRName + ingressDefinitionSuffix
+	fullauthorizeName := AuthorizeName + ingressDefinitionSuffix
+	fullendsessionName := EndsessionName + ingressDefinitionSuffix
+	fullissuerName := IssuerName + ingressDefinitionSuffix
+
+	destroyAdminR, err := destroyIngress(namespace, fulladminRName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyMgmtRest, err := mapping.AdaptFuncToDestroy(namespace, MgmtName)
+	destroyMgmtRest, err := destroyIngress(namespace, fullmgmtName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyOAuthv2, err := mapping.AdaptFuncToDestroy(namespace, OauthName)
+	destroyOAuthv2, err := destroyIngress(namespace, fulloauthName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyAuthR, err := mapping.AdaptFuncToDestroy(namespace, AuthRName)
+	destroyAuthR, err := destroyIngress(namespace, fullauthRName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyAuthorize, err := mapping.AdaptFuncToDestroy(namespace, AuthorizeName)
+	destroyAuthorize, err := destroyIngress(namespace, fullauthorizeName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyEndsession, err := mapping.AdaptFuncToDestroy(namespace, EndsessionName)
+	destroyEndsession, err := destroyIngress(namespace, fullendsessionName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyIssuer, err := mapping.AdaptFuncToDestroy(namespace, IssuerName)
+	destroyIssuer, err := destroyIngress(namespace, fullissuerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -87,7 +100,7 @@ func AdaptFunc(
 			apiDomain := dns.Subdomains.API + "." + dns.Domain
 			issuerDomain := dns.Subdomains.Issuer + "." + dns.Domain
 
-			cors := &mapping.CORS{
+			cors := &core.CORS{
 				Origins:        "*",
 				Methods:        "POST, GET, OPTIONS, DELETE, PUT",
 				Headers:        "*",
@@ -96,120 +109,127 @@ func AdaptFunc(
 				MaxAge:         "86400",
 			}
 
-			queryAdminR, err := mapping.AdaptFuncToEnsure(
+			queryAdminR, err := queryIngress(
 				namespace,
-				AdminRName,
-				labels.MustForNameK8SMap(componentLabels, AdminRName),
+				labels.MustForName(componentLabels, fulladminRName),
 				false,
 				apiDomain,
 				"/admin/v1",
-				"",
-				httpUrl,
-				"30000",
-				"30000",
+				"/admin/v1",
+				httpService,
+				httpPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err
 			}
 
-			queryMgmtRest, err := mapping.AdaptFuncToEnsure(
+			queryMgmtRest, err := queryIngress(
 				namespace,
-				MgmtName,
-				labels.MustForNameK8SMap(componentLabels, MgmtName),
+				labels.MustForName(componentLabels, fullmgmtName),
 				false,
 				apiDomain,
 				"/management/v1/",
-				"",
-				httpUrl,
-				"30000",
-				"30000",
+				"/management/v1/",
+				httpService,
+				httpPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err
 			}
 
-			queryOAuthv2, err := mapping.AdaptFuncToEnsure(
+			queryOAuthv2, err := queryIngress(
 				namespace,
-				OauthName,
-				labels.MustForNameK8SMap(componentLabels, OauthName),
+				labels.MustForName(componentLabels, fulloauthName),
 				false,
 				apiDomain,
 				"/oauth/v2/",
-				"",
-				httpUrl,
-				"30000",
-				"30000",
+				"/oauth/v2/",
+				httpService,
+				httpPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err
 			}
 
-			queryAuthR, err := mapping.AdaptFuncToEnsure(
+			queryAuthR, err := queryIngress(
 				namespace,
-				AuthRName,
-				labels.MustForNameK8SMap(componentLabels, AuthRName),
+				labels.MustForName(componentLabels, fullauthRName),
 				false,
 				apiDomain,
 				"/auth/v1/",
-				"",
-				httpUrl,
-				"30000",
-				"30000",
+				"/auth/v1/",
+				httpService,
+				httpPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err
 			}
 
-			queryAuthorize, err := mapping.AdaptFuncToEnsure(
+			queryAuthorize, err := queryIngress(
 				namespace,
-				AuthorizeName,
-				labels.MustForNameK8SMap(componentLabels, AuthorizeName),
+				labels.MustForName(componentLabels, fullauthorizeName),
 				false,
 				accountsDomain,
 				"/oauth/v2/authorize",
-				"",
-				httpUrl,
-				"30000",
-				"30000",
+				"/oauth/v2/authorize",
+				httpService,
+				httpPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err
 			}
 
-			queryEndsession, err := mapping.AdaptFuncToEnsure(
+			queryEndsession, err := queryIngress(
 				namespace,
-				EndsessionName,
-				labels.MustForNameK8SMap(componentLabels, EndsessionName),
+				labels.MustForName(componentLabels, fullendsessionName),
 				false,
 				accountsDomain,
 				"/oauth/v2/endsession",
-				"",
-				httpUrl,
-				"30000",
-				"30000",
+				"/oauth/v2/endsession",
+				httpService,
+				httpPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err
 			}
 
-			queryIssuer, err := mapping.AdaptFuncToEnsure(
+			queryIssuer, err := queryIngress(
 				namespace,
-				IssuerName,
-				labels.MustForNameK8SMap(componentLabels, IssuerName),
+				labels.MustForName(componentLabels, fullissuerName),
 				false,
 				issuerDomain,
 				"/.well-known/openid-configuration",
 				"/oauth/v2/.well-known/openid-configuration",
-				httpUrl,
-				"30000",
-				"30000",
+				httpService,
+				httpPort,
+				30000,
+				30000,
 				cors,
+				controllerSpecifics,
 			)
 			if err != nil {
 				return nil, err

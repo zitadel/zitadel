@@ -1,7 +1,10 @@
 package grpc
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/controllers/ambassador"
 
 	"github.com/caos/orbos/pkg/labels"
 
@@ -37,7 +40,9 @@ func SetReturnResourceVersion(
 func TestGrpc_Adapt(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	url := "url"
+	service := "service"
+	var port uint16 = 8080
+	url := fmt.Sprintf("%s:%d", service, port)
 	dns := &configuration.DNS{
 		Domain:    "",
 		TlsSecret: "",
@@ -67,7 +72,7 @@ func TestGrpc_Adapt(t *testing.T) {
 		"exposed_headers": "*",
 		"max_age":         "86400",
 	}
-	adminMName := labels.MustForName(componentLabels, AdminMName)
+	adminMName := labels.MustForName(componentLabels, AdminIName)
 	adminM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
@@ -89,10 +94,10 @@ func TestGrpc_Adapt(t *testing.T) {
 			},
 		},
 	}
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminMName, adminM).Times(1)
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminIName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminIName, adminM).Times(1)
 
-	authMName := labels.MustForName(componentLabels, AuthMName)
+	authMName := labels.MustForName(componentLabels, AuthIName)
 	authM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
@@ -114,10 +119,10 @@ func TestGrpc_Adapt(t *testing.T) {
 			},
 		},
 	}
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthMName, authM).Times(1)
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthIName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthIName, authM).Times(1)
 
-	mgmtMName := labels.MustForName(componentLabels, MgmtMName)
+	mgmtMName := labels.MustForName(componentLabels, MgmtIName)
 	mgmtM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
@@ -139,10 +144,10 @@ func TestGrpc_Adapt(t *testing.T) {
 			},
 		},
 	}
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtMName, mgmtM).Times(1)
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtIName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtIName, mgmtM).Times(1)
 
-	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMapping, ambassador.DestroyMapping)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)
@@ -153,7 +158,9 @@ func TestGrpc_Adapt(t *testing.T) {
 func TestGrpc_Adapt2(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	url := "url"
+	service := "service"
+	var port uint16 = 8080
+	url := fmt.Sprintf("%s:%d", service, port)
 	dns := &configuration.DNS{
 		Domain:    "domain",
 		TlsSecret: "tls",
@@ -184,7 +191,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 		"max_age":         "86400",
 	}
 
-	adminMName := labels.MustForName(componentLabels, AdminMName)
+	adminMName := labels.MustForName(componentLabels, AdminIName)
 	adminM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
@@ -206,10 +213,10 @@ func TestGrpc_Adapt2(t *testing.T) {
 			},
 		},
 	}
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminMName, adminM).Times(1)
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminIName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminIName, adminM).Times(1)
 
-	authMName := labels.MustForName(componentLabels, AuthMName)
+	authMName := labels.MustForName(componentLabels, AuthIName)
 	authM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
@@ -231,10 +238,10 @@ func TestGrpc_Adapt2(t *testing.T) {
 			},
 		},
 	}
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthMName, authM).Times(1)
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthIName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthIName, authM).Times(1)
 
-	mgmtMName := labels.MustForName(componentLabels, MgmtMName)
+	mgmtMName := labels.MustForName(componentLabels, MgmtIName)
 	mgmtM := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": group + "/" + version,
@@ -256,10 +263,10 @@ func TestGrpc_Adapt2(t *testing.T) {
 			},
 		},
 	}
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtMName, mgmtM).Times(1)
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtIName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtIName, mgmtM).Times(1)
 
-	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMapping, ambassador.DestroyMapping)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)

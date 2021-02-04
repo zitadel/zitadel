@@ -1,12 +1,11 @@
 package zitadel
 
 import (
-	"strconv"
-
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/setup"
 
 	core "k8s.io/api/core/v1"
@@ -16,7 +15,6 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/resources/namespace"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/migration"
@@ -70,11 +68,11 @@ func AdaptFunc(
 		secretPath := "/secret"
 		//services which are kubernetes resources and are used in the ambassador elements
 		grpcServiceName := "grpc-v1"
-		grpcPort := 80
+		var grpcPort uint16 = 80
 		httpServiceName := "http-v1"
-		httpPort := 80
+		var httpPort uint16 = 80
 		uiServiceName := "ui-v1"
-		uiPort := 80
+		var uiPort uint16 = 80
 
 		//		labels := getLabels()
 		users := getAllUsers(desiredKind)
@@ -205,18 +203,19 @@ func AdaptFunc(
 			return nil, nil, allSecrets, err
 		}
 
-		queryAmbassador, destroyAmbassador, err := ambassador.AdaptFunc(
+		queryI, destroyI, err := ingress.AdaptFunc(
 			internalMonitor,
-			labels.MustForComponent(apiLabels, "apiGateway"),
+			apiLabels,
 			namespaceStr,
-			grpcServiceName+"."+namespaceStr+":"+strconv.Itoa(grpcPort),
-			"http://"+httpServiceName+"."+namespaceStr+":"+strconv.Itoa(httpPort),
-			"http://"+uiServiceName+"."+namespaceStr,
+			grpcServiceName,
+			grpcPort,
+			httpServiceName,
+			httpPort,
+			uiServiceName,
+			uiPort,
 			desiredKind.Spec.Configuration.DNS,
+			desiredKind.Spec.IngressDeclarations,
 		)
-		if err != nil {
-			return nil, nil, allSecrets, err
-		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
 		queriers := make([]operator.QueryFunc, 0)
@@ -248,10 +247,10 @@ func AdaptFunc(
 					querySetup,
 					queryD,
 					operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr, zitadelDeploymentName)),
-					queryAmbassador,
+					queryI,
 				)
 				destroyers = append(destroyers,
-					destroyAmbassador,
+					destroyI,
 					destroyS,
 					destroyM,
 					destroyD,

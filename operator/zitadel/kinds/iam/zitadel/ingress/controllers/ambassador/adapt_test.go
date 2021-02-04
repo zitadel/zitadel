@@ -6,11 +6,11 @@ import (
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/labels/mocklabels"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador/grpc"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador/hosts"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador/http"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador/ui"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/controllers/ambassador/hosts"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/grpc"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/http"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/ui"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	apixv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
@@ -137,7 +137,7 @@ func TestAmbassador_Adapt(t *testing.T) {
 	SetMappingsGRPC(k8sClient, namespace)
 	SetHosts(k8sClient, namespace)
 
-	query, _, err := AdaptFunc(monitor, mocklabels.Component, namespace, grpcURL, httpURL, uiURL, dns)
+	query, _, err := AdaptFunc(monitor, mocklabels.Component, namespace, dns)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)
