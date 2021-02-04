@@ -1,9 +1,13 @@
 package handler
 
 import (
+	"context"
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -78,13 +82,36 @@ func (p *LoginPolicy) Reduce(event *models.Event) (err error) {
 func (p *LoginPolicy) processLoginPolicy(event *models.Event) (err error) {
 	policy := new(iam_model.LoginPolicyView)
 	switch event.Type {
+	case model.OrgAdded:
+		policy, err = p.getDefaultLoginPolicy()
+		if err != nil {
+			return err
+		}
+		policy.AggregateID = event.AggregateID
+		policy.Default = true
 	case iam_es_model.LoginPolicyAdded, model.LoginPolicyAdded:
 		err = policy.AppendEvent(event)
-	case iam_es_model.LoginPolicyChanged, model.LoginPolicyChanged,
-		iam_es_model.LoginPolicySecondFactorAdded, model.LoginPolicySecondFactorAdded,
-		iam_es_model.LoginPolicySecondFactorRemoved, model.LoginPolicySecondFactorRemoved,
-		iam_es_model.LoginPolicyMultiFactorAdded, model.LoginPolicyMultiFactorAdded,
-		iam_es_model.LoginPolicyMultiFactorRemoved, model.LoginPolicyMultiFactorRemoved:
+	case iam_es_model.LoginPolicyChanged,
+		iam_es_model.LoginPolicySecondFactorAdded,
+		iam_es_model.LoginPolicySecondFactorRemoved,
+		iam_es_model.LoginPolicyMultiFactorAdded,
+		iam_es_model.LoginPolicyMultiFactorRemoved:
+		policies, err := p.view.AllDefaultLoginPolicies()
+		if err != nil {
+			return err
+		}
+		for _, policy := range policies {
+			err = policy.AppendEvent(event)
+			if err != nil {
+				return err
+			}
+		}
+		return p.view.PutLoginPolicies(policies, event)
+	case model.LoginPolicyChanged,
+		model.LoginPolicySecondFactorAdded,
+		model.LoginPolicySecondFactorRemoved,
+		model.LoginPolicyMultiFactorAdded,
+		model.LoginPolicyMultiFactorRemoved:
 		policy, err = p.view.LoginPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
@@ -108,4 +135,34 @@ func (p *LoginPolicy) OnError(event *models.Event, err error) error {
 
 func (p *LoginPolicy) OnSuccess() error {
 	return spooler.HandleSuccess(p.view.UpdateLoginPolicySpoolerRunTimestamp)
+}
+
+func (p *LoginPolicy) getDefaultLoginPolicy() (*iam_model.LoginPolicyView, error) {
+	policy, policyErr := p.view.LoginPolicyByAggregateID(domain.IAMID)
+	if policyErr != nil && !caos_errs.IsNotFound(policyErr) {
+		return nil, policyErr
+	}
+	if policy == nil {
+		policy = &iam_model.LoginPolicyView{}
+	}
+	events, err := p.getIAMEvents(policy.Sequence)
+	if err != nil {
+		return policy, policyErr
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return policy, nil
+		}
+	}
+	return &policyCopy, nil
+}
+
+func (p *LoginPolicy) getIAMEvents(sequence uint64) ([]*models.Event, error) {
+	query, err := eventsourcing.IAMByIDQuery(domain.IAMID, sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.es.FilterEvents(context.Background(), query)
 }

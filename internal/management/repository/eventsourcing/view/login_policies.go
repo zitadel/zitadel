@@ -12,12 +12,24 @@ const (
 	loginPolicyTable = "management.login_policies"
 )
 
+func (v *View) AllDefaultLoginPolicies() ([]*model.LoginPolicyView, error) {
+	return view.GetDefaultLoginPolicies(v.Db, loginPolicyTable)
+}
+
 func (v *View) LoginPolicyByAggregateID(aggregateID string) (*model.LoginPolicyView, error) {
 	return view.GetLoginPolicyByAggregateID(v.Db, loginPolicyTable, aggregateID)
 }
 
 func (v *View) PutLoginPolicy(policy *model.LoginPolicyView, event *models.Event) error {
 	err := view.PutLoginPolicy(v.Db, loginPolicyTable, policy)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedLoginPolicySequence(event)
+}
+
+func (v *View) PutLoginPolicies(policies []*model.LoginPolicyView, event *models.Event) error {
+	err := view.PutLoginPolicies(v.Db, loginPolicyTable, policies...)
 	if err != nil {
 		return err
 	}

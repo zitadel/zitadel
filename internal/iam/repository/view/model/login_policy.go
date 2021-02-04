@@ -16,6 +16,7 @@ import (
 
 const (
 	LoginPolicyKeyAggregateID = "aggregate_id"
+	LoginPolicyKeyDefault     = "default_policy"
 )
 
 type LoginPolicyView struct {
@@ -31,7 +32,7 @@ type LoginPolicyView struct {
 	PasswordlessType      int32         `json:"passwordlessType" gorm:"column:passwordless_type"`
 	SecondFactors         pq.Int64Array `json:"-" gorm:"column:second_factors"`
 	MultiFactors          pq.Int64Array `json:"-" gorm:"column:multi_factors"`
-	Default               bool          `json:"-" gorm:"-"`
+	Default               bool          `json:"-" gorm:"column:default_policy"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
@@ -106,10 +107,16 @@ func (p *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
 	p.Sequence = event.Sequence
 	p.ChangeDate = event.CreationDate
 	switch event.Type {
-	case es_model.LoginPolicyAdded, org_es_model.LoginPolicyAdded:
+	case es_model.LoginPolicyAdded:
+		p.setRootData(event)
+		p.CreationDate = event.CreationDate
+		p.Default = true
+		err = p.SetData(event)
+	case org_es_model.LoginPolicyAdded:
 		p.setRootData(event)
 		p.CreationDate = event.CreationDate
 		err = p.SetData(event)
+		p.Default = false
 	case es_model.LoginPolicyChanged, org_es_model.LoginPolicyChanged:
 		err = p.SetData(event)
 	case es_model.LoginPolicySecondFactorAdded, org_es_model.LoginPolicySecondFactorAdded:
@@ -118,7 +125,10 @@ func (p *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		p.SecondFactors = append(p.SecondFactors, int64(mfa.MFAType))
+		if !existsMFA(p.SecondFactors, int64(mfa.MFAType)) {
+			p.SecondFactors = append(p.SecondFactors, int64(mfa.MFAType))
+		}
+
 	case es_model.LoginPolicySecondFactorRemoved, org_es_model.LoginPolicySecondFactorRemoved:
 		err = p.removeSecondFactor(event)
 	case es_model.LoginPolicyMultiFactorAdded, org_es_model.LoginPolicyMultiFactorAdded:
@@ -127,7 +137,9 @@ func (p *LoginPolicyView) AppendEvent(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		p.MultiFactors = append(p.MultiFactors, int64(mfa.MFAType))
+		if !existsMFA(p.MultiFactors, int64(mfa.MFAType)) {
+			p.MultiFactors = append(p.MultiFactors, int64(mfa.MFAType))
+		}
 	case es_model.LoginPolicyMultiFactorRemoved, org_es_model.LoginPolicyMultiFactorRemoved:
 		err = p.removeMultiFactor(event)
 	}
@@ -178,4 +190,13 @@ func (p *LoginPolicyView) removeMultiFactor(event *models.Event) error {
 		}
 	}
 	return nil
+}
+
+func existsMFA(mfas []int64, mfaType int64) bool {
+	for _, m := range mfas {
+		if m == mfaType {
+			return true
+		}
+	}
+	return false
 }
