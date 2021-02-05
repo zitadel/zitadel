@@ -66,7 +66,6 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 	if err != nil {
 		return nil, err
 	}
-	//key.ObjectID = "91981737608983070@zitadel"
 	if key.AuthIdentifier != issuer {
 		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
 	}
@@ -81,7 +80,14 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 	}, nil
 }
 
-func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, userID string, scopes oidc.Scopes) (oidc.Scopes, error) {
+func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes oidc.Scopes) (oidc.Scopes, error) {
+	if !strings.Contains(subject, "@") {
+		return o.validateJWTProfileScopesUser(ctx, subject, scopes)
+	}
+	return o.validateJWTProfileScopesClient(ctx, subject, scopes)
+}
+
+func (o *OPStorage) validateJWTProfileScopesUser(ctx context.Context, userID string, scopes oidc.Scopes) (oidc.Scopes, error) {
 	user, err := o.repo.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -89,17 +95,30 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, userID string,
 	for i := len(scopes) - 1; i >= 0; i-- {
 		scope := scopes[i]
 		if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
+			var orgID string
 			org, err := o.repo.OrgByPrimaryDomain(strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
-			if err != nil {
-				return nil, err
+			if err == nil {
+				orgID = org.ID
 			}
-			if org.ID != user.ResourceOwner {
+			if orgID != user.ResourceOwner {
 				scopes[i] = scopes[len(scopes)-1]
 				scopes[len(scopes)-1] = ""
 				scopes = scopes[:len(scopes)-1]
 			}
 		}
 	}
+	return scopes, nil
+}
+
+func (o *OPStorage) validateJWTProfileScopesClient(ctx context.Context, clientID string, scopes oidc.Scopes) (oidc.Scopes, error) {
+	//client, err := o.repo.ApplicationByClientID(ctx, clientID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//for i := len(scopes) - 1; i >= 0; i-- {
+	//	scope := scopes[i]
+	//
+	//}
 	return scopes, nil
 }
 
@@ -130,6 +149,20 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.User
 		}
 	}
 	return o.SetUserinfoFromScopes(ctx, userInfo, token.UserID, token.ApplicationID, token.Scopes)
+}
+
+func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
+	token, err := o.repo.TokenByID(ctx, subject, tokenID)
+	if err != nil {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
+	}
+	app, err := o.repo.ApplicationByClientID(ctx, clientID)
+	for _, aud := range token.Audience {
+		if aud == clientID || aud == app.ProjectID {
+			return o.SetUserinfoFromScopes(ctx, introspection, token.UserID, clientID, token.Scopes)
+		}
+	}
+	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
 }
 
 func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, origin string) (_ oidc.UserInfo, err error) {

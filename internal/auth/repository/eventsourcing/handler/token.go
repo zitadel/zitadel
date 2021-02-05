@@ -79,8 +79,7 @@ func (t *Token) EventQuery() (*models.SearchQuery, error) {
 
 func (t *Token) Reduce(event *models.Event) (err error) {
 	switch event.Type {
-	case user_es_model.UserTokenAdded,
-		project_es_model.TokenAdded:
+	case user_es_model.UserTokenAdded:
 		token := new(view_model.TokenView)
 		err := token.AppendEvent(event)
 		if err != nil {

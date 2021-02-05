@@ -403,19 +403,6 @@ func OIDCApplicationKeyRemovedAggregate(aggCreator *es_models.AggregateCreator, 
 	}
 }
 
-func OIDCApplicationTokenAddedAggregate(aggCreator *es_models.AggregateCreator, existingProject *model.Project, token *model.Token) es_sdk.AggregateFunc {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := ProjectAggregateOverwriteContext(ctx, aggCreator, existingProject, existingProject.ResourceOwner, existingProject.AggregateID) //TODO: !!!!
-		if err != nil {
-			return nil, err
-		}
-
-		agg.AppendEvent(model.TokenAdded, token)
-
-		return agg, nil
-	}
-}
-
 func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, project *model.Project, grant *model.ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {

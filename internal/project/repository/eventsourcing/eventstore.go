@@ -904,26 +904,6 @@ func (es *ProjectEventstore) RemoveApplicationKey(ctx context.Context, projectID
 	return nil
 }
 
-func (es *ProjectEventstore) TokenAdded(ctx context.Context, token *proj_model.Token) (*proj_model.Token, error) {
-	existingProject, err := es.ProjectByID(ctx, token.AggregateID)
-	if err != nil {
-		return nil, err
-	}
-	token.TokenID, err = es.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	repoProject := model.ProjectFromModel(existingProject)
-	repoToken := model.TokenFromModel(token)
-	agg := OIDCApplicationTokenAddedAggregate(es.AggregateCreator(), repoProject, repoToken)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoToken.AppendEvents, agg)
-	if err != nil {
-		return nil, err
-	}
-	es.projectCache.cacheProject(repoProject)
-	return model.TokenToModel(repoToken), nil
-}
-
 func (es *ProjectEventstore) ProjectGrantByIDs(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {
 	if grantID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-e8die", "Errors.Project.IDMissing")
