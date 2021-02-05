@@ -193,6 +193,7 @@ API:
       Issuer: $ZITADEL_ISSUER
       DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
       CodeMethodS256: true
+      AuthMethodPrivateKeyJWT: true
     StorageConfig:
       DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
       DefaultAccessTokenLifetime: 12h

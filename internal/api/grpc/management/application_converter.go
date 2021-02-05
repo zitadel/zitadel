@@ -356,6 +356,8 @@ func oidcAuthMethodTypeToModel(authType management.OIDCAuthMethodType) proj_mode
 		return proj_model.OIDCAuthMethodTypePost
 	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
 		return proj_model.OIDCAuthMethodTypeNone
+	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT:
+		return proj_model.OIDCAuthMethodTypePrivateKeyJWT
 	default:
 		return proj_model.OIDCAuthMethodTypeBasic
 	}
@@ -369,6 +371,8 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) managem
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST
 	case proj_model.OIDCAuthMethodTypeNone:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
+	case proj_model.OIDCAuthMethodTypePrivateKeyJWT:
+		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT
 	default:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
 	}

@@ -80,6 +80,7 @@ const (
 	OIDCAuthMethodTypeBasic OIDCAuthMethodType = iota
 	OIDCAuthMethodTypePost
 	OIDCAuthMethodTypeNone
+	OIDCAuthMethodTypePrivateKeyJWT
 )
 
 type Compliance struct {
@@ -138,10 +139,10 @@ func (c *OIDCConfig) GenerateNewClientID(idGenerator id.Generator, project *Proj
 }
 
 func (c *OIDCConfig) GenerateClientSecretIfNeeded(generator crypto.Generator) (string, error) {
-	if c.AuthMethodType == OIDCAuthMethodTypeNone {
-		return "", nil
+	if c.AuthMethodType == OIDCAuthMethodTypeBasic || c.AuthMethodType == OIDCAuthMethodTypePost {
+		return c.GenerateNewClientSecret(generator)
 	}
-	return c.GenerateNewClientSecret(generator)
+	return "", nil
 }
 
 func (c *OIDCConfig) GenerateNewClientSecret(generator crypto.Generator) (string, error) {

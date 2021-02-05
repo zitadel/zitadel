@@ -137,6 +137,8 @@ func authMethodToOIDC(authType model.OIDCAuthMethodType) oidc.AuthMethod {
 		return oidc.AuthMethodPost
 	case model.OIDCAuthMethodTypeNone:
 		return oidc.AuthMethodNone
+	case model.OIDCAuthMethodTypePrivateKeyJWT:
+		return oidc.AuthMethodPrivateKeyJWT
 	default:
 		return oidc.AuthMethodBasic
 	}
