@@ -37,6 +37,7 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
+	github.com/influxdata/influxdb v1.8.4 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kevinburke/go-types v0.0.0-20200309064045-f2d4aea18a7a // indirect
 	github.com/kevinburke/go.uuid v1.2.0 // indirect

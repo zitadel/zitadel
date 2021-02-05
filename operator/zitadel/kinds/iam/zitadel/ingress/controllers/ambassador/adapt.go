@@ -41,7 +41,7 @@ func QueryMapping(
 		host,
 		prefix,
 		rewrite,
-		fmt.Sprintf("%s%d", service, servicePort),
+		fmt.Sprintf("%s:%d", service, servicePort),
 		timeoutMS,
 		connectTimeoutMS,
 		cors.ToAmassadorCORS(),
