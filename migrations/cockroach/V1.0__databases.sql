@@ -6,14 +6,14 @@ CREATE DATABASE authz;
 CREATE DATABASE eventstore;
 
 
-CREATE USER eventstore;
+CREATE USER eventstore WITH PASSWORD ${eventstorepassword};
 GRANT SELECT, INSERT ON DATABASE eventstore TO eventstore;
 
-CREATE USER management;
+CREATE USER management WITH PASSWORD ${managementpassword};
 GRANT SELECT, INSERT, UPDATE, DELETE ON DATABASE management TO management;
 GRANT SELECT, INSERT ON DATABASE eventstore TO management;
 
-CREATE USER adminapi;
+CREATE USER adminapi WITH PASSWORD ${adminapipassword};
 GRANT SELECT, INSERT, UPDATE, DELETE, DROP ON DATABASE adminapi TO adminapi;
 GRANT SELECT, INSERT ON DATABASE eventstore TO adminapi;
 GRANT SELECT, INSERT, UPDATE, DROP, DELETE  ON DATABASE auth TO adminapi;
@@ -21,15 +21,15 @@ GRANT SELECT, INSERT, UPDATE, DROP, DELETE ON DATABASE authz TO adminapi;
 GRANT SELECT, INSERT, UPDATE, DROP, DELETE ON DATABASE management TO adminapi;
 GRANT SELECT, INSERT, UPDATE, DROP, DELETE ON DATABASE notification TO adminapi;
 
-CREATE USER auth;
+CREATE USER auth WITH PASSWORD ${authpassword};
 GRANT SELECT, INSERT, UPDATE, DELETE ON DATABASE auth TO auth;
 GRANT SELECT, INSERT ON DATABASE eventstore TO auth;
 
-CREATE USER notification;
+CREATE USER notification WITH PASSWORD ${notificationpassword};
 GRANT SELECT, INSERT, UPDATE, DELETE ON DATABASE notification TO notification;
 GRANT SELECT, INSERT ON DATABASE eventstore TO notification;
 
-CREATE USER authz;
+CREATE USER authz WITH PASSWORD ${authzpassword};
 GRANT SELECT, INSERT, UPDATE, DELETE ON DATABASE authz TO authz;
 GRANT SELECT, INSERT ON DATABASE eventstore TO authz;
 GRANT SELECT, INSERT, UPDATE ON DATABASE auth TO authz;
