@@ -70,11 +70,11 @@ func AdaptFunc(
 		secretPath := "/secret"
 		//services which are kubernetes resources and are used in the ambassador elements
 		grpcServiceName := "grpc-v1"
-		grpcPort := 80
+		var grpcPort uint16 = 80
 		httpServiceName := "http-v1"
-		httpPort := 80
+		var httpPort uint16 = 80
 		uiServiceName := "ui-v1"
-		uiPort := 80
+		var uiPort uint16 = 80
 
 		//		labels := getLabels()
 		users := getAllUsers(desiredKind)
@@ -209,8 +209,8 @@ func AdaptFunc(
 			internalMonitor,
 			labels.MustForComponent(apiLabels, "apiGateway"),
 			namespaceStr,
-			grpcServiceName+"."+namespaceStr+":"+strconv.Itoa(grpcPort),
-			"http://"+httpServiceName+"."+namespaceStr+":"+strconv.Itoa(httpPort),
+			grpcServiceName+"."+namespaceStr+":"+strconv.Itoa(int(grpcPort)),
+			"http://"+httpServiceName+"."+namespaceStr+":"+strconv.Itoa(int(httpPort)),
 			"http://"+uiServiceName+"."+namespaceStr,
 			desiredKind.Spec.Configuration.DNS,
 		)

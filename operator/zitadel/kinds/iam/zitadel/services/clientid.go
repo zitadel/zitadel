@@ -10,10 +10,10 @@ import (
 func GetClientIDFunc(
 	namespace string,
 	httpServiceName string,
-	httpPort int,
+	httpPort uint16,
 ) func() string {
 	return func() string {
-		resp, err := http.Get("http://" + httpServiceName + "." + namespace + ":" + strconv.Itoa(httpPort) + "/clientID")
+		resp, err := http.Get("http://" + httpServiceName + "." + namespace + ":" + strconv.Itoa(int(httpPort)) + "/clientID")
 		if err != nil || resp.StatusCode >= 400 {
 			return ""
 		}
