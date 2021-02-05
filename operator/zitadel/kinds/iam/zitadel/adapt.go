@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/setup"
@@ -28,7 +27,7 @@ func AdaptFunc(
 	apiLabels *labels.API,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	orbconfig *orb.Orb,
+	dbClient database.Client,
 	action string,
 	version *string,
 	features []string,
@@ -75,14 +74,7 @@ func AdaptFunc(
 		httpPort := 80
 		uiServiceName := "ui-v1"
 		uiPort := 80
-
-		//		labels := getLabels()
-		users := getAllUsers(desiredKind)
-		allZitadelUsers := getZitadelUserList()
-		dbClient, err := database.NewClient(monitor, orbconfig.URL, orbconfig.Repokey)
-		if err != nil {
-			return nil, nil, allSecrets, err
-		}
+		usersWithoutPWs := getUserListWithoutPasswords(desiredKind)
 
 		queryNS, err := namespace.AdaptFuncToEnsure(namespaceStr)
 		if err != nil {
@@ -123,9 +115,8 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
-			users,
-			services.GetClientIDFunc(namespaceStr, httpServiceName, httpPort),
 			dbClient,
+			services.GetClientIDFunc(namespaceStr, httpServiceName, httpPort),
 		)
 		if err != nil {
 			return nil, nil, allSecrets, err
@@ -146,7 +137,7 @@ func AdaptFunc(
 			action,
 			secretPasswordName,
 			migrationUser,
-			allZitadelUsers,
+			usersWithoutPWs,
 			nodeselector,
 			tolerations,
 		)
@@ -170,11 +161,10 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
-			allZitadelUsers,
-			migration.GetDoneFunc(monitor, namespaceStr, action),
-			configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
-			getConfigurationHashes,
 		)
+		if err != nil {
+			return nil, nil, allSecrets, err
+		}
 
 		queryD, destroyD, err := deployment.AdaptFunc(
 			internalMonitor,
@@ -192,14 +182,12 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
-			allZitadelUsers,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
 			desiredKind.Spec.Resources,
 			migration.GetDoneFunc(monitor, namespaceStr, action),
 			configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
 			setup.GetDoneFunc(monitor, namespaceStr, action),
-			getConfigurationHashes,
 		)
 		if err != nil {
 			return nil, nil, allSecrets, err
@@ -219,37 +207,13 @@ func AdaptFunc(
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
-		queriers := make([]operator.QueryFunc, 0)
 		for _, feature := range features {
 			switch feature {
 			case "migration":
-				queriers = append(queriers,
-					queryDB,
-					//configuration
-					queryC,
-					//migration
-					queryM,
-					//wait until migration is completed
-					operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespaceStr, action)),
-				)
 				destroyers = append(destroyers,
 					destroyM,
 				)
 			case "iam":
-				queriers = append(queriers,
-					operator.ResourceQueryToZitadelQuery(queryNS),
-					queryDB,
-					//configuration
-					queryC,
-					//migration
-					queryM,
-					//services
-					queryS,
-					querySetup,
-					queryD,
-					operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr, zitadelDeploymentName)),
-					queryAmbassador,
-				)
 				destroyers = append(destroyers,
 					destroyAmbassador,
 					destroyS,
@@ -259,18 +223,70 @@ func AdaptFunc(
 					destroyC,
 					operator.ResourceDestroyToZitadelDestroy(destroyNS),
 				)
-			case "scaledown":
-				queriers = append(queriers,
-					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(0)),
-				)
-			case "scaleup":
-				queriers = append(queriers,
-					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(desiredKind.Spec.ReplicaCount)),
-				)
 			}
 		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+				users, err := getAllUsers(k8sClient, desiredKind)
+				if err != nil {
+					return nil, err
+				}
+				allZitadelUsers, err := getZitadelUserList(k8sClient, desiredKind)
+				if err != nil {
+					return nil, err
+				}
+
+				queriers := make([]operator.QueryFunc, 0)
+				for _, feature := range features {
+					switch feature {
+					case "migration":
+						queriers = append(queriers,
+							queryDB,
+							//configuration
+							queryC(
+								users,
+							),
+							//migration
+							queryM,
+							//wait until migration is completed
+							operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespaceStr, action)),
+						)
+					case "iam":
+						queriers = append(queriers,
+							operator.ResourceQueryToZitadelQuery(queryNS),
+							queryDB,
+							//configuration
+							queryC(
+								users,
+							),
+							//migration
+							queryM,
+							//services
+							queryS,
+							querySetup(
+								allZitadelUsers,
+								migration.GetDoneFunc(monitor, namespaceStr, action),
+								configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
+								getConfigurationHashes,
+							),
+							queryD(
+								allZitadelUsers,
+								getConfigurationHashes,
+							),
+							operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr, zitadelDeploymentName)),
+							queryAmbassador,
+						)
+					case "scaledown":
+						queriers = append(queriers,
+							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(0)),
+						)
+					case "scaleup":
+						queriers = append(queriers,
+							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(desiredKind.Spec.ReplicaCount)),
+						)
+					}
+				}
+
 				return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(monitor, destroyers),

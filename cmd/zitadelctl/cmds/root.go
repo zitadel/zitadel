@@ -2,6 +2,7 @@ package cmds
 
 import (
 	"context"
+	"flag"
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/orb"
@@ -9,15 +10,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type RootValues func() (context.Context, mntr.Monitor, *orb.Orb, *git.Client, string, errFunc, error)
+type RootValues struct {
+	Ctx         context.Context
+	Version     string
+	Monitor     mntr.Monitor
+	OrbConfig   *orb.Orb
+	GitClient   *git.Client
+	MetricsAddr string
+	ErrFunc     errFunc
+}
+
+type GetRootValues func() (*RootValues, error)
 
 type errFunc func(err error) error
 
-func RootCommand(version string) (*cobra.Command, RootValues) {
+func RootCommand(version string) (*cobra.Command, GetRootValues) {
 
 	var (
 		verbose       bool
 		orbConfigPath string
+		metricsAddr   string
 	)
 
 	cmd := &cobra.Command{
@@ -40,8 +52,9 @@ $ orbctl -f ~/.orb/myorb [command]
 	flags := cmd.PersistentFlags()
 	flags.StringVarP(&orbConfigPath, "orbconfig", "f", "~/.orb/config", "Path to the file containing the orbs git repo URL, deploy key and the master key for encrypting and decrypting secrets")
 	flags.BoolVar(&verbose, "verbose", false, "Print debug levelled logs")
+	flag.StringVar(&metricsAddr, "metrics-addr", "", "The address the metric endpoint binds to.")
 
-	return cmd, func() (context.Context, mntr.Monitor, *orb.Orb, *git.Client, string, errFunc, error) {
+	return cmd, func() (*RootValues, error) {
 
 		monitor := mntr.Monitor{
 			OnInfo:   mntr.LogMessage,
@@ -57,16 +70,24 @@ $ orbctl -f ~/.orb/myorb [command]
 		orbConfig, err := orb.ParseOrbConfig(prunedPath)
 		if err != nil {
 			orbConfig = &orb.Orb{Path: prunedPath}
-			return nil, mntr.Monitor{}, nil, nil, "", nil, err
+			return nil, err
 		}
 
 		ctx := context.Background()
 
-		return ctx, monitor, orbConfig, git.New(ctx, monitor, "orbos", "orbos@caos.ch"), version, func(err error) error {
-			if err != nil {
-				monitor.Error(err)
-			}
-			return nil
+		return &RootValues{
+			Version:     version,
+			Ctx:         ctx,
+			Monitor:     monitor,
+			OrbConfig:   orbConfig,
+			GitClient:   git.New(ctx, monitor, "orbos", "orbos@caos.ch"),
+			MetricsAddr: metricsAddr,
+			ErrFunc: func(err error) error {
+				if err != nil {
+					monitor.Error(err)
+				}
+				return nil
+			},
 		}, nil
 	}
 }

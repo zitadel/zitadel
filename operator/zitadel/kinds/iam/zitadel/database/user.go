@@ -6,8 +6,8 @@ import (
 	"github.com/caos/zitadel/pkg/databases"
 )
 
-func (c *Client) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	return databases.DeleteUser(
+func (c *GitOpsClient) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
+	return databases.GitOpsDeleteUser(
 		monitor,
 		user,
 		k8sClient,
@@ -15,8 +15,8 @@ func (c *Client) DeleteUser(monitor mntr.Monitor, user string, k8sClient kuberne
 	)
 }
 
-func (c *Client) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	return databases.AddUser(
+func (c *GitOpsClient) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
+	return databases.GitOpsAddUser(
 		monitor,
 		user,
 		k8sClient,
@@ -24,10 +24,39 @@ func (c *Client) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes
 	)
 }
 
-func (c *Client) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
-	return databases.ListUsers(
+func (c *GitOpsClient) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
+	return databases.GitOpsListUsers(
 		monitor,
 		k8sClient,
 		c.gitClient,
+	)
+}
+
+func (c *CrdClient) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
+	return databases.CrdDeleteUser(
+		monitor,
+		user,
+		k8sClient,
+		c.Namespace,
+		c.Name,
+	)
+}
+
+func (c *CrdClient) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
+	return databases.CrdAddUser(
+		monitor,
+		user,
+		k8sClient,
+		c.Namespace,
+		c.Name,
+	)
+}
+
+func (c *CrdClient) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
+	return databases.CrdListUsers(
+		monitor,
+		k8sClient,
+		c.Namespace,
+		c.Name,
 	)
 }

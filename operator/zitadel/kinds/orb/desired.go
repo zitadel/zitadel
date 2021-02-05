@@ -8,17 +8,26 @@ import (
 
 type DesiredV0 struct {
 	Common *tree.Common `yaml:",inline"`
-	Spec   struct {
-		Verbose         bool
-		NodeSelector    map[string]string   `yaml:"nodeSelector,omitempty"`
-		Tolerations     []corev1.Toleration `yaml:"tolerations,omitempty"`
-		Version         string              `yaml:"version,omitempty"`
-		SelfReconciling bool                `yaml:"selfReconciling"`
-		//Use this registry to pull the database operator image from
-		//@default: ghcr.io
-		CustomImageRegistry string `json:"customImageRegistry,omitempty" yaml:"customImageRegistry,omitempty"`
-	}
-	IAM *tree.Tree
+	Spec   *Spec        `json:"spec" yaml:"spec"`
+	IAM    *tree.Tree   `json:"iam" yaml:"iam"`
+}
+
+// +kubebuilder:object:generate=true
+type Spec struct {
+	Verbose         bool                `json:"verbose" yaml:"verbose"`
+	NodeSelector    map[string]string   `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty"`
+	Tolerations     []corev1.Toleration `json:"tolerations,omitempty" yaml:"tolerations,omitempty"`
+	Version         string              `json:"version,omitempty" yaml:"version,omitempty"`
+	SelfReconciling bool                `json:"selfReconciling" yaml:"selfReconciling"`
+	//Use this registry to pull the zitadel operator image from
+	//@default: ghcr.io
+	CustomImageRegistry string       `json:"customImageRegistry,omitempty" yaml:"customImageRegistry,omitempty"`
+	DatabaseCrd         *DatabaseCrd `json:"databaseCrd,omitempty" yaml:"databaseCrd,omitempty"`
+}
+
+type DatabaseCrd struct {
+	Name      string `json:"name,omitempty" yaml:"name,omitempty"`
+	Namespace string `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 }
 
 func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {

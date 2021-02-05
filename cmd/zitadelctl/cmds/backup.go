@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 )
 
-func BackupCommand(rv RootValues) *cobra.Command {
+func BackupCommand(getRv GetRootValues) *cobra.Command {
 	var (
 		kubeconfig string
 		backup     string
@@ -24,13 +24,18 @@ func BackupCommand(rv RootValues) *cobra.Command {
 	flags.StringVar(&backup, "backup", "", "Name used for backup folder")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
-		_, monitor, orbConfig, gitClient, version, errFunc, err := rv()
+		rv, err := getRv()
 		if err != nil {
 			return err
 		}
 		defer func() {
-			err = errFunc(err)
+			err = rv.ErrFunc(err)
 		}()
+
+		monitor := rv.Monitor
+		orbConfig := rv.OrbConfig
+		gitClient := rv.GitClient
+		version := rv.Version
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
 			return err

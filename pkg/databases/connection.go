@@ -6,11 +6,26 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/api"
+	"github.com/caos/zitadel/operator/api/database"
 	coredb "github.com/caos/zitadel/operator/database/kinds/databases/core"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 )
 
-func GetConnectionInfo(
+func CrdGetConnectionInfo(
+	monitor mntr.Monitor,
+	k8sClient kubernetes.ClientInt,
+	namespace string,
+	name string,
+) (string, string, error) {
+	desired, err := database.ReadCrd(k8sClient, namespace, name)
+	if err != nil {
+		return "", "", err
+	}
+
+	return getConnectionInfo(monitor, k8sClient, desired)
+}
+
+func GitOpsGetConnectionInfo(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
@@ -20,9 +35,18 @@ func GetConnectionInfo(
 		monitor.Error(err)
 		return "", "", err
 	}
+
+	return getConnectionInfo(monitor, k8sClient, desired)
+}
+
+func getConnectionInfo(
+	monitor mntr.Monitor,
+	k8sClient kubernetes.ClientInt,
+	desired *tree.Tree,
+) (string, string, error) {
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil)(monitor, desired, current)
+	query, _, _, err := orbdb.AdaptFunc("", nil, false)(monitor, desired, current)
 	if err != nil {
 		return "", "", err
 	}

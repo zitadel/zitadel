@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Reconcile(monitor mntr.Monitor, desiredTree *tree.Tree, takeoff bool) operator.EnsureFunc {
+func Reconcile(monitor mntr.Monitor, desiredTree *tree.Tree, takeoff bool, gitops bool) operator.EnsureFunc {
 	return func(k8sClient kubernetes2.ClientInt) (err error) {
 		defer func() {
 			err = errors.Wrapf(err, "building %s failed", desiredTree.Common.Kind)
@@ -36,7 +36,7 @@ func Reconcile(monitor mntr.Monitor, desiredTree *tree.Tree, takeoff bool) opera
 		}
 
 		if takeoff || desiredKind.Spec.SelfReconciling {
-			if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustZITADELOperator(&desiredKind.Spec.Version)), k8sClient, desiredKind.Spec.Version, desiredKind.Spec.NodeSelector, desiredKind.Spec.Tolerations, imageRegistry); err != nil {
+			if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustZITADELOperator(&desiredKind.Spec.Version)), k8sClient, desiredKind.Spec.Version, desiredKind.Spec.NodeSelector, desiredKind.Spec.Tolerations, imageRegistry, gitops); err != nil {
 				recMonitor.Error(errors.Wrap(err, "Failed to deploy zitadel-operator into k8s-cluster"))
 				return err
 			}

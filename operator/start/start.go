@@ -17,7 +17,7 @@ import (
 	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
 )
 
-func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, version *string) error {
+func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, version *string, gitops bool) error {
 	takeoffChan := make(chan struct{})
 	go func() {
 		takeoffChan <- struct{}{}
@@ -36,7 +36,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", version, []string{"operator", "iam"}), k8sClient)
+		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"operator", "iam"}), k8sClient)
 
 		go func() {
 			started := time.Now()
@@ -54,7 +54,15 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 	return nil
 }
 
-func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb, k8sClient *kubernetes.Client, backup string, version *string) error {
+func Restore(
+	monitor mntr.Monitor,
+	gitClient *git.Client,
+	orbCfg *orbconfig.Orb,
+	k8sClient *kubernetes.Client,
+	backup string,
+	gitops bool,
+	version *string,
+) error {
 	databasesList := []string{
 		"notification",
 		"adminapi",
@@ -63,12 +71,11 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		"eventstore",
 		"management",
 	}
-
 	if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
 		return err
 	}
 
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", version, []string{"scaledown"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", version, gitops, []string{"scaledown"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -76,7 +83,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		return err
 	}
 
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "migration", version, []string{"migration"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "migration", version, gitops, []string{"migration"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -90,7 +97,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 		return err
 	}
 
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", version, []string{"scaleup"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", version, gitops, []string{"scaleup"}), k8sClient)(); err != nil {
 		return err
 	}
 
@@ -101,7 +108,7 @@ func Restore(monitor mntr.Monitor, gitClient *git.Client, orbCfg *orbconfig.Orb,
 	return nil
 }
 
-func Database(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, binaryVersion *string) error {
+func Database(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, binaryVersion *string, gitops bool) error {
 	takeoffChan := make(chan struct{})
 	go func() {
 		takeoffChan <- struct{}{}
@@ -120,7 +127,7 @@ func Database(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := database.Takeoff(monitor, gitClient, orbdb.AdaptFunc("", binaryVersion, "database", "backup"), k8sClient)
+		takeoff := database.Takeoff(monitor, gitClient, orbdb.AdaptFunc("", binaryVersion, gitops, "database", "backup"), k8sClient)
 
 		go func() {
 			started := time.Now()
@@ -150,6 +157,6 @@ func Backup(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Cl
 		return err
 	}
 
-	database.Takeoff(monitor, gitClient, orbdb.AdaptFunc(backup, binaryVersion, "instantbackup"), k8sClient)()
+	database.Takeoff(monitor, gitClient, orbdb.AdaptFunc(backup, binaryVersion, false, "instantbackup"), k8sClient)()
 	return nil
 }
