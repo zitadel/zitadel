@@ -89,6 +89,25 @@ func ExternalIDPsByIDPConfigIDAndResourceOwner(db *gorm.DB, table, idpConfigID, 
 	return externalIDPs, err
 }
 
+func ExternalIDPsByIDPConfigIDAndResourceOwners(db *gorm.DB, table, idpConfigID string, resourceOwners []string) ([]*model.ExternalIDPView, error) {
+	externalIDPs := make([]*model.ExternalIDPView, 0)
+	idpConfigIDQuery := &usr_model.ExternalIDPSearchQuery{
+		Key:    usr_model.ExternalIDPSearchKeyIdpConfigID,
+		Method: global_model.SearchMethodEquals,
+		Value:  idpConfigID,
+	}
+	orgIDQuery := &usr_model.ExternalIDPSearchQuery{
+		Key:    usr_model.ExternalIDPSearchKeyResourceOwner,
+		Method: global_model.SearchMethodIsOneOf,
+		Value:  resourceOwners,
+	}
+	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{
+		Queries: []*usr_model.ExternalIDPSearchQuery{orgIDQuery, idpConfigIDQuery},
+	})
+	_, err := query(db, &externalIDPs)
+	return externalIDPs, err
+}
+
 func ExternalIDPsByUserID(db *gorm.DB, table, userID string) ([]*model.ExternalIDPView, error) {
 	externalIDPs := make([]*model.ExternalIDPView, 0)
 	orgIDQuery := &usr_model.ExternalIDPSearchQuery{

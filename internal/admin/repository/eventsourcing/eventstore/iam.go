@@ -130,6 +130,23 @@ func (repo *IAMRepository) ExternalIDPsByIDPConfigID(ctx context.Context, idpCon
 	return model.ExternalIDPViewsToModel(externalIDPs), nil
 }
 
+func (repo *IAMRepository) ExternalIDPsByIDPConfigIDFromDefaultPolicy(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
+	policies, err := repo.View.AllDefaultLoginPolicies()
+	if err != nil {
+		return nil, err
+	}
+	resourceOwners := make([]string, len(policies))
+	for i, policy := range policies {
+		resourceOwners[i] = policy.AggregateID
+	}
+
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigIDAndResourceOwners(idpConfigID, resourceOwners)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
+}
+
 func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestIDPConfigSequence("")

@@ -25,6 +25,10 @@ func (v *View) ExternalIDPsByIDPConfigID(idpConfigID string) ([]*model.ExternalI
 	return view.ExternalIDPsByIDPConfigID(v.Db, externalIDPTable, idpConfigID)
 }
 
+func (v *View) ExternalIDPsByIDPConfigIDAndResourceOwners(idpConfigID string, resourceOwners []string) ([]*model.ExternalIDPView, error) {
+	return view.ExternalIDPsByIDPConfigIDAndResourceOwners(v.Db, externalIDPTable, idpConfigID, resourceOwners)
+}
+
 func (v *View) ExternalIDPsByUserID(userID string) ([]*model.ExternalIDPView, error) {
 	return view.ExternalIDPsByUserID(v.Db, externalIDPTable, userID)
 }

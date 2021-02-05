@@ -21,6 +21,7 @@ type IAMRepository interface {
 
 	IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error)
 	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
+	ExternalIDPsByIDPConfigIDFromDefaultPolicy(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
 
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 

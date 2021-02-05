@@ -121,23 +121,17 @@ func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string, 
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, existingIDP.ResourceOwner, idpID, existingIDP.Name))
 
+	userAggregates := make([]eventstore.Aggregater, 0)
 	for _, idpProvider := range idpProviders {
 		if idpProvider.AggregateID == domain.IAMID {
-			r.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, true)
+			userAggregates = r.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, true, externalIDPs...)
 		}
 		orgAgg := OrgAggregateFromWriteModel(&NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpID).WriteModel)
 		r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true)
 	}
 
-	for _, externalIDP := range externalIDPs {
-		userAgg, _, err := r.removeHumanExternalIDP(ctx, externalIDP, true)
-		if err != nil {
-			continue
-		}
-		aggregates = append(aggregates, userAgg)
-	}
-
 	aggregates = append(aggregates, iamAgg)
+	aggregates = append(aggregates, userAggregates...)
 	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
 	return err
 }
