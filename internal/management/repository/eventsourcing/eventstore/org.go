@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"strings"
 
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
@@ -370,14 +371,14 @@ func (repo *OrgRepository) GetIDPProvidersByIDPConfigID(ctx context.Context, agg
 }
 
 func (repo *OrgRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
-	policy, viewErr := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
+	policy, viewErr := repo.View.LoginPolicyByAggregateID(domain.IAMID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.LoginPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, domain.IAMID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
 	}
@@ -413,11 +414,12 @@ func (repo *OrgRepository) RemoveLoginPolicy(ctx context.Context) error {
 }
 
 func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
-	_, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	policy, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
-		if errors.IsNotFound(err) {
-			request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
-		}
+		return nil, err
+	}
+	if policy.Default {
+		request.AppendAggregateIDQuery(domain.IAMID)
 	} else {
 		request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
 	}
