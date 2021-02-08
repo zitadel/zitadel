@@ -5,6 +5,12 @@
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
             <h1>{{ 'APP.PAGES.TITLE' | translate }} {{app?.name}}</h1>
+            <ng-template appHasRole [appHasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
+                <button matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" mat-icon-button (click)="deleteApp()"
+                    aria-label="delete app" *ngIf="isZitadel === false">
+                    <i class="las la-trash"></i>
+                </button>
+            </ng-template>
 
             <p class="desc">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
             <p *ngIf="isZitadel" class="zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
@@ -216,8 +222,8 @@
                 <div class="btn-container">
 
                     <button class="submit-button" type="submit" color="primary"
-                        [disabled]="appForm.invalid || !canWrite"
-                        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+                        [disabled]="appForm.invalid || !canWrite" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
+                        }}</button>
                 </div>
             </form>
 

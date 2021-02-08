@@ -930,6 +930,12 @@
                     "1": "Aktiv",
                     "2": "Inaktiv"
                 }
+            },
+            "DIALOG": {
+                "DELETE": {
+                    "TITLE": "App löschen",
+                    "DESCRIPTION":"Wollen Sie diese App wirklich löschen?"
+                }
             }
         },
         "NAME": "Name",
@@ -997,7 +1003,8 @@
             "REACTIVATED":"Anwendung reaktiviert.",
             "DEACTIVATED":"Anwendung deaktiviert.",
             "OIDCUPDATED":"OIDC-Konfiguration geändert.",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC-Client Secret generiert."
+            "OIDCCLIENTSECRETREGENERATED":"OIDC-Client Secret generiert.",
+            "DELETED":"App gelöscht."
         }
     },
     "GENDERS": {

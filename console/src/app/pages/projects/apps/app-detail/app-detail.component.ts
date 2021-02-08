@@ -4,12 +4,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
     Application,
     AppState,
@@ -103,6 +104,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private dialog: MatDialog,
         private mgmtService: ManagementService,
         private authService: GrpcAuthService,
+        private router: Router,
     ) {
         this.appNameForm = this.fb.group({
             state: [{ value: '', disabled: true }, []],
@@ -145,7 +147,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.mgmtService.GetApplicationById(projectid, id).then(app => {
                 this.app = app.toObject();
                 this.appNameForm.patchValue(this.app);
-                console.log(this.app);
                 if (allowed) {
                     this.appNameForm.enable();
                     this.appForm.enable();
@@ -161,7 +162,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 }
                 if (this.app.oidcConfig?.clockSkew) {
                     const inSecs = this.app.oidcConfig?.clockSkew.seconds + this.app.oidcConfig?.clockSkew.nanos / 100000;
-                    console.log(inSecs);
                     this.appForm.controls['clockSkewSeconds'].setValue(inSecs);
                 }
                 if (this.app.oidcConfig) {
@@ -174,6 +174,29 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             });
         });
         this.docs = (await this.mgmtService.GetZitadelDocs()).toObject();
+    }
+
+    public deleteApp(): void {
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'APP.PAGES.DIALOG.DELETE.TITLE',
+                descriptionKey: 'APP.PAGES.DIALOG.DELETE.DESCRIPTION',
+            },
+            width: '400px',
+        });
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp && this.projectId && this.app.id) {
+                this.mgmtService.RemoveApplication(this.projectId, this.app.id).then(() => {
+                    this.toast.showInfo('APP.TOAST.DELETED', true);
+
+                    this.router.navigate(['/projects', this.projectId]);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            }
+        });
     }
 
     public changeState(event: MatButtonToggleChange): void {
@@ -282,7 +305,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                     dur.setNanos((Math.floor(this.clockSkewSeconds?.value % 1) * 10000));
                     req.setClockSkew(dur);
                 }
-                console.log(req.toObject());
                 this.mgmtService
                     .UpdateOIDCAppConfig(req)
                     .then(() => {

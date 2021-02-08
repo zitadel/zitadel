@@ -8,7 +8,7 @@
             <ng-template appHasRole [appHasRole]="['project.write:'+projectId, 'project.write']">
                 <button matTooltip="{{'ACTIONS.EDIT' | translate}}" mat-icon-button (click)="editstate = !editstate"
                     aria-label="Edit project name" *ngIf="isZitadel === false">
-                    <mat-icon *ngIf="!editstate">edit</mat-icon>
+                    <i *ngIf="!editstate" class="las la-edit"></i>
                     <mat-icon *ngIf="editstate">close</mat-icon>
                 </button>
             </ng-template>

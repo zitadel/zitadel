@@ -930,6 +930,12 @@
                     "1": "Active",
                     "2": "Inactive"
                 }
+            },
+            "DIALOG": {
+                "DELETE": {
+                    "TITLE": "Delete App",
+                    "DESCRIPTION":"Do you really want to delete this application?"
+                }
             }
         },
         "NAME": "Name",
@@ -997,7 +1003,8 @@
             "REACTIVATED":"Application reactivated.",
             "DEACTIVATED":"Application deactivated.",
             "OIDCUPDATED":"OIDC configuration updated.",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated."
+            "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated.",
+            "DELETED":"App deleted."
         }
     },
     "GENDERS": {
