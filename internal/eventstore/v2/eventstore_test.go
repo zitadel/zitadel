@@ -31,7 +31,7 @@ func (a *testAggregate) Events() []EventPusher {
 }
 
 func (a *testAggregate) ResourceOwner() string {
-	return "ro"
+	return "caos"
 }
 
 func (a *testAggregate) Version() Version {
@@ -54,7 +54,7 @@ func newTestEvent(id, description string, data func() interface{}, checkPrevious
 		shouldCheckPrevious: checkPrevious,
 		BaseEvent: *NewBaseEventForPush(
 			service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
-			NewAggregate(authz.NewMockContext("caos", "adlerhurst"), id, "testType", "v1"),
+			NewAggregate(authz.NewMockContext("caos", "adlerhurst"), id, "test.aggregate", "v1"),
 			"test.event",
 		),
 	}
@@ -130,7 +130,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 				mapper:    testFilterMapper,
 			},
 			res: res{
-				event:       newTestEvent("id", "hodor", nil, false),
+				event:       newTestEvent("testID", "hodor", nil, false),
 				mapperCount: 1,
 			},
 		},
@@ -146,7 +146,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 				mapper:    testFilterMapper,
 			},
 			res: res{
-				event:       newTestEvent("id", "hodor", nil, false),
+				event:       newTestEvent("testID", "hodor", nil, false),
 				mapperCount: 2,
 			},
 		},
@@ -166,7 +166,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 				mapper:    testFilterMapper,
 			},
 			res: res{
-				event:       newTestEvent("id", "hodor", nil, false),
+				event:       newTestEvent("testID", "hodor", nil, false),
 				mapperCount: 2,
 			},
 		},
@@ -381,7 +381,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 			args: args{
 				events: []EventPusher{
 					newTestEvent(
-						"id",
+						"1",
 						"",
 						func() interface{} {
 							return nil
@@ -398,7 +398,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Data:          []byte(nil),
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
-						ResourceOwner: "ro",
+						ResourceOwner: "caos",
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -434,7 +434,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Data:          []byte(nil),
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
-						ResourceOwner: "ro",
+						ResourceOwner: "caos",
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -444,7 +444,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Data:          []byte(nil),
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
-						ResourceOwner: "ro",
+						ResourceOwner: "caos",
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -505,7 +505,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "ro",
+							ResourceOwner: "caos",
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -515,7 +515,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "ro",
+							ResourceOwner: "caos",
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -527,7 +527,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "ro",
+							ResourceOwner: "caos",
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -642,7 +642,7 @@ func TestEventstore_Push(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "ro",
+							ResourceOwner: "caos",
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -685,7 +685,7 @@ func TestEventstore_Push(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "ro",
+							ResourceOwner: "caos",
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -695,7 +695,7 @@ func TestEventstore_Push(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "ro",
+							ResourceOwner: "caos",
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -749,7 +749,7 @@ func TestEventstore_Push(t *testing.T) {
 								Data:          []byte(nil),
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
-								ResourceOwner: "ro",
+								ResourceOwner: "caos",
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -759,7 +759,7 @@ func TestEventstore_Push(t *testing.T) {
 								Data:          []byte(nil),
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
-								ResourceOwner: "ro",
+								ResourceOwner: "caos",
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -771,7 +771,7 @@ func TestEventstore_Push(t *testing.T) {
 								Data:          []byte(nil),
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
-								ResourceOwner: "ro",
+								ResourceOwner: "caos",
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -1282,13 +1282,13 @@ func compareEvents(t *testing.T, want, got *repository.Event) {
 	t.Helper()
 
 	if want.AggregateID != got.AggregateID {
-		t.Errorf("wrong aggregateID got %q want %q", want.AggregateID, got.AggregateID)
+		t.Errorf("wrong aggregateID got %q want %q", got.AggregateID, want.AggregateID)
 	}
 	if want.AggregateType != got.AggregateType {
-		t.Errorf("wrong aggregateType got %q want %q", want.AggregateType, got.AggregateType)
+		t.Errorf("wrong aggregateType got %q want %q", got.AggregateType, want.AggregateType)
 	}
 	if !reflect.DeepEqual(want.Data, got.Data) {
-		t.Errorf("wrong data got %s want %s", string(want.Data), string(got.Data))
+		t.Errorf("wrong data got %s want %s", string(got.Data), string(want.Data))
 	}
 	if want.EditorService != got.EditorService {
 		t.Errorf("wrong editor service got %q want %q", got.EditorService, want.EditorService)
@@ -1341,7 +1341,7 @@ func TestEventstore_mapEvents(t *testing.T) {
 			},
 			res: res{
 				//TODO: as long as not all events are implemented in v2 eventstore doesn't return an error
-				// afterwards it will return an error on un
+				// afterwards it will return an error if mapper not found
 				wantErr: true,
 			},
 		},
