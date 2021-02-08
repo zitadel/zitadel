@@ -66,6 +66,7 @@
 
      .doc-container .doc .text .logo-cloud img {
          max-width: 60px;
+         max-height: 60px;
          margin: .5rem;
          object-fit: contain;
          border-radius: 4px;
@@ -209,9 +210,9 @@
                     <p>Learn how to integrate your applications and build secure workflows and APIs with ZITADEL</p>
 
                     <div class="logo-cloud">
-                        <img src="tech/react.png" alt="react" />
+                        <img src="tech/react.png" style="margin: -.5rem;" alt="react" />
                         <img src="tech/angular.svg" alt="angular" />
-                        <img style="padding: .6rem;" src="tech/dart.svg" alt="dart" />
+                        <img style="padding: 1rem;" src="tech/flutter.svg" alt="flutter" />
                         <img src="tech/golang.svg" alt="golang" />
                         <img style="padding: .5rem" src="tech/net.svg" alt="aspnet" />
                     </div>

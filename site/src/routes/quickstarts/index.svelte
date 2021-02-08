@@ -86,6 +86,7 @@
 
     .quickstart img {
         max-width: 150px;
+        max-height: 150px;
         object-fit: contain;
         padding: 20px;
         border-radius: 4px;

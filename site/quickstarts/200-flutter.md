@@ -1,10 +1,10 @@
 ---
 title: Dart / Flutter
 subtitle: Native Apps
-img: tech/dart.svg
+img: tech/flutter.svg
 date: 29 January 2021
 readingtime: 15min
-route: dart
+route: flutter
 visible: false
 ---
 
