@@ -205,10 +205,11 @@ jobs:
         run: docker pull $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }}
       - name: Download all zitadelctl artifact
         uses: actions/download-artifact@v2
-      - name: Move artifacts
+        with:
+          path: ${{ env.ARTIFACTS_FOLDER }}
+      - name: Workaround for exe
         run: |
-          mkdir -p $ARTIFACTS_FOLDER
-          mv /home/runner/work/zitadel/zitadel/* $ARTIFACTS_FOLDER
+          mv $ARTIFACTS_FOLDER/zitadelctl-windows-amd64/zitadelctl-windows-amd64 $ARTIFACTS_FOLDER/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
 
       - name: Semantic Release
         id: semantic
@@ -248,41 +249,43 @@ jobs:
           docker push $REGISTRY/$CRDB_IMAGE_NAME:latest
         if: steps.semantic.outputs.new_release_published == 'true'
 
-
+      - name: Set output
+        id: branch
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
       - name: Dev-Release
-        if: steps.semantic.outputs.new_release_published != 'true' && github.ref != 'master'
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master'
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Branch ${{ github.ref }}
+          tag_name: ${{ steps.branch.outputs.short_ref }}-dev
+          release_name: Branch ${{ steps.branch.outputs.short_ref }}
           body: |
             This is a release from a development branch.
             Do not use these artifacts in production.
           draft: false
           prerelease: true
       - name: Upload Release Asset Darwin
-        if: steps.semantic.outputs.new_release_published != 'true' && github.ref != 'master'
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master'
         id: upload-release-asset-darwin
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.ARTIFACTS_FOLDER }}zitadelctl-darwin-amd64
+          asset_path: ${{ env.ARTIFACTS_FOLDER }}zitadelctl-darwin-amd64/zitadelctl-darwin-amd64
           asset_name: Zitadelctl Darwin Amd64
           asset_content_type: application/octet-stream
       - name: Upload Release Asset Linux
-        if: steps.semantic.outputs.new_release_published != 'true' && github.ref != 'master'
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master'
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.ARTIFACTS_FOLDER }}zitadelctl-linux-amd64
+          asset_path: ${{ env.ARTIFACTS_FOLDER }}zitadelctl-linux-amd64/zitadelctl-linux-amd64
           asset_name: Zitadelctl Linux Amd64
           asset_content_type: application/octet-stream
       - name: Upload Release Asset
@@ -293,6 +296,6 @@ jobs:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.ARTIFACTS_FOLDER }}zitadelctl-windows-amd64
+          asset_path: ${{ env.ARTIFACTS_FOLDER }}zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
           asset_name: Zitadelctl Windows Amd64
           asset_content_type: application/octet-stream
