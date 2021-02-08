@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -40,7 +41,7 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID string, human *domain.
 	return r.createHuman(ctx, orgID, human, nil, false)
 }
 
-func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMember *domain.Member) (*domain.Human, error) {
+func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
 	aggregates := make([]eventstore.Aggregater, 2)
 
 	userAgg, addedHuman, err := r.registerHuman(ctx, orgID, human, externalIDP)
@@ -51,7 +52,16 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *do
 
 	orgMemberWriteModel := NewOrgMemberWriteModel(orgID, addedHuman.AggregateID)
 	orgAgg := OrgAggregateFromWriteModel(&orgMemberWriteModel.WriteModel)
-	r.addOrgMember(ctx, orgAgg, orgMemberWriteModel, orgMember)
+	if orgMemberRoles != nil {
+		orgMember := &domain.Member{
+			ObjectRoot: models.ObjectRoot{
+				AggregateID: orgID,
+			},
+			UserID: userAgg.ID(),
+			Roles:  orgMemberRoles,
+		}
+		r.addOrgMember(ctx, orgAgg, orgMemberWriteModel, orgMember)
+	}
 
 	aggregates[1] = orgAgg
 

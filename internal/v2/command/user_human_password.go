@@ -129,7 +129,7 @@ func (r *CommandSide) PasswordCodeSent(ctx context.Context, orgID, userID string
 		return err
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Password.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
 	userAgg.PushEvents(user.NewHumanPasswordCodeSentEvent(ctx))
@@ -149,7 +149,7 @@ func (r *CommandSide) HumanCheckPassword(ctx context.Context, orgID, userID, pas
 		return err
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Password.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 
 	if existingPassword.Secret == nil {

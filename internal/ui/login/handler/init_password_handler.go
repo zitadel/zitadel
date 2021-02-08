@@ -78,6 +78,10 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 }
 
 func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+	if authReq == nil {
+		l.renderError(w, r, nil, errors.ThrowInternal(nil, "LOGIN-8sn7s", "Errors.AuthRequest.NotFound"))
+		return
+	}
 	userOrg := login
 	if authReq != nil {
 		userOrg = authReq.UserOrgID

@@ -41,15 +41,9 @@ func (f PasswordlessType) Valid() bool {
 }
 
 func (p *LoginPolicy) HasSecondFactors() bool {
-	if p.SecondFactors == nil || len(p.SecondFactors) == 0 {
-		return false
-	}
-	return true
+	return len(p.SecondFactors) > 0
 }
 
 func (p *LoginPolicy) HasMultiFactors() bool {
-	if p.MultiFactors == nil || len(p.MultiFactors) == 0 {
-		return false
-	}
-	return true
+	return len(p.MultiFactors) > 0
 }

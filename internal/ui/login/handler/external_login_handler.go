@@ -7,7 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errors "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
@@ -182,13 +181,10 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	resourceOwner := iam.GlobalOrgID
-	member := &domain.Member{
-		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
-		Roles:      []string{orgProjectCreatorRole},
-	}
+	memberRoles := []string{domain.RoleOrgProjectCreator}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
-		member = nil
+		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
 
@@ -206,7 +202,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, member, authReq.ID, userAgentID, resourceOwner, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return

@@ -88,6 +88,24 @@ func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, user
 	return r.eventstore.PushAggregate(ctx, existingHuman, userAgg)
 }
 
+func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, userID string, authRequest *domain.AuthRequest) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-5n8sM", "Errors.IDMissing")
+	}
+
+	existingHuman, err := r.getHumanWriteModelByID(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingHuman.UserState == domain.UserStateUnspecified || existingHuman.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-dn88J", "Errors.User.NotFound")
+	}
+
+	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
+	userAgg.PushEvents(user.NewHumanExternalIDPCheckSucceededEvent(ctx, authRequestDomainToAuthRequestInfo(authRequest)))
+	return r.eventstore.PushAggregate(ctx, existingHuman, userAgg)
+}
+
 func (r *CommandSide) externalIDPWriteModelByID(ctx context.Context, userID, idpConfigID, externalUserID, resourceOwner string) (writeModel *HumanExternalIDPWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

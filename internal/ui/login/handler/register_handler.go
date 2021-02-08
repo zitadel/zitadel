@@ -7,12 +7,10 @@ import (
 	"golang.org/x/text/language"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
 const (
-	tmplRegister          = "register"
-	orgProjectCreatorRole = "ORG_PROJECT_CREATOR"
+	tmplRegister = "register"
 )
 
 type registerFormData struct {
@@ -66,15 +64,13 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resourceOwner := iam.GlobalOrgID
-	member := &domain.Member{
-		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
-		Roles:      []string{orgProjectCreatorRole},
-	}
+	memberRoles := []string{domain.RoleOrgProjectCreator}
+
 	if authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != iam.GlobalOrgID {
-		member = nil
+		memberRoles = nil
 		resourceOwner = authRequest.RequestedOrgID
 	}
-	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, member)
+	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, memberRoles)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return

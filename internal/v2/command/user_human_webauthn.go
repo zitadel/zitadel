@@ -346,6 +346,9 @@ func (r *CommandSide) finishWebAuthNLogin(ctx context.Context, userID, resourceO
 	}
 
 	_, token := domain.GetTokenByKeyID(tokens, keyID)
+	if token == nil {
+		return nil, nil, nil, 0, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3b7zs", "Errors.User.WebAuthN.NotFound")
+	}
 	writeModel, err := r.webauthNWriteModelByID(ctx, userID, "", resourceOwner)
 	if err != nil {
 		return nil, nil, nil, 0, err
