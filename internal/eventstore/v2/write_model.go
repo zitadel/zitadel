@@ -28,10 +28,10 @@ func (wm *WriteModel) Reduce() error {
 	}
 
 	if wm.AggregateID == "" {
-		wm.AggregateID = wm.Events[0].AggregateID()
+		wm.AggregateID = wm.Events[0].Aggregate().ID
 	}
 	if wm.ResourceOwner == "" {
-		wm.ResourceOwner = wm.Events[0].ResourceOwner()
+		wm.ResourceOwner = wm.Events[0].Aggregate().ResourceOwner
 	}
 
 	wm.ProcessedSequence = wm.Events[len(wm.Events)-1].Sequence()

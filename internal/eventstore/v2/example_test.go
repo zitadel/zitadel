@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository/sql"
@@ -15,34 +16,13 @@ import (
 // ------------------------------------------------------------
 // User aggregate start
 // ------------------------------------------------------------
-
-type UserAggregate struct {
-	eventstore.Aggregate
-
-	FirstName string
-}
-
-func NewUserAggregate(id string) *UserAggregate {
-	return &UserAggregate{
-		Aggregate: *eventstore.NewAggregate(
-			id,
-			"test.user",
-			"caos",
-			"v1",
-		),
-	}
-}
-
-func (rm *UserAggregate) Reduce() error {
-	for _, event := range rm.Aggregate.Events() {
-		switch e := event.(type) {
-		case *UserAddedEvent:
-			rm.FirstName = e.FirstName
-		case *UserFirstNameChangedEvent:
-			rm.FirstName = e.FirstName
-		}
-	}
-	return nil
+func NewUserAggregate(id string) *eventstore.Aggregate {
+	return eventstore.NewAggregate(
+		authz.NewMockContext("caos", "adlerhurst"),
+		id,
+		"test.user",
+		"v1",
+	)
 }
 
 // ------------------------------------------------------------
@@ -55,14 +35,13 @@ type UserAddedEvent struct {
 	FirstName string `json:"firstName"`
 }
 
-func NewUserAddedEvent(firstName string) *UserAddedEvent {
+func NewUserAddedEvent(id string, firstName string) *UserAddedEvent {
 	return &UserAddedEvent{
 		FirstName: firstName,
-		BaseEvent: eventstore.BaseEvent{
-			Service:   "test.suite",
-			User:      "adlerhurst",
-			EventType: "user.added",
-		},
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			context.Background(),
+			NewUserAggregate(id),
+			"user.added"),
 	}
 }
 
@@ -97,14 +76,13 @@ type UserFirstNameChangedEvent struct {
 	FirstName string `json:"firstName"`
 }
 
-func NewUserFirstNameChangedEvent(firstName string) *UserFirstNameChangedEvent {
+func NewUserFirstNameChangedEvent(id, firstName string) *UserFirstNameChangedEvent {
 	return &UserFirstNameChangedEvent{
 		FirstName: firstName,
-		BaseEvent: eventstore.BaseEvent{
-			Service:   "test.suite",
-			User:      "adlerhurst",
-			EventType: "user.firstName.changed",
-		},
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			context.Background(),
+			NewUserAggregate(id),
+			"user.firstname.changed"),
 	}
 }
 
@@ -137,13 +115,12 @@ type UserPasswordCheckedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func NewUserPasswordCheckedEvent() *UserPasswordCheckedEvent {
+func NewUserPasswordCheckedEvent(id string) *UserPasswordCheckedEvent {
 	return &UserPasswordCheckedEvent{
-		BaseEvent: eventstore.BaseEvent{
-			Service:   "test.suite",
-			User:      "adlerhurst",
-			EventType: "user.password.checked",
-		},
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			context.Background(),
+			NewUserAggregate(id),
+			"user.password.checked"),
 	}
 }
 
@@ -171,13 +148,12 @@ type UserDeletedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func NewUserDeletedEvent() *UserDeletedEvent {
+func NewUserDeletedEvent(id string) *UserDeletedEvent {
 	return &UserDeletedEvent{
-		BaseEvent: eventstore.BaseEvent{
-			Service:   "test.suite",
-			User:      "adlerhurst",
-			EventType: "user.deleted",
-		},
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			context.Background(),
+			NewUserAggregate(id),
+			"user.deleted"),
 	}
 }
 
@@ -213,18 +189,18 @@ func (rm *UsersReadModel) AppendEvents(events ...eventstore.EventReader) {
 		switch e := event.(type) {
 		case *UserAddedEvent:
 			//insert
-			user := NewUserReadModel(e.AggregateID())
+			user := NewUserReadModel(e.Aggregate().ID)
 			rm.Users = append(rm.Users, user)
 			user.AppendEvents(e)
 		case *UserFirstNameChangedEvent, *UserPasswordCheckedEvent:
 			//update
-			_, user := rm.userByID(e.AggregateID())
+			_, user := rm.userByID(e.Aggregate().ID)
 			if user == nil {
 				return
 			}
 			user.AppendEvents(e)
 		case *UserDeletedEvent:
-			idx, _ := rm.userByID(e.AggregateID())
+			idx, _ := rm.userByID(e.Aggregate().ID)
 			if idx < 0 {
 				return
 			}
@@ -302,11 +278,14 @@ func TestUserReadModel(t *testing.T) {
 		RegisterFilterEventMapper(UserPasswordCheckedMapper()).
 		RegisterFilterEventMapper(UserDeletedMapper())
 
-	events, err := es.PushAggregates(context.Background(),
-		NewUserAggregate("1").PushEvents(NewUserAddedEvent("hodor")),
-		NewUserAggregate("2").PushEvents(NewUserAddedEvent("hodor"), NewUserPasswordCheckedEvent(), NewUserPasswordCheckedEvent(), NewUserFirstNameChangedEvent("ueli")),
-		NewUserAggregate("2").PushEvents(NewUserDeletedEvent()),
-	)
+	events, err := es.PushEvents(context.Background(),
+		NewUserAddedEvent("1", "hodor"),
+		NewUserAddedEvent("2", "hodor"),
+		NewUserPasswordCheckedEvent("2"),
+		NewUserPasswordCheckedEvent("2"),
+		NewUserFirstNameChangedEvent("2", "ueli"),
+		NewUserDeletedEvent("2"))
+
 	if err != nil {
 		t.Errorf("unexpected error on push aggregates: %v", err)
 	}

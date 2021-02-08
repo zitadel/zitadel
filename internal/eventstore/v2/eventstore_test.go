@@ -47,13 +47,14 @@ type testEvent struct {
 	data                func() interface{}
 }
 
-func newTestEvent(description string, data func() interface{}, checkPrevious bool) *testEvent {
+func newTestEvent(id, description string, data func() interface{}, checkPrevious bool) *testEvent {
 	return &testEvent{
 		description:         description,
 		data:                data,
 		shouldCheckPrevious: checkPrevious,
 		BaseEvent: *NewBaseEventForPush(
 			service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+			NewAggregate(authz.NewMockContext("caos", "adlerhurst"), id, "testType", "v1"),
 			"test.event",
 		),
 	}
@@ -63,13 +64,13 @@ func (e *testEvent) Data() interface{} {
 	return e.data()
 }
 
-func (e *testEvent) UniqueConstraint() []*EventUniqueConstraint {
+func (e *testEvent) UniqueConstraints() []*EventUniqueConstraint {
 	return nil
 }
 
 func testFilterMapper(event *repository.Event) (EventReader, error) {
 	if event == nil {
-		return newTestEvent("hodor", nil, false), nil
+		return newTestEvent("testID", "hodor", nil, false), nil
 	}
 	return &testEvent{description: "hodor", BaseEvent: *BaseEventFromRepo(event)}, nil
 }
@@ -129,7 +130,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 				mapper:    testFilterMapper,
 			},
 			res: res{
-				event:       newTestEvent("hodor", nil, false),
+				event:       newTestEvent("id", "hodor", nil, false),
 				mapperCount: 1,
 			},
 		},
@@ -145,7 +146,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 				mapper:    testFilterMapper,
 			},
 			res: res{
-				event:       newTestEvent("hodor", nil, false),
+				event:       newTestEvent("id", "hodor", nil, false),
 				mapperCount: 2,
 			},
 		},
@@ -165,7 +166,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 				mapper:    testFilterMapper,
 			},
 			res: res{
-				event:       newTestEvent("hodor", nil, false),
+				event:       newTestEvent("id", "hodor", nil, false),
 				mapperCount: 2,
 			},
 		},
@@ -215,6 +216,7 @@ func Test_eventData(t *testing.T) {
 			name: "data as json bytes",
 			args: args{
 				event: newTestEvent(
+					"id",
 					"hodor",
 					func() interface{} {
 						return []byte(`{"piff":"paff"}`)
@@ -230,6 +232,7 @@ func Test_eventData(t *testing.T) {
 			name: "data as invalid json bytes",
 			args: args{
 				event: newTestEvent(
+					"id",
 					"hodor",
 					func() interface{} {
 						return []byte(`{"piffpaff"}`)
@@ -245,6 +248,7 @@ func Test_eventData(t *testing.T) {
 			name: "data as struct",
 			args: args{
 				event: newTestEvent(
+					"id",
 					"hodor",
 					func() interface{} {
 						return struct {
@@ -262,6 +266,7 @@ func Test_eventData(t *testing.T) {
 			name: "data as ptr to struct",
 			args: args{
 				event: newTestEvent(
+					"id",
 					"hodor",
 					func() interface{} {
 						return &struct {
@@ -279,6 +284,7 @@ func Test_eventData(t *testing.T) {
 			name: "no data",
 			args: args{
 				event: newTestEvent(
+					"id",
 					"hodor",
 					func() interface{} {
 						return nil
@@ -294,6 +300,7 @@ func Test_eventData(t *testing.T) {
 			name: "invalid because primitive",
 			args: args{
 				event: newTestEvent(
+					"id",
 					"hodor",
 					func() interface{} {
 						return ""
@@ -309,6 +316,7 @@ func Test_eventData(t *testing.T) {
 			name: "invalid because pointer to primitive",
 			args: args{
 				event: newTestEvent(
+					"id",
 					"hodor",
 					func() interface{} {
 						var s string
@@ -325,6 +333,7 @@ func Test_eventData(t *testing.T) {
 			name: "invalid because invalid struct for json",
 			args: args{
 				event: newTestEvent(
+					"id",
 					"hodor",
 					func() interface{} {
 						return struct {
@@ -355,7 +364,8 @@ func Test_eventData(t *testing.T) {
 
 func TestEventstore_aggregatesToEvents(t *testing.T) {
 	type args struct {
-		aggregates []Aggregater
+		aggregates []Aggregate
+		events     []EventPusher
 	}
 	type res struct {
 		wantErr bool
@@ -369,18 +379,14 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
-				aggregates: []Aggregater{
-					&testAggregate{
-						id: "1",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
+				events: []EventPusher{
+					newTestEvent(
+						"id",
+						"",
+						func() interface{} {
+							return nil
 						},
-					},
+						false),
 				},
 			},
 			res: res{
@@ -402,24 +408,21 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
-				aggregates: []Aggregater{
-					&testAggregate{
-						id: "1",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
+				events: []EventPusher{
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
 						},
-					},
+						false),
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
+						},
+						false),
 				},
 			},
 			res: res{
@@ -451,18 +454,14 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "invalid data",
 			args: args{
-				aggregates: []Aggregater{
-					&testAggregate{
-						id: "1",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return `{"data":""`
-								},
-								false),
+				events: []EventPusher{
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return `{"data":""`
 						},
-					},
+						false),
 				},
 			},
 			res: res{
@@ -472,35 +471,28 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "multiple aggregates",
 			args: args{
-				aggregates: []Aggregater{
-					&testAggregate{
-						id: "1",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
+				events: []EventPusher{
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
 						},
-					},
-					&testAggregate{
-						id: "2",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								true),
+						false),
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
 						},
-					},
+						false),
+					newTestEvent(
+						"2",
+						"",
+						func() interface{} {
+							return nil
+						},
+						true),
 				},
 			},
 			res: res{
@@ -546,8 +538,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			es := &Eventstore{}
-			events, _, err := es.aggregatesToEvents(tt.args.aggregates)
+			events, _, err := eventsToRepository(tt.args.events)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 				return
@@ -613,7 +604,7 @@ func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *reposito
 
 func TestEventstore_Push(t *testing.T) {
 	type args struct {
-		aggregates []Aggregater
+		events []EventPusher
 	}
 	type fields struct {
 		repo        *testRepo
@@ -631,18 +622,14 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
-				aggregates: []Aggregater{
-					&testAggregate{
-						id: "1",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
+				events: []EventPusher{
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
 						},
-					},
+						false),
 				},
 			},
 			fields: fields{
@@ -671,24 +658,21 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
-				aggregates: []Aggregater{
-					&testAggregate{
-						id: "1",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
+				events: []EventPusher{
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
 						},
-					},
+						false),
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
+						},
+						false),
 				},
 			},
 			fields: fields{
@@ -730,35 +714,28 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "multiple aggregates",
 			args: args{
-				aggregates: []Aggregater{
-					&testAggregate{
-						id: "1",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
+				events: []EventPusher{
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
 						},
-					},
-					&testAggregate{
-						id: "2",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								true),
+						false),
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
 						},
-					},
+						false),
+					newTestEvent(
+						"2",
+						"",
+						func() interface{} {
+							return nil
+						},
+						true),
 				},
 			},
 			fields: fields{
@@ -814,18 +791,14 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "push fails",
 			args: args{
-				aggregates: []Aggregater{
-					&testAggregate{
-						id: "1",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return nil
-								},
-								false),
+				events: []EventPusher{
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return nil
 						},
-					},
+						false),
 				},
 			},
 			fields: fields{
@@ -841,18 +814,14 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "aggreagtes to events mapping fails",
 			args: args{
-				aggregates: []Aggregater{
-					&testAggregate{
-						id: "1",
-						events: []EventPusher{
-							newTestEvent(
-								"",
-								func() interface{} {
-									return `{"data":""`
-								},
-								false),
+				events: []EventPusher{
+					newTestEvent(
+						"1",
+						"",
+						func() interface{} {
+							return `{"data":""`
 						},
-					},
+						false),
 				},
 			},
 			fields: fields{
@@ -881,7 +850,7 @@ func TestEventstore_Push(t *testing.T) {
 				t.FailNow()
 			}
 
-			_, err := es.PushAggregates(context.Background(), tt.args.aggregates...)
+			_, err := es.PushEvents(context.Background(), tt.args.events...)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 			}

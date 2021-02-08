@@ -9,15 +9,14 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
+//BaseEvent represents the minimum metadata of an event
 type BaseEvent struct {
-	aggregateID   string        `json:"-"`
-	aggregateType AggregateType `json:"-"`
-	EventType     EventType     `json:"-"`
+	EventType EventType
 
-	resourceOwner    string    `json:"-"`
-	aggregateVersion Version   `json:"-"`
-	sequence         uint64    `json:"-"`
-	creationDate     time.Time `json:"-"`
+	aggregate Aggregate
+
+	sequence     uint64
+	creationDate time.Time
 
 	//User is the user who created the event
 	User string `json:"-"`
@@ -35,59 +34,54 @@ func (e *BaseEvent) EditorUser() string {
 	return e.User
 }
 
-//KeyType implements EventPusher
+//Type implements EventPusher
 func (e *BaseEvent) Type() EventType {
 	return e.EventType
 }
 
-func (e *BaseEvent) AggregateID() string {
-	return e.aggregateID
-}
-func (e *BaseEvent) AggregateType() AggregateType {
-	return e.aggregateType
-}
-func (e *BaseEvent) ResourceOwner() string {
-	return e.resourceOwner
-}
-func (e *BaseEvent) AggregateVersion() Version {
-	return e.aggregateVersion
-}
+//Sequence is an upcounting unique number of the event
 func (e *BaseEvent) Sequence() uint64 {
 	return e.sequence
 }
+
+//CreationDate is the the time, the event is inserted into the eventstore
 func (e *BaseEvent) CreationDate() time.Time {
 	return e.creationDate
 }
 
+//Aggregate represents the metadata of the event's aggregate
+func (e *BaseEvent) Aggregate() Aggregate {
+	return e.aggregate
+}
+
+//BaseEventFromRepo maps a stored event to a BaseEvent
 func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 	return &BaseEvent{
-		aggregateID:      event.AggregateID,
-		aggregateType:    AggregateType(event.AggregateType),
-		aggregateVersion: Version(event.Version),
-		EventType:        EventType(event.Type),
-		creationDate:     event.CreationDate,
-		sequence:         event.Sequence,
-		resourceOwner:    event.ResourceOwner,
-		Service:          event.EditorService,
-		User:             event.EditorUser,
+		aggregate: Aggregate{
+			ID:            event.AggregateID,
+			Typ:           AggregateType(event.AggregateType),
+			ResourceOwner: event.ResourceOwner,
+			Version:       Version(event.Version),
+		},
+		EventType:    EventType(event.Type),
+		creationDate: event.CreationDate,
+		sequence:     event.Sequence,
+		Service:      event.EditorService,
+		User:         event.EditorUser,
 	}
 }
 
-func NewBaseEventForPush(ctx context.Context, typ EventType) *BaseEvent {
+//NewBaseEventForPush is the constructor for event's which will be pushed into the eventstore
+// the resource owner of the aggregate is only used if it's the first event of this aggregateroot
+// afterwards the resource owner of the first previous events is taken
+func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventType) *BaseEvent {
 	svcName := service.FromContext(ctx)
-	return &BaseEvent{
+	event := &BaseEvent{
+		aggregate: *aggregate,
 		User:      authz.GetCtxData(ctx).UserID,
 		Service:   svcName,
 		EventType: typ,
 	}
-}
 
-func NewBaseEventForPushWithResourceOwner(ctx context.Context, typ EventType, resourceOwner string) *BaseEvent {
-	svcName := service.FromContext(ctx)
-	return &BaseEvent{
-		User:          authz.GetCtxData(ctx).UserID,
-		Service:       svcName,
-		EventType:     typ,
-		resourceOwner: resourceOwner,
-	}
+	return event
 }

@@ -36,67 +36,56 @@ func (es *Eventstore) Health(ctx context.Context) error {
 	return es.repo.Health(ctx)
 }
 
-//PushAggregate pushes the aggregate and reduces the new events on the aggregate
-func (es *Eventstore) PushAggregate(ctx context.Context, writeModel queryReducer, aggregate Aggregater) error {
-	events, err := es.PushAggregates(ctx, aggregate)
-	if err != nil {
-		return err
-	}
-
-	writeModel.AppendEvents(events...)
-	return writeModel.Reduce()
-}
-
-//PushAggregates maps the events of all aggregates to an eventstore event
-// based on the pushMapper
-func (es *Eventstore) PushAggregates(ctx context.Context, aggregates ...Aggregater) ([]EventReader, error) {
-	events, uniqueConstraints, err := es.aggregatesToEvents(aggregates)
+//PushEvents pushes the events in a single transaction
+// an event needs at least an aggregate
+func (es *Eventstore) PushEvents(ctx context.Context, pushEvents ...EventPusher) ([]EventReader, error) {
+	events, constraints, err := eventsToRepository(pushEvents)
 	if err != nil {
 		return nil, err
 	}
-
-	err = es.repo.Push(ctx, events, uniqueConstraints...)
+	err = es.repo.Push(ctx, events, constraints...)
 	if err != nil {
 		return nil, err
 	}
-
 	return es.mapEvents(events)
 }
 
-func (es *Eventstore) aggregatesToEvents(aggregates []Aggregater) ([]*repository.Event, []*repository.UniqueConstraint, error) {
-	events := make([]*repository.Event, 0, len(aggregates))
-	uniqueConstraints := make([]*repository.UniqueConstraint, 0)
-	for _, aggregate := range aggregates {
-		for _, event := range aggregate.Events() {
-			data, err := eventData(event)
-			if err != nil {
-				return nil, nil, err
-			}
-			events = append(events, &repository.Event{
-				AggregateID:   aggregate.ID(),
-				AggregateType: repository.AggregateType(aggregate.Type()),
-				ResourceOwner: aggregate.ResourceOwner(),
-				EditorService: event.EditorService(),
-				EditorUser:    event.EditorUser(),
-				Type:          repository.EventType(event.Type()),
-				Version:       repository.Version(aggregate.Version()),
-				Data:          data,
-			})
-			if event.UniqueConstraints() != nil {
-				for _, constraint := range event.UniqueConstraints() {
-					uniqueConstraints = append(uniqueConstraints,
-						&repository.UniqueConstraint{
-							UniqueType:   constraint.UniqueType,
-							UniqueField:  constraint.UniqueField,
-							Action:       uniqueConstraintActionToRepository(constraint.Action),
-							ErrorMessage: constraint.ErrorMessage,
-						},
-					)
-				}
-			}
+func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
+	events = make([]*repository.Event, len(pushEvents))
+	for i, event := range pushEvents {
+		data, err := eventData(event)
+		if err != nil {
+			return nil, nil, err
+		}
+		events[i] = &repository.Event{
+			AggregateID:   event.Aggregate().ID,
+			AggregateType: repository.AggregateType(event.Aggregate().Typ),
+			ResourceOwner: event.Aggregate().ResourceOwner,
+			EditorService: event.EditorService(),
+			EditorUser:    event.EditorUser(),
+			Type:          repository.EventType(event.Type()),
+			Version:       repository.Version(event.Aggregate().Version),
+			Data:          data,
+		}
+		if len(event.UniqueConstraints()) > 0 {
+			constraints = append(constraints, uniqueConstraintsToRepository(event.UniqueConstraints())...)
 		}
 	}
-	return events, uniqueConstraints, nil
+
+	return events, constraints, nil
+}
+
+func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (uniqueConstraints []*repository.UniqueConstraint) {
+	uniqueConstraints = make([]*repository.UniqueConstraint, len(constraints))
+	for i, constraint := range constraints {
+		uniqueConstraints[i] = &repository.UniqueConstraint{
+			UniqueType:   constraint.UniqueType,
+			UniqueField:  constraint.UniqueField,
+			Action:       uniqueConstraintActionToRepository(constraint.Action),
+			ErrorMessage: constraint.ErrorMessage,
+		}
+	}
+	return uniqueConstraints
 }
 
 //FilterEvents filters the stored events based on the searchQuery
