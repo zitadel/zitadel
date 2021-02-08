@@ -5,7 +5,7 @@
 
 <style>
     h2 {
-        margin-bottom: 2rem;
+        margin: 2rem 0;
     }
     
     .section {
