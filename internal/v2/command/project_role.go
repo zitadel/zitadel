@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -108,13 +109,18 @@ func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, res
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
 	projectAgg.PushEvents(project.NewRoleRemovedEvent(ctx, key, projectID, existingRole.ResourceOwner))
 	for _, projectGrantID := range cascadingProjectGrantIds {
-		r.removeRoleFromProjectGrant(ctx, projectAgg, projectID, projectGrantID, key, true)
+		_, err = r.removeRoleFromProjectGrant(ctx, projectAgg, projectID, projectGrantID, key, true)
+		if err != nil {
+			logging.LogWithFields("COMMAND-6n77g", "projectgrantid", projectGrantID).WithError(err).Warn("could not cascade remove role from project grant")
+			continue
+		}
 	}
 	aggregates = append(aggregates, projectAgg)
 
 	for _, grantID := range cascadeUserGrantIDs {
 		grantAgg, _, err := r.removeRoleFromUserGrant(ctx, grantID, []string{key}, true)
 		if err != nil {
+			logging.LogWithFields("COMMAND-mK0of", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
 		aggregates = append(aggregates, grantAgg)

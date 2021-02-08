@@ -80,24 +80,6 @@ func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, user
 		return err
 	}
 	if existingHuman.UserState == domain.UserStateUnspecified || existingHuman.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-dn88J", "Errors.User.Password.NotFound")
-	}
-
-	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	userAgg.PushEvents(user.NewHumanExternalIDPCheckSucceededEvent(ctx, authRequestDomainToAuthRequestInfo(authRequest)))
-	return r.eventstore.PushAggregate(ctx, existingHuman, userAgg)
-}
-
-func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, userID string, authRequest *domain.AuthRequest) (err error) {
-	if userID == "" {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-5n8sM", "Errors.IDMissing")
-	}
-
-	existingHuman, err := r.getHumanWriteModelByID(ctx, userID, orgID)
-	if err != nil {
-		return err
-	}
-	if existingHuman.UserState == domain.UserStateUnspecified || existingHuman.UserState == domain.UserStateDeleted {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-dn88J", "Errors.User.NotFound")
 	}
 

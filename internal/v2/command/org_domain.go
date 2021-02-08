@@ -110,6 +110,7 @@ func (r *CommandSide) ValidateOrgDomain(ctx context.Context, orgDomain *domain.O
 		for _, userID := range claimedUserIDs {
 			userAgg, _, err := r.userDomainClaimed(ctx, userID)
 			if err != nil {
+				logging.LogWithFields("COMMAND-5m8fs", "userid", userID).WithError(err).Warn("could not claim user")
 				continue
 			}
 			aggregates = append(aggregates, userAgg)
@@ -178,6 +179,7 @@ func (r *CommandSide) addOrgDomain(ctx context.Context, orgAgg *org.Aggregate, a
 		for _, userID := range claimedUserIDs {
 			userAgg, _, err := r.userDomainClaimed(ctx, userID)
 			if err != nil {
+				logging.LogWithFields("COMMAND-nn8Jf", "userid", userID).WithError(err).Warn("could not claim user")
 				continue
 			}
 			userAggregates = append(userAggregates, userAgg)

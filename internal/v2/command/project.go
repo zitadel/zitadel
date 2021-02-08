@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -166,6 +167,7 @@ func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwne
 	for _, grantID := range cascadingUserGrantIDs {
 		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
+			logging.LogWithFields("COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
 		aggregates = append(aggregates, grantAgg)

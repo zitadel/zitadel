@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"github.com/caos/logging"
 	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -146,6 +147,7 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	for _, grantID := range cascadingGrantIDs {
 		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
+			logging.LogWithFields("COMMAND-5m9oL", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
 		aggregates = append(aggregates, grantAgg)
@@ -211,7 +213,7 @@ func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (_ *
 		return nil, nil, err
 	}
 	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
-		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.USer.NotFound")
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
 	}
 	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
 	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)

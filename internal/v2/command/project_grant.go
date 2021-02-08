@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -66,6 +67,9 @@ func (r *CommandSide) ChangeProjectGrant(ctx context.Context, grant *domain.Proj
 	removedRoles := domain.GetRemovedRoles(existingGrant.RoleKeys, grant.RoleKeys)
 	if len(removedRoles) == 0 {
 		err = r.eventstore.PushAggregate(ctx, existingGrant, projectAgg)
+		if err != nil {
+			return nil, err
+		}
 		return projectGrantWriteModelToProjectGrant(existingGrant), nil
 	}
 
@@ -83,7 +87,10 @@ func (r *CommandSide) ChangeProjectGrant(ctx context.Context, grant *domain.Proj
 		return nil, err
 	}
 	existingGrant.AppendEvents(resultEvents...)
-	existingGrant.Reduce()
+	err = existingGrant.Reduce()
+	if err != nil {
+		return nil, err
+	}
 	return projectGrantWriteModelToProjectGrant(existingGrant), nil
 }
 
@@ -184,6 +191,7 @@ func (r *CommandSide) RemoveProjectGrant(ctx context.Context, projectID, grantID
 	for _, userGrantID := range cascadeUserGrantIDs {
 		grantAgg, _, err := r.removeUserGrant(ctx, userGrantID, "", true)
 		if err != nil {
+			logging.LogWithFields("COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
 		aggregates = append(aggregates, grantAgg)

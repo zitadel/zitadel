@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -123,6 +124,7 @@ func (r *CommandSide) removeIDPProviderFromLoginPolicy(ctx context.Context, orgA
 	for _, idp := range cascadeExternalIDPs {
 		userAgg, _, err := r.removeHumanExternalIDP(ctx, idp, true)
 		if err != nil {
+			logging.LogWithFields("COMMAND-n8RRf", "userid", idp.AggregateID, "idpconfigid", idp.IDPConfigID).WithError(err).Warn("could not cascade remove external idp")
 			continue
 		}
 		userAggregates = append(userAggregates, userAgg)
