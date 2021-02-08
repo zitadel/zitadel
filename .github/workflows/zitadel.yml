@@ -251,7 +251,7 @@ jobs:
 
       - name: Set output
         id: branch
-        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+        run: echo ::set-output name=short_ref::${GITHUB_REF##*/}
       - name: Dev-Release
         if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master'
         id: create_release
