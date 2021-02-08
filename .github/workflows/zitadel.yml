@@ -216,7 +216,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: $GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
           release_name: Branch ${{ github.ref }}
@@ -230,7 +230,7 @@ jobs:
         id: upload-release-asset-darwin
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: $GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/orbctl-darwin-amd64
@@ -241,7 +241,7 @@ jobs:
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: $GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/orbctl-linux-amd64
@@ -252,7 +252,7 @@ jobs:
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: $GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/orbctl-windows-amd64
