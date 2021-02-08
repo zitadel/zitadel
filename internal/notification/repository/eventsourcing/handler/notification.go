@@ -4,9 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
+	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/user/model"
-	model2 "github.com/caos/zitadel/internal/user/repository/view/model"
 	"golang.org/x/text/language"
 	"net/http"
 	"time"
@@ -412,13 +411,13 @@ func (n *Notification) getMailText(ctx context.Context, textType string, lang st
 	return iam_es_model.MailTextViewToModel(mailText), err
 }
 
-func (n *Notification) getUserByID(userID string) (*model2.NotifyUser, error) {
+func (n *Notification) getUserByID(userID string) (*view_model.NotifyUser, error) {
 	user, usrErr := n.view.NotifyUserByID(userID)
 	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
 		return nil, usrErr
 	}
 	if user == nil {
-		user = &model2.NotifyUser{}
+		user = &view_model.NotifyUser{}
 	}
 	events, err := n.getUserEvents(userID, user.Sequence)
 	if err != nil {

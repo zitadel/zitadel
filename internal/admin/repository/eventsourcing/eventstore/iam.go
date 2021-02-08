@@ -132,31 +132,6 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	return result, nil
 }
 
-func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, viewErr := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if caos_errs.IsNotFound(viewErr) {
-		policy = new(iam_es_model.LabelPolicyView)
-	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
-	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4bM0s", "Errors.IAM.LabelPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.LabelPolicyViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.LabelPolicyViewToModel(policy), nil
-		}
-	}
-	return iam_es_model.LabelPolicyViewToModel(policy), nil
-}
-
 func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
 	policy, viewErr := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
@@ -443,12 +418,4 @@ func (repo *IAMRepository) AddDefaultMailText(ctx context.Context, text *iam_mod
 func (repo *IAMRepository) ChangeDefaultMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
 	text.AggregateID = repo.SystemDefaults.IamID
 	return repo.IAMEventstore.ChangeMailText(ctx, text)
-}
-
-func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
-	policy, err := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.LoginPolicyViewToModel(policy), err
 }
