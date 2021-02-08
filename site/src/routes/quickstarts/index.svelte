@@ -88,6 +88,7 @@
         max-width: 150px;
         object-fit: contain;
         padding: 20px;
+        border-radius: 4px;
     }
 
     .quickstart .sub {

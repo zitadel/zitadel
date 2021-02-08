@@ -68,6 +68,7 @@
          max-width: 60px;
          margin: .5rem;
          object-fit: contain;
+         border-radius: 4px;
      }
 
     .doc-container .doc a {
@@ -180,7 +181,7 @@
             <div class="left">
                 <h2>ZITADEL Identity and Access Management</h2>
                 <p>Most applications need to know the identity of a user allowing to securely store user data in the cloud and provide the same personalised experience across all of the user's devices.</p>
-                <p>ZITADEL's authentication provides backend services, easy-to-use SDKs, and ready-made UI libraries to authenticate users in your applicqtion. It supports authentication using passwords and applies additional security wirh the help of a second factor, for example OTP, to ensure a safe and secure access.</p>
+                <p>ZITADEL's authentication provides backend services, easy-to-use SDKs, and ready-made UI libraries to authenticate users in your application. It supports authentication using passwords and applies additional security with the help of a second factor, for example OTP, to ensure a safe and secure access.</p>
                 <p>ZITADEL's authentication leverages industry standards like OAuth 2.0 and OpenID Connect so that it can be easily integrated in your custom backend.</p>
             </div>
             <img class="caos-back" src="logos/zitadel-logo-solo-darkdesign.svg" alt="caos logo">
@@ -196,8 +197,8 @@
                 </Button>
             </a>
             <div class="sublinks">
-                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">Use ORBOS to install ZITADEL</a>
-                <a class="sublink" href="start#Use_ORBOS_to_install_ZITADEL">Create application</a>
+                <a class="sublink" href="start#ORBOS">Use ORBOS to install ZITADEL</a>
+                <a class="sublink" href="start#Integrating_an_application">Create application</a>
             </div>
         </div>
 
@@ -218,9 +219,9 @@
 
                     <p class="section">In this section</p>
                     <div class="sectionlinks">
-                        <a class="link" href="quickstarts#Single_Page_Application">Single Page Applications</a>
-                        <a class="link" href="quickstarts#Server_Side_Application">Serverside rendered Applications</a>
-                        <a class="link" href="quickstarts#Mobile_App_Native_App">Native Applications</a>
+                        <a class="link" href="angular">Single Page Applications (Angular)</a>
+                        <a class="link" href="go">Serverside rendered Applications</a>
+                        <a class="link" href="dart">Native Applications (Flutter)</a>
                     </div>
                 </div>
             </div>
@@ -234,7 +235,7 @@
                     <p class="section">In this section</p>
                     
                     <div class="sectionlinks">
-                        <a class="link" href="administrate#Organisations">Manage Organisations</a>
+                        <a class="link" href="administrate#Organizations">Manage Organisations</a>
                         <a class="link" href="administrate#Projects">Manage Projects</a>
                     </div>
                 </div>

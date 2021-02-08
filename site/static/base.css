@@ -193,7 +193,8 @@ samp {
 code {
 	position: relative;
 	border-radius: .3em;
-	white-space: nowrap;
+    white-space: nowrap;
+    font-size: var(--h6);
 	/* color: var(--text); */
     -webkit-font-smoothing: initial;
     font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -223,7 +224,7 @@ li:not(.white) > h2 {
 blockquote {
 	position: relative;
 	margin: 1.6rem 0 2.4rem;
-	padding: 2rem 2.4rem 1.8rem 2.4rem;
+	padding: 1rem 2.4rem 1rem 2.4rem;
 	border-radius: var(--border-r);
 	font-family: var(--font);
 	max-width: var(--linemax);
@@ -589,10 +590,12 @@ input[type="checkbox"]:checked::after {
 .zitadel-gallery img {
     width: 100%;
     object-fit: contain;
+    border-radius: 4px;
 }
 .zitadel-gallery figure {
     flex-basis: 30%;
     object-fit: contain;
     margin: 5px 5px 5px 0;
     width: 150px;
+    border-radius: 4px;
 }

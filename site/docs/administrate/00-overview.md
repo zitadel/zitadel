@@ -2,6 +2,8 @@
 title: Overview
 ---
 
+This documentation describes the structure of ZITADEL, its role system and in parallel the use of [console](https://console.zitadel.ch), our administration UI for ZITADEL.
+
 > All documentations are under active work and subject to change soon!
 
 ### Features
