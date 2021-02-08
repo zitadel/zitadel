@@ -210,6 +210,55 @@ jobs:
         with:
           dry_run: false
           semantic_version: 17.0.4
+
+      - name: Dev-Release
+        if: steps.semantic.outputs.new_release_published != 'true' && github.ref != 'master'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: $GITHUB_TOKEN
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Branch ${{ github.ref }}
+          body: |
+            This is a release from a development branch.
+            Do not use these artifacts in production.
+          draft: false
+          prerelease: true
+      - name: Upload Release Asset Darwin
+        if: steps.semantic.outputs.new_release_published != 'true' && github.ref != 'master'
+        id: upload-release-asset-darwin
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: $GITHUB_TOKEN
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/orbctl-darwin-amd64
+          asset_name: Zitadelctl Darwin Amd64
+          asset_content_type: application/octet-stream
+      - name: Upload Release Asset Linux
+        if: steps.semantic.outputs.new_release_published != 'true' && github.ref != 'master'
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: $GITHUB_TOKEN
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/orbctl-linux-amd64
+          asset_name: Zitadelctl Linux Amd64
+          asset_content_type: application/octet-stream
+      - name: Upload Release Asset
+        if: steps.semantic.outputs.new_release_published != 'true' && github.ref != 'master'
+        id: upload-release-asset-windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: $GITHUB_TOKEN
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/orbctl-windows-amd64
+          asset_name: Zitadelctl Windows Amd64
+          asset_content_type: application/octet-stream
+
       - name: Do something when a new release published
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
@@ -217,6 +266,7 @@ jobs:
           echo ${{ steps.semantic.outputs.new_release_major_version }}
           echo ${{ steps.semantic.outputs.new_release_minor_version }}
           echo ${{ steps.semantic.outputs.new_release_patch_version }}
+      - name:
       - name: Docker Tag Version
         run: |
           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
