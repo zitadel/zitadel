@@ -999,7 +999,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		name        string
 		fields      fields
 		args        args
-		want        model.NextStep
+		want        domain.NextStep
 		wantChecked bool
 		errFunc     func(err error) bool
 	}{
@@ -1071,9 +1071,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 					},
 				},
 			},
-			&model.MFAPromptStep{
-				MFAProviders: []model.MFAType{
-					model.MFATypeOTP,
+			&domain.MFAPromptStep{
+				MFAProviders: []domain.MFAType{
+					domain.MFATypeOTP,
 				},
 			},
 			false,
@@ -1097,10 +1097,10 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 					},
 				},
 			},
-			&model.MFAPromptStep{
+			&domain.MFAPromptStep{
 				Required: true,
-				MFAProviders: []model.MFAType{
-					model.MFATypeOTP,
+				MFAProviders: []domain.MFAType{
+					domain.MFATypeOTP,
 				},
 			},
 			false,
@@ -1169,8 +1169,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				userSession: &user_model.UserSessionView{},
 			},
 
-			&model.MFAVerificationStep{
-				MFAProviders: []model.MFAType{model.MFATypeOTP},
+			&domain.MFAVerificationStep{
+				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
 			},
 			false,
 			nil,
