@@ -27,6 +27,22 @@ func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*
 	return model.UserGrantToModel(grant), nil
 }
 
+func (repo *UserGrantRepo) UserGrantsByProjectID(ctx context.Context, projectID string) ([]*grant_model.UserGrantView, error) {
+	grants, err := repo.View.UserGrantsByProjectID(projectID)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserGrantsToModel(grants), nil
+}
+
+func (repo *UserGrantRepo) UserGrantsByUserID(ctx context.Context, userID string) ([]*grant_model.UserGrantView, error) {
+	grants, err := repo.View.UserGrantsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserGrantsToModel(grants), nil
+}
+
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, sequenceErr := repo.View.GetLatestUserGrantSequence("")

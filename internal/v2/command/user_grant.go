@@ -189,7 +189,7 @@ func (r *CommandSide) BulkRemoveUserGrant(ctx context.Context, grantIDs []string
 }
 
 func (r *CommandSide) removeUserGrant(ctx context.Context, grantID, resourceOwner string, cascade bool) (_ *usergrant.Aggregate, _ *UserGrantWriteModel, err error) {
-	if grantID == "" || resourceOwner == "" {
+	if grantID == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J9sc5", "Errors.UserGrant.IDMissing")
 	}
 
@@ -205,7 +205,6 @@ func (r *CommandSide) removeUserGrant(ctx context.Context, grantID, resourceOwne
 		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1My0t", "Errors.UserGrant.NotFound")
 	}
 
-	//TODO: Remove Uniqueness
 	removeUserGrant := NewUserGrantWriteModel(grantID, resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&removeUserGrant.WriteModel)
 	if !cascade {

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"time"
 
 	"golang.org/x/text/language"
@@ -117,21 +118,21 @@ func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &UserSearchQuery{Key: UserSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }
 
-func (u *UserView) MFATypesSetupPossible(level req_model.MFALevel, policy *iam_model.LoginPolicyView) []req_model.MFAType {
-	types := make([]req_model.MFAType, 0)
+func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.LoginPolicy) []domain.MFAType {
+	types := make([]domain.MFAType, 0)
 	switch level {
 	default:
 		fallthrough
-	case req_model.MFALevelSecondFactor:
+	case domain.MFALevelSecondFactor:
 		if policy.HasSecondFactors() {
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
-				case iam_model.SecondFactorTypeOTP:
+				case domain.SecondFactorTypeOTP:
 					if u.OTPState != MFAStateReady {
-						types = append(types, req_model.MFATypeOTP)
+						types = append(types, domain.MFATypeOTP)
 					}
-				case iam_model.SecondFactorTypeU2F:
-					types = append(types, req_model.MFATypeU2F)
+				case domain.SecondFactorTypeU2F:
+					types = append(types, domain.MFATypeU2F)
 				}
 			}
 		}
@@ -140,24 +141,24 @@ func (u *UserView) MFATypesSetupPossible(level req_model.MFALevel, policy *iam_m
 	return types
 }
 
-func (u *UserView) MFATypesAllowed(level req_model.MFALevel, policy *iam_model.LoginPolicyView) ([]req_model.MFAType, bool) {
-	types := make([]req_model.MFAType, 0)
+func (u *UserView) MFATypesAllowed(level domain.MFALevel, policy *domain.LoginPolicy) ([]domain.MFAType, bool) {
+	types := make([]domain.MFAType, 0)
 	required := true
 	switch level {
 	default:
 		required = policy.ForceMFA
 		fallthrough
-	case req_model.MFALevelSecondFactor:
+	case domain.MFALevelSecondFactor:
 		if policy.HasSecondFactors() {
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
-				case iam_model.SecondFactorTypeOTP:
+				case domain.SecondFactorTypeOTP:
 					if u.OTPState == MFAStateReady {
-						types = append(types, req_model.MFATypeOTP)
+						types = append(types, domain.MFATypeOTP)
 					}
-				case iam_model.SecondFactorTypeU2F:
+				case domain.SecondFactorTypeU2F:
 					if u.IsU2FReady() {
-						types = append(types, req_model.MFATypeU2F)
+						types = append(types, domain.MFATypeU2F)
 					}
 				}
 			}

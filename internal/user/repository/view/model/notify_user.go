@@ -39,6 +39,7 @@ type NotifyUser struct {
 	VerifiedPhone      string         `json:"-" gorm:"column:verified_phone"`
 	PasswordSet        bool           `json:"-" gorm:"column:password_set"`
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
+	State              int32          `json:"-"`
 }
 
 func NotifyUserFromModel(user *model.NotifyUser) *NotifyUser {
@@ -144,6 +145,8 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserPasswordChanged,
 		es_model.HumanPasswordChanged:
 		err = u.setPasswordData(event)
+	case es_model.UserRemoved:
+		u.State = int32(UserStateDeleted)
 	}
 	return err
 }

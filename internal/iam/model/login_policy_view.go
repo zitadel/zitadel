@@ -1,7 +1,9 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"time"
 )
 
@@ -63,4 +65,58 @@ func (p *LoginPolicyView) HasMultiFactors() bool {
 		return false
 	}
 	return true
+}
+
+func (p *LoginPolicyView) ToLoginPolicyDomain() *domain.LoginPolicy {
+	return &domain.LoginPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:  p.AggregateID,
+			CreationDate: p.CreationDate,
+			ChangeDate:   p.ChangeDate,
+			Sequence:     p.Sequence,
+		},
+		Default:               p.Default,
+		AllowUsernamePassword: p.AllowUsernamePassword,
+		AllowRegister:         p.AllowRegister,
+		AllowExternalIDP:      p.AllowExternalIDP,
+		ForceMFA:              p.ForceMFA,
+		PasswordlessType:      passwordLessTypeToDomain(p.PasswordlessType),
+		SecondFactors:         secondFactorsToDomain(p.SecondFactors),
+		MultiFactors:          multiFactorsToDomain(p.MultiFactors),
+	}
+}
+
+func passwordLessTypeToDomain(passwordless PasswordlessType) domain.PasswordlessType {
+	switch passwordless {
+	case PasswordlessTypeNotAllowed:
+		return domain.PasswordlessTypeNotAllowed
+	case PasswordlessTypeAllowed:
+		return domain.PasswordlessTypeAllowed
+	default:
+		return domain.PasswordlessTypeNotAllowed
+	}
+}
+
+func secondFactorsToDomain(types []SecondFactorType) []domain.SecondFactorType {
+	secondfactors := make([]domain.SecondFactorType, len(types))
+	for i, secondfactorType := range types {
+		switch secondfactorType {
+		case SecondFactorTypeU2F:
+			secondfactors[i] = domain.SecondFactorTypeU2F
+		case SecondFactorTypeOTP:
+			secondfactors[i] = domain.SecondFactorTypeOTP
+		}
+	}
+	return secondfactors
+}
+
+func multiFactorsToDomain(types []MultiFactorType) []domain.MultiFactorType {
+	multifactors := make([]domain.MultiFactorType, len(types))
+	for i, multifactorType := range types {
+		switch multifactorType {
+		case MultiFactorTypeU2FWithPIN:
+			multifactors[i] = domain.MultiFactorTypeU2FWithPIN
+		}
+	}
+	return multifactors
 }

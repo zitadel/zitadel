@@ -25,8 +25,6 @@ type UserRepository interface {
 
 	SearchMachineKeys(ctx context.Context, request *model.MachineKeySearchRequest) (*model.MachineKeySearchResponse, error)
 	GetMachineKey(ctx context.Context, userID, keyID string) (*model.MachineKeyView, error)
-	AddMachineKey(ctx context.Context, key *model.MachineKey) (*model.MachineKey, error)
-	RemoveMachineKey(ctx context.Context, userID, keyID string) error
 
 	EmailByID(ctx context.Context, userID string) (*model.Email, error)
 

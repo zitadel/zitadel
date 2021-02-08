@@ -107,7 +107,7 @@ func (mr *MockAuthRequestCacheMockRecorder) SaveAuthRequest(arg0, arg1 interface
 }
 
 // UpdateAuthRequest mocks base method
-func (m *MockAuthRequestCache) UpdateAuthRequest(arg0 context.Context, arg1 *model.AuthRequest) error {
+func (m *MockAuthRequestCache) UpdateAuthRequest(arg0 context.Context, arg1 *domain.AuthRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateAuthRequest", arg0, arg1)
 	ret0, _ := ret[0].(error)

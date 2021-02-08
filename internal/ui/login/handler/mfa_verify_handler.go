@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -25,7 +26,7 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 	}
 	if data.MFAType == model.MFATypeOTP {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Code, userAgentID, model.BrowserInfoFromRequest(r))
+		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Code, userAgentID, domain.BrowserInfoFromRequest(r))
 	}
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -34,7 +35,7 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderMFAVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, verificationStep *model.MFAVerificationStep, err error) {
+func (l *Login) renderMFAVerify(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, verificationStep *domain.MFAVerificationStep, err error) {
 	if verificationStep == nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -43,7 +44,7 @@ func (l *Login) renderMFAVerify(w http.ResponseWriter, r *http.Request, authReq 
 	l.renderMFAVerifySelected(w, r, authReq, verificationStep, provider, err)
 }
 
-func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, verificationStep *model.MFAVerificationStep, selectedProvider model.MFAType, err error) {
+func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, verificationStep *domain.MFAVerificationStep, selectedProvider domain.MFAType, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -54,12 +55,12 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 	switch selectedProvider {
-	case model.MFATypeU2F:
-		l.renderU2FVerification(w, r, authReq, removeSelectedProviderFromList(verificationStep.MFAProviders, model.MFATypeU2F), nil)
+	case domain.MFATypeU2F:
+		l.renderU2FVerification(w, r, authReq, removeSelectedProviderFromList(verificationStep.MFAProviders, domain.MFATypeU2F), nil)
 		return
-	case model.MFATypeOTP:
-		data.MFAProviders = removeSelectedProviderFromList(verificationStep.MFAProviders, model.MFATypeOTP)
-		data.SelectedMFAProvider = model.MFATypeOTP
+	case domain.MFATypeOTP:
+		data.MFAProviders = removeSelectedProviderFromList(verificationStep.MFAProviders, domain.MFATypeOTP)
+		data.SelectedMFAProvider = domain.MFATypeOTP
 	default:
 		l.renderError(w, r, authReq, err)
 		return
@@ -67,7 +68,7 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMFAVerify], data, nil)
 }
 
-func removeSelectedProviderFromList(providers []model.MFAType, selected model.MFAType) []model.MFAType {
+func removeSelectedProviderFromList(providers []domain.MFAType, selected domain.MFAType) []domain.MFAType {
 	for i := len(providers) - 1; i >= 0; i-- {
 		if providers[i] == selected {
 			copy(providers[i:], providers[i+1:])

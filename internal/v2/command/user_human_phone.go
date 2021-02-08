@@ -93,7 +93,7 @@ func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, user
 		return err
 	}
 	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9fs", "Errors.User.Phone.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-2b7Hf", "Errors.User.Phone.NotFound")
 	}
 	if existingPhone.IsPhoneVerified {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sf", "Errors.User.Phone.AlreadyVerified")
@@ -104,6 +104,19 @@ func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, user
 		return err
 	}
 	userAgg.PushEvents(user.NewHumanPhoneCodeAddedEvent(ctx, phoneCode.Code, phoneCode.Expiry))
+	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
+}
+
+func (r *CommandSide) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	existingPhone, err := r.phoneWriteModelByID(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-66n8J", "Errors.User.Phone.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
+	userAgg.PushEvents(user.NewHumanPhoneCodeSentEvent(ctx))
 	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
 }
 

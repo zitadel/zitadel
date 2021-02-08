@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
-	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
@@ -12,8 +12,8 @@ const (
 )
 
 type mfaPromptData struct {
-	MFAProvider model.MFAType `schema:"provider"`
-	Skip        bool          `schema:"skip"`
+	MFAProvider domain.MFAType `schema:"provider"`
+	Skip        bool           `schema:"skip"`
 }
 
 func (l *Login) handleMFAPrompt(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +29,7 @@ func (l *Login) handleMFAPrompt(w http.ResponseWriter, r *http.Request) {
 		l.handleMFACreation(w, r, authReq, mfaVerifyData)
 		return
 	}
-	err = l.authRepo.SkipMFAInit(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
+	err = l.command.HumanSkipMFAInit(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -48,7 +48,7 @@ func (l *Login) handleMFAPromptSelection(w http.ResponseWriter, r *http.Request)
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderMFAPrompt(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, mfaPromptData *model.MFAPromptStep, err error) {
+func (l *Login) renderMFAPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, mfaPromptData *domain.MFAPromptStep, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -76,20 +76,20 @@ func (l *Login) renderMFAPrompt(w http.ResponseWriter, r *http.Request, authReq 
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMFAPrompt], data, nil)
 }
 
-func (l *Login) handleMFACreation(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData) {
+func (l *Login) handleMFACreation(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaVerifyData) {
 	switch data.MFAType {
-	case model.MFATypeOTP:
+	case domain.MFATypeOTP:
 		l.handleOTPCreation(w, r, authReq, data)
 		return
-	case model.MFATypeU2F:
+	case domain.MFATypeU2F:
 		l.renderRegisterU2F(w, r, authReq, nil)
 		return
 	}
 	l.renderError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-Or3HO", "Errors.User.MFA.NoProviders"))
 }
 
-func (l *Login) handleOTPCreation(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData) {
-	otp, err := l.authRepo.AddMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
+func (l *Login) handleOTPCreation(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaVerifyData) {
+	otp, err := l.command.AddHumanOTP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

@@ -3,6 +3,8 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/caos/zitadel/internal/v2/command"
 	"net/http"
 	"time"
 
@@ -32,6 +34,7 @@ const (
 
 type Notification struct {
 	handler
+	command        *command.CommandSide
 	userEvents     *usr_event.UserEventstore
 	systemDefaults sd.SystemDefaults
 	AesCrypto      crypto.EncryptionAlgorithm
@@ -42,6 +45,7 @@ type Notification struct {
 
 func newNotification(
 	handler handler,
+	command *command.CommandSide,
 	userEvents *usr_event.UserEventstore,
 	defaults sd.SystemDefaults,
 	aesCrypto crypto.EncryptionAlgorithm,
@@ -50,6 +54,7 @@ func newNotification(
 ) *Notification {
 	h := &Notification{
 		handler:        handler,
+		command:        command,
 		userEvents:     userEvents,
 		systemDefaults: defaults,
 		i18n:           translator,
@@ -135,7 +140,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -143,7 +148,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return n.userEvents.InitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.command.HumanInitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
@@ -163,7 +168,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -171,7 +176,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return n.userEvents.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.command.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
@@ -191,7 +196,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -199,7 +204,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	return n.userEvents.EmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.command.HumanEmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
@@ -213,7 +218,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil || alreadyHandled {
 		return nil
 	}
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -221,7 +226,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	return n.userEvents.PhoneVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.command.HumanPhoneVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
@@ -234,7 +239,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		logging.Log("HANDLE-Gghq2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "HANDLE-7hgj3", "could not unmarshal event")
 	}
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -242,7 +247,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return n.userEvents.DomainClaimedSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.command.UserDomainClaimedSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) checkIfCodeAlreadyHandledOrExpired(event *models.Event, expiry time.Duration, eventTypes ...models.EventType) (bool, error) {
@@ -305,4 +310,28 @@ func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPoli
 		return nil, err
 	}
 	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
+	user, usrErr := n.view.NotifyUserByID(userID)
+	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+		return nil, usrErr
+	}
+	if user == nil {
+		user = &model.NotifyUser{}
+	}
+	events, err := n.getUserEvents(userID, user.Sequence)
+	if err != nil {
+		return user, usrErr
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return user, nil
+		}
+	}
+	if userCopy.State == int32(model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-3n8fs", "Errors.User.NotFound")
+	}
+	return &userCopy, nil
 }

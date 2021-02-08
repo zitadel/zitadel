@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/v2/command"
 	"net/http"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -29,7 +30,7 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 }
 
-func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.CommandSide) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -65,7 +66,7 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults) (
 		return nil, err
 	}
 	eventstoreRepos := handler.EventstoreRepos{UserEvents: user, OrgEvents: org, IAMEvents: iam}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults, translator, dir)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, eventstoreRepos, systemDefaults, translator, dir)
 
 	return &EsRepository{
 		spool,

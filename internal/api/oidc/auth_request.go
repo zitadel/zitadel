@@ -89,7 +89,7 @@ func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (_ str
 		userAgentID = authReq.AgentID
 		applicationID = authReq.ApplicationID
 	}
-	resp, err := o.repo.CreateToken(ctx, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.command.CreateUserToken(ctx, authReq.UserOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -113,7 +113,11 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
-	return o.repo.SignOut(ctx, userAgentID)
+	userIDs, err := o.repo.UserSessionUserIDsByAgentID(ctx, userAgentID)
+	if err != nil {
+		return err
+	}
+	return o.command.HumansSignOut(ctx, userAgentID, userIDs)
 }
 
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, errCh chan<- error, timer <-chan time.Time) {

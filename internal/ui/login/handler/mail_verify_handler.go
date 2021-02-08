@@ -1,9 +1,8 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
-
-	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
@@ -47,21 +46,21 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 		l.checkMailCode(w, r, authReq, data.UserID, data.Code)
 		return
 	}
-	userOrg := login
+	userOrg := ""
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	err = l.authRepo.ResendEmailVerificationMail(setContext(r.Context(), userOrg), data.UserID)
+	err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg)
 	l.renderMailVerification(w, r, authReq, data.UserID, err)
 }
 
-func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string) {
-	userOrg := login
+func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string) {
+	userOrg := ""
 	if authReq != nil {
 		userID = authReq.UserID
 		userOrg = authReq.UserOrgID
 	}
-	err := l.authRepo.VerifyEmail(setContext(r.Context(), userOrg), userID, code)
+	err := l.command.VerifyHumanEmail(setContext(r.Context(), userOrg), userID, code, userOrg)
 	if err != nil {
 		l.renderMailVerification(w, r, authReq, userID, err)
 		return
@@ -69,7 +68,7 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *m
 	l.renderMailVerified(w, r, authReq)
 }
 
-func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID string, err error) {
+func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -85,7 +84,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMailVerification], data, nil)
 }
 
-func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	data := mailVerificationData{
 		baseData:    l.getBaseData(r, authReq, "Mail Verified", "", ""),
 		profileData: l.getProfileData(authReq),

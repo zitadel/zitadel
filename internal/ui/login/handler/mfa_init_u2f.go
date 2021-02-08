@@ -2,11 +2,11 @@ package handler
 
 import (
 	"encoding/base64"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
-	user_model "github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -18,11 +18,11 @@ type u2fInitData struct {
 	MFAType model.MFAType
 }
 
-func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
+func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var errType, errMessage, credentialData string
-	var u2f *user_model.WebAuthNToken
+	var u2f *domain.WebAuthNToken
 	if err == nil {
-		u2f, err = l.authRepo.AddMFAU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
+		u2f, err = l.command.HumanAddU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, true)
 	}
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -54,12 +54,12 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	if err = l.authRepo.VerifyMFAU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Name, userAgentID, credData); err != nil {
+	if err = l.command.HumanVerifyU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, data.Name, userAgentID, credData); err != nil {
 		l.renderRegisterU2F(w, r, authReq, err)
 		return
 	}
 	done := &mfaDoneData{
-		MFAType: model.MFATypeU2F,
+		MFAType: domain.MFATypeU2F,
 	}
 	l.renderMFAInitDone(w, r, authReq, done)
 }

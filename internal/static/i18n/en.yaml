@@ -38,6 +38,9 @@ Errors:
     Address:
       NotFound: Address not found
       NotChanged: Address not changed
+    Machine:
+      Key:
+        NotFound: Machine key not found
     NotHuman: The User must be personal
     NotMachine: The User must be technical
     NotAllowedToLink: User is not allowed to link with external login provider
@@ -53,6 +56,7 @@ Errors:
       NotFound: Passoword not found
       Empty: Password is empty
       Invalid: Passwort is invalid
+      NotSet: User has not set a password
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short

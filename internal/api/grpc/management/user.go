@@ -217,11 +217,11 @@ func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*m
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
-	return &empty.Empty{}, s.command.RemoveHumanOTP(ctx, userID.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, s.command.HumanRemoveOTP(ctx, userID.Id, authz.GetCtxData(ctx).OrgID)
 }
 
 func (s *Server) RemoveMfaU2F(ctx context.Context, webAuthNTokenID *management.WebAuthNTokenID) (*empty.Empty, error) {
-	return &empty.Empty{}, s.command.RemoveHumanU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, s.command.HumanRemoveU2F(ctx, webAuthNTokenID.UserId, webAuthNTokenID.Id, authz.GetCtxData(ctx).OrgID)
 }
 
 func (s *Server) GetPasswordless(ctx context.Context, userID *management.UserID) (_ *management.WebAuthNTokens, err error) {
@@ -233,7 +233,7 @@ func (s *Server) GetPasswordless(ctx context.Context, userID *management.UserID)
 }
 
 func (s *Server) RemovePasswordless(ctx context.Context, id *management.WebAuthNTokenID) (*empty.Empty, error) {
-	return &empty.Empty{}, s.command.RemoveHumanPasswordless(ctx, id.UserId, id.Id, authz.GetCtxData(ctx).OrgID)
+	return &empty.Empty{}, s.command.HumanRemovePasswordless(ctx, id.UserId, id.Id, authz.GetCtxData(ctx).OrgID)
 }
 
 func (s *Server) SearchUserMemberships(ctx context.Context, in *management.UserMembershipSearchRequest) (*management.UserMembershipSearchResponse, error) {

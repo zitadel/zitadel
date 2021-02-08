@@ -2,6 +2,7 @@ package management
 
 import (
 	"encoding/json"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -75,7 +76,7 @@ func machineKeyViewFromModel(key *usr_model.MachineKeyView) *management.MachineK
 	}
 }
 
-func addMachineKeyToModel(key *management.AddMachineKeyRequest) *usr_model.MachineKey {
+func addMachineKeyToDomain(key *management.AddMachineKeyRequest) *domain.MachineKey {
 	expirationDate := time.Time{}
 	if key.ExpirationDate != nil {
 		var err error
@@ -83,20 +84,14 @@ func addMachineKeyToModel(key *management.AddMachineKeyRequest) *usr_model.Machi
 		logging.Log("MANAG-iNshR").OnError(err).Debug("unable to parse expiration date")
 	}
 
-	return &usr_model.MachineKey{
+	return &domain.MachineKey{
 		ExpirationDate: expirationDate,
-		Type:           machineKeyTypeToModel(key.Type),
+		Type:           machineKeyTypeToDomain(key.Type),
 		ObjectRoot:     models.ObjectRoot{AggregateID: key.UserId},
 	}
 }
 
-func addMachineKeyFromModel(key *usr_model.MachineKey) *management.AddMachineKeyResponse {
-	creationDate, err := ptypes.TimestampProto(key.CreationDate)
-	logging.Log("MANAG-dlb8m").OnError(err).Debug("unable to parse cretaion date")
-
-	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
-	logging.Log("MANAG-dlb8m").OnError(err).Debug("unable to parse cretaion date")
-
+func addMachineKeyFromDomain(key *domain.MachineKey) *management.AddMachineKeyResponse {
 	detail, err := json.Marshal(struct {
 		Type   string `json:"type"`
 		KeyID  string `json:"keyId"`
@@ -112,20 +107,29 @@ func addMachineKeyFromModel(key *usr_model.MachineKey) *management.AddMachineKey
 
 	return &management.AddMachineKeyResponse{
 		Id:             key.KeyID,
-		CreationDate:   creationDate,
-		ExpirationDate: expirationDate,
+		CreationDate:   timestamppb.New(key.CreationDate),
+		ExpirationDate: timestamppb.New(key.ExpirationDate),
 		Sequence:       key.Sequence,
 		KeyDetails:     detail,
-		Type:           machineKeyTypeFromModel(key.Type),
+		Type:           machineKeyTypeFromDomain(key.Type),
 	}
 }
 
-func machineKeyTypeToModel(typ management.MachineKeyType) usr_model.MachineKeyType {
+func machineKeyTypeToDomain(typ management.MachineKeyType) domain.MachineKeyType {
 	switch typ {
 	case management.MachineKeyType_MACHINEKEY_JSON:
-		return usr_model.MachineKeyTypeJSON
+		return domain.MachineKeyTypeJSON
 	default:
-		return usr_model.MachineKeyTypeNONE
+		return domain.MachineKeyTypeNONE
+	}
+}
+
+func machineKeyTypeFromDomain(typ domain.MachineKeyType) management.MachineKeyType {
+	switch typ {
+	case domain.MachineKeyTypeJSON:
+		return management.MachineKeyType_MACHINEKEY_JSON
+	default:
+		return management.MachineKeyType_MACHINEKEY_UNSPECIFIED
 	}
 }
 

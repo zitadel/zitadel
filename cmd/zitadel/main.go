@@ -115,7 +115,7 @@ func startZitadel(configPaths []string) {
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
-		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, authZRepo)
+		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, command, authZRepo)
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
@@ -123,7 +123,7 @@ func startZitadel(configPaths []string) {
 	startUI(ctx, conf, authRepo, command, query)
 
 	if *notificationEnabled {
-		notification.Start(ctx, conf.Notification, conf.SystemDefaults)
+		notification.Start(ctx, conf.Notification, conf.SystemDefaults, command)
 	}
 
 	<-ctx.Done()
@@ -166,7 +166,7 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo))
 	}
 	if *oidcEnabled {
-		op := oidc.NewProvider(ctx, conf.API.OIDC, authRepo, *localDevMode)
+		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, *localDevMode)
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	apis.Start(ctx)

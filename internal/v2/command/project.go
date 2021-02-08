@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -144,7 +145,7 @@ func (r *CommandSide) ReactivateProject(ctx context.Context, projectID string, r
 	return r.eventstore.PushAggregate(ctx, existingProject, projectAgg)
 }
 
-func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwner string) error {
+func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingGrantIDs ...string) error {
 	if projectID == "" || resourceOwner == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-66hM9", "Errors.Project.ProjectIDMissing")
 	}
@@ -157,11 +158,21 @@ func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwne
 		return caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
+	aggregates := make([]eventstore.Aggregater, 0)
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
 	projectAgg.PushEvents(project.NewProjectRemovedEvent(ctx, existingProject.Name, existingProject.ResourceOwner))
-	//TODO: Remove User Grants by ProjectID
+	aggregates = append(aggregates, projectAgg)
 
-	return r.eventstore.PushAggregate(ctx, existingProject, projectAgg)
+	for _, grantID := range cascadingGrantIDs {
+		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, grantAgg)
+	}
+
+	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	return err
 }
 
 func (r *CommandSide) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectWriteModel, error) {

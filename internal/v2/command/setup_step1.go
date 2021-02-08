@@ -91,7 +91,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 		&domain.LoginPolicy{
 			AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
 			AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
-			AllowExternalIdp:      step1.DefaultLoginPolicy.AllowExternalIdp,
+			AllowExternalIDP:      step1.DefaultLoginPolicy.AllowExternalIdp,
 		})
 	if err != nil {
 		return err

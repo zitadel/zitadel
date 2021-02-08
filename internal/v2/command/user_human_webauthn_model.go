@@ -39,6 +39,14 @@ func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.EventReader
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(e)
 			}
+		case *user.HumanWebAuthNVerifiedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanWebAuthNSignCountChangedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(e)
+			}
 		case *user.HumanWebAuthNRemovedEvent:
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(e)
@@ -56,6 +64,8 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 			wm.appendAddedEvent(e)
 		case *user.HumanWebAuthNVerifiedEvent:
 			wm.appendVerifiedEvent(e)
+		case *user.HumanWebAuthNSignCountChangedEvent:
+			wm.SignCount = e.SignCount
 		case *user.HumanWebAuthNRemovedEvent:
 			wm.State = domain.MFAStateRemoved
 		case *user.UserRemovedEvent:
@@ -104,34 +114,35 @@ func NewHumanU2FTokensReadModel(userID, resourceOwner string) *HumanU2FTokensRea
 }
 
 func (wm *HumanU2FTokensReadModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
-		switch e := event.(type) {
-		case *user.HumanWebAuthNAddedEvent:
-			wm.WriteModel.AppendEvents(e)
-		case *user.HumanWebAuthNVerifiedEvent:
-			wm.WriteModel.AppendEvents(e)
-		case *user.HumanWebAuthNRemovedEvent:
-			wm.WriteModel.AppendEvents(e)
-		case *user.UserRemovedEvent:
-			wm.WriteModel.AppendEvents(e)
-		}
-	}
+	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanU2FTokensReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.HumanWebAuthNAddedEvent:
+		case *user.HumanU2FAddedEvent:
 			token := &HumanWebAuthNWriteModel{}
-			token.appendAddedEvent(e)
-			wm.WebAuthNTokens = append(wm.WebAuthNTokens, token)
-		case *user.HumanWebAuthNVerifiedEvent:
+			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
+			token.WriteModel = eventstore.WriteModel{
+				AggregateID: e.AggregateID(),
+			}
+			replaced := false
+			for i, existingTokens := range wm.WebAuthNTokens {
+				if existingTokens.State == domain.MFAStateNotReady {
+					wm.WebAuthNTokens[i] = token
+					replaced = true
+				}
+			}
+			if !replaced {
+				wm.WebAuthNTokens = append(wm.WebAuthNTokens, token)
+			}
+		case *user.HumanU2FVerifiedEvent:
 			idx, token := wm.WebAuthNTokenByID(e.WebAuthNTokenID)
 			if idx < 0 {
 				continue
 			}
-			token.appendVerifiedEvent(e)
-		case *user.HumanWebAuthNRemovedEvent:
+			token.appendVerifiedEvent(&e.HumanWebAuthNVerifiedEvent)
+		case *user.HumanU2FRemovedEvent:
 			idx, _ := wm.WebAuthNTokenByID(e.WebAuthNTokenID)
 			if idx < 0 {
 				continue
@@ -153,8 +164,7 @@ func (rm *HumanU2FTokensReadModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			user.HumanU2FTokenAddedType,
 			user.HumanU2FTokenVerifiedType,
-			user.HumanU2FTokenRemovedType,
-			user.UserV1MFAOTPRemovedType)
+			user.HumanU2FTokenRemovedType)
 
 }
 
@@ -190,17 +200,29 @@ func (wm *HumanPasswordlessTokensReadModel) AppendEvents(events ...eventstore.Ev
 func (wm *HumanPasswordlessTokensReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.HumanWebAuthNAddedEvent:
+		case *user.HumanPasswordlessAddedEvent:
 			token := &HumanWebAuthNWriteModel{}
-			token.appendAddedEvent(e)
-			wm.WebAuthNTokens = append(wm.WebAuthNTokens, token)
-		case *user.HumanWebAuthNVerifiedEvent:
+			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
+			token.WriteModel = eventstore.WriteModel{
+				AggregateID: e.AggregateID(),
+			}
+			replaced := false
+			for i, existingTokens := range wm.WebAuthNTokens {
+				if existingTokens.State == domain.MFAStateNotReady {
+					wm.WebAuthNTokens[i] = token
+					replaced = true
+				}
+			}
+			if !replaced {
+				wm.WebAuthNTokens = append(wm.WebAuthNTokens, token)
+			}
+		case *user.HumanPasswordlessVerifiedEvent:
 			idx, token := wm.WebAuthNTokenByID(e.WebAuthNTokenID)
 			if idx < 0 {
 				continue
 			}
-			token.appendVerifiedEvent(e)
-		case *user.HumanWebAuthNRemovedEvent:
+			token.appendVerifiedEvent(&e.HumanWebAuthNVerifiedEvent)
+		case *user.HumanPasswordlessRemovedEvent:
 			idx, _ := wm.WebAuthNTokenByID(e.WebAuthNTokenID)
 			if idx < 0 {
 				continue
@@ -222,8 +244,7 @@ func (rm *HumanPasswordlessTokensReadModel) Query() *eventstore.SearchQueryBuild
 		EventTypes(
 			user.HumanPasswordlessTokenAddedType,
 			user.HumanPasswordlessTokenVerifiedType,
-			user.HumanPasswordlessTokenRemovedType,
-			user.UserV1MFAOTPRemovedType)
+			user.HumanPasswordlessTokenRemovedType)
 
 }
 
@@ -234,4 +255,115 @@ func (wm *HumanPasswordlessTokensReadModel) WebAuthNTokenByID(id string) (idx in
 		}
 	}
 	return -1, nil
+}
+
+type HumanU2FLoginReadModel struct {
+	eventstore.WriteModel
+
+	AuthReqID string
+	Challenge string
+	State     domain.UserState
+}
+
+func NewHumanU2FLoginReadModel(userID, authReqID, resourceOwner string) *HumanU2FLoginReadModel {
+	return &HumanU2FLoginReadModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
+		},
+		AuthReqID: authReqID,
+	}
+}
+
+func (wm *HumanU2FLoginReadModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *user.HumanU2FBeginLoginEvent:
+			if e.AuthRequestInfo.ID != wm.AuthReqID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.UserRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *HumanU2FLoginReadModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanU2FBeginLoginEvent:
+			wm.Challenge = e.Challenge
+			wm.State = domain.UserStateActive
+		case *user.UserRemovedEvent:
+			wm.State = domain.UserStateDeleted
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (rm *HumanU2FLoginReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+		AggregateIDs(rm.AggregateID).
+		ResourceOwner(rm.ResourceOwner).
+		EventTypes(
+			user.HumanU2FTokenBeginLoginType,
+			user.UserRemovedType,
+		)
+}
+
+type HumanPasswordlessLoginReadModel struct {
+	eventstore.WriteModel
+
+	AuthReqID string
+	Challenge string
+	State     domain.UserState
+}
+
+func NewHumanPasswordlessLoginReadModel(userID, authReqID, resourceOwner string) *HumanPasswordlessLoginReadModel {
+	return &HumanPasswordlessLoginReadModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
+		},
+		AuthReqID: authReqID,
+	}
+}
+
+func (wm *HumanPasswordlessLoginReadModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *user.HumanPasswordlessBeginLoginEvent:
+			if e.AuthRequestInfo.ID != wm.AuthReqID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.UserRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *HumanPasswordlessLoginReadModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanPasswordlessBeginLoginEvent:
+			wm.Challenge = e.Challenge
+			wm.State = domain.UserStateActive
+		case *user.UserRemovedEvent:
+			wm.State = domain.UserStateDeleted
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (rm *HumanPasswordlessLoginReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+		AggregateIDs(rm.AggregateID).
+		ResourceOwner(rm.ResourceOwner).
+		EventTypes(
+			user.HumanPasswordlessTokenBeginLoginType,
+			user.UserRemovedType,
+		)
+
 }

@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	"golang.org/x/text/language"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -22,7 +22,7 @@ const (
 )
 
 type AuthRequest struct {
-	*model.AuthRequest
+	*domain.AuthRequest
 }
 
 func (a *AuthRequest) GetID() string {
@@ -92,26 +92,26 @@ func (a *AuthRequest) GetSubject() string {
 
 func (a *AuthRequest) Done() bool {
 	for _, step := range a.PossibleSteps {
-		if step.Type() == model.NextStepRedirectToCallback {
+		if step.Type() == domain.NextStepRedirectToCallback {
 			return true
 		}
 	}
 	return false
 }
 
-func (a *AuthRequest) oidc() *model.AuthRequestOIDC {
-	return a.Request.(*model.AuthRequestOIDC)
+func (a *AuthRequest) oidc() *domain.AuthRequestOIDC {
+	return a.Request.(*domain.AuthRequestOIDC)
 }
 
-func AuthRequestFromBusiness(authReq *model.AuthRequest) (_ op.AuthRequest, err error) {
-	if _, ok := authReq.Request.(*model.AuthRequestOIDC); !ok {
+func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ op.AuthRequest, err error) {
+	if _, ok := authReq.Request.(*domain.AuthRequestOIDC); !ok {
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Haz7A", "auth request is not of type oidc")
 	}
 	return &AuthRequest{authReq}, nil
 }
 
-func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string) *model.AuthRequest {
-	return &model.AuthRequest{
+func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string) *domain.AuthRequest {
+	return &domain.AuthRequest{
 		AgentID:       userAgentID,
 		BrowserInfo:   ParseBrowserInfoFromContext(ctx),
 		ApplicationID: authReq.ClientID,
@@ -123,7 +123,7 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		LoginHint:     authReq.LoginHint,
 		MaxAuthAge:    authReq.MaxAge,
 		UserID:        userID,
-		Request: &model.AuthRequestOIDC{
+		Request: &domain.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
 			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),
 			Nonce:         authReq.Nonce,
@@ -132,10 +132,10 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 	}
 }
 
-func ParseBrowserInfoFromContext(ctx context.Context) *model.BrowserInfo {
+func ParseBrowserInfoFromContext(ctx context.Context) *domain.BrowserInfo {
 	userAgent, acceptLang := HttpHeadersFromContext(ctx)
 	ip := IpFromContext(ctx)
-	return &model.BrowserInfo{RemoteIP: ip, UserAgent: userAgent, AcceptLanguage: acceptLang}
+	return &domain.BrowserInfo{RemoteIP: ip, UserAgent: userAgent, AcceptLanguage: acceptLang}
 }
 
 func HttpHeadersFromContext(ctx context.Context) (userAgent, acceptLang string) {
@@ -160,22 +160,22 @@ func IpFromContext(ctx context.Context) net.IP {
 	return net.ParseIP(ipString)
 }
 
-func PromptToBusiness(prompt oidc.Prompt) model.Prompt {
+func PromptToBusiness(prompt oidc.Prompt) domain.Prompt {
 	switch prompt {
 	case oidc.PromptNone:
-		return model.PromptNone
+		return domain.PromptNone
 	case oidc.PromptLogin:
-		return model.PromptLogin
+		return domain.PromptLogin
 	case oidc.PromptConsent:
-		return model.PromptConsent
+		return domain.PromptConsent
 	case oidc.PromptSelectAccount:
-		return model.PromptSelectAccount
+		return domain.PromptSelectAccount
 	default:
-		return model.PromptUnspecified
+		return domain.PromptUnspecified
 	}
 }
 
-func ACRValuesToBusiness(values []string) []model.LevelOfAssurance {
+func ACRValuesToBusiness(values []string) []domain.LevelOfAssurance {
 	return nil
 }
 
@@ -190,52 +190,52 @@ func UILocalesToBusiness(tags []language.Tag) []string {
 	return locales
 }
 
-func ResponseTypeToBusiness(responseType oidc.ResponseType) model.OIDCResponseType {
+func ResponseTypeToBusiness(responseType oidc.ResponseType) domain.OIDCResponseType {
 	switch responseType {
 	case oidc.ResponseTypeCode:
-		return model.OIDCResponseTypeCode
+		return domain.OIDCResponseTypeCode
 	case oidc.ResponseTypeIDTokenOnly:
-		return model.OIDCResponseTypeIdToken
+		return domain.OIDCResponseTypeIDToken
 	case oidc.ResponseTypeIDToken:
-		return model.OIDCResponseTypeIdTokenToken
+		return domain.OIDCResponseTypeIDTokenToken
 	default:
-		return model.OIDCResponseTypeCode
+		return domain.OIDCResponseTypeCode
 	}
 }
 
-func ResponseTypeToOIDC(responseType model.OIDCResponseType) oidc.ResponseType {
+func ResponseTypeToOIDC(responseType domain.OIDCResponseType) oidc.ResponseType {
 	switch responseType {
-	case model.OIDCResponseTypeCode:
+	case domain.OIDCResponseTypeCode:
 		return oidc.ResponseTypeCode
-	case model.OIDCResponseTypeIdTokenToken:
+	case domain.OIDCResponseTypeIDTokenToken:
 		return oidc.ResponseTypeIDToken
-	case model.OIDCResponseTypeIdToken:
+	case domain.OIDCResponseTypeIDToken:
 		return oidc.ResponseTypeIDTokenOnly
 	default:
 		return oidc.ResponseTypeCode
 	}
 }
 
-func CodeChallengeToBusiness(challenge string, method oidc.CodeChallengeMethod) *model.OIDCCodeChallenge {
+func CodeChallengeToBusiness(challenge string, method oidc.CodeChallengeMethod) *domain.OIDCCodeChallenge {
 	if challenge == "" {
 		return nil
 	}
-	challengeMethod := model.CodeChallengeMethodPlain
+	challengeMethod := domain.CodeChallengeMethodPlain
 	if method == oidc.CodeChallengeMethodS256 {
-		challengeMethod = model.CodeChallengeMethodS256
+		challengeMethod = domain.CodeChallengeMethodS256
 	}
-	return &model.OIDCCodeChallenge{
+	return &domain.OIDCCodeChallenge{
 		Challenge: challenge,
 		Method:    challengeMethod,
 	}
 }
 
-func CodeChallengeToOIDC(challenge *model.OIDCCodeChallenge) *oidc.CodeChallenge {
+func CodeChallengeToOIDC(challenge *domain.OIDCCodeChallenge) *oidc.CodeChallenge {
 	if challenge == nil {
 		return nil
 	}
 	challengeMethod := oidc.CodeChallengeMethodPlain
-	if challenge.Method == model.CodeChallengeMethodS256 {
+	if challenge.Method == domain.CodeChallengeMethodS256 {
 		challengeMethod = oidc.CodeChallengeMethodS256
 	}
 	return &oidc.CodeChallenge{
@@ -244,12 +244,12 @@ func CodeChallengeToOIDC(challenge *model.OIDCCodeChallenge) *oidc.CodeChallenge
 	}
 }
 
-func AMRFromMFAType(mfaType model.MFAType) string {
+func AMRFromMFAType(mfaType domain.MFAType) string {
 	switch mfaType {
-	case model.MFATypeOTP:
+	case domain.MFATypeOTP:
 		return amrOTP
-	case model.MFATypeU2F,
-		model.MFATypeU2FUserVerification:
+	case domain.MFATypeU2F,
+		domain.MFATypeU2FUserVerification:
 		return amrUserPresence
 	default:
 		return ""

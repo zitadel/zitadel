@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	usr_repo "github.com/caos/zitadel/internal/v2/repository/user"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -31,6 +32,7 @@ func StartQuerySide(config *Config) (repo *QuerySide, err error) {
 		idGenerator: id.SonyFlakeGenerator,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
+	usr_repo.RegisterEventMappers(repo.eventstore)
 
 	repo.secretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)
 	if err != nil {

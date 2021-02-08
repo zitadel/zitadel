@@ -1,5 +1,9 @@
 package model
 
+import (
+	"github.com/caos/zitadel/internal/v2/domain"
+)
+
 type NextStep interface {
 	Type() NextStepType
 }
@@ -164,3 +168,45 @@ const (
 	MFALevelMultiFactor
 	MFALevelMultiFactorCertified
 )
+
+func MFATypeToDomain(mfaType MFAType) domain.MFAType {
+	switch mfaType {
+	case MFATypeOTP:
+		return domain.MFATypeOTP
+	case MFATypeU2F:
+		return domain.MFATypeU2F
+	case MFATypeU2FUserVerification:
+		return domain.MFATypeU2FUserVerification
+	default:
+		return domain.MFATypeOTP
+	}
+
+}
+
+func MFALevelToDomain(mfaLevel MFALevel) domain.MFALevel {
+	switch mfaLevel {
+	case MFALevelNotSetUp:
+		return domain.MFALevelNotSetUp
+	case MFALevelSecondFactor:
+		return domain.MFALevelSecondFactor
+	case MFALevelMultiFactor:
+		return domain.MFALevelMultiFactor
+	case MFALevelMultiFactorCertified:
+		return domain.MFALevelMultiFactorCertified
+	default:
+		return domain.MFALevelNotSetUp
+	}
+
+}
+
+func UserSessionStateToDomain(state UserSessionState) domain.UserSessionState {
+	switch state {
+	case UserSessionStateActive:
+		return domain.UserSessionStateActive
+	case UserSessionStateTerminated:
+		return domain.UserSessionStateTerminated
+	default:
+		return domain.UserSessionStateActive
+	}
+
+}

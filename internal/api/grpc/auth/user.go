@@ -162,19 +162,19 @@ func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *auth.MfaOtpR
 
 func (s *Server) VerifyMfaOTP(ctx context.Context, request *auth.VerifyMfaOtp) (*empty.Empty, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.CheckMFAOTPSetup(ctx, ctxData.UserID, request.Code, "", ctxData.ResourceOwner)
+	err := s.command.HumanCheckMFAOTPSetup(ctx, ctxData.UserID, request.Code, "", ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {
 	ctxData := authz.GetCtxData(ctx)
-	err = s.command.RemoveHumanOTP(ctx, ctxData.UserID, ctxData.OrgID)
+	err = s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.OrgID)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) AddMyMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
 	ctxData := authz.GetCtxData(ctx)
-	u2f, err := s.command.AddHumanU2F(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
+	u2f, err := s.command.HumanAddU2FSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
@@ -183,13 +183,13 @@ func (s *Server) AddMyMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.WebAu
 
 func (s *Server) VerifyMyMfaU2F(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.VerifyHumanU2F(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
+	err := s.command.HumanVerifyU2FSetup(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMyMfaU2F(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.RemoveHumanU2F(ctx, ctxData.UserID, id.Id, ctxData.OrgID)
+	err := s.command.HumanRemoveU2F(ctx, ctxData.UserID, id.Id, ctxData.OrgID)
 	return &empty.Empty{}, err
 }
 
@@ -203,7 +203,7 @@ func (s *Server) GetMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth
 
 func (s *Server) AddMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
 	ctxData := authz.GetCtxData(ctx)
-	u2f, err := s.command.AddHumanPasswordless(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
+	u2f, err := s.command.HumanAddPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
@@ -212,13 +212,13 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth
 
 func (s *Server) VerifyMyPasswordless(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.VerifyHumanPasswordless(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
+	err := s.command.HumanHumanPasswordlessSetup(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMyPasswordless(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.RemoveHumanPasswordless(ctx, ctxData.UserID, id.Id, ctxData.ResourceOwner)
+	err := s.command.HumanRemovePasswordless(ctx, ctxData.UserID, id.Id, ctxData.ResourceOwner)
 	return &empty.Empty{}, err
 }
 

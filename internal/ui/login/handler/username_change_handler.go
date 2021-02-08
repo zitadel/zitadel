@@ -1,9 +1,8 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
-
-	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
@@ -15,7 +14,7 @@ type changeUsernameData struct {
 	Username string `schema:"username"`
 }
 
-func (l *Login) renderChangeUsername(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
+func (l *Login) renderChangeUsername(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
@@ -31,7 +30,7 @@ func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.ChangeUsername(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Username)
+	err = l.command.ChangeUsername(setContext(r.Context(), authReq.UserOrgID), authReq.UserOrgID, authReq.UserID, data.Username)
 	if err != nil {
 		l.renderChangeUsername(w, r, authReq, err)
 		return
@@ -39,7 +38,7 @@ func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
 	l.renderChangeUsernameDone(w, r, authReq)
 }
 
-func (l *Login) renderChangeUsernameDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+func (l *Login) renderChangeUsernameDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	var errType, errMessage string
 	data := l.getUserData(r, authReq, "Username Change Done", errType, errMessage)
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangeUsernameDone], data, nil)

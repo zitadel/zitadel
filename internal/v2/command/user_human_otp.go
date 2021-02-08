@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -15,14 +16,17 @@ func (r *CommandSide) AddHumanOTP(ctx context.Context, userID, resourceowner str
 	}
 	human, err := r.getHuman(ctx, userID, resourceowner)
 	if err != nil {
+		logging.Log("COMMAND-DAqe1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get human for loginname")
 		return nil, err
 	}
 	org, err := r.getOrg(ctx, human.ResourceOwner)
 	if err != nil {
+		logging.Log("COMMAND-Cm0ds").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org for loginname")
 		return nil, err
 	}
 	orgPolicy, err := r.getOrgIAMPolicy(ctx, org.AggregateID)
 	if err != nil {
+		logging.Log("COMMAND-y5zv9").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org policy for loginname")
 		return nil, err
 	}
 	otpWriteModel, err := r.otpWriteModelByID(ctx, userID, resourceowner)
@@ -58,7 +62,7 @@ func (r *CommandSide) AddHumanOTP(ctx context.Context, userID, resourceowner str
 	}, nil
 }
 
-func (r *CommandSide) CheckMFAOTPSetup(ctx context.Context, userID, code, userAgentID, resourceowner string) error {
+func (r *CommandSide) HumanCheckMFAOTPSetup(ctx context.Context, userID, code, userAgentID, resourceowner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
 	}
@@ -84,7 +88,32 @@ func (r *CommandSide) CheckMFAOTPSetup(ctx context.Context, userID, code, userAg
 	return r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
 }
 
-func (r *CommandSide) RemoveHumanOTP(ctx context.Context, userID, resourceOwner string) error {
+func (r *CommandSide) HumanCheckMFAOTP(ctx context.Context, userID, code, resourceowner string, authRequest *domain.AuthRequest) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
+	}
+	existingOTP, err := r.otpWriteModelByID(ctx, userID, resourceowner)
+	if err != nil {
+		return err
+	}
+	if existingOTP.State != domain.MFAStateReady {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
+	err = domain.VerifyMFAOTP(code, existingOTP.Secret, r.multifactors.OTP.CryptoMFA)
+	if err == nil {
+		userAgg.PushEvents(
+			user.NewHumanOTPCheckSucceededEvent(ctx, authRequestDomainToAuthRequestInfo(authRequest)),
+		)
+		return r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
+	}
+	userAgg.PushEvents(user.NewHumanOTPCheckFailedEvent(ctx, authRequestDomainToAuthRequestInfo(authRequest)))
+	pushErr := r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
+	logging.Log("COMMAND-9fj7s").OnError(pushErr).Error("error create password check failed event")
+	return err
+}
+
+func (r *CommandSide) HumanRemoveOTP(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}

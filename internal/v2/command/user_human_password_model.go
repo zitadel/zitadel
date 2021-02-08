@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
+	"time"
 )
 
 type HumanPasswordWriteModel struct {
@@ -12,6 +13,10 @@ type HumanPasswordWriteModel struct {
 
 	Secret               *crypto.CryptoValue
 	SecretChangeRequired bool
+
+	Code             *crypto.CryptoValue
+	CodeCreationDate time.Time
+	CodeExpiry       time.Duration
 
 	UserState domain.UserState
 }
@@ -43,6 +48,11 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 		case *user.HumanPasswordChangedEvent:
 			wm.Secret = e.Secret
 			wm.SecretChangeRequired = e.ChangeRequired
+			wm.Code = nil
+		case *user.HumanPasswordCodeAddedEvent:
+			wm.Code = e.Code
+			wm.CodeCreationDate = e.CreationDate()
+			wm.CodeExpiry = e.Expiry
 		case *user.HumanEmailVerifiedEvent:
 			if wm.UserState == domain.UserStateInitial {
 				wm.UserState = domain.UserStateActive
@@ -55,7 +65,10 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 }
 
 func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+		AggregateIDs(wm.AggregateID)
+	if wm.ResourceOwner != "" {
+		query.ResourceOwner(wm.ResourceOwner)
+	}
+	return query
 }

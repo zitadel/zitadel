@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -192,26 +191,6 @@ func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *usr_model.
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
-}
-
-func (repo *UserRepo) AddMachineKey(ctx context.Context, key *usr_model.MachineKey) (*usr_model.MachineKey, error) {
-	return repo.UserEvents.AddMachineKey(ctx, key)
-}
-
-func (repo *UserRepo) RemoveMachineKey(ctx context.Context, userID, keyID string) error {
-	return repo.UserEvents.RemoveMachineKey(ctx, userID, keyID)
-}
-
-func (repo *UserRepo) ChangeUsername(ctx context.Context, userID, userName string) error {
-	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if err != nil && errors.IsNotFound(err) {
-		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return err
-	}
-	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
-	return repo.UserEvents.ChangeUsername(ctx, userID, userName, orgPolicyView)
 }
 
 func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {

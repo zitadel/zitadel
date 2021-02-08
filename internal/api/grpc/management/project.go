@@ -2,7 +2,6 @@ package management
 
 import (
 	"context"
-
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -36,7 +35,11 @@ func (s *Server) ReactivateProject(ctx context.Context, in *management.ProjectID
 }
 
 func (s *Server) RemoveProject(ctx context.Context, in *management.ProjectID) (*empty.Empty, error) {
-	err := s.command.RemoveProject(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
+	grants, err := s.usergrant.UserGrantsByProjectID(ctx, in.Id)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	err = s.command.RemoveProject(ctx, in.Id, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants)...)
 	return &empty.Empty{}, err
 }
 

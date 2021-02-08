@@ -139,14 +139,22 @@ func (factory *SearchQueryBuilder) eventTypeFilter() *repository.Filter {
 	if len(factory.eventTypes) == 1 {
 		return repository.NewFilter(repository.FieldEventType, factory.eventTypes[0], repository.OperationEquals)
 	}
-	return repository.NewFilter(repository.FieldEventType, factory.eventTypes, repository.OperationIn)
+	eventTypes := make([]repository.EventType, len(factory.eventTypes))
+	for i, eventType := range factory.eventTypes {
+		eventTypes[i] = repository.EventType(eventType)
+	}
+	return repository.NewFilter(repository.FieldEventType, eventTypes, repository.OperationIn)
 }
 
 func (factory *SearchQueryBuilder) aggregateTypeFilter() *repository.Filter {
 	if len(factory.aggregateTypes) == 1 {
 		return repository.NewFilter(repository.FieldAggregateType, factory.aggregateTypes[0], repository.OperationEquals)
 	}
-	return repository.NewFilter(repository.FieldAggregateType, factory.aggregateTypes, repository.OperationIn)
+	aggregateTypes := make([]repository.AggregateType, len(factory.aggregateTypes))
+	for i, aggregateType := range factory.aggregateTypes {
+		aggregateTypes[i] = repository.AggregateType(aggregateType)
+	}
+	return repository.NewFilter(repository.FieldAggregateType, aggregateTypes, repository.OperationIn)
 }
 
 func (factory *SearchQueryBuilder) eventSequenceFilter() *repository.Filter {

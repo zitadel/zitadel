@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
 func writeModelToHuman(wm *HumanWriteModel) *domain.Human {
@@ -77,6 +78,15 @@ func writeModelToMachine(wm *MachineWriteModel) *domain.Machine {
 	}
 }
 
+func keyWriteModelToMachineKey(wm *MachineKeyWriteModel) *domain.MachineKey {
+	return &domain.MachineKey{
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
+		KeyID:          wm.KeyID,
+		Type:           wm.KeyType,
+		ExpirationDate: wm.ExpirationDate,
+	}
+}
+
 func readModelToU2FTokens(wm *HumanU2FTokensReadModel) []*domain.WebAuthNToken {
 	tokens := make([]*domain.WebAuthNToken, len(wm.WebAuthNTokens))
 	for i, token := range wm.WebAuthNTokens {
@@ -106,4 +116,20 @@ func writeModelToWebAuthN(wm *HumanWebAuthNWriteModel) *domain.WebAuthNToken {
 		WebAuthNTokenName: wm.WebAuthNTokenName,
 		State:             wm.State,
 	}
+}
+
+func authRequestDomainToAuthRequestInfo(authRequest *domain.AuthRequest) *user.AuthRequestInfo {
+	info := &user.AuthRequestInfo{
+		ID:                  authRequest.ID,
+		UserAgentID:         authRequest.AgentID,
+		SelectedIDPConfigID: authRequest.SelectedIDPConfigID,
+	}
+	if authRequest.BrowserInfo != nil {
+		info.BrowserInfo = &user.BrowserInfo{
+			UserAgent:      authRequest.BrowserInfo.UserAgent,
+			AcceptLanguage: authRequest.BrowserInfo.AcceptLanguage,
+			RemoteIP:       authRequest.BrowserInfo.RemoteIP,
+		}
+	}
+	return info
 }

@@ -13,10 +13,6 @@ const (
 	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
 	externalLoginEventPrefix = humanEventPrefix + "externallogin."
 
-	//TODO: Handle unique Aggregate
-	HumanExternalIDPReservedType = externalIDPEventPrefix + "reserved"
-	HumanExternalIDPReleasedType = externalIDPEventPrefix + "released"
-
 	HumanExternalIDPAddedType          = externalIDPEventPrefix + "added"
 	HumanExternalIDPRemovedType        = externalIDPEventPrefix + "removed"
 	HumanExternalIDPCascadeRemovedType = externalIDPEventPrefix + "cascade.removed"
@@ -53,7 +49,7 @@ func (e *HumanExternalIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniq
 	return []*eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
 }
 
-func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName string) *HumanExternalIDPAddedEvent {
+func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName, externalUserID string) *HumanExternalIDPAddedEvent {
 	return &HumanExternalIDPAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -61,6 +57,7 @@ func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName
 		),
 		IDPConfigID: idpConfigID,
 		DisplayName: displayName,
+		UserID:      externalUserID,
 	}
 }
 
@@ -157,27 +154,36 @@ func HumanExternalIDPCascadeRemovedEventMapper(event *repository.Event) (eventst
 
 type HumanExternalIDPCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
 }
 
 func (e *HumanExternalIDPCheckSucceededEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanExternalIDPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewHumanExternalIDPCheckSucceededEvent(ctx context.Context) *HumanExternalIDPCheckSucceededEvent {
+func NewHumanExternalIDPCheckSucceededEvent(ctx context.Context, info *AuthRequestInfo) *HumanExternalIDPCheckSucceededEvent {
 	return &HumanExternalIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			HumanExternalLoginCheckSucceededType,
 		),
+		AuthRequestInfo: info,
 	}
 }
 
 func HumanExternalIDPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanExternalIDPCheckSucceededEvent{
+	e := &HumanExternalIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-2M0sd", "unable to unmarshal user external idp check succeeded")
+	}
+
+	return e, nil
 }
