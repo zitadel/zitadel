@@ -59,14 +59,14 @@ type InitUserStep struct {
 	PasswordSet bool
 }
 
+func (s *InitUserStep) Type() NextStepType {
+	return NextStepInitUser
+}
+
 type ExternalNotFoundOptionStep struct{}
 
 func (s *ExternalNotFoundOptionStep) Type() NextStepType {
 	return NextStepExternalNotFoundOption
-}
-
-func (s *InitUserStep) Type() NextStepType {
-	return NextStepInitUser
 }
 
 type PasswordStep struct{}

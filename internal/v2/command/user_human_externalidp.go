@@ -10,7 +10,7 @@ import (
 )
 
 func (r *CommandSide) BulkAddedHumanExternalIDP(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.ExternalIDP) error {
-	if externalIDPs == nil || len(externalIDPs) == 0 {
+	if len(externalIDPs) == 0 {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
 	}
 	aggregates := make([]eventstore.Aggregater, len(externalIDPs))
@@ -76,7 +76,7 @@ func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, user
 		return err
 	}
 	if existingHuman.UserState == domain.UserStateUnspecified || existingHuman.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-dn88J", "Errors.User.Password.NotFound")
+		return caos_errs.ThrowNotFound(nil, "COMMAND-dn88J", "Errors.User.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
