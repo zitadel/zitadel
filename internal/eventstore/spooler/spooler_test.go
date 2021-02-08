@@ -3,6 +3,7 @@ package spooler
 import (
 	"context"
 	"fmt"
+	es_v2 "github.com/caos/zitadel/internal/eventstore/v2"
 	"testing"
 	"time"
 
@@ -104,6 +105,9 @@ func (es *eventstoreStub) PushAggregates(ctx context.Context, in ...*models.Aggr
 
 func (es *eventstoreStub) LatestSequence(ctx context.Context, in *models.SearchQueryFactory) (uint64, error) {
 	return 0, nil
+}
+func (es *eventstoreStub) V2() *es_v2.Eventstore {
+	return nil
 }
 
 func TestSpooler_process(t *testing.T) {

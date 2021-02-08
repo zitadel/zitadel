@@ -63,7 +63,7 @@ func (e *testEvent) Data() interface{} {
 	return e.data()
 }
 
-func (e *testEvent) UniqueConstraint() []*EventUniqueConstraint {
+func (e *testEvent) UniqueConstraints() []*EventUniqueConstraint {
 	return nil
 }
 
