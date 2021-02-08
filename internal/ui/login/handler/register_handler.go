@@ -10,8 +10,7 @@ import (
 )
 
 const (
-	tmplRegister          = "register"
-	orgProjectCreatorRole = "ORG_PROJECT_CREATOR"
+	tmplRegister = "register"
 )
 
 type registerFormData struct {
@@ -65,7 +64,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resourceOwner := iam.GlobalOrgID
-	memberRoles := []string{orgProjectCreatorRole}
+	memberRoles := []string{domain.RoleOrgProjectCreator}
 
 	if authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != iam.GlobalOrgID {
 		memberRoles = nil

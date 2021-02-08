@@ -75,7 +75,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	resourceOwner := iam.GlobalOrgID
-	memberRoles := []string{orgProjectCreatorRole}
+	memberRoles := []string{domain.RoleOrgProjectCreator}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
 		memberRoles = nil

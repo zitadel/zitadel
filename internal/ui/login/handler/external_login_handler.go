@@ -181,7 +181,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	resourceOwner := iam.GlobalOrgID
-	memberRoles := []string{orgProjectCreatorRole}
+	memberRoles := []string{domain.RoleOrgProjectCreator}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
 		memberRoles = nil
