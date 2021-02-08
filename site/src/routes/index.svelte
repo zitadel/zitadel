@@ -91,18 +91,6 @@
         padding: 0;
     }
 
-    .sublinks {
-        display: block;
-        margin: 1rem 0;
-    }
-
-    .sublinks .sublink {
-        font-size: 15px;
-        margin-right: 2rem;
-        border: none;
-        white-space: nowrap;
-    }
-
     .sectionlinks {
         display: block;
         margin: 1rem 0;
@@ -197,10 +185,6 @@
                     <i class="las la-arrow-right"></i>
                 </Button>
             </a>
-            <div class="sublinks">
-                <a class="sublink" href="start#ORBOS">Use ORBOS to install ZITADEL</a>
-                <a class="sublink" href="start#Integrating_an_application">Create application</a>
-            </div>
         </div>
 
         <div class="doc-container">
@@ -222,7 +206,7 @@
                     <div class="sectionlinks">
                         <a class="link" href="angular">Single Page Applications (Angular)</a>
                         <a class="link" href="go">Serverside rendered Applications</a>
-                        <a class="link" href="dart">Native Applications (Flutter)</a>
+                        <a class="link" href="flutter">Native Applications (Flutter)</a>
                     </div>
                 </div>
             </div>
@@ -256,7 +240,6 @@
                         <a class="link" href="apis#Management_API">Management API</a>
                         <a class="link" href="apis#Admin_API">Admin API</a>
                     </div>
-                
                 </div>
             </div>
 
