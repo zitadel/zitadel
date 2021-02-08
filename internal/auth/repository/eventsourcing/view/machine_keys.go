@@ -53,8 +53,8 @@ func (v *View) DeleteMachineKeysByUserID(userID string, event *models.Event) err
 	return v.ProcessedMachineKeySequence(event)
 }
 
-func (v *View) GetLatestMachineKeySequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(machineKeyTable, aggregateType)
+func (v *View) GetLatestMachineKeySequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(machineKeyTable)
 }
 
 func (v *View) ProcessedMachineKeySequence(event *models.Event) error {

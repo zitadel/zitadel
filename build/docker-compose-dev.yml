@@ -4,7 +4,7 @@ services:
   angular:
     build:
       context: ..
-      dockerfile: build/dockerfile
+      dockerfile: dockerfile
       target: dev-angular-build
       args:
         ENV: dev
@@ -14,7 +14,7 @@ services:
   go:
     build:
       context: ..
-      dockerfile: build/dockerfile
+      dockerfile: dockerfile
       target: dev-go-build
       args:
         ENV: dev

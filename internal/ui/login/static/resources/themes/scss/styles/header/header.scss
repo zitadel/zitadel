@@ -1,0 +1,16 @@
+$lgn-header-padding: 0;
+$lgn-header-margin: 1rem auto .5rem auto;
+
+.lgn-header {
+    display: block;
+    position: relative;
+    margin: $lgn-header-margin;
+    padding: $lgn-header-padding;
+    width: 100%;
+
+    .lgn-logo {
+        height: 43px;
+        width: 160px;
+        margin: 0 auto;
+    }
+}

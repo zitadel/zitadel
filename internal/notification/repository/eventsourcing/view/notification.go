@@ -9,8 +9,8 @@ const (
 	notificationTable = "notification.notifications"
 )
 
-func (v *View) GetLatestNotificationSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(notificationTable, aggregateType)
+func (v *View) GetLatestNotificationSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(notificationTable)
 }
 
 func (v *View) ProcessedNotificationSequence(event *models.Event) error {

@@ -1,0 +1,5 @@
+@import './radio_base.scss';
+
+.lgn-radio {
+  @include lgn-radio-base;
+}

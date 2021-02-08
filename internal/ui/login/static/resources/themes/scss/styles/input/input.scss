@@ -1,0 +1,23 @@
+@import './input_base.scss';
+
+input:not([type=radio]):not([type=checkbox]),
+.lgn-input {
+  @include lgn-input-base;
+}
+
+// use seme base styling for select as input
+select, .lgn-select {
+    @include lgn-input-base;
+}
+
+.lgn-suffix-wrapper {
+    position: relative;
+
+    [lgnSuffix] {
+        position: absolute;
+        right: .5rem;
+        top: 9px;
+        height: inherit;
+        vertical-align: middle;
+    }
+}

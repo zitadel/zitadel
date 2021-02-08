@@ -77,8 +77,8 @@ func (v *View) DeleteUser(userID string, event *models.Event) error {
 	return v.ProcessedUserSequence(event)
 }
 
-func (v *View) GetLatestUserSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(userTable, aggregateType)
+func (v *View) GetLatestUserSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(userTable)
 }
 
 func (v *View) ProcessedUserSequence(event *models.Event) error {

@@ -11,8 +11,8 @@ import (
 
 func GetOrgIAMPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.OrgIAMPolicyView, error) {
 	policy := new(model.OrgIAMPolicyView)
-	userIDQuery := &model.OrgIAMPolicySearchQuery{Key: iam_model.OrgIAMPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, userIDQuery)
+	aggregateIDQuery := &model.OrgIAMPolicySearchQuery{Key: iam_model.OrgIAMPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-5fi9s", "Errors.IAM.OrgIAMPolicy.NotExisting")

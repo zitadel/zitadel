@@ -47,8 +47,8 @@ func (i *IDPConfig) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.IAMAggregate}
 }
 
-func (i *IDPConfig) CurrentSequence(event *es_models.Event) (uint64, error) {
-	sequence, err := i.view.GetLatestIDPConfigSequence(string(event.AggregateType))
+func (i *IDPConfig) CurrentSequence() (uint64, error) {
+	sequence, err := i.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -56,7 +56,7 @@ func (i *IDPConfig) CurrentSequence(event *es_models.Event) (uint64, error) {
 }
 
 func (i *IDPConfig) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestIDPConfigSequence("")
+	sequence, err := i.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return nil, err
 	}

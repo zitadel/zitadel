@@ -1,3 +1,4 @@
+
 ALTER TABLE adminapi.idp_configs ADD COLUMN oidc_idp_display_name_mapping SMALLINT;
 ALTER TABLE adminapi.idp_configs ADD COLUMN oidc_idp_username_mapping SMALLINT;
 
@@ -26,7 +27,6 @@ CREATE TABLE auth.idp_configs (
 
     PRIMARY KEY (idp_config_id)
 );
-
 
 CREATE TABLE auth.login_policies (
     aggregate_id TEXT,
@@ -58,7 +58,6 @@ CREATE TABLE auth.idp_providers (
     PRIMARY KEY (aggregate_id, idp_config_id)
 );
 
-
 CREATE TABLE auth.user_external_idps (
     external_user_id TEXT,
     idp_config_id TEXT,
@@ -88,7 +87,7 @@ CREATE TABLE management.user_external_idps (
 
     PRIMARY KEY (external_user_id, idp_config_id)
 );
-
+ 
 CREATE TABLE adminapi.user_external_idps (
     idp_config_id TEXT,
     external_user_id TEXT,
