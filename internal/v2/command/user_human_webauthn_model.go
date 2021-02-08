@@ -39,6 +39,14 @@ func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.EventReader
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(e)
 			}
+		case *user.HumanWebAuthNVerifiedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanWebAuthNSignCountChangedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(e)
+			}
 		case *user.HumanWebAuthNRemovedEvent:
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(e)
@@ -56,6 +64,8 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 			wm.appendAddedEvent(e)
 		case *user.HumanWebAuthNVerifiedEvent:
 			wm.appendVerifiedEvent(e)
+		case *user.HumanWebAuthNSignCountChangedEvent:
+			wm.SignCount = e.SignCount
 		case *user.HumanWebAuthNRemovedEvent:
 			wm.State = domain.MFAStateRemoved
 		case *user.UserRemovedEvent:
