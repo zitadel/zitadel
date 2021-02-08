@@ -71,7 +71,7 @@ func (r *CommandSide) HumanVerifyInitCode(ctx context.Context, userID, resourceO
 		passwordWriteModel := NewHumanPasswordWriteModel(userID, existingCode.ResourceOwner)
 		password := &domain.Password{
 			SecretString:   passwordString,
-			ChangeRequired: true,
+			ChangeRequired: false,
 		}
 		err = r.changePassword(ctx, existingCode.ResourceOwner, userID, "", password, userAgg, passwordWriteModel)
 		if err != nil {

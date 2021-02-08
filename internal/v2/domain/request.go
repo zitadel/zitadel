@@ -7,6 +7,7 @@ const (
 	AudSuffix             = ":aud"
 )
 
+//TODO: Change AuthRequest to interface and let oidcauthreqesut implement it
 type Request interface {
 	Type() AuthRequestType
 	IsValid() bool
