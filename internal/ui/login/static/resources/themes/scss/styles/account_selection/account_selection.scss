@@ -1,0 +1,51 @@
+$lgn-container-max-width: 380px;
+$lgn-container-padding: 20px;
+$lgn-container-margin: 0px auto 50px auto;
+
+.lgn-account-selection{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .lgn-account {
+        display: flex;
+        align-items: center;
+        border: none;
+        outline: none;
+
+        .left {
+            padding: .5rem 1rem;
+        }
+
+        .lgn-names {
+            display: block;
+            margin: .5rem; 
+            text-align: start;
+
+            .lgn-displayname{
+                font-size: 16px;
+                margin: .5rem 0;
+                margin-bottom: 0;
+            }
+
+            .lgn-loginname{
+                font-size: 14px;
+                margin: 0;
+            }
+
+            .lgn-session-state {
+                margin: 0;
+                font-size: 14px;
+                margin-bottom: .5rem;
+            }
+        }
+
+        .fill-space {
+            flex: 1;
+        }
+
+        i {
+            font-size: 1.2rem;
+        }
+    }
+}

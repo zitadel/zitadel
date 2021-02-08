@@ -48,8 +48,8 @@ func (_ *OrgIAMPolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *OrgIAMPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestOrgIAMPolicySequence(string(event.AggregateType))
+func (p *OrgIAMPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -57,7 +57,7 @@ func (p *OrgIAMPolicy) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (m *OrgIAMPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestOrgIAMPolicySequence("")
+	sequence, err := m.view.GetLatestOrgIAMPolicySequence()
 	if err != nil {
 		return nil, err
 	}

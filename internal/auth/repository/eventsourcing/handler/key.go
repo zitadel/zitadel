@@ -49,8 +49,8 @@ func (_ *Key) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.KeyPairAggregate}
 }
 
-func (k *Key) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := k.view.GetLatestKeySequence(string(event.AggregateType))
+func (k *Key) CurrentSequence() (uint64, error) {
+	sequence, err := k.view.GetLatestKeySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -58,7 +58,7 @@ func (k *Key) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (k *Key) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := k.view.GetLatestKeySequence("")
+	sequence, err := k.view.GetLatestKeySequence()
 	if err != nil {
 		return nil, err
 	}

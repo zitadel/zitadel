@@ -53,8 +53,8 @@ func (v *View) DeleteProjectRolesByProjectID(projectID string) error {
 	return view.DeleteProjectRolesByProjectID(v.Db, projectRoleTable, projectID)
 }
 
-func (v *View) GetLatestProjectRoleSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(projectRoleTable, aggregateType)
+func (v *View) GetLatestProjectRoleSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(projectRoleTable)
 }
 
 func (v *View) ProcessedProjectRoleSequence(event *models.Event) error {

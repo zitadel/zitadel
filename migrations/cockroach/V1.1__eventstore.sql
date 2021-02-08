@@ -1,3 +1,4 @@
+
 CREATE SEQUENCE eventstore.event_seq;
 
 GRANT UPDATE ON TABLE eventstore.event_seq TO management;
@@ -27,3 +28,4 @@ CREATE TABLE eventstore.events (
     INDEX agg_type_agg_id (aggregate_type, aggregate_id),
     CONSTRAINT previous_sequence_unique UNIQUE (previous_sequence DESC)
 );
+ALTER SEQUENCE eventstore.event_seq OWNED BY eventstore.events.event_sequence;

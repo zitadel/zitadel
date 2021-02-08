@@ -56,8 +56,8 @@ func (_ *Application) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.ProjectAggregate}
 }
 
-func (a *Application) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := a.view.GetLatestApplicationSequence(string(event.AggregateType))
+func (a *Application) CurrentSequence() (uint64, error) {
+	sequence, err := a.view.GetLatestApplicationSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -65,7 +65,7 @@ func (a *Application) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (a *Application) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := a.view.GetLatestApplicationSequence("")
+	sequence, err := a.view.GetLatestApplicationSequence()
 	if err != nil {
 		return nil, err
 	}

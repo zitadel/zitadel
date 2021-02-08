@@ -66,8 +66,8 @@ func (_ *IDPProvider) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
 }
 
-func (i *IDPProvider) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := i.view.GetLatestIDPProviderSequence(string(event.AggregateType))
+func (i *IDPProvider) CurrentSequence() (uint64, error) {
+	sequence, err := i.view.GetLatestIDPProviderSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -75,7 +75,7 @@ func (i *IDPProvider) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (i *IDPProvider) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestIDPProviderSequence("")
+	sequence, err := i.view.GetLatestIDPProviderSequence()
 	if err != nil {
 		return nil, err
 	}

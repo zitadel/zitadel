@@ -1,0 +1,43 @@
+@import './identity_provider.scss';
+
+@mixin lgn-idp-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    $color: lgn-get-color-config($theme);
+
+    @if $color != null {
+        @include lgn-idp-color($color);
+    }
+}
+
+@mixin lgn-idp-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $background: map-get($config, background);
+    $foreground: map-get($config, foreground);
+  
+    .lgn-idp {
+        border-color: lgn-color($foreground, divider);
+
+        @include lgn-idp-elevation(1, $config);
+
+        &:not([disabled]):active {
+            @include lgn-idp-elevation(8, $config);
+        }
+
+        &.google {
+            color: lgn-color($foreground, google-text);
+            background-color: lgn-color($background, google);
+        }
+    }
+}
+
+@mixin lgn-idp-elevation($zValue, $config, $opacity: $lgn-elevation-opacity) {
+    $foreground: map-get($config, foreground);
+    $elevation-color: map-get($foreground, elevation);
+    $elevation-color-or-default: if(
+      $elevation-color == null,
+      $lgn-elevation-color,
+      $elevation-color
+    );
+  
+    @include lgn-elevation($zValue, $elevation-color-or-default, $opacity);
+  }

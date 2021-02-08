@@ -37,8 +37,8 @@ func (v *View) DeleteIDPConfig(idpID string, event *models.Event) error {
 	return v.ProcessedIDPConfigSequence(event)
 }
 
-func (v *View) GetLatestIDPConfigSequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(idpConfigTable, aggregateType)
+func (v *View) GetLatestIDPConfigSequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(idpConfigTable)
 }
 
 func (v *View) ProcessedIDPConfigSequence(event *models.Event) error {

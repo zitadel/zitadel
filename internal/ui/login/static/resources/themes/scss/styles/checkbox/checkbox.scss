@@ -1,0 +1,5 @@
+@import './checkbox_base.scss';
+
+.lgn-checkbox {
+  @include lgn-checkbox-base;
+}
