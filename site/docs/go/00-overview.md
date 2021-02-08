@@ -5,7 +5,7 @@ description: ...
 
 <div style="display: flex; align-items: center;">
     <img src="logos/zitadel-logo-solo-darkdesign.svg" height="160px" alt="zitadel"/>
-    <i style="font-size: 40px; height: 40px;  margin: 0 15px;" class="las la-arrow-right"></i>
+    <i style="font-size: 40px; height: 40px;  margin: 0 15px;" class="las la-plus"></i>
     <img src="tech/golang.svg" height="80px" alt="golang"/>
 </div>
 
