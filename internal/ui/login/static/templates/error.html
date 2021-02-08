@@ -1,9 +1,12 @@
 {{template "main-top" .}}
 
-<div class="head">
-    {{ .ErrType }}
-    {{ .ErrMessage }}
+<div class="lgn-head">
+    <div class="lgn-error">
+        <i class="lgn-icon-exclamation-circle-solid lgn-warn"></i>
+        <p class="lgn-error-message">
+            {{ if .ErrType }}{{ .ErrType }} - {{end}}{{ .ErrMessage }}
+        </p>
+    </div>
 </div>
 
 {{template "main-bottom" .}}
- 

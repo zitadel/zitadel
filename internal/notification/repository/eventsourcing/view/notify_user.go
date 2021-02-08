@@ -36,8 +36,8 @@ func (v *View) DeleteNotifyUser(userID string, event *models.Event) error {
 	return v.ProcessedNotifyUserSequence(event)
 }
 
-func (v *View) GetLatestNotifyUserSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(notifyUserTable, aggregateType)
+func (v *View) GetLatestNotifyUserSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(notifyUserTable)
 }
 
 func (v *View) ProcessedNotifyUserSequence(event *models.Event) error {

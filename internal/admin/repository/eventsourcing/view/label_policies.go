@@ -23,8 +23,8 @@ func (v *View) PutLabelPolicy(policy *model.LabelPolicyView, event *models.Event
 	return v.ProcessedLabelPolicySequence(event)
 }
 
-func (v *View) GetLatestLabelPolicySequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(labelPolicyTable, aggregateType)
+func (v *View) GetLatestLabelPolicySequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(labelPolicyTable)
 }
 
 func (v *View) ProcessedLabelPolicySequence(event *models.Event) error {

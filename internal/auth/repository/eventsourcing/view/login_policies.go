@@ -44,8 +44,8 @@ func (v *View) DeleteLoginPolicy(aggregateID string, event *models.Event) error 
 	return v.ProcessedLoginPolicySequence(event)
 }
 
-func (v *View) GetLatestLoginPolicySequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(loginPolicyTable, aggregateType)
+func (v *View) GetLatestLoginPolicySequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(loginPolicyTable)
 }
 
 func (v *View) ProcessedLoginPolicySequence(event *models.Event) error {

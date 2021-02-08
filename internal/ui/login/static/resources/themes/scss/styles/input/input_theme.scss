@@ -1,0 +1,58 @@
+@import '../theming/theming.scss';
+@import './input.scss';
+
+@mixin lgn-input-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    $color: lgn-get-color-config($theme);
+
+    @if $color != null {
+        @include lgn-input-color($color);
+    }
+}
+
+@mixin lgn-input-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $primary: map-get($config, primary);
+    $warn: map-get($config, warn);
+    $background: map-get($config, background);
+    $foreground: map-get($config, foreground);
+
+    .lgn-input:not([disabled]),
+    select:not([disabled]), .lgn-select:not([disabled]) {
+      border-color: lgn-color($foreground, input-border);
+    }
+  
+    .lgn-input,
+    select, .lgn-select {
+      color: lgn-color($foreground, text);
+      background-color: lgn-color($background, input);
+
+      &:hover {
+        border-color: lgn-color($foreground, input-border-hover);
+      }
+
+      &:active {
+        @include _lgn-input-theme-property($config, 'border-color', default);
+      }
+
+      &:focus {
+        @include _lgn-input-theme-property($config, 'border-color', default);
+      }
+
+      // overwrite if state is warn
+      &[color='warn'] {
+        border-color: lgn-color($warn, default);
+      }
+    }
+
+    .lgn-input::placeholder,
+    select::placeholder,
+    .lgn-select::placeholder {
+        color: lgn-color($foreground, input-placeholder);
+    }    
+  }
+  
+  @mixin _lgn-input-theme-property($theme, $property, $hue) {
+    $primary: map-get($theme, primary);
+    #{$property}: lgn-color($primary, $hue);
+  }

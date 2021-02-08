@@ -53,8 +53,8 @@ func (_ *LoginPolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *LoginPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestLoginPolicySequence(string(event.AggregateType))
+func (p *LoginPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestLoginPolicySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -62,7 +62,7 @@ func (p *LoginPolicy) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (p *LoginPolicy) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestLoginPolicySequence("")
+	sequence, err := p.view.GetLatestLoginPolicySequence()
 	if err != nil {
 		return nil, err
 	}

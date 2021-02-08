@@ -2816,3 +2816,321 @@ func TestChangeOrgIAMPolicy(t *testing.T) {
 		})
 	}
 }
+func TestAddMailTemplate(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.MailTemplate
+	}
+	type res struct {
+		result  *iam_model.MailTemplate
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add mailtemplate, ok",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.MailTemplate{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					Template:   []byte("<!doctype html>"),
+				},
+			},
+			res: res{
+				result: &iam_model.MailTemplate{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					Template:   []byte("<!doctype html>"),
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.MailTemplate{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.MailTemplate{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddMailTemplate(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if string(result.Template) != string(tt.res.result.Template) {
+				t.Errorf("got wrong result Template: expected: %v, actual: %v ", tt.res.result.Template, result.Template)
+			}
+		})
+	}
+}
+
+func TestChangeMailTemplate(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *IAMEventstore
+		ctx      context.Context
+		template *iam_model.MailTemplate
+	}
+	type res struct {
+		result  *iam_model.MailTemplate
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add mail template, ok",
+			args: args{
+				es:  GetMockManipulateIAMWithMailTemplate(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				template: &iam_model.MailTemplate{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					Template:   []byte("<!doctype html>"),
+				},
+			},
+			res: res{
+				result: &iam_model.MailTemplate{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					Template:   []byte("<!doctype html>"),
+				},
+			},
+		},
+		{
+			name: "invalid mail template",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				template: &iam_model.MailTemplate{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				template: &iam_model.MailTemplate{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeMailTemplate(tt.args.ctx, tt.args.template)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if string(result.Template) != string(tt.res.result.Template) {
+				t.Errorf("got wrong result Template: expected: %v, actual: %v ", tt.res.result.Template, result.Template)
+			}
+		})
+	}
+}
+func TestAddMailText(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.MailText
+	}
+	type res struct {
+		result  *iam_model.MailText
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add mailtemplate, ok",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.MailText{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MailTextType: "Type", Language: "DE",
+				},
+			},
+			res: res{
+				result: &iam_model.MailText{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MailTextType: "Type", Language: "DE",
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.MailText{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.MailText{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddMailText(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if string(result.MailTextType) != string(tt.res.result.MailTextType) {
+				t.Errorf("got wrong result MailTextType: expected: %v, actual: %v ", tt.res.result.MailTextType, result.MailTextType)
+			}
+		})
+	}
+}
+
+func TestChangeMailText(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IAMEventstore
+		ctx    context.Context
+		policy *iam_model.MailText
+	}
+	type res struct {
+		result  *iam_model.MailText
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change mailtemplate, ok",
+			args: args{
+				es:  GetMockManipulateIAMWithMailText(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.MailText{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MailTextType: "Type", Language: "DE",
+				},
+			},
+			res: res{
+				result: &iam_model.MailText{
+					ObjectRoot:   es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					MailTextType: "Type", Language: "DE",
+				},
+			},
+		},
+		{
+			name: "invalid policy",
+			args: args{
+				es:  GetMockManipulateIAM(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.MailText{
+					ObjectRoot: es_models.ObjectRoot{Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIAMNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				policy: &iam_model.MailText{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeMailText(tt.args.ctx, tt.args.policy)
+			if (tt.res.wantErr && !tt.res.errFunc(err)) || (err != nil && !tt.res.wantErr) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.wantErr && tt.res.errFunc(err) {
+				return
+			}
+			if string(result.MailTextType) != string(tt.res.result.MailTextType) {
+				t.Errorf("got wrong result MailTextType: expected: %v, actual: %v ", tt.res.result.MailTextType, result.MailTextType)
+			}
+		})
+	}
+}

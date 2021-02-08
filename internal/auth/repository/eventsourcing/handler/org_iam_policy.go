@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -48,8 +48,8 @@ func (_ *OrgIAMPolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{org_es_model.OrgAggregate, iam_es_model.IAMAggregate}
 }
 
-func (p *OrgIAMPolicy) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestOrgIAMPolicySequence(string(event.AggregateType))
+func (p *OrgIAMPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -57,7 +57,7 @@ func (p *OrgIAMPolicy) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (p *OrgIAMPolicy) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestOrgIAMPolicySequence("")
+	sequence, err := p.view.GetLatestOrgIAMPolicySequence()
 	if err != nil {
 		return nil, err
 	}

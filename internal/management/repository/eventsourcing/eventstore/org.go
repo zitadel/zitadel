@@ -109,7 +109,7 @@ func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.Or
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
-	sequence, sequenceErr := repo.View.GetLatestOrgDomainSequence("")
+	sequence, sequenceErr := repo.View.GetLatestOrgDomainSequence()
 	logging.Log("EVENT-SLowp").OnError(sequenceErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest org domain sequence")
 	domains, count, err := repo.View.SearchOrgDomains(request)
 	if err != nil {
@@ -206,7 +206,7 @@ func (repo *OrgRepository) RemoveMyOrgMember(ctx context.Context, userID string)
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID}
-	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence("")
+	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence()
 	logging.Log("EVENT-Smu3d").OnError(sequenceErr).Warn("could not read latest org member sequence")
 	members, count, err := repo.View.SearchOrgMembers(request)
 	if err != nil {
@@ -293,7 +293,7 @@ func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID, repo.SystemDefaults.IamID)
 
-	sequence, sequenceErr := repo.View.GetLatestIDPConfigSequence("")
+	sequence, sequenceErr := repo.View.GetLatestIDPConfigSequence()
 	logging.Log("EVENT-Dk8si").OnError(sequenceErr).Warn("could not read latest idp config sequence")
 	idps, count, err := repo.View.SearchIDPConfigs(request)
 	if err != nil {
@@ -424,7 +424,7 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 		request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
 	}
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, sequenceErr := repo.View.GetLatestIDPProviderSequence("")
+	sequence, sequenceErr := repo.View.GetLatestIDPProviderSequence()
 	logging.Log("EVENT-Tuiks").OnError(sequenceErr).Warn("could not read latest iam sequence")
 	providers, count, err := repo.View.SearchIDPProviders(request)
 	if err != nil {
@@ -712,4 +712,84 @@ func (repo *OrgRepository) RemovePasswordLockoutPolicy(ctx context.Context) erro
 		AggregateID: authz.GetCtxData(ctx).OrgID,
 	}}
 	return repo.OrgEventstore.RemovePasswordLockoutPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
+	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	template.Default = true
+	return iam_es_model.MailTemplateViewToModel(template), err
+}
+
+func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
+	template, err := repo.View.MailTemplateByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		template, err = repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		template.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTemplateViewToModel(template), err
+}
+
+func (repo *OrgRepository) AddMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
+	template.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddMailTemplate(ctx, template)
+}
+
+func (repo *OrgRepository) ChangeMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
+	template.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangeMailTemplate(ctx, template)
+}
+
+func (repo *OrgRepository) RemoveMailTemplate(ctx context.Context) error {
+	template := &iam_model.MailTemplate{ObjectRoot: models.ObjectRoot{
+		AggregateID: authz.GetCtxData(ctx).OrgID,
+	}}
+	return repo.OrgEventstore.RemoveMailTemplate(ctx, template)
+}
+
+func (repo *OrgRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
+	texts, err := repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTextsViewToModel(texts, true), err
+}
+
+func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
+	defaultIn := false
+	texts, err := repo.View.MailTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) || len(texts) == 0 {
+		texts, err = repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		defaultIn = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
+}
+
+func (repo *OrgRepository) AddMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	text.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddMailText(ctx, text)
+}
+
+func (repo *OrgRepository) ChangeMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	text.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangeMailText(ctx, text)
+}
+
+func (repo *OrgRepository) RemoveMailText(ctx context.Context, text *iam_model.MailText) error {
+	text.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.RemoveMailText(ctx, text)
 }
