@@ -162,6 +162,10 @@ func (r *CommandSide) CreateUserToken(ctx context.Context, orgID, agentID, clien
 	}
 
 	preferredLanguage := ""
+	existingHuman, err := r.getHumanWriteModelByID(ctx, userID, orgID)
+	if existingHuman != nil {
+		preferredLanguage = existingHuman.PreferredLanguage.String()
+	}
 	now := time.Now().UTC()
 	tokenID, err := r.idGenerator.Next()
 	if err != nil {

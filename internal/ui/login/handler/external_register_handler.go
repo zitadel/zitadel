@@ -9,7 +9,6 @@ import (
 	"github.com/caos/oidc/pkg/rp"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	caos_errors "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
@@ -76,13 +75,10 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	resourceOwner := iam.GlobalOrgID
-	member := &domain.Member{
-		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
-		Roles:      []string{orgProjectCreatorRole},
-	}
+	memberRoles := []string{orgProjectCreatorRole}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
-		member = nil
+		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
 	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
@@ -91,7 +87,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	user, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(orgIamPolicy, tokens, idpConfig)
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, member)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
