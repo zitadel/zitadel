@@ -75,8 +75,8 @@ func MailTextAddedEventMapper(event *repository.Event) (eventstore.EventReader, 
 type MailTextChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MailTextType *string `json:"mailTextType,omitempty"`
-	Language     *string `json:"language,omitempty"`
+	MailTextType string  `json:"mailTextType,omitempty"`
+	Language     string  `json:"language,omitempty"`
 	Title        *string `json:"title,omitempty"`
 	PreHeader    *string `json:"preHeader,omitempty"`
 	Subject      *string `json:"subject,omitempty"`
@@ -95,13 +95,17 @@ func (e *MailTextChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 
 func NewMailTextChangedEvent(
 	base *eventstore.BaseEvent,
+	mailTextType,
+	language string,
 	changes []MailTextChanges,
 ) (*MailTextChangedEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-m9osd", "Errors.NoChangesFound")
 	}
 	changeEvent := &MailTextChangedEvent{
-		BaseEvent: *base,
+		BaseEvent:    *base,
+		MailTextType: mailTextType,
+		Language:     language,
 	}
 	for _, change := range changes {
 		change(changeEvent)
@@ -110,18 +114,6 @@ func NewMailTextChangedEvent(
 }
 
 type MailTextChanges func(*MailTextChangedEvent)
-
-func ChangeMailTextType(mailTextType string) func(*MailTextChangedEvent) {
-	return func(e *MailTextChangedEvent) {
-		e.MailTextType = &mailTextType
-	}
-}
-
-func ChangeLanguage(language string) func(*MailTextChangedEvent) {
-	return func(e *MailTextChangedEvent) {
-		e.Language = &language
-	}
-}
 
 func ChangeTitle(title string) func(*MailTextChangedEvent) {
 	return func(e *MailTextChangedEvent) {

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	mailPolicyPrefix                   = "iam.mail."
+	mailPolicyPrefix                   = "mail."
 	mailTemplatePolicyPrefix           = mailPolicyPrefix + "template."
 	MailTemplatePolicyAddedEventType   = mailTemplatePolicyPrefix + "added"
 	MailTemplatePolicyChangedEventType = mailTemplatePolicyPrefix + "changed"
@@ -84,7 +84,7 @@ func NewMailTemplateChangedEvent(
 
 type MailTemplateChanges func(*MailTemplateChangedEvent)
 
-func ChangeTemplateColor(template []byte) func(*MailTemplateChangedEvent) {
+func ChangeTemplate(template []byte) func(*MailTemplateChangedEvent) {
 	return func(e *MailTemplateChangedEvent) {
 		e.Template = &template
 	}
