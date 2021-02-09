@@ -23,13 +23,13 @@ func AuthNKeyByIDs(db *gorm.DB, table, objectID, keyID string) (*model.AuthNKeyV
 }
 
 func SearchAuthNKeys(db *gorm.DB, table string, req *key_model.AuthNKeySearchRequest) ([]*model.AuthNKeyView, uint64, error) {
-	members := make([]*model.AuthNKeyView, 0)
+	keys := make([]*model.AuthNKeyView, 0)
 	query := repository.PrepareSearchQuery(table, model.AuthNKeySearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
-	count, err := query(db, &members)
+	count, err := query(db, &keys)
 	if err != nil {
 		return nil, 0, err
 	}
-	return members, count, nil
+	return keys, count, nil
 }
 
 func AuthNKeysByObjectID(db *gorm.DB, table string, objectID string) ([]*model.AuthNKeyView, error) {

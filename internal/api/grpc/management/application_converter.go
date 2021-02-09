@@ -493,10 +493,11 @@ func addClientKeyFromModel(key *proj_model.ClientKey) *management.AddClientKeyRe
 		AppID    string `json:"appId"`
 		ClientID string `json:"clientID"`
 	}{
-		Type:  "application",
-		KeyID: key.KeyID,
-		Key:   string(key.PrivateKey),
-		AppID: key.ApplicationID,
+		Type:     "application",
+		KeyID:    key.KeyID,
+		Key:      string(key.PrivateKey),
+		AppID:    key.ApplicationID,
+		ClientID: key.ClientID,
 	})
 	logging.Log("MANAG-adt42").OnError(err).Warn("unable to marshall key")
 
@@ -537,7 +538,7 @@ func clientKeySearchRequestToModel(req *management.ClientKeySearchRequest) *key_
 			{
 				Key:    key_model.AuthNKeyObjectType,
 				Method: model.SearchMethodEquals,
-				Value:  key_model.AuthNKeyObjectTypeUser,
+				Value:  key_model.AuthNKeyObjectTypeApplication,
 			}, {
 				Key:    key_model.AuthNKeyObjectID,
 				Method: model.SearchMethodEquals,

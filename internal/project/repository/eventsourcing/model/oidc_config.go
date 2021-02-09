@@ -32,6 +32,7 @@ type OIDCConfig struct {
 	IDTokenRoleAssertion     bool                `json:"idTokenRoleAssertion,omitempty"`
 	IDTokenUserinfoAssertion bool                `json:"idTokenUserinfoAssertion,omitempty"`
 	ClockSkew                time.Duration       `json:"clockSkew,omitempty"`
+	ClientKeys               []*ClientKey        `json:"-"`
 }
 
 func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
@@ -136,6 +137,7 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		IDTokenRoleAssertion:     config.IDTokenRoleAssertion,
 		IDTokenUserinfoAssertion: config.IDTokenUserinfoAssertion,
 		ClockSkew:                config.ClockSkew,
+		ClientKeys:               ClientKeysToModel(config.ClientKeys),
 	}
 	oidcConfig.FillCompliance()
 	return oidcConfig
@@ -168,6 +170,35 @@ func (p *Project) appendChangeOIDCConfigEvent(event *es_models.Event) error {
 	return nil
 }
 
+func (p *Project) appendAddClientKeyEvent(event *es_models.Event) error {
+	key := new(ClientKey)
+	err := key.SetData(event)
+	if err != nil {
+		return err
+	}
+
+	if i, a := GetApplication(p.Applications, key.ApplicationID); a != nil && a.OIDCConfig != nil {
+		p.Applications[i].OIDCConfig.ClientKeys = append(p.Applications[i].OIDCConfig.ClientKeys, key)
+	}
+	return nil
+}
+
+func (p *Project) appendRemoveClientKeyEvent(event *es_models.Event) error {
+	key := new(ClientKey)
+	err := key.SetData(event)
+	if err != nil {
+		return err
+	}
+	if i, a := GetApplication(p.Applications, key.ApplicationID); a != nil && a.OIDCConfig != nil {
+		if j, k := GetClientKey(p.Applications[i].OIDCConfig.ClientKeys, key.KeyID); k != nil {
+			p.Applications[i].OIDCConfig.ClientKeys[j] = p.Applications[i].OIDCConfig.ClientKeys[len(p.Applications[i].OIDCConfig.ClientKeys)-1]
+			p.Applications[i].OIDCConfig.ClientKeys[len(p.Applications[i].OIDCConfig.ClientKeys)-1] = nil
+			p.Applications[i].OIDCConfig.ClientKeys = p.Applications[i].OIDCConfig.ClientKeys[:len(p.Applications[i].OIDCConfig.ClientKeys)-1]
+		}
+	}
+	return nil
+}
+
 func (o *OIDCConfig) setData(event *es_models.Event) error {
 	o.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, o); err != nil {
@@ -175,6 +206,15 @@ func (o *OIDCConfig) setData(event *es_models.Event) error {
 		return err
 	}
 	return nil
+}
+
+func GetClientKey(keys []*ClientKey, id string) (int, *ClientKey) {
+	for i, k := range keys {
+		if k.KeyID == id {
+			return i, k
+		}
+	}
+	return -1, nil
 }
 
 type ClientKey struct {
@@ -186,6 +226,15 @@ type ClientKey struct {
 	ExpirationDate       time.Time `json:"expirationDate,omitempty"`
 	PublicKey            []byte    `json:"publicKey,omitempty"`
 	privateKey           []byte
+}
+
+func (key *ClientKey) SetData(event *es_models.Event) error {
+	key.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, key); err != nil {
+		logging.Log("EVEN-SADdg").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
 }
 
 func (key *ClientKey) AppendEvents(events ...*es_models.Event) error {
@@ -221,6 +270,14 @@ func ClientKeyFromModel(key *model.ClientKey) *ClientKey {
 		KeyID:          key.KeyID,
 		Type:           int32(key.Type),
 	}
+}
+
+func ClientKeysToModel(keys []*ClientKey) []*model.ClientKey {
+	clientKeys := make([]*model.ClientKey, len(keys))
+	for i, key := range keys {
+		clientKeys[i] = ClientKeyToModel(key)
+	}
+	return clientKeys
 }
 
 func ClientKeyToModel(key *ClientKey) *model.ClientKey {
