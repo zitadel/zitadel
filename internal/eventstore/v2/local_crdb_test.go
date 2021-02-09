@@ -75,7 +75,7 @@ func executeMigrations() error {
 		if _, err = exec(migration); err != nil {
 			return fmt.Errorf("exec file: %v || err: %w", file, err)
 		}
-		duration := 2 * time.Second
+		duration := 1 * time.Second
 		if !transactionInMigration {
 			if err = tx.Commit(); err != nil {
 				return fmt.Errorf("commit file: %v || err: %w", file, err)

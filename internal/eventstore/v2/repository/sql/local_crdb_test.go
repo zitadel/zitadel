@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
@@ -78,11 +79,14 @@ func executeMigrations() error {
 		if _, err = exec(migration); err != nil {
 			return fmt.Errorf("exec file: %v || err: %w", file, err)
 		}
+		duration := 1 * time.Second
 		if !transactionInMigration {
 			if err = tx.Commit(); err != nil {
 				return fmt.Errorf("commit file: %v || err: %w", file, err)
 			}
+			duration = 0
 		}
+		time.Sleep(duration)
 	}
 	return nil
 }
