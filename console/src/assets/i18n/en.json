@@ -998,6 +998,8 @@
             "IDTOKENUSERINFOASSERTION":"User Info inside ID Token",
             "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Enables clients to retrieve profile, email, phone and address claims from ID token.",
             "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
+            "RECOMMENDED":"recommended",
+            "NOTRECOMMENDED":"not recommended",
             "SELECTION":{
                 "APPTYPE": {
                     "WEB": {

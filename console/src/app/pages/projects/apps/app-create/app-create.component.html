@@ -28,17 +28,19 @@
                 </cnsl-form-field>
 
                 <p class="step-title">{{'APP.OIDC.TYPETITLE' | translate}}</p>
-                <mat-radio-group color="primary" aria-labelledby="radio-group-label" class="radio-group"
-                    formControlName="applicationType">
-                    <mat-radio-button disableRipple="true" class="radio-button" *ngFor="let oidctype of oidcAppTypes"
-                        [value]="oidctype.type">
-                        <div class="radio-header" [ngStyle]="{'background': oidctype.background}">
-                            <span>{{oidctype.prefix}}</span>
-                        </div>
-                        <p>{{(oidctype.titleI18nKey) | translate}}</p>
-                        <p class="type-desc">{{oidctype.descI18nKey | translate}}</p>
-                    </mat-radio-button>
-                </mat-radio-group>
+                <div class="radio-button-wrapper">
+                    <ng-container *ngFor="let oidctype of oidcAppTypes">
+                        <input [id]="oidctype.type" formControlName="applicationType" type="radio"
+                            [value]="oidctype.type" />
+                        <label [for]="oidctype.type" disableRipple="true" class="radio-button">
+                            <div class="radio-header" [ngStyle]="{'background': oidctype.background}">
+                                <span>{{oidctype.prefix}}</span>
+                            </div>
+                            <p>{{(oidctype.titleI18nKey) | translate}}</p>
+                            <p class="type-desc">{{oidctype.descI18nKey | translate}}</p>
+                        </label>
+                    </ng-container>
+                </div>
                 <div class="actions">
                     <button mat-raised-button [disabled]="firstFormGroup.invalid" color="primary"
                         matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
@@ -67,32 +69,38 @@
             <form [formGroup]="secondFormGroup">
                 <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHODSECTION' | translate}}</ng-template>
 
-                <mat-radio-group color="primary" aria-labelledby="example-radio-group-label" class="radio-group"
-                    formControlName="authMethod">
-                    <mat-radio-button disableRipple="true" class="radio-button" *ngFor="let authmethod of authMethod"
-                        [disabled]="authmethod.disabled" [value]="authmethod.key">
-                        <div class="radio-header" [ngStyle]="{'background': authmethod.background}">
-                            <span>{{authmethod.prefix}}</span>
-                        </div>
-                        <p>{{authmethod.titleI18nKey | translate}}</p>
-                        <p class="type-desc">{{authmethod.descI18nKey | translate}}</p>
-                        <span class="fill-space"></span>
-                        <div class="specs">
-                            <div class="row">
-                                <span>{{'APP.OIDC.RESPONSE' | translate}}</span>
-                                <span>{{'APP.OIDC.RESPONSE'+authmethod.responseType | translate}}</span>
+                <div class="radio-button-wrapper">
+                    <ng-container *ngFor="let authmethod of authMethod">
+                        <input type="radio" [disabled]="authmethod.disabled" formControlName="authMethod"
+                            [value]="authmethod.key" [id]="authmethod.key" />
+                        <label class="radio-button" [for]="authmethod.key">
+                            <div class="recommended" [ngClass]="{'not': authmethod.notRecommended}"
+                                *ngIf="authmethod.recommended || authmethod.notRecommended">{{(authmethod.recommended ?
+                                'APP.OIDC.RECOMMENDED' : 'APP.OIDC.NOTRECOMMENDED') | translate }}</div>
+
+                            <div class="radio-header" [ngStyle]="{'background': authmethod.background}">
+                                <span>{{authmethod.prefix}}</span>
                             </div>
-                            <div class="row">
-                                <span>{{'APP.GRANT' | translate}}</span>
-                                <span>{{'APP.OIDC.GRANT'+authmethod.grantType | translate}}</span>
+                            <p>{{authmethod.titleI18nKey | translate}}</p>
+                            <p class="type-desc">{{authmethod.descI18nKey | translate}}</p>
+                            <span class="fill-space"></span>
+                            <div class="specs">
+                                <div class="row">
+                                    <span>{{'APP.OIDC.RESPONSE' | translate}}</span>
+                                    <span>{{'APP.OIDC.RESPONSE'+authmethod.responseType | translate}}</span>
+                                </div>
+                                <div class="row">
+                                    <span>{{'APP.GRANT' | translate}}</span>
+                                    <span>{{'APP.OIDC.GRANT'+authmethod.grantType | translate}}</span>
+                                </div>
+                                <div class="row">
+                                    <span>{{'APP.OIDC.AUTHMETHOD' | translate}}</span>
+                                    <span>{{'APP.OIDC.AUTHMETHOD'+authmethod.authMethod | translate}}</span>
+                                </div>
                             </div>
-                            <div class="row">
-                                <span>{{'APP.OIDC.AUTHMETHOD' | translate}}</span>
-                                <span>{{'APP.OIDC.AUTHMETHOD'+authmethod.authMethod | translate}}</span>
-                            </div>
-                        </div>
-                    </mat-radio-button>
-                </mat-radio-group>
+                        </label>
+                    </ng-container>
+                </div>
                 <div class="actions">
                     <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' |
                         translate}}</button>

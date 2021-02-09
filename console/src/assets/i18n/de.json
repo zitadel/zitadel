@@ -998,6 +998,8 @@
             "IDTOKENUSERINFOASSERTION":"User Info im ID Token",
             "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
             "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen.",
+            "RECOMMENDED":"Empfohlen",
+            "NOTRECOMMENDED":"nicht empfohlen",
             "SELECTION":{
                 "APPTYPE": {
                     "WEB": {

@@ -4,7 +4,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { animationFrameScheduler, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import {
     Application,
@@ -100,7 +100,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
                 grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
                 authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
-                recommended: animationFrameScheduler,
             },
             {
                 key: 'IMPLICIT',
@@ -113,7 +112,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 responseType: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
                 grantType: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
                 authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-                recommended: false,
+                notRecommended: true,
             },
         ];
 
