@@ -1,5 +1,10 @@
 name: Zitadel Release
-on: push
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
 
 env:
   GITHUB_TOKEN: ${{ secrets.CR_PAT }}
@@ -9,7 +14,6 @@ env:
   OPERATOR_IMAGE_NAME: ${{ github.repository }}-operator
   CRDB_IMAGE_NAME: ${{ github.repository }}-crbackup
   ARTIFACTS_FOLDER: './artifacts/'
-  DEV_RELEASE_SUFFIX:
 
 jobs:
   zitadel-image:
