@@ -9,6 +9,7 @@ env:
   OPERATOR_IMAGE_NAME: ${{ github.repository }}-operator
   CRDB_IMAGE_NAME: ${{ github.repository }}-crbackup
   ARTIFACTS_FOLDER: './artifacts/'
+  DEV_RELEASE_SUFFIX:
 
 jobs:
   zitadel-image:
@@ -251,9 +252,9 @@ jobs:
 
       - name: Set output
         id: branch
-        run: echo ::set-output name=short_ref::${GITHUB_REF##*/}
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/heads/}
       - name: Dev-Release
-        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master'
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -267,7 +268,7 @@ jobs:
           draft: false
           prerelease: true
       - name: Upload Release Asset Darwin
-        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master'
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
         id: upload-release-asset-darwin
         uses: actions/upload-release-asset@v1
         env:
@@ -278,7 +279,7 @@ jobs:
           asset_name: Zitadelctl Darwin Amd64
           asset_content_type: application/octet-stream
       - name: Upload Release Asset Linux
-        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master'
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
@@ -289,7 +290,7 @@ jobs:
           asset_name: Zitadelctl Linux Amd64
           asset_content_type: application/octet-stream
       - name: Upload Release Asset
-        if: steps.semantic.outputs.new_release_published != 'true' && github.ref != 'master'
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
