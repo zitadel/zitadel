@@ -40,9 +40,12 @@ func (wm *OrgMailTemplateWriteModel) Reduce() error {
 }
 
 func (wm *OrgMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.MailTemplateWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
+		AggregateIDs(wm.MailTemplateWriteModel.AggregateID)
+	if wm.ResourceOwner != "" {
+		query.ResourceOwner(wm.ResourceOwner)
+	}
+	return query
 }
 
 func (wm *OrgMailTemplateWriteModel) NewChangedEvent(

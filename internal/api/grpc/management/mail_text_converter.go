@@ -3,12 +3,14 @@ package management
 import (
 	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func mailTextRequestToModel(mailText *management.MailTextUpdate) *iam_model.MailText {
-	return &iam_model.MailText{
+func mailTextRequestToDomain(mailText *management.MailTextUpdate) *domain.MailText {
+	return &domain.MailText{
 		MailTextType: mailText.MailTextType,
 		Language:     mailText.Language,
 		Title:        mailText.Title,
@@ -20,20 +22,7 @@ func mailTextRequestToModel(mailText *management.MailTextUpdate) *iam_model.Mail
 	}
 }
 
-func mailTextRemoveToModel(mailText *management.MailTextRemove) *iam_model.MailText {
-	return &iam_model.MailText{
-		MailTextType: mailText.MailTextType,
-		Language:     mailText.Language,
-	}
-}
-
-func mailTextFromModel(mailText *iam_model.MailText) *management.MailText {
-	creationDate, err := ptypes.TimestampProto(mailText.CreationDate)
-	logging.Log("MANAG-ULKZ6").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(mailText.ChangeDate)
-	logging.Log("MANAG-451rI").OnError(err).Debug("date parse failed")
-
+func mailTextFromDoamin(mailText *domain.MailText) *management.MailText {
 	return &management.MailText{
 		MailTextType: mailText.MailTextType,
 		Language:     mailText.Language,
@@ -43,8 +32,8 @@ func mailTextFromModel(mailText *iam_model.MailText) *management.MailText {
 		Greeting:     mailText.Greeting,
 		Text:         mailText.Text,
 		ButtonText:   mailText.ButtonText,
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
+		CreationDate: timestamppb.New(mailText.CreationDate),
+		ChangeDate:   timestamppb.New(mailText.ChangeDate),
 	}
 }
 

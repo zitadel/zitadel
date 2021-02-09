@@ -20,11 +20,11 @@ func (r *CommandSide) getOrgPasswordComplexityPolicy(ctx context.Context, orgID 
 	return r.getDefaultPasswordComplexityPolicy(ctx)
 }
 
-func (r *CommandSide) AddPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+func (r *CommandSide) AddPasswordComplexityPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
-	addedPolicy := NewOrgPasswordComplexityPolicyWriteModel(policy.AggregateID)
+	addedPolicy := NewOrgPasswordComplexityPolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -44,12 +44,12 @@ func (r *CommandSide) AddPasswordComplexityPolicy(ctx context.Context, policy *d
 	return writeModelToPasswordComplexityPolicy(&addedPolicy.PasswordComplexityPolicyWriteModel), nil
 }
 
-func (r *CommandSide) ChangePasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+func (r *CommandSide) ChangePasswordComplexityPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
 
-	existingPolicy := NewOrgPasswordComplexityPolicyWriteModel(policy.AggregateID)
+	existingPolicy := NewOrgPasswordComplexityPolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err

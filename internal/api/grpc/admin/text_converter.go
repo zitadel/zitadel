@@ -1,14 +1,14 @@
 package admin
 
 import (
-	"github.com/caos/logging"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func textToModel(text *admin.DefaultMailTextUpdate) *iam_model.MailText {
-	return &iam_model.MailText{
+func textToDomain(text *admin.DefaultMailTextUpdate) *domain.MailText {
+	return &domain.MailText{
 		MailTextType: text.MailTextType,
 		Language:     text.Language,
 		Title:        text.Title,
@@ -20,13 +20,7 @@ func textToModel(text *admin.DefaultMailTextUpdate) *iam_model.MailText {
 	}
 }
 
-func textFromModel(text *iam_model.MailText) *admin.DefaultMailText {
-	creationDate, err := ptypes.TimestampProto(text.CreationDate)
-	logging.Log("ADMIN-Jlzsj").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(text.ChangeDate)
-	logging.Log("ADMIN-mw5b8").OnError(err).Debug("date parse failed")
-
+func textFromDomain(text *domain.MailText) *admin.DefaultMailText {
 	return &admin.DefaultMailText{
 		MailTextType: text.MailTextType,
 		Language:     text.Language,
@@ -36,8 +30,8 @@ func textFromModel(text *iam_model.MailText) *admin.DefaultMailText {
 		Greeting:     text.Greeting,
 		Text:         text.Text,
 		ButtonText:   text.ButtonText,
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
+		CreationDate: timestamppb.New(text.CreationDate),
+		ChangeDate:   timestamppb.New(text.ChangeDate),
 	}
 }
 
@@ -57,12 +51,6 @@ func textsViewToModel(queries []*iam_model.MailTextView) []*admin.DefaultMailTex
 }
 
 func textViewFromModel(text *iam_model.MailTextView) *admin.DefaultMailTextView {
-	creationDate, err := ptypes.TimestampProto(text.CreationDate)
-	logging.Log("ADMIN-7RyJc").OnError(err).Debug("date parse failed")
-
-	changeDate, err := ptypes.TimestampProto(text.ChangeDate)
-	logging.Log("ADMIN-fTFgY").OnError(err).Debug("date parse failed")
-
 	return &admin.DefaultMailTextView{
 		MailTextType: text.MailTextType,
 		Language:     text.Language,
@@ -72,7 +60,7 @@ func textViewFromModel(text *iam_model.MailTextView) *admin.DefaultMailTextView 
 		Greeting:     text.Greeting,
 		Text:         text.Text,
 		ButtonText:   text.ButtonText,
-		CreationDate: creationDate,
-		ChangeDate:   changeDate,
+		CreationDate: timestamppb.New(text.CreationDate),
+		ChangeDate:   timestamppb.New(text.ChangeDate),
 	}
 }

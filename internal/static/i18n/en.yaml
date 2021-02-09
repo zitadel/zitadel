@@ -132,6 +132,16 @@ Errors:
         AlreadyExists: Multifactor already exists
         NotExisting: Multifactor not existing
         Unspecified: Multifactor invalid
+    MailTemplate:
+      NotFound: Default Mail Template not found
+      NotChanged: Default Mail Template has not been changed
+      AlreadyExists: Default Mail Template already exists
+      Invalid: Default Mail Template is invalid
+    MailText:
+      NotFound: Default Mail Text not found
+      NotChanged: Default Mail Text has not been changed
+      AlreadyExists: Default Mail Text already exists
+      Invalid: Default Mail Text is invalid
     PasswordComplexity:
       NotFound: Password  Complexity Policy not found
       Empty: Password Complexity Policy is empty
@@ -230,6 +240,16 @@ Errors:
     LabelPolicy:
       NotFound: Default Private Label Policy not found
       NotChanged: Default Private Label Policy has not been changed
+    MailTemplate:
+      NotFound: Default Mail Template not found
+      NotChanged: Default Mail Template has not been changed
+      AlreadyExists: Default Mail Template already exists
+      Invalid: Default Mail Template is invalid
+    MailText:
+      NotFound: Default Mail Text not found
+      NotChanged: Default Mail Text has not been changed
+      AlreadyExists: Default Mail Text already exists
+      Invalid: Default Mail Text is invalid
     PasswordComplexityPolicy:
       NotFound: Default Private Label Policy not found
       NotExisting: Default Password Complexity Policy not existing

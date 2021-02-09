@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 
 	"github.com/golang/protobuf/ptypes/empty"
@@ -65,7 +66,7 @@ func (s *Server) GetOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyID) 
 }
 
 func (s *Server) CreateOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyRequest) (_ *admin.OrgIamPolicy, err error) {
-	policy, err := s.command.AddOrgIAMPolicy(ctx, orgIAMPolicyRequestToDomain(in))
+	policy, err := s.command.AddOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID, orgIAMPolicyRequestToDomain(in))
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +74,7 @@ func (s *Server) CreateOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyR
 }
 
 func (s *Server) UpdateOrgIamPolicy(ctx context.Context, in *admin.OrgIamPolicyRequest) (_ *admin.OrgIamPolicy, err error) {
-	policy, err := s.command.ChangeOrgIAMPolicy(ctx, orgIAMPolicyRequestToDomain(in))
+	policy, err := s.command.ChangeOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID, orgIAMPolicyRequestToDomain(in))
 	if err != nil {
 		return nil, err
 	}

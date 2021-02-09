@@ -24,9 +24,9 @@ func (s *Server) GetDefaultMailText(ctx context.Context, textType string, langua
 }
 
 func (s *Server) UpdateDefaultMailText(ctx context.Context, text *admin.DefaultMailTextUpdate) (*admin.DefaultMailText, error) {
-	result, err := s.iam.ChangeDefaultMailText(ctx, textToModel(text))
+	result, err := s.command.ChangeDefaultMailText(ctx, textToDomain(text))
 	if err != nil {
 		return nil, err
 	}
-	return textFromModel(result), nil
+	return textFromDomain(result), nil
 }

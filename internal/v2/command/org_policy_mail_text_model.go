@@ -11,13 +11,15 @@ type OrgMailTextWriteModel struct {
 	MailTextWriteModel
 }
 
-func NewOrgMailTextWriteModel(orgID string) *OrgMailTextWriteModel {
+func NewOrgMailTextWriteModel(orgID, mailTextType, language string) *OrgMailTextWriteModel {
 	return &OrgMailTextWriteModel{
 		MailTextWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   orgID,
 				ResourceOwner: orgID,
 			},
+			MailTextType: mailTextType,
+			Language:     language,
 		},
 	}
 }
@@ -38,9 +40,12 @@ func (wm *OrgMailTextWriteModel) Reduce() error {
 }
 
 func (wm *OrgMailTextWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.MailTextWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
+		AggregateIDs(wm.MailTextWriteModel.AggregateID)
+	if wm.ResourceOwner != "" {
+		query.ResourceOwner(wm.ResourceOwner)
+	}
+	return query
 }
 
 func (wm *OrgMailTextWriteModel) NewChangedEvent(

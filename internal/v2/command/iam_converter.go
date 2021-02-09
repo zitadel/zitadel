@@ -52,10 +52,53 @@ func writeModelToLabelPolicy(wm *LabelPolicyWriteModel) *domain.LabelPolicy {
 	}
 }
 
+func writeModelToMailTemplate(wm *MailTemplateWriteModel) *domain.MailTemplate {
+	return &domain.MailTemplate{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		Template:   wm.Template,
+	}
+}
+
+func writeModelToMailText(wm *MailTextWriteModel) *domain.MailText {
+	return &domain.MailText{
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		MailTextType: wm.MailTextType,
+		Language:     wm.Language,
+		Title:        wm.Title,
+		PreHeader:    wm.PreHeader,
+		Subject:      wm.Subject,
+		Greeting:     wm.Greeting,
+		Text:         wm.Text,
+		ButtonText:   wm.ButtonText,
+	}
+}
+
 func writeModelToOrgIAMPolicy(wm *IAMOrgIAMPolicyWriteModel) *domain.OrgIAMPolicy {
 	return &domain.OrgIAMPolicy{
 		ObjectRoot:            writeModelToObjectRoot(wm.PolicyOrgIAMWriteModel.WriteModel),
 		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
+	}
+}
+
+func writeModelToMailTemplatePolicy(wm *MailTemplateWriteModel) *domain.MailTemplate {
+	return &domain.MailTemplate{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		Template:   wm.Template,
+	}
+}
+
+func writeModelToMailTextPolicy(wm *MailTextWriteModel) *domain.MailText {
+	return &domain.MailText{
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		State:        wm.State,
+		MailTextType: wm.MailTextType,
+		Language:     wm.Language,
+		Title:        wm.Title,
+		PreHeader:    wm.PreHeader,
+		Subject:      wm.Subject,
+		Greeting:     wm.Greeting,
+		Text:         wm.Text,
+		ButtonText:   wm.ButtonText,
 	}
 }
 
