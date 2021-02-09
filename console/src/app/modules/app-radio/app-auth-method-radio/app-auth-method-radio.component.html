@@ -1,0 +1,33 @@
+<div class="radio-button-wrapper">
+    <ng-container *ngFor="let method of authMethods">
+        <input type="radio" [disabled]="method.disabled" (change)="emitChange()" [value]="method.key" [id]="method.key"
+            [(ngModel)]="selected" />
+        <label class="cnsl-radio-button" [for]="method.key">
+            <div class="recommended" [ngClass]="{'not': method.notRecommended}"
+                *ngIf="method.recommended || method.notRecommended">
+                {{(method.recommended ?
+                'APP.OIDC.RECOMMENDED' : 'APP.OIDC.NOTRECOMMENDED') | translate }}</div>
+
+            <div class="cnsl-radio-header" [ngStyle]="{'background': method.background}">
+                <span>{{method.prefix}}</span>
+            </div>
+            <p>{{method.titleI18nKey | translate}}</p>
+            <p class="type-desc">{{method.descI18nKey | translate}}</p>
+            <span class="fill-space"></span>
+            <div class="app-specs">
+                <div class="row">
+                    <span>{{'APP.OIDC.RESPONSE' | translate}}</span>
+                    <span>{{'APP.OIDC.RESPONSE'+method?.responseType | translate}}</span>
+                </div>
+                <div class="row">
+                    <span>{{'APP.GRANT' | translate}}</span>
+                    <span>{{'APP.OIDC.GRANT'+method.grantType | translate}}</span>
+                </div>
+                <div class="row">
+                    <span>{{'APP.OIDC.AUTHMETHOD' | translate}}</span>
+                    <span>{{'APP.OIDC.AUTHMETHOD'+method.authMethod | translate}}</span>
+                </div>
+            </div>
+        </label>
+    </ng-container>
+</div>

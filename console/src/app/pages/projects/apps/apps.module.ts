@@ -19,6 +19,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { AppRadioModule } from 'src/app/modules/app-radio/app-radio.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
@@ -38,6 +39,7 @@ import { AppsRoutingModule } from './apps-routing.module';
     ],
     imports: [
         CommonModule,
+        AppRadioModule,
         AppsRoutingModule,
         FormsModule,
         TranslateModule,

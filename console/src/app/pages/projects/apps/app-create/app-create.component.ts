@@ -108,7 +108,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 checked: false,
                 disabled: false,
                 prefix: 'IMP',
-                background: 'rgb(110, 80, 80)',
+                background: 'rgb(144 75 75)',
                 responseType: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
                 grantType: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
                 authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
@@ -177,12 +177,15 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
         this.firstFormGroup = this.fb.group({
             name: ['', [Validators.required]],
-            applicationType: ['', [Validators.required]],
+            applicationType: [OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB, [Validators.required]],
         });
 
         this.firstFormGroup.valueChanges.subscribe(value => {
             if (this.firstFormGroup.valid) {
-                switch (value.applicationType) {
+                this.oidcApp.name = this.name?.value;
+                this.oidcApp.applicationType = this.applicationType?.value;
+
+                switch (this.applicationType?.value) {
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE:
                         this.oidcResponseTypes[0].checked = true;
                         this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
@@ -190,9 +193,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                         this.oidcApp.grantTypesList =
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-
-                        // this.redirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
-                        // this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
                         this.oidcAuthMethodType[0].disabled = false;
@@ -207,9 +207,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
                         this.oidcApp.grantTypesList =
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
-
-                        // this.redirectControl = new FormControl('', [webValidator as ValidatorFn]);
-                        // this.postRedirectControl = new FormControl('', [webValidator as ValidatorFn]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
                         this.oidcResponseTypes[0].checked = true;
@@ -219,14 +216,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDCGRANTTYPE_IMPLICIT];
 
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-
-                        // this.redirectControl = new FormControl('', [webValidator as ValidatorFn]);
-                        // this.postRedirectControl = new FormControl('', [webValidator as ValidatorFn]);
                         break;
                 }
-
-                this.oidcApp.name = this.name?.value;
-                this.oidcApp.applicationType = this.applicationType?.value;
             }
         });
 
@@ -285,6 +276,10 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy(): void {
         this.subscription?.unsubscribe();
+    }
+
+    public changedAppType(type: OIDCApplicationType) {
+        this.firstFormGroup.controls['applicationType'].setValue(type);
     }
 
     private async getData({ projectid }: Params): Promise<void> {
