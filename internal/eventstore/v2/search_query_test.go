@@ -231,7 +231,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
 					},
 				},
 			},
@@ -250,7 +250,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, []AggregateType{"user", "org"}, repository.OperationIn),
+						repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
 					},
 				},
 			},
@@ -273,7 +273,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    true,
 					Limit:   5,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
 						repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationLess),
 					},
 				},
@@ -297,7 +297,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    false,
 					Limit:   5,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
 						repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationGreater),
 					},
 				},
@@ -322,7 +322,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    true,
 					Limit:   5,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
 						repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationLess),
 					},
 				},
@@ -344,7 +344,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
 						repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
 					},
 				},
@@ -366,7 +366,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
 						repository.NewFilter(repository.FieldAggregateID, []string{"1234", "0815"}, repository.OperationIn),
 					},
 				},
@@ -388,7 +388,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
 						repository.NewFilter(repository.FieldSequence, uint64(8), repository.OperationGreater),
 					},
 				},
@@ -410,8 +410,8 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
-						repository.NewFilter(repository.FieldEventType, EventType("user.created"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldEventType, repository.EventType("user.created"), repository.OperationEquals),
 					},
 				},
 			},
@@ -432,8 +432,8 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
-						repository.NewFilter(repository.FieldEventType, []EventType{"user.created", "user.changed"}, repository.OperationIn),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldEventType, []repository.EventType{"user.created", "user.changed"}, repository.OperationIn),
 					},
 				},
 			},
@@ -454,7 +454,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 					Desc:    false,
 					Limit:   0,
 					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
 						repository.NewFilter(repository.FieldResourceOwner, "hodor", repository.OperationEquals),
 					},
 				},
