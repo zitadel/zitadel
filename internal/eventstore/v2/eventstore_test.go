@@ -63,7 +63,7 @@ func (e *testEvent) Data() interface{} {
 	return e.data()
 }
 
-func (e *testEvent) UniqueConstraint() []*EventUniqueConstraint {
+func (e *testEvent) UniqueConstraints() []*EventUniqueConstraint {
 	return nil
 }
 
@@ -1358,24 +1358,24 @@ func TestEventstore_mapEvents(t *testing.T) {
 		args   args
 		res    res
 	}{
-		{
-			name: "no mapper",
-			args: args{
-				events: []*repository.Event{
-					{
-						Type: "no.mapper.found",
-					},
-				},
-			},
-			fields: fields{
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){},
-			},
-			res: res{
-				//TODO: as long as not all events are implemented in v2 eventstore doesn't return an error
-				// afterwards it will return an error on un
-				wantErr: true,
-			},
-		},
+		//{
+		//	name: "no mapper",
+		//	args: args{
+		//		events: []*repository.Event{
+		//			{
+		//				Type: "no.mapper.found",
+		//			},
+		//		},
+		//	},
+		//	fields: fields{
+		//		eventMapper: map[EventType]func(*repository.Event) (EventReader, error){},
+		//	},
+		//	res: res{
+		//		//TODO: as long as not all events are implemented in v2 eventstore doesn't return an error
+		//		// afterwards it will return an error on un
+		//		wantErr: true,
+		//	},
+		//},
 		{
 			name: "mapping failed",
 			args: args{

@@ -3,6 +3,7 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"testing"
 	"time"
 
@@ -213,14 +214,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		MultiFactorCheckLifeTime   time.Duration
 	}
 	type args struct {
-		request       *model.AuthRequest
+		request       *domain.AuthRequest
 		checkLoggedIn bool
 	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    []model.NextStep
+		want    []domain.NextStep
 		wantErr func(error) bool
 	}{
 		{
@@ -233,8 +234,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		{
 			"prompt none and checkLoggedIn false, callback step",
 			fields{},
-			args{&model.AuthRequest{Prompt: model.PromptNone}, false},
-			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			args{&domain.AuthRequest{Prompt: domain.PromptNone}, false},
+			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
@@ -242,8 +243,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userSessionViewProvider: &mockViewNoUserSession{},
 			},
-			args{&model.AuthRequest{}, false},
-			[]model.NextStep{&model.LoginStep{}},
+			args{&domain.AuthRequest{}, false},
+			[]domain.NextStep{&domain.LoginStep{}},
 			nil,
 		},
 		{
@@ -251,8 +252,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userSessionViewProvider: &mockViewNoUserSession{},
 			},
-			args{&model.AuthRequest{LinkingUsers: []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "ExternalUserID"}}}, false},
-			[]model.NextStep{&model.ExternalNotFoundOptionStep{}},
+			args{&domain.AuthRequest{LinkingUsers: []*domain.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "ExternalUserID"}}}, false},
+			[]domain.NextStep{&domain.ExternalNotFoundOptionStep{}},
 			nil,
 		},
 		{
@@ -260,7 +261,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userSessionViewProvider: &mockViewErrUserSession{},
 			},
-			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}, false},
+			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount}, false},
 			nil,
 			errors.IsInternal,
 		},
@@ -283,11 +284,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}, false},
-			[]model.NextStep{
-				&model.LoginStep{},
-				&model.SelectUserStep{
-					Users: []model.UserSelection{
+			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount}, false},
+			[]domain.NextStep{
+				&domain.LoginStep{},
+				&domain.SelectUserStep{
+					Users: []domain.UserSelection{
 						{
 							UserID:            "id1",
 							LoginName:         "loginname1",
@@ -321,11 +322,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{Prompt: model.PromptSelectAccount, RequestedOrgID: "orgID1"}, false},
-			[]model.NextStep{
-				&model.LoginStep{},
-				&model.SelectUserStep{
-					Users: []model.UserSelection{
+			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount, RequestedOrgID: "orgID1"}, false},
+			[]domain.NextStep{
+				&domain.LoginStep{},
+				&domain.SelectUserStep{
+					Users: []domain.UserSelection{
 						{
 							UserID:            "id1",
 							LoginName:         "loginname1",
@@ -348,11 +349,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}, false},
-			[]model.NextStep{
-				&model.LoginStep{},
-				&model.SelectUserStep{
-					Users: []model.UserSelection{},
+			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount}, false},
+			[]domain.NextStep{
+				&domain.LoginStep{},
+				&domain.SelectUserStep{
+					Users: []domain.UserSelection{},
 				}},
 			nil,
 		},
@@ -362,7 +363,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider:  &mockViewNoUser{},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
 			errors.IsNotFound,
 		},
@@ -378,7 +379,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				orgViewProvider: &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
 			errors.IsPreconditionFailed,
 		},
@@ -394,7 +395,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				orgViewProvider: &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
 			errors.IsPreconditionFailed,
 		},
@@ -405,7 +406,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewErrOrg{},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
 			errors.IsInternal,
 		},
@@ -416,7 +417,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateInactive},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
 			errors.IsPreconditionFailed,
 		},
@@ -430,8 +431,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{}}, false},
-			[]model.NextStep{&model.PasswordStep{}},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
+			[]domain.NextStep{&domain.PasswordStep{}},
 			nil,
 		},
 		{
@@ -442,7 +443,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider:       &mockEventUser{},
 				orgViewProvider:         &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
+			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
 			errors.IsInternal,
 		},
@@ -457,8 +458,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}, false},
-			[]model.NextStep{&model.InitUserStep{
+			args{&domain.AuthRequest{UserID: "UserID"}, false},
+			[]domain.NextStep{&domain.InitUserStep{
 				PasswordSet: true,
 			}},
 			nil,
@@ -475,8 +476,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
 				MultiFactorCheckLifeTime: 10 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{PasswordlessType: iam_model.PasswordlessTypeAllowed}}, false},
-			[]model.NextStep{&model.PasswordlessStep{}},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
+			[]domain.NextStep{&domain.PasswordlessStep{}},
 			nil,
 		},
 		{
@@ -497,14 +498,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
 				MultiFactorCheckLifeTime: 10 * time.Hour,
 			},
-			args{&model.AuthRequest{
+			args{&domain.AuthRequest{
 				UserID: "UserID",
-				LoginPolicy: &iam_model.LoginPolicyView{
-					PasswordlessType: iam_model.PasswordlessTypeAllowed,
-					MultiFactors:     []iam_model.MultiFactorType{iam_model.MultiFactorTypeU2FWithPIN},
+				LoginPolicy: &domain.LoginPolicy{
+					PasswordlessType: domain.PasswordlessTypeAllowed,
+					MultiFactors:     []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
 				},
 			}, false},
-			[]model.NextStep{&model.VerifyEMailStep{}},
+			[]domain.NextStep{&domain.VerifyEMailStep{}},
 			nil,
 		},
 		{
@@ -515,8 +516,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider:       &mockEventUser{},
 				orgViewProvider:         &mockViewOrg{State: org_model.OrgStateActive},
 			},
-			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{}}, false},
-			[]model.NextStep{&model.InitPasswordStep{}},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
+			[]domain.NextStep{&domain.InitPasswordStep{}},
 			nil,
 		},
 		{
@@ -533,8 +534,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
-			[]model.NextStep{&model.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
+			args{&domain.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
+			[]domain.NextStep{&domain.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
 			nil,
 		},
 		{
@@ -558,14 +559,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				SecondFactorCheckLifeTime:  18 * time.Hour,
 			},
 			args{
-				&model.AuthRequest{
+				&domain.AuthRequest{
 					UserID:              "UserID",
 					SelectedIDPConfigID: "IDPConfigID",
-					Request:             &model.AuthRequestOIDC{},
-					LoginPolicy:         &iam_model.LoginPolicyView{},
+					Request:             &domain.AuthRequestOIDC{},
+					LoginPolicy:         &domain.LoginPolicy{},
 				},
 				false},
-			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
@@ -579,8 +580,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:       &mockViewOrg{State: org_model.OrgStateActive},
 				PasswordCheckLifeTime: 10 * 24 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID", LoginPolicy: &iam_model.LoginPolicyView{}}, false},
-			[]model.NextStep{&model.PasswordStep{}},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
+			[]domain.NextStep{&domain.PasswordStep{}},
 			nil,
 		},
 		{
@@ -602,13 +603,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 			},
 			args{
-				&model.AuthRequest{
+				&domain.AuthRequest{
 					UserID:              "UserID",
 					SelectedIDPConfigID: "IDPConfigID",
-					Request:             &model.AuthRequestOIDC{},
-					LoginPolicy:         &iam_model.LoginPolicyView{},
+					Request:             &domain.AuthRequestOIDC{},
+					LoginPolicy:         &domain.LoginPolicy{},
 				}, false},
-			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
@@ -629,14 +630,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{
-				&model.AuthRequest{
+				&domain.AuthRequest{
 					UserID: "UserID",
-					LoginPolicy: &iam_model.LoginPolicyView{
-						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				}, false},
-			[]model.NextStep{&model.MFAVerificationStep{
-				MFAProviders: []model.MFAType{model.MFATypeOTP},
+			[]domain.NextStep{&domain.MFAVerificationStep{
+				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
 			}},
 			nil,
 		},
@@ -657,14 +658,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{
-				&model.AuthRequest{
+				&domain.AuthRequest{
 					UserID: "UserID",
-					LoginPolicy: &iam_model.LoginPolicyView{
-						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				}, false},
-			[]model.NextStep{&model.MFAVerificationStep{
-				MFAProviders: []model.MFAType{model.MFATypeOTP},
+			[]domain.NextStep{&domain.MFAVerificationStep{
+				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
 			}},
 			nil,
 		},
@@ -687,15 +688,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				SecondFactorCheckLifeTime:  18 * time.Hour,
 			},
 			args{
-				&model.AuthRequest{
+				&domain.AuthRequest{
 					UserID:              "UserID",
 					SelectedIDPConfigID: "IDPConfigID",
-					LoginPolicy: &iam_model.LoginPolicyView{
-						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				}, false},
-			[]model.NextStep{&model.MFAVerificationStep{
-				MFAProviders: []model.MFAType{model.MFATypeOTP},
+			[]domain.NextStep{&domain.MFAVerificationStep{
+				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
 			}},
 			nil,
 		},
@@ -718,13 +719,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{
-				&model.AuthRequest{
+				&domain.AuthRequest{
 					UserID: "UserID",
-					LoginPolicy: &iam_model.LoginPolicyView{
-						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				}, false},
-			[]model.NextStep{&model.ChangePasswordStep{}},
+			[]domain.NextStep{&domain.ChangePasswordStep{}},
 			nil,
 		},
 		{
@@ -743,13 +744,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{
+			args{&domain.AuthRequest{
 				UserID: "UserID",
-				LoginPolicy: &iam_model.LoginPolicyView{
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 				},
 			}, false},
-			[]model.NextStep{&model.VerifyEMailStep{}},
+			[]domain.NextStep{&domain.VerifyEMailStep{}},
 			nil,
 		},
 		{
@@ -769,13 +770,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{
+			args{&domain.AuthRequest{
 				UserID: "UserID",
-				LoginPolicy: &iam_model.LoginPolicyView{
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 				},
 			}, false},
-			[]model.NextStep{&model.ChangePasswordStep{}, &model.VerifyEMailStep{}},
+			[]domain.NextStep{&domain.ChangePasswordStep{}, &domain.VerifyEMailStep{}},
 			nil,
 		},
 		{
@@ -796,14 +797,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{
+			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Request: &model.AuthRequestOIDC{},
-				LoginPolicy: &iam_model.LoginPolicyView{
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+				Request: &domain.AuthRequestOIDC{},
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 				},
 			}, false},
-			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
@@ -824,15 +825,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{
+			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Prompt:  model.PromptNone,
-				Request: &model.AuthRequestOIDC{},
-				LoginPolicy: &iam_model.LoginPolicyView{
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+				Prompt:  domain.PromptNone,
+				Request: &domain.AuthRequestOIDC{},
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 				},
 			}, true},
-			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
@@ -856,15 +857,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{
+			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Prompt:  model.PromptNone,
-				Request: &model.AuthRequestOIDC{},
-				LoginPolicy: &iam_model.LoginPolicyView{
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+				Prompt:  domain.PromptNone,
+				Request: &domain.AuthRequestOIDC{},
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 				},
 			}, true},
-			[]model.NextStep{&model.GrantRequiredStep{}},
+			[]domain.NextStep{&domain.GrantRequiredStep{}},
 			nil,
 		},
 		{
@@ -888,15 +889,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{
+			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Prompt:  model.PromptNone,
-				Request: &model.AuthRequestOIDC{},
-				LoginPolicy: &iam_model.LoginPolicyView{
-					SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+				Prompt:  domain.PromptNone,
+				Request: &domain.AuthRequestOIDC{},
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 				},
 			}, true},
-			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
@@ -915,13 +916,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{
-				&model.AuthRequest{
+				&domain.AuthRequest{
 					UserID:              "UserID",
-					LoginPolicy:         &iam_model.LoginPolicyView{},
+					LoginPolicy:         &domain.LoginPolicy{},
 					SelectedIDPConfigID: "IDPConfigID",
-					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
+					LinkingUsers:        []*domain.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
 				}, false},
-			[]model.NextStep{&model.PasswordStep{}},
+			[]domain.NextStep{&domain.PasswordStep{}},
 			nil,
 		},
 		{
@@ -942,15 +943,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 			},
 			args{
-				&model.AuthRequest{
+				&domain.AuthRequest{
 					UserID:              "UserID",
 					SelectedIDPConfigID: "IDPConfigID",
-					LinkingUsers:        []*model.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
-					LoginPolicy: &iam_model.LoginPolicyView{
-						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+					LinkingUsers:        []*domain.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				}, false},
-			[]model.NextStep{&model.LinkUsersStep{}},
+			[]domain.NextStep{&domain.LinkUsersStep{}},
 			nil,
 		},
 	}
@@ -990,7 +991,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 	}
 	type args struct {
 		userSession *user_model.UserSessionView
-		request     *model.AuthRequest
+		request     *domain.AuthRequest
 		user        *user_model.UserView
 		policy      *iam_model.LoginPolicyView
 	}
@@ -998,7 +999,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		name        string
 		fields      fields
 		args        args
-		want        model.NextStep
+		want        domain.NextStep
 		wantChecked bool
 		errFunc     func(err error) bool
 	}{
@@ -1006,7 +1007,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		//	"required, prompt and false", //TODO: enable when LevelsOfAssurance is checked
 		//	fields{},
 		//	args{
-		//		request: &model.AuthRequest{PossibleLOAs: []model.LevelOfAssurance{}},
+		//		request: &domain.AuthRequest{PossibleLOAs: []model.LevelOfAssurance{}},
 		//		user: &user_model.UserView{
 		//			OTPState: user_model.MFAStateReady,
 		//		},
@@ -1019,8 +1020,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{
-					LoginPolicy: &iam_model.LoginPolicyView{
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
 						ForceMFA: true,
 					},
 				},
@@ -1040,8 +1041,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{
-					LoginPolicy: &iam_model.LoginPolicyView{},
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{},
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
@@ -1059,9 +1060,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{
-					LoginPolicy: &iam_model.LoginPolicyView{
-						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				},
 				user: &user_model.UserView{
@@ -1070,9 +1071,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 					},
 				},
 			},
-			&model.MFAPromptStep{
-				MFAProviders: []model.MFAType{
-					model.MFATypeOTP,
+			&domain.MFAPromptStep{
+				MFAProviders: []domain.MFAType{
+					domain.MFATypeOTP,
 				},
 			},
 			false,
@@ -1084,10 +1085,10 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{
-					LoginPolicy: &iam_model.LoginPolicyView{
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
 						ForceMFA:      true,
-						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				},
 				user: &user_model.UserView{
@@ -1096,10 +1097,10 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 					},
 				},
 			},
-			&model.MFAPromptStep{
+			&domain.MFAPromptStep{
 				Required: true,
-				MFAProviders: []model.MFAType{
-					model.MFATypeOTP,
+				MFAProviders: []domain.MFAType{
+					domain.MFATypeOTP,
 				},
 			},
 			false,
@@ -1111,8 +1112,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{
-					LoginPolicy: &iam_model.LoginPolicyView{},
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{},
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
@@ -1131,9 +1132,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{
-					LoginPolicy: &iam_model.LoginPolicyView{
-						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				},
 				user: &user_model.UserView{
@@ -1154,9 +1155,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{
-				request: &model.AuthRequest{
-					LoginPolicy: &iam_model.LoginPolicyView{
-						SecondFactors: []iam_model.SecondFactorType{iam_model.SecondFactorTypeOTP},
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				},
 				user: &user_model.UserView{
@@ -1168,8 +1169,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				userSession: &user_model.UserSessionView{},
 			},
 
-			&model.MFAVerificationStep{
-				MFAProviders: []model.MFAType{model.MFATypeOTP},
+			&domain.MFAVerificationStep{
+				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
 			},
 			false,
 			nil,

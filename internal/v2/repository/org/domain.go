@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	uniqueOrgDomain                      = "org_domain"
 	domainEventPrefix                    = orgEventTypePrefix + "domain."
 	OrgDomainAddedEventType              = domainEventPrefix + "added"
 	OrgDomainVerificationAddedEventType  = domainEventPrefix + "verification.added"
@@ -20,6 +21,19 @@ const (
 	OrgDomainPrimarySetEventType         = domainEventPrefix + "primary.set"
 	OrgDomainRemovedEventType            = domainEventPrefix + "removed"
 )
+
+func NewAddOrgDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueOrgDomain,
+		orgDomain,
+		"Errors.Org.Domain.AlreadyExists")
+}
+
+func NewRemoveOrgDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueOrgDomain,
+		orgDomain)
+}
 
 type DomainAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -70,7 +84,7 @@ func (e *DomainVerificationAddedEvent) Data() interface{} {
 }
 
 func (e *DomainVerificationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
 }
 
 func NewDomainVerificationAddedEvent(
@@ -212,7 +226,8 @@ func DomainPrimarySetEventMapper(event *repository.Event) (eventstore.EventReade
 type DomainRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Domain string `json:"domain,omitempty"`
+	Domain     string `json:"domain,omitempty"`
+	isVerified bool
 }
 
 func (e *DomainRemovedEvent) Data() interface{} {
@@ -220,7 +235,10 @@ func (e *DomainRemovedEvent) Data() interface{} {
 }
 
 func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	if !e.isVerified {
+		return nil
+	}
+	return []*eventstore.EventUniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
 }
 
 func NewDomainRemovedEvent(ctx context.Context, domain string) *DomainRemovedEvent {

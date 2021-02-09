@@ -78,6 +78,10 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	return result, nil
 }
 
+func (repo *UserRepo) UserIDsByDomain(ctx context.Context, domain string) ([]string, error) {
+	return repo.View.UserIDsByDomain(domain)
+}
+
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
 	changes, err := repo.UserEvents.UserChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
@@ -162,6 +166,22 @@ func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
+}
+
+func (repo *UserRepo) ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
+}
+
+func (repo *UserRepo) ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Context, idpConfigID, resourceOwner string) ([]*usr_model.ExternalIDPView, error) {
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigIDAndResourceOwner(idpConfigID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
 }
 
 func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (*usr_model.MachineKeyView, error) {

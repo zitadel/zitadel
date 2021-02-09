@@ -63,7 +63,11 @@ func (s *Server) AddIdpProviderToLoginPolicy(ctx context.Context, provider *mana
 }
 
 func (s *Server) RemoveIdpProviderFromLoginPolicy(ctx context.Context, provider *management.IdpProviderID) (*empty.Empty, error) {
-	err := s.command.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderIDToDomain(ctx, provider))
+	externalIDPs, err := s.user.ExternalIDPsByIDPConfigIDAndResourceOwner(ctx, provider.IdpConfigId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	err = s.command.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderIDToDomain(ctx, provider), externalIDPViewsToDomain(externalIDPs)...)
 	return &empty.Empty{}, err
 }
 

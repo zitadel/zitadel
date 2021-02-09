@@ -2,8 +2,11 @@ package command
 
 import (
 	"context"
+	"fmt"
+	"github.com/caos/logging"
 	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"strings"
 	"time"
 
@@ -121,7 +124,7 @@ func (r *CommandSide) UnlockUser(ctx context.Context, userID, resourceOwner stri
 	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
 }
 
-func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner string) error {
+func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingGrantIDs ...string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
@@ -136,11 +139,22 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	if err != nil {
 		return err
 	}
+	aggregates := make([]eventstore.Aggregater, 0)
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 	userAgg.PushEvents(user.NewUserRemovedEvent(ctx, existingUser.ResourceOwner, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
-	//TODO: remove user grants
+	aggregates = append(aggregates, userAgg)
 
-	return r.eventstore.PushAggregate(ctx, existingUser, userAgg)
+	for _, grantID := range cascadingGrantIDs {
+		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
+		if err != nil {
+			logging.LogWithFields("COMMAND-5m9oL", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
+			continue
+		}
+		aggregates = append(aggregates, grantAgg)
+	}
+
+	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	return err
 }
 
 func (r *CommandSide) CreateUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
@@ -191,6 +205,25 @@ func (r *CommandSide) CreateUserToken(ctx context.Context, orgID, agentID, clien
 		Expiration:        now.Add(lifetime),
 		PreferredLanguage: preferredLanguage,
 	}, nil
+}
+
+func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (_ *user.Aggregate, _ *UserWriteModel, err error) {
+	existingUser, err := r.userWriteModelByID(ctx, userID, "")
+	if err != nil {
+		return nil, nil, err
+	}
+	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
+	}
+	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
+	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)
+
+	id, err := r.idGenerator.Next()
+	if err != nil {
+		return nil, nil, err
+	}
+	userAgg.PushEvents(user.NewDomainClaimedEvent(ctx, fmt.Sprintf("%s@temporary.%s", id, r.iamDomain)))
+	return userAgg, changedUserGrant, nil
 }
 
 func (r *CommandSide) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {

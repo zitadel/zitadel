@@ -108,6 +108,45 @@ func (r *CommandSide) changeUserGrant(ctx context.Context, userGrant *domain.Use
 	return userGrantAgg, changedUserGrant, nil
 }
 
+func (r *CommandSide) removeRoleFromUserGrant(ctx context.Context, userGrantID string, roleKeys []string, cascade bool) (_ *usergrant.Aggregate, _ *UserGrantWriteModel, err error) {
+	existingUserGrant, err := r.userGrantWriteModelByID(ctx, userGrantID, "")
+	if err != nil {
+		return nil, nil, err
+	}
+	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
+	}
+	keyExists := false
+	for i, key := range existingUserGrant.RoleKeys {
+		for _, roleKey := range roleKeys {
+			if key == roleKey {
+				keyExists = true
+				copy(existingUserGrant.RoleKeys[i:], existingUserGrant.RoleKeys[i+1:])
+				existingUserGrant.RoleKeys[len(existingUserGrant.RoleKeys)-1] = ""
+				existingUserGrant.RoleKeys = existingUserGrant.RoleKeys[:len(existingUserGrant.RoleKeys)-1]
+				continue
+			}
+		}
+	}
+	if !keyExists {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5m8g9", "Errors.UserGrant.RoleKeyNotFound")
+	}
+	changedUserGrant := NewUserGrantWriteModel(userGrantID, "")
+	userGrantAgg := UserGrantAggregateFromWriteModel(&changedUserGrant.WriteModel)
+
+	if !cascade {
+		userGrantAgg.PushEvents(
+			usergrant.NewUserGrantChangedEvent(ctx, existingUserGrant.RoleKeys),
+		)
+	} else {
+		userGrantAgg.PushEvents(
+			usergrant.NewUserGrantCascadeChangedEvent(ctx, existingUserGrant.RoleKeys),
+		)
+	}
+
+	return userGrantAgg, changedUserGrant, nil
+}
+
 func (r *CommandSide) DeactivateUserGrant(ctx context.Context, grantID, resourceOwner string) (err error) {
 	if grantID == "" || resourceOwner == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M0dsf", "Errors.UserGrant.IDMissing")
@@ -197,10 +236,13 @@ func (r *CommandSide) removeUserGrant(ctx context.Context, grantID, resourceOwne
 	if err != nil {
 		return nil, nil, err
 	}
-	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
-	if err != nil {
-		return nil, nil, err
+	if !cascade {
+		err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
+
 	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
 		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1My0t", "Errors.UserGrant.NotFound")
 	}

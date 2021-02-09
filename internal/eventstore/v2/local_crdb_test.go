@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
@@ -49,12 +50,19 @@ func executeMigrations() error {
 		return err
 	}
 	sort.Sort(files)
+	if err = setPasswordNULL(); err != nil {
+		return err
+	}
+	if err = createFlywayHistory(); err != nil {
+		return err
+	}
 	for _, file := range files {
-		migration, err := ioutil.ReadFile(string(file))
+		migrationData, err := ioutil.ReadFile(file)
 		if err != nil {
 			return err
 		}
-		transactionInMigration := strings.Contains(string(migration), "BEGIN;")
+		migration := os.ExpandEnv(string(migrationData))
+		transactionInMigration := strings.Contains(migration, "BEGIN;")
 		exec := testCRDBClient.Exec
 		var tx *sql.Tx
 		if !transactionInMigration {
@@ -64,16 +72,41 @@ func executeMigrations() error {
 			}
 			exec = tx.Exec
 		}
-		if _, err = exec(string(migration)); err != nil {
+		if _, err = exec(migration); err != nil {
 			return fmt.Errorf("exec file: %v || err: %w", file, err)
 		}
+		duration := 1 * time.Second
 		if !transactionInMigration {
 			if err = tx.Commit(); err != nil {
 				return fmt.Errorf("commit file: %v || err: %w", file, err)
 			}
+			duration = 0
+		}
+		time.Sleep(duration)
+	}
+	return nil
+}
+
+func setPasswordNULL() error {
+	passwordNames := []string{
+		"eventstorepassword",
+		"managementpassword",
+		"adminapipassword",
+		"authpassword",
+		"notificationpassword",
+		"authzpassword",
+	}
+	for _, name := range passwordNames {
+		if err := os.Setenv(name, "NULL"); err != nil {
+			return err
 		}
 	}
 	return nil
+}
+
+func createFlywayHistory() error {
+	_, err := testCRDBClient.Exec("CREATE TABLE defaultdb.flyway_schema_history(id TEXT, PRIMARY KEY(id));")
+	return err
 }
 
 type migrationPaths []string

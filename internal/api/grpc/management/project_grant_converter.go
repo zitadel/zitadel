@@ -180,3 +180,11 @@ func projectGrantStateFromProjectStateModel(state proj_model.ProjectState) manag
 		return management.ProjectGrantState_PROJECTGRANTSTATE_UNSPECIFIED
 	}
 }
+
+func projectGrantsToIDs(projectGrants []*proj_model.ProjectGrantView) []string {
+	converted := make([]string, len(projectGrants))
+	for i, grant := range projectGrants {
+		converted[i] = grant.GrantID
+	}
+	return converted
+}

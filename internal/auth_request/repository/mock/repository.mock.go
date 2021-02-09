@@ -6,7 +6,7 @@ package mock
 
 import (
 	context "context"
-	model "github.com/caos/zitadel/internal/auth_request/model"
+	domain "github.com/caos/zitadel/internal/v2/domain"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -49,10 +49,10 @@ func (mr *MockAuthRequestCacheMockRecorder) DeleteAuthRequest(arg0, arg1 interfa
 }
 
 // GetAuthRequestByCode mocks base method
-func (m *MockAuthRequestCache) GetAuthRequestByCode(arg0 context.Context, arg1 string) (*model.AuthRequest, error) {
+func (m *MockAuthRequestCache) GetAuthRequestByCode(arg0 context.Context, arg1 string) (*domain.AuthRequest, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAuthRequestByCode", arg0, arg1)
-	ret0, _ := ret[0].(*model.AuthRequest)
+	ret0, _ := ret[0].(*domain.AuthRequest)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -64,10 +64,10 @@ func (mr *MockAuthRequestCacheMockRecorder) GetAuthRequestByCode(arg0, arg1 inte
 }
 
 // GetAuthRequestByID mocks base method
-func (m *MockAuthRequestCache) GetAuthRequestByID(arg0 context.Context, arg1 string) (*model.AuthRequest, error) {
+func (m *MockAuthRequestCache) GetAuthRequestByID(arg0 context.Context, arg1 string) (*domain.AuthRequest, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAuthRequestByID", arg0, arg1)
-	ret0, _ := ret[0].(*model.AuthRequest)
+	ret0, _ := ret[0].(*domain.AuthRequest)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -93,7 +93,7 @@ func (mr *MockAuthRequestCacheMockRecorder) Health(arg0 interface{}) *gomock.Cal
 }
 
 // SaveAuthRequest mocks base method
-func (m *MockAuthRequestCache) SaveAuthRequest(arg0 context.Context, arg1 *model.AuthRequest) error {
+func (m *MockAuthRequestCache) SaveAuthRequest(arg0 context.Context, arg1 *domain.AuthRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveAuthRequest", arg0, arg1)
 	ret0, _ := ret[0].(error)

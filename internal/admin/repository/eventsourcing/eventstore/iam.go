@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"strings"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -109,6 +110,39 @@ func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID stri
 		aggregates = append(aggregates, idpAgg...)
 	}
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
+}
+
+func (repo *IAMRepository) IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
+	providers, err := repo.View.IDPProvidersByIdpConfigID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.IDPProviderViewsToModel(providers), nil
+}
+
+func (repo *IAMRepository) ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
+}
+
+func (repo *IAMRepository) ExternalIDPsByIDPConfigIDFromDefaultPolicy(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
+	policies, err := repo.View.AllDefaultLoginPolicies()
+	if err != nil {
+		return nil, err
+	}
+	resourceOwners := make([]string, len(policies))
+	for i, policy := range policies {
+		resourceOwners[i] = policy.AggregateID
+	}
+
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigIDAndResourceOwners(idpConfigID, resourceOwners)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
 }
 
 func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {

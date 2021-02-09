@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	loginPolicyIDPProviderPrevix      = loginPolicyPrefix + "idpprovider."
-	LoginPolicyIDPProviderAddedType   = loginPolicyIDPProviderPrevix + "added"
-	LoginPolicyIDPProviderRemovedType = loginPolicyIDPProviderPrevix + "removed"
+	loginPolicyIDPProviderPrevix             = loginPolicyPrefix + "idpprovider."
+	LoginPolicyIDPProviderAddedType          = loginPolicyIDPProviderPrevix + "added"
+	LoginPolicyIDPProviderRemovedType        = loginPolicyIDPProviderPrevix + "removed"
+	LoginPolicyIDPProviderCascadeRemovedType = loginPolicyIDPProviderPrevix + "cascade.removed"
 )
 
 type IdentityProviderAddedEvent struct {
@@ -87,6 +88,43 @@ func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.Eve
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROVI-6H0KQ", "Errors.Internal")
+	}
+
+	return e, nil
+}
+
+type IdentityProviderCascadeRemovedEvent struct {
+	eventstore.BaseEvent
+
+	IDPConfigID string `json:"idpConfigId"`
+}
+
+func (e *IdentityProviderCascadeRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *IdentityProviderCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewIdentityProviderCascadeRemovedEvent(
+	base *eventstore.BaseEvent,
+	idpConfigID string,
+) *IdentityProviderCascadeRemovedEvent {
+	return &IdentityProviderCascadeRemovedEvent{
+		BaseEvent:   *base,
+		IDPConfigID: idpConfigID,
+	}
+}
+
+func IdentityProviderCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &IdentityProviderCascadeRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "PROVI-7M9fs", "Errors.Internal")
 	}
 
 	return e, nil

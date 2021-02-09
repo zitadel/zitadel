@@ -269,6 +269,7 @@ Errors:
     NotActive: Benutzer Berechtigung ist nicht aktiv
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
+    RoleKeyNotFound: Rolle konnte nicht gefunden werden
   IDPConfig:
     AlreadyExists: IDP Konfiguration mit diesem Name existiert bereits
   Changes:

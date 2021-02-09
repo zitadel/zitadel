@@ -638,33 +638,6 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "clients push same aggregates",
-			args: args{
-				events: [][]*repository.Event{
-					{
-						generateEventWithData(t, "210", []byte(`{ "transaction": 1 }`)),
-						generateEventWithData(t, "210", []byte(`{ "transaction": 1.1 }`)),
-					},
-					{
-						generateEventWithData(t, "210", []byte(`{ "transaction": 2 }`)),
-						generateEventWithData(t, "210", []byte(`{ "transaction": 2.1 }`)),
-					},
-					{
-						generateEventWithData(t, "210", []byte(`{ "transaction": 3 }`)),
-						generateEventWithData(t, "210", []byte(`{ "transaction": 30.1 }`)),
-					},
-				},
-			},
-			res: res{
-				errCount: 2,
-				eventsRes: eventsRes{
-					aggIDs:            []string{"210"},
-					pushedEventsCount: 2,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
-				},
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
