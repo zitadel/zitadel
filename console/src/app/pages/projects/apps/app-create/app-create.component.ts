@@ -4,7 +4,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { animationFrameScheduler, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import {
     Application,
@@ -37,11 +37,85 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         { type: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN, checked: false, disabled: false },
     ];
 
-    public oidcAppTypes: OIDCApplicationType[] = [
-        OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
-        OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
-        OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE,
+    public oidcAppTypes: any = [
+        {
+            titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.WEB.TITLE',
+            descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.WEB.DESCRIPTION',
+            type: OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
+            prefix: 'WEB',
+            background: 'rgb(80, 110, 110)',
+        },
+        {
+            titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.TITLE',
+            descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.DESCRIPTION',
+            type: OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE,
+            prefix: 'N',
+            background: '#595d80',
+        },
+        {
+            titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.USERAGENT.TITLE',
+            descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.USERAGENT.DESCRIPTION',
+            type: OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
+            prefix: 'UA',
+            background: '#6a506e',
+        },
     ];
+
+    public authMethod: any[] =
+        [
+            {
+                key: 'CODE',
+                titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.TITLE',
+                descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.DESCRIPTION',
+                checked: false,
+                disabled: false,
+                prefix: 'CODE',
+                background: 'rgb(80, 110, 110)',
+                responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+                grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+                authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+                recommended: false,
+            },
+            {
+                key: 'PKCE',
+                titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.TITLE',
+                descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.DESCRIPTION',
+                checked: false,
+                disabled: false,
+                prefix: 'PKCE',
+                background: '#595d80',
+                responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+                grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+                authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+                recommended: true,
+            },
+            {
+                key: 'ALTERNATIVE',
+                titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.TITLE',
+                descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.DESCRIPTION',
+                checked: false,
+                disabled: false,
+                prefix: 'ALT',
+                background: '#6a506e',
+                responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+                grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+                authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+                recommended: animationFrameScheduler,
+            },
+            {
+                key: 'IMPLICIT',
+                titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.TITLE',
+                descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.DESCRIPTION',
+                checked: false,
+                disabled: false,
+                prefix: 'IMP',
+                background: 'rgb(110, 80, 80)',
+                responseType: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
+                grantType: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
+                authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+                recommended: false,
+            },
+        ];
 
     public oidcAuthMethodType: { type: OIDCAuthMethodType, checked: boolean, disabled: boolean; }[] = [
         { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, checked: false, disabled: false },
@@ -158,10 +232,51 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         });
 
         this.secondFormGroup = this.fb.group({
-            authMethodType: [OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, [Validators.required]],
+            authMethod: ['', [Validators.required]],
         });
-        this.secondFormGroup.valueChanges.subscribe(value => {
-            this.oidcApp.authMethodType = value.authMethodType;
+        this.secondFormGroup.valueChanges.subscribe(key => {
+            switch (key) {
+                case 'CODE':
+                    this.oidcResponseTypes[0].checked = true;
+                    this.oidcResponseTypes[1].checked = false;
+                    this.oidcResponseTypes[2].checked = false;
+                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
+
+                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
+                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+                    this.changeResponseType();
+                    break;
+                case 'PKCE':
+                    this.oidcResponseTypes[0].checked = true;
+                    this.oidcResponseTypes[1].checked = false;
+                    this.oidcResponseTypes[2].checked = false;
+                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
+
+                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
+                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+                    this.changeResponseType();
+                    break;
+                case 'ALTERNATIVE':
+                    this.oidcResponseTypes[0].checked = true;
+                    this.oidcResponseTypes[1].checked = false;
+                    this.oidcResponseTypes[2].checked = false;
+                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
+
+                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
+                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+                    this.changeResponseType();
+                    break;
+                case 'IMPLICIT':
+                    this.oidcResponseTypes[0].checked = true;
+                    this.oidcResponseTypes[1].checked = false;
+                    this.oidcResponseTypes[2].checked = false;
+                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
+
+                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
+                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+                    this.changeResponseType();
+                    break;
+            }
         });
     }
 
@@ -251,7 +366,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     changeResponseType(): void {
         this.oidcApp.responseTypesList = this.oidcResponseTypes.filter(gt => gt.checked).map(gt => gt.type);
-    }
+    };
 
     moreThanOneOption(options: Array<{ type: OIDCGrantType, checked: boolean, disabled: boolean; }>): boolean {
         return options.filter(option => option.disabled === false).length > 1;
@@ -301,5 +416,5 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     get formauthMethodType(): AbstractControl | null {
         return this.form.get('authMethodType');
     }
-}
+};
 

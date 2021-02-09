@@ -98,10 +98,69 @@ p.desc {
 
 .radio-group {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: -1rem;
 
   .radio-button {
-    margin: .5rem 0;
+    margin: 1rem;
+    border-radius: .5rem;
+    border: 1px solid var(--grey);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-basis: 300px;
+    height: 100%;
+
+    .radio-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgb(80, 110, 110);
+        margin-bottom: 1rem;
+
+        span {
+            margin: 2rem;
+            font-size: 30px;
+        }
+    }
+
+    p {
+        text-align: center;
+        padding: 0 1rem;
+    }
+    
+    .type-desc {
+        font-size: 14px;
+        color: var(--grey);
+    }
+
+    .fill-space {
+        flex: 1;
+    }
+
+    .specs {
+        display: block;
+        padding: 1rem 0;
+        margin: 0 1rem;
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--grey);
+            margin: 3px 0;
+
+            :first-child {
+                margin-right: 1rem;
+            }
+        }
+    }
+
+    &.mat-radio-checked {
+        border-color: white;
+    }
   }
 }
 
@@ -164,4 +223,22 @@ p.desc {
     padding: .5rem 4rem;
     float: right;
   }
+}
+
+::ng-deep .mat-radio-button .mat-radio-container {
+    width: 0;
+}
+::ng-deep .mat-radio-container .mat-radio-outer-circle,
+::ng-deep .mat-radio-container .mat-radio-inner-circle {
+    border: none;
+    width: 0;
+}
+
+::ng-deep .mat-radio-label-content {
+    padding-left: 0 !important;
+    width: 100%;
+}
+
+::ng-deep .mat-radio-label {
+    white-space: normal !important;
 }

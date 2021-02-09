@@ -30,9 +30,13 @@
                 <p class="step-title">{{'APP.OIDC.TYPETITLE' | translate}}</p>
                 <mat-radio-group color="primary" aria-labelledby="radio-group-label" class="radio-group"
                     formControlName="applicationType">
-                    <mat-radio-button class="radio-button" *ngFor="let type of oidcAppTypes | keyvalue"
-                        [value]="type.value">
-                        <div>{{('APP.OIDC.APPTYPE'+type.key.toString()) | translate}}</div>
+                    <mat-radio-button disableRipple="true" class="radio-button" *ngFor="let oidctype of oidcAppTypes"
+                        [value]="oidctype.type">
+                        <div class="radio-header" [ngStyle]="{'background': oidctype.background}">
+                            <span>{{oidctype.prefix}}</span>
+                        </div>
+                        <p>{{(oidctype.titleI18nKey) | translate}}</p>
+                        <p class="type-desc">{{oidctype.descI18nKey | translate}}</p>
                     </mat-radio-button>
                 </mat-radio-group>
                 <div class="actions">
@@ -64,15 +68,34 @@
                 <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHODSECTION' | translate}}</ng-template>
 
                 <mat-radio-group color="primary" aria-labelledby="example-radio-group-label" class="radio-group"
-                    formControlName="authMethodType">
-                    <mat-radio-button class="radio-button" *ngFor="let authmethod of oidcAuthMethodType"
-                        [disabled]="authmethod.disabled" [value]="authmethod.type">
-                        {{'APP.OIDC.AUTHMETHOD'+authmethod.type | translate}}
+                    formControlName="authMethod">
+                    <mat-radio-button disableRipple="true" class="radio-button" *ngFor="let authmethod of authMethod"
+                        [disabled]="authmethod.disabled" [value]="authmethod.key">
+                        <div class="radio-header" [ngStyle]="{'background': authmethod.background}">
+                            <span>{{authmethod.prefix}}</span>
+                        </div>
+                        <p>{{authmethod.titleI18nKey | translate}}</p>
+                        <p class="type-desc">{{authmethod.descI18nKey | translate}}</p>
+                        <span class="fill-space"></span>
+                        <div class="specs">
+                            <div class="row">
+                                <span>{{'APP.OIDC.RESPONSE' | translate}}</span>
+                                <span>{{'APP.OIDC.RESPONSE'+authmethod.responseType | translate}}</span>
+                            </div>
+                            <div class="row">
+                                <span>{{'APP.GRANT' | translate}}</span>
+                                <span>{{'APP.OIDC.GRANT'+authmethod.grantType | translate}}</span>
+                            </div>
+                            <div class="row">
+                                <span>{{'APP.OIDC.AUTHMETHOD' | translate}}</span>
+                                <span>{{'APP.OIDC.AUTHMETHOD'+authmethod.authMethod | translate}}</span>
+                            </div>
+                        </div>
                     </mat-radio-button>
                 </mat-radio-group>
                 <div class="actions">
-                    <button mat-stroked-button color="primary"
-                        matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
+                    <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' |
+                        translate}}</button>
                     <button mat-raised-button color="primary" [disabled]="secondFormGroup.invalid"
                         matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
                 </div>
@@ -171,9 +194,8 @@
                 <span class="right" *ngIf="oidcApp.grantTypesList?.length > 0">
                     [<span *ngFor="let element of oidcApp.grantTypesList; index as i">
                         {{'APP.OIDC.GRANT'+element | translate}}
-                        {{i < oidcApp.grantTypesList.length - 1 ? ', ': ''}}
-                    </span>]
-                </span>
+                        {{i < oidcApp.grantTypesList.length - 1 ? ', ' : '' }} </span>]
+                    </span>
             </div>
             <div class="row">
                 <span class="left">
@@ -182,9 +204,8 @@
                 <span class="right" *ngIf="oidcApp.responseTypesList?.length > 0">
                     [<span *ngFor="let element of oidcApp.responseTypesList; index as i">
                         {{('APP.OIDC.RESPONSE'+element | translate)}}
-                        {{i < oidcApp.responseTypesList.length - 1 ? ', ': ''}}
-                    </span>]
-                </span>
+                        {{i < oidcApp.responseTypesList.length - 1 ? ', ' : '' }} </span>]
+                    </span>
             </div>
 
             <div class="row">
@@ -205,9 +226,8 @@
                 <span class="right" *ngIf="oidcApp.redirectUrisList?.length > 0">
                     [<span *ngFor="let redirect of oidcApp.redirectUrisList; index as i">
                         {{redirect}}
-                        {{i < oidcApp.redirectUrisList.length - 1 ? ', ': ''}}
-                    </span>]
-                </span>
+                        {{i < oidcApp.redirectUrisList.length - 1 ? ', ' : '' }} </span>]
+                    </span>
             </div>
 
             <div class="row">
@@ -217,15 +237,14 @@
                 <span class="right" *ngIf="oidcApp.postLogoutRedirectUrisList?.length > 0">
                     [<span *ngFor="let redirect of oidcApp.postLogoutRedirectUrisList; index as i">
                         {{redirect}}
-                        {{i < oidcApp.postLogoutRedirectUrisList.length - 1 ? ', ': ''}}
-                    </span>]
-                </span>
+                        {{i < oidcApp.postLogoutRedirectUrisList.length - 1 ? ', ' : '' }} </span>]
+                    </span>
             </div>
 
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary"
-                    (click)="saveOIDCApp()">{{'ACTIONS.CREATE' | translate}}</button>
+                <button mat-raised-button color="primary" (click)="saveOIDCApp()">{{'ACTIONS.CREATE' |
+                    translate}}</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

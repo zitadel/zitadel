@@ -997,7 +997,41 @@
             "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the ID token.",
             "IDTOKENUSERINFOASSERTION":"User Info inside ID Token",
             "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Enables clients to retrieve profile, email, phone and address claims from ID token.",
-            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf."
+            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
+            "SELECTION":{
+                "APPTYPE": {
+                    "WEB": {
+                        "TITLE":"Web",
+                        "DESCRIPTION":"Regular Web applications like .net, PHP, Node.js, Java, etc."
+                    },
+                    "NATIVE": {
+                        "TITLE":"NATIVE",
+                        "DESCRIPTION":"Mobile Apps, Desktop, Smart Devices, etc."
+                    },
+                    "USERAGENT": {
+                        "TITLE":"User Agent",
+                        "DESCRIPTION":"Single Page Apüplications (SPA) and in general all js frameworks executed in browsers"
+                    }
+                },
+                "AUTHMETHOD": {
+                    "CODE": {
+                        "TITLE":"Code",
+                        "DESCRIPTION":"Currently default for most applications"
+                    },
+                    "PKCE": {
+                        "TITLE":"PKCE",
+                        "DESCRIPTION":"Equivalent alternative"
+                    },
+                    "ALTERNATIVE": {
+                        "TITLE":"Technical Alternative",
+                        "DESCRIPTION":"Alternative for technical reasons"
+                    },
+                    "IMPLICIT": {
+                        "TITLE":"Implicit",
+                        "DESCRIPTION":"Theoretically possible but not reasonable (until OAuth 2.1)"
+                    }
+                }
+            }
         },
         "TOAST": {
             "REACTIVATED":"Application reactivated.",
