@@ -265,9 +265,10 @@ jobs:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.branch.outputs.short_ref }}-dev
-          release_name: Branch ${{ steps.branch.outputs.short_ref }}
+          name: Branch ${{ steps.branch.outputs.short_ref }}
           draft: false
           prerelease: true
+          fail_on_unmatched_files: true
           body: |
             This is a release from a development branch.
             Do not use these artifacts in production.
