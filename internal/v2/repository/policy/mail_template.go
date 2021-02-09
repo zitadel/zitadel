@@ -18,7 +18,7 @@ const (
 type MailTemplateAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Template []byte `json:"primaryColor,omitempty"`
+	Template []byte `json:"template,omitempty"`
 }
 
 func (e *MailTemplateAddedEvent) Data() interface{} {
