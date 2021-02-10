@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+import "user.proto";
+
+package caos.zitadel.api.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/auth";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+    info: {
+        title: "auth service";
+        version: "1.0";
+        contact:{
+            url: "https://github.com/caos/zitadel/api/auth" //TODO: should be swagger path
+        };
+    };
+
+    schemes: HTTPS;
+
+    consumes: "application/json";
+    consumes: "application/grpc";
+
+    produces: "application/json";
+    produces: "application/grpc";
+};
+
+
+service AuthService {
+
+    //User
+    rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
+        option (google.api.http) = {
+            get: "/users/me"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+}
+
+//GetMyUserRequest is an empty request
+// the request parameters are read from the token-header
+message GetMyUserRequest {}
+
+message GetMyUserResponse{
+    string id = ;
+    uint64 sequence = ;
+    google.protobuf.Timestamp creation_date = ;
+    google.protobuf.Timestamp change_date = ;
+    string resource_owner = ;
+    caos.zitadel.api.v1.user.UserState state = ;
+    string user_name = ;
+    string preferred_login_name = ;
+    repeated string login_names = ;
+    google.protobuf.Timestamp last_login = ;
+    google.protobuf.Timestamp password_changed = ;
+
+    oneof type {
+        option (validate.required) = true;
+
+        Human human = ;
+        Machine machine = ;
+    }
+}

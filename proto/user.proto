@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "object.proto";
+
+package caos.zitadel.api.v1.user;
+
+message User {
+    caos.zitadel.api.v1.MetaData meta_data = 1;
+    UserState state = 2;
+    string user_name = 3;
+    string preferred_login_name = 5;
+
+    oneof user {
+        option (validate.required) = true;
+
+        Human human = 6;
+        Machine machine = 7;
+    }
+}
+
+message Human {
+    Profile profile = 1;
+    Email email = 2;
+    Phone phone = 3;
+    Address address = 4;
+}
+
+message Machine {
+    string name = 1;
+    string description = 2;
+}
+
+message MachineKey {
+    caos.zitadel.api.v1.MetaData meta_data = 1;
+    MachineKeyType type = 2;
+}
+  
+enum MachineKeyType {
+    MACHINEKEY_UNSPECIFIED = 0;
+    MACHINEKEY_JSON = 1;
+}
+
+message Profile {
+    string first_name = 1;
+    string last_name = 2;
+    string nick_name = 3;
+    string display_name = 4;
+    string preferred_language = 5;
+    Gender gender = 6;
+}
+
+message Email {
+    string email = 1;
+    bool is_email_verified = 2;
+}
+
+message Phone {
+    //TODO: use https://github.com/google/libphonenumber/blob/master/resources/phonenumber.proto
+    string phone = 1;
+    bool is_phone_verified = 2;
+}
+
+message Address {
+    string country = 1;
+    string locality = 2;
+    string postal_code = 3;
+    string region = 4;
+    string street_address = 5;
+}
+
+enum UserState {
+    USERSTATE_UNSPECIFIED = 0;
+    USERSTATE_ACTIVE = 1;
+    USERSTATE_INACTIVE = 2;
+    USERSTATE_DELETED = 3;
+    USERSTATE_LOCKED = 4;
+    USERSTATE_SUSPEND = 5;
+    USERSTATE_INITIAL = 6;
+}
+
+enum Gender {
+    GENDER_UNSPECIFIED = 0;
+    GENDER_FEMALE = 1;
+    GENDER_MALE = 2;
+    GENDER_DIVERSE = 3;
+}
+
+
+message SearchQuery {
+    oneof query {
+        UserNameQuery user_name = 1;
+        FirstNameQuery first_name = 2;
+        LastNameQuery last_name = 3;
+        NickNameQuery nick_name = 4;
+        DisplayNameQuery display_name = 5;
+        EmailQuery email = 6;
+        UserStateQuery state = 7;
+        UserTypeQuery type = 8;
+    }
+}
+
+message UserNameQuery{
+    string user_name = 1;//TODO: validate
+    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+}
+
+message FirstNameQuery {
+    string first_name = 1;//TODO: validate
+    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+}
+
+message LastNameQuery {
+    string last_name = 1;//TODO: validate
+    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+}
+
+message NickNameQuery {
+    string nick_name = 1;//TODO: validate
+    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+}
+
+message DisplayNameQuery {
+    string display_name = 1;//TODO: validate
+    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+}
+
+message EmailQuery {
+    string email_address = 1; //TODO: validate
+    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+}
+
+//UserStateQuery is always equals
+message UserStateQuery {
+    UserState state = 1; //TODO: validate
+}
+
+//UserTypeQuery is always equals
+message UserTypeQuery {
+    UserType type = 1; //TODO: validate
+}

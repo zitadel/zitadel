@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package caos.zitadel.api.v1;
+
+
+message SearchRequest {
+    uint64 offset = 1;
+    uint32 limit = 2;
+    bool asc = 3;
+}
+
+message SearchResponse {
+    uint64 offset = 1;
+    uint32 limit = 2;
+    uint64 total_result = 3;
+    uint64 processed_sequence = 4;
+    google.protobuf.Timestamp view_timestamp = 5;
+}
+
+message TextQueryMethod {
+    bool ignore_case = 1;
+    enum method {//TODO: validate
+        UNSPECIFIED = 0;
+        EQUALS = 1;
+        STARTS_WITH = 2;
+        CONTAINS = 3;
+        ENDS_WITH = 4;
+    }
+}

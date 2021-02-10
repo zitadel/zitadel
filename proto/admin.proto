@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package caos.zitadel.api.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/admin";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+    info: {
+        title: "admin service";
+        version: "1.0";
+        contact:{
+            url: "https://github.com/caos/zitadel/api/admin" //TODO: should be swagger path
+        };
+    };
+
+    schemes: HTTPS;
+
+    consumes: "application/json";
+    consumes: "application/grpc";
+
+    produces: "application/json";
+    produces: "application/grpc";
+};
+
+
+service AdminService {
+}
