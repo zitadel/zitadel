@@ -5,6 +5,9 @@ import "google/protobuf/timestamp.proto";
 
 package caos.zitadel.api.v1;
 
+message IAMMemberRolesRequest {}
+message IAMMemberRolesResponse {}
+
 message AddIAMMemberRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
     repeated string roles = 2;
@@ -47,6 +50,8 @@ message SearchIAMMembersRequest {
     //queries are used to enclose the search result
     repeated IAMMemberSearchQuery queries = 5;
 }
+
+message SearchIAMMembersResponse{}
 
 message IAMMemberField {
 

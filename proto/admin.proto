@@ -57,7 +57,7 @@ service AdminService {
     }
 
     //GetOrgByID returns the requested organisation
-    rpc GetOrgByID(caos.zitadel.api.v1.OrgIDRequest) returns (caos.zitadel.api.v1.OrgResponse) {
+    rpc GetOrgByID(caos.zitadel.api.v1.OrgIDRequest) returns (caos.zitadel.api.v1.Org) {
         option (google.api.http) = {
             get: "/orgs/{id}"
         };
@@ -106,7 +106,7 @@ service AdminService {
 
     //UpdateDefaultOrgIAMPolicy changes the default IAM policy it will impact all
     // it impacts all organisations without a customised policy
-    rpc UpdateDefaultOrgIAMPolicy(caos.zitadel.api.v1.UpdatedOrgIAMPolicyRequest) returns (caos.zitadel.api.v1.UpdateOrgIAMPolicyResponse) {
+    rpc UpdateDefaultOrgIAMPolicy(UpdateDefaultOrgIAMPolicyRequest) returns (UpdateDefaultOrgIAMPolicyResponse) {
         option (google.api.http) = {
             put: "/orgs/default/policies/orgiam"
             body: "*"
@@ -118,7 +118,7 @@ service AdminService {
     }
 
     //GetOrgIAMPolicy returns the customised policy or the default if not defined
-    rpc GetOrgIAMPolicy(caos.zitadel.api.v1.OrgIAMPolicyIDRequest) returns (caos.zitadel.api.v1.OrgIAMPolicy) {
+    rpc GetOrgIAMPolicy(caos.zitadel.api.v1.OrgIAMPolicyIDRequest) returns (caos.zitadel.api.v1.OrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/orgs/{org_id}/policies/orgiam"
         };
@@ -165,7 +165,7 @@ service AdminService {
     }
 
     //GetIAMMemberRoles returns the IAM roles visible for this user 
-    rpc GetIAMMemberRoles(IAMMemberRolesRequest) returns (IAMMemberRolesResponse) {
+    rpc GetIAMMemberRoles(caos.zitadel.api.v1.IAMMemberRolesRequest) returns (caos.zitadel.api.v1.IAMMemberRolesResponse) {
         option (google.api.http) = {
             get: "/members/roles"
         };
@@ -213,7 +213,7 @@ service AdminService {
 
     //SearchIAMMembers returns all members matching the request
     // all queries need to match (ANDed)
-    rpc SearchIAMMembers(IAMMemberSearchRequest) returns (IAMMemberSearchResponse) {
+    rpc SearchIAMMembers(caos.zitadel.api.v1.SearchIAMMembersRequest) returns (caos.zitadel.api.v1.SearchIAMMembersResponse) {
         option (google.api.http) = {
             post: "/members/_search"
             body: "*"
@@ -610,13 +610,19 @@ message SetUpOrgResponse {
     caos.zitadel.api.v1.CreateUserResponse user = 2;
 }
 
+message DefaultOrgIAMPolicyRequest {}
+
 message DefaultOrgIAMPolicyResponse{
     caos.zitadel.api.v1.OrgIAMPolicy policy = 1;
 }
 
-message DefaultOrgIAMPolicyRequest {}
+message UpdateDefaultOrgIAMPolicyRequest{
+    caos.zitadel.api.v1.UpdatedOrgIAMPolicyRequest policy = 1;
+}
 
-
+message UpdateDefaultOrgIAMPolicyResponse{
+    caos.zitadel.api.v1.UpdatedOrgIAMPolicyResponse policy = 1;
+}
 
 
 

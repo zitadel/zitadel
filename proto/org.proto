@@ -20,15 +20,7 @@ message IsOrgUniqueResponse {
     bool is_unique = 1;
 }
 
-//OrgResponse represents a ZITADEL org
-message OrgResponse {
-    string id = 1;
-    OrgState state = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
-    string name = 5;
-    string domain = 6;
-}
+
 
 enum OrgState {
     ORGSTATE_UNSPECIFIED = 0;
