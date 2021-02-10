@@ -245,7 +245,7 @@ Errors:
       NotFound: Default Private Label Policy konnte nicht gefunden
       NotChanged: Default Private Label Policy wurde nicht verändert
     MailTemplate:
-      NotFound: Default Mail Template konnte nicht gefunden
+      NotFound: Default Mail Template konnte nicht gefunden werden
       NotChanged: Default Mail Template wurde nicht verändert
       AlreadyExists: Default Mail Template existiert bereits
       Invalid: Default Mail Template ist ungültig
