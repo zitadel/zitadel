@@ -1018,19 +1018,23 @@
                 "AUTHMETHOD": {
                     "CODE": {
                         "TITLE":"Code",
-                        "DESCRIPTION":"Currently default for most applications"
+                        "DESCRIPTION":"Exchange the authorization code for the tokens"
                     },
                     "PKCE": {
                         "TITLE":"PKCE",
-                        "DESCRIPTION":"Equivalent alternative"
+                        "DESCRIPTION":"Use a random hash instead of a static client secret for more security"
                     },
-                    "ALTERNATIVE": {
-                        "TITLE":"Technical Alternative",
-                        "DESCRIPTION":"Alternative for technical reasons"
+                    "POST": {
+                        "TITLE":"POST",
+                        "DESCRIPTION":"Send client_id and client_secret as part of the form"
+                    },
+                    "PK_JWT": {
+                        "TITLE":"Private Key JWT",
+                        "DESCRIPTION":"Use a private key to authorize your application"
                     },
                     "IMPLICIT": {
                         "TITLE":"Implicit",
-                        "DESCRIPTION":"Theoretically possible but not reasonable (until OAuth 2.1)"
+                        "DESCRIPTION":"Get the tokens directly from the authorization endpoint"
                     }
                 }
             }

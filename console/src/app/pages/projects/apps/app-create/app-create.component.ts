@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import {
     Application,
     OIDCApplicationCreate,
@@ -18,6 +19,71 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+
+const CODE_METHOD: RadioItemAuthType = {
+    key: 'CODE',
+    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.TITLE',
+    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.DESCRIPTION',
+    checked: false,
+    disabled: false,
+    prefix: 'CODE',
+    background: 'rgb(89 115 128)',
+    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+    recommended: false,
+};
+const PKCE_METHOD: RadioItemAuthType = {
+    key: 'PKCE',
+    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.TITLE',
+    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.DESCRIPTION',
+    checked: false,
+    disabled: false,
+    prefix: 'PKCE',
+    background: 'rgb(80 110 92)',
+    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+    recommended: true,
+};
+const POST_METHOD: RadioItemAuthType = {
+    key: 'POST',
+    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.POST.TITLE',
+    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.POST.DESCRIPTION',
+    checked: false,
+    disabled: false,
+    prefix: 'POST',
+    background: '#595d80',
+    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+    notRecommended: true,
+};
+const PK_JWT_METHOD: RadioItemAuthType = {
+    key: 'PK_JWT',
+    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.TITLE',
+    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.DESCRIPTION',
+    checked: false,
+    disabled: false,
+    prefix: 'PK_JWT',
+    background: '#6a506e',
+    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+};
+const IMPLICIT_METHOD: RadioItemAuthType = {
+    key: 'IMPLICIT',
+    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.TITLE',
+    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.DESCRIPTION',
+    checked: false,
+    disabled: false,
+    prefix: 'IMP',
+    background: 'rgb(144 75 75)',
+    responseType: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
+    grantType: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
+    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+    notRecommended: true,
+};
 
 @Component({
     selector: 'app-app-create',
@@ -61,60 +127,13 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         },
     ];
 
-    public authMethods: any[] =
-        [
-            {
-                key: 'CODE',
-                titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.TITLE',
-                descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.DESCRIPTION',
-                checked: false,
-                disabled: false,
-                prefix: 'CODE',
-                background: 'rgb(80, 110, 110)',
-                responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-                grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-                authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
-                recommended: false,
-            },
-            {
-                key: 'PKCE',
-                titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.TITLE',
-                descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.DESCRIPTION',
-                checked: false,
-                disabled: false,
-                prefix: 'PKCE',
-                background: '#595d80',
-                responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-                grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-                authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-                recommended: true,
-            },
-            {
-                key: 'ALTERNATIVE',
-                titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.TITLE',
-                descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.DESCRIPTION',
-                checked: false,
-                disabled: false,
-                prefix: 'ALT',
-                background: '#6a506e',
-                responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-                grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-                authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
-            },
-            {
-                key: 'IMPLICIT',
-                titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.TITLE',
-                descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.DESCRIPTION',
-                checked: false,
-                disabled: false,
-                prefix: 'IMP',
-                background: 'rgb(144 75 75)',
-                responseType: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
-                grantType: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
-                authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-                notRecommended: true,
-            },
-        ];
+    public authMethods: RadioItemAuthType[] = [
+        PKCE_METHOD,
+        CODE_METHOD,
+        POST_METHOD,
+        // PK_JWT_METHOD,
+        // IMPLICIT_METHOD,
+    ];
 
     public oidcAuthMethodType: { type: OIDCAuthMethodType, checked: boolean, disabled: boolean; }[] = [
         { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, checked: false, disabled: false },
@@ -125,7 +144,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     // stepper
     firstFormGroup!: FormGroup;
     secondFormGroup!: FormGroup;
-    // thirdFormGroup!: FormGroup;
 
     // devmode
     public form!: FormGroup;
@@ -187,46 +205,43 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
                 switch (this.applicationType?.value) {
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE:
-                        this.oidcResponseTypes[0].checked = true;
-                        this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
+                        this.authMethods = [
+                            PKCE_METHOD,
+                        ];
 
-                        this.oidcApp.grantTypesList =
-                            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
+                        // automatically set to PKCE and skip step
+                        this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
+                        this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
-                        this.oidcAuthMethodType[0].disabled = false;
-                        this.oidcAuthMethodType[1].disabled = false;
-                        this.oidcAuthMethodType[2].disabled = false;
-                        // this.authMethodType?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC);
-                        this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC;
+                        this.authMethods = [
+                            PKCE_METHOD,
+                            CODE_METHOD,
+                            POST_METHOD,
+                        ];
 
-                        this.oidcResponseTypes[0].checked = true;
-                        this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
-                        this.changeResponseType();
-
-                        this.oidcApp.grantTypesList =
-                            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
+                        this.authMethod?.setValue(PKCE_METHOD.key);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
-                        this.oidcResponseTypes[0].checked = true;
-                        this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
+                        this.authMethods = [
+                            PKCE_METHOD,
+                            IMPLICIT_METHOD,
+                        ];
 
-                        this.oidcApp.grantTypesList =
-                            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDCGRANTTYPE_IMPLICIT];
-
-                        this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+                        this.authMethod?.setValue(PKCE_METHOD.key);
                         break;
                 }
             }
         });
 
         this.secondFormGroup = this.fb.group({
-            authMethod: [this.authMethods[1].key, [Validators.required]],
+            authMethod: [this.authMethods[0].key, [Validators.required]],
         });
-        this.secondFormGroup.valueChanges.subscribe(key => {
-            switch (key) {
-                case 'CODE':
+        this.secondFormGroup.valueChanges.subscribe(form => {
+            switch (form.authMethod) {
+                case CODE_METHOD.key:
                     this.oidcResponseTypes[0].checked = true;
                     this.oidcResponseTypes[1].checked = false;
                     this.oidcResponseTypes[2].checked = false;
@@ -234,9 +249,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
                     this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                     this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-                    this.changeResponseType();
+
                     break;
-                case 'PKCE':
+                case PKCE_METHOD.key:
                     this.oidcResponseTypes[0].checked = true;
                     this.oidcResponseTypes[1].checked = false;
                     this.oidcResponseTypes[2].checked = false;
@@ -244,9 +259,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
                     this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                     this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-                    this.changeResponseType();
+
                     break;
-                case 'ALTERNATIVE':
+                case POST_METHOD.key:
                     this.oidcResponseTypes[0].checked = true;
                     this.oidcResponseTypes[1].checked = false;
                     this.oidcResponseTypes[2].checked = false;
@@ -254,9 +269,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
                     this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                     this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-                    this.changeResponseType();
+
                     break;
-                case 'IMPLICIT':
+                case PK_JWT_METHOD.key:
                     this.oidcResponseTypes[0].checked = true;
                     this.oidcResponseTypes[1].checked = false;
                     this.oidcResponseTypes[2].checked = false;
@@ -264,7 +279,17 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
                     this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                     this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-                    this.changeResponseType();
+
+                    break;
+                case IMPLICIT_METHOD.key:
+                    this.oidcResponseTypes[0].checked = true;
+                    this.oidcResponseTypes[1].checked = false;
+                    this.oidcResponseTypes[2].checked = false;
+
+                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
+                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
+                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+
                     break;
             }
         });
@@ -363,9 +388,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         }
     }
 
-    changeResponseType(): void {
-        this.oidcApp.responseTypesList = this.oidcResponseTypes.filter(gt => gt.checked).map(gt => gt.type);
-    };
+    // changeResponseType(): void {
+    //     this.oidcApp.responseTypesList = this.oidcResponseTypes.filter(gt => gt.checked).map(gt => gt.type);
+    // };
 
     moreThanOneOption(options: Array<{ type: OIDCGrantType, checked: boolean, disabled: boolean; }>): boolean {
         return options.filter(option => option.disabled === false).length > 1;

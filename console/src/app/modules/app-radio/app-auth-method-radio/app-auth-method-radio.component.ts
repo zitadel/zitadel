@@ -12,8 +12,8 @@ export interface RadioItemAuthType {
     responseType: OIDCResponseType;
     grantType: OIDCGrantType;
     authMethod: OIDCAuthMethodType;
-    recommended: boolean;
-    notRecommended: boolean;
+    recommended?: boolean;
+    notRecommended?: boolean;
 }
 
 @Component({

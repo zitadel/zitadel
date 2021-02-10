@@ -38,23 +38,8 @@
             </form>
         </mat-step>
 
-        <mat-step [editable]="true"
-            *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
-            <ng-template matStepLabel>{{'APP.OIDC.RESPONSESECTION' | translate}}</ng-template>
-            <div class="checkbox-container">
-                <mat-checkbox class="checkbox" *ngFor="let responsetype of oidcResponseTypes"
-                    (change)="changeResponseType()" color="primary" [(ngModel)]="responsetype.checked"
-                    [disabled]="responsetype.disabled">
-                    {{'APP.OIDC.RESPONSE'+responsetype.type | translate}}
-                </mat-checkbox>
-            </div>
-            <div class="actions">
-                <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
-            </div>
-        </mat-step>
-
-        <mat-step *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB"
+        <!-- skip for native applications -->
+        <mat-step *ngIf="oidcApp.applicationType !== OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE"
             [stepControl]="secondFormGroup" [editable]="true">
             <form [formGroup]="secondFormGroup">
                 <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHODSECTION' | translate}}</ng-template>
@@ -263,10 +248,11 @@
                     </mat-select>
                 </cnsl-form-field>
 
-                <cnsl-form-field appearance="outline" class="formfield full-width">
+                <cnsl-form-field appearance="outline" class="full-width chip-form">
                     <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
                     <mat-chip-list #chipRedirectList aria-label="uri selection">
                         <mat-chip class="chip" *ngFor="let uri of oidcApp.redirectUrisList" removable
+                            [color]="!uri?.startsWith('https://') ? 'warn': 'green'"
                             (removed)="removeUri(uri, 'REDIRECT')">
                             {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                         </mat-chip>
@@ -276,10 +262,11 @@
                     </mat-chip-list>
                 </cnsl-form-field>
 
-                <cnsl-form-field appearance="outline" class="formfield full-width">
+                <cnsl-form-field appearance="outline" class="full-width chip-form">
                     <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
                     <mat-chip-list #chipPostRedirectList aria-label="uri selection">
                         <mat-chip class="chip" *ngFor="let uri of oidcApp.postLogoutRedirectUrisList" removable
+                            [color]="!uri?.startsWith('https://') ? 'warn': 'green'"
                             (removed)="removeUri(uri, 'POSTREDIRECT')">
                             {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                         </mat-chip>
