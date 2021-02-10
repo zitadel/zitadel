@@ -2,17 +2,32 @@ package policy
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
+	uniqueMailText                 = "mail_text"
 	mailTextPolicyPrefix           = mailPolicyPrefix + "text."
 	MailTextPolicyAddedEventType   = mailTextPolicyPrefix + "added"
 	MailTextPolicyChangedEventType = mailTextPolicyPrefix + "changed"
 	MailTextPolicyRemovedEventType = mailTextPolicyPrefix + "removed"
 )
+
+func NewAddMailTextUniqueConstraint(aggregateID, mailTextType, langugage string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueMailText,
+		fmt.Sprintf("%v:%v:%v", aggregateID, mailTextType, langugage),
+		"Errors.Org.AlreadyExists")
+}
+
+func NewRemoveMailTextUniqueConstraint(aggregateID, mailTextType, langugage string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueMailText,
+		fmt.Sprintf("%v:%v:%v", aggregateID, mailTextType, langugage))
+}
 
 type MailTextAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -32,7 +47,7 @@ func (e *MailTextAddedEvent) Data() interface{} {
 }
 
 func (e *MailTextAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewAddMailTextUniqueConstraint(e.ResourceOwner(), e.MailTextType, e.Language)}
 }
 
 func NewMailTextAddedEvent(
@@ -166,6 +181,9 @@ func MailTextChangedEventMapper(event *repository.Event) (eventstore.EventReader
 
 type MailTextRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	MailTextType string `json:"mailTextType,omitempty"`
+	Language     string `json:"language,omitempty"`
 }
 
 func (e *MailTextRemovedEvent) Data() interface{} {
@@ -173,12 +191,14 @@ func (e *MailTextRemovedEvent) Data() interface{} {
 }
 
 func (e *MailTextRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewRemoveMailTextUniqueConstraint(e.ResourceOwner(), e.MailTextType, e.Language)}
 }
 
-func NewMailTextRemovedEvent(base *eventstore.BaseEvent) *MailTextRemovedEvent {
+func NewMailTextRemovedEvent(base *eventstore.BaseEvent, mailTextType, language string) *MailTextRemovedEvent {
 	return &MailTextRemovedEvent{
-		BaseEvent: *base,
+		BaseEvent:    *base,
+		MailTextType: mailTextType,
+		Language:     language,
 	}
 }
 

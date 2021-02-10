@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
@@ -29,7 +30,7 @@ func NewMailTextAddedEvent(
 ) *MailTextAddedEvent {
 	return &MailTextAddedEvent{
 		MailTextAddedEvent: *policy.NewMailTextAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, MailTextAddedEventType),
+			eventstore.NewBaseEventForPushWithResourceOwner(ctx, MailTextAddedEventType, domain.IAMID),
 			mailTextType,
 			language,
 			title,

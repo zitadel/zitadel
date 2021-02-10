@@ -20,6 +20,7 @@ type MailTextAddedEvent struct {
 
 func NewMailTextAddedEvent(
 	ctx context.Context,
+	resourceOwner,
 	mailTextType,
 	language,
 	title,
@@ -31,7 +32,7 @@ func NewMailTextAddedEvent(
 ) *MailTextAddedEvent {
 	return &MailTextAddedEvent{
 		MailTextAddedEvent: *policy.NewMailTextAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, MailTextAddedEventType),
+			eventstore.NewBaseEventForPushWithResourceOwner(ctx, MailTextAddedEventType, resourceOwner),
 			mailTextType,
 			language,
 			title,
@@ -89,10 +90,15 @@ type MailTextRemovedEvent struct {
 
 func NewMailTextRemovedEvent(
 	ctx context.Context,
+	resourceOwner,
+	mailTextType,
+	language string,
 ) *MailTextRemovedEvent {
 	return &MailTextRemovedEvent{
 		MailTextRemovedEvent: *policy.NewMailTextRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, MailTextRemovedEventType),
+			eventstore.NewBaseEventForPushWithResourceOwner(ctx, MailTextRemovedEventType, resourceOwner),
+			mailTextType,
+			language,
 		),
 	}
 }

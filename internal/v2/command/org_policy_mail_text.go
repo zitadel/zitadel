@@ -25,6 +25,7 @@ func (r *CommandSide) AddMailText(ctx context.Context, resourceOwner string, mai
 	orgAgg.PushEvents(
 		org.NewMailTextAddedEvent(
 			ctx,
+			resourceOwner,
 			mailText.MailTextType,
 			mailText.Language,
 			mailText.Title,
@@ -90,7 +91,7 @@ func (r *CommandSide) RemoveMailText(ctx context.Context, resourceOwner, mailTex
 		return caos_errs.ThrowNotFound(nil, "Org-3b8Jf", "Errors.Org.MailText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	orgAgg.PushEvents(org.NewMailTextRemovedEvent(ctx))
+	orgAgg.PushEvents(org.NewMailTextRemovedEvent(ctx, mailTextType, language, resourceOwner))
 
 	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
 }
