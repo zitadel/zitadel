@@ -256,7 +256,20 @@ jobs:
 
       - name: Set output
         id: branch
-        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/heads/}
+        run: |
+          echo ::set-output name=short_ref::$(echo ${GITHUB_REF#refs/heads/} | tr '/' '_')
+      - name: Docker Tag Version
+        run: |
+           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.branch.outputs.short_ref }}
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
+      - name: Docker Push Version
+        run: |
+          docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.branch.outputs.short_ref }}
+          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
+          docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
       - name: Dev-Release
         id: create_release
         uses: softprops/action-gh-release@v1
