@@ -17,7 +17,7 @@ export interface RadioItemAppType {
     styleUrls: ['./app-type-radio.component.scss'],
 })
 export class AppTypeRadioComponent {
-    selected: OIDCApplicationType = OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB;
+    @Input() selected: OIDCApplicationType = OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB;
     @Input() types!: RadioItemAppType[];
     @Output() selectedType: EventEmitter<OIDCApplicationType> = new EventEmitter();
 

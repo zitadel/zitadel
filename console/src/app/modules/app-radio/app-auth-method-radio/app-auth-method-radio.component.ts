@@ -22,12 +22,11 @@ export interface RadioItemAuthType {
     styleUrls: ['./app-auth-method-radio.component.scss'],
 })
 export class AppAuthMethodRadioComponent {
-    selected: string = '';
+    @Input() selected: string = '';
     @Input() authMethods!: RadioItemAuthType[];
-    @Output() selectedType: EventEmitter<string> = new EventEmitter();
+    @Output() selectedMethod: EventEmitter<string> = new EventEmitter();
 
     public emitChange(): void {
-        console.log('ch');
-        this.selectedType.emit(this.selected);
+        this.selectedMethod.emit(this.selected);
     }
 }

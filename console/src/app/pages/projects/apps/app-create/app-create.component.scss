@@ -42,11 +42,6 @@ p.desc {
   margin-right: .5rem;
 }
 
-.formfield {
-  width: 400px;
-  display: block;
-}
-
 .full-width {
   width: 100%;
 }
@@ -54,6 +49,10 @@ p.desc {
 .stepper {
   background: inherit !important;
   margin: 0 -1.5rem;
+
+  .formfield {
+      max-width: 400px;
+  }
 
   .step-title {
     font-size: 1rem;
@@ -137,9 +136,11 @@ p.desc {
     display: flex;
     margin: 0 -.5rem;
     flex-wrap: wrap;
+    flex-direction: row;
 
     .formfield {
-      flex: 1 0 40%;
+      flex: 1;
+      box-sizing: border-box;
       margin: 0 .5rem;
 
       &.full-width {

@@ -23,13 +23,14 @@
                 <p class="step-title">{{'APP.OIDC.TITLEFIRST' | translate}}</p>
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
-                    <input cnslInput formControlName="name" />
+                    <input cnslInput cdkFocusInitial formControlName="name" />
                     <span cnsl-error *ngIf="name?.errors?.required">{{'PROJECT.APP.NAMEREQUIRED' | translate}}</span>
                 </cnsl-form-field>
 
                 <p class="step-title">{{'APP.OIDC.TYPETITLE' | translate}}</p>
 
-                <app-type-radio [types]="oidcAppTypes" (selectedType)="changedAppType($event)"></app-type-radio>
+                <app-type-radio [types]="oidcAppTypes" (selectedType)="changedAppType($event)"
+                    [selected]="applicationType?.value"></app-type-radio>
                 <div class="actions">
                     <button mat-raised-button [disabled]="firstFormGroup.invalid" color="primary"
                         matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
@@ -58,7 +59,8 @@
             <form [formGroup]="secondFormGroup">
                 <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHODSECTION' | translate}}</ng-template>
 
-                <app-auth-method-radio [authMethods]="authMethod" (selected)="changedAppAuthMethod($event)">
+                <app-auth-method-radio [authMethods]="authMethods" [selected]="authMethod?.value"
+                    (selectedMethod)="changedAppAuthMethod($event)">
                 </app-auth-method-radio>
 
                 <div class="actions">
@@ -228,8 +230,8 @@
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'APP.OIDC.APPTYPE' | translate }}</cnsl-label>
                     <mat-select formControlName="applicationType">
-                        <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
-                            {{ 'APP.OIDC.APPTYPE'+type | translate }}
+                        <mat-option *ngFor="let type of oidcAppTypes" [value]="type.type">
+                            {{ 'APP.OIDC.APPTYPE'+type.type | translate }}
                         </mat-option>
                     </mat-select>
                 </cnsl-form-field>

@@ -61,7 +61,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         },
     ];
 
-    public authMethod: any[] =
+    public authMethods: any[] =
         [
             {
                 key: 'CODE',
@@ -198,7 +198,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                         this.oidcAuthMethodType[0].disabled = false;
                         this.oidcAuthMethodType[1].disabled = false;
                         this.oidcAuthMethodType[2].disabled = false;
-                        this.authMethodType?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC);
+                        // this.authMethodType?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC);
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC;
 
                         this.oidcResponseTypes[0].checked = true;
@@ -222,7 +222,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         });
 
         this.secondFormGroup = this.fb.group({
-            authMethod: ['', [Validators.required]],
+            authMethod: [this.authMethods[1].key, [Validators.required]],
         });
         this.secondFormGroup.valueChanges.subscribe(key => {
             switch (key) {
@@ -387,8 +387,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         return this.secondFormGroup.get('responseTypesList');
     }
 
-    get authMethodType(): AbstractControl | null {
-        return this.secondFormGroup.get('authMethodType');
+    get authMethod(): AbstractControl | null {
+        return this.secondFormGroup.get('authMethod');
     }
 
     // devmode

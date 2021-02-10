@@ -30,6 +30,7 @@ import { AppCreateComponent } from './app-create/app-create.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
 import { AppSecretDialogComponent } from './app-secret-dialog/app-secret-dialog.component';
 import { AppsRoutingModule } from './apps-routing.module';
+import { A11yModule } from '@angular/cdk/a11y';
 
 @NgModule({
     declarations: [
@@ -39,6 +40,7 @@ import { AppsRoutingModule } from './apps-routing.module';
     ],
     imports: [
         CommonModule,
+        A11yModule,
         AppRadioModule,
         AppsRoutingModule,
         FormsModule,
