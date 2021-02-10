@@ -10,7 +10,7 @@ import (
 
 func (r *CommandSide) AddMailText(ctx context.Context, resourceOwner string, mailText *domain.MailText) (*domain.MailText, error) {
 	if !mailText.IsValid() {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-4778u", "Errors.Org.MailText.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4778u", "Errors.Org.MailText.Invalid")
 	}
 	addedPolicy := NewOrgMailTextWriteModel(resourceOwner, mailText.MailTextType, mailText.Language)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
