@@ -54,7 +54,7 @@ func (r *CommandSide) addDefaultMailText(ctx context.Context, iamAgg *iam_repo.A
 
 func (r *CommandSide) ChangeDefaultMailText(ctx context.Context, mailText *domain.MailText) (*domain.MailText, error) {
 	if !mailText.IsValid() {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-kd9fs", "Errors.IAM.MailText.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-kd9fs", "Errors.IAM.MailText.Invalid")
 	}
 	existingPolicy, err := r.defaultMailTextWriteModelByID(ctx, mailText.MailTextType, mailText.Language)
 	if err != nil {
