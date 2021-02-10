@@ -43,7 +43,7 @@ func (r *CommandSide) addDefaultMailTemplate(ctx context.Context, iamAgg *iam_re
 
 func (r *CommandSide) ChangeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
 	if !policy.IsValid() {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-4m9ds", "Errors.IAM.MailTemplate.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4m9ds", "Errors.IAM.MailTemplate.Invalid")
 	}
 	existingPolicy, err := r.defaultMailTemplateWriteModelByID(ctx)
 	if err != nil {
