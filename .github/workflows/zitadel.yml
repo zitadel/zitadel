@@ -1,91 +1,296 @@
 name: Zitadel Release
-on: push
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
 
 env:
   GITHUB_TOKEN: ${{ secrets.CR_PAT }}
   REGISTRY: ghcr.io
   NODE_VERSION: '12'
   GO_VERSION: '1.15'
+  OPERATOR_IMAGE_NAME: ${{ github.repository }}-operator
+  CRDB_IMAGE_NAME: ${{ github.repository }}-crbackup
+  ARTIFACTS_FOLDER: './artifacts'
 
 jobs:
-  container:
+  zitadel-image:
     runs-on: ubuntu-18.04
     steps:
-    - name: Source checkout
-      uses: actions/checkout@v2
-    - name: Set output
-      id: branch
-      run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-    - name: Check output
-      run: echo ${{ steps.branch.outputs.short_ref }}
-    - name: Generate Short SHA Container Tag
-      id: vars
-      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
-    - name: Cache Docker layers
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    - name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ github.actor }}
-        password: ${{ secrets.CR_PAT }}
-        registry: ${{ env.REGISTRY }}
-    - uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: ./build/dockerfile
-        platforms: linux/amd64
-        tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.branch.outputs.short_ref }}
-        push: true
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set output
+        id: branch
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+      - name: Check output
+        run: echo ${{ steps.branch.outputs.short_ref }}
+      - name: Generate Short SHA Container Tag
+        id: vars
+        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+          registry: ${{ env.REGISTRY }}
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.branch.outputs.short_ref }}
+          push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+
+
+  operator-image:
+    runs-on: ubuntu-18.04
+    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
+    strategy:
+      matrix:
+        goos: [ 'linux', 'darwin', 'windows' ]
+        goarch: [ 'amd64' ]
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set output
+        id: branch
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          dry_run: true
+          semantic_version: 17.0.4
+      - name: Set version
+        id: version
+        run: |
+          if ${{ steps.semantic.outputs.new_release_published == 'true' }}; then
+            echo ::set-output name=version::${{ steps.semantic.outputs.new_release_version }}
+          else
+            echo ::set-output name=version::${{ steps.branch.outputs.short_ref }}
+          fi
+      - name: Check outputs
+        run: |
+          echo ${{ steps.branch.outputs.short_ref }}
+          echo ${{ steps.version.outputs.version }}
+      - name: Generate Short SHA Container Tag
+        id: vars
+        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-op-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-op-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+          registry: ${{ env.REGISTRY }}
+      - uses: docker/build-push-action@v2
+        name: onlybuild
+        with:
+          context: .
+          file: ./build/operator/Dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
+          push: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          outputs: type=local,dest=/tmp/operator
+          build-args: |
+            OS=${{ matrix.goos }}
+            ARCH=${{ matrix.goarch }}
+            VERSION=${{ steps.version.outputs.version }}
+      - shell: bash
+        run: |
+          mv /tmp/operator/zitadelctl /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+      - uses: docker/build-push-action@v2
+        if: ${{ matrix.goos == 'linux' && matrix.goarch == 'amd64' }}
+        name: buildandpush
+        with:
+          context: .
+          file: ./build/operator/Dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
+          push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          build-args: |
+            OS=${{ matrix.goos }}
+            ARCH=${{ matrix.goarch }}
+            VERSION=${{ steps.version.outputs.version }}
+
+
+  crdb-image:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set output
+        id: branch
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+      - name: Check output
+        run: echo ${{ steps.branch.outputs.short_ref }}
+      - name: Generate Short SHA Container Tag
+        id: vars
+        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+          registry: ${{ env.REGISTRY }}
+      - uses: docker/build-push-action@v2
+        name: buildandpush
+        with:
+          context: .
+          file: ./build/cr-backup/Dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
+          push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
   release:
     runs-on: ubuntu-18.04
-    needs: [container]
+    needs: [ zitadel-image, operator-image, crdb-image ]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
       DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
     steps:
-    - name: Source checkout
-      uses: actions/checkout@v2
-    - name: Generate Short SHA Container Tag
-      id: vars
-      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
-    - name: Docker Login
-      run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-    - name: Docker Pull short-sha
-      run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }}
-    - name: Semantic Release
-      id: semantic
-      uses: cycjimmy/semantic-release-action@v2
-      with:
-        dry_run: false
-        semantic_version: 17.0.4
-    - name: Do something when a new release published
-      if: steps.semantic.outputs.new_release_published == 'true'
-      run: |
-        echo ${{ steps.semantic.outputs.new_release_version }}
-        echo ${{ steps.semantic.outputs.new_release_major_version }}
-        echo ${{ steps.semantic.outputs.new_release_minor_version }}
-        echo ${{ steps.semantic.outputs.new_release_patch_version }}
-    - name: Docker Tag Version
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
-      if: steps.semantic.outputs.new_release_published == 'true'
-    - name: Docker Tag Latest
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
-      if: steps.semantic.outputs.new_release_published == 'true'
-    - name: Docker Push Version
-      run: docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
-      if: steps.semantic.outputs.new_release_published == 'true'
-    - name: Docker Push Latest
-      run: docker push $REGISTRY/$GITHUB_REPOSITORY:latest
-      if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Generate Short SHA Container Tag
+        id: vars
+        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
+      - name: Docker Login
+        run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+      - name: Docker Pull short-sha
+        run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }}
+      - name: Docker Pull short-sha
+        run: docker pull $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.vars.outputs.sha_short }}
+      - name: Docker Pull short-sha
+        run: docker pull $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }}
+      - name: Download all zitadelctl artifact
+        uses: actions/download-artifact@v2
+        with:
+          path: ${{ env.ARTIFACTS_FOLDER }}/
+      - name: Workaround for exe
+        run: |
+          mv ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64 ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
+          find ${ARTIFACTS_FOLDER}
+
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          dry_run: false
+          semantic_version: 17.0.4
+      - name: Do something when a new release published
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+      - name: Docker Tag Version
+        run: |
+          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Docker Tag Latest
+        run: |
+          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:latest
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:latest
+        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Docker Push Version
+        run: |
+          docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
+          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+          docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Docker Push Latest
+        run: |
+          docker push $REGISTRY/$GITHUB_REPOSITORY:latest
+          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:latest
+          docker push $REGISTRY/$CRDB_IMAGE_NAME:latest
+        if: steps.semantic.outputs.new_release_published == 'true'
+
+      - name: Set output
+        id: branch
+        run: |
+          export BRANCH=${GITHUB_REF#refs/heads/}
+          echo ${BRANCH}
+          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
+          echo ${BRANCHTRANSLATED}
+          echo ::set-output name=short_ref::${BRANCHTRANSLATED}
+      - name: Docker Tag Version
+        run: |
+          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.branch.outputs.short_ref }}
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
+      - name: Docker Push Version
+        run: |
+          docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.branch.outputs.short_ref }}
+          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
+          docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
+      - name: Dev-Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.branch.outputs.short_ref }}-dev
+          name: Branch ${{ steps.branch.outputs.short_ref }}
+          draft: false
+          prerelease: true
+          fail_on_unmatched_files: true
+          body: |
+            This is a release from a development branch.
+            Do not use these artifacts in production.
+          files: |
+            ${{ env.ARTIFACTS_FOLDER }}/zitadelctl-darwin-amd64/zitadelctl-darwin-amd64
+            ${{ env.ARTIFACTS_FOLDER }}/zitadelctl-linux-amd64/zitadelctl-linux-amd64
+            ${{ env.ARTIFACTS_FOLDER }}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
