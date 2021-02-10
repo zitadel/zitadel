@@ -27,6 +27,7 @@ export class AppAuthMethodRadioComponent {
     @Output() selectedType: EventEmitter<string> = new EventEmitter();
 
     public emitChange(): void {
+        console.log('ch');
         this.selectedType.emit(this.selected);
     }
 }

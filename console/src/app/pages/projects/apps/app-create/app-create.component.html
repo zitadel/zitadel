@@ -58,7 +58,8 @@
             <form [formGroup]="secondFormGroup">
                 <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHODSECTION' | translate}}</ng-template>
 
-                <app-auth-method-radio [authMethods]="authMethod"></app-auth-method-radio>
+                <app-auth-method-radio [authMethods]="authMethod" (selected)="changedAppAuthMethod($event)">
+                </app-auth-method-radio>
 
                 <div class="actions">
                     <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' |

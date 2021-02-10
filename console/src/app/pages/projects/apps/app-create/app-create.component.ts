@@ -230,8 +230,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.oidcResponseTypes[0].checked = true;
                     this.oidcResponseTypes[1].checked = false;
                     this.oidcResponseTypes[2].checked = false;
-                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
 
+                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
                     this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                     this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
                     this.changeResponseType();
@@ -240,8 +240,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.oidcResponseTypes[0].checked = true;
                     this.oidcResponseTypes[1].checked = false;
                     this.oidcResponseTypes[2].checked = false;
-                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
 
+                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
                     this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                     this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
                     this.changeResponseType();
@@ -250,8 +250,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.oidcResponseTypes[0].checked = true;
                     this.oidcResponseTypes[1].checked = false;
                     this.oidcResponseTypes[2].checked = false;
-                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
 
+                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
                     this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                     this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
                     this.changeResponseType();
@@ -260,8 +260,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.oidcResponseTypes[0].checked = true;
                     this.oidcResponseTypes[1].checked = false;
                     this.oidcResponseTypes[2].checked = false;
-                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
 
+                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
                     this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                     this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
                     this.changeResponseType();
@@ -280,6 +280,11 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     public changedAppType(type: OIDCApplicationType) {
         this.firstFormGroup.controls['applicationType'].setValue(type);
+    }
+
+    public changedAppAuthMethod(methodKey: string) {
+        console.log(methodKey);
+        this.secondFormGroup.controls['authMethod'].setValue(methodKey);
     }
 
     private async getData({ projectid }: Params): Promise<void> {

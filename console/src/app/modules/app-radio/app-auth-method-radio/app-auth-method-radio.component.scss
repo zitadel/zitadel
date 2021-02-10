@@ -50,6 +50,7 @@
         color: black;
         padding: 3px 1rem;
         box-shadow: 0 0 6px rgb(0 0 0 / 10%);
+        white-space: nowrap;
 
         &.not {
             background: rgb(144 75 75);
