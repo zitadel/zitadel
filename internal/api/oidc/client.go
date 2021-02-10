@@ -157,9 +157,18 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	app, err := o.repo.ApplicationByClientID(ctx, clientID)
+	if err != nil {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+	}
 	for _, aud := range token.Audience {
 		if aud == clientID || aud == app.ProjectID {
-			return o.SetUserinfoFromScopes(ctx, introspection, token.UserID, clientID, token.Scopes)
+			err := o.SetUserinfoFromScopes(ctx, introspection, token.UserID, clientID, token.Scopes)
+			if err != nil {
+				return err
+			}
+			introspection.SetScopes(token.Scopes)
+			introspection.SetClientID(token.ApplicationID)
+			return nil
 		}
 	}
 	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
