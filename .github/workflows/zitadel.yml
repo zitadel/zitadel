@@ -23,9 +23,12 @@ jobs:
         uses: actions/checkout@v2
       - name: Set output
         id: branch
-        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-      - name: Check output
-        run: echo ${{ steps.branch.outputs.short_ref }}
+        run: |
+          export BRANCH=${GITHUB_REF#refs/*/}
+          echo "branch: ${BRANCH}"
+          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
+          echo "short_ref: ${BRANCHTRANSLATED}"
+          echo ::set-output name=short_ref::${BRANCHTRANSLATED}
       - name: Generate Short SHA Container Tag
         id: vars
         run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
@@ -69,7 +72,13 @@ jobs:
         uses: actions/checkout@v2
       - name: Set output
         id: branch
-        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+        run: |
+          export BRANCH=${GITHUB_REF#refs/*/}
+          echo "branch: ${BRANCH}"
+          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
+          echo "short_ref: ${BRANCHTRANSLATED}"
+          echo "version: ${BRANCHTRANSLATED}"
+          echo ::set-output name=short_ref::${BRANCHTRANSLATED}
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
@@ -79,15 +88,13 @@ jobs:
       - name: Set version
         id: version
         run: |
+          export VERSION=""
           if ${{ steps.semantic.outputs.new_release_published == 'true' }}; then
-            echo ::set-output name=version::${{ steps.semantic.outputs.new_release_version }}
+            export VERSION=${{ steps.semantic.outputs.new_release_version }}
           else
-            echo ::set-output name=version::${{ steps.branch.outputs.short_ref }}
+            export VERSION=${{ steps.branch.outputs.short_ref }}
           fi
-      - name: Check outputs
-        run: |
-          echo ${{ steps.branch.outputs.short_ref }}
-          echo ${{ steps.version.outputs.version }}
+          echo ::set-output name=version::${VERSION}
       - name: Generate Short SHA Container Tag
         id: vars
         run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
@@ -154,9 +161,12 @@ jobs:
         uses: actions/checkout@v2
       - name: Set output
         id: branch
-        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-      - name: Check output
-        run: echo ${{ steps.branch.outputs.short_ref }}
+        run: |
+          export BRANCH=${GITHUB_REF#refs/*/}
+          echo "branch: ${BRANCH}"
+          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
+          echo "short_ref: ${BRANCHTRANSLATED}"
+          echo ::set-output name=short_ref::${BRANCHTRANSLATED}
       - name: Generate Short SHA Container Tag
         id: vars
         run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
@@ -258,10 +268,10 @@ jobs:
       - name: Set output
         id: branch
         run: |
-          export BRANCH=${GITHUB_REF#refs/heads/}
-          echo ${BRANCH}
+          export BRANCH=${GITHUB_REF#refs/*/}
+          echo "branch: ${BRANCH}"
           export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
-          echo ${BRANCHTRANSLATED}
+          echo "short_ref: ${BRANCHTRANSLATED}"
           echo ::set-output name=short_ref::${BRANCHTRANSLATED}
       - name: Docker Tag Version
         run: |
