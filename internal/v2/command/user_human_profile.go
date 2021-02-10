@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -23,10 +24,12 @@ func (r *CommandSide) ChangeHumanProfile(ctx context.Context, profile *domain.Pr
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
 	}
-	userAgg := UserAggregateFromWriteModel(&existingProfile.WriteModel)
-	userAgg.PushEvents(changedEvent)
 
-	err = r.eventstore.PushAggregate(ctx, existingProfile, userAgg)
+	events, err := r.eventstore.PushEvents(ctx, changedEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingProfile, events...)
 	if err != nil {
 		return nil, err
 	}

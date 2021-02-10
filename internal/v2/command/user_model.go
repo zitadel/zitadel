@@ -25,10 +25,6 @@ func NewUserWriteModel(userID, resourceOwner string) *UserWriteModel {
 	}
 }
 
-func (wm *UserWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 //TODO: Compute OTPState? initial/active
 func (wm *UserWriteModel) Reduce() error {
 	for _, event := range wm.Events {
@@ -78,10 +74,8 @@ func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return query
 }
 
-func UserAggregateFromWriteModel(wm *eventstore.WriteModel) *user.Aggregate {
-	return &user.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, user.AggregateType, user.AggregateVersion),
-	}
+func UserAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModel(wm, user.AggregateType, user.AggregateVersion)
 }
 
 func CheckOrgIAMPolicyForUserName(userName string, policy *domain.OrgIAMPolicy) error {
@@ -92,4 +86,21 @@ func CheckOrgIAMPolicyForUserName(userName string, policy *domain.OrgIAMPolicy) 
 		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-4M9vs", "Errors.User.EmailAsUsernameNotAllowed")
 	}
 	return nil
+}
+
+func isUserStateExists(state domain.UserState) bool {
+	return !hasUserState(state, domain.UserStateDeleted, domain.UserStateUnspecified)
+}
+
+func isUserStateInactive(state domain.UserState) bool {
+	return hasUserState(state, domain.UserStateInactive)
+}
+
+func hasUserState(check domain.UserState, states ...domain.UserState) bool {
+	for _, state := range states {
+		if check == state {
+			return true
+		}
+	}
+	return false
 }

@@ -75,13 +75,10 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 // the resource owner of the aggregate is only used if it's the first event of this aggregateroot
 // afterwards the resource owner of the first previous events is taken
 func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventType) *BaseEvent {
-	svcName := service.FromContext(ctx)
-	event := &BaseEvent{
+	return &BaseEvent{
 		aggregate: *aggregate,
 		User:      authz.GetCtxData(ctx).UserID,
-		Service:   svcName,
+		Service:   service.FromContext(ctx),
 		EventType: typ,
 	}
-
-	return event
 }

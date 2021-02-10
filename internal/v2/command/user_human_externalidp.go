@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -9,32 +10,32 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )
 
-func (r *CommandSide) BulkAddedHumanExternalIDP(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.ExternalIDP) error {
+func (r *CommandSide) BulkAddedHumanExternalIDP(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.ExternalIDP) (err error) {
 	if len(externalIDPs) == 0 {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
 	}
-	aggregates := make([]eventstore.Aggregater, len(externalIDPs))
 
+	events := make([]eventstore.EventPusher, len(externalIDPs))
 	for i, externalIDP := range externalIDPs {
 		externalIDPWriteModel := NewHumanExternalIDPWriteModel(userID, externalIDP.IDPConfigID, externalIDP.ExternalUserID, resourceOwner)
 		userAgg := UserAggregateFromWriteModel(&externalIDPWriteModel.WriteModel)
-		err := r.addHumanExternalIDP(ctx, userAgg, externalIDP)
+
+		events[i], err = r.addHumanExternalIDP(ctx, userAgg, externalIDP)
 		if err != nil {
 			return err
 		}
-		aggregates[i] = userAgg
 	}
-	_, err := r.eventstore.PushAggregates(ctx, aggregates...)
+
+	_, err = r.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
-func (r *CommandSide) addHumanExternalIDP(ctx context.Context, userAgg *user.Aggregate, externalIDP *domain.ExternalIDP) error {
+func (r *CommandSide) addHumanExternalIDP(ctx context.Context, aggregate *eventstore.Aggregate, externalIDP *domain.ExternalIDP) (eventstore.EventPusher, error) {
 	if !externalIDP.IsValid() {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid")
 	}
 	//TODO: check if idpconfig exists
-	userAgg.PushEvents(user.NewHumanExternalIDPAddedEvent(ctx, externalIDP.IDPConfigID, externalIDP.DisplayName, externalIDP.ExternalUserID))
-	return nil
+	return user.NewHumanExternalIDPAddedEvent(ctx, aggregate, externalIDP.IDPConfigID, externalIDP.DisplayName, externalIDP.ExternalUserID), nil
 }
 
 func (r *CommandSide) RemoveHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP) error {
@@ -53,17 +54,14 @@ func (r *CommandSide) removeHumanExternalIDP(ctx context.Context, externalIDP *d
 	if existingExternalIDP.State == domain.ExternalIDPStateUnspecified || existingExternalIDP.State == domain.ExternalIDPStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-1M9xR", "Errors.User.ExternalIDP.NotFound")
 	}
+
 	userAgg := UserAggregateFromWriteModel(&existingExternalIDP.WriteModel)
 	if !cascade {
-		userAgg.PushEvents(
-			user.NewHumanExternalIDPRemovedEvent(ctx, externalIDP.IDPConfigID, externalIDP.ExternalUserID),
-		)
+		_, err = r.eventstore.PushEvents(ctx, user.NewHumanExternalIDPRemovedEvent(ctx, userAgg, externalIDP.IDPConfigID, externalIDP.ExternalUserID))
 	} else {
-		userAgg.PushEvents(
-			user.NewHumanExternalIDPCascadeRemovedEvent(ctx, externalIDP.IDPConfigID, externalIDP.ExternalUserID),
-		)
+		_, err = r.eventstore.PushEvents(ctx, user.NewHumanExternalIDPCascadeRemovedEvent(ctx, userAgg, externalIDP.IDPConfigID, externalIDP.ExternalUserID))
 	}
-	return r.eventstore.PushAggregate(ctx, existingExternalIDP, userAgg)
+	return err
 }
 
 func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, userID string, authRequest *domain.AuthRequest) (err error) {
@@ -80,8 +78,8 @@ func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, user
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	userAgg.PushEvents(user.NewHumanExternalIDPCheckSucceededEvent(ctx, authRequestDomainToAuthRequestInfo(authRequest)))
-	return r.eventstore.PushAggregate(ctx, existingHuman, userAgg)
+	_, err = r.eventstore.PushEvents(ctx, user.NewHumanExternalIDPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	return err
 }
 
 func (r *CommandSide) externalIDPWriteModelByID(ctx context.Context, userID, idpConfigID, externalUserID, resourceOwner string) (writeModel *HumanExternalIDPWriteModel, err error) {

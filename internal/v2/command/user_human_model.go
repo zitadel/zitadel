@@ -47,10 +47,6 @@ func NewHumanWriteModel(userID, resourceOwner string) *HumanWriteModel {
 	}
 }
 
-func (wm *HumanWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 //TODO: Compute OTPState? initial/active
 func (wm *HumanWriteModel) Reduce() error {
 	for _, event := range wm.Events {

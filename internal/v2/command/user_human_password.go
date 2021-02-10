@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -79,20 +80,17 @@ func (r *CommandSide) ChangePassword(ctx context.Context, orgID, userID, oldPass
 	return r.changePassword(ctx, orgID, userID, userAgentID, password, userAgg, existingPassword)
 }
 
-func (r *CommandSide) changePassword(ctx context.Context, orgID, userID, userAgentID string, password *domain.Password, userAgg *user.Aggregate, existingPassword *HumanPasswordWriteModel) (err error) {
+func (r *CommandSide) changePassword(ctx context.Context, userAgentID string, password *domain.Password, userAgg *user.Aggregate, existingPassword *HumanPasswordWriteModel) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-B8hY3", "Errors.User.UserIDMissing")
-	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-G8dh3", "Errors.User.Email.NotFound")
 	}
 	if existingPassword.UserState == domain.UserStateInitial {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised")
 	}
-	pwPolicy, err := r.getOrgPasswordComplexityPolicy(ctx, orgID)
+	pwPolicy, err := r.getOrgPasswordComplexityPolicy(ctx, userAgg.ResourceOwner)
 	if err != nil {
 		return err
 	}

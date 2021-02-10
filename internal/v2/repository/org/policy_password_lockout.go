@@ -20,12 +20,16 @@ type PasswordLockoutPolicyAddedEvent struct {
 
 func NewPasswordLockoutPolicyAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	maxAttempts uint64,
 	showLockoutFailure bool,
 ) *PasswordLockoutPolicyAddedEvent {
 	return &PasswordLockoutPolicyAddedEvent{
 		PasswordLockoutPolicyAddedEvent: *policy.NewPasswordLockoutPolicyAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordLockoutPolicyAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				PasswordLockoutPolicyAddedEventType),
 			maxAttempts,
 			showLockoutFailure),
 	}
@@ -46,10 +50,14 @@ type PasswordLockoutPolicyChangedEvent struct {
 
 func NewPasswordLockoutPolicyChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	changes []policy.PasswordLockoutPolicyChanges,
 ) (*PasswordLockoutPolicyChangedEvent, error) {
 	changedEvent, err := policy.NewPasswordLockoutPolicyChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, PasswordLockoutPolicyChangedEventType),
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasswordLockoutPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {
@@ -73,10 +81,14 @@ type PasswordLockoutPolicyRemovedEvent struct {
 
 func NewPasswordLockoutPolicyRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 ) *PasswordLockoutPolicyRemovedEvent {
 	return &PasswordLockoutPolicyRemovedEvent{
 		PasswordLockoutPolicyRemovedEvent: *policy.NewPasswordLockoutPolicyRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordLockoutPolicyRemovedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				PasswordLockoutPolicyRemovedEventType),
 		),
 	}
 }

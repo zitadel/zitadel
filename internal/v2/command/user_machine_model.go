@@ -27,10 +27,6 @@ func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
 	}
 }
 
-func (wm *MachineWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 //TODO: Compute OTPState? initial/active
 func (wm *MachineWriteModel) Reduce() error {
 	for _, event := range wm.Events {
@@ -80,11 +76,12 @@ func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *MachineWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	name,
 	description string,
 ) (*user.MachineChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := user.NewMachineChangedEvent(ctx)
+	changedEvent := user.NewMachineChangedEvent(ctx, aggregate)
 	if wm.Name != name {
 		hasChanged = true
 		changedEvent.Name = &name

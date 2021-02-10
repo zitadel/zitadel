@@ -29,10 +29,6 @@ func NewHumanAddressWriteModel(userID, resourceOwner string) *HumanAddressWriteM
 	}
 }
 
-func (wm *HumanAddressWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *HumanAddressWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {

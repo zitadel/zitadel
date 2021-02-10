@@ -3,13 +3,14 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"golang.org/x/text/language"
-	"time"
 )
 
 const (
@@ -55,7 +56,7 @@ func (e *HumanAddedEvent) Data() interface{} {
 }
 
 func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.userLoginMustBeDomain)}
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
 }
 
 func (e *HumanAddedEvent) AddAddressData(
@@ -88,7 +89,8 @@ func (e *HumanAddedEvent) AddPasswordData(
 
 func NewHumanAddedEvent(
 	ctx context.Context,
-	resourceOwner,
+	aggregate *eventstore.Aggregate,
+
 	userName,
 	firstName,
 	lastName,
@@ -100,10 +102,10 @@ func NewHumanAddedEvent(
 	userLoginMustBeDomain bool,
 ) *HumanAddedEvent {
 	return &HumanAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
+		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanAddedType,
-			resourceOwner,
 		),
 		UserName:              userName,
 		FirstName:             firstName,
@@ -161,7 +163,7 @@ func (e *HumanRegisteredEvent) Data() interface{} {
 }
 
 func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.userLoginMustBeDomain)}
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
 }
 
 func (e *HumanRegisteredEvent) AddAddressData(
@@ -194,7 +196,8 @@ func (e *HumanRegisteredEvent) AddPasswordData(
 
 func NewHumanRegisteredEvent(
 	ctx context.Context,
-	resourceOwner,
+	aggregate *eventstore.Aggregate,
+
 	userName,
 	firstName,
 	lastName,
@@ -206,10 +209,10 @@ func NewHumanRegisteredEvent(
 	userLoginMustBeDomain bool,
 ) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{
-		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
+		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanRegisteredType,
-			resourceOwner,
 		),
 		UserName:              userName,
 		FirstName:             firstName,
@@ -251,12 +254,14 @@ func (e *HumanInitialCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniq
 
 func NewHumanInitialCodeAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 ) *HumanInitialCodeAddedEvent {
 	return &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanInitialCodeAddedType,
 		),
 		Code:   code,
@@ -288,10 +293,11 @@ func (e *HumanInitialCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqu
 	return nil
 }
 
-func NewHumanInitialCodeSentEvent(ctx context.Context) *HumanInitialCodeSentEvent {
+func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitialCodeSentEvent {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanInitialCodeSentType,
 		),
 	}
@@ -315,10 +321,11 @@ func (e *HumanInitializedCheckSucceededEvent) UniqueConstraints() []*eventstore.
 	return nil
 }
 
-func NewHumanInitializedCheckSucceededEvent(ctx context.Context) *HumanInitializedCheckSucceededEvent {
+func NewHumanInitializedCheckSucceededEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitializedCheckSucceededEvent {
 	return &HumanInitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanInitializedCheckSucceededType,
 		),
 	}
@@ -342,10 +349,11 @@ func (e *HumanInitializedCheckFailedEvent) UniqueConstraints() []*eventstore.Eve
 	return nil
 }
 
-func NewHumanInitializedCheckFailedEvent(ctx context.Context) *HumanInitializedCheckFailedEvent {
+func NewHumanInitializedCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitializedCheckFailedEvent {
 	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanInitializedCheckFailedType,
 		),
 	}
@@ -371,10 +379,15 @@ func (e *HumanSignedOutEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return nil
 }
 
-func NewHumanSignedOutEvent(ctx context.Context, userAgentID string) *HumanSignedOutEvent {
+func NewHumanSignedOutEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	userAgentID string,
+) *HumanSignedOutEvent {
 	return &HumanSignedOutEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanSignedOutType,
 		),
 		UserAgentID: userAgentID,

@@ -15,9 +15,8 @@ type WriteModel struct {
 
 //AppendEvents adds all the events to the read model.
 // The function doesn't compute the new state of the read model
-func (rm *WriteModel) AppendEvents(events ...EventReader) *WriteModel {
+func (rm *WriteModel) AppendEvents(events ...EventReader) {
 	rm.Events = append(rm.Events, events...)
-	return rm
 }
 
 //Reduce is the basic implementaion of reducer

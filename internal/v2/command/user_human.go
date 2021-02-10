@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 
@@ -11,22 +12,27 @@ import (
 )
 
 func (r *CommandSide) getHuman(ctx context.Context, userID, resourceowner string) (*domain.Human, error) {
-	writeModel, err := r.getHumanWriteModelByID(ctx, userID, resourceowner)
+	human, err := r.getHumanWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}
-	if writeModel.UserState == domain.UserStateUnspecified || writeModel.UserState == domain.UserStateDeleted {
+	if !isUserStateExists(human.UserState) {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-M9dsd", "Errors.User.NotFound")
 	}
-	return writeModelToHuman(writeModel), nil
+	return writeModelToHuman(human), nil
 }
 
 func (r *CommandSide) AddHuman(ctx context.Context, orgID string, human *domain.Human) (*domain.Human, error) {
-	userAgg, addedHuman, err := r.addHuman(ctx, orgID, human)
+	events, addedHuman, err := r.addHuman(ctx, orgID, human)
 	if err != nil {
 		return nil, err
 	}
-	err = r.eventstore.PushAggregate(ctx, addedHuman, userAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = AppendAndReduce(addedHuman, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +40,7 @@ func (r *CommandSide) AddHuman(ctx context.Context, orgID string, human *domain.
 	return writeModelToHuman(addedHuman), nil
 }
 
-func (r *CommandSide) addHuman(ctx context.Context, orgID string, human *domain.Human) (*user.Aggregate, *HumanWriteModel, error) {
+func (r *CommandSide) addHuman(ctx context.Context, orgID string, human *domain.Human) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
@@ -42,46 +48,48 @@ func (r *CommandSide) addHuman(ctx context.Context, orgID string, human *domain.
 }
 
 func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
-	aggregates := make([]eventstore.Aggregater, 2)
-
-	userAgg, addedHuman, err := r.registerHuman(ctx, orgID, human, externalIDP)
+	userEvents, registeredHuman, err := r.registerHuman(ctx, orgID, human, externalIDP)
 	if err != nil {
 		return nil, err
 	}
-	aggregates[0] = userAgg
 
-	orgMemberWriteModel := NewOrgMemberWriteModel(orgID, addedHuman.AggregateID)
+	orgMemberWriteModel := NewOrgMemberWriteModel(orgID, registeredHuman.AggregateID)
 	orgAgg := OrgAggregateFromWriteModel(&orgMemberWriteModel.WriteModel)
-	if orgMemberRoles != nil {
+	if len(orgMemberRoles) > 0 {
 		orgMember := &domain.Member{
 			ObjectRoot: models.ObjectRoot{
 				AggregateID: orgID,
 			},
-			UserID: userAgg.ID(),
+			UserID: human.AggregateID,
 			Roles:  orgMemberRoles,
 		}
-		r.addOrgMember(ctx, orgAgg, orgMemberWriteModel, orgMember)
+		memberEvent, err := r.addOrgMember(ctx, orgAgg, orgMemberWriteModel, orgMember)
+		if err != nil {
+			return nil, err
+		}
+		userEvents = append(userEvents, memberEvent)
 	}
 
-	aggregates[1] = orgAgg
-
-	eventReader, err := r.eventstore.PushAggregates(ctx, aggregates...)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, userEvents...)
 	if err != nil {
 		return nil, err
 	}
-	addedHuman.AppendEvents(eventReader...)
-	addedHuman.Reduce()
-	return writeModelToHuman(addedHuman), nil
+
+	err = AppendAndReduce(registeredHuman, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToHuman(registeredHuman), nil
 }
 
-func (r *CommandSide) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) (*user.Aggregate, *HumanWriteModel, error) {
+func (r *CommandSide) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-9dk45", "Errors.User.Invalid")
 	}
 	return r.createHuman(ctx, orgID, human, externalIDP, true)
 }
 
-func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister bool) (*user.Aggregate, *HumanWriteModel, error) {
+func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister bool) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	userID, err := r.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
@@ -95,7 +103,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	if err != nil {
 		return nil, nil, err
 	}
-
+	//TODO: adlerhurst shouldn't 107 be after 114?
 	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
 	if err := human.CheckOrgIAMPolicy(orgIAMPolicy); err != nil {
 		return nil, nil, err
@@ -104,43 +112,47 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	if err := human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true); err != nil {
 		return nil, nil, err
 	}
-
+	//TODO: adlerhurst maybe we could simplify the code below
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
-	var createEvent eventstore.EventPusher
+	var events []eventstore.EventPusher
+
 	if selfregister {
-		createEvent = createRegisterHumanEvent(ctx, orgID, human, orgIAMPolicy.UserLoginMustBeDomain)
+		events = append(events, createRegisterHumanEvent(ctx, userAgg, human, orgIAMPolicy.UserLoginMustBeDomain))
 	} else {
-		createEvent = createAddHumanEvent(ctx, orgID, human, orgIAMPolicy.UserLoginMustBeDomain)
+		events = append(events, createAddHumanEvent(ctx, userAgg, human, orgIAMPolicy.UserLoginMustBeDomain))
 	}
-	userAgg.PushEvents(createEvent)
 
 	if externalIDP != nil {
-		err = r.addHumanExternalIDP(ctx, userAgg, externalIDP)
+		event, err := r.addHumanExternalIDP(ctx, userAgg, externalIDP)
 		if err != nil {
 			return nil, nil, err
 		}
+		events = append(events, event)
 	}
+
 	if human.IsInitialState() {
 		initCode, err := domain.NewInitUserCode(r.initializeUserCode)
 		if err != nil {
 			return nil, nil, err
 		}
-		userAgg.PushEvents(user.NewHumanInitialCodeAddedEvent(ctx, initCode.Code, initCode.Expiry))
+		events = append(events, user.NewHumanInitialCodeAddedEvent(ctx, userAgg, initCode.Code, initCode.Expiry))
 	}
+
 	if human.Email != nil && human.EmailAddress != "" && human.IsEmailVerified {
-		userAgg.PushEvents(user.NewHumanEmailVerifiedEvent(ctx))
+		events = append(events, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 	}
+
 	if human.Phone != nil && human.PhoneNumber != "" && !human.IsPhoneVerified {
 		phoneCode, err := domain.NewPhoneCode(r.phoneVerificationCode)
 		if err != nil {
 			return nil, nil, err
 		}
-		userAgg.PushEvents(user.NewHumanPhoneCodeAddedEvent(ctx, phoneCode.Code, phoneCode.Expiry))
+		events = append(events, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
 	} else if human.Phone != nil && human.PhoneNumber != "" && human.IsPhoneVerified {
-		userAgg.PushEvents(user.NewHumanPhoneVerifiedEvent(ctx))
+		events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 	}
 
-	return userAgg, addedHuman, nil
+	return events, addedHuman, nil
 }
 
 func (r *CommandSide) HumanSkipMFAInit(ctx context.Context, userID, resourceowner string) (err error) {
@@ -152,18 +164,20 @@ func (r *CommandSide) HumanSkipMFAInit(ctx context.Context, userID, resourceowne
 	if err != nil {
 		return err
 	}
-	if existingHuman.UserState == domain.UserStateUnspecified || existingHuman.UserState == domain.UserStateDeleted {
+	if isUserStateExists(existingHuman.UserState) {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-m9cV8", "Errors.User.NotFound")
 	}
-	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	userAgg.PushEvents(user.NewHumanMFAInitSkippedEvent(ctx))
-	return r.eventstore.PushAggregate(ctx, existingHuman, userAgg)
+
+	_, err = r.eventstore.PushEvents(ctx,
+		user.NewHumanMFAInitSkippedEvent(ctx, UserAggregateFromWriteModel(&existingHuman.WriteModel)))
+	return err
 }
 
-func createAddHumanEvent(ctx context.Context, orgID string, human *domain.Human, userLoginMustBeDomain bool) *user.HumanAddedEvent {
+///TODO: adlerhurst maybe we can simplify createAddHumanEvent and createRegisterHumanEvent
+func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, human *domain.Human, userLoginMustBeDomain bool) *user.HumanAddedEvent {
 	addEvent := user.NewHumanAddedEvent(
 		ctx,
-		orgID,
+		aggregate,
 		human.Username,
 		human.FirstName,
 		human.LastName,
@@ -191,10 +205,10 @@ func createAddHumanEvent(ctx context.Context, orgID string, human *domain.Human,
 	return addEvent
 }
 
-func createRegisterHumanEvent(ctx context.Context, orgID string, human *domain.Human, userLoginMustBeDomain bool) *user.HumanRegisteredEvent {
+func createRegisterHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, human *domain.Human, userLoginMustBeDomain bool) *user.HumanRegisteredEvent {
 	addEvent := user.NewHumanRegisteredEvent(
 		ctx,
-		orgID,
+		aggregate,
 		human.Username,
 		human.FirstName,
 		human.LastName,
@@ -226,21 +240,22 @@ func (r *CommandSide) HumansSignOut(ctx context.Context, agentID string, userIDs
 	if agentID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
-	aggregates := make([]eventstore.Aggregater, len(userIDs))
+	events := make([]eventstore.EventPusher, len(userIDs))
 	for i, userID := range userIDs {
 		existingUser, err := r.getHumanWriteModelByID(ctx, userID, "")
 		if err != nil {
 			return err
 		}
-		if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
+		if !isUserStateExists(existingUser.UserState) {
 			continue
 		}
-		userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-		userAgg.PushEvents(user.NewHumanSignedOutEvent(ctx, agentID))
-		aggregates[i] = userAgg
+		events[i] = user.NewHumanSignedOutEvent(
+			ctx,
+			UserAggregateFromWriteModel(&existingUser.WriteModel),
+			agentID)
 	}
 
-	_, err := r.eventstore.PushAggregates(ctx, aggregates...)
+	_, err := r.eventstore.PushEvents(ctx, events...)
 	return err
 }
 

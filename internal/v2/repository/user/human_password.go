@@ -3,12 +3,13 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
-	"time"
 )
 
 const (
@@ -38,6 +39,7 @@ func (e *HumanPasswordChangedEvent) UniqueConstraints() []*eventstore.EventUniqu
 
 func NewHumanPasswordChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	secret *crypto.CryptoValue,
 	changeRequired bool,
 	userAgentID string,
@@ -45,6 +47,7 @@ func NewHumanPasswordChangedEvent(
 	return &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPasswordChangedType,
 		),
 		Secret:         secret,
@@ -83,6 +86,7 @@ func (e *HumanPasswordCodeAddedEvent) UniqueConstraints() []*eventstore.EventUni
 
 func NewHumanPasswordCodeAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	notificationType domain.NotificationType,
@@ -90,6 +94,7 @@ func NewHumanPasswordCodeAddedEvent(
 	return &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPasswordCodeAddedType,
 		),
 		Code:             code,
@@ -122,10 +127,11 @@ func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.EventUniq
 	return nil
 }
 
-func NewHumanPasswordCodeSentEvent(ctx context.Context) *HumanPasswordCodeSentEvent {
+func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordCodeSentEvent {
 	return &HumanPasswordCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPasswordCodeSentType,
 		),
 	}
@@ -150,10 +156,15 @@ func (e *HumanPasswordCheckSucceededEvent) UniqueConstraints() []*eventstore.Eve
 	return nil
 }
 
-func NewHumanPasswordCheckSucceededEvent(ctx context.Context, info *AuthRequestInfo) *HumanPasswordCheckSucceededEvent {
+func NewHumanPasswordCheckSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanPasswordCheckSucceededEvent {
 	return &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPasswordCheckSucceededType,
 		),
 		AuthRequestInfo: info,
@@ -185,10 +196,15 @@ func (e *HumanPasswordCheckFailedEvent) UniqueConstraints() []*eventstore.EventU
 	return nil
 }
 
-func NewHumanPasswordCheckFailedEvent(ctx context.Context, info *AuthRequestInfo) *HumanPasswordCheckFailedEvent {
+func NewHumanPasswordCheckFailedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanPasswordCheckFailedEvent {
 	return &HumanPasswordCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPasswordCheckFailedType,
 		),
 		AuthRequestInfo: info,

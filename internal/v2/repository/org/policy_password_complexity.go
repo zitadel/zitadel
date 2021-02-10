@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
@@ -19,6 +20,7 @@ type PasswordComplexityPolicyAddedEvent struct {
 
 func NewPasswordComplexityPolicyAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	minLength uint64,
 	hasLowercase,
 	hasUppercase,
@@ -27,7 +29,10 @@ func NewPasswordComplexityPolicyAddedEvent(
 ) *PasswordComplexityPolicyAddedEvent {
 	return &PasswordComplexityPolicyAddedEvent{
 		PasswordComplexityPolicyAddedEvent: *policy.NewPasswordComplexityPolicyAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				PasswordComplexityPolicyAddedEventType),
 			minLength,
 			hasLowercase,
 			hasUppercase,
@@ -51,10 +56,14 @@ type PasswordComplexityPolicyChangedEvent struct {
 
 func NewPasswordComplexityPolicyChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	changes []policy.PasswordComplexityPolicyChanges,
 ) (*PasswordComplexityPolicyChangedEvent, error) {
 	changedEvent, err := policy.NewPasswordComplexityPolicyChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyChangedEventType),
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasswordComplexityPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {
@@ -78,10 +87,14 @@ type PasswordComplexityPolicyRemovedEvent struct {
 
 func NewPasswordComplexityPolicyRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 ) *PasswordComplexityPolicyRemovedEvent {
 	return &PasswordComplexityPolicyRemovedEvent{
 		PasswordComplexityPolicyRemovedEvent: *policy.NewPasswordComplexityPolicyRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyRemovedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				PasswordComplexityPolicyRemovedEventType),
 		),
 	}
 }

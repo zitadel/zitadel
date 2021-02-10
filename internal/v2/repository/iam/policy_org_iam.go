@@ -19,11 +19,15 @@ type OrgIAMPolicyAddedEvent struct {
 
 func NewOrgIAMPolicyAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	userLoginMustBeDomain bool,
 ) *OrgIAMPolicyAddedEvent {
 	return &OrgIAMPolicyAddedEvent{
 		OrgIAMPolicyAddedEvent: *policy.NewOrgIAMPolicyAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				OrgIAMPolicyAddedEventType),
 			userLoginMustBeDomain,
 		),
 	}
@@ -44,10 +48,14 @@ type OrgIAMPolicyChangedEvent struct {
 
 func NewOrgIAMPolicyChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	changes []policy.OrgIAMPolicyChanges,
 ) (*OrgIAMPolicyChangedEvent, error) {
 	changedEvent, err := policy.NewOrgIAMPolicyChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, OrgIAMPolicyChangedEventType),
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OrgIAMPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {

@@ -2,12 +2,13 @@ package command
 
 import (
 	"context"
+	"reflect"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/usergrant"
-	"reflect"
 )
 
 func (r *CommandSide) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {
@@ -15,6 +16,8 @@ func (r *CommandSide) AddUserGrant(ctx context.Context, usergrant *domain.UserGr
 	if err != nil {
 		return nil, err
 	}
+	// events, err := r.eventstore.PushEvents(ctx, userGrantAgg.)
+
 	err = r.eventstore.PushAggregate(ctx, addedUserGrant, userGrantAgg)
 	if err != nil {
 		return nil, err
@@ -23,40 +26,41 @@ func (r *CommandSide) AddUserGrant(ctx context.Context, usergrant *domain.UserGr
 	return userGrantWriteModelToUserGrant(addedUserGrant), nil
 }
 
-func (r *CommandSide) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (_ *usergrant.Aggregate, _ *UserGrantWriteModel, err error) {
+func (r *CommandSide) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (_ *UserGrantWriteModel, err error) {
 	err = checkExplicitProjectPermission(ctx, userGrant.ProjectGrantID, userGrant.ProjectID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if !userGrant.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.UserGrant.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.UserGrant.Invalid")
 	}
 	err = r.checkUserExists(ctx, userGrant.UserID, "")
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	err = r.checkProjectExists(ctx, userGrant.ProjectID, resourceOwner)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	userGrant.AggregateID, err = r.idGenerator.Next()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	addedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, resourceOwner)
-	userGrantAgg := UserGrantAggregateFromWriteModel(&addedUserGrant.WriteModel)
 
-	userGrantAgg.PushEvents(
-		usergrant.NewUserGrantAddedEvent(
-			ctx,
-			resourceOwner,
-			userGrant.UserID,
-			userGrant.ProjectID,
-			userGrant.ProjectGrantID,
-			userGrant.RoleKeys,
-		),
-	)
-	return userGrantAgg, addedUserGrant, nil
+	return NewUserGrantWriteModel(userGrant.AggregateID, resourceOwner), nil
+	// userGrantAgg := UserGrantAggregateFromWriteModel(&addedUserGrant.WriteModel)
+
+	// userGrantAgg.PushEvents(
+	// 	usergrant.NewUserGrantAddedEvent(
+	// 		ctx,
+	// 		resourceOwner,
+	// 		userGrant.UserID,
+	// 		userGrant.ProjectID,
+	// 		userGrant.ProjectGrantID,
+	// 		userGrant.RoleKeys,
+	// 	),
+	// )
+	// return userGrantAgg, addedUserGrant, nil
 }
 
 func (r *CommandSide) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {

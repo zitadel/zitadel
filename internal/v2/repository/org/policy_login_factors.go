@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -22,11 +23,15 @@ type LoginPolicySecondFactorAddedEvent struct {
 
 func NewLoginPolicySecondFactorAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mfaType domain.SecondFactorType,
 ) *LoginPolicySecondFactorAddedEvent {
 	return &LoginPolicySecondFactorAddedEvent{
 		SecondFactorAddedEvent: *policy.NewSecondFactorAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicySecondFactorAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicySecondFactorAddedEventType),
 			mfaType),
 	}
 }
@@ -48,12 +53,16 @@ type LoginPolicySecondFactorRemovedEvent struct {
 
 func NewLoginPolicySecondFactorRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mfaType domain.SecondFactorType,
 ) *LoginPolicySecondFactorRemovedEvent {
 
 	return &LoginPolicySecondFactorRemovedEvent{
 		SecondFactorRemovedEvent: *policy.NewSecondFactorRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicySecondFactorRemovedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicySecondFactorRemovedEventType),
 			mfaType),
 	}
 }
@@ -75,11 +84,15 @@ type LoginPolicyMultiFactorAddedEvent struct {
 
 func NewLoginPolicyMultiFactorAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mfaType domain.MultiFactorType,
 ) *LoginPolicyMultiFactorAddedEvent {
 	return &LoginPolicyMultiFactorAddedEvent{
 		MultiFactorAddedEvent: *policy.NewMultiFactorAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyMultiFactorAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicyMultiFactorAddedEventType),
 			mfaType),
 	}
 }
@@ -101,12 +114,16 @@ type LoginPolicyMultiFactorRemovedEvent struct {
 
 func NewLoginPolicyMultiFactorRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mfaType domain.MultiFactorType,
 ) *LoginPolicyMultiFactorRemovedEvent {
 
 	return &LoginPolicyMultiFactorRemovedEvent{
 		MultiFactorRemovedEvent: *policy.NewMultiFactorRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyMultiFactorRemovedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicyMultiFactorRemovedEventType),
 			mfaType),
 	}
 }

@@ -2,11 +2,12 @@ package command
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
-	"time"
 )
 
 type HumanPhoneWriteModel struct {
@@ -29,10 +30,6 @@ func NewHumanPhoneWriteModel(userID, resourceOwner string) *HumanPhoneWriteModel
 			ResourceOwner: resourceOwner,
 		},
 	}
-}
-
-func (wm *HumanPhoneWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanPhoneWriteModel) Reduce() error {
@@ -77,10 +74,11 @@ func (wm *HumanPhoneWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *HumanPhoneWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	phone string,
 ) (*user.HumanPhoneChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := user.NewHumanPhoneChangedEvent(ctx)
+	changedEvent := user.NewHumanPhoneChangedEvent(ctx, aggregate)
 	if wm.Phone != phone {
 		hasChanged = true
 		changedEvent.PhoneNumber = phone

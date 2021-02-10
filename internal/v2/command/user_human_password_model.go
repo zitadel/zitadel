@@ -1,11 +1,12 @@
 package command
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
-	"time"
 )
 
 type HumanPasswordWriteModel struct {
@@ -28,10 +29,6 @@ func NewHumanPasswordWriteModel(userID, resourceOwner string) *HumanPasswordWrit
 			ResourceOwner: resourceOwner,
 		},
 	}
-}
-
-func (wm *HumanPasswordWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanPasswordWriteModel) Reduce() error {

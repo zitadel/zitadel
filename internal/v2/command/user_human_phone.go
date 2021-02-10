@@ -2,9 +2,11 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
@@ -22,24 +24,30 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-aM9cs", "Errors.User.Phone.NotFound")
 	}
-	changedEvent, hasChanged := existingPhone.NewChangedEvent(ctx, phone.PhoneNumber)
+
+	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
+	changedEvent, hasChanged := existingPhone.NewChangedEvent(ctx, userAgg, phone.PhoneNumber)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-wF94r", "Errors.User.Phone.NotChanged")
 	}
-	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
-	userAgg.PushEvents(changedEvent)
+
+	events := []eventstore.EventPusher{changedEvent}
 
 	if phone.IsPhoneVerified {
-		userAgg.PushEvents(user.NewHumanPhoneVerifiedEvent(ctx))
+		events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 	} else {
 		phoneCode, err := domain.NewPhoneCode(r.phoneVerificationCode)
 		if err != nil {
 			return nil, err
 		}
-		userAgg.PushEvents(user.NewHumanPhoneCodeAddedEvent(ctx, phoneCode.Code, phoneCode.Expiry))
+		events = append(events, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
 	}
 
-	err = r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPhone, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,22 +72,14 @@ func (r *CommandSide) VerifyHumanPhone(ctx context.Context, userID, code, resour
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.emailVerificationCode)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.phoneVerificationCode)
 	if err == nil {
-		userAgg.PushEvents(user.NewHumanPhoneVerifiedEvent(ctx))
-		return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+		_, err = r.eventstore.PushEvents(ctx, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
+		return err
 	}
-	userAgg.PushEvents(user.NewHumanPhoneVerificationFailedEvent(ctx))
-	err = r.eventstore.PushAggregate(ctx, existingCode, userAgg)
+	_, err = r.eventstore.PushEvents(ctx, user.NewHumanPhoneVerificationFailedEvent(ctx, userAgg))
 
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.emailVerificationCode)
-	if err == nil {
-		userAgg.PushEvents(user.NewHumanEmailVerifiedEvent(ctx))
-		return r.eventstore.PushAggregate(ctx, existingCode, userAgg)
-	}
-	userAgg.PushEvents(user.NewHumanEmailVerificationFailedEvent(ctx))
-	err = r.eventstore.PushAggregate(ctx, existingCode, userAgg)
-	logging.LogWithFields("COMMAND-5M9ds", "userID", userAgg.ID()).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
+	logging.LogWithFields("COMMAND-5M9ds", "userID", userAgg.ID).OnError(err).Error("NewHumanPhoneVerificationFailedEvent push failed")
 	return caos_errs.ThrowInvalidArgument(err, "COMMAND-sM0cs", "Errors.User.Code.Invalid")
 }
 
@@ -92,19 +92,23 @@ func (r *CommandSide) CreateHumanPhoneVerificationCode(ctx context.Context, user
 	if err != nil {
 		return err
 	}
+
+	//TODO: code like the following if is written many times find way to simplify
 	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-2b7Hf", "Errors.User.Phone.NotFound")
 	}
 	if existingPhone.IsPhoneVerified {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sf", "Errors.User.Phone.AlreadyVerified")
 	}
-	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
+
 	phoneCode, err := domain.NewPhoneCode(r.phoneVerificationCode)
 	if err != nil {
 		return err
 	}
-	userAgg.PushEvents(user.NewHumanPhoneCodeAddedEvent(ctx, phoneCode.Code, phoneCode.Expiry))
-	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
+
+	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
+	_, err = r.eventstore.PushEvents(ctx, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
+	return err
 }
 
 func (r *CommandSide) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
@@ -115,9 +119,10 @@ func (r *CommandSide) HumanPhoneVerificationCodeSent(ctx context.Context, orgID,
 	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-66n8J", "Errors.User.Phone.NotFound")
 	}
+
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
-	userAgg.PushEvents(user.NewHumanPhoneCodeSentEvent(ctx))
-	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
+	_, err = r.eventstore.PushEvents(ctx, user.NewHumanPhoneCodeSentEvent(ctx, userAgg))
+	return err
 }
 
 func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID, resourceOwner string) error {
@@ -132,11 +137,10 @@ func (r *CommandSide) RemoveHumanPhone(ctx context.Context, userID, resourceOwne
 	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-p6rsc", "Errors.User.Phone.NotFound")
 	}
+
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
-	userAgg.PushEvents(
-		user.NewHumanPhoneRemovedEvent(ctx),
-	)
-	return r.eventstore.PushAggregate(ctx, existingPhone, userAgg)
+	_, err = r.eventstore.PushEvents(ctx, user.NewHumanPhoneRemovedEvent(ctx, userAgg))
+	return err
 }
 
 func (r *CommandSide) phoneWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPhoneWriteModel, err error) {

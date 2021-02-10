@@ -25,10 +25,6 @@ func NewUserGrantWriteModel(userGrantID string, resourceOwner string) *UserGrant
 	}
 }
 
-func (wm *UserGrantWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *UserGrantWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {

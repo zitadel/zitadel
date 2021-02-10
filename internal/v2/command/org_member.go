@@ -6,6 +6,7 @@ import (
 
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/org"
@@ -27,24 +28,22 @@ func (r *CommandSide) AddOrgMember(ctx context.Context, member *domain.Member) (
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
-func (r *CommandSide) addOrgMember(ctx context.Context, orgAgg *org.Aggregate, addedMember *OrgMemberWriteModel, member *domain.Member) error {
+func (r *CommandSide) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregate, addedMember *OrgMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
-		return caos_errs.ThrowPreconditionFailed(nil, "Org-W8m4l", "Errors.Org.MemberInvalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-W8m4l", "Errors.Org.MemberInvalid")
 	}
 
 	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if addedMember.State == domain.MemberStateActive {
-		return errors.ThrowAlreadyExists(nil, "Org-PtXi1", "Errors.Org.Member.AlreadyExists")
+		return nil, errors.ThrowAlreadyExists(nil, "Org-PtXi1", "Errors.Org.Member.AlreadyExists")
 	}
 
-	orgAgg.PushEvents(org.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
-
-	return nil
+	return org.NewMemberAddedEvent(ctx, orgAgg, member.UserID, member.Roles...), nil
 }
 
 //ChangeOrgMember updates an existing member

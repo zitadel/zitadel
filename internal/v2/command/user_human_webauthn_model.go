@@ -22,13 +22,13 @@ type HumanWebAuthNWriteModel struct {
 	State domain.MFAState
 }
 
-func NewHumanWebAuthNWriteModel(userID, wbAuthNTokenID, resourceOwner string) *HumanWebAuthNWriteModel {
+func NewHumanWebAuthNWriteModel(userID, webAuthNTokenID, resourceOwner string) *HumanWebAuthNWriteModel {
 	return &HumanWebAuthNWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
-		WebauthNTokenID: wbAuthNTokenID,
+		WebauthNTokenID: webAuthNTokenID,
 	}
 }
 
@@ -124,7 +124,7 @@ func (wm *HumanU2FTokensReadModel) Reduce() error {
 			token := &HumanWebAuthNWriteModel{}
 			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
 			token.WriteModel = eventstore.WriteModel{
-				AggregateID: e.AggregateID(),
+				AggregateID: e.Aggregate().ID,
 			}
 			replaced := false
 			for i, existingTokens := range wm.WebAuthNTokens {
@@ -204,7 +204,7 @@ func (wm *HumanPasswordlessTokensReadModel) Reduce() error {
 			token := &HumanWebAuthNWriteModel{}
 			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
 			token.WriteModel = eventstore.WriteModel{
-				AggregateID: e.AggregateID(),
+				AggregateID: e.Aggregate().ID,
 			}
 			replaced := false
 			for i, existingTokens := range wm.WebAuthNTokens {

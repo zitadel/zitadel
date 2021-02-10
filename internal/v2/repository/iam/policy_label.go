@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
@@ -18,12 +19,16 @@ type LabelPolicyAddedEvent struct {
 
 func NewLabelPolicyAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	primaryColor,
 	secondaryColor string,
 ) *LabelPolicyAddedEvent {
 	return &LabelPolicyAddedEvent{
 		LabelPolicyAddedEvent: *policy.NewLabelPolicyAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, LabelPolicyAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LabelPolicyAddedEventType),
 			primaryColor,
 			secondaryColor),
 	}
@@ -44,10 +49,14 @@ type LabelPolicyChangedEvent struct {
 
 func NewLabelPolicyChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	changes []policy.LabelPolicyChanges,
 ) (*LabelPolicyChangedEvent, error) {
 	changedEvent, err := policy.NewLabelPolicyChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, LabelPolicyChangedEventType),
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			LabelPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {

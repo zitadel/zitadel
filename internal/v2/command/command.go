@@ -114,3 +114,11 @@ func (r *CommandSide) getIAMWriteModel(ctx context.Context) (_ *IAMWriteModel, e
 
 	return writeModel, nil
 }
+
+func AppendAndReduce(object interface {
+	AppendEvents(...eventstore.EventReader)
+	Reduce() error
+}, events ...eventstore.EventReader) error {
+	object.AppendEvents(events...)
+	return object.Reduce()
+}

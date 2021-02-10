@@ -25,18 +25,6 @@ func NewIAMWriteModel() *IAMWriteModel {
 	}
 }
 
-func (wm *IAMWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-	//for _, event := range events {
-	//	switch e := event.(type) {
-	//	case *iam.LabelPolicyAddedEvent:
-	//		wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyAddedEvent)
-	//	case *iam.LabelPolicyChangedEvent:
-	//		wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyChangedEvent)
-	//	}
-	//}
-}
-
 func (wm *IAMWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {

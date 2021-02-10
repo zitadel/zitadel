@@ -23,10 +23,6 @@ func NewHumanOTPWriteModel(userID, resourceOwner string) *HumanOTPWriteModel {
 	}
 }
 
-func (wm *HumanOTPWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *HumanOTPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {

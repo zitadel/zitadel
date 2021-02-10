@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 
 	"github.com/caos/logging"
@@ -81,6 +82,30 @@ type OIDCApp struct {
 	AuthMethodType         string
 	PostLogoutRedirectUris []string
 	DevMode                bool
+}
+
+func (cs *CommandSide) setupStep1(ctx context.Context, step1 *Step1) error {
+	iamWriteModel := NewIAMWriteModel()
+	iamAgg := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
+	//create default login policy
+	err := cs.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(),
+		&domain.LoginPolicy{
+			AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
+			AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
+			AllowExternalIDP:      step1.DefaultLoginPolicy.AllowExternalIdp,
+		})
+	if err != nil {
+		return err
+	}
+	logging.Log("SETUP-sd2hj").Info("default login policy set up")
+
+	events := []eventstore.EventPusher{}
+
+	//create org
+	for _, org := range step1.Orgs {
+		orgAggregate
+	}
+
 }
 
 func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {

@@ -45,15 +45,19 @@ func (e *ProjectAddedEvent) Data() interface{} {
 }
 
 func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.ResourceOwner())}
+	return []*eventstore.EventUniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
-func NewProjectAddedEvent(ctx context.Context, name, resourceOwner string) *ProjectAddedEvent {
+func NewProjectAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	name string,
+) *ProjectAddedEvent {
 	return &ProjectAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
+		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ProjectAddedType,
-			resourceOwner,
 		),
 		Name: name,
 	}
@@ -90,13 +94,16 @@ func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 
 func NewProjectChangeEvent(
 	ctx context.Context,
-	changes []ProjectChanges) (*ProjectChangeEvent, error) {
+	aggregate *eventstore.Aggregate,
+	changes []ProjectChanges,
+) (*ProjectChangeEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-mV9xc", "Errors.NoChangesFound")
 	}
 	changeEvent := &ProjectChangeEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ProjectChangedType,
 		),
 	}
@@ -151,10 +158,11 @@ func (e *ProjectDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func NewProjectDeactivatedEvent(ctx context.Context) *ProjectDeactivatedEvent {
+func NewProjectDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *ProjectDeactivatedEvent {
 	return &ProjectDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ProjectDeactivatedType,
 		),
 	}
@@ -178,10 +186,11 @@ func (e *ProjectReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func NewProjectReactivatedEvent(ctx context.Context) *ProjectReactivatedEvent {
+func NewProjectReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *ProjectReactivatedEvent {
 	return &ProjectReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ProjectReactivatedType,
 		),
 	}
@@ -204,15 +213,19 @@ func (e *ProjectRemovedEvent) Data() interface{} {
 }
 
 func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.ResourceOwner())}
+	return []*eventstore.EventUniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
-func NewProjectRemovedEvent(ctx context.Context, name, resourceOwner string) *ProjectRemovedEvent {
+func NewProjectRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	name string,
+) *ProjectRemovedEvent {
 	return &ProjectRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
+		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ProjectRemovedType,
-			resourceOwner,
 		),
 		Name: name,
 	}

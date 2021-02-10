@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/project"
@@ -23,10 +24,6 @@ func NewProjectWriteModel(projectID string, resourceOwner string) *ProjectWriteM
 			ResourceOwner: resourceOwner,
 		},
 	}
-}
-
-func (wm *ProjectWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *ProjectWriteModel) Reduce() error {
