@@ -215,6 +215,7 @@ jobs:
       - name: Workaround for exe
         run: |
           mv ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64 ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
+          find ${ARTIFACTS_FOLDER}
 
       - name: Semantic Release
         id: semantic
