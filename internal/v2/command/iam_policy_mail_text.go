@@ -26,7 +26,7 @@ func (r *CommandSide) AddDefaultMailText(ctx context.Context, policy *domain.Mai
 
 func (r *CommandSide) addDefaultMailText(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMMailTextWriteModel, mailText *domain.MailText) error {
 	if !mailText.IsValid() {
-		return caos_errs.ThrowAlreadyExists(nil, "IAM-3n8fs", "Errors.IAM.MailText.Invalid")
+		return caos_errs.ThrowPreconditionFailed(nil, "IAM-3n8fs", "Errors.IAM.MailText.Invalid")
 	}
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
