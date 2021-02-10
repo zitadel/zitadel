@@ -133,7 +133,7 @@ Errors:
         NotExisting: Multifaktor existiert nicht
         Unspecified: Multifaktor ungültig
     MailTemplate:
-      NotFound: Default Mail Template konnte nicht gefunden
+      NotFound: Default Mail Template nicht gefunden
       NotChanged: Default Mail Template wurde nicht verändert
       AlreadyExists: Default Mail Template existiert bereits
       Invalid: Default Mail Template ist ungültig
