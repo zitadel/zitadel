@@ -72,6 +72,7 @@ func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *ProjectWriteModel) NewChangedEvent(
 	ctx context.Context,
+	resourceOwner,
 	name string,
 	projectRoleAssertion,
 	projectRoleCheck bool,
@@ -79,7 +80,9 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	changes := make([]project.ProjectChanges, 0)
 	var err error
 
+	oldName := ""
 	if wm.Name != name {
+		oldName = wm.Name
 		changes = append(changes, project.ChangeName(name))
 	}
 	if wm.ProjectRoleAssertion != projectRoleAssertion {
@@ -91,7 +94,7 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := project.NewProjectChangeEvent(ctx, changes)
+	changeEvent, err := project.NewProjectChangeEvent(ctx, resourceOwner, oldName, changes)
 	if err != nil {
 		return nil, false, err
 	}

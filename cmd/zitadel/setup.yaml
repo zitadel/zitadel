@@ -179,3 +179,5 @@ SetUp:
         Greeting: Hello {{.FirstName}} {{.LastName}},
         Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.Username}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
         ButtonText: Login
+  Step11:
+    MigrateV1EventstoreToV2: true

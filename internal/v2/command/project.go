@@ -84,7 +84,7 @@ func (r *CommandSide) ChangeProject(ctx context.Context, projectChange *domain.P
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
-	changedEvent, hasChanged, err := existingProject.NewChangedEvent(ctx, projectChange.Name, projectChange.ProjectRoleAssertion, projectChange.ProjectRoleCheck)
+	changedEvent, hasChanged, err := existingProject.NewChangedEvent(ctx, existingProject.ResourceOwner, projectChange.Name, projectChange.ProjectRoleAssertion, projectChange.ProjectRoleCheck)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (r *CommandSide) ReactivateProject(ctx context.Context, projectID string, r
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	projectAgg.PushEvents(project.NewProjectDeactivatedEvent(ctx))
+	projectAgg.PushEvents(project.NewProjectReactivatedEvent(ctx))
 
 	return r.eventstore.PushAggregate(ctx, existingProject, projectAgg)
 }

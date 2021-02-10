@@ -70,7 +70,8 @@ func OrgAddedEventMapper(event *repository.Event) (eventstore.EventReader, error
 type OrgChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name string `json:"name,omitempty"`
+	Name    string `json:"name,omitempty"`
+	oldName string `json:"-"`
 }
 
 func (e *OrgChangedEvent) Data() interface{} {
@@ -78,16 +79,20 @@ func (e *OrgChangedEvent) Data() interface{} {
 }
 
 func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{
+		NewRemoveOrgDomainUniqueConstraint(e.oldName),
+		NewAddOrgNameUniqueConstraint(e.Name),
+	}
 }
 
-func NewOrgChangedEvent(ctx context.Context, name string) *OrgChangedEvent {
+func NewOrgChangedEvent(ctx context.Context, oldName, newName string) *OrgChangedEvent {
 	return &OrgChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			OrgChangedEventType,
 		),
-		Name: name,
+		Name:    newName,
+		oldName: oldName,
 	}
 }
 

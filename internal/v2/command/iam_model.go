@@ -27,14 +27,6 @@ func NewIAMWriteModel() *IAMWriteModel {
 
 func (wm *IAMWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	wm.WriteModel.AppendEvents(events...)
-	//for _, event := range events {
-	//	switch e := event.(type) {
-	//	case *iam.LabelPolicyAddedEvent:
-	//		wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyAddedEvent)
-	//	case *iam.LabelPolicyChangedEvent:
-	//		wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyChangedEvent)
-	//	}
-	//}
 }
 
 func (wm *IAMWriteModel) Reduce() error {
@@ -60,17 +52,6 @@ func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		ResourceOwner(wm.ResourceOwner)
 }
-
-//
-//func (wm *IAMLabelPolicyWriteModel) HasChanged(primaryColor, secondaryColor string) bool {
-//	if primaryColor != "" && wm.PrimaryColor != primaryColor {
-//		return true
-//	}
-//	if secondaryColor != "" && wm.SecondaryColor != secondaryColor {
-//		return true
-//	}
-//	return false
-//}
 
 func IAMAggregateFromWriteModel(wm *eventstore.WriteModel) *iam.Aggregate {
 	return &iam.Aggregate{

@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/project"
-	"github.com/caos/zitadel/internal/v2/repository/usergrant"
 	"reflect"
 )
 
@@ -123,7 +122,7 @@ func (r *CommandSide) removeRoleFromProjectGrant(ctx context.Context, projectAgg
 		)
 	} else {
 		projectAgg.PushEvents(
-			usergrant.NewUserGrantCascadeChangedEvent(ctx, existingProjectGrant.RoleKeys),
+			project.NewGrantCascadeChangedEvent(ctx, projectGrantID, existingProjectGrant.RoleKeys),
 		)
 	}
 

@@ -31,7 +31,7 @@ func NewLoginPolicySecondFactorAddedEvent(
 	}
 }
 
-func SecondFactorAddedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SecondFactorAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.SecondFactorAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func NewLoginPolicySecondFactorRemovedEvent(
 	}
 }
 
-func SecondFactorRemovedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.SecondFactorRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func NewLoginPolicyMultiFactorAddedEvent(
 	}
 }
 
-func MultiFactorAddedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MultiFactorAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.MultiFactorAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ func NewLoginPolicyMultiFactorRemovedEvent(
 	}
 }
 
-func MultiFactorRemovedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MultiFactorRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.MultiFactorRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

@@ -78,6 +78,7 @@ type IDPConfigChangedEvent struct {
 	ConfigID    string                       `json:"idpConfigId"`
 	Name        *string                      `json:"name,omitempty"`
 	StylingType *domain.IDPConfigStylingType `json:"stylingType,omitempty"`
+	oldName     string                       `json:"-"`
 }
 
 func (e *IDPConfigChangedEvent) Data() interface{} {
@@ -85,12 +86,19 @@ func (e *IDPConfigChangedEvent) Data() interface{} {
 }
 
 func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	if e.oldName == "" {
+		return nil
+	}
+	return []*eventstore.EventUniqueConstraint{
+		NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.ResourceOwner()),
+		NewAddIDPConfigNameUniqueConstraint(*e.Name, e.ResourceOwner()),
+	}
 }
 
 func NewIDPConfigChangedEvent(
 	base *eventstore.BaseEvent,
-	configID string,
+	configID,
+	oldName string,
 	changes []IDPConfigChanges,
 ) (*IDPConfigChangedEvent, error) {
 	if len(changes) == 0 {
@@ -99,6 +107,7 @@ func NewIDPConfigChangedEvent(
 	changeEvent := &IDPConfigChangedEvent{
 		BaseEvent: *base,
 		ConfigID:  configID,
+		oldName:   oldName,
 	}
 	for _, change := range changes {
 		change(changeEvent)
