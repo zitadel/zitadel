@@ -8,8 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
-func (r *CommandSide) AddPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	addedPolicy := NewOrgPasswordAgePolicyWriteModel(policy.AggregateID)
+func (r *CommandSide) AddPasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+	addedPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -29,8 +29,8 @@ func (r *CommandSide) AddPasswordAgePolicy(ctx context.Context, policy *domain.P
 	return writeModelToPasswordAgePolicy(&addedPolicy.PasswordAgePolicyWriteModel), nil
 }
 
-func (r *CommandSide) ChangePasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	existingPolicy := NewOrgPasswordAgePolicyWriteModel(policy.AggregateID)
+func (r *CommandSide) ChangePasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+	existingPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err

@@ -396,16 +396,6 @@ func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_mod
 	return iam_es_model.MailTemplateViewToModel(template), err
 }
 
-func (repo *IAMRepository) AddDefaultMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
-	template.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.AddMailTemplate(ctx, template)
-}
-
-func (repo *IAMRepository) ChangeDefaultMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
-	template.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.ChangeMailTemplate(ctx, template)
-}
-
 func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestIAMMemberSequence()

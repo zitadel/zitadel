@@ -26,8 +26,6 @@ type IAMRepository interface {
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
-	AddDefaultMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error)
-	ChangeDefaultMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error)
 
 	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
 	GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error)

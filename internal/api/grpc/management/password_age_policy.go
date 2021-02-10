@@ -24,7 +24,7 @@ func (s *Server) GetDefaultPasswordAgePolicy(ctx context.Context, _ *empty.Empty
 }
 
 func (s *Server) CreatePasswordAgePolicy(ctx context.Context, policy *management.PasswordAgePolicyRequest) (*management.PasswordAgePolicy, error) {
-	result, err := s.command.AddPasswordAgePolicy(ctx, passwordAgePolicyRequestToDomain(ctx, policy))
+	result, err := s.command.AddPasswordAgePolicy(ctx, authz.GetCtxData(ctx).OrgID, passwordAgePolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (s *Server) CreatePasswordAgePolicy(ctx context.Context, policy *management
 }
 
 func (s *Server) UpdatePasswordAgePolicy(ctx context.Context, policy *management.PasswordAgePolicyRequest) (*management.PasswordAgePolicy, error) {
-	result, err := s.command.ChangePasswordAgePolicy(ctx, passwordAgePolicyRequestToDomain(ctx, policy))
+	result, err := s.command.ChangePasswordAgePolicy(ctx, authz.GetCtxData(ctx).OrgID, passwordAgePolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}

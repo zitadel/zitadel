@@ -16,9 +16,9 @@ func (s *Server) GetDefaultMailTemplate(ctx context.Context, _ *empty.Empty) (*a
 }
 
 func (s *Server) UpdateDefaultMailTemplate(ctx context.Context, policy *admin.DefaultMailTemplateUpdate) (*admin.DefaultMailTemplate, error) {
-	result, err := s.iam.ChangeDefaultMailTemplate(ctx, templateToModel(policy))
+	result, err := s.command.ChangeDefaultMailTemplate(ctx, templateToDomain(policy))
 	if err != nil {
 		return nil, err
 	}
-	return templateFromModel(result), nil
+	return templateFromDomain(result), nil
 }

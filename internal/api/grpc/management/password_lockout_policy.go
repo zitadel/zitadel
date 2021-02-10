@@ -24,7 +24,7 @@ func (s *Server) GetDefaultPasswordLockoutPolicy(ctx context.Context, _ *empty.E
 }
 
 func (s *Server) CreatePasswordLockoutPolicy(ctx context.Context, policy *management.PasswordLockoutPolicyRequest) (*management.PasswordLockoutPolicy, error) {
-	result, err := s.command.AddPasswordLockoutPolicy(ctx, passwordLockoutPolicyRequestToDomain(ctx, policy))
+	result, err := s.command.AddPasswordLockoutPolicy(ctx, authz.GetCtxData(ctx).OrgID, passwordLockoutPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (s *Server) CreatePasswordLockoutPolicy(ctx context.Context, policy *manage
 }
 
 func (s *Server) UpdatePasswordLockoutPolicy(ctx context.Context, policy *management.PasswordLockoutPolicyRequest) (*management.PasswordLockoutPolicy, error) {
-	result, err := s.command.ChangePasswordLockoutPolicy(ctx, passwordLockoutPolicyRequestToDomain(ctx, policy))
+	result, err := s.command.ChangePasswordLockoutPolicy(ctx, authz.GetCtxData(ctx).OrgID, passwordLockoutPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}

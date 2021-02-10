@@ -738,23 +738,6 @@ func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.Mail
 	return iam_es_model.MailTemplateViewToModel(template), err
 }
 
-func (repo *OrgRepository) AddMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
-	template.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddMailTemplate(ctx, template)
-}
-
-func (repo *OrgRepository) ChangeMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
-	template.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangeMailTemplate(ctx, template)
-}
-
-func (repo *OrgRepository) RemoveMailTemplate(ctx context.Context) error {
-	template := &iam_model.MailTemplate{ObjectRoot: models.ObjectRoot{
-		AggregateID: authz.GetCtxData(ctx).OrgID,
-	}}
-	return repo.OrgEventstore.RemoveMailTemplate(ctx, template)
-}
-
 func (repo *OrgRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
 	texts, err := repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {

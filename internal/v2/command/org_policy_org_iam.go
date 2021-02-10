@@ -8,8 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
-func (r *CommandSide) AddOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
-	addedPolicy := NewORGOrgIAMPolicyWriteModel(policy.AggregateID)
+func (r *CommandSide) AddOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+	addedPolicy := NewORGOrgIAMPolicyWriteModel(resourceOwner)
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
 	err := r.addOrgIAMPolicy(ctx, orgAgg, addedPolicy, policy)
 	if err != nil {
@@ -40,8 +40,8 @@ func (r *CommandSide) addOrgIAMPolicy(ctx context.Context, orgAgg *org.Aggregate
 	return nil
 }
 
-func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
-	existingPolicy, err := r.orgIAMPolicyWriteModelByID(ctx, policy.AggregateID)
+func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+	existingPolicy, err := r.orgIAMPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

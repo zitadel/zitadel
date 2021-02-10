@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
-func (r *CommandSide) AddLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
-	addedPolicy := NewOrgLoginPolicyWriteModel(policy.AggregateID)
+func (r *CommandSide) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	addedPolicy := NewOrgLoginPolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -31,8 +31,8 @@ func (r *CommandSide) AddLoginPolicy(ctx context.Context, policy *domain.LoginPo
 	return writeModelToLoginPolicy(&addedPolicy.LoginPolicyWriteModel), nil
 }
 
-func (r *CommandSide) ChangeLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
-	existingPolicy := NewOrgLoginPolicyWriteModel(policy.AggregateID)
+func (r *CommandSide) ChangeLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	existingPolicy := NewOrgLoginPolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
@@ -71,8 +71,8 @@ func (r *CommandSide) RemoveLoginPolicy(ctx context.Context, orgID string) error
 	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
 }
 
-func (r *CommandSide) AddIDPProviderToLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
-	idpModel := NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
+func (r *CommandSide) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
+	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
@@ -91,8 +91,8 @@ func (r *CommandSide) AddIDPProviderToLoginPolicy(ctx context.Context, idpProvid
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (r *CommandSide) RemoveIDPProviderFromLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) error {
-	idpModel := NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpProvider.IDPConfigID)
+func (r *CommandSide) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) error {
+	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return err

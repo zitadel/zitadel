@@ -32,5 +32,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(IDPOIDCConfigChangedEventType, IDPOIDCConfigChangedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyIDPProviderAddedEventType, IdentityProviderAddedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyIDPProviderRemovedEventType, IdentityProviderRemovedEventMapper).
-		RegisterFilterEventMapper(LoginPolicyIDPProviderCascadeRemovedEventType, IdentityProviderCascadeRemovedEventMapper)
+		RegisterFilterEventMapper(LoginPolicyIDPProviderCascadeRemovedEventType, IdentityProviderCascadeRemovedEventMapper).
+		RegisterFilterEventMapper(MailTemplateAddedEventType, MailTemplateAddedEventMapper).
+		RegisterFilterEventMapper(MailTemplateChangedEventType, MailTemplateChangedEventMapper).
+		RegisterFilterEventMapper(MailTextAddedEventType, MailTextAddedEventMapper).
+		RegisterFilterEventMapper(MailTextChangedEventType, MailTextChangedEventMapper)
 }
