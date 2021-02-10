@@ -257,7 +257,11 @@ jobs:
       - name: Set output
         id: branch
         run: |
-          echo ::set-output name=short_ref::$(echo ${GITHUB_REF#refs/heads/} | tr '/' '_')
+          export BRANCH=${GITHUB_REF#refs/heads/}
+          echo ${BRANCH}
+          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
+          echo ${BRANCHTRANSLATED}
+          echo ::set-output name=short_ref::${BRANCHTRANSLATED}
       - name: Docker Tag Version
         run: |
           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.branch.outputs.short_ref }}
