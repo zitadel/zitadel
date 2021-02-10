@@ -138,7 +138,7 @@ Errors:
       AlreadyExists: Default Mail Template existiert bereits
       Invalid: Default Mail Template ist ungültig
     MailText:
-      NotFound: Default Mail Text konnte nicht gefunden
+      NotFound: Default Mail Text konnte nicht gefunden werden
       NotChanged: Default Mail Text wurde nicht verändert
       AlreadyExists: Default Mail Text existiert bereits
       Invalid: Default Mail Text ist ungültig
