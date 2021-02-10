@@ -34,7 +34,7 @@ func (r *CommandSide) AddMailTemplate(ctx context.Context, resourceOwner string,
 
 func (r *CommandSide) ChangeMailTemplate(ctx context.Context, resourceOwner string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
 	if !policy.IsValid() {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-9f9ds", "Errors.Org.MailTemplate.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-9f9ds", "Errors.Org.MailTemplate.Invalid")
 	}
 	existingPolicy := NewOrgMailTemplateWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
