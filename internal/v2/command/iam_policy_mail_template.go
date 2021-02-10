@@ -26,7 +26,7 @@ func (r *CommandSide) AddDefaultMailTemplate(ctx context.Context, policy *domain
 
 func (r *CommandSide) addDefaultMailTemplate(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMMailTemplateWriteModel, policy *domain.MailTemplate) error {
 	if !policy.IsValid() {
-		return caos_errs.ThrowAlreadyExists(nil, "IAM-fm9sd", "Errors.IAM.MailTemplate.Invalid")
+		return caos_errs.ThrowPreconditionFailed(nil, "IAM-fm9sd", "Errors.IAM.MailTemplate.Invalid")
 	}
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
