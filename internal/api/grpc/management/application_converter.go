@@ -42,6 +42,11 @@ func appConfigFromModel(app *proj_model.Application) management.AppConfig {
 			OidcConfig: oidcConfigFromModel(app.OIDCConfig),
 		}
 	}
+	if app.Type == proj_model.AppTypeAPI {
+		return &management.Application_ApiConfig{
+			ApiConfig: apiConfigFromModel(app.APIConfig),
+		}
+	}
 	return nil
 }
 
@@ -64,6 +69,14 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *management.OIDCConfig {
 		IdTokenRoleAssertion:     config.IDTokenRoleAssertion,
 		IdTokenUserinfoAssertion: config.IDTokenUserinfoAssertion,
 		ClockSkew:                durationpb.New(config.ClockSkew),
+	}
+}
+
+func apiConfigFromModel(config *proj_model.APIConfig) *management.APIConfig {
+	return &management.APIConfig{
+		ClientId:       config.ClientID,
+		ClientSecret:   config.ClientSecretString,
+		AuthMethodType: apiAuthMethodTypeFromModel(config.AuthMethodType),
 	}
 }
 
@@ -122,6 +135,19 @@ func oidcAppCreateToModel(app *management.OIDCApplicationCreate) *proj_model.App
 	}
 }
 
+func apiAppCreateToModel(app *management.APIApplicationCreate) *proj_model.Application {
+	return &proj_model.Application{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: app.ProjectId,
+		},
+		Name: app.Name,
+		Type: proj_model.AppTypeAPI,
+		APIConfig: &proj_model.APIConfig{
+			AuthMethodType: apiAuthMethodTypeToModel(app.AuthMethodType),
+		},
+	}
+}
+
 func appUpdateToModel(app *management.ApplicationUpdate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
@@ -150,6 +176,16 @@ func oidcConfigUpdateToModel(app *management.OIDCConfigUpdate) *proj_model.OIDCC
 		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
 		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
 		ClockSkew:                app.ClockSkew.AsDuration(),
+	}
+}
+
+func apiConfigUpdateToModel(app *management.APIConfigUpdate) *proj_model.APIConfig {
+	return &proj_model.APIConfig{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: app.ProjectId,
+		},
+		AppID:          app.ApplicationId,
+		AuthMethodType: apiAuthMethodTypeToModel(app.AuthMethodType),
 	}
 }
 
@@ -363,6 +399,17 @@ func oidcAuthMethodTypeToModel(authType management.OIDCAuthMethodType) proj_mode
 	}
 }
 
+func apiAuthMethodTypeToModel(authType management.APIAuthMethodType) proj_model.APIAuthMethodType {
+	switch authType {
+	case management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC:
+		return proj_model.APIAuthMethodTypeBasic
+	case management.APIAuthMethodType_APIAUTHMETHODTYPE_PRIVATE_KEY_JWT:
+		return proj_model.APIAuthMethodTypePrivateKeyJWT
+	default:
+		return proj_model.APIAuthMethodTypeBasic
+	}
+}
+
 func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) management.OIDCAuthMethodType {
 	switch authType {
 	case proj_model.OIDCAuthMethodTypeBasic:
@@ -375,6 +422,17 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) managem
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT
 	default:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
+	}
+}
+
+func apiAuthMethodTypeFromModel(authType proj_model.APIAuthMethodType) management.APIAuthMethodType {
+	switch authType {
+	case proj_model.APIAuthMethodTypeBasic:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
+	case proj_model.APIAuthMethodTypePrivateKeyJWT:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_PRIVATE_KEY_JWT
+	default:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
 	}
 }
 

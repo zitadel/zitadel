@@ -448,8 +448,16 @@ func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_mode
 	return repo.ProjectEvents.ChangeOIDCConfig(ctx, config)
 }
 
+func (repo *ProjectRepo) ChangeAPIConfig(ctx context.Context, config *proj_model.APIConfig) (*proj_model.APIConfig, error) {
+	return repo.ProjectEvents.ChangeAPIConfig(ctx, config)
+}
+
 func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
 	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
+}
+
+func (repo *ProjectRepo) ChangeAPIConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.APIConfig, error) {
+	return repo.ProjectEvents.ChangeAPIConfigSecret(ctx, projectID, appID)
 }
 
 func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (*proj_model.ProjectGrantView, error) {

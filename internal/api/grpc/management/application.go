@@ -31,6 +31,13 @@ func (s *Server) CreateOIDCApplication(ctx context.Context, in *management.OIDCA
 	}
 	return appFromModel(app), nil
 }
+func (s *Server) CreateAPIApplication(ctx context.Context, in *management.APIApplicationCreate) (*management.Application, error) {
+	app, err := s.project.AddApplication(ctx, apiAppCreateToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return appFromModel(app), nil
+}
 func (s *Server) UpdateApplication(ctx context.Context, in *management.ApplicationUpdate) (*management.Application, error) {
 	app, err := s.project.ChangeApplication(ctx, appUpdateToModel(in))
 	if err != nil {
@@ -66,8 +73,24 @@ func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *management
 	return oidcConfigFromModel(config), nil
 }
 
+func (s *Server) UpdateApplicationAPIConfig(ctx context.Context, in *management.APIConfigUpdate) (*management.APIConfig, error) {
+	config, err := s.project.ChangeAPIConfig(ctx, apiConfigUpdateToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return apiConfigFromModel(config), nil
+}
+
 func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *management.ApplicationID) (*management.ClientSecret, error) {
 	config, err := s.project.ChangeOIDConfigSecret(ctx, in.ProjectId, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &management.ClientSecret{ClientSecret: config.ClientSecretString}, nil
+}
+
+func (s *Server) RegenerateAPIClientSecret(ctx context.Context, in *management.ApplicationID) (*management.ClientSecret, error) {
+	config, err := s.project.ChangeAPIConfigSecret(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
 	}

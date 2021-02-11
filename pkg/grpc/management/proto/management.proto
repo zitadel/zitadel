@@ -945,6 +945,18 @@ service ManagementService {
     };
   }
 
+  rpc CreateAPIApplication(APIApplicationCreate) returns (Application) {
+    option (google.api.http) = {
+      post: "/projects/{project_id}/applications/api"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
   rpc UpdateApplication(ApplicationUpdate) returns (Application) {
     option (google.api.http) = {
       put: "/projects/{project_id}/applications/{id}"
@@ -1007,6 +1019,30 @@ service ManagementService {
   rpc RegenerateOIDCClientSecret(ApplicationID) returns (ClientSecret) {
     option (google.api.http) = {
       put: "/projects/{project_id}/applications/{id}/oidcconfig/_changeclientsecret"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc UpdateApplicationAPIConfig(APIConfigUpdate) returns (APIConfig) {
+    option (google.api.http) = {
+      put: "/projects/{project_id}/applications/{application_id}/apiconfig"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc RegenerateAPIClientSecret(ApplicationID) returns (ClientSecret) {
+    option (google.api.http) = {
+      put: "/projects/{project_id}/applications/{id}/apiconfig/_changeclientsecret"
       body: "*"
     };
 
@@ -2685,6 +2721,7 @@ message Application {
   string name = 5;
   oneof app_config {
     OIDCConfig oidc_config = 8;
+    APIConfig api_config = 10;
   }
   uint64 sequence = 9;
 }
@@ -2733,6 +2770,18 @@ message OIDCApplicationCreate {
   google.protobuf.Duration clock_skew = 15 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
+message APIApplicationCreate {
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  APIAuthMethodType auth_method_type = 3;
+}
+
+message APIConfig {
+  string client_id = 1;
+  string client_secret = 2;
+  APIAuthMethodType auth_method_type = 3;
+}
+
 enum OIDCVersion {
   OIDCV1_0 = 0;
 }
@@ -2759,6 +2808,12 @@ message OIDCConfigUpdate {
   google.protobuf.Duration clock_skew = 14 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
+message APIConfigUpdate {
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string application_id = 2 [(validate.rules).string = {min_len: 1}];
+  APIAuthMethodType auth_method_type = 7;
+}
+
 enum OIDCResponseType {
   OIDCRESPONSETYPE_CODE = 0;
   OIDCRESPONSETYPE_ID_TOKEN = 1;
@@ -2782,6 +2837,11 @@ enum OIDCAuthMethodType {
   OIDCAUTHMETHODTYPE_POST = 1;
   OIDCAUTHMETHODTYPE_NONE = 2;
   OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT = 3;
+}
+
+enum APIAuthMethodType {
+  APIAUTHMETHODTYPE_BASIC = 0;
+  APIAUTHMETHODTYPE_PRIVATE_KEY_JWT = 1;
 }
 
 message ClientSecret {

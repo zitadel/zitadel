@@ -165,7 +165,7 @@ func (p *Project) appendChangeOIDCConfigEvent(event *es_models.Event) error {
 	}
 
 	if i, a := GetApplication(p.Applications, config.AppID); a != nil {
-		p.Applications[i].OIDCConfig.setData(event)
+		return p.Applications[i].OIDCConfig.setData(event)
 	}
 	return nil
 }
@@ -177,8 +177,13 @@ func (p *Project) appendAddClientKeyEvent(event *es_models.Event) error {
 		return err
 	}
 
-	if i, a := GetApplication(p.Applications, key.ApplicationID); a != nil && a.OIDCConfig != nil {
-		p.Applications[i].OIDCConfig.ClientKeys = append(p.Applications[i].OIDCConfig.ClientKeys, key)
+	if i, a := GetApplication(p.Applications, key.ApplicationID); a != nil {
+		if a.OIDCConfig != nil {
+			p.Applications[i].OIDCConfig.ClientKeys = append(p.Applications[i].OIDCConfig.ClientKeys, key)
+		}
+		if a.APIConfig != nil {
+			p.Applications[i].APIConfig.ClientKeys = append(p.Applications[i].APIConfig.ClientKeys, key)
+		}
 	}
 	return nil
 }
@@ -189,11 +194,20 @@ func (p *Project) appendRemoveClientKeyEvent(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	if i, a := GetApplication(p.Applications, key.ApplicationID); a != nil && a.OIDCConfig != nil {
-		if j, k := GetClientKey(p.Applications[i].OIDCConfig.ClientKeys, key.KeyID); k != nil {
-			p.Applications[i].OIDCConfig.ClientKeys[j] = p.Applications[i].OIDCConfig.ClientKeys[len(p.Applications[i].OIDCConfig.ClientKeys)-1]
-			p.Applications[i].OIDCConfig.ClientKeys[len(p.Applications[i].OIDCConfig.ClientKeys)-1] = nil
-			p.Applications[i].OIDCConfig.ClientKeys = p.Applications[i].OIDCConfig.ClientKeys[:len(p.Applications[i].OIDCConfig.ClientKeys)-1]
+	if i, a := GetApplication(p.Applications, key.ApplicationID); a != nil {
+		if a.OIDCConfig != nil {
+			if j, k := GetClientKey(p.Applications[i].OIDCConfig.ClientKeys, key.KeyID); k != nil {
+				p.Applications[i].OIDCConfig.ClientKeys[j] = p.Applications[i].OIDCConfig.ClientKeys[len(p.Applications[i].OIDCConfig.ClientKeys)-1]
+				p.Applications[i].OIDCConfig.ClientKeys[len(p.Applications[i].OIDCConfig.ClientKeys)-1] = nil
+				p.Applications[i].OIDCConfig.ClientKeys = p.Applications[i].OIDCConfig.ClientKeys[:len(p.Applications[i].OIDCConfig.ClientKeys)-1]
+			}
+		}
+		if a.APIConfig != nil {
+			if j, k := GetClientKey(p.Applications[i].APIConfig.ClientKeys, key.KeyID); k != nil {
+				p.Applications[i].APIConfig.ClientKeys[j] = p.Applications[i].APIConfig.ClientKeys[len(p.Applications[i].APIConfig.ClientKeys)-1]
+				p.Applications[i].APIConfig.ClientKeys[len(p.Applications[i].APIConfig.ClientKeys)-1] = nil
+				p.Applications[i].APIConfig.ClientKeys = p.Applications[i].APIConfig.ClientKeys[:len(p.Applications[i].APIConfig.ClientKeys)-1]
+			}
 		}
 	}
 	return nil

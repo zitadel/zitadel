@@ -139,6 +139,10 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 		return p.appendAddOIDCConfigEvent(event)
 	case OIDCConfigChanged, OIDCConfigSecretChanged:
 		return p.appendChangeOIDCConfigEvent(event)
+	case APIConfigAdded:
+		return p.appendAddAPIConfigEvent(event)
+	case APIConfigChanged, APIConfigSecretChanged:
+		return p.appendChangeAPIConfigEvent(event)
 	case ClientKeyAdded:
 		return p.appendAddClientKeyEvent(event)
 	case ClientKeyRemoved:

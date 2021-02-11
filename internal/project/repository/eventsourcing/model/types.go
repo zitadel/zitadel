@@ -42,6 +42,10 @@ const (
 	OIDCClientSecretCheckSucceeded models.EventType = "project.application.oidc.secret.check.succeeded"
 	OIDCClientSecretCheckFailed    models.EventType = "project.application.oidc.secret.check.failed"
 
+	APIConfigAdded         models.EventType = "project.application.config.api.added"
+	APIConfigChanged       models.EventType = "project.application.config.api.changed"
+	APIConfigSecretChanged models.EventType = "project.application.config.api.secret.changed"
+
 	ClientKeyAdded   models.EventType = "project.application.oidc.key.added"
 	ClientKeyRemoved models.EventType = "project.application.oidc.key.removed"
 )

@@ -156,14 +156,20 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
-	case es_model.OIDCConfigChanged,
-		es_model.ApplicationChanged:
+	case es_model.APIConfigAdded:
+		a.IsOIDC = false
+		return a.SetData(event)
+	case es_model.ApplicationChanged:
+		return a.SetData(event)
+	case es_model.OIDCConfigChanged:
 		err = a.SetData(event)
 		if err != nil {
 			return err
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
+	case es_model.APIConfigChanged:
+		return a.SetData(event)
 	case es_model.ProjectChanged:
 		return a.SetData(event)
 	case es_model.ApplicationDeactivated:

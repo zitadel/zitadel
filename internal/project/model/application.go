@@ -14,6 +14,7 @@ type Application struct {
 	Name       string
 	Type       AppType
 	OIDCConfig *OIDCConfig
+	APIConfig  *APIConfig
 }
 type ApplicationChanges struct {
 	Changes      []*ApplicationChange
@@ -43,6 +44,7 @@ const (
 	AppTypeUnspecified AppType = iota
 	AppTypeOIDC
 	AppTypeSAML
+	AppTypeAPI
 )
 
 func NewApplication(projectID, appID string) *Application {
@@ -57,6 +59,9 @@ func (a *Application) IsValid(includeConfig bool) bool {
 		return true
 	}
 	if a.Type == AppTypeOIDC && !a.OIDCConfig.IsValid() {
+		return false
+	}
+	if a.Type == AppTypeAPI && !a.APIConfig.IsValid() {
 		return false
 	}
 	return true
