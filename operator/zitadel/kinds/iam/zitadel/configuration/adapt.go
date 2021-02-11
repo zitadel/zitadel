@@ -111,7 +111,7 @@ func AdaptFunc(
 				labels.MustForNameK8SMap(componentLabels, consoleCMName),
 				literalsConsoleCM(
 					getClientID(),
-					desired.DNS,
+					desired.Ingress,
 					k8sClient,
 					namespace,
 					consoleCMName,
@@ -170,7 +170,7 @@ func AdaptFunc(
 				consoleCMName: getHash(
 					literalsConsoleCM(
 						getClientID(),
-						desired.DNS,
+						desired.Ingress,
 						k8sClient,
 						namespace,
 						consoleCMName,

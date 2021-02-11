@@ -1,6 +1,8 @@
 package configuration
 
 import (
+	"testing"
+
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
@@ -8,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"testing"
 )
 
 var (
@@ -56,7 +57,7 @@ var (
 		},
 		DebugMode: false,
 		LogLevel:  "info",
-		DNS: &DNS{
+		Ingress: &Ingress{
 			Domain:    "",
 			TlsSecret: "",
 			Subdomains: &Subdomains{
@@ -113,7 +114,7 @@ var (
 		},
 		DebugMode: true,
 		LogLevel:  "debug",
-		DNS: &DNS{
+		Ingress: &Ingress{
 			Domain:    "domain",
 			TlsSecret: "tls",
 			Subdomains: &Subdomains{
@@ -347,7 +348,7 @@ func TestConfiguration_LiteralsConsoleCM(t *testing.T) {
 	equals := map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\"}"}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
-	literals := literalsConsoleCM(clientID, desiredEmpty.DNS, k8sClient, namespace, cmName)
+	literals := literalsConsoleCM(clientID, desiredEmpty.Ingress, k8sClient, namespace, cmName)
 	assert.EqualValues(t, equals, literals)
 }
 
@@ -370,7 +371,7 @@ func TestConfiguration_LiteralsConsoleCMFull(t *testing.T) {
 	}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
-	literals := literalsConsoleCM(clientID, desiredFull.DNS, k8sClient, namespace, cmName)
+	literals := literalsConsoleCM(clientID, desiredFull.Ingress, k8sClient, namespace, cmName)
 	assert.EqualValues(t, equals, literals)
 }
 
@@ -395,7 +396,7 @@ func TestConfiguration_LiteralsConsoleCMWithCM(t *testing.T) {
 	}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
-	literals := literalsConsoleCM(clientID, desiredFull.DNS, k8sClient, namespace, cmName)
+	literals := literalsConsoleCM(clientID, desiredFull.Ingress, k8sClient, namespace, cmName)
 	assert.EqualValues(t, equals, literals)
 }
 
@@ -420,6 +421,6 @@ func TestConfiguration_LiteralsConsoleCMWithCMFull(t *testing.T) {
 	}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
-	literals := literalsConsoleCM(clientID, desiredFull.DNS, k8sClient, namespace, cmName)
+	literals := literalsConsoleCM(clientID, desiredFull.Ingress, k8sClient, namespace, cmName)
 	assert.EqualValues(t, equals, literals)
 }

@@ -2,10 +2,11 @@ package configuration
 
 import (
 	"encoding/json"
-	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"strconv"
 	"strings"
+
+	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
 const (
@@ -77,14 +78,14 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_LOG_LEVEL"] = desired.LogLevel
 		}
 
-		if desired.DNS != nil {
-			defaultDomain := desired.DNS.Domain
-			accountsDomain := desired.DNS.Subdomains.Accounts + "." + defaultDomain
+		if desired.Ingress != nil {
+			defaultDomain := desired.Ingress.Domain
+			accountsDomain := desired.Ingress.Subdomains.Accounts + "." + defaultDomain
 			accounts := "https://" + accountsDomain
-			issuer := "https://" + desired.DNS.Subdomains.Issuer + "." + defaultDomain
-			oauth := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain + "/oauth/v2"
-			authorize := "https://" + desired.DNS.Subdomains.Accounts + "." + defaultDomain + "/oauth/v2"
-			console := "https://" + desired.DNS.Subdomains.Console + "." + defaultDomain
+			issuer := "https://" + desired.Ingress.Subdomains.Issuer + "." + defaultDomain
+			oauth := "https://" + desired.Ingress.Subdomains.API + "." + defaultDomain + "/oauth/v2"
+			authorize := "https://" + desired.Ingress.Subdomains.Accounts + "." + defaultDomain + "/oauth/v2"
+			console := "https://" + desired.Ingress.Subdomains.Console + "." + defaultDomain
 
 			literalsConfigMap["ZITADEL_ISSUER"] = issuer
 			literalsConfigMap["ZITADEL_ACCOUNTS"] = accounts
@@ -142,7 +143,7 @@ func literalsSecretVars(desired *Configuration) map[string]string {
 
 func literalsConsoleCM(
 	clientID string,
-	dns *DNS,
+	dns *Ingress,
 	k8sClient kubernetes.ClientInt,
 	namespace string,
 	cmName string,

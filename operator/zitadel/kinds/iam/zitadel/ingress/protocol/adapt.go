@@ -16,34 +16,34 @@ func AdaptFunc(
 	monitor mntr.Monitor,
 	componentLabels *labels.Component,
 	namespaceStr string,
-	ingressDefinitionSuffix string,
 	grpcService string,
 	grpcPort uint16,
 	httpService string,
 	httpPort uint16,
 	uiService string,
 	uiPort uint16,
-	dns *configuration.DNS,
+	dns *configuration.Ingress,
 	controllerSpecifics map[string]interface{},
-	queryIngress core.IngressDefinitionQueryFunc,
-	destroyIngress core.IngressDefinitionDestroyFunc,
-
+	hostAdapter core.HostAdapter,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
 	error,
 ) {
+	apiAdapter := hostAdapter(dns.Subdomains.API + "." + dns.Domain)
+	accountsAdapter := hostAdapter(dns.Subdomains.Accounts + "." + dns.Domain)
+	consoleAdapter := hostAdapter(dns.Subdomains.Console + "." + dns.Domain)
+	issuerAdapter := hostAdapter(dns.Subdomains.Issuer + "." + dns.Domain)
+
 	queryGRPC, destroyGRPC, err := grpc.AdaptFunc(
 		monitor,
 		componentLabels,
 		namespaceStr,
-		ingressDefinitionSuffix,
 		grpcService,
 		grpcPort,
-		dns,
 		controllerSpecifics,
-		queryIngress,
-		destroyIngress,
+		dns.TlsSecret,
+		apiAdapter,
 	)
 	if err != nil {
 		return nil, nil, err
@@ -53,13 +53,12 @@ func AdaptFunc(
 		monitor,
 		componentLabels,
 		namespaceStr,
-		ingressDefinitionSuffix,
 		uiService,
 		uiPort,
-		dns,
 		controllerSpecifics,
-		queryIngress,
-		destroyIngress,
+		dns.TlsSecret,
+		consoleAdapter,
+		accountsAdapter,
 	)
 	if err != nil {
 		return nil, nil, err
@@ -69,13 +68,13 @@ func AdaptFunc(
 		monitor,
 		componentLabels,
 		namespaceStr,
-		ingressDefinitionSuffix,
 		httpService,
 		httpPort,
-		dns,
 		controllerSpecifics,
-		queryIngress,
-		destroyIngress,
+		dns.TlsSecret,
+		apiAdapter,
+		accountsAdapter,
+		issuerAdapter,
 	)
 	if err != nil {
 		return nil, nil, err

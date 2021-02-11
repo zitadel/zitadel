@@ -28,8 +28,7 @@ func AdaptFunc(
 	httpPort uint16,
 	uiServiceName string,
 	uiPort uint16,
-	dns *configuration.DNS,
-	spec *Spec,
+	ingress *configuration.Ingress,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -40,21 +39,8 @@ func AdaptFunc(
 	componentLabels := labels.MustForComponent(apiLabels, component)
 	monitor = monitor.WithField("component", component)
 
-	var (
-		queriers            []operator.QueryFunc
-		controller          = "None"
-		controllerSpecifics map[string]interface{}
-	)
-
-	if spec != nil {
-		controller = spec.Controller
-		controllerSpecifics = spec.ControllerSpecifics
-	}
-
 	controllerIngressFunc := func(
-		suffix string,
-		queryIngressFunc core.IngressDefinitionQueryFunc,
-		destroyDestroyFunc core.IngressDefinitionDestroyFunc) (
+		adapter core.HostAdapter) (
 		operator.QueryFunc,
 		operator.DestroyFunc,
 		error,
@@ -63,55 +49,43 @@ func AdaptFunc(
 			monitor,
 			componentLabels,
 			namespaceStr,
-			suffix,
 			grpcServiceName,
 			grpcPort,
 			httpServiceName,
 			httpPort,
 			uiServiceName,
 			uiPort,
-			dns,
-			controllerSpecifics,
-			queryIngressFunc,
-			destroyDestroyFunc,
+			ingress,
+			ingress.ControllerSpecifics,
+			adapter,
 		)
 	}
 
-	ambassadorIngQ, ambassadorIngD, err := controllerIngressFunc("", ambassador.QueryMapping, ambassador.DestroyMapping)
+	ambassadorIngQ, ambassadorIngD, err := controllerIngressFunc(ambassador.Adapt)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	nginxIngQ, nginxIngD, err := controllerIngressFunc("-nginx", nginx.QueryIngress, nginx.DestroyIngress)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	ambassadorQ, ambassadorD, err := ambassador.AdaptFunc(
-		monitor,
-		componentLabels,
-		namespaceStr,
-		dns,
-	)
+	nginxIngQ, nginxIngD, err := controllerIngressFunc(nginx.Adapt)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	destroyers := []operator.DestroyFunc{
 		ambassadorIngD,
-		ambassadorD,
 		nginxIngD,
 	}
 
-	switch controller {
+	var queriers []operator.QueryFunc
+	switch ingress.Controller {
 	case "Ambassador":
-		queriers = append(queriers, ambassadorQ, ambassadorIngQ, operator.DestroyerToQueryFunc(nginxIngD))
+		queriers = append(queriers, ambassadorIngQ, operator.DestroyerToQueryFunc(nginxIngD))
 	case "NGINX":
-		queriers = append(queriers, nginxIngQ, operator.DestroyerToQueryFunc(ambassadorD), operator.DestroyerToQueryFunc(ambassadorIngD))
+		queriers = append(queriers, nginxIngQ, operator.DestroyerToQueryFunc(ambassadorIngD))
 	case "None":
 		queriers = operator.DestroyersToQueryFuncs(destroyers)
 	default:
-		return nil, nil, fmt.Errorf("unknown contoller type %s. possible values: Ambassador, NGINX, None", controller)
+		return nil, nil, fmt.Errorf("unknown contoller type %s. possible values: Ambassador, NGINX, None", ingress.Controller)
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {

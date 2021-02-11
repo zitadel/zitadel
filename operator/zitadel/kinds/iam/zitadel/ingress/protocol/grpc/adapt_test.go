@@ -43,7 +43,7 @@ func TestGrpc_Adapt(t *testing.T) {
 	service := "service"
 	var port uint16 = 8080
 	url := fmt.Sprintf("%s:%d", service, port)
-	dns := &configuration.DNS{
+	dns := &configuration.Ingress{
 		Domain:    "",
 		TlsSecret: "",
 		Subdomains: &configuration.Subdomains{
@@ -147,7 +147,7 @@ func TestGrpc_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtIName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtIName, mgmtM).Times(1)
 
-	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMapping, ambassador.DestroyMapping)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMappingFunc, ambassador.DestroyMapping)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)
@@ -161,7 +161,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 	service := "service"
 	var port uint16 = 8080
 	url := fmt.Sprintf("%s:%d", service, port)
-	dns := &configuration.DNS{
+	dns := &configuration.Ingress{
 		Domain:    "domain",
 		TlsSecret: "tls",
 		Subdomains: &configuration.Subdomains{
@@ -266,7 +266,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtIName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtIName, mgmtM).Times(1)
 
-	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMapping, ambassador.DestroyMapping)
+	query, _, err := AdaptFunc(monitor, componentLabels, namespace, "", service, port, dns, make(map[string]interface{}), ambassador.QueryMappingFunc, ambassador.DestroyMapping)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)

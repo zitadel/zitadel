@@ -213,8 +213,7 @@ func AdaptFunc(
 			httpPort,
 			uiServiceName,
 			uiPort,
-			desiredKind.Spec.Configuration.DNS,
-			desiredKind.Spec.IngressDeclarations,
+			desiredKind.Spec.Configuration.Ingress,
 		)
 
 		destroyers := make([]operator.DestroyFunc, 0)

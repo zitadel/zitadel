@@ -1,9 +1,10 @@
 package core
 
 import (
-	"github.com/caos/orbos/pkg/kubernetes/resources"
+	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
 	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/zitadel/operator"
 )
 
 type CORS mapping.CORS
@@ -17,13 +18,14 @@ func (c *CORS) ToAmassadorCORS() *mapping.CORS {
 	return &ambassadorCORS
 }
 
-type IngressDefinitionDestroyFunc func(namespace, name string) (resources.DestroyFunc, error)
+type HostAdapter func(virtualHost string) PathAdapter
 
-type IngressDefinitionQueryFunc func(
+type PathAdapter func(
+	monitor mntr.Monitor,
 	namespace string,
 	labels labels.IDLabels,
 	grpc bool,
-	host,
+	originCASecretName,
 	prefix,
 	rewrite,
 	service string,
@@ -31,5 +33,8 @@ type IngressDefinitionQueryFunc func(
 	timeoutMS,
 	connectTimeoutMS int,
 	cors *CORS,
-	controllerSpecifics map[string]interface{},
-) (resources.QueryFunc, error)
+	controllerSpecifics map[string]interface{}) (
+	operator.QueryFunc,
+	operator.DestroyFunc,
+	error,
+)

@@ -1,6 +1,8 @@
 package clean
 
 import (
+	"time"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator"
@@ -14,7 +16,7 @@ func getCleanupFunc(
 ) operator.EnsureFunc {
 	return func(k8sClient kubernetes.ClientInt) error {
 		monitor.Info("waiting for clean to be completed")
-		if err := k8sClient.WaitUntilJobCompleted(namespace, jobName, 60); err != nil {
+		if err := k8sClient.WaitUntilJobCompleted(namespace, jobName, 60*time.Second); err != nil {
 			monitor.Error(errors.Wrap(err, "error while waiting for clean to be completed"))
 			return err
 		}

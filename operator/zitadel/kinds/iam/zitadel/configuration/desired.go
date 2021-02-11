@@ -1,6 +1,8 @@
 package configuration
 
-import "github.com/caos/orbos/pkg/secret"
+import (
+	"github.com/caos/orbos/pkg/secret"
+)
 
 type Configuration struct {
 	Tracing       *Tracing       `yaml:"tracing,omitempty"`
@@ -10,14 +12,16 @@ type Configuration struct {
 	Passwords     *Passwords     `yaml:"passwords,omitempty"`
 	DebugMode     bool           `yaml:"debugMode"`
 	LogLevel      string         `yaml:"logLevel"`
-	DNS           *DNS           `yaml:"dns"`
+	Ingress       *Ingress       `yaml:"ingress"`
 	ClusterDNS    string         `yaml:"clusterdns"`
 }
 
-type DNS struct {
-	Domain     string      `yaml:"domain"`
-	TlsSecret  string      `yaml:"tlsSecret"`
-	Subdomains *Subdomains `yaml:"subdomains"`
+type Ingress struct {
+	Domain              string                 `yaml:"domain"`
+	TlsSecret           string                 `yaml:"tlsSecret"`
+	Subdomains          *Subdomains            `yaml:"subdomains"`
+	Controller          string                 `yaml:"controller"`
+	ControllerSpecifics map[string]interface{} `yaml:"controllerSpecifics,omitempty"`
 }
 
 type Subdomains struct {

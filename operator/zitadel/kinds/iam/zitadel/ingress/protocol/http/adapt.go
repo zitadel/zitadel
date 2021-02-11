@@ -5,7 +5,6 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/core"
 )
 
@@ -23,13 +22,13 @@ func AdaptFunc(
 	monitor mntr.Monitor,
 	componentLabels *labels.Component,
 	namespace string,
-	ingressDefinitionSuffix string,
 	httpService string,
 	httpPort uint16,
-	dns *configuration.DNS,
 	controllerSpecifics map[string]interface{},
-	queryIngress core.IngressDefinitionQueryFunc,
-	destroyIngress core.IngressDefinitionDestroyFunc,
+	originCASecretName string,
+	apiAdapter core.PathAdapter,
+	accountsAdapter core.PathAdapter,
+	issuerAdapter core.PathAdapter,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -37,216 +36,167 @@ func AdaptFunc(
 ) {
 	internalMonitor := monitor.WithField("part", "http")
 
-	fulladminRName := AdminRName + ingressDefinitionSuffix
-	fullmgmtName := MgmtName + ingressDefinitionSuffix
-	fulloauthName := OauthName + ingressDefinitionSuffix
-	fullauthRName := AuthRName + ingressDefinitionSuffix
-	fullauthorizeName := AuthorizeName + ingressDefinitionSuffix
-	fullendsessionName := EndsessionName + ingressDefinitionSuffix
-	fullissuerName := IssuerName + ingressDefinitionSuffix
+	cors := &core.CORS{
+		Origins:        "*",
+		Methods:        "POST, GET, OPTIONS, DELETE, PUT",
+		Headers:        "*",
+		Credentials:    true,
+		ExposedHeaders: "*",
+		MaxAge:         "86400",
+	}
 
-	destroyAdminR, err := destroyIngress(namespace, fulladminRName)
+	queryAdminR, destroyAdminR, err := apiAdapter(
+		monitor,
+		namespace,
+		labels.MustForName(componentLabels, AdminRName),
+		false,
+		originCASecretName,
+		"/admin/v1",
+		"/admin/v1",
+		httpService,
+		httpPort,
+		30000,
+		30000,
+		cors,
+		controllerSpecifics,
+	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyMgmtRest, err := destroyIngress(namespace, fullmgmtName)
+	queryMgmtRest, destroyMgmtRest, err := apiAdapter(
+		monitor,
+		namespace,
+		labels.MustForName(componentLabels, MgmtName),
+		false,
+		originCASecretName,
+		"/management/v1/",
+		"/management/v1/",
+		httpService,
+		httpPort,
+		30000,
+		30000,
+		cors,
+		controllerSpecifics,
+	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyOAuthv2, err := destroyIngress(namespace, fulloauthName)
+	queryOAuthv2, destroyOAuthv2, err := apiAdapter(
+		monitor,
+		namespace,
+		labels.MustForName(componentLabels, OauthName),
+		false,
+		originCASecretName,
+		"/oauth/v2/",
+		"/oauth/v2/",
+		httpService,
+		httpPort,
+		30000,
+		30000,
+		cors,
+		controllerSpecifics,
+	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyAuthR, err := destroyIngress(namespace, fullauthRName)
+	queryAuthR, destroyAuthR, err := apiAdapter(
+		monitor,
+		namespace,
+		labels.MustForName(componentLabels, AuthRName),
+		false,
+		originCASecretName,
+		"/auth/v1/",
+		"/auth/v1/",
+		httpService,
+		httpPort,
+		30000,
+		30000,
+		cors,
+		controllerSpecifics,
+	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyAuthorize, err := destroyIngress(namespace, fullauthorizeName)
+	queryAuthorize, destroyAuthorize, err := accountsAdapter(
+		monitor,
+		namespace,
+		labels.MustForName(componentLabels, AuthorizeName),
+		false,
+		originCASecretName,
+		"/oauth/v2/authorize",
+		"/oauth/v2/authorize",
+		httpService,
+		httpPort,
+		30000,
+		30000,
+		cors,
+		controllerSpecifics,
+	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyEndsession, err := destroyIngress(namespace, fullendsessionName)
+	queryEndsession, destroyEndsession, err := accountsAdapter(
+		monitor,
+		namespace,
+		labels.MustForName(componentLabels, EndsessionName),
+		false,
+		originCASecretName,
+		"/oauth/v2/endsession",
+		"/oauth/v2/endsession",
+		httpService,
+		httpPort,
+		30000,
+		30000,
+		cors,
+		controllerSpecifics,
+	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	destroyIssuer, err := destroyIngress(namespace, fullissuerName)
+	queryIssuer, destroyIssuer, err := issuerAdapter(
+		monitor,
+		namespace,
+		labels.MustForName(componentLabels, IssuerName),
+		false,
+		originCASecretName,
+		"/.well-known/openid-configuration",
+		"/oauth/v2/.well-known/openid-configuration",
+		httpService,
+		httpPort,
+		30000,
+		30000,
+		cors,
+		controllerSpecifics,
+	)
 	if err != nil {
 		return nil, nil, err
-	}
-
-	destroyers := []operator.DestroyFunc{
-		operator.ResourceDestroyToZitadelDestroy(destroyAdminR),
-		operator.ResourceDestroyToZitadelDestroy(destroyMgmtRest),
-		operator.ResourceDestroyToZitadelDestroy(destroyOAuthv2),
-		operator.ResourceDestroyToZitadelDestroy(destroyAuthR),
-		operator.ResourceDestroyToZitadelDestroy(destroyAuthorize),
-		operator.ResourceDestroyToZitadelDestroy(destroyEndsession),
-		operator.ResourceDestroyToZitadelDestroy(destroyIssuer),
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			crd, err := k8sClient.CheckCRD("mappings.getambassador.io")
-			if crd == nil || err != nil {
-				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
-			}
-
-			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
-			apiDomain := dns.Subdomains.API + "." + dns.Domain
-			issuerDomain := dns.Subdomains.Issuer + "." + dns.Domain
-
-			cors := &core.CORS{
-				Origins:        "*",
-				Methods:        "POST, GET, OPTIONS, DELETE, PUT",
-				Headers:        "*",
-				Credentials:    true,
-				ExposedHeaders: "*",
-				MaxAge:         "86400",
-			}
-
-			queryAdminR, err := queryIngress(
-				namespace,
-				labels.MustForName(componentLabels, fulladminRName),
-				false,
-				apiDomain,
-				"/admin/v1",
-				"/admin/v1",
-				httpService,
-				httpPort,
-				30000,
-				30000,
-				cors,
-				controllerSpecifics,
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			queryMgmtRest, err := queryIngress(
-				namespace,
-				labels.MustForName(componentLabels, fullmgmtName),
-				false,
-				apiDomain,
-				"/management/v1/",
-				"/management/v1/",
-				httpService,
-				httpPort,
-				30000,
-				30000,
-				cors,
-				controllerSpecifics,
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			queryOAuthv2, err := queryIngress(
-				namespace,
-				labels.MustForName(componentLabels, fulloauthName),
-				false,
-				apiDomain,
-				"/oauth/v2/",
-				"/oauth/v2/",
-				httpService,
-				httpPort,
-				30000,
-				30000,
-				cors,
-				controllerSpecifics,
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			queryAuthR, err := queryIngress(
-				namespace,
-				labels.MustForName(componentLabels, fullauthRName),
-				false,
-				apiDomain,
-				"/auth/v1/",
-				"/auth/v1/",
-				httpService,
-				httpPort,
-				30000,
-				30000,
-				cors,
-				controllerSpecifics,
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			queryAuthorize, err := queryIngress(
-				namespace,
-				labels.MustForName(componentLabels, fullauthorizeName),
-				false,
-				accountsDomain,
-				"/oauth/v2/authorize",
-				"/oauth/v2/authorize",
-				httpService,
-				httpPort,
-				30000,
-				30000,
-				cors,
-				controllerSpecifics,
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			queryEndsession, err := queryIngress(
-				namespace,
-				labels.MustForName(componentLabels, fullendsessionName),
-				false,
-				accountsDomain,
-				"/oauth/v2/endsession",
-				"/oauth/v2/endsession",
-				httpService,
-				httpPort,
-				30000,
-				30000,
-				cors,
-				controllerSpecifics,
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			queryIssuer, err := queryIngress(
-				namespace,
-				labels.MustForName(componentLabels, fullissuerName),
-				false,
-				issuerDomain,
-				"/.well-known/openid-configuration",
-				"/oauth/v2/.well-known/openid-configuration",
-				httpService,
-				httpPort,
-				30000,
-				30000,
-				cors,
-				controllerSpecifics,
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			queriers := []operator.QueryFunc{
-				operator.ResourceQueryToZitadelQuery(queryAdminR),
-				operator.ResourceQueryToZitadelQuery(queryMgmtRest),
-				operator.ResourceQueryToZitadelQuery(queryOAuthv2),
-				operator.ResourceQueryToZitadelQuery(queryAuthR),
-				operator.ResourceQueryToZitadelQuery(queryAuthorize),
-				operator.ResourceQueryToZitadelQuery(queryEndsession),
-				operator.ResourceQueryToZitadelQuery(queryIssuer),
-			}
-
-			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
+			return operator.QueriersToEnsureFunc(internalMonitor, false, []operator.QueryFunc{
+				queryMgmtRest,
+				queryOAuthv2,
+				queryAuthR,
+				queryAdminR,
+				queryAuthorize,
+				queryEndsession,
+				queryIssuer,
+			}, k8sClient, queried)
 		},
-		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
+		operator.DestroyersToDestroyFunc(internalMonitor, []operator.DestroyFunc{
+			destroyAdminR,
+			destroyMgmtRest,
+			destroyOAuthv2,
+			destroyAuthR,
+			destroyAuthorize,
+			destroyEndsession,
+			destroyIssuer,
+		}),
 		nil
 }

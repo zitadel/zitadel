@@ -71,7 +71,7 @@ func SetConsoleCM(
 			Name:      consoleCMName,
 			Labels:    labels,
 		},
-		Data: literalsConsoleCM(getClientID(), desired.DNS, k8sClient, namespace, consoleCMName),
+		Data: literalsConsoleCM(getClientID(), desired.Ingress, k8sClient, namespace, consoleCMName),
 	}
 	k8sClient.EXPECT().ApplyConfigmap(consoleCM).Times(1)
 }

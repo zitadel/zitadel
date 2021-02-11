@@ -57,7 +57,7 @@ func TestAmbassador_Adapt(t *testing.T) {
 
 	monitor := mntr.Monitor{}
 	namespace := "test"
-	dns := &configuration.DNS{
+	dns := &configuration.Ingress{
 		Domain:    "",
 		TlsSecret: "",
 		Subdomains: &configuration.Subdomains{
