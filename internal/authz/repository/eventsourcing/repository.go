@@ -18,7 +18,6 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/id"
-	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
@@ -27,7 +26,6 @@ type Config struct {
 	AuthRequest cache.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
-	KeyConfig   es_key.KeyConfig
 }
 
 type EsRepository struct {
