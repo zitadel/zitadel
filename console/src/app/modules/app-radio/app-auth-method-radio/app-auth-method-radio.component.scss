@@ -4,8 +4,11 @@
 .radio-button-wrapper {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
-    margin: 0 -0.5rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 0;
+    padding-bottom: .5rem;
 }
 
 @mixin app-auth-method-radio-theme($theme) {
@@ -39,6 +42,14 @@
     padding-bottom: 1rem;
     box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
 
+    &.first  {
+        margin-left: 0;
+    }
+
+    &.last {
+        margin-right: 0;
+    }
+
     .recommended {
         position: absolute;
         bottom: 0;
@@ -63,7 +74,6 @@
         align-items: center;
         justify-content: center;
         background: rgb(80, 110, 110);
-        margin-bottom: 1rem;
         border-top-left-radius: 6px;
         border-top-right-radius: 6px;
 

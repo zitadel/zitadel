@@ -1,8 +1,9 @@
 <div class="radio-button-wrapper">
-    <ng-container *ngFor="let method of authMethods">
+    <ng-container *ngFor="let method of authMethods; index as i">
         <input type="radio" [disabled]="method.disabled" (change)="emitChange()" [value]="method.key" [id]="method.key"
             [(ngModel)]="selected" />
-        <label class="cnsl-radio-button" [for]="method.key">
+        <label class="cnsl-radio-button" [ngClass]="{'first': i == 0, 'last': i == authMethods.length - 1}"
+            [for]="method.key">
             <div class="recommended" [ngClass]="{'not': method.notRecommended}"
                 *ngIf="method.recommended || method.notRecommended">
                 {{(method.recommended ?
@@ -15,17 +16,17 @@
             <p class="type-desc">{{method.descI18nKey | translate}}</p>
             <span class="fill-space"></span>
             <div class="app-specs">
-                <div class="row">
+                <div class="row" *ngIf="method && method.responseType != undefined">
                     <span>{{'APP.OIDC.RESPONSE' | translate}}</span>
-                    <span>{{'APP.OIDC.RESPONSE'+method?.responseType | translate}}</span>
+                    <span>{{('APP.OIDC.RESPONSE'+method.responseType) | translate}}</span>
                 </div>
-                <div class="row">
+                <div class="row" *ngIf="method.grantType != undefined">
                     <span>{{'APP.GRANT' | translate}}</span>
-                    <span>{{'APP.OIDC.GRANT'+method.grantType | translate}}</span>
+                    <span>{{('APP.OIDC.GRANT'+method.grantType) | translate}}</span>
                 </div>
-                <div class="row">
+                <div class="row" *ngIf="method.authMethod != undefined">
                     <span>{{'APP.OIDC.AUTHMETHOD' | translate}}</span>
-                    <span>{{'APP.OIDC.AUTHMETHOD'+method.authMethod | translate}}</span>
+                    <span>{{('APP.OIDC.AUTHMETHOD'+method.authMethod) | translate}}</span>
                 </div>
             </div>
         </label>

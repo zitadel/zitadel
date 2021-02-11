@@ -9,6 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
@@ -28,6 +29,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import { CODE_METHOD, getAuthMethodFromPartialConfig, getPartialConfigFromAuthMethod, IMPLICIT_METHOD, PKCE_METHOD, PK_JWT_METHOD, POST_METHOD, CUSTOM_METHOD } from '../authmethods';
 
 enum RedirectType {
     REDIRECT = 'redirect',
@@ -40,12 +42,19 @@ enum RedirectType {
     styleUrls: ['./app-detail.component.scss'],
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
+    public editState: boolean = false;
+    public initialAuthMethod: string = CUSTOM_METHOD.key;
     public canWrite: boolean = false;
     public errorMessage: string = '';
     public removable: boolean = true;
     public addOnBlur: boolean = true;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
+    public authMethods: RadioItemAuthType[] = [
+        PKCE_METHOD,
+        CODE_METHOD,
+        POST_METHOD,
+    ];
     private subscription?: Subscription;
     public projectId: string = '';
     public app!: Application.AsObject;
@@ -147,6 +156,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.mgmtService.GetApplicationById(projectid, id).then(app => {
                 this.app = app.toObject();
                 this.appNameForm.patchValue(this.app);
+
+                this.getAuthMethodOptions();
+                if (this.app.oidcConfig) {
+                    this.initialAuthMethod = this.authMethodFromPartialConfig(this.app.oidcConfig);
+                }
+
                 if (allowed) {
                     this.appNameForm.enable();
                     this.appForm.enable();
@@ -174,6 +189,51 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             });
         });
         this.docs = (await this.mgmtService.GetZitadelDocs()).toObject();
+    }
+
+    private getAuthMethodOptions(): void {
+        switch (this.applicationType?.value) {
+            case OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE:
+                this.authMethods = [
+                    PKCE_METHOD,
+                    CUSTOM_METHOD,
+                ];
+
+                // automatically set to PKCE and skip step
+                // this.app.oidcConfig.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
+                // this.app.oidcConfig.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
+                // this.app.oidcConfig.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+                break;
+            case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
+                this.authMethods = [
+                    PKCE_METHOD,
+                    CODE_METHOD,
+                    POST_METHOD,
+                ];
+                break;
+            case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
+                this.authMethods = [
+                    PKCE_METHOD,
+                    IMPLICIT_METHOD,
+                ];
+                break;
+        }
+    }
+
+    public authMethodFromPartialConfig(config: OIDCConfig.AsObject): string {
+        const key = getAuthMethodFromPartialConfig(config);
+        console.log(key);
+        return key;
+    }
+
+    public setPartialConfigFromAuthMethod(authMethod: string): void {
+        const partialConfig = getPartialConfigFromAuthMethod(authMethod);
+
+        if (partialConfig && this.app.oidcConfig) {
+            this.app.oidcConfig.responseTypesList = partialConfig.responseTypesList ?? [];
+            this.app.oidcConfig.grantTypesList = partialConfig.grantTypesList ?? [];
+            this.app.oidcConfig.authMethodType = partialConfig.authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+        }
     }
 
     public deleteApp(): void {
@@ -257,6 +317,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 .UpdateApplication(this.projectId, this.app.id, this.name?.value)
                 .then(() => {
                     this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+                    this.editState = false;
                 })
                 .catch(error => {
                     this.toast.showError(error);

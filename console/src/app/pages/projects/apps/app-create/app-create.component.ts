@@ -19,71 +19,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
-
-const CODE_METHOD: RadioItemAuthType = {
-    key: 'CODE',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.DESCRIPTION',
-    checked: false,
-    disabled: false,
-    prefix: 'CODE',
-    background: 'rgb(89 115 128)',
-    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
-    recommended: false,
-};
-const PKCE_METHOD: RadioItemAuthType = {
-    key: 'PKCE',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.DESCRIPTION',
-    checked: false,
-    disabled: false,
-    prefix: 'PKCE',
-    background: 'rgb(80 110 92)',
-    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-    recommended: true,
-};
-const POST_METHOD: RadioItemAuthType = {
-    key: 'POST',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.POST.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.POST.DESCRIPTION',
-    checked: false,
-    disabled: false,
-    prefix: 'POST',
-    background: '#595d80',
-    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-    notRecommended: true,
-};
-const PK_JWT_METHOD: RadioItemAuthType = {
-    key: 'PK_JWT',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.DESCRIPTION',
-    checked: false,
-    disabled: false,
-    prefix: 'PK_JWT',
-    background: '#6a506e',
-    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
-};
-const IMPLICIT_METHOD: RadioItemAuthType = {
-    key: 'IMPLICIT',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.DESCRIPTION',
-    checked: false,
-    disabled: false,
-    prefix: 'IMP',
-    background: 'rgb(144 75 75)',
-    responseType: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
-    grantType: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
-    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-    notRecommended: true,
-};
+import { CODE_METHOD, getPartialConfigFromAuthMethod, IMPLICIT_METHOD, PKCE_METHOD, PK_JWT_METHOD, POST_METHOD } from '../authmethods';
 
 @Component({
     selector: 'app-app-create',
@@ -240,57 +176,12 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             authMethod: [this.authMethods[0].key, [Validators.required]],
         });
         this.secondFormGroup.valueChanges.subscribe(form => {
-            switch (form.authMethod) {
-                case CODE_METHOD.key:
-                    this.oidcResponseTypes[0].checked = true;
-                    this.oidcResponseTypes[1].checked = false;
-                    this.oidcResponseTypes[2].checked = false;
+            const partialConfig = getPartialConfigFromAuthMethod(form.authMethod);
 
-                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
-                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
-                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-
-                    break;
-                case PKCE_METHOD.key:
-                    this.oidcResponseTypes[0].checked = true;
-                    this.oidcResponseTypes[1].checked = false;
-                    this.oidcResponseTypes[2].checked = false;
-
-                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
-                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
-                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-
-                    break;
-                case POST_METHOD.key:
-                    this.oidcResponseTypes[0].checked = true;
-                    this.oidcResponseTypes[1].checked = false;
-                    this.oidcResponseTypes[2].checked = false;
-
-                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
-                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
-                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-
-                    break;
-                case PK_JWT_METHOD.key:
-                    this.oidcResponseTypes[0].checked = true;
-                    this.oidcResponseTypes[1].checked = false;
-                    this.oidcResponseTypes[2].checked = false;
-
-                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
-                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
-                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-
-                    break;
-                case IMPLICIT_METHOD.key:
-                    this.oidcResponseTypes[0].checked = true;
-                    this.oidcResponseTypes[1].checked = false;
-                    this.oidcResponseTypes[2].checked = false;
-
-                    this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
-                    this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
-                    this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-
-                    break;
+            if (partialConfig) {
+                this.oidcApp.responseTypesList = partialConfig.responseTypesList ?? [];
+                this.oidcApp.grantTypesList = partialConfig.grantTypesList ?? [];
+                this.oidcApp.authMethodType = partialConfig.authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
             }
         });
     }

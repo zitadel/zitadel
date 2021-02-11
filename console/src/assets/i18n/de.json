@@ -1035,6 +1035,10 @@
                     "IMPLICIT": {
                         "TITLE":"Implicit",
                         "DESCRIPTION":"Get the tokens directly from the authorization endpoint"
+                    },
+                    "CUSTOM": {
+                        "TITLE":"Custom",
+                        "DESCRIPTION":"Your setting doesn't correspond to any other option."
                     }
                 }
             }

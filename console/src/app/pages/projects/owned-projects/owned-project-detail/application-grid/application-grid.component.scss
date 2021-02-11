@@ -42,6 +42,7 @@
         cursor: pointer;
         animation: all .2s;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         font-size: 2rem;
@@ -74,7 +75,11 @@
       }
 
       .name {
-        font-size: .8rem;
+        font-size: 14px;
+      }
+
+      .type {
+        font-size: 14px;
         color: #8a868a;
       }
     }
