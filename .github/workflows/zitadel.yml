@@ -16,22 +16,49 @@ env:
   ARTIFACTS_FOLDER: './artifacts'
 
 jobs:
+  refs:
+    runs-on: ubuntu-18.04
+    outputs:
+      sha_short: ${{ steps.refs.outputs.sha_short }}
+      short_ref: ${{ steps.refs.outputs.short_ref }}
+      version: ${{ steps.refs.outputs.version }}
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Semantic Release
+          id: semantic
+          uses: cycjimmy/semantic-release-action@v2
+          with:
+            dry_run: true
+            semantic_version: 17.0.4
+      - name: Set outputs
+        id: refs
+        run: |
+          export BRANCH=${GITHUB_REF#refs/*/}
+          echo "branch: ${BRANCH}"
+
+          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
+          echo "short_ref: ${BRANCHTRANSLATED}"
+
+          export VERSION=""
+          if ${{ steps.semantic.outputs.new_release_published == 'true' }}; then
+            export VERSION=${{ steps.semantic.outputs.new_release_version }}
+          else
+            export VERSION=${BRANCHTRANSLATED}
+          fi
+          echo "New semantic release: ${{ steps.semantic.outputs.new_release_published }}"
+          echo "version: ${version}"
+
+          echo "::set-output name=short_ref::${BRANCHTRANSLATED}"
+          echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
+          echo "::set-output name=version::${VERSION}"
+
   zitadel-image:
+    needs: refs
     runs-on: ubuntu-18.04
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Set output
-        id: branch
-        run: |
-          export BRANCH=${GITHUB_REF#refs/*/}
-          echo "branch: ${BRANCH}"
-          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
-          echo "short_ref: ${BRANCHTRANSLATED}"
-          echo ::set-output name=short_ref::${BRANCHTRANSLATED}
-      - name: Generate Short SHA Container Tag
-        id: vars
-        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
@@ -54,13 +81,14 @@ jobs:
           context: .
           file: ./build/dockerfile
           platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.branch.outputs.short_ref }}
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
 
   operator-image:
+    needs: refs
     runs-on: ubuntu-18.04
     name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
@@ -70,34 +98,6 @@ jobs:
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Set output
-        id: branch
-        run: |
-          export BRANCH=${GITHUB_REF#refs/*/}
-          echo "branch: ${BRANCH}"
-          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
-          echo "short_ref: ${BRANCHTRANSLATED}"
-          echo "version: ${BRANCHTRANSLATED}"
-          echo ::set-output name=short_ref::${BRANCHTRANSLATED}
-      - name: Semantic Release
-        id: semantic
-        uses: cycjimmy/semantic-release-action@v2
-        with:
-          dry_run: true
-          semantic_version: 17.0.4
-      - name: Set version
-        id: version
-        run: |
-          export VERSION=""
-          if ${{ steps.semantic.outputs.new_release_published == 'true' }}; then
-            export VERSION=${{ steps.semantic.outputs.new_release_version }}
-          else
-            export VERSION=${{ steps.branch.outputs.short_ref }}
-          fi
-          echo ::set-output name=version::${VERSION}
-      - name: Generate Short SHA Container Tag
-        id: vars
-        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
@@ -121,7 +121,7 @@ jobs:
           context: .
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
+          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
@@ -144,7 +144,7 @@ jobs:
           context: .
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
+          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
@@ -155,21 +155,11 @@ jobs:
 
 
   crdb-image:
+    needs: refs
     runs-on: ubuntu-18.04
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Set output
-        id: branch
-        run: |
-          export BRANCH=${GITHUB_REF#refs/*/}
-          echo "branch: ${BRANCH}"
-          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
-          echo "short_ref: ${BRANCHTRANSLATED}"
-          echo ::set-output name=short_ref::${BRANCHTRANSLATED}
-      - name: Generate Short SHA Container Tag
-        id: vars
-        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
@@ -193,31 +183,29 @@ jobs:
           context: .
           file: ./build/cr-backup/Dockerfile
           platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ steps.branch.outputs.short_ref }}
+          tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
   release:
     runs-on: ubuntu-18.04
-    needs: [ zitadel-image, operator-image, crdb-image ]
+    needs: [ refs, zitadel-image, operator-image, crdb-image ]
+    if:
     env:
       DOCKER_USERNAME: ${{ github.actor }}
       DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Generate Short SHA Container Tag
-        id: vars
-        run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
       - name: Docker Login
         run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
       - name: Docker Pull short-sha
-        run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }}
+        run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }}
       - name: Docker Pull short-sha
-        run: docker pull $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.vars.outputs.sha_short }}
+        run: docker pull $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
       - name: Docker Pull short-sha
-        run: docker pull $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }}
+        run: docker pull $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
       - name: Download all zitadelctl artifact
         uses: actions/download-artifact@v2
         with:
@@ -242,15 +230,15 @@ jobs:
           echo ${{ steps.semantic.outputs.new_release_patch_version }}
       - name: Docker Tag Version
         run: |
-          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
-          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
-          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
         if: steps.semantic.outputs.new_release_published == 'true'
       - name: Docker Tag Latest
         run: |
-          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
-          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:latest
-          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:latest
+          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:latest
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:latest
         if: steps.semantic.outputs.new_release_published == 'true'
       - name: Docker Push Version
         run: |
@@ -266,34 +254,27 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true'
 
       - name: Set output
-        id: branch
-        run: |
-          export BRANCH=${GITHUB_REF#refs/*/}
-          echo "branch: ${BRANCH}"
-          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
-          echo "short_ref: ${BRANCHTRANSLATED}"
-          echo ::set-output name=short_ref::${BRANCHTRANSLATED}
       - name: Docker Tag Version
         run: |
-          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.branch.outputs.short_ref }}
-          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
-          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.vars.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
-        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
+          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
       - name: Docker Push Version
         run: |
-          docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.branch.outputs.short_ref }}
-          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
-          docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.branch.outputs.short_ref }}
-        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
+          docker push $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
+          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
+          docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
       - name: Dev-Release
         id: create_release
         uses: softprops/action-gh-release@v1
-        if: steps.semantic.outputs.new_release_published != 'true' && steps.branch.outputs.short_ref != 'master' && steps.branch.outputs.short_ref != ''
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.branch.outputs.short_ref }}-dev
-          name: Branch ${{ steps.branch.outputs.short_ref }}
+          tag_name: ${{ needs.refs.outputs.short_ref }}-dev
+          name: Branch ${{ needs.refs.outputs.short_ref }}
           draft: false
           prerelease: true
           fail_on_unmatched_files: true
