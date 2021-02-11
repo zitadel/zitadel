@@ -26,11 +26,11 @@ jobs:
       - name: Source checkout
         uses: actions/checkout@v2
       - name: Semantic Release
-          id: semantic
-          uses: cycjimmy/semantic-release-action@v2
-          with:
-            dry_run: true
-            semantic_version: 17.0.4
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          dry_run: true
+          semantic_version: 17.0.4
       - name: Set outputs
         id: refs
         run: |
