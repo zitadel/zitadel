@@ -81,14 +81,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 }
 
 func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes oidc.Scopes) (oidc.Scopes, error) {
-	if !strings.Contains(subject, "@") {
-		return o.validateJWTProfileScopesUser(ctx, subject, scopes)
-	}
-	return o.validateJWTProfileScopesClient(ctx, subject, scopes)
-}
-
-func (o *OPStorage) validateJWTProfileScopesUser(ctx context.Context, userID string, scopes oidc.Scopes) (oidc.Scopes, error) {
-	user, err := o.repo.UserByID(ctx, userID)
+	user, err := o.repo.UserByID(ctx, subject)
 	if err != nil {
 		return nil, err
 	}
@@ -149,48 +142,6 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.User
 		}
 	}
 	return o.SetUserinfoFromScopes(ctx, userInfo, token.UserID, token.ApplicationID, token.Scopes)
-}
-
-func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
-	token, err := o.repo.TokenByID(ctx, subject, tokenID)
-	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
-	}
-	app, err := o.repo.ApplicationByClientID(ctx, clientID)
-	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
-	}
-	for _, aud := range token.Audience {
-		if aud == clientID || aud == app.ProjectID {
-			err := o.SetUserinfoFromScopes(ctx, introspection, token.UserID, clientID, token.Scopes)
-			if err != nil {
-				return err
-			}
-			introspection.SetScopes(token.Scopes)
-			introspection.SetClientID(token.ApplicationID)
-			return nil
-		}
-	}
-	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
-}
-
-func (o *OPStorage) GetUserinfoFromToken(ctx context.Context, tokenID, subject, origin string) (_ oidc.UserInfo, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	token, err := o.repo.TokenByID(ctx, subject, tokenID)
-	if err != nil {
-		return nil, errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
-	}
-	if token.ApplicationID != "" {
-		app, err := o.repo.ApplicationByClientID(ctx, token.ApplicationID)
-		if err != nil {
-			return nil, err
-		}
-		if origin != "" && !http.IsOriginAllowed(app.OriginAllowList, origin) {
-			return nil, errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
-		}
-	}
-	return o.GetUserinfoFromScopes(ctx, token.UserID, token.ApplicationID, token.Scopes)
 }
 
 func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
@@ -261,73 +212,27 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 	return nil
 }
 
-func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID, applicationID string, scopes []string) (_ oidc.UserInfo, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	user, err := o.repo.UserByID(ctx, userID)
+func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection oidc.IntrospectionResponse, tokenID, subject, clientID string) error {
+	token, err := o.repo.TokenByID(ctx, subject, tokenID)
 	if err != nil {
-		return nil, err
+		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
-	userInfo := oidc.NewUserInfo()
-	roles := make([]string, 0)
-	for _, scope := range scopes {
-		switch scope {
-		case oidc.ScopeOpenID:
-			userInfo.SetSubject(user.ID)
-		case oidc.ScopeEmail:
-			if user.HumanView == nil {
-				continue
+	app, err := o.repo.ApplicationByClientID(ctx, clientID)
+	if err != nil {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+	}
+	for _, aud := range token.Audience {
+		if aud == clientID || aud == app.ProjectID {
+			err := o.SetUserinfoFromScopes(ctx, introspection, token.UserID, clientID, token.Scopes)
+			if err != nil {
+				return err
 			}
-			userInfo.SetEmail(user.Email, user.IsEmailVerified)
-		case oidc.ScopeProfile:
-			userInfo.SetPreferredUsername(user.PreferredLoginName)
-			userInfo.SetUpdatedAt(user.ChangeDate)
-			if user.HumanView != nil {
-				userInfo.SetName(user.DisplayName)
-				userInfo.SetFamilyName(user.LastName)
-				userInfo.SetGivenName(user.FirstName)
-				userInfo.SetNickname(user.NickName)
-				userInfo.SetGender(oidc.Gender(getGender(user.Gender)))
-				locale, _ := language.Parse(user.PreferredLanguage)
-				userInfo.SetLocale(locale)
-			} else {
-				userInfo.SetName(user.MachineView.Name)
-			}
-		case oidc.ScopePhone:
-			if user.HumanView == nil {
-				continue
-			}
-			userInfo.SetPhone(user.Phone, user.IsPhoneVerified)
-		case oidc.ScopeAddress:
-			if user.HumanView == nil {
-				continue
-			}
-			if user.StreetAddress == "" && user.Locality == "" && user.Region == "" && user.PostalCode == "" && user.Country == "" {
-				continue
-			}
-			userInfo.SetAddress(oidc.NewUserInfoAddress(user.StreetAddress, user.Locality, user.Region, user.PostalCode, user.Country, ""))
-		default:
-			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
-				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
-			}
-			if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
-				userInfo.AppendClaims(model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
-			}
+			introspection.SetScopes(token.Scopes)
+			introspection.SetClientID(token.ApplicationID)
+			return nil
 		}
 	}
-
-	if len(roles) == 0 || applicationID == "" {
-		return userInfo, nil
-	}
-	projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
-	if err != nil {
-		return nil, err
-	}
-	if len(projectRoles) > 0 {
-		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
-	}
-
-	return userInfo, nil
+	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
 }
 
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
