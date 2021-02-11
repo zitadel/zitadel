@@ -53,7 +53,7 @@ func Adapt(virtualHost string) core.PathAdapter {
 
 		annotations := map[string]string{
 			backendProtocolKey: "HTTP",
-			rewriteKey:         rewrite,
+			rewriteKey:         rewrite + "$1",
 			readTimeoutKey:     timeoutMSStr,
 			sendTimeoutKey:     timeoutMSStr,
 			connectTimeoutKey:  connTimeoutMSStr,
@@ -80,7 +80,7 @@ func Adapt(virtualHost string) core.PathAdapter {
 			namespace,
 			id,
 			virtualHost,
-			prefix,
+			prefix+"(.*)",
 			service,
 			servicePort,
 			annotations,
