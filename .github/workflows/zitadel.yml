@@ -47,7 +47,7 @@ jobs:
             export VERSION=${BRANCHTRANSLATED}
           fi
           echo "New semantic release: ${{ steps.semantic.outputs.new_release_published }}"
-          echo "version: ${version}"
+          echo "version: ${VERSION}"
 
           echo "::set-output name=short_ref::${BRANCHTRANSLATED}"
           echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
