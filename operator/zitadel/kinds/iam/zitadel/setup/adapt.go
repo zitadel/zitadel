@@ -1,8 +1,6 @@
 package setup
 
 import (
-	"time"
-
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
@@ -17,11 +15,10 @@ import (
 )
 
 const (
-	jobNamePrefix               = "zitadel-setup-"
-	containerName               = "zitadel"
-	rootSecret                  = "client-root"
-	dbSecrets                   = "db-secrets"
-	timeout       time.Duration = 300
+	jobNamePrefix = "zitadel-setup-"
+	containerName = "zitadel"
+	rootSecret    = "client-root"
+	dbSecrets     = "db-secrets"
 )
 
 func AdaptFunc(
@@ -43,8 +40,6 @@ func AdaptFunc(
 ) (
 	func(
 		necessaryUsers map[string]string,
-		migrationDone operator.EnsureFunc,
-		configurationDone operator.EnsureFunc,
 		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
 	) operator.QueryFunc,
 	operator.DestroyFunc,
@@ -66,8 +61,6 @@ func AdaptFunc(
 
 	return func(
 			necessaryUsers map[string]string,
-			migrationDone operator.EnsureFunc,
-			configurationDone operator.EnsureFunc,
 			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
 		) operator.QueryFunc {
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
@@ -111,8 +104,6 @@ func AdaptFunc(
 				}
 
 				queriers := []operator.QueryFunc{
-					operator.EnsureFuncToQueryFunc(migrationDone),
-					operator.EnsureFuncToQueryFunc(configurationDone),
 					operator.ResourceQueryToZitadelQuery(query),
 				}
 

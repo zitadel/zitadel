@@ -103,7 +103,7 @@ func AdaptFunc(
 			return nil, nil, allSecrets, err
 		}
 
-		queryC, destroyC, getConfigurationHashes, err := configuration.AdaptFunc(
+		getQueryC, destroyC, getConfigurationHashes, err := configuration.AdaptFunc(
 			internalMonitor,
 			zitadelComponent,
 			namespaceStr,
@@ -145,7 +145,7 @@ func AdaptFunc(
 			return nil, nil, allSecrets, err
 		}
 
-		querySetup, destroySetup, err := setup.AdaptFunc(
+		getQuerySetup, destroySetup, err := setup.AdaptFunc(
 			internalMonitor,
 			zitadelComponent,
 			namespaceStr,
@@ -236,6 +236,14 @@ func AdaptFunc(
 					return nil, err
 				}
 
+				queryReadyM := operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespaceStr, action))
+				queryC := getQueryC(users)
+				queryReadyC := operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName))
+				querySetup := getQuerySetup(allZitadelUsers, getConfigurationHashes)
+				queryReadySetup := operator.EnsureFuncToQueryFunc(setup.GetDoneFunc(monitor, namespaceStr, action))
+				queryD := queryD(allZitadelUsers, getConfigurationHashes)
+				queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr, zitadelDeploymentName))
+
 				queriers := make([]operator.QueryFunc, 0)
 				for _, feature := range features {
 					switch feature {
@@ -243,37 +251,37 @@ func AdaptFunc(
 						queriers = append(queriers,
 							queryDB,
 							//configuration
-							queryC(
-								users,
-							),
+							queryC,
+							queryReadyC,
 							//migration
 							queryM,
-							//wait until migration is completed
-							operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespaceStr, action)),
+							queryReadyM,
 						)
 					case "iam":
 						queriers = append(queriers,
 							operator.ResourceQueryToZitadelQuery(queryNS),
 							queryDB,
 							//configuration
-							queryC(
-								users,
-							),
+							queryC,
+							queryReadyC,
 							//migration
 							queryM,
+							queryReadyM,
 							//services
 							queryS,
-							querySetup(
-								allZitadelUsers,
-								migration.GetDoneFunc(monitor, namespaceStr, action),
-								configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
-								getConfigurationHashes,
-							),
-							queryD(
-								allZitadelUsers,
-								getConfigurationHashes,
-							),
-							operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr, zitadelDeploymentName)),
+							//setup
+							querySetup,
+							queryReadySetup,
+							//deployment
+							queryD,
+							queryReadyD,
+							//handle change if necessary for clientID
+							queryC,
+							queryReadyC,
+							//again apply deployment if config changed
+							queryD,
+							queryReadyD,
+							//apply ambassador crds after zitadel is ready
 							queryAmbassador,
 						)
 					case "scaledown":
