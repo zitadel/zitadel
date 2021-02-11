@@ -253,7 +253,6 @@ jobs:
           docker push $REGISTRY/$CRDB_IMAGE_NAME:latest
         if: steps.semantic.outputs.new_release_published == 'true'
 
-      - name: Set output
       - name: Docker Tag Version
         run: |
           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
