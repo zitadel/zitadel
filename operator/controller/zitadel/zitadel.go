@@ -27,7 +27,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 
 	desired, err := zitadel.ReadCrd(r.ClientInt, req.Namespace, req.Name)
 
-	query, _, _, err := orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"database"})(internalMonitor, desired, &tree.Tree{})
+	query, _, _, err := orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"})(internalMonitor, desired, &tree.Tree{})
 	if err != nil {
 		return ctrl.Result{}, err
 	}

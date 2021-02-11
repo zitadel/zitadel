@@ -34,18 +34,18 @@ type Passwords struct {
 	Adminapi             *secret.Secret   `yaml:"adminapi"`
 	Notification         *secret.Secret   `yaml:"notification"`
 	Eventstore           *secret.Secret   `yaml:"eventstore"`
-	ExistingMigration    *secret.Existing `yaml:"existingmigration"`
-	ExistingManagement   *secret.Existing `yaml:"existingmanagement"`
-	ExistingAuth         *secret.Existing `yaml:"existingauth"`
-	ExistingAuthz        *secret.Existing `yaml:"existingauthz"`
-	ExistingAdminapi     *secret.Existing `yaml:"existingadminapi"`
-	ExistingNotification *secret.Existing `yaml:"existingnotification"`
-	ExistingEventstore   *secret.Existing `yaml:"existingeventstore"`
+	ExistingMigration    *secret.Existing `yaml:"existingMigration"`
+	ExistingManagement   *secret.Existing `yaml:"existingManagement"`
+	ExistingAuth         *secret.Existing `yaml:"existingAuth"`
+	ExistingAuthz        *secret.Existing `yaml:"existingAuthz"`
+	ExistingAdminapi     *secret.Existing `yaml:"existingAdminapi"`
+	ExistingNotification *secret.Existing `yaml:"existingNotification"`
+	ExistingEventstore   *secret.Existing `yaml:"existingEventstore"`
 }
 
 type Secrets struct {
 	Keys                    *secret.Secret   `yaml:"keys,omitempty"`
-	ExistingKeys            *secret.Existing `yaml:"existingkeys,omitempty"`
+	ExistingKeys            *secret.Existing `yaml:"existingKeys,omitempty"`
 	UserVerificationID      string           `yaml:"userVerificationID,omitempty"`
 	OTPVerificationID       string           `yaml:"otpVerificationID,omitempty"`
 	OIDCKeysID              string           `yaml:"oidcKeysID,omitempty"`
