@@ -218,11 +218,16 @@ func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (_ *
 	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
 	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)
 
+	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	id, err := r.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
-	userAgg.PushEvents(user.NewDomainClaimedEvent(ctx, fmt.Sprintf("%s@temporary.%s", id, r.iamDomain)))
+	userAgg.PushEvents(user.NewDomainClaimedEvent(ctx, fmt.Sprintf("%s@temporary.%s", id, r.iamDomain), existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
 	return userAgg, changedUserGrant, nil
 }
 

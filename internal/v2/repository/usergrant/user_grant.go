@@ -21,17 +21,17 @@ const (
 	UserGrantReactivatedType    = userGrantEventTypePrefix + "reactivated"
 )
 
-func NewAddUserGrantUniqueConstraint(resourceOwner, userID, projectID string) *eventstore.EventUniqueConstraint {
+func NewAddUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		uniqueUserGrant,
-		fmt.Sprintf("%s:%s:%s", resourceOwner, userID, projectID),
+		fmt.Sprintf("%s:%s:%s:%v", resourceOwner, userID, projectID, projectGrantID),
 		"Errors.UserGrant.AlreadyExists")
 }
 
-func NewRemoveUserGrantUniqueConstraint(resourceOwner, userID, projectID string) *eventstore.EventUniqueConstraint {
+func NewRemoveUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
 		uniqueUserGrant,
-		fmt.Sprintf("%s:%s:%s", resourceOwner, userID, projectID))
+		fmt.Sprintf("%s:%s:%s:%S", resourceOwner, userID, projectID, projectGrantID))
 }
 
 type UserGrantAddedEvent struct {
@@ -48,7 +48,7 @@ func (e *UserGrantAddedEvent) Data() interface{} {
 }
 
 func (e *UserGrantAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUserGrantUniqueConstraint(e.ResourceOwner(), e.UserID, e.ProjectID)}
+	return []*eventstore.EventUniqueConstraint{NewAddUserGrantUniqueConstraint(e.ResourceOwner(), e.UserID, e.ProjectID, e.ProjectGrantID)}
 }
 
 func NewUserGrantAddedEvent(
@@ -162,8 +162,9 @@ func UserGrantCascadeChangedEventMapper(event *repository.Event) (eventstore.Eve
 
 type UserGrantRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	userID               string
-	projectID            string
+	userID               string `json:"-"`
+	projectID            string `json:"-"`
+	projectGrantID       string `json:"-"`
 }
 
 func (e *UserGrantRemovedEvent) Data() interface{} {
@@ -171,18 +172,19 @@ func (e *UserGrantRemovedEvent) Data() interface{} {
 }
 
 func (e *UserGrantRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.ResourceOwner(), e.userID, e.projectID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.ResourceOwner(), e.userID, e.projectID, e.projectGrantID)}
 }
 
-func NewUserGrantRemovedEvent(ctx context.Context, resourceOwner, userID, projectID string) *UserGrantRemovedEvent {
+func NewUserGrantRemovedEvent(ctx context.Context, resourceOwner, userID, projectID, projectGrantID string) *UserGrantRemovedEvent {
 	return &UserGrantRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			UserGrantRemovedType,
 			resourceOwner,
 		),
-		userID:    userID,
-		projectID: projectID,
+		userID:         userID,
+		projectID:      projectID,
+		projectGrantID: projectGrantID,
 	}
 }
 
@@ -194,8 +196,9 @@ func UserGrantRemovedEventMapper(event *repository.Event) (eventstore.EventReade
 
 type UserGrantCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	userID               string
-	projectID            string
+	userID               string `json:"-"`
+	projectID            string `json:"-"`
+	projectGrantID       string `json:"-"`
 }
 
 func (e *UserGrantCascadeRemovedEvent) Data() interface{} {
@@ -203,18 +206,19 @@ func (e *UserGrantCascadeRemovedEvent) Data() interface{} {
 }
 
 func (e *UserGrantCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.ResourceOwner(), e.userID, e.projectID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.ResourceOwner(), e.userID, e.projectID, e.projectGrantID)}
 }
 
-func NewUserGrantCascadeRemovedEvent(ctx context.Context, resourceOwner, userID, projectID string) *UserGrantCascadeRemovedEvent {
+func NewUserGrantCascadeRemovedEvent(ctx context.Context, resourceOwner, userID, projectID, projectGrantID string) *UserGrantCascadeRemovedEvent {
 	return &UserGrantCascadeRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			UserGrantCascadeRemovedType,
 			resourceOwner,
 		),
-		userID:    userID,
-		projectID: projectID,
+		userID:         userID,
+		projectID:      projectID,
+		projectGrantID: projectGrantID,
 	}
 }
 

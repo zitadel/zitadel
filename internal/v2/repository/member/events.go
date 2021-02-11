@@ -2,16 +2,32 @@ package member
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
+	uniqueMember     = "member"
 	AddedEventType   = "member.added"
 	ChangedEventType = "member.changed"
 	RemovedEventType = "member.removed"
 )
+
+func NewAddMemberUniqueConstraint(aggregateID, userID string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueMember,
+		fmt.Sprintf("%s:%s", aggregateID, userID),
+		"Errors.Member.AlreadyExists")
+}
+
+func NewRemoveMemberUniqueConstraint(aggregateID, userID string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		uniqueMember,
+		fmt.Sprintf("%s:%s", aggregateID, userID),
+	)
+}
 
 type MemberAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -25,7 +41,7 @@ func (e *MemberAddedEvent) Data() interface{} {
 }
 
 func (e *MemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewAddMemberUniqueConstraint(e.AggregateID(), e.UserID)}
 }
 
 func NewMemberAddedEvent(
@@ -105,7 +121,7 @@ func (e *MemberRemovedEvent) Data() interface{} {
 }
 
 func (e *MemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewRemoveMemberUniqueConstraint(e.AggregateID(), e.UserID)}
 }
 
 func NewRemovedEvent(

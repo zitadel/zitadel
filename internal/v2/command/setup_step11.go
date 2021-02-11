@@ -22,7 +22,7 @@ func (s *Step11) execute(ctx context.Context, commandSide *CommandSide) error {
 func (r *CommandSide) SetupStep11(ctx context.Context, step *Step11) error {
 	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		uniqueConstraints := NewUniqueConstraintReadModel()
+		uniqueConstraints := NewUniqueConstraintReadModel(ctx, r)
 		err := r.eventstore.FilterToQueryReducer(ctx, uniqueConstraints)
 		if err != nil {
 			return nil, err

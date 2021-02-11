@@ -245,7 +245,9 @@ func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName string `json:"userName"`
+	UserName              string `json:"userName"`
+	oldUserName           string `json:"-"`
+	userLoginMustBeDomain bool   `json:"-"`
 }
 
 func (e *DomainClaimedEvent) Data() interface{} {
@@ -253,19 +255,26 @@ func (e *DomainClaimedEvent) Data() interface{} {
 }
 
 func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.ResourceOwner(), e.userLoginMustBeDomain),
+		NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.userLoginMustBeDomain),
+	}
 }
 
 func NewDomainClaimedEvent(
 	ctx context.Context,
-	userName string,
+	userName,
+	oldUserName string,
+	userLoginMustBeDomain bool,
 ) *DomainClaimedEvent {
 	return &DomainClaimedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			UserDomainClaimedType,
 		),
-		UserName: userName,
+		UserName:              userName,
+		oldUserName:           oldUserName,
+		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
@@ -314,8 +323,8 @@ type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	OldUserName           string
-	UserLoginMustBeDomain bool
+	oldUserName           string `json:"-"`
+	userLoginMustBeDomain bool   `json:"-"`
 }
 
 func (e *UsernameChangedEvent) Data() interface{} {
@@ -324,8 +333,8 @@ func (e *UsernameChangedEvent) Data() interface{} {
 
 func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.OldUserName, e.ResourceOwner(), e.UserLoginMustBeDomain),
-		NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain),
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.ResourceOwner(), e.userLoginMustBeDomain),
+		NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.userLoginMustBeDomain),
 	}
 }
 
@@ -341,8 +350,8 @@ func NewUsernameChangedEvent(
 			UserUserNameChangedType,
 		),
 		UserName:              newUserName,
-		OldUserName:           oldUserName,
-		UserLoginMustBeDomain: userLoginMustBeDomain,
+		oldUserName:           oldUserName,
+		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 

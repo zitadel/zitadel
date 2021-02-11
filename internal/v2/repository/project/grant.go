@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	uniqueGrantType         = "project_Grant"
+	uniqueGrantType         = "project_grant"
 	grantEventTypePrefix    = projectEventTypePrefix + "grant."
 	GrantAddedType          = grantEventTypePrefix + "added"
 	GrantChangedType        = grantEventTypePrefix + "changed"

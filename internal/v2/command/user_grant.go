@@ -251,11 +251,21 @@ func (r *CommandSide) removeUserGrant(ctx context.Context, grantID, resourceOwne
 	userGrantAgg := UserGrantAggregateFromWriteModel(&removeUserGrant.WriteModel)
 	if !cascade {
 		userGrantAgg.PushEvents(
-			usergrant.NewUserGrantRemovedEvent(ctx, existingUserGrant.ResourceOwner, existingUserGrant.UserID, existingUserGrant.ProjectID),
+			usergrant.NewUserGrantRemovedEvent(
+				ctx,
+				existingUserGrant.ResourceOwner,
+				existingUserGrant.UserID,
+				existingUserGrant.ProjectID,
+				existingUserGrant.ProjectGrantID),
 		)
 	} else {
 		userGrantAgg.PushEvents(
-			usergrant.NewUserGrantCascadeRemovedEvent(ctx, existingUserGrant.ResourceOwner, existingUserGrant.UserID, existingUserGrant.ProjectID),
+			usergrant.NewUserGrantCascadeRemovedEvent(
+				ctx,
+				existingUserGrant.ResourceOwner,
+				existingUserGrant.UserID,
+				existingUserGrant.ProjectID,
+				existingUserGrant.ProjectGrantID),
 		)
 	}
 
