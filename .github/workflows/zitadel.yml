@@ -86,7 +86,6 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
-
   operator-image:
     needs: refs
     runs-on: ubuntu-18.04
@@ -191,7 +190,6 @@ jobs:
   release:
     runs-on: ubuntu-18.04
     needs: [ refs, zitadel-image, operator-image, crdb-image ]
-    if:
     env:
       DOCKER_USERNAME: ${{ github.actor }}
       DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
