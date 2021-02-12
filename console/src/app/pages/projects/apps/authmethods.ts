@@ -76,7 +76,7 @@ export function getPartialConfigFromAuthMethod(authMethod: string): Partial<OIDC
             config = {
                 responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
                 grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-                authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+                authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
             };
             return config;
         case PKCE_METHOD.key:

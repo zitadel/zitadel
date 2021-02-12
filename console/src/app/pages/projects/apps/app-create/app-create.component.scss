@@ -64,26 +64,6 @@ p.desc {
     font-size: .9rem;
     color: var(--grey);
   }
-
-  .chip-form {
-    width: 100%;
-    display: flex;
-    align-items: center;
-
-    .formfield {
-      flex: 1;
-    }
-
-    button {
-      margin-top: 1rem;
-    }
-  }
-
-  .error {
-    font-size: 13px;
-    color: #f44336;
-    margin-top: 0;
-  }
 }
 
 .checkbox-container {
@@ -138,10 +118,6 @@ p.desc {
         flex-basis: 80%;
       }
     }
-
-    .chip-form {
-        margin: 0 .5rem;
-    }
   }
 
   .continue-button {
@@ -150,17 +126,4 @@ p.desc {
     padding: .5rem 4rem;
     float: right;
   }
-}
-
-.chip {
-    border-radius: 4px;
-    height: 40px;
-}
-
-.chip[color='white'] {
-    background-color: #fafafa;
-}
-
-.chip[color='green'] {
-    background-color: #56a392 !important;
 }

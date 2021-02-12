@@ -67,25 +67,10 @@
             <p class="step-description" *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB">
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
-            <form class="chip-form" (ngSubmit)="addUri(redInput, 'REDIRECT')">
-                <cnsl-form-field appearance="outline" class="full-width">
-                    <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
-                    <input #redInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
-                        [formControl]="redirectControl">
-                </cnsl-form-field>
-                <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button>
-                    <mat-icon>add</mat-icon>
-                </button>
-            </form>
-            <mat-chip-list #chipRedirectList aria-label="uri selection">
-                <mat-chip #redInput class="chip" *ngFor="let uri of oidcApp.redirectUrisList" selected removable
-                    [matTooltip]="!uri?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
-                    [color]="!uri?.startsWith('https://') ? 'warn': 'white'" (removed)="removeUri(uri, 'REDIRECT')">
-                    {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
-                </mat-chip>
-            </mat-chip-list>
-
-            <p *ngIf="redirectControl.invalid" class="error">{{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
+            <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
+                (changedUris)="oidcApp.redirectUrisList = $event" [urisList]="oidcApp.redirectUrisList"
+                title="{{ 'APP.OIDC.REDIRECT' | translate }}">
+            </cnsl-redirect-uris>
 
             <p class="step-title">{{'APP.OIDC.POSTREDIRECTTITLE' | translate}}</p>
             <p class="step-description"
@@ -95,26 +80,10 @@
                 *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
-            <form class="chip-form" (ngSubmit)="addUri(postInput, 'POSTREDIRECT')">
-                <cnsl-form-field appearance="outline" class="full-width">
-                    <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
-                    <input #postInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
-                        [formControl]="postRedirectControl">
-                </cnsl-form-field>
-                <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button>
-                    <mat-icon>add</mat-icon>
-                </button>
-            </form>
-            <mat-chip-list #chipPostRedirectList aria-label="uri selection">
-                <mat-chip class="chip" *ngFor="let uri of oidcApp.postLogoutRedirectUrisList"
-                    [matTooltip]="!uri?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
-                    removable (removed)="removeUri(uri, 'POSTREDIRECT')" selected
-                    [color]="!uri?.startsWith('https://') ? 'warn': 'white'">
-                    {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
-                </mat-chip>
-            </mat-chip-list>
-
-            <p *ngIf="postRedirectControl.invalid" class="error">{{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
+            <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
+                (changedUris)="oidcApp.postLogoutRedirectUrisList = $event"
+                [urisList]="oidcApp.postLogoutRedirectUrisList" title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
+            </cnsl-redirect-uris>
 
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
@@ -248,34 +217,18 @@
                     </mat-select>
                 </cnsl-form-field>
 
-                <cnsl-form-field appearance="outline" class="full-width chip-form">
-                    <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
-                    <mat-chip-list #chipRedirectList aria-label="uri selection">
-                        <mat-chip class="chip" *ngFor="let uri of oidcApp.redirectUrisList" removable
-                            [color]="!uri?.startsWith('https://') ? 'warn': 'green'"
-                            (removed)="removeUri(uri, 'REDIRECT')">
-                            {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
-                        </mat-chip>
-                        <input cnslInput [matChipInputFor]="chipRedirectList"
-                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
-                            (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
-                    </mat-chip-list>
-                </cnsl-form-field>
+                <div class="formfield full-width">
+                    <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
+                        (changedUris)="oidcApp.redirectUrisList = $event" [urisList]="oidcApp.redirectUrisList"
+                        title="{{ 'APP.OIDC.REDIRECT' | translate }}">
+                    </cnsl-redirect-uris>
 
-                <cnsl-form-field appearance="outline" class="full-width chip-form">
-                    <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
-                    <mat-chip-list #chipPostRedirectList aria-label="uri selection">
-                        <mat-chip class="chip" *ngFor="let uri of oidcApp.postLogoutRedirectUrisList" removable
-                            [color]="!uri?.startsWith('https://') ? 'warn': 'green'"
-                            (removed)="removeUri(uri, 'POSTREDIRECT')">
-                            {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
-                        </mat-chip>
-                        <input cnslInput [matChipInputFor]="chipPostRedirectList"
-                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
-                            (matChipInputTokenEnd)="addUri($event, 'POSTREDIRECT')">
-                    </mat-chip-list>
-                </cnsl-form-field>
-
+                    <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
+                        (changedUris)="oidcApp.postLogoutRedirectUrisList = $event"
+                        [urisList]="oidcApp.postLogoutRedirectUrisList"
+                        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
+                    </cnsl-redirect-uris>
+                </div>
             </div>
 
             <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" cdkFocusInitial

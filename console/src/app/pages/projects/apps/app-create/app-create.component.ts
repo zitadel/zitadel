@@ -18,8 +18,15 @@ import {
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import {
+    WEB_TYPE,
+    NATIVE_TYPE,
+    USER_AGENT_TYPE
+} from '../authtypes';
+
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import { CODE_METHOD, getPartialConfigFromAuthMethod, IMPLICIT_METHOD, PKCE_METHOD, PK_JWT_METHOD, POST_METHOD } from '../authmethods';
+
 
 @Component({
     selector: 'app-app-create',
@@ -40,27 +47,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     ];
 
     public oidcAppTypes: any = [
-        {
-            titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.WEB.TITLE',
-            descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.WEB.DESCRIPTION',
-            type: OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
-            prefix: 'WEB',
-            background: 'rgb(80, 110, 110)',
-        },
-        {
-            titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.TITLE',
-            descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.DESCRIPTION',
-            type: OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE,
-            prefix: 'N',
-            background: '#595d80',
-        },
-        {
-            titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.USERAGENT.TITLE',
-            descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.USERAGENT.DESCRIPTION',
-            type: OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
-            prefix: 'UA',
-            background: '#6a506e',
-        },
+        WEB_TYPE,
+        NATIVE_TYPE,
+        USER_AGENT_TYPE,
     ];
 
     public authMethods: RadioItemAuthType[] = [
@@ -98,9 +87,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             // { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false, disabled: true },
             // TODO show when implemented
         ];
-
-    public redirectControl: FormControl = new FormControl('');
-    public postRedirectControl: FormControl = new FormControl('');
 
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -245,64 +231,22 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         }
     }
 
-    public addUri(input: any, target: string): void {
-        const value = input.value.trim();
-
-        if (value !== '') {
-            if (target === 'REDIRECT' && this.redirectControl.valid) {
-                this.oidcApp.redirectUrisList.push(value);
-                if (input) {
-                    input.value = '';
-                }
-            } else if (target === 'POSTREDIRECT' && this.redirectControl.valid) {
-                this.oidcApp.postLogoutRedirectUrisList.push(value);
-                if (input) {
-                    input.value = '';
-                }
-            }
-        }
-    }
-
-    public removeUri(uri: string, target: string): void {
-        if (target === 'REDIRECT') {
-            const index = this.oidcApp.redirectUrisList.indexOf(uri);
-
-            if (index !== undefined && index >= 0) {
-                this.oidcApp.redirectUrisList.splice(index, 1);
-            }
-        } else if (target === 'POSTREDIRECT') {
-            const index = this.oidcApp.postLogoutRedirectUrisList.indexOf(uri);
-
-            if (index !== undefined && index >= 0) {
-                this.oidcApp.postLogoutRedirectUrisList.splice(index, 1);
-            }
-        }
-    }
-
-    // changeResponseType(): void {
-    //     this.oidcApp.responseTypesList = this.oidcResponseTypes.filter(gt => gt.checked).map(gt => gt.type);
-    // };
-
-    moreThanOneOption(options: Array<{ type: OIDCGrantType, checked: boolean, disabled: boolean; }>): boolean {
-        return options.filter(option => option.disabled === false).length > 1;
-    }
+    // moreThanOneOption(options: Array<{ type: OIDCGrantType, checked: boolean, disabled: boolean; }>): boolean {
+    //     return options.filter(option => option.disabled === false).length > 1;
+    // }
 
     get name(): AbstractControl | null {
         return this.firstFormGroup.get('name');
     }
-
     get applicationType(): AbstractControl | null {
         return this.firstFormGroup.get('applicationType');
     }
-
     public grantTypeChecked(type: OIDCGrantType): boolean {
         return this.oidcGrantTypes.filter(gt => gt.checked).map(gt => gt.type).findIndex(t => t === type) > -1;
     }
-
     get responseTypesList(): AbstractControl | null {
         return this.secondFormGroup.get('responseTypesList');
     }
-
     get authMethod(): AbstractControl | null {
         return this.secondFormGroup.get('authMethod');
     }
@@ -312,22 +256,15 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     get formname(): AbstractControl | null {
         return this.form.get('name');
     }
-
-
     get formresponseTypesList(): AbstractControl | null {
         return this.form.get('responseTypesList');
     }
-
-
     get formgrantTypesList(): AbstractControl | null {
         return this.form.get('grantTypesList');
     }
-
-
     get formapplicationType(): AbstractControl | null {
         return this.form.get('applicationType');
     }
-
     get formauthMethodType(): AbstractControl | null {
         return this.form.get('authMethodType');
     }
