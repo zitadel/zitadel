@@ -16,7 +16,6 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/id"
-	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -31,7 +30,6 @@ type Config struct {
 	AuthRequest cache.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
-	KeyConfig   es_key.KeyConfig
 }
 
 type EsRepository struct {
@@ -59,7 +57,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		return nil, err
 	}
 
-	keyAlgorithm, err := crypto.NewAESCrypto(conf.KeyConfig.EncryptionConfig)
+	keyAlgorithm, err := crypto.NewAESCrypto(systemDefaults.KeyConfig.EncryptionConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -85,10 +83,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		return nil, err
 	}
 
-	key, err := es_key.StartKey(es, conf.KeyConfig, keyAlgorithm, idGenerator)
-	if err != nil {
-		return nil, err
-	}
 	iam, err := es_iam.StartIAM(
 		es_iam.IAMConfig{
 			Eventstore: es,
@@ -158,9 +152,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			View:       view,
 		},
 		eventstore.KeyRepository{
-			KeyEvents:          key,
 			View:               view,
-			SigningKeyRotation: conf.KeyConfig.SigningKeyRotation.Duration,
+			SigningKeyRotation: systemDefaults.KeyConfig.SigningKeyRotation.Duration,
 		},
 		eventstore.ApplicationRepo{
 			View:          view,

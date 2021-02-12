@@ -24,6 +24,7 @@ type SystemDefaults struct {
 	IamID                    string
 	Notifications            Notifications
 	WebAuthN                 WebAuthN
+	KeyConfig                KeyConfig
 }
 
 type ZitadelDocs struct {
@@ -96,4 +97,12 @@ type WebAuthN struct {
 	OriginLogin   string
 	OriginConsole string
 	DisplayName   string
+}
+
+type KeyConfig struct {
+	Size               int
+	PrivateKeyLifetime types.Duration
+	PublicKeyLifetime  types.Duration
+	EncryptionConfig   *crypto.KeyConfig
+	SigningKeyRotation types.Duration
 }

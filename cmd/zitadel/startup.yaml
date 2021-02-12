@@ -100,13 +100,6 @@ Auth:
     ConcurrentWorkers: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
-  KeyConfig:
-    Size: 2048
-    PrivateKeyLifetime: 6h
-    PublicKeyLifetime: 30h
-    EncryptionConfig:
-      EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
-    SigningKeyRotation: 10s
 
 Admin:
   SearchLimit: 1000
