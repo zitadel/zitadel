@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	uniqueUserGrant             = "user_grant"
+	UniqueUserGrant             = "user_grant"
 	userGrantEventTypePrefix    = eventstore.EventType("user.grant.")
 	UserGrantAddedType          = userGrantEventTypePrefix + "added"
 	UserGrantChangedType        = userGrantEventTypePrefix + "changed"
@@ -23,14 +23,14 @@ const (
 
 func NewAddUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueUserGrant,
+		UniqueUserGrant,
 		fmt.Sprintf("%s:%s:%s:%v", resourceOwner, userID, projectID, projectGrantID),
 		"Errors.UserGrant.AlreadyExists")
 }
 
 func NewRemoveUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueUserGrant,
+		UniqueUserGrant,
 		fmt.Sprintf("%s:%s:%s:%S", resourceOwner, userID, projectID, projectGrantID))
 }
 

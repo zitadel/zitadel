@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	uniqueProjectnameType  = "project_names"
+	UniqueProjectnameType  = "project_names"
 	projectEventTypePrefix = eventstore.EventType("project.")
 	ProjectAddedType       = projectEventTypePrefix + "added"
 	ProjectChangedType     = projectEventTypePrefix + "changed"
@@ -21,14 +21,14 @@ const (
 
 func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueProjectnameType,
+		UniqueProjectnameType,
 		projectName+resourceOwner,
 		"Errors.Project.AlreadyExists")
 }
 
 func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueProjectnameType,
+		UniqueProjectnameType,
 		projectName+resourceOwner)
 }
 

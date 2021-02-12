@@ -10,19 +10,19 @@ import (
 )
 
 const (
-	uniqueIDPConfigNameType = "idp_config_names"
+	UniqueIDPConfigNameType = "idp_config_names"
 )
 
 func NewAddIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueIDPConfigNameType,
+		UniqueIDPConfigNameType,
 		idpConfigName+resourceOwner,
 		"Errors.IDPConfig.AlreadyExists")
 }
 
 func NewRemoveIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueIDPConfigNameType,
+		UniqueIDPConfigNameType,
 		idpConfigName+resourceOwner)
 }
 

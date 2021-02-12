@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	uniqueMember     = "member"
+	UniqueMember     = "member"
 	AddedEventType   = "member.added"
 	ChangedEventType = "member.changed"
 	RemovedEventType = "member.removed"
@@ -17,14 +17,14 @@ const (
 
 func NewAddMemberUniqueConstraint(aggregateID, userID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueMember,
+		UniqueMember,
 		fmt.Sprintf("%s:%s", aggregateID, userID),
 		"Errors.Member.AlreadyExists")
 }
 
 func NewRemoveMemberUniqueConstraint(aggregateID, userID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueMember,
+		UniqueMember,
 		fmt.Sprintf("%s:%s", aggregateID, userID),
 	)
 }

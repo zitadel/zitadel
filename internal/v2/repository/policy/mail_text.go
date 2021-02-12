@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	uniqueMailText                 = "mail_text"
+	UniqueMailText                 = "mail_text"
 	mailTextPolicyPrefix           = mailPolicyPrefix + "text."
 	MailTextPolicyAddedEventType   = mailTextPolicyPrefix + "added"
 	MailTextPolicyChangedEventType = mailTextPolicyPrefix + "changed"
@@ -18,14 +18,14 @@ const (
 
 func NewAddMailTextUniqueConstraint(aggregateID, mailTextType, langugage string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueMailText,
+		UniqueMailText,
 		fmt.Sprintf("%v:%v:%v", aggregateID, mailTextType, langugage),
 		"Errors.Org.AlreadyExists")
 }
 
 func NewRemoveMailTextUniqueConstraint(aggregateID, mailTextType, langugage string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueMailText,
+		UniqueMailText,
 		fmt.Sprintf("%v:%v:%v", aggregateID, mailTextType, langugage))
 }
 

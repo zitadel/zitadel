@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	uniqueExternalIDPType    = "external_idps"
+	UniqueExternalIDPType    = "external_idps"
 	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
 	externalLoginEventPrefix = humanEventPrefix + "externallogin."
 
@@ -22,14 +22,14 @@ const (
 
 func NewAddExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueExternalIDPType,
+		UniqueExternalIDPType,
 		idpConfigID+externalUserID,
 		"Errors.User.ExternalIDP.AlreadyExists")
 }
 
 func NewRemoveExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueExternalIDPType,
+		UniqueExternalIDPType,
 		idpConfigID+externalUserID)
 }
 

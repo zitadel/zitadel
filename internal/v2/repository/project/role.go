@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	uniqueRoleType      = "project_role"
+	UniqueRoleType      = "project_role"
 	roleEventTypePrefix = projectEventTypePrefix + "role."
 	RoleAddedType       = roleEventTypePrefix + "added"
 	RoleChangedType     = roleEventTypePrefix + "changed"
@@ -19,14 +19,14 @@ var (
 
 func NewAddProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueRoleType,
+		UniqueRoleType,
 		fmt.Sprintf("%s:%s", roleKey, projectID),
 		"Errors.Project.Role.AlreadyExists")
 }
 
 func NewRemoveProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueRoleType,
+		UniqueRoleType,
 		fmt.Sprintf("%s:%s", roleKey, projectID))
 }
 

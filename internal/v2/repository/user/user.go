@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	uniqueUsername            = "usernames"
+	UniqueUsername            = "usernames"
 	userEventTypePrefix       = eventstore.EventType("user.")
 	UserLockedType            = userEventTypePrefix + "locked"
 	UserUnlockedType          = userEventTypePrefix + "unlocked"
@@ -29,7 +29,7 @@ func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMus
 		uniqueUserName = userName + resourceOwner
 	}
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueUsername,
+		UniqueUsername,
 		uniqueUserName,
 		"Errors.User.AlreadyExists")
 }
@@ -40,7 +40,7 @@ func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, userLogin
 		uniqueUserName = userName + resourceOwner
 	}
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueUsername,
+		UniqueUsername,
 		uniqueUserName)
 }
 
