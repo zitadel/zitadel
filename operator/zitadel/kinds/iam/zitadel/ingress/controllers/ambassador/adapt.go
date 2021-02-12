@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/host"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
@@ -19,39 +18,25 @@ func Adapt(virtualHost string) core.PathAdapter {
 
 	seenHosts := make(map[string]struct{})
 
-	return func(
-		monitor mntr.Monitor,
-		namespace string,
-		id labels.IDLabels,
-		grpc bool,
-		originCASecretName,
-		prefix,
-		rewrite,
-		service string,
-		servicePort uint16,
-		timeoutMS,
-		connectTimeoutMS int,
-		cors *core.CORS,
-		controllerSpecifics map[string]interface{},
-	) (operator.QueryFunc, operator.DestroyFunc, error) {
+	return func(args core.PathArguments) (operator.QueryFunc, operator.DestroyFunc, error) {
 
-		destroyMapping, err := mapping.AdaptFuncToDestroy(namespace, id.Name())
+		destroyMapping, err := mapping.AdaptFuncToDestroy(args.Namespace, args.ID.Name())
 		if err != nil {
 			return nil, nil, err
 		}
 
 		queryMapping, err := mapping.AdaptFuncToEnsure(
-			monitor,
-			namespace,
-			id,
-			grpc,
+			args.Monitor,
+			args.Namespace,
+			args.ID,
+			args.GRPC,
 			virtualHost,
-			prefix,
-			rewrite,
-			fmt.Sprintf("%s:%d", service, servicePort),
-			timeoutMS,
-			connectTimeoutMS,
-			cors.ToAmassadorCORS(),
+			args.Prefix,
+			args.Rewrite,
+			fmt.Sprintf("%s:%d", args.Service, args.ServicePort),
+			args.TimeoutMS,
+			args.ConnectTimeoutMS,
+			args.CORS.ToAmassadorCORS(),
 		)
 		if err != nil {
 			return nil, nil, err
@@ -70,23 +55,23 @@ func Adapt(virtualHost string) core.PathAdapter {
 
 			hostName := strings.ReplaceAll(virtualHost, ".", "-")
 
-			destroyHost, err := host.AdaptFuncToDestroy(namespace, hostName)
+			destroyHost, err := host.AdaptFuncToDestroy(args.Namespace, hostName)
 			if err != nil {
 				return nil, nil, err
 			}
 
 			queryHost, err := host.AdaptFuncToEnsure(
-				monitor,
-				namespace,
+				args.Monitor,
+				args.Namespace,
 				hostName,
-				labels.MustK8sMap(id),
+				labels.MustK8sMap(args.ID),
 				virtualHost,
 				"none",
 				"",
 				map[string]string{
 					"hostname": virtualHost,
 				},
-				originCASecretName,
+				args.OriginCASecretName,
 			)
 			if err != nil {
 				return nil, nil, err
@@ -96,9 +81,9 @@ func Adapt(virtualHost string) core.PathAdapter {
 		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				return operator.QueriersToEnsureFunc(monitor, false, queriers, k8sClient, queried)
+				return operator.QueriersToEnsureFunc(args.Monitor, false, queriers, k8sClient, queried)
 			},
-			operator.DestroyersToDestroyFunc(monitor, destroyers),
+			operator.DestroyersToDestroyFunc(args.Monitor, destroyers),
 			nil
 	}
 }

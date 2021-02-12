@@ -45,135 +45,135 @@ func AdaptFunc(
 		MaxAge:         "86400",
 	}
 
-	queryAdminR, destroyAdminR, err := apiAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, AdminRName),
-		false,
-		originCASecretName,
-		"/admin/v1",
-		"/admin/v1",
-		httpService,
-		httpPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryAdminR, destroyAdminR, err := apiAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, AdminRName),
+		GRPC:                false,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/admin/v1",
+		Rewrite:             "/admin/v1",
+		Service:             httpService,
+		ServicePort:         httpPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryMgmtRest, destroyMgmtRest, err := apiAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, MgmtName),
-		false,
-		originCASecretName,
-		"/management/v1/",
-		"/management/v1/",
-		httpService,
-		httpPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryMgmtRest, destroyMgmtRest, err := apiAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, MgmtName),
+		GRPC:                false,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/management/v1/",
+		Rewrite:             "/management/v1/",
+		Service:             httpService,
+		ServicePort:         httpPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryOAuthv2, destroyOAuthv2, err := apiAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, OauthName),
-		false,
-		originCASecretName,
-		"/oauth/v2/",
-		"/oauth/v2/",
-		httpService,
-		httpPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryOAuthv2, destroyOAuthv2, err := apiAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, OauthName),
+		GRPC:                false,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/oauth/v2/",
+		Rewrite:             "/oauth/v2/",
+		Service:             httpService,
+		ServicePort:         httpPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryAuthR, destroyAuthR, err := apiAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, AuthRName),
-		false,
-		originCASecretName,
-		"/auth/v1/",
-		"/auth/v1/",
-		httpService,
-		httpPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryAuthR, destroyAuthR, err := apiAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, AuthRName),
+		GRPC:                false,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/auth/v1/",
+		Rewrite:             "/auth/v1/",
+		Service:             httpService,
+		ServicePort:         httpPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryAuthorize, destroyAuthorize, err := accountsAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, AuthorizeName),
-		false,
-		originCASecretName,
-		"/oauth/v2/authorize",
-		"/oauth/v2/authorize",
-		httpService,
-		httpPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryAuthorize, destroyAuthorize, err := accountsAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, AuthorizeName),
+		GRPC:                false,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/oauth/v2/authorize",
+		Rewrite:             "/oauth/v2/authorize",
+		Service:             httpService,
+		ServicePort:         httpPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryEndsession, destroyEndsession, err := accountsAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, EndsessionName),
-		false,
-		originCASecretName,
-		"/oauth/v2/endsession",
-		"/oauth/v2/endsession",
-		httpService,
-		httpPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryEndsession, destroyEndsession, err := accountsAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, EndsessionName),
+		GRPC:                false,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/oauth/v2/endsession",
+		Rewrite:             "/oauth/v2/endsession",
+		Service:             httpService,
+		ServicePort:         httpPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryIssuer, destroyIssuer, err := issuerAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, IssuerName),
-		false,
-		originCASecretName,
-		"/.well-known/openid-configuration",
-		"/oauth/v2/.well-known/openid-configuration",
-		httpService,
-		httpPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryIssuer, destroyIssuer, err := issuerAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, IssuerName),
+		GRPC:                false,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/.well-known/openid-configuration",
+		Rewrite:             "/oauth/v2/.well-known/openid-configuration",
+		Service:             httpService,
+		ServicePort:         httpPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}

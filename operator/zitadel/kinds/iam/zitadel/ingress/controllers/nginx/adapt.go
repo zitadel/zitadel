@@ -8,10 +8,7 @@ import (
 
 	"github.com/caos/zitadel/operator"
 
-	"github.com/caos/orbos/mntr"
-
 	"github.com/caos/orbos/pkg/kubernetes/resources/ingress"
-	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/core"
 )
 
@@ -32,74 +29,60 @@ const (
 var _ core.HostAdapter = Adapt
 
 func Adapt(virtualHost string) core.PathAdapter {
-	return func(
-		monitor mntr.Monitor,
-		namespace string,
-		id labels.IDLabels,
-		grpc bool,
-		originCASecretName,
-		prefix,
-		rewrite,
-		service string,
-		servicePort uint16,
-		timeoutMS,
-		connectTimeoutMS int,
-		cors *core.CORS,
-		controllerSpecifics map[string]interface{},
-	) (operator.QueryFunc, operator.DestroyFunc, error) {
+	return func(args core.PathArguments) (operator.QueryFunc, operator.DestroyFunc, error) {
 
-		timeoutMSStr := fmt.Sprintf("%dms", timeoutMS)
-		connTimeoutMSStr := fmt.Sprintf("%dms", connectTimeoutMS)
+		timeoutMSStr := fmt.Sprintf("%dms", args.TimeoutMS)
+		connTimeoutMSStr := fmt.Sprintf("%dms", args.ConnectTimeoutMS)
 
 		annotations := map[string]string{
 			backendProtocolKey: "HTTP",
-			rewriteKey:         rewrite + "$1",
+			rewriteKey:         args.Rewrite + "$1",
 			readTimeoutKey:     timeoutMSStr,
 			sendTimeoutKey:     timeoutMSStr,
 			connectTimeoutKey:  connTimeoutMSStr,
 		}
 
-		if grpc {
+		if args.GRPC {
 			annotations[backendProtocolKey] = "GRPC"
 		}
 
-		if cors != nil {
+		if args.CORS != nil {
 			annotations[enableCorsKey] = "true"
-			annotations[corsAllowOriginKey] = cors.Origins
-			annotations[corsAllowMethodsKey] = cors.Methods
-			annotations[corsAllowHeadersKey] = cors.Headers
-			annotations[corsAllowCredentialsKey] = strconv.FormatBool(cors.Credentials)
-			annotations[corsMaxAgeKey] = cors.MaxAge
+			annotations[corsAllowOriginKey] = args.CORS.Origins
+			annotations[corsAllowMethodsKey] = args.CORS.Methods
+			annotations[corsAllowHeadersKey] = args.CORS.Headers
+			annotations[corsAllowCredentialsKey] = strconv.FormatBool(args.CORS.Credentials)
+			annotations[corsMaxAgeKey] = args.CORS.MaxAge
 		}
 
-		for k, v := range controllerSpecifics {
+		for k, v := range args.ControllerSpecifics {
 			annotations[k] = fmt.Sprintf("%v", v)
 		}
 
 		query, err := ingress.AdaptFuncToEnsure(
-			namespace,
-			id,
+			args.Namespace,
+			args.ID,
 			virtualHost,
-			prefix+"(.*)",
-			service,
-			servicePort,
+			args.Prefix+"(.*)",
+			args.Service,
+			args.ServicePort,
 			annotations,
 		)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		destroy, err := ingress.AdaptFuncToDestroy(namespace, id.Name())
+		destroy, err := ingress.AdaptFuncToDestroy(args.Namespace, args.ID.Name())
 		if err != nil {
 			return nil, nil, err
 		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				return operator.QueriersToEnsureFunc(monitor, false, []operator.QueryFunc{
+				return operator.QueriersToEnsureFunc(args.Monitor, false, []operator.QueryFunc{
 					operator.ResourceQueryToZitadelQuery(query),
 				}, k8sClient, queried)
 			},
-			operator.DestroyersToDestroyFunc(monitor, []operator.DestroyFunc{
+			operator.DestroyersToDestroyFunc(args.Monitor, []operator.DestroyFunc{
 				operator.ResourceDestroyToZitadelDestroy(destroy)}),
 			nil
 	}

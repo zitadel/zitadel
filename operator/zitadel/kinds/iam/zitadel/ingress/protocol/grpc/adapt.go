@@ -39,59 +39,59 @@ func AdaptFunc(
 		MaxAge:         "86400",
 	}
 
-	queryAdminG, destroyAdminG, err := apiAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, AdminIName),
-		true,
-		originCASecretName,
-		"/caos.zitadel.admin.api.v1.AdminService/",
-		"/caos.zitadel.admin.api.v1.AdminService/",
-		grpcService,
-		grpcPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryAdminG, destroyAdminG, err := apiAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, AdminIName),
+		GRPC:                true,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/caos.zitadel.admin.api.v1.AdminService/",
+		Rewrite:             "/caos.zitadel.admin.api.v1.AdminService/",
+		Service:             grpcService,
+		ServicePort:         grpcPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryAuthG, destroyAuthG, err := apiAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, AuthIName),
-		true,
-		originCASecretName,
-		"/caos.zitadel.auth.api.v1.AuthService/",
-		"/caos.zitadel.auth.api.v1.AuthService/",
-		grpcService,
-		grpcPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryAuthG, destroyAuthG, err := apiAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, AuthIName),
+		GRPC:                true,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/caos.zitadel.auth.api.v1.AuthService/",
+		Rewrite:             "/caos.zitadel.auth.api.v1.AuthService/",
+		Service:             grpcService,
+		ServicePort:         grpcPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	queryMgmtGRPC, destroyMgmtGRPC, err := apiAdapter(
-		monitor,
-		namespace,
-		labels.MustForName(componentLabels, MgmtIName),
-		true,
-		originCASecretName,
-		"/caos.zitadel.management.api.v1.ManagementService/",
-		"/caos.zitadel.management.api.v1.ManagementService/",
-		grpcService,
-		grpcPort,
-		30000,
-		30000,
-		cors,
-		controllerSpecifics,
-	)
+	queryMgmtGRPC, destroyMgmtGRPC, err := apiAdapter(core.PathArguments{
+		Monitor:             monitor,
+		Namespace:           namespace,
+		ID:                  labels.MustForName(componentLabels, MgmtIName),
+		GRPC:                true,
+		OriginCASecretName:  originCASecretName,
+		Prefix:              "/caos.zitadel.management.api.v1.ManagementService/",
+		Rewrite:             "/caos.zitadel.management.api.v1.ManagementService/",
+		Service:             grpcService,
+		ServicePort:         grpcPort,
+		TimeoutMS:           30000,
+		ConnectTimeoutMS:    30000,
+		CORS:                cors,
+		ControllerSpecifics: controllerSpecifics,
+	})
 	if err != nil {
 		return nil, nil, err
 	}

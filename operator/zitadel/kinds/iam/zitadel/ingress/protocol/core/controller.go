@@ -20,21 +20,16 @@ func (c *CORS) ToAmassadorCORS() *mapping.CORS {
 
 type HostAdapter func(virtualHost string) PathAdapter
 
-type PathAdapter func(
-	monitor mntr.Monitor,
-	namespace string,
-	labels labels.IDLabels,
-	grpc bool,
-	originCASecretName,
-	prefix,
-	rewrite,
-	service string,
-	servicePort uint16,
-	timeoutMS,
-	connectTimeoutMS int,
-	cors *CORS,
-	controllerSpecifics map[string]interface{}) (
-	operator.QueryFunc,
-	operator.DestroyFunc,
-	error,
-)
+type PathAdapter func(PathArguments) (operator.QueryFunc, operator.DestroyFunc, error)
+
+type PathArguments struct {
+	Monitor                                      mntr.Monitor
+	Namespace                                    string
+	ID                                           labels.IDLabels
+	GRPC                                         bool
+	OriginCASecretName, Prefix, Rewrite, Service string
+	ServicePort                                  uint16
+	TimeoutMS, ConnectTimeoutMS                  int
+	CORS                                         *CORS
+	ControllerSpecifics                          map[string]interface{}
+}
