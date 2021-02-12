@@ -9,11 +9,12 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/user/model"
 )
 
 type Machine struct {
-	*User `json:"-"`
+	user *User `json:"-"`
 
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
@@ -115,7 +116,7 @@ func MachineKeyToModel(machine *MachineKey) *model.MachineKey {
 		ExpirationDate: machine.ExpirationDate,
 		KeyID:          machine.KeyID,
 		PrivateKey:     machine.privateKey,
-		Type:           model.MachineKeyType(machine.Type),
+		Type:           key_model.AuthNKeyType(machine.Type),
 	}
 }
 

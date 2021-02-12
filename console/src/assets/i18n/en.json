@@ -152,6 +152,36 @@
             },
             "EMPTY":"No entries"
         },
+        "PASSWORDLESS": {
+            "TABLETYPE":"Type",
+            "TABLESTATE":"Status",
+            "NAME":"Name",
+            "TABLEACTIONS":"Actions",
+            "TITLE": "Passwordless Authentication",
+            "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL passwordless.",
+            "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
+            "U2F":"Add authenticator",
+            "U2F_DIALOG_TITLE": "Verify authenticator",
+            "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
+            "U2F_SUCCESS":"Passwordless Auth created successfully!",
+            "U2F_ERROR":"An error during U2F setup occurred!",
+            "U2F_NAME":"Authenticator Name",
+            "TYPE": {
+                "0": "No MFA defined",
+                "1": "OTP",
+                "2": "U2F"
+            },
+            "STATE": {
+                "0": "No State",
+                "1": "Not Ready",
+                "2": "Ready",
+                "3": "Deleted"
+            },
+            "DIALOG": {
+                "DELETE_TITLE":"Remove Passwordless Authentication Method",
+                "DELETE_DESCRIPTION":"You are about to delete a passwordless Authentication method. Are you sure?"
+            }
+        },
         "MFA": {
             "TABLETYPE":"Type",
             "TABLESTATE":"Status",
@@ -353,6 +383,7 @@
             "EMAILVERIFICATIONSENT":"E-mail verification code sent.",
             "OTPREMOVED":"OTP removed.",
             "U2FREMOVED":"U2F removed.",
+            "PASSWORDLESSREMOVED":"Passwordless removed.",
             "INITIALPASSWORDSET":"Initial password set.",
             "PASSWORDNOTIFICATIONSENT":"Password change notification sent.",
             "PASSWORDCHANGED":"Password changed successfully.",
@@ -877,6 +908,11 @@
             "TITLE":"Add Identity Provider",
             "DESCRIPTION":"You can select predefined or selfcreated providers for authentication.",
             "SELECTIDPS":"Identity providers"
+        },
+        "PASSWORDLESS":"Passwordless Login",
+        "PASSWORDLESSTYPE": {
+            "0":"Not allowed",
+            "1":"Allowed"
         }
     },
     "APP": {
@@ -951,8 +987,11 @@
             "OVERVIEWTITLE":"You are now done. Review your configuration.",
             "ACCESSTOKENROLEASSERTION":"Add user roles to the access token",
             "ACCESSTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the access token.",
-            "IDTOKENROLEASSERTION":"Add user roles to the id token",
-            "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the id token."
+            "IDTOKENROLEASSERTION":"User roles inside ID Token",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the ID token.",
+            "IDTOKENUSERINFOASSERTION":"User Info inside ID Token",
+            "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Enables clients to retrieve profile, email, phone and address claims from ID token.",
+            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf."
         },
         "TOAST": {
             "REACTIVATED":"Application reactivated.",

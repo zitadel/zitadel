@@ -40,6 +40,15 @@ type IAMRepository interface {
 	AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error)
 	ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error)
 
+	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
+	AddDefaultMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error)
+	ChangeDefaultMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error)
+
+	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
+	GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error)
+	AddDefaultMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
+	ChangeDefaultMailText(ctx context.Context, policy *iam_model.MailText) (*iam_model.MailText, error)
+
 	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
 	AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error)
 	ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error)

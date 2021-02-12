@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
 )
 
 type Machine struct {
@@ -21,14 +22,7 @@ type MachineKey struct {
 	models.ObjectRoot
 
 	KeyID          string
-	Type           MachineKeyType
+	Type           key_model.AuthNKeyType
 	ExpirationDate time.Time
 	PrivateKey     []byte
 }
-
-type MachineKeyType int32
-
-const (
-	MachineKeyTypeNONE = iota
-	MachineKeyTypeJSON
-)

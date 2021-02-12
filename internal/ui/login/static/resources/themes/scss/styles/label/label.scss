@@ -1,0 +1,5 @@
+@import './label_base.scss';
+
+.lgn-label {
+  @include lgn-label-base;
+}

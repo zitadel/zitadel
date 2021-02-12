@@ -2,24 +2,57 @@ package handler
 
 import (
 	"github.com/caos/logging"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 )
 
-type OrgDomain struct {
-	handler
-}
-
 const (
 	orgDomainTable = "management.org_domains"
 )
 
+type OrgDomain struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newOrgDomain(handler handler) *OrgDomain {
+	h := &OrgDomain{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *OrgDomain) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
+
 func (d *OrgDomain) ViewModel() string {
 	return orgDomainTable
+}
+
+func (_ *OrgDomain) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate}
+}
+
+func (p *OrgDomain) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestOrgDomainSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
@@ -28,7 +61,7 @@ func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate).
+		AggregateTypeFilter(d.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -72,7 +105,7 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		for _, existingDomain := range existingDomains {
 			existingDomain.Primary = false
 		}
-		err = d.view.PutOrgDomains(existingDomains, 0, event.CreationDate)
+		err = d.view.PutOrgDomains(existingDomains, event)
 		if err != nil {
 			return err
 		}
@@ -82,14 +115,14 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return d.view.DeleteOrgDomain(event.AggregateID, domain.Domain, event.Sequence, event.CreationDate)
+		return d.view.DeleteOrgDomain(event.AggregateID, domain.Domain, event)
 	default:
-		return d.view.ProcessedOrgDomainSequence(event.Sequence, event.CreationDate)
+		return d.view.ProcessedOrgDomainSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return d.view.PutOrgDomain(domain, domain.Sequence, event.CreationDate)
+	return d.view.PutOrgDomain(domain, event)
 }
 
 func (d *OrgDomain) OnError(event *models.Event, err error) error {

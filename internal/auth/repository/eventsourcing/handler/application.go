@@ -5,7 +5,9 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -13,17 +15,50 @@ import (
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
-type Application struct {
-	handler
-	projectEvents *proj_event.ProjectEventstore
-}
-
 const (
 	applicationTable = "auth.applications"
 )
 
+type Application struct {
+	handler
+	projectEvents *proj_event.ProjectEventstore
+	subscription  *eventstore.Subscription
+}
+
+func newApplication(handler handler, projectEvents *proj_event.ProjectEventstore) *Application {
+	h := &Application{
+		handler:       handler,
+		projectEvents: projectEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (a *Application) subscribe() {
+	a.subscription = a.es.Subscribe(a.AggregateTypes()...)
+	go func() {
+		for event := range a.subscription.Events {
+			query.ReduceEvent(a, event)
+		}
+	}()
+}
+
 func (a *Application) ViewModel() string {
 	return applicationTable
+}
+
+func (_ *Application) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.ProjectAggregate}
+}
+
+func (a *Application) CurrentSequence() (uint64, error) {
+	sequence, err := a.view.GetLatestApplicationSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (a *Application) EventQuery() (*models.SearchQuery, error) {
@@ -49,6 +84,8 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 	case es_model.ApplicationChanged,
 		es_model.OIDCConfigAdded,
 		es_model.OIDCConfigChanged,
+		es_model.APIConfigAdded,
+		es_model.APIConfigChanged,
 		es_model.ApplicationDeactivated,
 		es_model.ApplicationReactivated:
 		err = app.SetData(event)
@@ -65,30 +102,33 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return a.view.DeleteApplication(app.ID, event.Sequence, event.CreationDate)
+		return a.view.DeleteApplication(app.ID, event)
 	case es_model.ProjectChanged:
 		apps, err := a.view.ApplicationsByProjectID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		if len(apps) == 0 {
-			return a.view.ProcessedApplicationSequence(event.Sequence, event.CreationDate)
+			return a.view.ProcessedApplicationSequence(event)
 		}
 		for _, app := range apps {
 			if err := app.AppendEvent(event); err != nil {
 				return err
 			}
 		}
-		return a.view.PutApplications(apps, event.Sequence, event.CreationDate)
+		return a.view.PutApplications(apps, event)
 	case es_model.ProjectRemoved:
-		return a.view.DeleteApplicationsByProjectID(event.AggregateID)
+		err = a.view.DeleteApplicationsByProjectID(event.AggregateID)
+		if err == nil {
+			return a.view.ProcessedApplicationSequence(event)
+		}
 	default:
-		return a.view.ProcessedApplicationSequence(event.Sequence, event.CreationDate)
+		return a.view.ProcessedApplicationSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return a.view.PutApplication(app, event.CreationDate)
+	return a.view.PutApplication(app, event)
 }
 
 func (a *Application) OnError(event *models.Event, spoolerError error) error {

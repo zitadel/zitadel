@@ -2,25 +2,59 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-type PasswordLockoutPolicy struct {
-	handler
-}
-
 const (
 	passwordLockoutPolicyTable = "adminapi.password_lockout_policies"
 )
 
+type PasswordLockoutPolicy struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newPasswordLockoutPolicy(handler handler) *PasswordLockoutPolicy {
+	h := &PasswordLockoutPolicy{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (p *PasswordLockoutPolicy) subscribe() {
+	p.subscription = p.es.Subscribe(p.AggregateTypes()...)
+	go func() {
+		for event := range p.subscription.Events {
+			query.ReduceEvent(p, event)
+		}
+	}()
+}
+
 func (p *PasswordLockoutPolicy) ViewModel() string {
 	return passwordLockoutPolicyTable
+}
+
+func (p *PasswordLockoutPolicy) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+}
+
+func (p *PasswordLockoutPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (p *PasswordLockoutPolicy) EventQuery() (*models.SearchQuery, error) {
@@ -29,7 +63,7 @@ func (p *PasswordLockoutPolicy) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate, iam_es_model.IAMAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -53,14 +87,14 @@ func (p *PasswordLockoutPolicy) processPasswordLockoutPolicy(event *models.Event
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordLockoutPolicyRemoved:
-		return p.view.DeletePasswordLockoutPolicy(event.AggregateID, event.Sequence, event.CreationDate)
+		return p.view.DeletePasswordLockoutPolicy(event.AggregateID, event)
 	default:
-		return p.view.ProcessedPasswordLockoutPolicySequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedPasswordLockoutPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutPasswordLockoutPolicy(policy, policy.Sequence, event.CreationDate)
+	return p.view.PutPasswordLockoutPolicy(policy, event)
 }
 
 func (p *PasswordLockoutPolicy) OnError(event *models.Event, err error) error {

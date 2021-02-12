@@ -152,6 +152,36 @@
             },
             "EMPTY":"Keine Einträge"
         },
+        "PASSWORDLESS": {
+            "TABLETYPE":"Typ",
+            "TABLESTATE":"Status",
+            "NAME":"Name",
+            "TABLEACTIONS":"Aktionen",
+            "TITLE": "Passwortlose Authentifizierungsmethoden",
+            "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
+            "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
+            "U2F":"Authentifikator hinzufügen",
+            "U2F_DIALOG_TITLE": "Authentifikator hinzufügen",
+            "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Login an.",
+            "U2F_SUCCESS":"Passwordless erfolgreich erstellt!",
+            "U2F_ERROR":"Ein Fehler ist aufgetreten!",
+            "U2F_NAME":"Authentifikator Name",
+            "TYPE": {
+                "0":"Keine MFA definiert",
+                "1":"OTP",
+                "2":"U2F"
+            },
+            "STATE": {
+                "0": "Kein Status",
+                "1": "Nicht bereit",
+                "2": "Bereit",
+                "3": "Gelöscht"
+            },
+            "DIALOG": {
+                "DELETE_TITLE":"Passwordless entfernen",
+                "DELETE_DESCRIPTION":"Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?"
+            }
+        },
         "MFA": {
             "TABLETYPE":"Typ",
             "TABLESTATE":"Status",
@@ -353,6 +383,7 @@
             "EMAILVERIFICATIONSENT":"Bestätigungscode per E-Mail gesendet.",
             "OTPREMOVED":"OTP entfernt.",
             "U2FREMOVED":"U2F entfernt.",
+            "PASSWORDLESSREMOVED":"Passwordless entfernt.",
             "INITIALPASSWORDSET":"Initiales Passwort gesetzt.",
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt.",
             "PASSWORDCHANGED":"Passwort geändert.",
@@ -877,6 +908,11 @@
             "TITLE":"Identity Provider hinzufügen",
             "DESCRIPTION":"Sie können vordefinierte oder selbsterstellten Provider auswählen",
             "SELECTIDPS":"Identity Provider"
+        },
+        "PASSWORDLESS":"Passwordloser Login",
+        "PASSWORDLESSTYPE": {
+            "0":"Nicht erlaubt",
+            "1":"Erlaubt"
         }
     },
     "APP": {
@@ -951,8 +987,11 @@
             "OVERVIEWTITLE":"Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen.",
             "ACCESSTOKENROLEASSERTION":"Benutzerrollen dem Access Token hinzufügen",
             "ACCESSTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Access Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
-            "IDTOKENROLEASSERTION":"Benutzerrollen dem Id Token hinzufügen",
-            "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt."
+            "IDTOKENROLEASSERTION":"Benutzerrollen im ID Token",
+            "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
+            "IDTOKENUSERINFOASSERTION":"User Info im ID Token",
+            "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
+            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen."
         },
         "TOAST": {
             "REACTIVATED":"Anwendung reaktiviert.",

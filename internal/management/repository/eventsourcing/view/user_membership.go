@@ -1,11 +1,12 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -24,60 +25,60 @@ func (v *View) SearchUserMemberships(request *usr_model.UserMembershipSearchRequ
 	return view.SearchUserMemberships(v.Db, userMembershipTable, request)
 }
 
-func (v *View) PutUserMembership(membership *model.UserMembershipView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutUserMembership(membership *model.UserMembershipView, event *models.Event) error {
 	err := view.PutUserMembership(v.Db, userMembershipTable, membership)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserMembershipSequence(sequence, eventTimestamp)
+	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) BulkPutUserMemberships(memberships []*model.UserMembershipView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) BulkPutUserMemberships(memberships []*model.UserMembershipView, event *models.Event) error {
 	err := view.PutUserMemberships(v.Db, userMembershipTable, memberships...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserMembershipSequence(sequence, eventTimestamp)
+	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) DeleteUserMembership(userID, aggregateID, objectID string, memberType usr_model.MemberType, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteUserMembership(userID, aggregateID, objectID string, memberType usr_model.MemberType, event *models.Event) error {
 	err := view.DeleteUserMembership(v.Db, userMembershipTable, userID, aggregateID, objectID, memberType)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedUserMembershipSequence(eventSequence, eventTimestamp)
+	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) DeleteUserMembershipsByUserID(userID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteUserMembershipsByUserID(userID string, event *models.Event) error {
 	err := view.DeleteUserMembershipsByUserID(v.Db, userMembershipTable, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedUserMembershipSequence(eventSequence, eventTimestamp)
+	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) DeleteUserMembershipsByAggregateID(aggregateID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteUserMembershipsByAggregateID(aggregateID string, event *models.Event) error {
 	err := view.DeleteUserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedUserMembershipSequence(eventSequence, eventTimestamp)
+	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) DeleteUserMembershipsByAggregateIDAndObjectID(aggregateID, objectID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteUserMembershipsByAggregateIDAndObjectID(aggregateID, objectID string, event *models.Event) error {
 	err := view.DeleteUserMembershipsByAggregateIDAndObjectID(v.Db, userMembershipTable, aggregateID, objectID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedUserMembershipSequence(eventSequence, eventTimestamp)
+	return v.ProcessedUserMembershipSequence(event)
 }
 
 func (v *View) GetLatestUserMembershipSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userMembershipTable)
 }
 
-func (v *View) ProcessedUserMembershipSequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(userMembershipTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedUserMembershipSequence(event *models.Event) error {
+	return v.saveCurrentSequence(userMembershipTable, event)
 }
 
 func (v *View) UpdateUserMembershipSpoolerRunTimestamp() error {

@@ -703,3 +703,83 @@ func (repo *OrgRepository) RemovePasswordLockoutPolicy(ctx context.Context) erro
 	}}
 	return repo.OrgEventstore.RemovePasswordLockoutPolicy(ctx, policy)
 }
+
+func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
+	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	template.Default = true
+	return iam_es_model.MailTemplateViewToModel(template), err
+}
+
+func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
+	template, err := repo.View.MailTemplateByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		template, err = repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		template.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTemplateViewToModel(template), err
+}
+
+func (repo *OrgRepository) AddMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
+	template.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddMailTemplate(ctx, template)
+}
+
+func (repo *OrgRepository) ChangeMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error) {
+	template.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangeMailTemplate(ctx, template)
+}
+
+func (repo *OrgRepository) RemoveMailTemplate(ctx context.Context) error {
+	template := &iam_model.MailTemplate{ObjectRoot: models.ObjectRoot{
+		AggregateID: authz.GetCtxData(ctx).OrgID,
+	}}
+	return repo.OrgEventstore.RemoveMailTemplate(ctx, template)
+}
+
+func (repo *OrgRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
+	texts, err := repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTextsViewToModel(texts, true), err
+}
+
+func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
+	defaultIn := false
+	texts, err := repo.View.MailTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) || len(texts) == 0 {
+		texts, err = repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+		if err != nil {
+			return nil, err
+		}
+		defaultIn = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
+}
+
+func (repo *OrgRepository) AddMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	text.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddMailText(ctx, text)
+}
+
+func (repo *OrgRepository) ChangeMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	text.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ChangeMailText(ctx, text)
+}
+
+func (repo *OrgRepository) RemoveMailText(ctx context.Context, text *iam_model.MailText) error {
+	text.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.RemoveMailText(ctx, text)
+}

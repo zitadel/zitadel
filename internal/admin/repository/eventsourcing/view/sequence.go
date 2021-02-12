@@ -1,16 +1,18 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/view/repository"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
 	sequencesTable = "adminapi.current_sequences"
 )
 
-func (v *View) saveCurrentSequence(viewName string, sequence uint64, eventTimeStamp time.Time) error {
-	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, sequence, eventTimeStamp)
+func (v *View) saveCurrentSequence(viewName string, event *models.Event) error {
+	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, event.Sequence, event.CreationDate)
 }
 
 func (v *View) latestSequence(viewName string) (*repository.CurrentSequence, error) {
@@ -30,6 +32,9 @@ func (v *View) updateSpoolerRunSequence(viewName string) error {
 		currentSequence.ViewName = viewName
 	}
 	currentSequence.LastSuccessfulSpoolerRun = time.Now()
+	//update all aggregate types
+	//TODO: not sure if all scenarios work as expected
+	currentSequence.AggregateType = ""
 	return repository.UpdateCurrentSequence(v.Db, sequencesTable, currentSequence)
 }
 

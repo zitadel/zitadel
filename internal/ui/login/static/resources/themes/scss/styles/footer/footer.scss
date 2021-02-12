@@ -1,0 +1,29 @@
+$container-max-width: 350px;
+$footer-height: 50px;
+$footer-padding: 0 1rem;
+
+footer {
+    width: 100%;
+    box-sizing: border-box;
+    background: #00000020;
+    min-height: $footer-height;
+    display: flex;
+    align-items: center;
+    padding: $footer-padding;
+
+    .fill-space {
+        flex: 1;
+    }
+
+    a {
+        font-size: 12px;
+        margin-left: 1rem;
+    }
+
+    @media only screen and (min-width: 600px) {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+}

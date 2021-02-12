@@ -3,26 +3,58 @@ package handler
 import (
 	"time"
 
-	es_model "github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
-
 	"github.com/caos/logging"
-
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/key/repository/eventsourcing"
+	es_model "github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 )
-
-type Key struct {
-	handler
-}
 
 const (
 	keyTable = "auth.keys"
 )
 
+type Key struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newKey(handler handler) *Key {
+	h := &Key{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *Key) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
+
 func (k *Key) ViewModel() string {
 	return keyTable
+}
+
+func (_ *Key) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.KeyPairAggregate}
+}
+
+func (k *Key) CurrentSequence() (uint64, error) {
+	sequence, err := k.view.GetLatestKeySequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (k *Key) EventQuery() (*models.SearchQuery, error) {
@@ -41,11 +73,11 @@ func (k *Key) Reduce(event *models.Event) error {
 			return err
 		}
 		if privateKey.Expiry.Before(time.Now()) && publicKey.Expiry.Before(time.Now()) {
-			return k.view.ProcessedKeySequence(event.Sequence, event.CreationDate)
+			return k.view.ProcessedKeySequence(event)
 		}
-		return k.view.PutKeys(privateKey, publicKey, event.Sequence, event.CreationDate)
+		return k.view.PutKeys(privateKey, publicKey, event)
 	default:
-		return k.view.ProcessedKeySequence(event.Sequence, event.CreationDate)
+		return k.view.ProcessedKeySequence(event)
 	}
 }
 

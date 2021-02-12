@@ -13,6 +13,8 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	key_model "github.com/caos/zitadel/internal/key/model"
+	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
@@ -405,12 +407,57 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appI
 	return changes, nil
 }
 
+func (repo *ProjectRepo) SearchClientKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, sequenceErr := repo.View.GetLatestAuthNKeySequence()
+	logging.Log("EVENT-ADwgw").OnError(sequenceErr).Warn("could not read latest authn key sequence")
+	keys, count, err := repo.View.SearchAuthNKeys(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &key_model.AuthNKeySearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      key_view_model.AuthNKeysToModel(keys),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
+}
+
+func (repo *ProjectRepo) GetClientKey(ctx context.Context, projectID, applicationID, keyID string) (*key_model.AuthNKeyView, error) {
+	key, err := repo.View.AuthNKeyByIDs(applicationID, keyID)
+	if err != nil {
+		return nil, err
+	}
+	return key_view_model.AuthNKeyToModel(key), nil
+}
+
+func (repo *ProjectRepo) AddClientKey(ctx context.Context, key *proj_model.ClientKey) (*proj_model.ClientKey, error) {
+	return repo.ProjectEvents.AddClientKey(ctx, key)
+}
+
+func (repo *ProjectRepo) RemoveClientKey(ctx context.Context, projectID, applicationID, keyID string) error {
+	return repo.ProjectEvents.RemoveApplicationKey(ctx, projectID, applicationID, keyID)
+}
+
 func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
 	return repo.ProjectEvents.ChangeOIDCConfig(ctx, config)
 }
 
+func (repo *ProjectRepo) ChangeAPIConfig(ctx context.Context, config *proj_model.APIConfig) (*proj_model.APIConfig, error) {
+	return repo.ProjectEvents.ChangeAPIConfig(ctx, config)
+}
+
 func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
 	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
+}
+
+func (repo *ProjectRepo) ChangeAPIConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.APIConfig, error) {
+	return repo.ProjectEvents.ChangeAPIConfigSecret(ctx, projectID, appID)
 }
 
 func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (*proj_model.ProjectGrantView, error) {

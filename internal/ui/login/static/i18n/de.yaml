@@ -1,5 +1,5 @@
 Password:
-  Title: Passwort
+  Title: Willkommen zurück!
   Description: Gib deine Benutzerdaten ein.
   Password: Passwort
   MinLength: Mindestlänge
@@ -10,7 +10,7 @@ Password:
 
 Login:
   Title: Anmeldung
-  Description: Gib deine Benutzerdaten ein.
+  Description: Mit ZITADEL-Konto anmelden.
   TitleLinking: Anmeldung für Benutzer Linking
   DescriptionLinking: Gib deine Benutzerdaten ein um den externen Benutzer mit einem ZITADEL Benutzer zu linken.
   Loginname: Loginname
@@ -157,11 +157,12 @@ Registration:
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
   TosLink: https://zitadel.ch/pdf/agb.pdf
+  ExternalLogin: oder registriere dich mit einem externen Benutzer
 
 RegistrationOrg:
   Title: Organisations Registration
   Description: Gib deinen Organisationsnamen und deine Benutzerangaben an.
-  FreeTillEndOfYear: Wir bieten den premium Tier FORTRESS während der Einführungsphase bis zum Ende des Jahres 2020 gratis an.
+  FreeTillEndOfYear: Wir bieten den premium Tier FORTRESS während der Einführungsphase bis zum Ende des ersten Quartals 2021 gratis an.
   OrgName: Organisationsname
   OrgDomain: Domäne
   Email: E-Mail
@@ -209,6 +210,12 @@ Actions:
   RegisterToken: Token registrieren
   ValidateToken: Token validieren
   Recreate: erneut erstellen
+  PasswordLogin: Mit Passwort anmelden
+
+Footer:
+  TosPrivacyPolicy: Datenschutz und AGB
+  TosLink: https://zitadel.ch/pdf/agb.pdf
+  Help: Hilfe
 
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten

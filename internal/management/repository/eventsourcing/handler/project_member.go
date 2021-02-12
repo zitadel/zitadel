@@ -5,8 +5,10 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
@@ -15,17 +17,53 @@ import (
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-type ProjectMember struct {
-	handler
-	userEvents *usr_event.UserEventstore
-}
-
 const (
 	projectMemberTable = "management.project_members"
 )
 
+type ProjectMember struct {
+	handler
+	userEvents   *usr_event.UserEventstore
+	subscription *eventstore.Subscription
+}
+
+func newProjectMember(
+	handler handler,
+	userEvents *usr_event.UserEventstore,
+) *ProjectMember {
+	h := &ProjectMember{
+		handler:    handler,
+		userEvents: userEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *ProjectMember) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
+
 func (p *ProjectMember) ViewModel() string {
 	return projectMemberTable
+}
+
+func (_ *ProjectMember) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{proj_es_model.ProjectAggregate, usr_es_model.UserAggregate}
+}
+
+func (p *ProjectMember) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestProjectMemberSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (p *ProjectMember) EventQuery() (*models.SearchQuery, error) {
@@ -34,7 +72,7 @@ func (p *ProjectMember) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(proj_es_model.ProjectAggregate, usr_es_model.UserAggregate).
+		AggregateTypeFilter(p.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
@@ -72,16 +110,16 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectMember(event.AggregateID, member.UserID, event.Sequence, event.CreationDate)
+		return p.view.DeleteProjectMember(event.AggregateID, member.UserID, event)
 	case proj_es_model.ProjectRemoved:
 		return p.view.DeleteProjectMembersByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedProjectMemberSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectMemberSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectMember(member, member.Sequence, event.CreationDate)
+	return p.view.PutProjectMember(member, event)
 }
 
 func (p *ProjectMember) processUser(event *models.Event) (err error) {
@@ -96,7 +134,7 @@ func (p *ProjectMember) processUser(event *models.Event) (err error) {
 			return err
 		}
 		if len(members) == 0 {
-			return p.view.ProcessedProjectMemberSequence(event.Sequence, event.CreationDate)
+			return p.view.ProcessedProjectMemberSequence(event)
 		}
 		user, err := p.userEvents.UserByID(context.Background(), event.AggregateID)
 		if err != nil {
@@ -105,9 +143,9 @@ func (p *ProjectMember) processUser(event *models.Event) (err error) {
 		for _, member := range members {
 			p.fillUserData(member, user)
 		}
-		return p.view.PutProjectMembers(members, event.Sequence, event.CreationDate)
+		return p.view.PutProjectMembers(members, event)
 	default:
-		return p.view.ProcessedProjectMemberSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectMemberSequence(event)
 	}
 	return nil
 }

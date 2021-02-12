@@ -1,0 +1,54 @@
+$lgn-checkbox-font-size: 14px !default;
+
+@mixin lgn-checkbox-base {
+    display: inline-block;
+    position: relative;
+    margin: 0 0 10px;
+    font-size: $lgn-checkbox-font-size;
+    line-height: 24px;
+    box-sizing: inherit;
+    
+    input[type='checkbox'] {
+        position: absolute;
+        top: 4px;
+        left: 0;
+        width: 16px;
+        height: 16px;
+        opacity: 0;    
+        z-index: 0;
+        box-sizing: inherit;
+    }
+    
+    // Unchecked
+    label {
+        display: block;
+        padding: 0 0 0 30px;
+        cursor: pointer;
+        box-sizing: inherit;
+        font-size: $lgn-checkbox-font-size;
+        line-height: 28px;
+        
+        &:before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+            transition: all .28s cubic-bezier(.4, 0, .2, 1);
+            transition-property: background-color, border-color;
+        }
+        
+        &:after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 6px;
+            height: 12px;
+            transform: rotate(45deg);
+            transition: border-color .28s cubic-bezier(.4, 0, .2, 1);
+        }
+    } 
+}

@@ -15,6 +15,8 @@ const (
 	Step6
 	Step7
 	Step8
+	Step9
+	Step10
 	//StepCount marks the the length of possible steps (StepCount-1 == last possible step)
 	StepCount
 )
@@ -33,6 +35,8 @@ type IAM struct {
 	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy
 	DefaultPasswordAgePolicy        *PasswordAgePolicy
 	DefaultPasswordLockoutPolicy    *PasswordLockoutPolicy
+	DefaultMailTemplate             *MailTemplate
+	DefaultMailTexts                []*MailText
 }
 
 func (iam *IAM) GetMember(userID string) (int, *IAMMember) {
@@ -48,6 +52,15 @@ func (iam *IAM) GetIDP(idpID string) (int, *IDPConfig) {
 	for i, idp := range iam.IDPs {
 		if idp.IDPConfigID == idpID {
 			return i, idp
+		}
+	}
+	return -1, nil
+}
+
+func (iam *IAM) GetDefaultMailText(mailTextType string, language string) (int, *MailText) {
+	for i, m := range iam.DefaultMailTexts {
+		if m.MailTextType == mailTextType && m.Language == language {
+			return i, m
 		}
 	}
 	return -1, nil

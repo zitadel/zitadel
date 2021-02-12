@@ -38,6 +38,11 @@ const (
 	LabelPolicyAdded   models.EventType = "iam.policy.label.added"
 	LabelPolicyChanged models.EventType = "iam.policy.label.changed"
 
+	MailTemplateAdded   models.EventType = "iam.mail.template.added"
+	MailTemplateChanged models.EventType = "iam.mail.template.changed"
+	MailTextAdded       models.EventType = "iam.mail.text.added"
+	MailTextChanged     models.EventType = "iam.mail.text.changed"
+
 	PasswordComplexityPolicyAdded   models.EventType = "iam.policy.password.complexity.added"
 	PasswordComplexityPolicyChanged models.EventType = "iam.policy.password.complexity.changed"
 

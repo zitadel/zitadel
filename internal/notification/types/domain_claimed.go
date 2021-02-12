@@ -1,11 +1,11 @@
 package types
 
 import (
-	"net/http"
+	"html"
 	"strings"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/i18n"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/notification/templates"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -15,7 +15,7 @@ type DomainClaimedData struct {
 	URL string
 }
 
-func SendDomainClaimed(dir http.FileSystem, i18n *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults) error {
+func SendDomainClaimed(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, colors *iam_model.LabelPolicyView) error {
 	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.DomainClaimed, &UrlData{UserID: user.ID})
 	if err != nil {
 		return err
@@ -27,11 +27,28 @@ func SendDomainClaimed(dir http.FileSystem, i18n *i18n.Translator, user *view_mo
 		"TempUsername": username,
 		"Domain":       strings.Split(user.LastEmail, "@")[1],
 	}
-	systemDefaults.Notifications.TemplateData.DomainClaimed.Translate(i18n, args, user.PreferredLanguage)
-	data := &DomainClaimedData{TemplateData: systemDefaults.Notifications.TemplateData.DomainClaimed, URL: url}
-	template, err := templates.GetParsedTemplate(dir, data)
+
+	text.Greeting, err = templates.ParseTemplateText(text.Greeting, args)
+	text.Text, err = templates.ParseTemplateText(text.Text, args)
+	text.Text = html.UnescapeString(text.Text)
+
+	emailCodeData := &DomainClaimedData{
+		TemplateData: templates.TemplateData{
+			Title:          text.Title,
+			PreHeader:      text.PreHeader,
+			Subject:        text.Subject,
+			Greeting:       text.Greeting,
+			Text:           html.UnescapeString(text.Text),
+			Href:           url,
+			ButtonText:     text.ButtonText,
+			PrimaryColor:   colors.PrimaryColor,
+			SecondaryColor: colors.SecondaryColor,
+		},
+		URL: url,
+	}
+	template, err := templates.GetParsedTemplate(mailhtml, emailCodeData)
 	if err != nil {
 		return err
 	}
-	return generateEmail(user, systemDefaults.Notifications.TemplateData.DomainClaimed.Subject, template, systemDefaults.Notifications, true)
+	return generateEmail(user, text.Subject, template, systemDefaults.Notifications, true)
 }

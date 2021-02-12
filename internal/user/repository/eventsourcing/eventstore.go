@@ -20,16 +20,12 @@ import (
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/id"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
-)
-
-const (
-	yearLayout            = "2006-01-02"
-	defaultExpirationDate = "9999-01-01"
 )
 
 type UserEventstore struct {
@@ -1302,12 +1298,12 @@ func (es *UserEventstore) verifyMFAOTP(otp *usr_model.OTP, code string) error {
 	return nil
 }
 
-func (es *UserEventstore) AddU2F(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
+func (es *UserEventstore) AddU2F(ctx context.Context, userID string, accountName string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, isLoginUI, user.U2FTokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, accountName, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementDiscouraged, isLoginUI, user.U2FTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1353,7 +1349,7 @@ func (es *UserEventstore) RemoveU2FToken(ctx context.Context, userID, webAuthNTo
 		return err
 	}
 	if _, token := user.Human.GetU2F(webAuthNTokenID); token == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-2M9ds", "Errors.User.NotHuman")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-2M9ds", "Errors.User.MFA.U2F.NotExisting")
 	}
 	repoUser := model.UserFromModel(user)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MFAU2FRemoveAggregate(es.AggregateCreator(), repoUser, &model.WebAuthNTokenID{webAuthNTokenID}))
@@ -1418,12 +1414,12 @@ func (es *UserEventstore) GetPasswordless(ctx context.Context, userID string) ([
 	return user.PasswordlessTokens, nil
 }
 
-func (es *UserEventstore) AddPasswordless(ctx context.Context, userID string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
+func (es *UserEventstore) AddPasswordless(ctx context.Context, userID, accountName string, isLoginUI bool) (*usr_model.WebAuthNToken, error) {
 	user, err := es.HumanByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	webAuthN, err := es.webauthn.BeginRegistration(user, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementRequired, isLoginUI, user.PasswordlessTokens...)
+	webAuthN, err := es.webauthn.BeginRegistration(user, accountName, usr_model.AuthenticatorAttachmentUnspecified, usr_model.UserVerificationRequirementRequired, isLoginUI, user.PasswordlessTokens...)
 	if err != nil {
 		return nil, err
 	}
@@ -1624,14 +1620,13 @@ func (es *UserEventstore) AddMachineKey(ctx context.Context, key *usr_model.Mach
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-5ROh4", "Errors.User.NotMachine")
 	}
 
-	id, err := es.idGenerator.Next()
+	key.KeyID, err = es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	key.KeyID = id
 
 	if key.ExpirationDate.IsZero() {
-		key.ExpirationDate, err = time.Parse(yearLayout, defaultExpirationDate)
+		key.ExpirationDate, err = key_model.DefaultExpiration()
 		if err != nil {
 			logging.Log("EVENT-vzibi").WithError(err).Warn("unable to set default date")
 			return nil, errors.ThrowInternal(err, "EVENT-j68fg", "Errors.Internal")

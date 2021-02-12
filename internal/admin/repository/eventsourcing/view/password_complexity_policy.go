@@ -2,10 +2,10 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	global_view "github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -16,28 +16,28 @@ func (v *View) PasswordComplexityPolicyByAggregateID(aggregateID string) (*model
 	return view.GetPasswordComplexityPolicyByAggregateID(v.Db, passwordComplexityPolicyTable, aggregateID)
 }
 
-func (v *View) PutPasswordComplexityPolicy(policy *model.PasswordComplexityPolicyView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutPasswordComplexityPolicy(policy *model.PasswordComplexityPolicyView, event *models.Event) error {
 	err := view.PutPasswordComplexityPolicy(v.Db, passwordComplexityPolicyTable, policy)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedPasswordComplexityPolicySequence(sequence, eventTimestamp)
+	return v.ProcessedPasswordComplexityPolicySequence(event)
 }
 
-func (v *View) DeletePasswordComplexityPolicy(aggregateID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeletePasswordComplexityPolicy(aggregateID string, event *models.Event) error {
 	err := view.DeletePasswordComplexityPolicy(v.Db, passwordComplexityPolicyTable, aggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedPasswordComplexityPolicySequence(eventSequence, eventTimestamp)
+	return v.ProcessedPasswordComplexityPolicySequence(event)
 }
 
 func (v *View) GetLatestPasswordComplexityPolicySequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(passwordComplexityPolicyTable)
 }
 
-func (v *View) ProcessedPasswordComplexityPolicySequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(passwordComplexityPolicyTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedPasswordComplexityPolicySequence(event *models.Event) error {
+	return v.saveCurrentSequence(passwordComplexityPolicyTable, event)
 }
 
 func (v *View) UpdatePasswordComplexityPolicySpoolerRunTimestamp() error {

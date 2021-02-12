@@ -3,7 +3,9 @@ package handler
 import (
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -11,17 +13,53 @@ import (
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
-type ProjectRole struct {
-	handler
-	projectEvents *proj_event.ProjectEventstore
-}
-
 const (
 	projectRoleTable = "management.project_roles"
 )
 
+type ProjectRole struct {
+	handler
+	projectEvents *proj_event.ProjectEventstore
+	subscription  *eventstore.Subscription
+}
+
+func newProjectRole(
+	handler handler,
+	projectEvents *proj_event.ProjectEventstore,
+) *ProjectRole {
+	h := &ProjectRole{
+		handler:       handler,
+		projectEvents: projectEvents,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (m *ProjectRole) subscribe() {
+	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+	go func() {
+		for event := range m.subscription.Events {
+			query.ReduceEvent(m, event)
+		}
+	}()
+}
+
 func (p *ProjectRole) ViewModel() string {
 	return projectRoleTable
+}
+
+func (_ *ProjectRole) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{es_model.ProjectAggregate}
+}
+
+func (p *ProjectRole) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestProjectRoleSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (p *ProjectRole) EventQuery() (*models.SearchQuery, error) {
@@ -52,16 +90,16 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event.Sequence, event.CreationDate)
+		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event)
 	case es_model.ProjectRemoved:
 		return p.view.DeleteProjectRolesByProjectID(event.AggregateID)
 	default:
-		return p.view.ProcessedProjectRoleSequence(event.Sequence, event.CreationDate)
+		return p.view.ProcessedProjectRoleSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutProjectRole(role, event.CreationDate)
+	return p.view.PutProjectRole(role, event)
 }
 
 func (p *ProjectRole) OnError(event *models.Event, err error) error {

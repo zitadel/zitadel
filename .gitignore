@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+zitadelctl
 
 # Test binary, build with `go test -c`
 *.test
@@ -17,6 +18,7 @@ coverage.txt
 #Debug
 __debug_bin
 debug
+sandbox.go
 
 # IDE
 .idea
@@ -37,6 +39,7 @@ cockroach-data/*
 #binaries
 cmd/zitadel/zitadel
 **/statik/statik.go
+zitadelctl
 
 # buildfolders and generated js
 tmp/
@@ -44,3 +47,4 @@ console/src/app/proto/generated/
 
 pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
+pkg/grpc/*/mock/*.mock.go

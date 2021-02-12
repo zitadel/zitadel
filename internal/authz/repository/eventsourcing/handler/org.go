@@ -3,23 +3,57 @@ package handler
 import (
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 )
 
-type Org struct {
-	handler
-}
-
 const (
 	orgTable = "authz.orgs"
 )
 
+type Org struct {
+	handler
+	subscription *eventstore.Subscription
+}
+
+func newOrg(handler handler) *Org {
+	h := &Org{
+		handler: handler,
+	}
+
+	h.subscribe()
+
+	return h
+}
+
+func (k *Org) subscribe() {
+	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+	go func() {
+		for event := range k.subscription.Events {
+			query.ReduceEvent(k, event)
+		}
+	}()
+}
+
 func (o *Org) ViewModel() string {
 	return orgTable
+}
+
+func (_ *Org) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.OrgAggregate}
+}
+
+func (o *Org) CurrentSequence() (uint64, error) {
+	sequence, err := o.view.GetLatestOrgSequence()
+	if err != nil {
+		return 0, err
+	}
+	return sequence.CurrentSequence, nil
 }
 
 func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
@@ -53,10 +87,10 @@ func (o *Org) Reduce(event *es_models.Event) error {
 			return err
 		}
 	default:
-		return o.view.ProcessedOrgSequence(event.Sequence, event.CreationDate)
+		return o.view.ProcessedOrgSequence(event)
 	}
 
-	return o.view.PutOrg(org, event.CreationDate)
+	return o.view.PutOrg(org, event)
 }
 
 func (o *Org) OnError(event *es_models.Event, spoolerErr error) error {

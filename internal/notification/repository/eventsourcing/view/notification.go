@@ -1,8 +1,8 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -13,8 +13,8 @@ func (v *View) GetLatestNotificationSequence() (*repository.CurrentSequence, err
 	return v.latestSequence(notificationTable)
 }
 
-func (v *View) ProcessedNotificationSequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(notificationTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedNotificationSequence(event *models.Event) error {
+	return v.saveCurrentSequence(notificationTable, event)
 }
 
 func (v *View) UpdateNotificationSpoolerRunTimestamp() error {

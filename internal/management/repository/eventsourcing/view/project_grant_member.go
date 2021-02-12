@@ -1,11 +1,12 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -28,28 +29,28 @@ func (v *View) ProjectGrantMembersByUserID(userID string) ([]*model.ProjectGrant
 	return view.ProjectGrantMembersByUserID(v.Db, projectGrantMemberTable, userID)
 }
 
-func (v *View) PutProjectGrantMember(member *model.ProjectGrantMemberView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutProjectGrantMember(member *model.ProjectGrantMemberView, event *models.Event) error {
 	err := view.PutProjectGrantMember(v.Db, projectGrantMemberTable, member)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectGrantMemberSequence(sequence, eventTimestamp)
+	return v.ProcessedProjectGrantMemberSequence(event)
 }
 
-func (v *View) PutProjectGrantMembers(members []*model.ProjectGrantMemberView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutProjectGrantMembers(members []*model.ProjectGrantMemberView, event *models.Event) error {
 	err := view.PutProjectGrantMembers(v.Db, projectGrantMemberTable, members...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectGrantMemberSequence(sequence, eventTimestamp)
+	return v.ProcessedProjectGrantMemberSequence(event)
 }
 
-func (v *View) DeleteProjectGrantMember(grantID, userID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteProjectGrantMember(grantID, userID string, event *models.Event) error {
 	err := view.DeleteProjectGrantMember(v.Db, projectGrantMemberTable, grantID, userID)
-	if err != nil {
-		return nil
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
-	return v.ProcessedProjectGrantMemberSequence(eventSequence, eventTimestamp)
+	return v.ProcessedProjectGrantMemberSequence(event)
 }
 
 func (v *View) DeleteProjectGrantMembersByProjectID(projectID string) error {
@@ -60,8 +61,8 @@ func (v *View) GetLatestProjectGrantMemberSequence() (*repository.CurrentSequenc
 	return v.latestSequence(projectGrantMemberTable)
 }
 
-func (v *View) ProcessedProjectGrantMemberSequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(projectGrantMemberTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedProjectGrantMemberSequence(event *models.Event) error {
+	return v.saveCurrentSequence(projectGrantMemberTable, event)
 }
 
 func (v *View) UpdateProjectGrantMemberSpoolerRunTimestamp() error {

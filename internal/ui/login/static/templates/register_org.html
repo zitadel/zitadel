@@ -1,8 +1,8 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     <h1>{{t "RegistrationOrg.Title"}}</h1>
-    <p class="free-tier">{{t "RegistrationOrg.FreeTillEndOfYear"}}</p>
+    <p class="lgn-success-label">{{t "RegistrationOrg.FreeTillEndOfYear"}}</p>
     <p>{{t "RegistrationOrg.Description"}}</p>
 </div>
 
@@ -12,58 +12,70 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    <div class="fields">
-        <div class="field">
-            <label class="label" for="orgname">{{t "RegistrationOrg.OrgName"}}</label>
-            <input class="input" type="text" id="orgname" name="orgname" value="{{ .OrgName }}" autofocus required>
+    <div class="lgn-register">
+        <div class="lgn-field">
+            <label class="lgn-label" for="orgname">{{t "RegistrationOrg.OrgName"}}</label>
+            <input class="lgn-input" type="text" id="orgname" name="orgname" value="{{ .RegisterOrgName }}" autofocus
+                required>
+        </div>
+        
+        <div class="double-col">
+            <div class="lgn-field">
+                <label class="lgn-label" for="firstname">{{t "RegistrationOrg.Firstname"}}</label>
+                <input class="lgn-input" type="text" id="firstname" name="firstname" autocomplete="given-name"
+                    value="{{ .Firstname }}" required>
+            </div>
+            <div class="lgn-field">
+                <label class="lgn-label" for="lastname">{{t "RegistrationOrg.Lastname"}}</label>
+                <input class="lgn-input" type="text" id="lastname" name="lastname" autocomplete="family-name"
+                    value="{{ .Lastname }}" required>
+            </div>
         </div>
 
         {{if .UserLoginMustBeDomain}}
-            <div class="field">
-                <label class="label" for="username">{{t "RegistrationOrg.Username"}}</label>
-                <span id="loginname">
-                    <input data-iam-domain="{{ .IamDomain }}"
-                       class="input" type="text" id="username" name="username"
-                       value="{{ .Username }}" autofocus required>
-                    <span id="default-login-suffix" class="loginname-suffix"></span>
-
-                </span>
-            </div>
+        <div class="lgn-field">
+            <label class="lgn-label" for="username">{{t "RegistrationOrg.Username"}}</label>
+            <span id="loginname">
+                <div class="lgn-suffix-wrapper">
+                    <input data-iam-domain="{{ .IamDomain }}" class="lgn-input lgn-suffix-input" type="text" id="username" name="username"
+                        value="{{ .Username }}" autofocus required>
+                    <!-- suffix requires parent div 'lgn-suffix-wrapper', corresponding input class 'lgn-suffix-input' and its id="default-login-suffix" as well as an offset script -->
+                    <span id="default-login-suffix" lgnSuffix class="loginname-suffix"></span>
+                </div>
+            </span>
+        </div>
         {{end}}
-        <div class="field">
-            <label class="label" for="email">{{t "RegistrationOrg.Email"}}</label>
-            <input class="input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" autofocus required>
+        <div class="lgn-field">
+            <label class="lgn-label" for="email">{{t "RegistrationOrg.Email"}}</label>
+            <input class="lgn-input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}"
+                autofocus required>
         </div>
-
-        <div class="field">
-            <label class="label" for="firstname">{{t "RegistrationOrg.Firstname"}}</label>
-            <input class="input" type="text" id="firstname" name="firstname" autocomplete="given-name" value="{{ .Firstname }}" required>
+       <div class="double-col">
+            <div class="lgn-field">
+                <label class="lgn-label" for="register-password">{{t "RegistrationOrg.Password"}}</label>
+                <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
+                    data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
+                    data-has-symbol="{{ .HasSymbol }}" class="lgn-input" type="password" id="register-password"
+                    name="register-password" autocomplete="new-password" required>
+            </div>
+            <div class="lgn-field">
+                <label class="lgn-label" for="register-password-confirmation">{{t "RegistrationOrg.Password2"}}</label>
+                <input class="lgn-input" type="password" id="register-password-confirmation"
+                    name="register-password-confirmation" autocomplete="new-password" required>
+            </div>
         </div>
-        <div class="field">
-            <label class="label" for="lastname">{{t "RegistrationOrg.Lastname"}}</label>
-            <input class="input" type="text" id="lastname" name="lastname" autocomplete="family-name" value="{{ .Lastname }}" required>
-        </div>
-        <div class="field">
-            <label class="label" for="register-password">{{t "RegistrationOrg.Password"}}</label>
-            <input data-minlength="{{ .MinLength }}"
-                   data-has-uppercase="{{ .HasUppercase }}"
-                   data-has-lowercase="{{ .HasLowercase }}"
-                   data-has-number="{{ .HasNumber }}"
-                   data-has-symbol="{{ .HasSymbol }}"
-                   class="input" type="password" id="register-password" name="register-password" autocomplete="new-password" required>
+        <div class="lgn-field">
             {{ .PasswordPolicyDescription }}
         </div>
-        <div class="field">
-            <label class="label" for="register-password-confirmation">{{t "RegistrationOrg.Password2"}}</label>
-            <input class="input" type="password" id="register-password-confirmation" name="register-password-confirmation" autocomplete="new-password" required>
-        </div>
-        <div class="field">
-            <label class="label" for="register-term-confirmation">{{t "RegistrationOrg.Tos"}}</label>
-            <div class="field check-box">
-                <input class="input" type="checkbox" id="register-term-confirmation" name="register-term-confirmation" required>
-                <label for="register-term-confirmation">
+
+        <div class="lgn-field">
+            <label class="lgn-label" for="register-term-confirmation">{{t "RegistrationOrg.Tos"}}</label>
+            <div class="lgn-checkbox">
+                <input class="lgn-input" type="checkbox" id="register-term-confirmation"
+                    name="register-term-confirmation" required>
+                <label class="lgn-label" for="register-term-confirmation">
                     {{t "RegistrationOrg.TosConfirm"}}
-                    <a class="tos-link" target="_blank" href="{{t "RegistrationOrg.TosLink"}}">{{t "RegistrationOrg.TosLinkText"}}</a>
+                    <a class="tos-link" target="_blank" href="{{t " RegistrationOrg.TosLink"}}">{{t "RegistrationOrg.TosLinkText"}}</a>
                 </label>
             </div>
         </div>
@@ -71,12 +83,13 @@
 
     {{template "error-message" .}}
 
-    <div class="actions">
-        <button class="primary right" id="register-button" type="submit">{{t "Actions.Save"}}</button>
+    <div class="lgn-actions">
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" id="register-button" type="submit">{{t "Actions.Save"}}</button>
     </div>
 </form>
 
-
+<script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
 <script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
 <script src="{{ resourceUrl "scripts/register_check.js" }}"></script>

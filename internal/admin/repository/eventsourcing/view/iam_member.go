@@ -2,11 +2,11 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	global_view "github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -25,44 +25,44 @@ func (v *View) IAMMembersByUserID(userID string) ([]*model.IAMMemberView, error)
 	return view.IAMMembersByUserID(v.Db, iamMemberTable, userID)
 }
 
-func (v *View) PutIAMMember(org *model.IAMMemberView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutIAMMember(org *model.IAMMemberView, event *models.Event) error {
 	err := view.PutIAMMember(v.Db, iamMemberTable, org)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedIAMMemberSequence(sequence, eventTimestamp)
+	return v.ProcessedIAMMemberSequence(event)
 }
 
-func (v *View) PutIAMMembers(members []*model.IAMMemberView, sequence uint64, eventTimestamp time.Time) error {
+func (v *View) PutIAMMembers(members []*model.IAMMemberView, event *models.Event) error {
 	err := view.PutIAMMembers(v.Db, iamMemberTable, members...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedIAMMemberSequence(sequence, eventTimestamp)
+	return v.ProcessedIAMMemberSequence(event)
 }
 
-func (v *View) DeleteIAMMember(iamID, userID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteIAMMember(iamID, userID string, event *models.Event) error {
 	err := view.DeleteIAMMember(v.Db, iamMemberTable, iamID, userID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedIAMMemberSequence(eventSequence, eventTimestamp)
+	return v.ProcessedIAMMemberSequence(event)
 }
 
-func (v *View) DeleteIAMMembersByUserID(userID string, eventSequence uint64, eventTimestamp time.Time) error {
+func (v *View) DeleteIAMMembersByUserID(userID string, event *models.Event) error {
 	err := view.DeleteIAMMembersByUserID(v.Db, iamMemberTable, userID)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedIAMMemberSequence(eventSequence, eventTimestamp)
+	return v.ProcessedIAMMemberSequence(event)
 }
 
 func (v *View) GetLatestIAMMemberSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(iamMemberTable)
 }
 
-func (v *View) ProcessedIAMMemberSequence(eventSequence uint64, eventTimestamp time.Time) error {
-	return v.saveCurrentSequence(iamMemberTable, eventSequence, eventTimestamp)
+func (v *View) ProcessedIAMMemberSequence(event *models.Event) error {
+	return v.saveCurrentSequence(iamMemberTable, event)
 }
 
 func (v *View) UpdateIAMMemberSpoolerRunTimestamp() error {

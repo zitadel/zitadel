@@ -1,5 +1,5 @@
 Login:
-  Title: Login
+  Title: Welcome back!
   Description: Enter your logindata.
   TitleLinking: Login for userlinking
   DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
@@ -10,7 +10,7 @@ Login:
 
 UserSelection:
   Title: Select account
-  Description: Select your account.
+  Description: Use your ZITADEL-Account
   TitleLinking: Select account for userlinking
   DescriptionLinking: Select your account to link with your external user.
   OtherUser: Other User
@@ -133,7 +133,7 @@ EmailVerificationDone:
   Title: E-Mail Verification
   Description: Your email address has been successfully verified.
 
-RegistrationOption:
+RegisterOption:
   Title: Registration Options
   Description: Choose how you'd like to register
   RegisterUsernamePassword: With username password
@@ -157,11 +157,12 @@ Registration:
   TosConfirm: I agree the
   TosLinkText: TOS
   TosLink: https://zitadel.ch/pdf/tos.pdf
+  ExternalLogin: or register with an external user
 
 RegistrationOrg:
   Title: Organisation Registration
   Description: Enter your organisationname and userdata.
-  FreeTillEndOfYear: We are offering the premium tier FORTRESS free of charge during the introductory phase until the end of 2020.
+  FreeTillEndOfYear: We are offering the premium tier FORTRESS free of charge during the introductory phase until the end of the first quarter 2021.
   OrgName: Organisationname
   OrgDomain: Domäne
   Email: E-Mail
@@ -209,6 +210,12 @@ Actions:
   RegisterToken: Register Token
   ValidateToken: Validate Token
   Recreate: recreate
+  PasswordLogin: Login with password
+
+Footer:
+  TosPrivacyPolicy: ToS and Privacy Policy
+  TosLink: https://zitadel.ch/pdf/agb.pdf
+  Help: Help
 
 Errors:
   Internal: An internal error occured

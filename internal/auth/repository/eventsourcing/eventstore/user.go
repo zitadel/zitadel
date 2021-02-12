@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	key_model "github.com/caos/zitadel/internal/key/model"
 
 	"github.com/caos/logging"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
+	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -303,11 +305,26 @@ func (repo *UserRepo) RemoveMyMFAOTP(ctx context.Context) error {
 }
 
 func (repo *UserRepo) AddMFAU2F(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddU2F(ctx, userID, true)
+	accountName := ""
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		logging.Log("EVENT-DAqe1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
+	} else {
+		accountName = user.PreferredLoginName
+	}
+	return repo.UserEvents.AddU2F(ctx, userID, accountName, true)
 }
 
 func (repo *UserRepo) AddMyMFAU2F(ctx context.Context) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddU2F(ctx, authz.GetCtxData(ctx).UserID, false)
+	userID := authz.GetCtxData(ctx).UserID
+	accountName := ""
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		logging.Log("EVENT-Ghwl1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
+	} else {
+		accountName = user.PreferredLoginName
+	}
+	return repo.UserEvents.AddU2F(ctx, userID, accountName, false)
 }
 
 func (repo *UserRepo) VerifyMFAU2FSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
@@ -331,7 +348,14 @@ func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*mo
 }
 
 func (repo *UserRepo) AddPasswordless(ctx context.Context, userID string) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddPasswordless(ctx, userID, true)
+	accountName := ""
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		logging.Log("EVENT-Vj2k1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
+	} else {
+		accountName = user.PreferredLoginName
+	}
+	return repo.UserEvents.AddPasswordless(ctx, userID, accountName, true)
 }
 
 func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error) {
@@ -339,7 +363,15 @@ func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNT
 }
 
 func (repo *UserRepo) AddMyPasswordless(ctx context.Context) (*model.WebAuthNToken, error) {
-	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID, false)
+	userID := authz.GetCtxData(ctx).UserID
+	accountName := ""
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		logging.Log("EVENT-AEq21").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get user for loginname")
+	} else {
+		accountName = user.PreferredLoginName
+	}
+	return repo.UserEvents.AddPasswordless(ctx, authz.GetCtxData(ctx).UserID, accountName, false)
 }
 
 func (repo *UserRepo) VerifyPasswordlessSetup(ctx context.Context, userID, tokenName, userAgentID string, credentialData []byte) error {
@@ -485,10 +517,10 @@ func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
 	return nil
 }
 
-func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*model.MachineKeyView, error) {
-	key, err := repo.View.MachineKeyByID(keyID)
+func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*key_model.AuthNKeyView, error) {
+	key, err := repo.View.AuthNKeyByID(keyID)
 	if err != nil {
 		return nil, err
 	}
-	return usr_view_model.MachineKeyToModel(key), nil
+	return key_view_model.AuthNKeyToModel(key), nil
 }
