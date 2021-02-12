@@ -88,10 +88,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public AppState: any = AppState;
     public appNameForm!: FormGroup;
     public appForm!: FormGroup;
+
     public redirectUrisList: string[] = [];
     public postLogoutRedirectUrisList: string[] = [];
-
-    public RedirectType: any = RedirectType;
 
     public isZitadel: boolean = false;
     public docs!: ZitadelDocs.AsObject;
@@ -99,9 +98,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public OIDCApplicationType: any = OIDCApplicationType;
     public OIDCAuthMethodType: any = OIDCAuthMethodType;
     public OIDCTokenType: any = OIDCTokenType;
-
-    public redirectControl: FormControl = new FormControl({ value: '', disabled: true });
-    public postRedirectControl: FormControl = new FormControl({ value: '', disabled: true });
 
     public ChangeType: any = ChangeType;
     constructor(
@@ -165,8 +161,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 if (allowed) {
                     this.appNameForm.enable();
                     this.appForm.enable();
-                    this.redirectControl.enable();
-                    this.postRedirectControl.enable();
                 }
 
                 if (this.app.oidcConfig?.redirectUrisList) {
@@ -272,41 +266,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             }).catch((error: any) => {
                 this.toast.showError(error);
             });
-        }
-    }
-
-    public add(input: any, target: RedirectType): void {
-        if (target === RedirectType.POSTREDIRECT && this.postRedirectControl.valid) {
-            if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
-                this.postLogoutRedirectUrisList.push(input.value);
-            }
-            if (input) {
-                input.value = '';
-            }
-        } else if (target === RedirectType.REDIRECT && this.redirectControl.valid) {
-            if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
-                this.redirectUrisList.push(input.value);
-            }
-            if (input) {
-                input.value = '';
-            }
-        }
-    }
-
-    public remove(redirect: any, target: RedirectType): void {
-        console.log(redirect);
-        if (target === RedirectType.POSTREDIRECT) {
-            const index = this.postLogoutRedirectUrisList.indexOf(redirect);
-
-            if (index >= 0) {
-                this.postLogoutRedirectUrisList.splice(index, 1);
-            }
-        } else if (target === RedirectType.REDIRECT) {
-            const index = this.redirectUrisList.indexOf(redirect);
-
-            if (index >= 0) {
-                this.redirectUrisList.splice(index, 1);
-            }
         }
     }
 

@@ -31,12 +31,14 @@ import { AppDetailComponent } from './app-detail/app-detail.component';
 import { AppSecretDialogComponent } from './app-secret-dialog/app-secret-dialog.component';
 import { AppsRoutingModule } from './apps-routing.module';
 import { A11yModule } from '@angular/cdk/a11y';
+import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
 
 @NgModule({
     declarations: [
         AppCreateComponent,
         AppDetailComponent,
         AppSecretDialogComponent,
+        RedirectUrisComponent,
     ],
     imports: [
         CommonModule,

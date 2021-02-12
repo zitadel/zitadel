@@ -1,0 +1,51 @@
+.form {
+    display: flex;
+    align-items: flex-end;
+    min-width: 320px;
+
+    .formfield {
+        flex: 1;
+    }
+
+    button {
+        margin-bottom: 14px;
+        margin-right: -0.5rem;
+    }
+}
+.uri-list {
+    margin: 0 .5rem;
+    width: 100%;
+
+    .uri-line {
+        display: flex;
+        align-items: center;
+
+        .uri {
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+        }
+
+        .fill-space {
+            flex: 1;
+        }
+
+        .icon-button {
+            height: 30px;
+            line-height: 30px;
+
+            mat-icon {
+                font-size: 1rem !important;
+            }
+        }
+
+        &:not(:hover) {
+            color: var(--grey);
+        }
+    }
+}
+
+.error {
+    font-size: 13px;
+    color: #f44336;
+    margin: 0 .5rem 1.5rem .5rem;
+}

@@ -76,67 +76,24 @@
                 *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
-            <form class="chip-form" (ngSubmit)="add(redInput, RedirectType.REDIRECT)">
-                <cnsl-form-field class="formfield full-width">
-                    <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
-
-                    <input #redInput cnslInput placeholder="ex. https://" [formControl]="redirectControl">
-                </cnsl-form-field>
-                <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button
-                    [disabled]="redirectControl.invalid || !canWrite">
-                    <mat-icon>add</mat-icon>
-                </button>
-            </form>
-
-            <div class="uri-list">
-                <div *ngFor="let redirect of redirectUrisList" class="uri-line">
-                    <span class="uri"
-                        [ngClass]="{'green': !devMode && redirect?.startsWith('https://'), 'red': !devMode && !redirect?.startsWith('https://')}">{{redirect}}</span>
-                    <span class="fill-space"></span>
-                    <button matTooltip="{{'ACTIONS.DELETE' | translate}}" mat-icon-button
-                        (click)="remove(redirect, RedirectType.REDIRECT)" class="icon-button">
-                        <mat-icon>cancel</mat-icon>
-                    </button>
-                </div>
-            </div>
-
             <div style="margin: .5rem" class="divider"></div>
 
-            <p *ngIf="redirectControl.value && redirectControl.invalid" class="error">
-                {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
+            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode"
+                (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
+                title="{{ 'APP.OIDC.REDIRECT' | translate }}">
+            </cnsl-redirect-uris>
 
-            <form class="chip-form" (ngSubmit)="add(postInput, RedirectType.POSTREDIRECT)">
-                <cnsl-form-field class="formfield full-width">
-                    <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
-                    <input #postInput cnslInput placeholder="ex. https://" [formControl]="postRedirectControl">
-                </cnsl-form-field>
-                <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button
-                    [disabled]="postRedirectControl.invalid || !canWrite">
-                    <mat-icon>add</mat-icon>
-                </button>
-            </form>
-
-            <div class="uri-list">
-                <div *ngFor="let redirect of postLogoutRedirectUrisList" class="uri-line">
-                    <span class="uri"
-                        [ngClass]="{'green': !devMode && redirect?.startsWith('https://'), 'red': !devMode && !redirect?.startsWith('https://')}">{{redirect}}</span>
-                    <span class="fill-space"></span>
-                    <button matTooltip="{{'ACTIONS.DELETE' | translate}}" mat-icon-button
-                        (click)="remove(redirect, RedirectType.POSTREDIRECT)" class="icon-button">
-                        <mat-icon>cancel</mat-icon>
-                    </button>
-                </div>
-            </div>
-
-            <p *ngIf="postRedirectControl.value && postRedirectControl.invalid" class="error">
-                {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
+            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode"
+                (changedUris)="postLogoutRedirectUrisList = $event" [urisList]="postLogoutRedirectUrisList"
+                title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
+            </cnsl-redirect-uris>
         </div>
 
         <app-auth-method-radio *ngIf="authMethods && initialAuthMethod && app?.oidcConfig" [authMethods]="authMethods"
             [selected]="initialAuthMethod" (selectedMethod)="setPartialConfigFromAuthMethod($event)">
         </app-auth-method-radio>
 
-        <app-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig">
+        <app-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
             <div card-actions *ngIf="app?.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
                 <button [disabled]="!canWrite" mat-stroked-button
                     (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
