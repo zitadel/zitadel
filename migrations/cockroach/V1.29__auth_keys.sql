@@ -77,10 +77,10 @@ SELECT
 FROM management.machine_keys;
 
 INSERT INTO auth.current_sequences (view_name, event_timestamp, current_sequence, last_successful_spooler_run, aggregate_type)
-    SELECT view_name, event_timestamp, current_sequence, last_successful_spooler_run, aggregate_type FROM auth.current_sequences WHERE view_name = 'auth.machine_keys';
+    SELECT 'auth.authn_keys', event_timestamp, current_sequence, last_successful_spooler_run, aggregate_type FROM auth.current_sequences WHERE view_name = 'auth.machine_keys';
 
 INSERT INTO management.current_sequences (view_name, event_timestamp, current_sequence, last_successful_spooler_run, aggregate_type)
-    SELECT view_name, event_timestamp, current_sequence, last_successful_spooler_run, aggregate_type FROM management.current_sequences WHERE view_name = 'management.machine_keys';
+    SELECT 'management.authn_keys', event_timestamp, current_sequence, last_successful_spooler_run, aggregate_type FROM management.current_sequences WHERE view_name = 'management.machine_keys';
 
 ALTER TABLE auth.authn_keys OWNER TO admin;
 ALTER TABLE management.authn_keys OWNER TO admin;
