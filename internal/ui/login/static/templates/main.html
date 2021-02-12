@@ -1,32 +1,37 @@
 {{define "main-top"}}
 <!DOCTYPE html>
 <html lang="{{ .Lang }}" class="{{.ThemeMode}}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    {{if .ThemeMode}}
-    <link rel="stylesheet" href="{{ resourceThemeUrl (printf "css/%s.css" .ThemeMode) .Theme }}" type="text/css" media="all">
-    {{else}}
-    <link rel="stylesheet" href="{{ resourceThemeUrl "css/dark.css" .Theme }}" type="text/css" media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)">
-    <link rel="stylesheet" href="{{ resourceThemeUrl "css/light.css" .Theme }}" type="text/css" media="(prefers-color-scheme: light)">
-    {{end}}
+    <link rel="stylesheet" href="{{ resourceThemeUrl "css/main.css" .Theme }}" type="text/css">
+    <link rel="stylesheet" href="{{ resourceThemeUrl "css/bundle.css" .Theme }}" type="text/css">
+    <link rel="stylesheet" href="{{ resourceThemeUrl "css/zitadel.css" .Theme }}" type="text/css">
     <link rel="icon" type="image/x-icon" href="{{ resourceThemeUrl "favicon.ico" .Theme }}">
 
+    <link rel="stylesheet" href="{{ resourceThemeUrl "../../fonts/lgn-icons/css/lgn-icon-font.css" .Theme }}">
+
     <title>{{ .Title }}</title>
+
+    <script src="{{ resourceUrl "scripts/theme.js" }}"></script>
 </head>
-<body>
-    <header>
-        {{template "header" .}}
-    </header>
-    <div class="content">
-{{end}}
 
-<!-- here goes the content -->
+<!-- lgn-app-background tints the background to the selected theme colors -->
+<body class="lgn-app-background">
+    <div class="lgn-grow">
+        <div class="lgn-max-width-wrapper">
+            {{template "header" .}}
+            <div class="content-container">
+                {{end}}
+                    <!-- here goes the content -->
 
-{{define "main-bottom"}}
-</div>
+                {{define "main-bottom"}}
+            </div>
+        </div>
+    </div>
 </body>
 <footer>
     {{template "footer" .}}

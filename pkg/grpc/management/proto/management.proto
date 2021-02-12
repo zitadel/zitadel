@@ -1491,7 +1491,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.read"
+      permission: "policy.read"
     };
   }
 
@@ -1502,7 +1502,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.write"
+      permission: "policy.write"
     };
   }
 
@@ -1512,7 +1512,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.write"
+      permission: "policy.write"
     };
   }
 
@@ -1522,7 +1522,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.read"
+      permission: "policy.read"
     };
   }
 
@@ -1533,7 +1533,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.write"
+      permission: "policy.write"
     };
   }
 
@@ -1543,7 +1543,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.write"
+      permission: "policy.write"
     };
   }
 

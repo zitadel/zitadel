@@ -1,0 +1,160 @@
+@import "../theming/theming.scss";
+@import "./button.scss";
+@import "../elevation/elevation.scss";
+
+@mixin lgn-button-theme($theme-or-color-config) {
+  $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+  $color: lgn-get-color-config($theme);
+
+  @if $color != null {
+    @include lgn-button-color($color);
+  }
+}
+
+@mixin lgn-button-color($config-or-theme) {
+  $config: lgn-get-color-config($config-or-theme);
+  $primary: map-get($config, primary);
+  $accent: map-get($config, accent);
+  $warn: map-get($config, warn);
+  $background: map-get($config, background);
+  $foreground: map-get($config, foreground);
+
+  .lgn-button,
+  .lgn-stroked-button,
+  .lgn-icon-button {
+    color: inherit;
+    background: transparent;
+
+    @include _lgn-button-theme-property($config, "color", text);
+  }
+
+  .lgn-button:focus,
+  .lgn-stroked-button:focus,
+  .lgn-raised-button:focus {
+    @include lgn-button-elevation(8, $config);
+    background: map-get($background, base);
+  }
+
+  .lgn-stroked-button:not([disabled]) {
+    border-color: lgn-color($foreground, divider);
+  }
+
+  .lgn-button {
+    @include _lgn-button-theme-property($config, "color", text);
+    &:hover {
+      $primary: map-get($config, primary);
+      background-color: rgba(lgn-color($primary, 500), 0.1);
+    }
+
+    &:focus {
+      background-color: rgba(lgn-color($primary, 500), 0.2);
+    }
+
+    &:active {
+      background-color: rgba(lgn-color($primary, 500), 0.25);
+    }
+  }
+
+  .lgn-raised-button {
+    color: lgn-color($foreground, text);
+    background-color: lgn-color($background, raised-button);
+
+    @include _lgn-button-theme-property($config, "color", default-contrast);
+    @include _lgn-button-theme-property($config, "background-color", default);
+
+    &:active {
+      background-color: rgba(lgn-color($primary, 500), 0.8);
+    }
+  }
+
+  .lgn-button,
+  .lgn-stroked-button {
+    @include lgn-button-elevation(0, $config);
+  }
+
+  .lgn-raised-button {
+    @include lgn-button-elevation(2, $config);
+
+    &:not([disabled]):active {
+      @include lgn-button-elevation(8, $config);
+    }
+
+    // &:focus {
+    //     @include lgn-b-elevation(8, $config);
+    // }
+
+    &[disabled] {
+      @include lgn-button-elevation(0, $config);
+    }
+  }
+}
+
+@mixin _lgn-button-theme-property($theme, $property, $hue) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+
+  &.lgn-primary {
+    #{$property}: lgn-color($primary, $hue);
+  }
+  &.lgn-accent {
+    #{$property}: lgn-color($accent, $hue);
+  }
+  &.lgn-warn {
+    #{$property}: lgn-color($warn, $hue);
+  }
+
+  &.lgn-primary,
+  &.lgn-accent,
+  &.lgn-warn,
+  &[disabled] {
+        &[disabled] {
+            $palette: if($property == "color", $foreground, $background);
+            #{$property}: lgn-color($palette, disabled-button);
+        }
+  }
+}
+
+@mixin _lgn-button-focus-overlay-color($config-or-theme) {
+  $config: lgn-get-color-config($config-or-theme);
+  $primary: map-get($config, primary);
+  $accent: map-get($config, accent);
+  $warn: map-get($config, warn);
+
+  &.lgn-primary:focus {
+    background-color: lgn-color($primary);
+  }
+
+  &.lgn-accent:focus {
+    background-color: lgn-color($accent);
+  }
+
+  &.lgn-warn:focus {
+    background-color: lgn-color($warn);
+  }
+}
+
+@mixin lgn-button-elevation($zValue, $config, $opacity: $lgn-elevation-opacity) {
+  $foreground: map-get($config, foreground);
+  $elevation-color: map-get($foreground, elevation);
+  $elevation-color-or-default: if(
+    $elevation-color == null,
+    $lgn-elevation-color,
+    $elevation-color
+  );
+
+  @include lgn-elevation($zValue, $elevation-color-or-default, $opacity);
+}
+
+@mixin lgn-button-typography($config-or-theme) {
+    $config: lgn-get-typography-config($config-or-theme);
+    .lgn-button, .lgn-raised-button, .lgn-icon-button, .lgn-stroked-button {
+      font: {
+        family: lgn-font-family($config, button);
+        size: lgn-font-size($config, button);
+        weight: lgn-font-weight($config, button);
+      }
+    }
+  }

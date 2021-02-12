@@ -7,6 +7,7 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
+	"strings"
 )
 
 func GetMailTexts(db *gorm.DB, table string, aggregateID string) ([]*model.MailTextView, error) {
@@ -30,7 +31,7 @@ func GetMailTextByIDs(db *gorm.DB, table, aggregateID string, textType string, l
 	mailText := new(model.MailTextView)
 	aggregateIDQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
 	textTypeQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyMailTextType, Value: textType, Method: global_model.SearchMethodEquals}
-	languageQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyLanguage, Value: language, Method: global_model.SearchMethodEquals}
+	languageQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyLanguage, Value: strings.ToUpper(language), Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery, textTypeQuery, languageQuery)
 	err := query(db, mailText)
 	if caos_errs.IsNotFound(err) {
