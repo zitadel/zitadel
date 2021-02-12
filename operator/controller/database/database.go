@@ -27,20 +27,24 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 
 	desired, err := database.ReadCrd(r.ClientInt, req.Namespace, req.Name)
 	if err != nil {
+		internalMonitor.Error(err)
 		return ctrl.Result{}, err
 	}
 
 	query, _, _, err := orbdb.AdaptFunc("", &r.Version, false, "database")(internalMonitor, desired, &tree.Tree{})
 	if err != nil {
+		internalMonitor.Error(err)
 		return ctrl.Result{}, err
 	}
 
 	ensure, err := query(r.ClientInt, map[string]interface{}{})
 	if err != nil {
+		internalMonitor.Error(err)
 		return ctrl.Result{}, err
 	}
 
 	if err := ensure(r.ClientInt); err != nil {
+		internalMonitor.Error(err)
 		return ctrl.Result{}, err
 	}
 

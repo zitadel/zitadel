@@ -29,15 +29,18 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 
 	query, _, _, err := orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"})(internalMonitor, desired, &tree.Tree{})
 	if err != nil {
+		internalMonitor.Error(err)
 		return ctrl.Result{}, err
 	}
 
 	ensure, err := query(r.ClientInt, map[string]interface{}{})
 	if err != nil {
+		internalMonitor.Error(err)
 		return ctrl.Result{}, err
 	}
 
 	if err := ensure(r.ClientInt); err != nil {
+		internalMonitor.Error(err)
 		return ctrl.Result{}, err
 	}
 
