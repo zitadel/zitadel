@@ -110,14 +110,11 @@
     }
   }
 
-  .chiplist {
-    margin-bottom: 1rem;
-  }
-
   .chip-form {
     width: 100%;
     display: flex;
     align-items: center;
+    margin-right: .5rem;
 
     .formfield {
       flex: 1;
@@ -129,7 +126,7 @@
   }
 
   .section-title {
-    margin-bottom: 1.5rem;
+      margin: 1.5rem 0 0 0;
   }
 
   .full-width {
@@ -194,4 +191,36 @@
   margin: 1.5rem .5rem;
   height: 1px;
   background-color: rgba(#8795a1, .2);
+}
+
+.uri-list {
+    margin: 0 .5rem;
+    width: 100%;
+
+    .uri-line {
+        display: flex;
+        align-items: center;
+
+        .uri {
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+        }
+
+        .fill-space {
+            flex: 1;
+        }
+
+        .icon-button {
+            height: 30px;
+            line-height: 30px;
+
+            mat-icon {
+                font-size: 1rem !important;
+            }
+        }
+
+        &:not(:hover) {
+            color: var(--grey);
+        }
+    }
 }

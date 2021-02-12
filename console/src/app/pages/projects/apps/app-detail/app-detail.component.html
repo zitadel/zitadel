@@ -34,7 +34,6 @@
 
         <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
 
-        <!-- <app-card title="{{ 'APP.PAGES.DETAIL.TITLE' | translate }}" > -->
         <form *ngIf="app && editState" [formGroup]="appNameForm">
             <div class="name-content">
                 <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
@@ -61,9 +60,9 @@
         </cnsl-info-section> -->
 
         <div class="content">
-            <!-- <p class="full-width section-title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}</p> -->
+            <h3 class="full-width section-title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}</h3>
 
-            <mat-slide-toggle color="primary" class="devmode" formControlName="devMode" name="devMode"
+            <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
                 matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
                 {{ 'APP.OIDC.DEVMODE' | translate }}
             </mat-slide-toggle>
@@ -81,23 +80,27 @@
                 <cnsl-form-field class="formfield full-width">
                     <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
 
-                    <input #redInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
-                        [formControl]="redirectControl">
+                    <input #redInput cnslInput placeholder="ex. https://" [formControl]="redirectControl">
                 </cnsl-form-field>
                 <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button
                     [disabled]="redirectControl.invalid || !canWrite">
                     <mat-icon>add</mat-icon>
                 </button>
             </form>
-            <mat-chip-list class="chiplist formfield full-width" [disabled]="!canWrite" #chipRedirectList>
-                <mat-chip class="chip" *ngFor="let redirect of redirectUrisList" selected
-                    [matTooltip]="!redirect?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
-                    [color]="!redirect?.startsWith('https://') ? 'warn': 'green'"
-                    (removed)="remove(redirect, RedirectType.REDIRECT)">
-                    {{redirect}}
-                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                </mat-chip>
-            </mat-chip-list>
+
+            <div class="uri-list">
+                <div *ngFor="let redirect of redirectUrisList" class="uri-line">
+                    <span class="uri"
+                        [ngClass]="{'green': !devMode && redirect?.startsWith('https://'), 'red': !devMode && !redirect?.startsWith('https://')}">{{redirect}}</span>
+                    <span class="fill-space"></span>
+                    <button matTooltip="{{'ACTIONS.DELETE' | translate}}" mat-icon-button
+                        (click)="remove(redirect, RedirectType.REDIRECT)" class="icon-button">
+                        <mat-icon>cancel</mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin: .5rem" class="divider"></div>
 
             <p *ngIf="redirectControl.value && redirectControl.invalid" class="error">
                 {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
@@ -105,23 +108,25 @@
             <form class="chip-form" (ngSubmit)="add(postInput, RedirectType.POSTREDIRECT)">
                 <cnsl-form-field class="formfield full-width">
                     <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
-                    <input #postInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
-                        [formControl]="postRedirectControl">
+                    <input #postInput cnslInput placeholder="ex. https://" [formControl]="postRedirectControl">
                 </cnsl-form-field>
                 <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button
                     [disabled]="postRedirectControl.invalid || !canWrite">
                     <mat-icon>add</mat-icon>
                 </button>
             </form>
-            <mat-chip-list class="chiplist formfield full-width" [disabled]="!canWrite" #chipPostRedirectList>
-                <mat-chip class="chip" *ngFor="let redirect of postLogoutRedirectUrisList" selected
-                    (removed)="remove(redirect, RedirectType.POSTREDIRECT)"
-                    [matTooltip]="!redirect?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
-                    [color]="!redirect?.startsWith('https://') ? 'warn': 'green'">
-                    {{redirect}}
-                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                </mat-chip>
-            </mat-chip-list>
+
+            <div class="uri-list">
+                <div *ngFor="let redirect of postLogoutRedirectUrisList" class="uri-line">
+                    <span class="uri"
+                        [ngClass]="{'green': !devMode && redirect?.startsWith('https://'), 'red': !devMode && !redirect?.startsWith('https://')}">{{redirect}}</span>
+                    <span class="fill-space"></span>
+                    <button matTooltip="{{'ACTIONS.DELETE' | translate}}" mat-icon-button
+                        (click)="remove(redirect, RedirectType.POSTREDIRECT)" class="icon-button">
+                        <mat-icon>cancel</mat-icon>
+                    </button>
+                </div>
+            </div>
 
             <p *ngIf="postRedirectControl.value && postRedirectControl.invalid" class="error">
                 {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
