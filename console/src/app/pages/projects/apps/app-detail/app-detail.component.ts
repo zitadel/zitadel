@@ -156,6 +156,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.getAuthMethodOptions();
                 if (this.app.oidcConfig) {
                     this.initialAuthMethod = this.authMethodFromPartialConfig(this.app.oidcConfig);
+                    if (this.initialAuthMethod === CUSTOM_METHOD.key) {
+                        this.authMethods.push(CUSTOM_METHOD);
+                    } else {
+                        this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
+                    }
                 }
 
                 if (allowed) {
@@ -176,6 +181,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 if (this.app.oidcConfig) {
                     this.appForm.patchValue(this.app.oidcConfig);
                 }
+
+                this.appForm.valueChanges.subscribe(oidcConfig => {
+                    this.initialAuthMethod = this.authMethodFromPartialConfig(oidcConfig);
+                    if (this.initialAuthMethod === CUSTOM_METHOD.key) {
+                        this.authMethods.push(CUSTOM_METHOD);
+                    } else {
+                        this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
+                    }
+                });
             }).catch(error => {
                 console.error(error);
                 this.toast.showError(error);
@@ -227,6 +241,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.app.oidcConfig.responseTypesList = partialConfig.responseTypesList ?? [];
             this.app.oidcConfig.grantTypesList = partialConfig.grantTypesList ?? [];
             this.app.oidcConfig.authMethodType = partialConfig.authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+            this.appForm.patchValue(this.app.oidcConfig);
         }
     }
 

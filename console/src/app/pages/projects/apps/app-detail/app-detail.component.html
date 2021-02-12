@@ -1,5 +1,5 @@
 <app-meta-layout>
-    <div class="max-width-container">
+    <div class="enlarged-container">
         <div class="head">
             <a [routerLink]="['/projects', projectId]" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
@@ -93,21 +93,23 @@
             [selected]="initialAuthMethod" (selectedMethod)="setPartialConfigFromAuthMethod($event)">
         </app-auth-method-radio>
 
-        <app-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
-            <div card-actions *ngIf="app?.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
-                <button [disabled]="!canWrite" mat-stroked-button
-                    (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
-            </div>
+        <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
+            <app-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
+                <div card-actions
+                    *ngIf="app?.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
+                    <button [disabled]="!canWrite" mat-stroked-button
+                        (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
+                </div>
 
-            <div class="compliance">
-                <cnsl-info-section class="problem">
-                    <ul style="margin: 0;">
-                        <li style="margin: 0 0 .5rem 0;" *ngFor="let problem of app.oidcConfig.complianceProblemsList">
-                            {{problem.localizedMessage}}</li>
-                    </ul>
-                </cnsl-info-section>
-            </div>
-            <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
+                <div class="compliance">
+                    <cnsl-info-section class="problem">
+                        <ul style="margin: 0;">
+                            <li style="margin: 0 0 .5rem 0;"
+                                *ngFor="let problem of app.oidcConfig.complianceProblemsList">
+                                {{problem.localizedMessage}}</li>
+                        </ul>
+                    </cnsl-info-section>
+                </div>
                 <div class="content">
                     <cnsl-form-field class="formfield" appearance="outline">
                         <cnsl-label>{{ 'APP.OIDC.CLIENTID' | translate }}</cnsl-label>
@@ -191,20 +193,16 @@
                     <cnsl-info-section class="full-width desc">
                         <span>{{'APP.OIDC.CLOCKSKEW' | translate}}</span>
                     </cnsl-info-section>
-
-
-                    <div class="divider"></div>
-
                 </div>
-                <div class="btn-container">
+            </app-card>
 
-                    <button class="submit-button" type="submit" color="primary"
-                        [disabled]="appForm.invalid || !canWrite" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
-                        }}</button>
-                </div>
-            </form>
-
-        </app-card>
+            <div class="btn-container">
+                <button class="submit-button" type="submit" color="primary" [disabled]="appForm.invalid || !canWrite"
+                    mat-raised-button>
+                    {{ 'ACTIONS.SAVE' | translate }}
+                </button>
+            </div>
+        </form>
     </div>
 
     <div class="side" metainfo>

@@ -93,13 +93,13 @@ export function getPartialConfigFromAuthMethod(authMethod: string): Partial<OIDC
                 authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
             };
             return config;
-        case PK_JWT_METHOD.key:
-            config = {
-                responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-                grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-                authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-            };
-            return config;
+        // case PK_JWT_METHOD.key:
+        //     config = {
+        //         responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+        //         grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+        //         authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+        //     };
+        //     return config;
         case IMPLICIT_METHOD.key:
             config = {
                 responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
@@ -113,27 +113,54 @@ export function getPartialConfigFromAuthMethod(authMethod: string): Partial<OIDC
 }
 
 export function getAuthMethodFromPartialConfig(config: Partial<OIDCConfig.AsObject> | OIDCConfig.AsObject): string {
-    if (config.responseTypesList == [OIDCResponseType.OIDCRESPONSETYPE_CODE] &&
-        config.grantTypesList == [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE] &&
-        config.authMethodType == OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
-        return CODE_METHOD.key;
-    } else if (config.responseTypesList == [OIDCResponseType.OIDCRESPONSETYPE_CODE] &&
-        config.grantTypesList == [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE] &&
-        config.authMethodType == OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
-        return PKCE_METHOD.key;
-    } else if (config.responseTypesList == [OIDCResponseType.OIDCRESPONSETYPE_CODE] &&
-        config.grantTypesList == [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE] &&
-        config.authMethodType == OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
-        return POST_METHOD.key;
-    } else if (config.responseTypesList == [OIDCResponseType.OIDCRESPONSETYPE_CODE] &&
-        config.grantTypesList == [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE] &&
-        config.authMethodType == OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
-        return PK_JWT_METHOD.key;
-    } else if (config.responseTypesList == [OIDCResponseType.OIDCRESPONSETYPE_CODE] &&
-        config.grantTypesList == [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE] &&
-        config.authMethodType == OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
-        return IMPLICIT_METHOD.key;
-    } else {
-        return CUSTOM_METHOD.key;
-    };;
+    const toCheck = [config.responseTypesList, config.grantTypesList, config.authMethodType];
+    const code = JSON.stringify(
+        [
+            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+        ]
+    );
+
+    const pkce = JSON.stringify(
+        [
+            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+        ]
+    );
+
+    const post = JSON.stringify(
+        [
+            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+        ]
+    );
+
+    // const pk_jwt = JSON.stringify(
+    //     [
+    //         [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+    //         [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+    //         OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+    //     ]
+    // );
+
+    const implicit = JSON.stringify(
+        [
+            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+        ]
+    );
+
+    switch (JSON.stringify(toCheck)) {
+        case code: return CODE_METHOD.key;
+        case pkce: return PKCE_METHOD.key;
+        case post: return POST_METHOD.key;
+        // case pk_jwt: return PK_JWT_METHOD.key;
+        case implicit: return IMPLICIT_METHOD.key;
+        default:
+            return CUSTOM_METHOD.key;
+    }
 }
