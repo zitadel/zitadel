@@ -103,18 +103,6 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 	return scopes, nil
 }
 
-func (o *OPStorage) validateJWTProfileScopesClient(ctx context.Context, clientID string, scopes oidc.Scopes) (oidc.Scopes, error) {
-	//client, err := o.repo.ApplicationByClientID(ctx, clientID)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//for i := len(scopes) - 1; i >= 0; i-- {
-	//	scope := scopes[i]
-	//
-	//}
-	return scopes, nil
-}
-
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

@@ -17,37 +17,3 @@ func machineViewFromModel(machine *usr_model.MachineView) *auth.MachineView {
 		LastKeyAdded: lastKeyAdded,
 	}
 }
-
-//
-//func machineKeyViewsFromModel(keys ...*key_model.AuthNKeyView) []*auth.MachineKeyView {
-//	keyViews := make([]*auth.MachineKeyView, len(keys))
-//	for i, key := range keys {
-//		keyViews[i] = machineKeyViewFromModel(key)
-//	}
-//	return keyViews
-//}
-//
-//func machineKeyViewFromModel(key *key_model.AuthNKeyView) *auth.MachineKeyView {
-//	creationDate, err := ptypes.TimestampProto(key.CreationDate)
-//	logging.Log("MANAG-gluk7").OnError(err).Debug("unable to parse timestamp")
-//
-//	expirationDate, err := ptypes.TimestampProto(key.CreationDate)
-//	logging.Log("MANAG-gluk7").OnError(err).Debug("unable to parse timestamp")
-//
-//	return &auth.MachineKeyView{
-//		Id:             key.ID,
-//		CreationDate:   creationDate,
-//		ExpirationDate: expirationDate,
-//		Sequence:       key.Sequence,
-//		Type:           machineKeyTypeFromModel(key.Type),
-//	}
-//}
-//
-//func machineKeyTypeFromModel(typ key_model.AuthNKeyType) auth.MachineKeyType {
-//	switch typ {
-//	case key_model.AuthNKeyTypeJSON:
-//		return auth.MachineKeyType_MACHINEKEY_JSON
-//	default:
-//		return auth.MachineKeyType_MACHINEKEY_UNSPECIFIED
-//	}
-//}
