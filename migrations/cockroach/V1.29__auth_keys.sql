@@ -75,3 +75,6 @@ SELECT
     creation_date,
     public_key
 FROM management.machine_keys;
+
+ALTER TABLE auth.authn_keys OWNER TO admin;
+ALTER TABLE management.authn_keys OWNER TO admin;
