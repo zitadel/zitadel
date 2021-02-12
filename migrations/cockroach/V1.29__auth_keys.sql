@@ -76,5 +76,11 @@ SELECT
     public_key
 FROM management.machine_keys;
 
+INSERT INTO auth.current_sequences (view_name, event_timestamp, current_sequence, last_successful_spooler_run)
+    SELECT view_name, event_timestamp, current_sequence, last_successful_spooler_run FROM auth.current_sequences WHERE view_name = 'auth.machine_keys';
+
+INSERT INTO management.current_sequences (view_name, event_timestamp, current_sequence, last_successful_spooler_run)
+    SELECT view_name, event_timestamp, current_sequence, last_successful_spooler_run FROM management.current_sequences WHERE view_name = 'management.machine_keys';
+
 ALTER TABLE auth.authn_keys OWNER TO admin;
 ALTER TABLE management.authn_keys OWNER TO admin;
