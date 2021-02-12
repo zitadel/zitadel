@@ -34,7 +34,7 @@ func GetAllSecretsFunc(orb *orb.Orb) func(monitor mntr.Monitor, gitClient *git.C
 				return nil, nil, err
 			}
 			allTrees[zitadel] = zitadelYML
-			_, _, zitadelSecrets, err := zitadelOrb.AdaptFunc(orb, "secret", nil, []string{})(monitor, zitadelYML, &tree.Tree{})
+			_, _, zitadelSecrets, err := zitadelOrb.AdaptFunc(orb, "secret", nil, true, []string{})(monitor, zitadelYML, &tree.Tree{})
 			if err != nil {
 				return nil, nil, err
 			}
@@ -57,7 +57,7 @@ func GetAllSecretsFunc(orb *orb.Orb) func(monitor mntr.Monitor, gitClient *git.C
 			}
 			allTrees[database] = dbYML
 
-			_, _, dbSecrets, err := orbdb.AdaptFunc("", nil, "database", "backup")(monitor, dbYML, nil)
+			_, _, dbSecrets, err := orbdb.AdaptFunc("", nil, true, "database", "backup")(monitor, dbYML, nil)
 			if err != nil {
 				return nil, nil, err
 			}

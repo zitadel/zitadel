@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func BackupListCommand(rv RootValues) *cobra.Command {
+func BackupListCommand(getRv GetRootValues) *cobra.Command {
 	var (
 		cmd = &cobra.Command{
 			Use:   "backuplist",
@@ -18,13 +18,17 @@ func BackupListCommand(rv RootValues) *cobra.Command {
 	)
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_, monitor, orbConfig, gitClient, _, errFunc, err := rv()
+		rv, err := getRv()
 		if err != nil {
 			return err
 		}
 		defer func() {
-			err = errFunc(err)
+			err = rv.ErrFunc(err)
 		}()
+
+		monitor := rv.Monitor
+		orbConfig := rv.OrbConfig
+		gitClient := rv.GitClient
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
 			monitor.Error(err)

@@ -4,13 +4,12 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/pkg/errors"
+	"github.com/rakyll/statik/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
-
-	"github.com/pkg/errors"
-	"github.com/rakyll/statik/fs"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"

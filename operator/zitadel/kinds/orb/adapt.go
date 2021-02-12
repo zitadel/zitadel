@@ -8,6 +8,7 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam"
+	zitadeldb "github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/pkg/errors"
 )
 
@@ -15,6 +16,7 @@ func AdaptFunc(
 	orbconfig *orb.Orb,
 	action string,
 	binaryVersion *string,
+	gitops bool,
 	features []string,
 ) operator.AdaptFunc {
 	return func(
@@ -46,6 +48,25 @@ func AdaptFunc(
 			orbMonitor = orbMonitor.Verbose()
 		}
 
+		var dbClient zitadeldb.Client
+		if gitops {
+			dbClientT, err := zitadeldb.NewGitOpsClient(monitor, orbconfig.URL, orbconfig.Repokey)
+			if err != nil {
+				monitor.Error(err)
+				return nil, nil, nil, err
+			}
+			dbClient = dbClientT
+		} else {
+			if desiredKind.Spec.DatabaseCrd == nil ||
+				desiredKind.Spec.DatabaseCrd.Name == "" ||
+				desiredKind.Spec.DatabaseCrd.Namespace == "" {
+
+				return nil, nil, nil, errors.New("no defined database crd to use in spec.databasecrd")
+			}
+
+			dbClient = zitadeldb.NewCrdClient(monitor, desiredKind.Spec.DatabaseCrd.Namespace, desiredKind.Spec.DatabaseCrd.Name)
+		}
+
 		operatorLabels := mustZITADELOperator(binaryVersion)
 
 		iamCurrent := &tree.Tree{}
@@ -56,7 +77,7 @@ func AdaptFunc(
 			iamCurrent,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
-			orbconfig,
+			dbClient,
 			action,
 			&desiredKind.Spec.Version,
 			features,
@@ -74,7 +95,7 @@ func AdaptFunc(
 				queriers = append(queriers, queryIAM)
 				destroyers = append(destroyers, destroyIAM)
 			case "operator":
-				queriers = append(queriers, operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredTree, false)))
+				queriers = append(queriers, operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredTree, false, gitops)))
 			}
 		}
 

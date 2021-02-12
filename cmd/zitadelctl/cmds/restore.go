@@ -13,10 +13,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func RestoreCommand(rv RootValues) *cobra.Command {
+func RestoreCommand(getRv GetRootValues) *cobra.Command {
 	var (
 		backup     string
 		kubeconfig string
+		gitOpsMode bool
 		cmd        = &cobra.Command{
 			Use:   "restore",
 			Short: "Restore from backup",
@@ -27,15 +28,21 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 	flags := cmd.Flags()
 	flags.StringVar(&backup, "backup", "", "Backup used for db restore")
 	flags.StringVar(&kubeconfig, "kubeconfig", "~/.kube/config", "Kubeconfig for ZITADEL operator deployment")
+	flags.BoolVar(&gitOpsMode, "gitops", false, "defines if the operator should run in gitops mode")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_, monitor, orbConfig, gitClient, version, errFunc, err := rv()
+		rv, err := getRv()
 		if err != nil {
 			return err
 		}
 		defer func() {
-			err = errFunc(err)
+			err = rv.ErrFunc(err)
 		}()
+
+		monitor := rv.Monitor
+		orbConfig := rv.OrbConfig
+		gitClient := rv.GitClient
+		version := rv.Version
 
 		kubeconfig = helpers.PruneHome(kubeconfig)
 
@@ -89,7 +96,7 @@ func RestoreCommand(rv RootValues) *cobra.Command {
 				return nil
 			}
 
-			if err := start.Restore(monitor, gitClient, orbConfig, k8sClient, backup, &version); err != nil {
+			if err := start.Restore(monitor, gitClient, orbConfig, k8sClient, backup, gitOpsMode, &version); err != nil {
 				monitor.Error(err)
 			}
 			return nil

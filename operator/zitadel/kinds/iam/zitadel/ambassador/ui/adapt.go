@@ -53,14 +53,15 @@ func AdaptFunc(
 
 			queryConsole, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				labels.MustForName(componentLabels, ConsoleName),
+				ConsoleName,
+				labels.MustForNameK8SMap(componentLabels, ConsoleName),
 				false,
 				consoleDomain,
 				"/",
 				"/console/",
 				uiURL,
-				0,
-				0,
+				"",
+				"",
 				nil,
 			)
 			if err != nil {
@@ -69,14 +70,15 @@ func AdaptFunc(
 
 			queryAcc, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				labels.MustForName(componentLabels, AccountsName),
+				AccountsName,
+				labels.MustForNameK8SMap(componentLabels, AccountsName),
 				false,
 				accountsDomain,
 				"/",
 				"/login/",
 				uiURL,
-				30000,
-				30000,
+				"30000",
+				"30000",
 				nil,
 			)
 			if err != nil {

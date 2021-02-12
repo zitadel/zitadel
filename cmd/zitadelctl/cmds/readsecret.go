@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func ReadSecretCommand(rv RootValues) *cobra.Command {
+func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 	return &cobra.Command{
 		Use:     "readsecret [path]",
 		Short:   "Print a secrets decrypted value to stdout",
@@ -16,14 +16,18 @@ func ReadSecretCommand(rv RootValues) *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		Example: `zitadelctl readsecret zitadel.emailappkey > ~/emailappkey`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			_, monitor, orbConfig, gitClient, _, errFunc, err := rv()
+			rv, err := getRv()
 			if err != nil {
 				return err
 			}
 			defer func() {
-				err = errFunc(err)
+				err = rv.ErrFunc(err)
 			}()
+
+			monitor := rv.Monitor
+			orbConfig := rv.OrbConfig
+			gitClient := rv.GitClient
+
 			if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
 				return err
 			}

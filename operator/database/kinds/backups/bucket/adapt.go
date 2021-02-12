@@ -2,6 +2,7 @@ package bucket
 
 import (
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/helper"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/orbos/pkg/labels"
@@ -47,11 +48,6 @@ func AdaptFunc(
 		}
 
 		destroyS, err := secret.AdaptFuncToDestroy(namespace, secretName)
-		if err != nil {
-			return nil, nil, nil, err
-		}
-
-		queryS, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretName), map[string]string{secretKey: desiredKind.Spec.ServiceAccountJSON.Value})
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -141,6 +137,16 @@ func AdaptFunc(
 				databases, err := currentDB.GetListDatabasesFunc()(k8sClient)
 				if err != nil {
 					databases = []string{}
+				}
+
+				value, err := helper.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
+				if err != nil {
+					return nil, err
+				}
+
+				queryS, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretName), map[string]string{secretKey: value})
+				if err != nil {
+					return nil, err
 				}
 
 				queryB, _, err := backup.AdaptFunc(

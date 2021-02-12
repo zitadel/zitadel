@@ -27,7 +27,11 @@ func TestSetup_AdaptFunc(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	namespace := "test"
 	reason := "test"
-	users := []string{"test"}
+	usersMap := map[string]string{"test": "test"}
+	users := []string{}
+	for _, user := range usersMap {
+		users = append(users, user)
+	}
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{}
 	dbHost := "test"
@@ -110,17 +114,11 @@ func TestSetup_AdaptFunc(t *testing.T) {
 	client.EXPECT().ApplyJob(jobDef).Times(1)
 	client.EXPECT().GetJob(namespace, getJobName(reason)).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, jobNamePrefix+reason))
 
-	getConfigurationHashes := func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) map[string]string {
-		return map[string]string{"testHash": "test"}
-	}
-	migrationDone := func(k8sClient kubernetes.ClientInt) error {
-		return nil
-	}
-	configurationDone := func(k8sClient kubernetes.ClientInt) error {
-		return nil
+	getConfigurationHashes := func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error) {
+		return map[string]string{"testHash": "test"}, nil
 	}
 
-	query, _, err := AdaptFunc(
+	getQuery, _, err := AdaptFunc(
 		monitor,
 		componentLabels,
 		namespace,
@@ -136,10 +134,6 @@ func TestSetup_AdaptFunc(t *testing.T) {
 		consoleCMName,
 		secretVarsName,
 		secretPasswordsName,
-		users,
-		migrationDone,
-		configurationDone,
-		getConfigurationHashes,
 	)
 
 	queried := map[string]interface{}{}
@@ -149,6 +143,7 @@ func TestSetup_AdaptFunc(t *testing.T) {
 	})
 
 	assert.NoError(t, err)
+	query := getQuery(usersMap, getConfigurationHashes)
 	ensure, err := query(client, queried)
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(client))

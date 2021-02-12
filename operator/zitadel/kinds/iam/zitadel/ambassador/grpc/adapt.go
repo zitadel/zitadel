@@ -68,14 +68,15 @@ func AdaptFunc(
 
 			queryAdminG, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				labels.MustForName(componentLabels, AdminMName),
+				AdminMName,
+				labels.MustForNameK8SMap(componentLabels, AdminMName),
 				true,
 				apiDomain,
 				"/caos.zitadel.admin.api.v1.AdminService/",
 				"",
 				grpcURL,
-				30000,
-				30000,
+				"30000",
+				"30000",
 				cors,
 			)
 			if err != nil {
@@ -84,14 +85,15 @@ func AdaptFunc(
 
 			queryAuthG, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				labels.MustForName(componentLabels, AuthMName),
+				AuthMName,
+				labels.MustForNameK8SMap(componentLabels, AuthMName),
 				true,
 				apiDomain,
 				"/caos.zitadel.auth.api.v1.AuthService/",
 				"",
 				grpcURL,
-				30000,
-				30000,
+				"30000",
+				"30000",
 				cors,
 			)
 			if err != nil {
@@ -100,14 +102,15 @@ func AdaptFunc(
 
 			queryMgmtGRPC, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				labels.MustForName(componentLabels, MgmtMName),
+				MgmtMName,
+				labels.MustForNameK8SMap(componentLabels, MgmtMName),
 				true,
 				apiDomain,
 				"/caos.zitadel.management.api.v1.ManagementService/",
 				"",
 				grpcURL,
-				30000,
-				30000,
+				"30000",
+				"30000",
 				cors,
 			)
 			if err != nil {

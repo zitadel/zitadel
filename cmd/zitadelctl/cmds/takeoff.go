@@ -14,10 +14,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func TakeoffCommand(rv RootValues) *cobra.Command {
+func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	var (
-		kubeconfig string
-		cmd        = &cobra.Command{
+		kubeconfig     string
+		gitOpsOperator bool
+		gitOpsDatabase bool
+		cmd            = &cobra.Command{
 			Use:   "takeoff",
 			Short: "Launch a ZITADEL operator on the orb",
 			Long:  "Ensures a desired state of the resources on the orb",
@@ -26,15 +28,21 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 
 	flags := cmd.Flags()
 	flags.StringVar(&kubeconfig, "kubeconfig", "~/.kube/config", "Kubeconfig for ZITADEL operator deployment")
+	flags.BoolVar(&gitOpsOperator, "gitops-operator", false, "defines if the zitadel operator should run in gitops mode")
+	flags.BoolVar(&gitOpsDatabase, "gitops-database", false, "defines if the database operator should run in gitops mode")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_, monitor, orbConfig, gitClient, _, errFunc, err := rv()
+		rv, err := getRv()
 		if err != nil {
 			return err
 		}
 		defer func() {
-			err = errFunc(err)
+			err = rv.ErrFunc(err)
 		}()
+
+		monitor := rv.Monitor
+		orbConfig := rv.OrbConfig
+		gitClient := rv.GitClient
 		kubeconfig = helpers.PruneHome(kubeconfig)
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
@@ -58,6 +66,7 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 			monitor,
 			gitClient,
 			&kubeconfigStr,
+			gitOpsOperator,
 		); err != nil {
 			monitor.Error(err)
 		}
@@ -66,6 +75,7 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 			monitor,
 			gitClient,
 			&kubeconfigStr,
+			gitOpsDatabase,
 		); err != nil {
 			monitor.Error(err)
 		}
@@ -74,7 +84,7 @@ func TakeoffCommand(rv RootValues) *cobra.Command {
 	return cmd
 }
 
-func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string) error {
+func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, gitops bool) error {
 	found, err := api.ExistsZitadelYml(gitClient)
 	if err != nil {
 		return err
@@ -92,7 +102,7 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 			if err != nil {
 				return err
 			}
-			if err := orb.Reconcile(monitor, desiredTree, true)(k8sClient); err != nil {
+			if err := orb.Reconcile(monitor, desiredTree, true, gitops)(k8sClient); err != nil {
 				return err
 			}
 		}
@@ -100,7 +110,7 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 	return nil
 }
 
-func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string) error {
+func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, gitops bool) error {
 	found, err := api.ExistsDatabaseYml(gitClient)
 	if err != nil {
 		return err
@@ -116,7 +126,8 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 
 			if err := orbdb.Reconcile(
 				monitor,
-				tree)(k8sClient); err != nil {
+				tree,
+				gitops)(k8sClient); err != nil {
 				return err
 			}
 		} else {

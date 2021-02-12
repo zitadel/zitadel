@@ -41,16 +41,17 @@ func AdaptFunc(
 	consoleCMName string,
 	secretVarsName string,
 	secretPasswordsName string,
-	users []string,
 	nodeSelector map[string]string,
 	tolerations []corev1.Toleration,
 	resources *k8s.Resources,
 	migrationDone operator.EnsureFunc,
 	configurationDone operator.EnsureFunc,
 	setupDone operator.EnsureFunc,
-	getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) map[string]string,
 ) (
-	operator.QueryFunc,
+	func(
+		necessaryUsers map[string]string,
+		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+	) operator.QueryFunc,
 	operator.DestroyFunc,
 	error,
 ) {
@@ -64,52 +65,65 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroy),
 	}
 
-	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-
-			deploymentDef := deploymentDef(
-				nameLabels,
-				namespace,
-				replicaCount,
-				podSelector,
-				nodeSelector,
-				tolerations,
-				affinity,
-				users,
-				version,
-				resources,
-				cmName,
-				certPath,
-				secretName,
-				secretPath,
-				consoleCMName,
-				secretVarsName,
-				secretPasswordsName,
-			)
-
-			hashes := getConfigurationHashes(k8sClient, queried)
-			if hashes != nil && len(hashes) != 0 {
-				for k, v := range hashes {
-					deploymentDef.Annotations[k] = v
-					deploymentDef.Spec.Template.Annotations[k] = v
+	return func(
+			necessaryUsers map[string]string,
+			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+		) operator.QueryFunc {
+			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+				users := make([]string, 0)
+				for user := range necessaryUsers {
+					users = append(users, user)
 				}
-			}
 
-			query, err := deployment.AdaptFuncToEnsure(deploymentDef, force)
-			if err != nil {
-				return nil, err
-			}
+				deploymentDef := deploymentDef(
+					nameLabels,
+					namespace,
+					replicaCount,
+					podSelector,
+					nodeSelector,
+					tolerations,
+					affinity,
+					users,
+					version,
+					resources,
+					cmName,
+					certPath,
+					secretName,
+					secretPath,
+					consoleCMName,
+					secretVarsName,
+					secretPasswordsName,
+				)
 
-			queriers := []operator.QueryFunc{
-				operator.EnsureFuncToQueryFunc(migrationDone),
-				operator.EnsureFuncToQueryFunc(configurationDone),
-				operator.EnsureFuncToQueryFunc(setupDone),
-				operator.ResourceQueryToZitadelQuery(query),
-			}
+				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
+				if err != nil {
+					return nil, err
+				}
+				if hashes != nil && len(hashes) != 0 {
+					for k, v := range hashes {
+						deploymentDef.Annotations[k] = v
+						deploymentDef.Spec.Template.Annotations[k] = v
+					}
+				}
 
-			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
+				query, err := deployment.AdaptFuncToEnsure(deploymentDef, force)
+				if err != nil {
+					return nil, err
+				}
+
+				queriers := []operator.QueryFunc{
+					operator.EnsureFuncToQueryFunc(migrationDone),
+					operator.EnsureFuncToQueryFunc(configurationDone),
+					operator.EnsureFuncToQueryFunc(setupDone),
+					operator.ResourceQueryToZitadelQuery(query),
+				}
+
+				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
+			}
 		},
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 		nil
+
 }
 
 func deploymentDef(nameLabels *labels.Name, namespace string, replicaCount int, podSelector *labels.Selector, nodeSelector map[string]string, tolerations []corev1.Toleration, affinity *k8s.Affinity, users []string, version *string, resources *k8s.Resources, cmName string, certPath string, secretName string, secretPath string, consoleCMName string, secretVarsName string, secretPasswordsName string) *appsv1.Deployment {

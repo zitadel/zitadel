@@ -21,7 +21,7 @@ func OperatorSelector() *labels.Selector {
 	return labels.OpenOperatorSelector("ZITADEL", "database.caos.ch")
 }
 
-func AdaptFunc(timestamp string, binaryVersion *string, features ...string) operator.AdaptFunc {
+func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ...string) operator.AdaptFunc {
 
 	return func(monitor mntr.Monitor, orbDesiredTree *tree.Tree, currentTree *tree.Tree) (queryFunc operator.QueryFunc, destroyFunc operator.DestroyFunc, secrets map[string]*secret.Secret, err error) {
 		defer func() {
@@ -76,7 +76,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, features ...string) oper
 		}
 		if desiredKind.Spec.SelfReconciling {
 			queriers = append(queriers,
-				operator.EnsureFuncToQueryFunc(Reconcile(monitor, orbDesiredTree)),
+				operator.EnsureFuncToQueryFunc(Reconcile(monitor, orbDesiredTree, gitops)),
 			)
 		}
 
