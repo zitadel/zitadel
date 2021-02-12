@@ -3,6 +3,7 @@ package orb
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/orbos/pkg/kubernetes/resources/namespace"
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
@@ -10,6 +11,10 @@ import (
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam"
 	zitadeldb "github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/pkg/errors"
+)
+
+const (
+	namespaceName = "caos-zitadel"
 )
 
 func AdaptFunc(
@@ -37,7 +42,7 @@ func AdaptFunc(
 
 		orbMonitor := monitor.WithField("kind", "orb")
 
-		desiredKind, err := parseDesiredV0(desiredTree)
+		desiredKind, err := ParseDesiredV0(desiredTree)
 		if err != nil {
 			return nil, nil, allSecrets, errors.Wrap(err, "parsing desired state failed")
 		}
@@ -69,6 +74,15 @@ func AdaptFunc(
 
 		operatorLabels := mustZITADELOperator(binaryVersion)
 
+		queryNS, err := namespace.AdaptFuncToEnsure(namespaceName)
+		if err != nil {
+			return nil, nil, allSecrets, err
+		}
+		/*destroyNS, err := namespace.AdaptFuncToDestroy(namespaceName)
+		if err != nil {
+			return nil, nil, allSecrets, err
+		}*/
+
 		iamCurrent := &tree.Tree{}
 		queryIAM, destroyIAM, zitadelSecrets, err := iam.GetQueryAndDestroyFuncs(
 			orbMonitor,
@@ -78,6 +92,7 @@ func AdaptFunc(
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
 			dbClient,
+			namespaceName,
 			action,
 			&desiredKind.Spec.Version,
 			features,
@@ -92,10 +107,16 @@ func AdaptFunc(
 		for _, feature := range features {
 			switch feature {
 			case "iam", "migration", "scaleup", "scaledown":
-				queriers = append(queriers, queryIAM)
+				queriers = append(queriers,
+					operator.ResourceQueryToZitadelQuery(queryNS),
+					queryIAM,
+				)
 				destroyers = append(destroyers, destroyIAM)
 			case "operator":
-				queriers = append(queriers, operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredTree, false, gitops)))
+				queriers = append(queriers,
+					operator.ResourceQueryToZitadelQuery(queryNS),
+					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec, gitops)),
+				)
 			}
 		}
 

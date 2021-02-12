@@ -66,6 +66,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			monitor,
 			gitClient,
 			&kubeconfigStr,
+			rv.Version,
 			gitOpsOperator,
 		); err != nil {
 			monitor.Error(err)
@@ -75,6 +76,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			monitor,
 			gitClient,
 			&kubeconfigStr,
+			rv.Version,
 			gitOpsDatabase,
 		); err != nil {
 			monitor.Error(err)
@@ -84,7 +86,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	return cmd
 }
 
-func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, gitops bool) error {
+func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, version string, gitops bool) error {
 	found, err := api.ExistsZitadelYml(gitClient)
 	if err != nil {
 		return err
@@ -98,11 +100,24 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 		k8sClient := kubernetes.NewK8sClient(monitor, kubeconfig)
 
 		if k8sClient.Available() {
-			desiredTree, err := api.ReadZitadelYml(gitClient)
-			if err != nil {
-				return err
+			spec := &orb.Spec{}
+			if gitops {
+				desiredTree, err := api.ReadZitadelYml(gitClient)
+				if err != nil {
+					return err
+				}
+				desired, err := orb.ParseDesiredV0(desiredTree)
+				if err != nil {
+					return err
+				}
+				spec = desired.Spec
+			} else {
+				spec.Version = version
 			}
-			if err := orb.Reconcile(monitor, desiredTree, true, gitops)(k8sClient); err != nil {
+
+			// at takeoff the artifacts have to be applied
+			spec.SelfReconciling = true
+			if err := orb.Reconcile(monitor, spec, gitops)(k8sClient); err != nil {
 				return err
 			}
 		}
@@ -110,7 +125,7 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 	return nil
 }
 
-func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, gitops bool) error {
+func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, version string, gitops bool) error {
 	found, err := api.ExistsDatabaseYml(gitClient)
 	if err != nil {
 		return err
@@ -119,14 +134,26 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 		k8sClient := kubernetes.NewK8sClient(monitor, kubeconfig)
 
 		if k8sClient.Available() {
-			tree, err := api.ReadDatabaseYml(gitClient)
-			if err != nil {
-				return err
+			spec := &orbdb.Spec{}
+			if gitops {
+				desiredTree, err := api.ReadDatabaseYml(gitClient)
+				if err != nil {
+					return err
+				}
+				desired, err := orbdb.ParseDesiredV0(desiredTree)
+				if err != nil {
+					return err
+				}
+				spec = desired.Spec
+			} else {
+				spec.Version = version
 			}
 
+			// at takeoff the artifacts have to be applied
+			spec.SelfReconciling = true
 			if err := orbdb.Reconcile(
 				monitor,
-				tree,
+				spec,
 				gitops)(k8sClient); err != nil {
 				return err
 			}

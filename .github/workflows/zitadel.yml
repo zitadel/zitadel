@@ -36,8 +36,10 @@ jobs:
         run: |
           export BRANCH=${GITHUB_REF#refs/*/}
           echo "branch: ${BRANCH}"
+
           export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
           echo "short_ref: ${BRANCHTRANSLATED}"
+
           export VERSION=""
           if ${{ steps.semantic.outputs.new_release_published == 'true' }}; then
             export VERSION=${{ steps.semantic.outputs.new_release_version }}
@@ -46,9 +48,11 @@ jobs:
           fi
           echo "New semantic release: ${{ steps.semantic.outputs.new_release_published }}"
           echo "version: ${VERSION}"
+
           echo "::set-output name=short_ref::${BRANCHTRANSLATED}"
           echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
           echo "::set-output name=version::${VERSION}"
+
   zitadel-image:
     needs: refs
     runs-on: ubuntu-18.04
@@ -124,7 +128,7 @@ jobs:
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
-            VERSION=${{ steps.version.outputs.version }}
+            VERSION=${{ needs.refs.outputs.version }}
       - shell: bash
         run: |
           mv /tmp/operator/zitadelctl /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
@@ -146,7 +150,9 @@ jobs:
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
-            VERSION=${{ steps.version.outputs.version }}
+            VERSION=${{ needs.refs.outputs.version }}
+
+
   crdb-image:
     needs: refs
     runs-on: ubuntu-18.04
@@ -206,6 +212,7 @@ jobs:
         run: |
           mv ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64 ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
           find ${ARTIFACTS_FOLDER}
+
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v2

@@ -12,7 +12,6 @@ import (
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/orbos/pkg/kubernetes/resources/namespace"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
@@ -28,6 +27,7 @@ func AdaptFunc(
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
 	dbClient database.Client,
+	namespace string,
 	action string,
 	version *string,
 	features []string,
@@ -57,7 +57,6 @@ func AdaptFunc(
 			internalMonitor.Verbose()
 		}
 
-		namespaceStr := "caos-zitadel"
 		// shared elements
 		cmName := "zitadel-vars"
 		secretName := "zitadel-secret"
@@ -76,15 +75,6 @@ func AdaptFunc(
 		uiPort := 80
 		usersWithoutPWs := getUserListWithoutPasswords(desiredKind)
 
-		queryNS, err := namespace.AdaptFuncToEnsure(namespaceStr)
-		if err != nil {
-			return nil, nil, allSecrets, err
-		}
-		destroyNS, err := namespace.AdaptFuncToDestroy(namespaceStr)
-		if err != nil {
-			return nil, nil, allSecrets, err
-		}
-
 		zitadelComponent := labels.MustForComponent(apiLabels, "ZITADEL")
 		zitadelDeploymentName := labels.MustForName(zitadelComponent, "zitadel")
 		zitadelPodSelector := labels.DeriveNameSelector(zitadelDeploymentName, false)
@@ -92,7 +82,7 @@ func AdaptFunc(
 			internalMonitor,
 			zitadelComponent,
 			zitadelPodSelector,
-			namespaceStr,
+			namespace,
 			grpcServiceName,
 			grpcPort,
 			httpServiceName,
@@ -106,7 +96,7 @@ func AdaptFunc(
 		getQueryC, destroyC, getConfigurationHashes, err := configuration.AdaptFunc(
 			internalMonitor,
 			zitadelComponent,
-			namespaceStr,
+			namespace,
 			desiredKind.Spec.Configuration,
 			cmName,
 			certPath,
@@ -116,7 +106,7 @@ func AdaptFunc(
 			secretVarsName,
 			secretPasswordName,
 			dbClient,
-			services.GetClientIDFunc(namespaceStr, httpServiceName, httpPort),
+			services.GetClientIDFunc(namespace, httpServiceName, httpPort),
 		)
 		if err != nil {
 			return nil, nil, allSecrets, err
@@ -133,7 +123,7 @@ func AdaptFunc(
 		queryM, destroyM, err := migration.AdaptFunc(
 			internalMonitor,
 			labels.MustForComponent(apiLabels, "database"),
-			namespaceStr,
+			namespace,
 			action,
 			secretPasswordName,
 			migrationUser,
@@ -148,7 +138,7 @@ func AdaptFunc(
 		getQuerySetup, destroySetup, err := setup.AdaptFunc(
 			internalMonitor,
 			zitadelComponent,
-			namespaceStr,
+			namespace,
 			action,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
@@ -172,7 +162,7 @@ func AdaptFunc(
 			zitadelPodSelector,
 			desiredKind.Spec.Force,
 			version,
-			namespaceStr,
+			namespace,
 			desiredKind.Spec.ReplicaCount,
 			desiredKind.Spec.Affinity,
 			cmName,
@@ -185,9 +175,9 @@ func AdaptFunc(
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
 			desiredKind.Spec.Resources,
-			migration.GetDoneFunc(monitor, namespaceStr, action),
-			configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
-			setup.GetDoneFunc(monitor, namespaceStr, action),
+			migration.GetDoneFunc(monitor, namespace, action),
+			configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
+			setup.GetDoneFunc(monitor, namespace, action),
 		)
 		if err != nil {
 			return nil, nil, allSecrets, err
@@ -196,10 +186,10 @@ func AdaptFunc(
 		queryAmbassador, destroyAmbassador, err := ambassador.AdaptFunc(
 			internalMonitor,
 			labels.MustForComponent(apiLabels, "apiGateway"),
-			namespaceStr,
-			grpcServiceName+"."+namespaceStr+":"+strconv.Itoa(grpcPort),
-			"http://"+httpServiceName+"."+namespaceStr+":"+strconv.Itoa(httpPort),
-			"http://"+uiServiceName+"."+namespaceStr,
+			namespace,
+			grpcServiceName+"."+namespace+":"+strconv.Itoa(grpcPort),
+			"http://"+httpServiceName+"."+namespace+":"+strconv.Itoa(httpPort),
+			"http://"+uiServiceName+"."+namespace,
 			desiredKind.Spec.Configuration.DNS,
 		)
 		if err != nil {
@@ -221,7 +211,6 @@ func AdaptFunc(
 					destroyD,
 					destroySetup,
 					destroyC,
-					operator.ResourceDestroyToZitadelDestroy(destroyNS),
 				)
 			}
 		}
@@ -236,13 +225,13 @@ func AdaptFunc(
 					return nil, err
 				}
 
-				queryReadyM := operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespaceStr, action))
+				queryReadyM := operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespace, action))
 				queryC := getQueryC(users)
-				queryReadyC := operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName))
+				queryReadyC := operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName))
 				querySetup := getQuerySetup(allZitadelUsers, getConfigurationHashes)
-				queryReadySetup := operator.EnsureFuncToQueryFunc(setup.GetDoneFunc(monitor, namespaceStr, action))
+				queryReadySetup := operator.EnsureFuncToQueryFunc(setup.GetDoneFunc(monitor, namespace, action))
 				queryD := queryD(allZitadelUsers, getConfigurationHashes)
-				queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr, zitadelDeploymentName))
+				queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespace, zitadelDeploymentName))
 
 				queriers := make([]operator.QueryFunc, 0)
 				for _, feature := range features {
@@ -259,7 +248,6 @@ func AdaptFunc(
 						)
 					case "iam":
 						queriers = append(queriers,
-							operator.ResourceQueryToZitadelQuery(queryNS),
 							queryDB,
 							//configuration
 							queryC,
@@ -286,11 +274,11 @@ func AdaptFunc(
 						)
 					case "scaledown":
 						queriers = append(queriers,
-							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(0)),
+							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespace, zitadelDeploymentName)(0)),
 						)
 					case "scaleup":
 						queriers = append(queriers,
-							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(desiredKind.Spec.ReplicaCount)),
+							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespace, zitadelDeploymentName)(desiredKind.Spec.ReplicaCount)),
 						)
 					}
 				}

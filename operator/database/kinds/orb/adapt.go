@@ -9,6 +9,9 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/orbos/pkg/treelabels"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
+	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
+	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
 	"github.com/caos/zitadel/operator/database/kinds/databases"
 	"github.com/pkg/errors"
 )
@@ -30,7 +33,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 
 		orbMonitor := monitor.WithField("kind", "orb")
 
-		desiredKind, err := parseDesiredV0(orbDesiredTree)
+		desiredKind, err := ParseDesiredV0(orbDesiredTree)
 		if err != nil {
 			return nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
 		}
@@ -45,10 +48,10 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		destroyNS, err := namespace.AdaptFuncToDestroy(NamespaceStr)
+		/*destroyNS, err := namespace.AdaptFuncToDestroy(NamespaceStr)
 		if err != nil {
 			return nil, nil, nil, err
-		}
+		}*/
 
 		databaseCurrent := &tree.Tree{}
 
@@ -66,23 +69,28 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 			desiredKind.Spec.Version,
 			features,
 		)
-
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		queriers := []operator.QueryFunc{
-			operator.ResourceQueryToZitadelQuery(queryNS),
-			queryDB,
-		}
-		if desiredKind.Spec.SelfReconciling {
-			queriers = append(queriers,
-				operator.EnsureFuncToQueryFunc(Reconcile(monitor, orbDesiredTree, gitops)),
-			)
-		}
 
-		destroyers := []operator.DestroyFunc{
-			operator.ResourceDestroyToZitadelDestroy(destroyNS),
-			destroyDB,
+		destroyers := make([]operator.DestroyFunc, 0)
+		queriers := make([]operator.QueryFunc, 0)
+		for _, feature := range features {
+			switch feature {
+			case "database", backup.Instant, backup.Normal, restore.Instant, clean.Instant:
+				queriers = append(queriers,
+					operator.ResourceQueryToZitadelQuery(queryNS),
+					queryDB,
+				)
+				destroyers = append(destroyers,
+					destroyDB,
+				)
+			case "operator":
+				queriers = append(queriers,
+					operator.ResourceQueryToZitadelQuery(queryNS),
+					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec, gitops)),
+				)
+			}
 		}
 
 		currentTree.Parsed = &DesiredV0{

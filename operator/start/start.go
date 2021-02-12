@@ -128,7 +128,7 @@ func Database(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := database.Takeoff(monitor, gitClient, orbdb.AdaptFunc("", binaryVersion, gitops, "database", "backup"), k8sClient)
+		takeoff := database.Takeoff(monitor, gitClient, orbdb.AdaptFunc("", binaryVersion, gitops, "operator", "database", "backup"), k8sClient)
 
 		go func() {
 			started := time.Now()

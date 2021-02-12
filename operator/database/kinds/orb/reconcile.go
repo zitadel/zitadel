@@ -10,38 +10,39 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Reconcile(monitor mntr.Monitor, desiredTree *tree.Tree, gitops bool) operator.EnsureFunc {
+func Reconcile(
+	monitor mntr.Monitor,
+	spec *Spec,
+	gitops bool,
+) operator.EnsureFunc {
 	return func(k8sClient kubernetes.ClientInt) (err error) {
-		defer func() {
-			err = errors.Wrapf(err, "building %s failed", desiredTree.Common.Kind)
-		}()
+		recMonitor := monitor.WithField("version", spec.Version)
 
-		desiredKind, err := parseDesiredV0(desiredTree)
-		if err != nil {
-			return errors.Wrap(err, "parsing desired state failed")
-		}
-		desiredTree.Parsed = desiredKind
-
-		recMonitor := monitor.WithField("version", desiredKind.Spec.Version)
-
-		if desiredKind.Spec.Version == "" {
-			err := errors.New("No version set in database.yml")
-			monitor.Error(err)
+		if spec.Version == "" {
+			err := errors.New("No version provided for self-reconciling")
+			recMonitor.Error(err)
 			return err
 		}
 
-		imageRegistry := desiredKind.Spec.CustomImageRegistry
+		imageRegistry := spec.CustomImageRegistry
 		if imageRegistry == "" {
 			imageRegistry = "ghcr.io"
 		}
 
-		if err := zitadelKubernetes.EnsureDatabaseArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustDatabaseOperator(&desiredKind.Spec.Version)), k8sClient, desiredKind.Spec.Version, desiredKind.Spec.NodeSelector, desiredKind.Spec.Tolerations, imageRegistry, gitops); err != nil {
-			recMonitor.Error(errors.Wrap(err, "Failed to deploy database-operator into k8s-cluster"))
-			return err
+		if spec.SelfReconciling {
+			desiredTree := &tree.Tree{
+				Common: &tree.Common{
+					Kind:    "databases.caos.ch/Orb",
+					Version: "v0",
+				},
+			}
+
+			if err := zitadelKubernetes.EnsureDatabaseArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustDatabaseOperator(&spec.Version)), k8sClient, spec.Version, spec.NodeSelector, spec.Tolerations, imageRegistry, gitops); err != nil {
+				recMonitor.Error(errors.Wrap(err, "Failed to deploy database-operator into k8s-cluster"))
+				return err
+			}
+			recMonitor.Info("Applied database-operator")
 		}
-
-		recMonitor.Info("Applied database-operator")
-
 		return nil
 
 	}
