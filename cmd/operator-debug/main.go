@@ -14,6 +14,7 @@ func main() {
 	orbconfig := flag.String("orbconfig", "~/.orb/config", "The orbconfig file to use")
 	kubeconfig := flag.String("kubeconfig", "~/.kube/config", "The kubeconfig file to use")
 	verbose := flag.Bool("verbose", false, "Print debug levelled logs")
+	gitops := flag.Bool("gitops", false, "defines if the ZITADEL operator should run in gitops mode")
 
 	flag.Parse()
 
@@ -37,6 +38,7 @@ func main() {
 		helpers.PruneHome(*orbconfig),
 		kubernetes.NewK8sClient(monitor, strPtr(string(kc))),
 		strPtr("local-debugging"),
+		*gitops,
 	); err != nil {
 		panic(err)
 	}
