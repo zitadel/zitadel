@@ -1,0 +1,175 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "object.proto";
+
+package zitadel.v1.project;
+
+message ProjectIDRequest {
+    string project_id = ;
+}
+
+message ProjectResponse {
+    zitadel.v1.ReadMetaData meta_data = ;
+    string id = ;
+    string name = ;
+    ProjectState state = ;
+    bool project_role_assertion = ;
+    bool project_role_check = ;
+}
+
+message SearchProjectsRequest {
+    zitadel.v1.SearchRequest meta_data = ;
+    repeated ProjectQuery queries = ;
+}
+
+message SearchProjectsResponse {
+    zitadel.v1.SearchResponse meta_data = ;
+    repeated ProjectResponse result = ;
+}
+
+message CreateProjectRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool project_role_assertion = 2;
+    bool project_role_check = 3;
+}
+
+message CreateProjectResponse {
+    zitadel.v1.CreateMetaData meta_data = ;
+    string id = ;
+    string name = ;
+    ProjectState state = ;
+    bool project_role_assertion = ;
+    bool project_role_check = ;
+}
+
+message UpdateProjectRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool project_role_assertion = 3;
+    bool project_role_check = 4;
+}
+
+message UpdateProjectResponse {
+    zitadel.v1.UpdateMetaData meta_data = ;
+    string id = ;
+    string name = ;
+    ProjectState state = ;
+    bool project_role_assertion = ;
+    bool project_role_check = ;
+}
+
+message ProjectRoleResposne {
+    zitadel.v1.ReadMetaData = ;
+    string project_id = ;
+    string key = ;
+    string display_name = ;
+    string group = ;
+}
+
+message SearchProjectRolesRequest {
+    zitadel.v1.SearchRequest meta_data = ;
+    string project_id = ;
+    repeated ProjectRoleQuery queries = ;
+}
+
+message SearchProjectRolesResponse {
+    zitadel.v1.SearchResponse = ;
+    repeated ProjectRoleResposne result = ;
+}
+
+message AddProjectRoleRequest {
+    string project_id = ;
+    string key = ;
+    string display_name = ;
+    string group = ;
+}
+
+message AddProjectRoleResponse {
+    zitadel.v1.CreateResponse meta_data = ;
+    
+    string project_id = ;
+    string key = ;
+    string display_name = ;
+    string group = ;
+}
+
+message AddProjectRolesRequest {
+    //TODO: ugly as fuck, we could require the project id for each role
+    message ProjectRoleBulkRequest {
+        string key = ;
+        string display_name = ;
+        string group = ;
+    }
+
+    string project_id = ;
+    repeated ProjectRoleBulkRequest roles = ;
+}
+
+message AddProjectRolesResponse { //TODO: empty atm
+    repeated AddProjectRoleResponse roles = ;
+}
+
+message UpdateProjectRoleRequest {
+    string project_id = ;
+    string key = ;
+    string display_name = ;
+    string group = ;
+}
+
+message UpdateProjectRoleResponse {
+    zitadel.v1.UpdateResponse meta_data = ;
+    
+    string project_id = ;
+    string key = ;
+    string display_name = ;
+    string group = ;
+}
+
+message RemoveProjeRoleRequest {
+    string project_id = ;
+    string role_key = ;
+}
+
+message RemoveProjectRoleResponse {}
+
+enum ProjectState {
+    PROJECTSTATE_UNSPECIFIED = 0;
+    PROJECTSTATE_ACTIVE = 1;
+    PROJECTSTATE_INACTIVE = 2;
+}
+
+message ProjectQuery {
+    oneof query {
+        ProjectNameQuery name = ;
+    }
+}
+
+message ProjectNameQuery {
+    string name = ;
+    zitadel.v1.TextQueryMethod method = ;
+}
+
+message ProjectRoleQuery {
+    oneof query {
+        ProjectRoleKeyQuery key = ;
+        ProjectRoleDisplayNameQuery display_name = ;
+        ProjectRoleGroupQuery = ; //TODO: not implemented yet
+    }
+}
+
+message ProjectRoleKeyQuery {
+    string key = ;
+    zitadel.v1.TextQueryMethod method = ;
+}
+
+message ProjectRoleDisplayNameQuery {
+    string display_name = ;
+    zitadel.v1.TextQueryMethod method = ;
+}
+
+message ProjectRoleGroupQuery {
+    string group = ;
+    zitadel.v1.TextQueryMethod method = ;
+}

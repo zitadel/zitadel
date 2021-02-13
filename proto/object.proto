@@ -2,8 +2,26 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 
-package caos.zitadel.api.v1;
+package zitadel.v1;
 
+message ReadMetaData {
+    uint64 sequence = 1;
+    google.protobuf.Timestamp creation_date = 2;
+    google.protobuf.Timestamp change_date = 3;
+    string resource_owner = 4;
+}
+
+message CreateMetaData {
+    uint64 sequence = 1;
+    google.protobuf.Timestamp creation_date = 2;
+    string resource_owner = 3;
+}
+
+message UpdateMetaData {
+    uint64 sequence = 1;
+    google.protobuf.Timestamp change_date = 2;
+    string resource_owner = 3;
+}
 
 message SearchRequest {
     uint64 offset = 1;
@@ -19,13 +37,23 @@ message SearchResponse {
     google.protobuf.Timestamp view_timestamp = 5;
 }
 
-message TextQueryMethod {
-    bool ignore_case = 1;
-    enum method {//TODO: validate
-        UNSPECIFIED = 0;
-        EQUALS = 1;
-        STARTS_WITH = 2;
-        CONTAINS = 3;
-        ENDS_WITH = 4;
-    }
+enum TextQueryMethod {//TODO: validate
+    TEXTQUERYMETHOD_UNSPECIFIED = 0;
+    TEXTQUERYMETHOD_EQUALS = 1;
+    TEXTQUERYMETHOD_EQUALS_IGNORE_CASE = ;
+    TEXTQUERYMETHOD_STARTS_WITH = 2;
+    TEXTQUERYMETHOD_STARTS_WITH_IGNORE_CASE = ;
+    TEXTQUERYMETHOD_CONTAINS = 3;
+    TEXTQUERYMETHOD_CONTAINS_IGNORE_CASE = ;
+    TEXTQUERYMETHOD_ENDS_WITH = 4;
+    TEXTQUERYMETHOD_ENDS_WITH_IGNORE_CASE = ;
+}
+
+enum ListQueryMethod {
+    LISTQUERYMETHOD_UNSPECIFIED = ;
+    //TODO: better alternatives?
+    // the list must contain at least ONE of the items
+    LISTQUERYMETHOD_CONTAINS_ONE = ;
+    // the list must contain ALL items
+    LISTQUERYMETHOD_CONTAINS_ALL = ;
 }

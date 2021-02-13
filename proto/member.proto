@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "object.proto";
+
+package zitadel.v1.member;
+
+message MemberResponse {
+    zitadel.v1.ReadMetaData meta_data = ;
+    string user_id = ;
+    repeated string roles = ;
+    string login_name = ;
+    string display_name = ;
+    //TODO: which fields do we realy need?
+}
+
+message SearchMembersRequest {
+    zitadel.v1.SearchRequest meta_data = ;
+    repeated MemberSearchQuery queries = ;
+}
+
+message SearchMembersResponse {
+    zitadel.v1.SearchResponse meta_data = ;
+    repeated MemberResponse members = ;
+}
+
+message AddMemberRequest {
+    string user_id = ;
+    repeated string roles = ;
+}
+
+message AddMemberResponse {
+    zitadel.v1.CreateMetaData meta_data = ;
+    string user_id = ;
+    repeated string roles = ;
+}
+
+message UpdateMemberRequest {
+    string user_id = ;
+    repeated string roles = ;
+}
+
+message UpdateMemberResponse {
+    zitadel.v1.UpdateMetaData = ;
+    string user_id = ;
+    repeated string roles = ;
+}

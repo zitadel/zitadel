@@ -1,0 +1,154 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "object.proto";
+
+package zitadel.v1.org;
+
+message OrgIDRequest {
+    string id = ;
+}
+
+message OrgResponse {
+    zitadel.v1.ReadResponse meta_data = ;
+    string id = ;
+    OrgState state = ;
+    string name = ;
+}
+
+message CreateOrgRequest {
+    string name = ;
+}
+
+message CreateOrgResponse {
+    zitadel.v1.CreateResponse meta_data = ;
+    string name = ;
+    OrgState state = ;
+}
+
+message SearchOrgsRequest {
+    zitadel.v1.SearchRequest meta_data = ;
+    OrgFieldName sorting_column = ;
+    repeated OrgSearchQuery queries = ;
+}
+
+message SearchOrgsResponse {
+    zitadel.v1.SearchResponse meta_data = ;
+    repeated OrgResponse result = ;
+}
+
+message DomainResponse {
+    zitadel.v1.ReadResponse meta_data = ;
+    string org_id = ;
+    string domain = ;
+    bool verified = ;
+    bool primary = ;
+    DomainValidationType validation_type = ;
+}
+
+message DomainSearchRequest {
+    zitadel.v1.SearchRequest meta_data = ;
+    repeated DomainSearchQuery queries = ;
+}
+
+message DomainSearchResponse {
+    zitadel.v1.SearchResponse meta_data = ;
+    repeated DomainResponse result = ;
+}
+
+// message MemberResponse {
+//     zitadel.v1.ReadMetaData meta_data = ;
+//     string user_id = ;
+//     repeated string roles = ;
+//     string login_name = ;
+//     string display_name = ;
+//     //TODO: which fields do we realy need?
+// }
+
+// message SearchMembersRequest {
+//     zitadel.v1.SearchRequest meta_data = ;
+//     repeated MemberSearchQuery queries = ;
+// }
+
+// message SearchMembersResponse {
+//     zitadel.v1.SearchResponse meta_data = ;
+//     repeated MemberResponse members = ;
+// }
+
+// message AddMemberRequest {
+//     string user_id = ;
+//     repeated string roles = ;
+// }
+
+// message AddMemberResponse {
+//     zitadel.v1.CreateMetaData meta_data = ;
+//     string user_id = ;
+//     repeated string roles = ;
+// }
+
+// message UpdateMemberRequest {
+//     string user_id = ;
+//     repeated string roles = ;
+// }
+
+// message UpdateMemberResponse {
+//     zitadel.v1.UpdateMetaData = ;
+//     string user_id = ;
+//     repeated string roles = ;
+// }
+
+enum OrgSearchQuery {}
+
+enum OrgFieldName {}
+
+enum OrgState {
+    ORGSTATE_UNSPECIFIED = 0;
+    ORGSTATE_ACTIVATE = 1;
+    ORGSTATE_INACTIVATE = 2;
+}
+
+message DomainSearchQuery {
+    oneof query {
+        DomainQuery domain = ;
+    }
+}
+
+message DomainQuery {
+    string domain = ;
+    zitadel.v1.TextQueryMethod method = ;
+}
+
+enum DomainValidationType {
+    DOMAINVALIDATIONTYPE_UNSPECIFIED = 0;
+    DOMAINVALIDATIONTYPE_HTTP = 1;
+    DOMAINVALIDATIONTYPE_DNS = 2;
+}
+
+message MemberSearchQuery {
+    oneof query {
+        MemberFirstNameQuery first_name = ;
+        MemberLastNameQuery last_name = ;
+        MemberLoginNameQuery login_name = ;
+        MemberUserIDQuery user_id = ;
+    }
+}
+
+message MemberFirstNameQuery {
+    string first_name = ;
+    zitadel.v1.TextQueryMethod = ;
+}
+
+message MemberLastNameQuery {
+    string last_name = ;
+    zitadel.v1.TextQueryMethod method = ;
+}
+
+message MemberLoginNameQuery {
+    string login_name = ;
+    zitadel.v1.TextQueryMethod method = ;
+}
+
+message MemberUserIDQuery {
+    string user_id = ;
+}

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "user.proto";
 
-package caos.zitadel.api.v1;
+package zitadel.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/auth";
 
@@ -28,7 +28,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 service AuthService {
 
     //User
-    rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
+    rpc GetMyUser(GetMyUserRequest) returns (zitadel.v1.user.UserResponse) {
         option (google.api.http) = {
             get: "/users/me"
         };
@@ -38,29 +38,250 @@ service AuthService {
         };
     }
 
+    rpc UpdateMyUserName(zitadel.v1.user.UpdateUserNameRequest) returns (zitadel.v1.user.UpdateUserNameResponse) {
+        option (google.api.http) = {
+            put: "/users/me/username"
+            body: "*"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc UpdateMyPassword(UpdateMyPasswordRequest) returns (UpdateMyPasswordResponse) {
+        option (google.api.http) = {
+            put: "/users/me/passwords/_change"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc GetMyProfile(GetMyHumanProfileRequest) returns (GetMyHumanProfileResponse) {
+        option (google.api.http) = {
+            get: "/users/me/profile"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc UpdateMyProfile(zitadel.v1.user.UpdateHumanProfileRequest) returns (zitadel.v1.user.UpdateHumanProfileResponse) {
+        option (google.api.http) = {
+            put: "/users/me/profile"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc GetMyEmail(GetMyEmailRequest) returns (GetMyEmailResponse) {
+        option (google.api.http) = {
+            get: "/users/me/email"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc UpdateMyEmail(UpdateMyEmailRequest) returns (UpdateMyEmailResponse) {
+        option (google.api.http) = {
+            put: "/users/me/email"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyEmail(VerifyMyEmailRequest) returns (VerifyMyEmailResponse) {
+        option (google.api.http) = {
+            post: "/users/me/email/_verify"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ResendMyEmailVerification(ResendMyEmailVerificationRequest) returns (ResendMyEmailVerificationResponse) {
+        option (google.api.http) = {
+            post: "/users/me/email/_resendverification"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc GetMyPhone(GetByPhoneRequest) returns (GetMyPhoneResponse) {
+        option (google.api.http) = {
+            get: "/users/me/phone"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc UpdateMyPhone(UpdateMyPhoneRequest) returns (UpdateMyPhoneResponse) {
+        option (google.api.http) = {
+            put: "/users/me/phone"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyPhone(VerifyMyPhoneRequest) returns (VerifyMyPhoneResponse) {
+        option (google.api.http) = {
+            post: "/users/me/phone/_verify"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ResendMyPhoneVerificationCode(ResendMyPhoneVerificationRequest) returns (ResendMyPhoneVerificationResponse) {
+        option (google.api.http) = {
+            post: "/users/me/phone/_resendverification"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyPhone(RemoveMyPhoneRequest) returns (RemoveMyPhoneResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/phone"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc GetMyAddress(GetMyAddressRequest) returns (GetMyAddressResponse) {
+        option (google.api.http) = {
+            get: "/users/me/address"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc UpdateMyUserAddress(UpdateMyAddressRequest) returns (UpdateMyAddressResponse) {
+        option (google.api.http) = {
+            put: "/users/me/address"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
 }
 
 //GetMyUserRequest is an empty request
 // the request parameters are read from the token-header
 message GetMyUserRequest {}
 
-message GetMyUserResponse{
-    string id = ;
-    uint64 sequence = ;
-    google.protobuf.Timestamp creation_date = ;
-    google.protobuf.Timestamp change_date = ;
-    string resource_owner = ;
-    caos.zitadel.api.v1.user.UserState state = ;
-    string user_name = ;
-    string preferred_login_name = ;
-    repeated string login_names = ;
-    google.protobuf.Timestamp last_login = ;
-    google.protobuf.Timestamp password_changed = ;
+message UpdateMyPasswordRequest {
+    string password = ;
+}
 
-    oneof type {
-        option (validate.required) = true;
+message UpdateMyPasswordResponse {
+    zitadel.v1.UpdateMetaData meta_data = ;
+}
 
-        Human human = ;
-        Machine machine = ;
-    }
+message GetMyHumanProfileRequest {}
+
+message GetMyHumanProfileResponse {
+    zitadel.v1.ReadMetaData meta_data = ;
+    zitadel.v1.user.Profile profile = ;
+}
+
+message GetMyEmailRequest {}
+
+message GetMyEmailResponse {
+    zitadel.v1.ReadMetaData meta_data = ;
+    zitadel.v1.user.Email email = ;
+}
+
+message UpdateMyEmailRequest {
+    zitadel.v1.user.Email email = ;
+}
+
+message UpdateMyEmailResponse {
+    zitadel.v1.UpdateMetaData = ;
+    zitadel.v1.user.Email = ;
+}
+
+message VerifyMyEmailRequest {
+    string code = ;
+}
+
+message VerifyMyEmailResponse {}
+
+message ResendMyEmailVerificationRequest {}
+message ResendMyEmailVerificationResponse {}
+
+message GetMyPhoneRequest {}
+message GetMyPhoneResponse {
+    zitadel.v1.ReadMetaData meta_data = ;
+    zitadel.v1.user.Phone phone = ;
+}
+
+message UpdateMyPhoneRequest {
+    zitadel.v1.user.Email email = ;
+}
+
+message UpdateMyPhoneResponse {
+    zitadel.v1.UpdateMetaData meta_data = ;
+    zitadel.v1.user.Email email = ;
+}
+
+message VerifyMyPhoneRequest {
+    string code = ;
+}
+
+message VerifyMyPhoneResponse {}
+
+message ResendMyPhoneVerificationRequest {}
+message ResendMyPhoneVerificationResponse {}
+
+message RemoveMyPhoneRequest {}
+message RemoveMyPhoneResponse {}
+
+message GetMyAddressRequest {}
+
+message GetMyAddressResponse {
+    zitadel.v1.ReadMetaData meta_data = ;
+    zitadel.v1.user.Address address = ;
+}
+
+message UpdateMyAddressRequest {
+    zitadel.v1.user.Address address = ;
+}
+
+message UpdateMyAddressResponse {
+    zitadel.v1.UpdateMetaData meta_data = ;
+    zitadel.v1.user.Address address = ;
 }

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package caos.zitadel.api.v1;
+package zitadel.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/admin";
 
@@ -24,4 +24,149 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 
 
 service AdminService {
+    rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
+        option (google.api.http) = {
+            get: "/orgs/_isunique"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+
+
+    rpc GetOrgByID(zitadel.v1.org.OrgIDRequest) returns (zitadel.v1.org.OrgResponse) {
+        option (google.api.http) = {
+            get: "/orgs/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc SearchOrgs(zitadel.v1.org.SearchOrgRequest) returns (zitadel.v1.org.SearchOrgResponse) {
+        option (google.api.http) = {
+            post: "/orgs/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
+        option (google.api.http) = {
+            post: "/orgs/_setup"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.write"
+        };
+    }
+
+    rpc GetViews(GetViewsRequest) returns (GetViewsResponse) {
+        option (google.api.http) = {
+            get: "/views"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc ClearView(ClearViewRequest) returns (ClearViewResponse) {
+        option (google.api.http) = {
+            post: "/views/{database}/{view_name}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.write"
+        };
+    }
+
+    rpc GetFailedEvents(GetFailedEventsRequest) returns (GetFailedEventsResponse) {
+        option (google.api.http) = {
+            get: "/failedevents"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
+        option (google.api.http) = {
+            delete: "/failedevents/{database}/{view_name}/{failed_sequence}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.write"
+        };
+    }
+}
+
+message IsOrgUniqueRequest {
+    string name = 1 [(validate.rules).string.min_len = 1];
+    string domain = 2 [(validate.rules).string.min_len = 1];
+}
+
+message IsOrgUniqueResponse {
+    bool is_unique = ;
+}
+
+message SetUpOrgRequest {
+    zitadel.v1.org.CreateOrgRequest org = ;
+    zitadel.v1.user.CreateUserRequest user = ;
+}
+
+message SetUpOrgResponse {
+    zitadel.v1.org.CreateOrgResponse org = ;
+    zitadel.v1.user.CreateUserResponse user = ;
+}
+
+message GetViewsRequest {}
+
+message GetViewsResponse {
+    repeated View views = ;
+}
+
+message ClearViewRequest {
+    string database = 1 [(validate.rules).string = {min_len: 1}];
+    string view_name = 2 [(validate.rules).string = {min_len: 1}];
+}
+
+message ClearViewResponse {}
+
+message GetFailedEventsRequest {}
+
+message GetFailedEventsResponse {
+    repeated FailedEvent result = ;
+}
+
+message RemoveFailedEventRequest {
+    string database = 1 [(validate.rules).string = {min_len: 1}];
+    string view_name = 2 [(validate.rules).string = {min_len: 1}];
+    uint64 failed_sequence = 3;
+}
+
+message RemoveFailedEventResponse {}
+
+message View {
+    string database = 1;
+    string view_name = 2;
+    uint64 processed_sequence = 3;
+    google.protobuf.Timestamp event_timestamp = 4;
+    google.protobuf.Timestamp last_successful_spooler_run = 5;
+}
+
+message FailedEvent {
+    string database = 1;
+    string view_name = 2;
+    uint64 failed_sequence = 3;
+    uint64 failure_count = 4;
+    string error_message = 5;
 }
