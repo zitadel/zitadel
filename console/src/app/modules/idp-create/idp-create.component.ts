@@ -110,9 +110,9 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
             setTimeout(() => {
                 this.loading = false;
                 this.router.navigate([
-                    this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
-                        this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : '',
-                    'idp', idp.getId()]);
+                    (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
+                        this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
+                    'policy', 'login']);
             }, 2000);
         }).catch(error => {
             this.toast.showError(error);

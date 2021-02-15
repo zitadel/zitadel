@@ -1,6 +1,6 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
     [emitRefreshOnPreviousRoutes]="['/iam/idp/create']" [timestamp]="idpResult?.viewTimestamp" [selection]="selection">
-    <ng-template appHasRole [appHasRole]="['iam.write']" actions>
+    <div actions>
         <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="icon-button"
             mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon>block</mat-icon>
@@ -16,7 +16,7 @@
         <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
-    </ng-template>
+    </div>
 
     <div class="table-wrapper">
         <table class="table" mat-table [dataSource]="dataSource">
