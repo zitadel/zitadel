@@ -22,6 +22,7 @@ type AuthNKeyView struct {
 	CreationDate   time.Time
 	ExpirationDate time.Time
 	PublicKey      []byte
+	State          AuthNKeyState
 }
 
 type AuthNKey struct {
@@ -39,6 +40,14 @@ type AuthNKeyType int32
 const (
 	AuthNKeyTypeNONE = iota
 	AuthNKeyTypeJSON
+)
+
+type AuthNKeyState int32
+
+const (
+	AuthNKeyStateActive AuthNKeyState = iota
+	AuthNKeyStateInactive
+	AuthNKeyStateRemoved
 )
 
 type AuthNKeySearchRequest struct {
