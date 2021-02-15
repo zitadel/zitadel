@@ -59,6 +59,15 @@
             <p><strong>Issuer:</strong> {{docs.issuer}}</p>
         </cnsl-info-section> -->
 
+        <div class="compliance" *ngIf="app.oidcConfig">
+            <cnsl-info-section class="problem" *ngIf="app.oidcConfig.complianceProblemsList?.length">
+                <ul style="margin: 0;">
+                    <li style="margin: 0 0 .5rem 0;" *ngFor="let problem of app.oidcConfig.complianceProblemsList">
+                        {{problem.localizedMessage}}</li>
+                </ul>
+            </cnsl-info-section>
+        </div>
+
         <div class="content">
             <h3 class="full-width section-title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}</h3>
 
@@ -102,15 +111,6 @@
                         (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
                 </div>
 
-                <div class="compliance">
-                    <cnsl-info-section class="problem">
-                        <ul style="margin: 0;">
-                            <li style="margin: 0 0 .5rem 0;"
-                                *ngFor="let problem of app.oidcConfig.complianceProblemsList">
-                                {{problem.localizedMessage}}</li>
-                        </ul>
-                    </cnsl-info-section>
-                </div>
                 <div class="content">
                     <cnsl-form-field class="formfield" appearance="outline">
                         <cnsl-label>{{ 'APP.OIDC.CLIENTID' | translate }}</cnsl-label>
