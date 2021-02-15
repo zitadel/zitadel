@@ -13,7 +13,6 @@ import (
 func Reconcile(
 	monitor mntr.Monitor,
 	spec *Spec,
-	gitops bool,
 ) operator.EnsureFunc {
 	return func(k8sClient kubernetes2.ClientInt) (err error) {
 		recMonitor := monitor.WithField("version", spec.Version)
@@ -37,7 +36,7 @@ func Reconcile(
 				},
 			}
 
-			if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustZITADELOperator(&spec.Version)), k8sClient, spec.Version, spec.NodeSelector, spec.Tolerations, imageRegistry, gitops); err != nil {
+			if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustZITADELOperator(&spec.Version)), k8sClient, spec.Version, spec.NodeSelector, spec.Tolerations, imageRegistry, spec.GitOps); err != nil {
 				recMonitor.Error(errors.Wrap(err, "Failed to deploy zitadel-operator into k8s-cluster"))
 				return err
 			}

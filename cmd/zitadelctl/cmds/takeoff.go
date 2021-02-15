@@ -110,10 +110,11 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 					return err
 				}
 				spec := desired.Spec
+				spec.GitOps = gitops
 
 				// at takeoff the artifacts have to be applied
 				spec.SelfReconciling = true
-				if err := orb.Reconcile(monitor, spec, gitops)(k8sClient); err != nil {
+				if err := orb.Reconcile(monitor, spec)(k8sClient); err != nil {
 					return err
 				}
 			}
@@ -126,9 +127,10 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 			spec := &orb.Spec{
 				Version:         version,
 				SelfReconciling: true,
+				GitOps:          gitops,
 			}
 
-			if err := orb.Reconcile(monitor, spec, gitops)(k8sClient); err != nil {
+			if err := orb.Reconcile(monitor, spec)(k8sClient); err != nil {
 				return err
 			}
 		} else {
@@ -158,13 +160,13 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 					return err
 				}
 				spec := desired.Spec
+				spec.GitOps = gitops
 
 				// at takeoff the artifacts have to be applied
 				spec.SelfReconciling = true
 				if err := orbdb.Reconcile(
 					monitor,
-					spec,
-					gitops)(k8sClient); err != nil {
+					spec)(k8sClient); err != nil {
 					return err
 				}
 			} else {
@@ -179,12 +181,12 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 			spec := &orbdb.Spec{
 				Version:         version,
 				SelfReconciling: true,
+				GitOps:          gitops,
 			}
 
 			if err := orbdb.Reconcile(
 				monitor,
-				spec,
-				gitops)(k8sClient); err != nil {
+				spec)(k8sClient); err != nil {
 				return err
 			}
 		} else {

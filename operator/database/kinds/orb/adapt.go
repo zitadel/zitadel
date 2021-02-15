@@ -88,7 +88,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 			case "operator":
 				queriers = append(queriers,
 					operator.ResourceQueryToZitadelQuery(queryNS),
-					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec, gitops)),
+					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec)),
 				)
 			}
 		}
