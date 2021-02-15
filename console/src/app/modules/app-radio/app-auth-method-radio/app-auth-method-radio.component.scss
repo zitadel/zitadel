@@ -74,9 +74,22 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
         background: rgb(80, 110, 110);
         border-top-left-radius: 6px;
         border-top-right-radius: 6px;
+        position: relative;
+
+        .current {
+            position: absolute;
+            bottom: .5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: block;
+            color: #ffffff60;
+            white-space: nowrap;
+            font-size: 12px;
+        }
 
         span {
             margin: 2rem;

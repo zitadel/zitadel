@@ -90,7 +90,8 @@
         </div>
 
         <app-auth-method-radio *ngIf="authMethods && initialAuthMethod && app?.oidcConfig" [authMethods]="authMethods"
-            [selected]="initialAuthMethod" (selectedMethod)="setPartialConfigFromAuthMethod($event)">
+            [selected]="initialAuthMethod" [current]="currentAuthMethod"
+            (selectedMethod)="setPartialConfigFromAuthMethod($event)">
         </app-auth-method-radio>
 
         <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
@@ -203,7 +204,35 @@
                 </button>
             </div>
         </form>
+
+        <div class="next-steps">
+            <h5>{{'APP.PAGES.NEXTSTEPS.TITLE' | translate}}</h5>
+            <div class="row">
+                <div class="step">
+                    <h6>{{ 'APP.PAGES.NEXTSTEPS.0.TITLE' | translate }}</h6>
+                    <p>{{'APP.PAGES.NEXTSTEPS.0.DESC' | translate}}</p>
+                    <span class="fill-space"></span>
+                    <a [routerLink]="['/projects', this.projectId]" color="primary" mat-mini-fab><i
+                            class="las la-angle-right"></i></a>
+                </div>
+                <div class="step">
+                    <h6>{{ 'APP.PAGES.NEXTSTEPS.1.TITLE' | translate }}</h6>
+                    <p>{{'APP.PAGES.NEXTSTEPS.1.DESC' | translate}}</p>
+                    <span class="fill-space"></span>
+                    <a [routerLink]="['/users', 'create']" color="primary" mat-mini-fab><i
+                            class="las la-angle-right"></i></a>
+                </div>
+                <div class="step">
+                    <h6>{{ 'APP.PAGES.NEXTSTEPS.2.TITLE' | translate }}</h6>
+                    <p>{{'APP.PAGES.NEXTSTEPS.2.DESC' | translate}}</p>
+                    <span class="fill-space"></span>
+                    <a href="https://docs.zitadel.ch" color="primary" mat-mini-fab><i
+                            class="las la-angle-right"></i></a>
+                </div>
+            </div>
+        </div>
     </div>
+
 
     <div class="side" metainfo>
         <div class="meta-details">

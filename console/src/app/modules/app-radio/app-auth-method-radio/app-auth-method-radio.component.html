@@ -11,6 +11,7 @@
 
             <div class="cnsl-radio-header" [ngStyle]="{'background': method.background}">
                 <span>{{method.prefix}}</span>
+                <div class="current" *ngIf="current == method.key">{{'APP.OIDC.CURRENT' | translate}}</div>
             </div>
             <p>{{method.titleI18nKey | translate}}</p>
             <p class="type-desc">{{method.descI18nKey | translate}}</p>

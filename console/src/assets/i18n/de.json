@@ -936,12 +936,28 @@
                     "TITLE": "App löschen",
                     "DESCRIPTION":"Wollen Sie diese App wirklich löschen?"
                 }
+            },
+            "NEXTSTEPS": {
+                "TITLE":"Nächste Schritte",
+                "0": {
+                    "TITLE":"Rollen festlegen",
+                    "DESC":"Erfassen Sie Rollen für ihr Projekt"
+                },
+                "1": {
+                    "TITLE":"Benutzer hinzufügen",
+                    "DESC":"Fügen Sie Nutzer ihrer Organisation hinzu"
+                },
+                "2": {
+                    "TITLE":"Hilfe & Support",
+                    "DESC":"Lesen Sie unsere Dokumentation zum Erstellen von Applikation oder kontaktieren Sie unseren Support"
+                }
             }
         },
         "NAME": "Name",
         "TYPE":"Anwendungstyp",
         "GRANT":"Berechtigungstypen",
         "OIDC": {
+            "CURRENT":"Aktuelle Konfiguration",
             "TOKENSECTIONTITLE":"AuthToken Optionen",
             "REDIRECTSECTIONTITLE":"Weiterleitungseinstellungen",
             "PROSWITCH":"Konfigurator überspringen",

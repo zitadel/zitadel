@@ -21,6 +21,7 @@ export interface RadioItemAuthType {
     styleUrls: ['./app-auth-method-radio.component.scss'],
 })
 export class AppAuthMethodRadioComponent implements OnInit {
+    @Input() current: string = '';
     @Input() selected: string = '';
     @Input() authMethods!: RadioItemAuthType[];
     @Output() selectedMethod: EventEmitter<string> = new EventEmitter();
@@ -30,6 +31,7 @@ export class AppAuthMethodRadioComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        console.log(this.current, this.selected);
         //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
         //Add 'implements OnInit' to the class.
         this.authMethods;

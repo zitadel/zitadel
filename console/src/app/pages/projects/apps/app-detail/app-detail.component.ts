@@ -31,11 +31,6 @@ import { ToastService } from 'src/app/services/toast.service';
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import { CODE_METHOD, getAuthMethodFromPartialConfig, getPartialConfigFromAuthMethod, IMPLICIT_METHOD, PKCE_METHOD, PK_JWT_METHOD, POST_METHOD, CUSTOM_METHOD } from '../authmethods';
 
-enum RedirectType {
-    REDIRECT = 'redirect',
-    POSTREDIRECT = 'postredirect',
-}
-
 @Component({
     selector: 'app-app-detail',
     templateUrl: './app-detail.component.html',
@@ -43,6 +38,7 @@ enum RedirectType {
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
     public editState: boolean = false;
+    public currentAuthMethod: string = CUSTOM_METHOD.key;
     public initialAuthMethod: string = CUSTOM_METHOD.key;
     public canWrite: boolean = false;
     public errorMessage: string = '';
@@ -156,8 +152,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.getAuthMethodOptions();
                 if (this.app.oidcConfig) {
                     this.initialAuthMethod = this.authMethodFromPartialConfig(this.app.oidcConfig);
+                    this.currentAuthMethod = this.initialAuthMethod;
                     if (this.initialAuthMethod === CUSTOM_METHOD.key) {
-                        this.authMethods.push(CUSTOM_METHOD);
+                        if (!this.authMethods.includes(CUSTOM_METHOD)) {
+                            this.authMethods.push(CUSTOM_METHOD);
+                        }
                     } else {
                         this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
                     }
@@ -185,7 +184,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.appForm.valueChanges.subscribe(oidcConfig => {
                     this.initialAuthMethod = this.authMethodFromPartialConfig(oidcConfig);
                     if (this.initialAuthMethod === CUSTOM_METHOD.key) {
-                        this.authMethods.push(CUSTOM_METHOD);
+                        if (!this.authMethods.includes(CUSTOM_METHOD)) {
+                            this.authMethods.push(CUSTOM_METHOD);
+                        }
                     } else {
                         this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
                     }
@@ -200,7 +201,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     private getAuthMethodOptions(): void {
-        switch (this.applicationType?.value) {
+        switch (this.app.oidcConfig?.applicationType) {
             case OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE:
                 this.authMethods = [
                     PKCE_METHOD,
@@ -344,6 +345,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.mgmtService
                     .UpdateOIDCAppConfig(req)
                     .then(() => {
+                        if (this.app.oidcConfig) {
+                            this.currentAuthMethod = this.authMethodFromPartialConfig(this.app.oidcConfig);
+                        }
                         this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
                     })
                     .catch(error => {

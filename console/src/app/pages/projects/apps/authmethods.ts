@@ -34,7 +34,7 @@ export const POST_METHOD: RadioItemAuthType = {
     background: '#595d80',
     responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
     grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
     notRecommended: true,
 };
 export const PK_JWT_METHOD: RadioItemAuthType = {
@@ -90,7 +90,7 @@ export function getPartialConfigFromAuthMethod(authMethod: string): Partial<OIDC
             config = {
                 responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
                 grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-                authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+                authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
             };
             return config;
         // case PK_JWT_METHOD.key:
@@ -102,8 +102,8 @@ export function getPartialConfigFromAuthMethod(authMethod: string): Partial<OIDC
         //     return config;
         case IMPLICIT_METHOD.key:
             config = {
-                responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-                grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+                responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN],
+                grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_IMPLICIT],
                 authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
             };
             return config;
@@ -148,9 +148,9 @@ export function getAuthMethodFromPartialConfig(config: Partial<OIDCConfig.AsObje
 
     const implicit = JSON.stringify(
         [
-            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+            [OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN],
+            [OIDCGrantType.OIDCGRANTTYPE_IMPLICIT],
+            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
         ]
     );
 

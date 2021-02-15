@@ -936,12 +936,28 @@
                     "TITLE": "Delete App",
                     "DESCRIPTION":"Do you really want to delete this application?"
                 }
+            },
+            "NEXTSTEPS": {
+                "TITLE":"Next Steps",
+                "0": {
+                    "TITLE":"Add roles",
+                    "DESC":"Enter your project roles"
+                },
+                "1": {
+                    "TITLE":"Add users",
+                    "DESC":"Add new users of your organization"
+                },
+                "2": {
+                    "TITLE":"Help & Support",
+                    "DESC":"Read our documentation on creating applications or contact our support"
+                }
             }
         },
         "NAME": "Name",
         "TYPE":"Application Type",
         "GRANT":"Grant Types",
         "OIDC": {
+            "CURRENT":"Current Config",
             "TOKENSECTIONTITLE":"AuthToken Options",
             "REDIRECTSECTIONTITLE":"Redirect Settings",
             "PROSWITCH":"I'm a pro. Skip this wizard.",
