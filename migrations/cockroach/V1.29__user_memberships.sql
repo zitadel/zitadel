@@ -14,3 +14,5 @@ CREATE TABLE authz.user_memberships (
 
    PRIMARY KEY (user_id, member_type, aggregate_id, object_id)
 );
+
+ALTER TABLE authz.user_memberships OWNER TO admin;
