@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	uniqueProjectnameType  = "project_names"
+	UniqueProjectnameType  = "project_names"
 	projectEventTypePrefix = eventstore.EventType("project.")
 	ProjectAddedType       = projectEventTypePrefix + "added"
 	ProjectChangedType     = projectEventTypePrefix + "changed"
@@ -21,14 +21,14 @@ const (
 
 func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueProjectnameType,
+		UniqueProjectnameType,
 		projectName+resourceOwner,
 		"Errors.Project.AlreadyExists")
 }
 
 func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueProjectnameType,
+		UniqueProjectnameType,
 		projectName+resourceOwner)
 }
 
@@ -78,6 +78,7 @@ type ProjectChangeEvent struct {
 	Name                 *string `json:"name,omitempty"`
 	ProjectRoleAssertion *bool   `json:"projectRoleAssertion,omitempty"`
 	ProjectRoleCheck     *bool   `json:"projectRoleCheck,omitempty"`
+	oldName              string
 }
 
 func (e *ProjectChangeEvent) Data() interface{} {
@@ -85,19 +86,27 @@ func (e *ProjectChangeEvent) Data() interface{} {
 }
 
 func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	if e.oldName != "" {
+		return []*eventstore.EventUniqueConstraint{
+			NewRemoveProjectNameUniqueConstraint(e.oldName, e.ResourceOwner()),
+			NewAddProjectNameUniqueConstraint(*e.Name, e.ResourceOwner()),
+		}
+	}
 	return nil
 }
 
 func NewProjectChangeEvent(
 	ctx context.Context,
+	resourceOwner, oldName string,
 	changes []ProjectChanges) (*ProjectChangeEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-mV9xc", "Errors.NoChangesFound")
 	}
 	changeEvent := &ProjectChangeEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
 			ctx,
 			ProjectChangedType,
+			resourceOwner,
 		),
 	}
 	for _, change := range changes {

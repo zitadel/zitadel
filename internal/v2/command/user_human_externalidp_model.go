@@ -37,7 +37,7 @@ func (wm *HumanExternalIDPWriteModel) Reduce() error {
 		case *user.HumanExternalIDPAddedEvent:
 			wm.IDPConfigID = e.IDPConfigID
 			wm.DisplayName = e.DisplayName
-			wm.ExternalUserID = e.UserID
+			wm.ExternalUserID = e.ExternalUserID
 			wm.State = domain.ExternalIDPStateActive
 		case *user.HumanExternalIDPRemovedEvent:
 			wm.State = domain.ExternalIDPStateRemoved

@@ -59,12 +59,15 @@ type IDPConfigChangedEvent struct {
 
 func NewIDPConfigChangedEvent(
 	ctx context.Context,
-	configID string,
+	resourceOwner,
+	configID,
+	oldName string,
 	changes []idpconfig.IDPConfigChanges,
 ) (*IDPConfigChangedEvent, error) {
 	changeEvent, err := idpconfig.NewIDPConfigChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, IDPConfigChangedEventType),
+		eventstore.NewBaseEventForPushWithResourceOwner(ctx, IDPConfigChangedEventType, resourceOwner),
 		configID,
+		oldName,
 		changes,
 	)
 	if err != nil {

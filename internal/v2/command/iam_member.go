@@ -42,7 +42,7 @@ func (r *CommandSide) addIAMMember(ctx context.Context, iamAgg *iam_repo.Aggrega
 		return errors.ThrowAlreadyExists(nil, "IAM-sdgQ4", "Errors.IAM.Member.AlreadyExists")
 	}
 
-	iamAgg.PushEvents(iam_repo.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
+	iamAgg.PushEvents(iam_repo.NewMemberAddedEvent(ctx, iamAgg.ID(), member.UserID, member.Roles...))
 
 	return nil
 }
@@ -89,7 +89,7 @@ func (r *CommandSide) RemoveIAMMember(ctx context.Context, userID string) error 
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewMemberRemovedEvent(ctx, userID))
+	iamAgg.PushEvents(iam_repo.NewMemberRemovedEvent(ctx, iamAgg.ID(), userID))
 
 	return r.eventstore.PushAggregate(ctx, m, iamAgg)
 }

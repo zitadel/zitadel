@@ -67,7 +67,13 @@ func (r *CommandSide) ChangeIDPConfig(ctx context.Context, config *domain.IDPCon
 		return nil, caos_errs.ThrowNotFound(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotExisting")
 	}
 
-	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, config.IDPConfigID, config.Name, config.StylingType)
+	changedEvent, hasChanged := existingIDP.NewChangedEvent(
+		ctx,
+		existingIDP.ResourceOwner,
+		config.IDPConfigID,
+		config.Name,
+		config.StylingType)
+
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
 	}

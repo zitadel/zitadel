@@ -286,6 +286,8 @@ Errors:
     NotInactive: User grant is not deactivated
     NoPermissionForProject: User has no permissions on this project
     RoleKeyNotFound: Role not found
+  Member:
+    AlreadyExists: Member already exists
   IDPConfig:
     AlreadyExists: IDP Configuration with this name already exists
   Changes:

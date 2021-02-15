@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	uniqueOrgDomain                      = "org_domain"
+	UniqueOrgDomain                      = "org_domain"
 	domainEventPrefix                    = orgEventTypePrefix + "domain."
 	OrgDomainAddedEventType              = domainEventPrefix + "added"
 	OrgDomainVerificationAddedEventType  = domainEventPrefix + "verification.added"
@@ -24,14 +24,14 @@ const (
 
 func NewAddOrgDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueOrgDomain,
+		UniqueOrgDomain,
 		orgDomain,
 		"Errors.Org.Domain.AlreadyExists")
 }
 
 func NewRemoveOrgDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueOrgDomain,
+		UniqueOrgDomain,
 		orgDomain)
 }
 
@@ -84,7 +84,7 @@ func (e *DomainVerificationAddedEvent) Data() interface{} {
 }
 
 func (e *DomainVerificationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
+	return nil
 }
 
 func NewDomainVerificationAddedEvent(
@@ -162,7 +162,7 @@ func (e *DomainVerifiedEvent) Data() interface{} {
 }
 
 func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
 }
 
 func NewDomainVerifiedEvent(ctx context.Context, domain string) *DomainVerifiedEvent {

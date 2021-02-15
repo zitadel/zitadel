@@ -51,7 +51,6 @@ func (r *CommandSide) addProjectRoles(ctx context.Context, projectAgg *project.A
 				projectRole.DisplayName,
 				projectRole.Group,
 				projectID,
-				resourceOwner,
 			),
 		)
 	}
@@ -107,7 +106,7 @@ func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, res
 	}
 	aggregates := make([]eventstore.Aggregater, 0)
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
-	projectAgg.PushEvents(project.NewRoleRemovedEvent(ctx, key, projectID, existingRole.ResourceOwner))
+	projectAgg.PushEvents(project.NewRoleRemovedEvent(ctx, key, projectID))
 	for _, projectGrantID := range cascadingProjectGrantIds {
 		_, err = r.removeRoleFromProjectGrant(ctx, projectAgg, projectID, projectGrantID, key, true)
 		if err != nil {
