@@ -10,6 +10,7 @@ CREATE TABLE auth.authn_keys
     expiration_date TIMESTAMPTZ,
     creation_date   TIMESTAMPTZ,
     public_key      BYTES,
+    state           SMALLINT,
 
     PRIMARY KEY (key_id, object_id, object_type, auth_identifier)
 );
@@ -23,7 +24,8 @@ INSERT INTO auth.authn_keys (
     sequence,
     expiration_date,
     creation_date,
-    public_key
+    public_key,
+    state
     )
     SELECT
         id,
@@ -34,7 +36,8 @@ INSERT INTO auth.authn_keys (
         sequence,
         expiration_date,
         creation_date,
-        public_key
+        public_key,
+        0
     FROM auth.machine_keys;
 
 CREATE TABLE management.authn_keys
@@ -49,6 +52,7 @@ CREATE TABLE management.authn_keys
     expiration_date TIMESTAMPTZ,
     creation_date   TIMESTAMPTZ,
     public_key      BYTES,
+    state           SMALLINT,
 
     PRIMARY KEY (key_id, object_id, object_type, auth_identifier)
 );
@@ -62,7 +66,8 @@ INSERT INTO management.authn_keys (
     sequence,
     expiration_date,
     creation_date,
-    public_key
+    public_key,
+    state
 )
 SELECT
     id,
@@ -73,7 +78,8 @@ SELECT
     sequence,
     expiration_date,
     creation_date,
-    public_key
+    public_key,
+    0
 FROM management.machine_keys;
 
 INSERT INTO auth.current_sequences (view_name, event_timestamp, current_sequence, last_successful_spooler_run, aggregate_type)

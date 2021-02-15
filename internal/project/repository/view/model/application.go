@@ -116,17 +116,25 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.ApplicationAdded:
 		err = view.SetData(event)
+		if err != nil {
+			return err
+		}
 	case es_model.ApplicationChanged,
 		es_model.OIDCConfigAdded,
 		es_model.OIDCConfigChanged,
+		es_model.APIConfigAdded,
+		es_model.APIConfigChanged,
 		es_model.ApplicationDeactivated,
 		es_model.ApplicationReactivated:
-		err := view.SetData(event)
+		err = view.SetData(event)
 		if err != nil {
 			return err
 		}
 	case es_model.ApplicationRemoved:
-		return view.SetData(event)
+		err = view.SetData(event)
+		if err != nil {
+			return err
+		}
 	case es_model.ProjectChanged:
 		return a.AppendEvent(event)
 	case es_model.ProjectRemoved:

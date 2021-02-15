@@ -429,9 +429,30 @@ func (repo *ProjectRepo) SearchClientKeys(ctx context.Context, request *key_mode
 }
 
 func (repo *ProjectRepo) GetClientKey(ctx context.Context, projectID, applicationID, keyID string) (*key_model.AuthNKeyView, error) {
-	key, err := repo.View.AuthNKeyByIDs(applicationID, keyID)
-	if err != nil {
-		return nil, err
+	key, viewErr := repo.View.AuthNKeyByIDs(applicationID, keyID)
+	if viewErr != nil {
+		return nil, viewErr
+	}
+
+	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, projectID, key.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-SFf2g", "Errors.User.KeyNotFound")
+	}
+
+	if esErr != nil {
+		logging.Log("EVENT-ADbf2").WithError(viewErr).Debug("error retrieving new events")
+		return key_view_model.AuthNKeyToModel(key), nil
+	}
+
+	viewKey := *key
+	for _, event := range events {
+		err := key.AppendEventIfMyClientKey(event)
+		if err != nil {
+			return key_view_model.AuthNKeyToModel(&viewKey), nil
+		}
+		if key.State != int32(proj_model.AppStateActive) {
+			return nil, caos_errs.ThrowNotFound(nil, "EVENT-Adfg3", "Errors.User.KeyNotFound")
+		}
 	}
 	return key_view_model.AuthNKeyToModel(key), nil
 }

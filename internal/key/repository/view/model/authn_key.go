@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/key/model"
 	proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	user_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -27,10 +28,9 @@ type AuthNKeyView struct {
 	Type           int32     `json:"type" gorm:"column:key_type"`
 	ExpirationDate time.Time `json:"expirationDate" gorm:"column:expiration_date"`
 	Sequence       uint64    `json:"-" gorm:"column:sequence"`
-
-	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
-
-	PublicKey []byte `json:"publicKey" gorm:"column:public_key"`
+	CreationDate   time.Time `json:"-" gorm:"column:creation_date"`
+	PublicKey      []byte    `json:"publicKey" gorm:"column:public_key"`
+	State          int32     `json:"-" gorm:"column:state"`
 }
 
 func AuthNKeyViewFromModel(key *model.AuthNKeyView) *AuthNKeyView {
@@ -42,6 +42,7 @@ func AuthNKeyViewFromModel(key *model.AuthNKeyView) *AuthNKeyView {
 		ExpirationDate: key.ExpirationDate,
 		Sequence:       key.Sequence,
 		CreationDate:   key.CreationDate,
+		State:          int32(key.State),
 	}
 }
 
@@ -56,6 +57,7 @@ func AuthNKeyToModel(key *AuthNKeyView) *model.AuthNKeyView {
 		Sequence:       key.Sequence,
 		CreationDate:   key.CreationDate,
 		PublicKey:      key.PublicKey,
+		State:          model.AuthNKeyState(key.State),
 	}
 }
 
@@ -65,6 +67,40 @@ func AuthNKeysToModel(keys []*AuthNKeyView) []*model.AuthNKeyView {
 		result[i] = AuthNKeyToModel(key)
 	}
 	return result
+}
+
+func (k *AuthNKeyView) AppendEventIfMyClientKey(event *models.Event) (err error) {
+	switch event.Type {
+	case proj_model.ApplicationDeactivated,
+		proj_model.ApplicationReactivated,
+		proj_model.ApplicationRemoved:
+		a := new(proj_view_model.ApplicationView)
+		if err := a.AppendEvent(event); err != nil {
+			return err
+		}
+		if a.ID == k.ObjectID {
+			return k.AppendEvent(event)
+		}
+	case proj_model.ProjectDeactivated,
+		proj_model.ProjectReactivated,
+		proj_model.ProjectRemoved:
+		return k.AppendEvent(event)
+	case user_model.UserLocked,
+		user_model.UserDeactivated,
+		user_model.UserUnlocked,
+		user_model.UserReactivated,
+		user_model.UserRemoved:
+		return k.AppendEvent(event)
+	case proj_model.ClientKeyRemoved,
+		user_model.MachineKeyRemoved:
+		view := new(AuthNKeyView)
+		if view.ID == k.ID {
+			return k.AppendEvent(event)
+		}
+	default:
+		return nil
+	}
+	return nil
 }
 
 func (k *AuthNKeyView) AppendEvent(event *models.Event) (err error) {
@@ -78,6 +114,24 @@ func (k *AuthNKeyView) AppendEvent(event *models.Event) (err error) {
 		k.setRootData(event)
 		k.CreationDate = event.CreationDate
 		err = k.SetClientData(event)
+	case proj_model.ClientKeyRemoved,
+		proj_model.ApplicationRemoved,
+		proj_model.ProjectRemoved,
+		user_model.MachineKeyRemoved,
+		user_model.UserRemoved:
+		k.State = int32(model.AuthNKeyStateRemoved)
+	case proj_model.ProjectDeactivated,
+		proj_model.ApplicationDeactivated,
+		user_model.UserDeactivated,
+		user_model.UserLocked:
+		k.State = int32(model.AuthNKeyStateInactive)
+	case proj_model.ProjectReactivated,
+		proj_model.ApplicationReactivated,
+		user_model.UserReactivated,
+		user_model.UserUnlocked:
+		if k.State != int32(model.AuthNKeyStateRemoved) {
+			k.State = int32(model.AuthNKeyStateActive)
+		}
 	}
 	return err
 }
@@ -93,25 +147,25 @@ func (k *AuthNKeyView) setRootData(event *models.Event) {
 	}
 }
 
-func (r *AuthNKeyView) SetUserData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
+func (k *AuthNKeyView) SetUserData(event *models.Event) error {
+	if err := json.Unmarshal(event.Data, k); err != nil {
 		logging.Log("EVEN-Sj90d").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lub6s", "Could not unmarshal data")
 	}
 	return nil
 }
 
-func (r *AuthNKeyView) SetClientData(event *models.Event) error {
+func (k *AuthNKeyView) SetClientData(event *models.Event) error {
 	key := new(proj_model.ClientKey)
 	if err := json.Unmarshal(event.Data, key); err != nil {
 		logging.Log("EVEN-Dgsgg").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-ADbfz", "Could not unmarshal data")
 	}
-	r.ObjectID = key.ApplicationID
-	r.AuthIdentifier = key.ClientID
-	r.ID = key.KeyID
-	r.ExpirationDate = key.ExpirationDate
-	r.PublicKey = key.PublicKey
-	r.Type = key.Type
+	k.ObjectID = key.ApplicationID
+	k.AuthIdentifier = key.ClientID
+	k.ID = key.KeyID
+	k.ExpirationDate = key.ExpirationDate
+	k.PublicKey = key.PublicKey
+	k.Type = key.Type
 	return nil
 }
