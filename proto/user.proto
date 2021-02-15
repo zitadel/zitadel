@@ -4,297 +4,41 @@ import "google/protobuf/timestamp.proto";
 
 import "object.proto";
 
-package zitadel.v1.user;
+package zitadel.user.v1;
 
-message UserIDRequest {
-    string id = 1;
-}
-
-message UserResponse {
-    string id = ;
-    zitadel.v1.ReadResponse = ;
-    UserState state = ;
-    string user_name = ;
-    repeated string login_names = ;
-    string preferred_login_name = ;
+message User {
+    string id = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+    zitadel.v1.MetaData meta_data = 2 [
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+    UserState state = 3 [
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+    string user_name = 4 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    repeated string login_names = 5 [
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+    string preferred_login_name = 6 [
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
     oneof type {
         Human human = ;
         Machine machine = ;
     }
 }
 
-message UserProfileResponse {
-    string user_id = 1;
-    zitadel.v1.ReadMetaData meta_data = ;
-
-    zitadel.v1.user.Profile profile = ;
-}
-
-message UserEmailResponse {
-    string user_id = 1;
-    zitadel.v1.ReadMetaData meta_data = ;
-    
-    Email email = ;
-}
-
-message UserPhoneResponse {
-    string user_id = ;
-    zitadel.v1.ReadMetaData meta_data = ;
-
-    Phone phone = ;
-}
-
-message UserAddressResponse {
-    string user_id = ;
-    zitadel.v1.ReadMetaData meta_data = ;
-
-    Address address = ;
-}
-
-message SearchUsersRequest {
-    zitadel.v1.SearchRequest request = 1;
-    UserFieldName sorting_column = 2;
-    repeated SearchQuery queries = 3;
-}
-
-message SearchUsersResponse {
-    zitadel.v1.SearchResponse meta_data = ;
-    
-    repeated UserResponse users = ;
-}
-
-message CreateUserRequest {
-    string user_name = ;
-  
-    oneof user {
-        option (validate.required) = true;
-
-        CreateHumanRequest human = ;
-        CreateMachineRequest machine = ;
-    }
-}
-  
-message CreateHumanRequest {
-    Profile profile = 1; //TODO: check in code if it's possible to set the display name
-    Email email = 2;
-    Phone phone = 3;
-    Address address = 4;
-    string password = 5;
-}
-  
-//TODO: refactor to Machine? atm both have the same fields
-message CreateMachineRequest {
-    string name = 1;
-    string description = 2;
-}
-  
-message CreateUserResponse {
-    string id = 1;
-    zitadel.v1.CreateMetaData meta_data = ;
-    UserState state = ;
-    string user_name = ;
-    string preferred_login_name = ;
-    repeated string login_names = ;
-    oneof type {
-        Human human = ;
-        Machine machine = ;
-    }
-}
-
-//TODO: shall we name it change or update?
-message UpdateUserNameRequest {
-    string user_id = ;
-    string user_name = ;
-}
-
-message UpdateUserNameResponse {
-    string user_id = ;
-    zitadel.v1.UpdateMetaData meta_data = ;
-    string user_name = ;
-}
-
-message UpdateHumanEmailRequest {
-    string user_id = ;
-    Email email = ;
-}
-
-message UpdateHumanEmailResponse {
-    string user_id = 1;
-    zitadel.v1.UpdateMetaData meta_data = ;
-    Email email = ;
-}
-
-message UpdateHumanPhoneRequest {
-    string user_id = ;
-    Phone phone = ;
-}
-
-message UpdateHumanPhoneResponse {
-    string user_id = 1;
-    zitadel.v1.UpdateMetaData meta_data = ;
-    Phone phone = ;
-}
-
-message UpdateHumanProfileRequest {
-    string user_id = 1;
-    Profile profile = ;
-}
-
-message UpdateHumanProfileResponse {
-    string user_id = 1;
-    zitadel.v1.UpdateMetaData meta_data = ;
-    
-    Profile profile = ;
-}
-
-message UpdateHumanAddressRequest {
-    string user_id = 1;
-    Address address = ;
-}
-
-message UpdateHumanAddressResponse {
-    string user_id = 1;
-    zitadel.v1.UpdateMetaData meta_data = ;
-    
-    Address address = ;
-}
-  
-message UserMembershipSearchRequest {
-    string user_id = 1 [(validate.rules).string = {min_len: 1}];
-    zitadel.v1.SearchRequest meta_data = ;
-    repeated MembershipSearchQuery queries = ;
-}
-
-message MembershipSearchQuery {
-    oneof type {
-        MembershipTypeQuery type = ;
-        MembershipObjectIDQuery object_id = ;
-    }
-}
-
-message MembershipTypeQuery {
-    MemberType type = ;
-}
-
-message MembershipObjectIDQuery {
-    string object_id = ;
-}
-
-message SearchUserMembershipResponse {
-    zitadel.v1.SearchResponse meta_data = ;
-    repeated UserMembership result = ;
-}
-
-message UserMembership {
-    string user_id = 1;
-    MemberType member_type = 2;
-    string aggregate_id = 3;
-    //TODO: whats that?
-    string object_id = 4;
-    repeated string roles = 5;
-    string display_name = 6;
-    google.protobuf.Timestamp creation_date = 7;
-    google.protobuf.Timestamp change_date = 8;
-    uint64 sequence = 9;
-    string resource_owner = 10;
-}
-
-enum MemberType {
-    MEMBERTYPE_UNSPECIFIED = 0;
-    MEMBERTYPE_ORGANISATION = 1;
-    MEMBERTYPE_PROJECT = 2;
-    MEMBERTYPE_PROJECT_GRANT = 3;
-}
-
-message Multifactors {
-    repeated Multifactor multifactors = ;
-}
-
-message Multifactor {
-    MFAState state = 2;
-    oneof type {
-        MFAU2F u2f = ;
-        MFAOTP otp = ;
-    }
-}
-
-message MFAU2F {
-    string id = ;
-    string name = ;
-}
-
-message MFAOTP {}
-
-enum MFAState {
-    MFASTATE_UNSPECIFIED = 0;
-    MFASTATE_NOT_READY = 1;
-    MFASTATE_READY = 2;
-    MFASTATE_REMOVED = 3;
-}
-
-message WebAuthNTokenID {
-    string user_id = ;
-    string token_id = ;
-}
-
-message WebAuthNTokensResponse {
-    repeated WebAuthNToken tokens = ;
-}
-
-message WebAuthNToken {
-    string id = 1;
-    string name = 2;
-    MFAState state = 3;
-}
-
-message UpdateMachineRequest {
-    string user_id = ;
-    Machine machine = ;
-}
-
-message UpdateMachineResponse {
-    string user_id = ;
-    zitadel.v1.UpdateMetaData meta_data = ;
-
-    Machine machine = ;
-}
-
-message MachineKeyIDRequest {
-    string user_id = 1 [(validate.rules).string.min_len = 1];
-    string key_id = 2 [(validate.rules).string.min_len = 1];
-}
-
-message MachineKeyResponse {
-    string key_id = 1;
-    zitadel.v1.ReadMetaData meta_data = ;
-
-    zitadel.v1.user.MachineKeyType type = 4;
-    google.protobuf.Timestamp expiration_date = 5;
-}
-
-message SearchMachineKeyRequest {
-    zitadel.v1.SearchRequest meta_data = ;
-    string user_id = 4 [(validate.rules).string.min_len = 1];
-}
-
-message SearchMachineKeysResponse {
-    zitadel.v1.SearchResponse meta_data = ;
-    repeated MachineKeyResponse result = 4;
-}
-
-message AddMachineKeyRequest {
-    string user_id = 1 [(validate.rules).string.min_len = 1];
-    MachineKeyType type = 2 [(validate.rules).enum = {not_in: [0]}];
-    google.protobuf.Timestamp expiration_date = 3;
-}
-
-message AddMachineKeyResponse {
-    string key_id = 1;
-    zitadel.v1.CreateMetaData meta_data = ;
-
-    zitadel.v1.user.MachineKeyType type = 4;
-    google.protobuf.Timestamp expiration_date = 5;
-    bytes details = 6;
+enum UserState {
+    USER_STATE_UNSPECIFIED = 0;
+    USER_STATE_ACTIVE = 1;
+    USER_STATE_INACTIVE = 2;
+    USER_STATE_DELETED = 3;
+    USER_STATE_LOCKED = 4;
+    USER_STATE_SUSPEND = 5;
+    USER_STATE_INITIAL = 6;
 }
 
 message Human {
@@ -307,16 +51,6 @@ message Human {
 message Machine {
     string name = 1;
     string description = 2;
-}
-
-message MachineKey {
-    caos.zitadel.api.v1.MetaData meta_data = 1;
-    MachineKeyType type = 2;
-}
-  
-enum MachineKeyType {
-    MACHINEKEY_UNSPECIFIED = 0;
-    MACHINEKEY_JSON = 1;
 }
 
 message Profile {
@@ -347,23 +81,12 @@ message Address {
     string street_address = 5;
 }
 
-enum State {
-    STATE_UNSPECIFIED = 0;
-    STATE_ACTIVE = 1;
-    STATE_INACTIVE = 2;
-    STATE_DELETED = 3;
-    STATE_LOCKED = 4;
-    STATE_SUSPEND = 5;
-    STATE_INITIAL = 6;
-}
-
 enum Gender {
     GENDER_UNSPECIFIED = 0;
     GENDER_FEMALE = 1;
     GENDER_MALE = 2;
     GENDER_DIVERSE = 3;
 }
-
 
 message SearchQuery {
     oneof query {
@@ -435,3 +158,71 @@ enum UserFieldName {
     USERFIELDNAME_STATE = 7;
     USERFIELDNAME_TYPE = 8;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+message Multifactors {
+    repeated Multifactor multifactors = ;
+}
+
+message Multifactor {
+    MFAState state = 2;
+    oneof type {
+        MFAU2F u2f = ;
+        MFAOTP otp = ;
+    }
+}
+
+message MFAU2F {
+    string id = ;
+    string name = ;
+}
+
+message MFAOTP {}
+
+enum MFAState {
+    MFASTATE_UNSPECIFIED = 0;
+    MFASTATE_NOT_READY = 1;
+    MFASTATE_READY = 2;
+    MFASTATE_REMOVED = 3;
+}
+
+message WebAuthNTokenID {
+    string user_id = ;
+    string token_id = ;
+}
+
+message WebAuthNToken {
+    string id = 1;
+    string name = 2;
+    MFAState state = 3;
+}
+
+
+
+message MachineKey {
+    caos.zitadel.api.v1.MetaData meta_data = 1;
+    MachineKeyType type = 2;
+}
+  
+enum MachineKeyType {
+    MACHINEKEY_UNSPECIFIED = 0;
+    MACHINEKEY_JSON = 1;
+}
+
+
+

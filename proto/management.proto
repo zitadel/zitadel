@@ -27,7 +27,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 
 
 service ManagementService {
-    rpc GetUserByID(zitadel.v1.user.UserIDRequest) returns (zitadel.v1.user.UserResponse) {
+    rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
         };
@@ -39,7 +39,7 @@ service ManagementService {
 
     // GetUserByLoginNameGlobal searches a user over all organisations
     // the login name has to match exactly
-    rpc GetUserByLoginNameGlobal(GetUserByLoginNameGlobalRequest) returns (zitadel.v1.user.UserResponse) {
+    rpc GetUserByLoginNameGlobal(GetUserByLoginNameGlobalRequest) returns (zitadel.user.v1.UserResponse) {
         option (google.api.http) = {
             get: "/global/users/_byloginname"
         };
@@ -50,7 +50,7 @@ service ManagementService {
     }
 
     // Limit should always be set, there is a default limit set by the service
-    rpc SearchUsers(zitadel.v1.user.UserSearchRequest) returns (zitadel.v1.user.UserSearchResponse) {
+    rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse) {
         option (google.api.http) = {
             post: "/users/_search"
             body: "*"
@@ -71,7 +71,7 @@ service ManagementService {
         };
     }
 
-    rpc CreateUser(zitadel.v1.user.CreateUserRequest) returns (zitadel.v1.user.CreateUserResponse) {
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
         option (google.api.http) = {
             post: "/users"
             body: "*"
@@ -82,7 +82,7 @@ service ManagementService {
         };
     }
 
-    rpc DeactivateUser(zitadel.v1.user.UserIDRequest) returns (DeactivateUserResponse) {
+    rpc DeactivateUser(zitadel.user.v1.UserIDRequest) returns (DeactivateUserResponse) {
         option (google.api.http) = {
             put: "/users/{id}/_deactivate"
             body: "*"
@@ -93,7 +93,7 @@ service ManagementService {
         };
     }
 
-    rpc ReactivateUser(zitadel.v1.user.UserIDRequest) returns (ReactivateUserResponse) {
+    rpc ReactivateUser(zitadel.user.v1.UserIDRequest) returns (ReactivateUserResponse) {
         option (google.api.http) = {
             put: "/users/{id}/_reactivate"
             body: "*"
@@ -104,7 +104,7 @@ service ManagementService {
         };
     }
 
-    rpc LockUser(zitadel.v1.user.UserIDRequest) returns (LockUserResponse) {
+    rpc LockUser(zitadel.user.v1.UserIDRequest) returns (LockUserResponse) {
         option (google.api.http) = {
             put: "/users/{id}/_lock"
             body: "*"
@@ -115,7 +115,7 @@ service ManagementService {
         };
     }
 
-    rpc UnlockUser(zitadel.v1.user.UserIDRequest) returns (UnlockUserResponse) {
+    rpc UnlockUser(zitadel.user.v1.UserIDRequest) returns (UnlockUserResponse) {
         option (google.api.http) = {
             put: "/users/{id}/_unlock"
             body: "*"
@@ -126,7 +126,7 @@ service ManagementService {
         };
     }
 
-    rpc DeleteUser(zitadel.v1.user.UserIDRequest) returns (DeleteUserResponse) {
+    rpc DeleteUser(zitadel.user.v1.UserIDRequest) returns (DeleteUserResponse) {
         option (google.api.http) = {
             delete: "/users/{id}"
         };
@@ -136,7 +136,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateUserName(zitadel.v1.user.UpdateUserNameRequest) returns (zitadel.v1.user.UpdateUserNameResponse) {
+    rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             get: "/users/{id}/username"
         };
@@ -146,7 +146,7 @@ service ManagementService {
         };
     }
 
-    rpc GetHumanProfile(zitadel.v1.user.UserIDRequest) returns (zitadel.v1.user.UserProfileResponse) {
+    rpc GetHumanProfile(GetHumanProfileRequest) returns (GetHumanProfileResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/profile"
         };
@@ -156,7 +156,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateHumanProfile(zitadel.v1.user.UpdateUserProfileRequest) returns (UpdateUserProfileResponse) {
+    rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/profile"
             body: "*"
@@ -167,7 +167,7 @@ service ManagementService {
         };
     }
 
-    rpc GetHumanEmail(zitadel.v1.user.UserIDRequest) returns (zitadel.v1.user.UserEmailResponse) {
+    rpc GetHumanEmail(GetHumanEmailRequest) returns (GetHumanEmailResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/email"
         };
@@ -177,7 +177,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateHumanEmail(zitadel.v1.user.UpdateUserEmailRequest) returns (zitadel.v1.user.UpdateUserEmailResponse) {
+    rpc UpdateHumanEmail(UpdateHumanEmailRequest) returns (UpdateHumanEmailResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/email"
             body: "*"
@@ -188,9 +188,9 @@ service ManagementService {
         };
     }
 
-    rpc ResendInitialMail(ResendInitialMailRequest) returns (ResendInitialMailResponse) {
+    rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
-            post: "/users/{id}/_resendinitialisation"
+            post: "/users/{id}/_resendinitialisation" //TODO: verb?
             body: "*"
         };
 
@@ -200,7 +200,7 @@ service ManagementService {
     }
 
     //TODO: previously ResendEmailVerificationMail
-    rpc ResendHumanEmailVerification(zitadel.v1.user.UserIDRequest) returns (ResendEmailVerificationResponse) {
+    rpc ResendHumanEmailVerification(ResendEmailVerificationRequest) returns (ResendEmailVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{id}/email/_resendverification"
             body: "*"
@@ -211,7 +211,7 @@ service ManagementService {
         };
     }  
 
-    rpc GetHumanPhone(zitadel.v1.user.UserIDRequest) returns (zitadel.v1.user.UserPhoneResponse) {
+    rpc GetHumanPhone(GetHumanPhoneRequest) returns (GetHumanPhoneResponse) {
         option (google.api.http) = {
             get: "/users/{id}/phone"
         };
@@ -221,7 +221,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateHumanPhone(zitadel.v1.user.UpdateUserPhoneRequest) returns (zitadel.v1.user.Update) {
+    rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
         option (google.api.http) = {
             put: "/users/{id}/phone"
             body: "*"
@@ -232,7 +232,7 @@ service ManagementService {
         };
     }
 
-    rpc RemoveHumanPhone(zitadel.v1.user.UserIDRequest) returns (RemoveUserPhoneResponse) {
+    rpc RemoveHumanPhone(RemoveHumanPhoneRequest) returns (RemoveHumanPhoneResponse) {
         option (google.api.http) = {
             delete: "/users/{id}/phone"
         };
@@ -242,7 +242,7 @@ service ManagementService {
         };
     }
 
-    rpc ResendHumanPhoneVerification(zitadel.v1.user.UserIDRequest) returns (ResendPhoneVerificationResponse) {
+    rpc ResendHumanPhoneVerification(ResendHumanPhoneVerificationRequest) returns (ResendHumanPhoneVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{id}/phone/_resendverification"
             body: "*"
@@ -253,7 +253,7 @@ service ManagementService {
         };
     }
 
-    rpc GetHumanAddress(zitadel.v1.user.UserIDRequest) returns (zitadel.v1.user.UserAddressResponse) {
+    rpc GetHumanAddress(GetHumanAddressRequest) returns (GetHumanAddressResponse) {
         option (google.api.http) = {
             get: "/users/{id}/address"
         };
@@ -263,71 +263,9 @@ service ManagementService {
         };
     }
 
-    rpc UpdateHumanAddress(zitadel.v1.user.UpdateUserAddressRequest) returns (zitadel.v1.user.UpdateUserAddressResponse) {
+    rpc UpdateHumanAddress(UpdateHumanAddressRequest) returns (UpdateHumanAddressResponse) {
         option (google.api.http) = {
             put: "/users/{id}/address"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.write"
-        };
-    }
-
-    rpc GetUserMFAs(zitadel.v1.user.UserIDRequest) returns (zitadel.v1.user.Multifactors) {
-        option (google.api.http) = {
-            get: "/users/{id}/mfas"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.read"
-        };
-    }
-
-    rpc RemoveMFAOTP(zitadel.v1.user.UserIDRequest) returns (RemoveMFAOTPResponse) {
-        option (google.api.http) = {
-            delete: "/users/{id}/mfas/otp"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.write"
-        };
-    }
-
-    rpc RemoveMFAU2F(zitadel.v1.user.WebAuthNTokenID) returns (RemoveMFAU2FResponse) {
-        option (google.api.http) = {
-            delete: "/users/{user_id}/mfas/u2f/{id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.write"
-        };
-    }
-
-    rpc GetPasswordless(zitadel.v1.user.UserIDRequest) returns (zitadel.v1.user.WebAuthNTokensResponse) {
-        option (google.api.http) = {
-            get: "/users/{id}/passwordless"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.read"
-        };
-    }
-
-    rpc RemovePasswordless(zitadel.v1.user.WebAuthNTokenID) returns (RemovePasswordlessResponse) {
-        option (google.api.http) = {
-            delete: "/users/{user_id}/passwordless"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.write"
-        };
-    }
-
-    // Sends an Notification (Email/SMS) with a password reset Link
-    rpc SendSetPasswordNotification(SetPasswordNotificationRequest) returns (SendSetPasswordNotificationResponse) {
-        option (google.api.http) = {
-            post: "/users/{id}/password/_sendsetnotification"
             body: "*"
         };
 
@@ -348,537 +286,362 @@ service ManagementService {
         };
     }
 
-    rpc UpdateMachine(zitadel.v1.user.UpdateMachineRequest) returns (zitadel.v1.user.UpdateMachineResponse) {
+
+
+
+
+
+
+
+
+
+
+//TODO: ...OrgIDP... or is comment enough?
+    rpc GetOrgIDPByID(GetOrgIDPByIDRequest) returns (GetOrgIDPByIDResponse) {
         option (google.api.http) = {
-            put: "/users/{id}/machine"
+            get: "/orgs/me/idps/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.idp.read"
+        };
+    }
+
+    rpc SearchOrgIDPs(SearchOrgIDPsRequest) returns (SearchOrgIDPsResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/idps/_search"
             body: "*"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.write"
+            permission: "org.idp.read"
         };
     }
 
-    rpc GetMachineKey(zitadel.v1.user.MachineKeyIDRequest) returns (MachineKeyResponse) {
+    rpc CreateOrgIDP(CreateOrgIDPRequest) returns (CreateOrgIDPResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/keys/{key_id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.read"
-        };
-    }
-
-    rpc SearchMachineKeys(zitadel.v1.user.SearchMachineKeyRequest) returns (SearchMachineKeysResponse) {
-        option (google.api.http) = {
-            post: "/users/{user_id}/keys/_search"
+            post: "/orgs/me/idps"
             body: "*"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.read"
+            permission: "org.idp.write"
         };
     }
 
-    rpc AddMachineKey(zitadel.v1.user.AddMachineKeyRequest) returns (AddMachineKeyResponse) {
+    rpc DeactivateOrgIDP(DeactivateOrgIDPRequest) returns (DeactivateOrgIDPResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/keys"
+            put: "/orgs/me/idps/{id}/_deactivate"
             body: "*"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.write"
+            permission: "org.idp.write"
         };
     }
 
-    rpc DeleteMachineKey(zitadel.v1.user.MachineKeyIDRequest) returns (DeleteMachineKeyResponse) {
+    rpc ReactivateOrgIDP(ReactivateOrgIDPRequest) returns (ReactivateOrgIDPResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/keys/{key_id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.write"
-        };
-    }
-
-    rpc SearchUserExternalIDPs(zitadel.v1.externalidp.ExternalIDPSearchRequest) returns (zitadel.v1.externalidp.ExternalIDPSearchResponse) {
-        option (google.api.http) = {
-            post: "/users/{user_id}/externalidps/_search"
+            put: "/orgs/me/idps/{id}/_reactivate"
             body: "*"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.read"
+            permission: "org.idp.write"
         };
     }
 
-    rpc RemoveExternalIDP(zitadel.v1.externalidp.RemoveExternalIDPRequest) returns (zitadel.v1.externalidp.RemoveExternalIDPResponse) {
+    rpc RemoveOrgIDP(RemoveOrgIDPRequest) returns (RemoveOrgIDPResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/externalidps/{idp_config_id}/{external_user_id}"
+            delete: "/orgs/me/idps/{id}"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.write"
+            permission: "org.idp.write"
         };
     }
 
-    rpc SearchUserMemberships(zitadel.v1.user.UserMembershipSearchRequest) returns (zitadel.v1.user.UserMembershipSearchResponse) {
+    rpc UpdateOrgIDP(UpdateOrgIDPRequest) returns (UpdateOrgIDPResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/memberships/_search"
+            put: "/orgs/me/idps/{id}"
             body: "*"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.membership.read"
+            permission: "org.idp.write"
         };
     }
 
-
-
-
-    rpc CreateOrg(zitadel.v1.org.CreateOrgRequest) returns (zitadel.v1.org.CreateOrgResponse) {
+    rpc UpdateOrgIDPOIDCConfig(UpdateOrgIDPOIDCConfigRequest) returns (UpdateOrgIDPOIDCConfigResponse) {
         option (google.api.http) = {
-            post: "/orgs"
+            put: "/orgs/me/idps/{idp_id}/oidcconfig"
             body: "*"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.create"
+            permission: "org.idp.write"
         };
     }
-
-    rpc GetMyOrg(MyOrgRequest) returns (zitadel.v1.org.OrgResponse) {
-        option (google.api.http) = {
-            get: "/orgs/me"
-        };
-    
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.read"
-        };
-      }
-
-    // search a organisation by its domain overall organisations
-    rpc GetOrgByDomainGlobal(OrgByDomainRequest) returns (zitadel.v1.org.OrgResponse) {
-            option (google.api.http) = {
-            get: "/global/orgs/_bydomain"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.global.read"
-        };
-    }
-
-    rpc DeactivateMyOrg(MyOrgRequest) returns (DeactivateOrgResponse) {
-        option (google.api.http) = {
-            put: "/orgs/me/_deactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.write"
-        };
-    }
-
-    rpc ReactivateMyOrg(MyOrgRequest) returns (ReactivateOrgResponse) {
-        option (google.api.http) = {
-            put: "/orgs/me/_reactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.write"
-        };
-    }
-
-    rpc SearchMyOrgDomains(zitadel.v1.org.DomainSearchRequest) returns (zitadel.v1.org.DomainSearchResponse) {
-        option (google.api.http) = {
-            post: "/orgs/me/domains/_search"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.read"
-        };
-    }
-
-    rpc AddMyOrgDomain(AddOrgDomainRequest) returns (OrgDomain) {
-        option (google.api.http) = {
-            post: "/orgs/me/domains"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.write"
-        };
-    }
-
-    rpc GenerateMyOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
-        option (google.api.http) = {
-            post: "/orgs/me/domains/{domain}/validation/create"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.write"
-        };
-    }
-
-    rpc ValidateMyOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
-        option (google.api.http) = {
-            post: "/orgs/me/domains/{domain}/validation/check"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.write"
-        };
-    }
-
-    rpc SetMyPrimaryOrgDomain(SetPrimaryOrgDomainRequest) returns (SetPrimaryOrgDomainResponse) {
-        option (google.api.http) = {
-            post: "/orgs/me/domains/{domain}/_primary"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.write"
-        };
-    }
-
-    rpc RemoveMyOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
-        option (google.api.http) = {
-            delete: "/orgs/me/domains/{domain}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.write"
-        };
-    }
-
-    rpc AddMyOrgMember(zitadel.v1.member.AddMemberRequest) returns (zitadel.v1.member.AddMemberResponse) {
-        option (google.api.http) = {
-            post: "/orgs/me/members"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.member.write"
-        };
-    }
-
-    rpc UpdateMyOrgMember(zitadel.v1.member.UpdateMemberRequest) returns (zitadel.v1.member.UpdateMemberResponse) {
-        option (google.api.http) = {
-            put: "/orgs/me/members/{user_id}"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.member.write"
-        };
-    }
-
-    rpc RemoveMyOrgMember(RemoveOrgMemberRequest) returns (RemoveOrgMemberResponse) {
-        option (google.api.http) = {
-            delete: "/orgs/me/members/{user_id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.member.delete"
-        };
-    }
-
-    rpc SearchMyOrgMembers(zitadel.v1.member.MembersSearchRequest) returns (zitadel.v1.member.MembersSearchResponse) {
-        option (google.api.http) = {
-            post: "/orgs/me/members/_search"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "org.member.read"
-        };
-    }
-
-
-
-
-
-
-
-    rpc ProjectByID(zitadel.v1.project.ProjectIDRequest) returns (zitadel.v1.ProjectResponse) {
-        option (google.api.http) = {
-            get: "/projects/{id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.read"
-            check_field_name: "Id"
-        };
-    }
-
-    rpc SearchProjects(zitadel.v1.project.SearchProjectsRequest) returns (SearchProjectsResponse) {
-        option (google.api.http) = {
-            post: "/projects/_search"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.read"
-        };
-    }
-
-    rpc CreateProject(zitadel.v1.project.CreateProjectRequest) returns (zitadel.v1.project.CreateProjectResponse) {
-        option (google.api.http) = {
-            post: "/projects"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.create"
-        };
-    }
-
-    rpc UpdateProject(zitadel.v1.project.UpdateProjectRequest) returns (zitadel.v1.project.UpdateProjectResponse) {
-        option (google.api.http) = {
-            put: "/projects/{id}"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.write"
-            check_field_name: "Id"
-        };
-    }
-
-    rpc DeactivateProject(zitadel.v1.project.ProjectIDRequest) returns (DeactivateProjectResponse) {
-        option (google.api.http) = {
-            put: "/projects/{id}/_deactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.write"
-            check_field_name: "Id"
-        };
-    }
-
-    rpc ReactivateProject(zitadel.v1.project.ProjectIDRequset) returns (ReactivateProjectResponse) {
-        option (google.api.http) = {
-            put: "/projects/{id}/_reactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.write"
-            check_field_name: "Id"
-        };
-    }
-
-    rpc RemoveProject(zitadel.v1.project.ProjectIDRequest) returns (RemoveProjectResponse) {
-        option (google.api.http) = {
-            delete: "/projects/{id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.delete"
-            check_field_name: "Id"
-        };
-    }
-
-
-
-
-
-
-
-    rpc SearchProjectRoles(zitadel.v1.project.SearchProjectRolesRequest) returns (zitadel.v1.project.SearchProjectRolesResponse) {
-        option (google.api.http) = {
-            post: "/projects/{project_id}/roles/_search"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.role.read"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    rpc AddProjectRole(zitadel.v1.project.AddProjectRole) returns (zitadel.v1.project.AddProjectRole) {
-        option (google.api.http) = {
-            post: "/projects/{id}/roles"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.role.write"
-            check_field_name: "Id"
-        };
-    }
-
-    // add a list of project roles in one request
-    rpc BulkAddProjectRole(zitadel.v1.project.AddProjectRolesRequest) returns (zitadel.v1.project.AddProjectRolesResponse) {
-        option (google.api.http) = {
-            post: "/projects/{id}/roles/_bulk"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.role.write"
-            check_field_name: "Id"
-        };
-    }
-
-    rpc ChangeProjectRole(zitadel.v1.project.UpdateProjectRole) returns (zitadel.v1.project.UpdateProjectRoleResponse) {
-        option (google.api.http) = {
-            put: "/projects/{id}/roles/{key}"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.role.write"
-            check_field_name: "Id"
-        };
-    }
-
-    // RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
-    rpc RemoveProjectRole(zitadel.v1.project.RemoveProjectRoleRequest) returns (zitadel.v1.project.RemoveProjectRoleResponse) {
-        option (google.api.http) = {
-            delete: "/projects/{id}/roles/{key}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.role.delete"
-            check_field_name: "Id"
-        };
-    }
-
-
-
-    rpc GetApplicationByID(zitadel.v1.project.ApplicationIDRequest) returns (zitadel.v1.project.ApplicationResponse) {
-        option (google.api.http) = {
-            get: "/projects/{project_id}/applications/{id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.app.read"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    rpc SearchApplications(zitadel.v1.project.SearchApplicationRequest) returns (zitadel.v1.project.SearchApplicationResponse) {
-        option (google.api.http) = {
-            post: "/projects/{project_id}/applications/_search"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.app.read"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    rpc CreateApplication(CreateApplicationRequest) returns (CreateApplicationResponse) {
-        option (google.api.http) = {
-            post: "/projects/{project_id}/applications/oidc"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.app.write"
-            check_field_name: "ProjectId"
-        };
-    }
-
-
-    rpc UpdateApplication(UpdateApplicationRequest) returns (UpdateApplicationResponse) {
-        option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{id}"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.app.write"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    rpc DeactivateApplication(zitadel.v1.project.ApplicationIDRequest) returns (DeactivateApplicationResponse) {
-        option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{id}/_deactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.app.write"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    rpc ReactivateApplication(zitadel.v1.project.ApplicationIDRequest) returns (ReactivateApplicationResponse) {
-        option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{id}/_reactivate"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.app.write"
-            check_field_name: "ProjectId"
-        };
-    }
-
-    rpc RemoveApplication(zitadel.v1.project.ApplicationIDRequest) returns (RemoveApplicationResponse) {
-        option (google.api.http) = {
-            delete: "/projects/{project_id}/applications/{id}"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.app.delete"
-            check_field_name: "ProjectId"
-        };
-    }
-
 }
 
-message GetUserByLoginNameGlobalRequest {
-    string login_name = 1; //TODO: validate
+message GetUserByIDRequest {
+    string id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message GetUserByIDResponse {
+    zitadel.user.v1.User user = 1;
+}
+
+message GetUserByLoginNameGlobalRequest{
+    string login_name = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
 }
 
 message GetUserByLoginNameGlobalResponse {
-    zitadel.v1.user.User user = 1;
-    repeated string login_names = 6;
-    google.protobuf.Timestamp last_login = 8;
+    zitadel.user.v1.User user = 1;
+}
+
+message SearchUsersRequest {
+    zitadel.v1.Search meta_data = ;
+    zitadel.user.v1.UserFieldName sorting_column ;
+    zitadel.user.v1.SearchQuery query = ;
+}
+
+message SearchUsersResponse {
+    zitadel.v1.Search meta_data = ;
+    zitadel.user.v1.UserFieldName sorting_column = ;
+    repeated zitadel.user.v1.User result = ;
 }
 
 message IsUserUniqueRequest {
-    string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
+    string user_name = 1 [
+        (validate.rules).string.pattern = "^[^[:space:]]{1,200}$",
+        (google.api.field_behavior) = REQUIRED
+    ];
     //TODO: email still needed or should it be login_names?
-    string email = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string email = 2  [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED
+    ];
 }
 
 message IsUserUniqueResponse {
     bool is_unique = 1;
 }
 
-message DeactivateUserResponse {}
-message ReactivateUserResponse {}
-message LockUserResponse {}
-message UnlockUserResponse {}
-message DeleteUserResponse {}
-message DeleteMachineKeyResponse {}
-message ResendEmailVerificationResponse {}
-message RemoveUserPhoneResponse {}
-message ResendPhoneVerificationResponse {}
-message RemoveMFAOTPResponse {}
-message RemoveMFAU2FResponse {}
-message RemovePasswordlessResponse {}
-message SendSetPasswordNotificationResponse {}
-
-message SetPasswordNotificationRequest {
-    string user_id = 1 [(validate.rules).string.min_len = 1];
-    NotificationType type = 2;
+message CreateUserRequest {
+    zitadel.user.v1.User user = 1;
 }
 
-enum NotificationType {
-    NOTIFICATIONTYPE_EMAIL = 0;
-    NOTIFICATIONTYPE_SMS = 1;
+message CreateUserResponse {
+    zitadel.user.v1.User user = 1;
+}
+
+message DeactivateUserRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message DeactivateUserResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ReactivateUserRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message ReactivateUserResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message LockUserRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message LockUserResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UnlockUserRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message UnlockUserResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message DeleteUserRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message DeleteUserResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UpdateUserNameRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    string user_name = 2 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message UpdateUserNameResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    string user_name = 2;
+}
+
+message GetHumanProfileRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message GetHumanProfileResponse {
+    string user_id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+    zitadel.user.v1.Profile profile = 3;
+}
+
+message UpdateHumanProfileRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    zitadel.user.v1.Profile profile = 2 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message UpdateHumanProfileResponse {
+    string user_id = 1;
+    zitadel.user.v1.Profile profile = 2;
+    zitadel.v1.MetaData meta_data = 3;
+}
+
+message GetHumanEmailRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message GetHumanEmailResponse {
+    string user_id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+    zitadel.user.v1.Email email = 3;
+}
+
+message UpdateHumanEmailRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    zitadel.user.v1.Email email = 2 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message UpdateHumanEmailResponse {
+    string user_id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+    zitadel.user.v1.Email email = 3;
+}
+
+message ResendHumanInitializationRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message ResendHumanInitializationResponse {}
+
+message ResendEmailVerificationRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message ResendEmailVerificationResponse {}
+
+message GetHumanPhoneRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message GetHumanPhoneResponse {
+    string user_id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+    zitadel.user.v1.Phone phone = 3;
+}
+
+message UpdateHumanPhoneRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    zitadel.user.v1.Phone phone = 2 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message UpdateHumanPhoneResponse {
+    string user_id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+    zitadel.user.v1.Email email = 3;
+}
+
+message RemoveHumanPhoneRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message RemoveHumanPhoneResponse {}
+
+message ResendHumanPhoneVerificationRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message ResendHumanPhoneVerificationResponse {}
+
+message GetHumanAddressRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message GetHumanAddressResponse {
+    string user_id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+    zitadel.user.v1.Address address = 3;
+}
+
+message UpdateHumanAddressRequest {
+    string user_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    zitadel.user.v1.Address address = 2 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+message UpdateHumanAddressResponse {
+    string user_id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+    zitadel.user.v1.Address address = 3;
 }
 
 message SetInitialPasswordRequest {
@@ -888,54 +651,107 @@ message SetInitialPasswordRequest {
 
 message SetInitialPasswordResponse {}
 
-message ResendInitialMailRequest {
-    string user_id = 1 [(validate.rules).string.min_len = 1];
-    string email = 2;
+
+
+
+
+
+
+
+
+message GetOrgIDPByIDRequest {
+    string id = 1;
 }
 
-message ResendInitialMailResponse {}
-
-message MyOrgRequest {}
-
-message OrgByDomainRequest {
-    string domain = ;
+message GetOrgIDPByIDResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.idp.v1.IDP idp = 2;
 }
 
-message DeactivateOrgResponse {}
-message ReactivateOrgResponse {}
-
-message AddOrgDomainRequest {
-    string domain = ;
+message SearchOrgIDPsRequest {
+    zitadel.v1.Search meta_data = 1;
+    zitadel.idp.v1.IDPFieldName sorting_column = 2;
+    repeated zitadel.idp.v1.IDPQuery queries = 3;
 }
 
-message GenerateOrgDomainValidationResponse {
-    string domain = ;
-    zitadel.v1.org.DomainValidationType type = ;
+message SearchOrgIDPsResponse {
+    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.IDPFieldName sorting_column = 2;
+    repeated zitadel.idp.v1.IDP result = 3;
 }
 
-message GenerateOrgDomainValidationResponse {
-    string token = ;
-    string url = ;
+message CreateOrgIDPRequest {
+    zitadel.idp.v1.IDP idp = 1;
 }
 
-message ValidateOrgDomainRequest {
-    string domain = ;
+message CreateOrgIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.idp.v1.IDP idp = 2;
 }
 
-message ValidateOrgDomainRequest {}
-
-message SetPrimaryOrgDomainRequest {
-    string domain = ;
+message DeactivateOrgIDPRequest {
+    string id = 1;
 }
 
-message SetPrimaryOrgDomainResponse {}
-
-message RemoveOrgDomainRequest {
-    string domain = ;
+message DeactivateOrgIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
 }
 
-message RemoveOrgDomainResponse {}
+message ReactivateOrgIDPRequest {
+    string id = 1;
+}
 
-message DeactivateProjectResponse {}
-message ReactivateProjectResponse {}
-message RemoveProjectResponse {}
+message ReactivateOrgIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveOrgIDPRequest {
+    string id = 1;
+}
+
+message RemoveOrgIDPRequest {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UpdateOrgIDPRequest {
+    string id = 1;
+    string name = 2;
+    zitadel.idp.v1.IDPStylingType styling_type = 3;
+}
+
+message UpdateOrgIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    string id = 2;
+    zitadel.idp.v1.IDPState state = 3;
+    string name = 4;
+    zitadel.idp.v1.IDPStylingType styling_type = 5;
+}
+
+message UpdateOrgIDPOIDCConfigRequest {
+    string idp_id = 1;
+    zitadel.idp.v1.OIDCConfig config = 2;
+}
+
+message UpdateOrgIDPOIDCConfigResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.idp.v1.OIDCConfig config = 2;
+}
+
+
+
+
+message View {
+    string database = 1;
+    string view_name = 2;
+    uint64 processed_sequence = 3;
+    google.protobuf.Timestamp event_timestamp = 4;
+    google.protobuf.Timestamp last_successful_spooler_run = 5;
+}
+
+message FailedEvent {
+    string database = 1;
+    string view_name = 2;
+    uint64 failed_sequence = 3;
+    uint64 failure_count = 4;
+    string error_message = 5;
+}

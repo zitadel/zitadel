@@ -28,7 +28,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 service AuthService {
 
     //User
-    rpc GetMyUser(GetMyUserRequest) returns (zitadel.v1.user.UserResponse) {
+    rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
         option (google.api.http) = {
             get: "/users/me"
         };
@@ -38,7 +38,7 @@ service AuthService {
         };
     }
 
-    rpc UpdateMyUserName(zitadel.v1.user.UpdateUserNameRequest) returns (zitadel.v1.user.UpdateUserNameResponse) {
+    rpc UpdateMyUserName(UpdateMyUserNameRequest) returns (UpdateMyUserNameResponse) {
         option (google.api.http) = {
             put: "/users/me/username"
             body: "*"
@@ -60,7 +60,7 @@ service AuthService {
         };
     }
 
-    rpc GetMyProfile(GetMyHumanProfileRequest) returns (GetMyHumanProfileResponse) {
+    rpc GetMyProfile(GetMyProfileRequest) returns (GetMyProfileResponse) {
         option (google.api.http) = {
             get: "/users/me/profile"
         };
@@ -70,7 +70,7 @@ service AuthService {
         };
     }
 
-    rpc UpdateMyProfile(zitadel.v1.user.UpdateHumanProfileRequest) returns (zitadel.v1.user.UpdateHumanProfileResponse) {
+    rpc UpdateMyProfile(UpdateMyProfileRequest) returns (UpdateMyProfileResponse) {
         option (google.api.http) = {
             put: "/users/me/profile"
             body: "*"
@@ -156,7 +156,7 @@ service AuthService {
         };
     }
 
-    rpc ResendMyPhoneVerificationCode(ResendMyPhoneVerificationRequest) returns (ResendMyPhoneVerificationResponse) {
+    rpc ResendMyPhoneVerification(ResendMyPhoneVerificationRequest) returns (ResendMyPhoneVerificationResponse) {
         option (google.api.http) = {
             post: "/users/me/phone/_resendverification"
             body: "*"
@@ -197,41 +197,87 @@ service AuthService {
             permission: "authenticated"
         };
     }
+
+    rpc SearchMyLinkedIDPs(SearchMyLinkedIDPsRequest) returns (SearchMyLinkedIDPsResponse) {
+        option (google.api.http) = {
+            post: "/users/me/idps/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyLinkedIDP(RemoveMyLinkedIDPRequest) returns (RemoveMyLinkedIDPResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/idps/{idp_id}/{linked_user_id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
 }
 
 //GetMyUserRequest is an empty request
 // the request parameters are read from the token-header
 message GetMyUserRequest {}
 
+message GetMyUserResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.User user = 2;
+    google.protobuf.Timestamp last_login = 3;
+}
+
+message UpdateMyUserNameRequest {
+    string user_name = 1;
+}
+
+message UpdateMyUserNameResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    string user_name = 2;
+}
+
 message UpdateMyPasswordRequest {
+    //TODO: current_password?
     string password = ;
 }
 
 message UpdateMyPasswordResponse {
-    zitadel.v1.UpdateMetaData meta_data = ;
+    zitadel.v1.MetaData meta_data = ;
 }
 
 message GetMyHumanProfileRequest {}
 
 message GetMyHumanProfileResponse {
-    zitadel.v1.ReadMetaData meta_data = ;
-    zitadel.v1.user.Profile profile = ;
+    zitadel.v1.MetaData meta_data = ;
+    zitadel.user.v1.Profile profile = ;
+}
+
+message UpdateMyProfileRequest {
+    zitadel.user.v1.Profile profile = 1;
+}
+
+message UpdateMyProfileResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.Profile profile = 2;
 }
 
 message GetMyEmailRequest {}
 
 message GetMyEmailResponse {
     zitadel.v1.ReadMetaData meta_data = ;
-    zitadel.v1.user.Email email = ;
+    zitadel.user.v1.Email email = ;
 }
 
 message UpdateMyEmailRequest {
-    zitadel.v1.user.Email email = ;
+    zitadel.user.v1.Email email = ;
 }
 
 message UpdateMyEmailResponse {
     zitadel.v1.UpdateMetaData = ;
-    zitadel.v1.user.Email = ;
+    zitadel.user.v1.Email = ;
 }
 
 message VerifyMyEmailRequest {
@@ -241,21 +287,23 @@ message VerifyMyEmailRequest {
 message VerifyMyEmailResponse {}
 
 message ResendMyEmailVerificationRequest {}
+
 message ResendMyEmailVerificationResponse {}
 
 message GetMyPhoneRequest {}
+
 message GetMyPhoneResponse {
-    zitadel.v1.ReadMetaData meta_data = ;
-    zitadel.v1.user.Phone phone = ;
+    zitadel.v1.MetaData meta_data = ;
+    zitadel.user.v1.Phone phone = ;
 }
 
 message UpdateMyPhoneRequest {
-    zitadel.v1.user.Email email = ;
+    zitadel.user.v1.Email email = ;
 }
 
 message UpdateMyPhoneResponse {
-    zitadel.v1.UpdateMetaData meta_data = ;
-    zitadel.v1.user.Email email = ;
+    zitadel.v1.MetaData meta_data = ;
+    zitadel.user.v1.Email email = ;
 }
 
 message VerifyMyPhoneRequest {
@@ -265,6 +313,7 @@ message VerifyMyPhoneRequest {
 message VerifyMyPhoneResponse {}
 
 message ResendMyPhoneVerificationRequest {}
+
 message ResendMyPhoneVerificationResponse {}
 
 message RemoveMyPhoneRequest {}
@@ -274,14 +323,33 @@ message GetMyAddressRequest {}
 
 message GetMyAddressResponse {
     zitadel.v1.ReadMetaData meta_data = ;
-    zitadel.v1.user.Address address = ;
+    zitadel.user.v1.Address address = ;
 }
 
 message UpdateMyAddressRequest {
-    zitadel.v1.user.Address address = ;
+    zitadel.user.v1.Address address = ;
 }
 
 message UpdateMyAddressResponse {
     zitadel.v1.UpdateMetaData meta_data = ;
-    zitadel.v1.user.Address address = ;
+    zitadel.user.v1.Address address = ;
+}
+
+message SearchMyLinkedIDPsRequest {
+    zitadel.v1.Search meta_data = 1;
+    //TODO: maybe search for idp name and linked login name?
+}
+
+message SearchMyLinkedIDPsResponse {
+    zitadel.v1.Search meta_data = 1;
+    
+}
+
+message RemoveMyLinkedIDPRequest {
+    string idp_id = 1;
+    string linked_user_id = 2;
+}
+
+message RemoveMyLinkedIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
 }

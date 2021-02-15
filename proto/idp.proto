@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "object.proto";
+
+package zitadel.idp.v1;
+
+message IDP {
+    string id = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+    IDPState state = 2 [
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+    string name = 3 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    IDPStylingType styling_type = 4 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    oneof config {
+        OIDCConfig oidc_config = 5;
+    }
+}
+
+enum StylingType {
+    STYLING_TYPE_UNSPECIFIED = 0;
+    STYLING_TYPE_GOOGLE = 1;
+}
+
+message OIDCConfig {
+    string client_id = 1 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    string client_secret = 2 [
+        (google.api.field_behavior) = INPUT_ONLY
+    ];
+    string issuer = 3 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    repeated string scopes = 4 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    OIDCMappingField idp_display_name_mapping = 5 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+    OIDCMappingField username_mapping = 6 [
+        (google.api.field_behavior) = REQUIRED
+    ];
+}
+
+enum OIDCMappingField {
+    OIDC_MAPPING_FIELD_UNSPECIFIED = 0;
+    OIDC_MAPPING_FIELD_PREFERRED_USERNAME = 1;
+    OIDC_MAPPING_FIELD_EMAIL = 2;
+}
+
+message IDPQuery {
+    oneof query {
+        UserIDQuery user_id = 1;
+    }
+}
+
+message UserIDQuery {
+    string user_id = 1;
+}
+
+enum IDPFieldName {
+    IDP_FIELD_NAME_UNSPECIFIED = 0;
+    IDP_FIELD_NAME_NAME = 1;
+}
+
+message IDPLink {
+    string user_id = 1;
+    string idp_id = 2;
+    string idp_name = 3;
+    string linked_user_id = 4;
+    string linked_user_name = 5;
+}

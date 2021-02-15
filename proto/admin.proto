@@ -34,9 +34,7 @@ service AdminService {
         };
     }
 
-
-
-    rpc GetOrgByID(zitadel.v1.org.OrgIDRequest) returns (zitadel.v1.org.OrgResponse) {
+    rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDReResponse) {
         option (google.api.http) = {
             get: "/orgs/{id}"
         };
@@ -46,7 +44,7 @@ service AdminService {
         };
     }
 
-    rpc SearchOrgs(zitadel.v1.org.SearchOrgRequest) returns (zitadel.v1.org.SearchOrgResponse) {
+    rpc SearchOrgs(SearchOrgsRequest) returns (SearchOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search"
             body: "*"
@@ -65,6 +63,92 @@ service AdminService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "iam.write"
+        };
+    }
+
+    rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
+        option (google.api.http) = {
+            get: "/idps/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.read"
+        };
+    }
+
+    rpc SearchIDPs(SearchIDPsRequest) returns (SearchIDPsResponse) {
+        option (google.api.http) = {
+            post: "/idps/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.read"
+        };
+    }
+
+    rpc CreateIDP(CreateIDPRequest) returns (CreateIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc DeactivateIDP(DeactivateIDPRequest) returns (DeactivateIDPResponse) {
+        option (google.api.http) = {
+            put: "/idps/{id}/_deactivate"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc ReactivateIDP(ReactivateIDPRequest) returns (ReactivateIDPResponse) {
+        option (google.api.http) = {
+            put: "/idps/{id}/_reactivate"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc RemoveIDP(RemoveIDPRequest) returns (RemoveIDPResponse) {
+        option (google.api.http) = {
+            delete: "/idps/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
+        option (google.api.http) = {
+            put: "/idps/{id}"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateIDPOIDCConfig(UpdateIDPOIDCConfigRequest) returns (UpdateIDPOIDCConfigResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}/oidcconfig"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.write"
         };
     }
 
@@ -118,15 +202,46 @@ message IsOrgUniqueResponse {
     bool is_unique = ;
 }
 
+message GetOrgByIDRequest {
+    string id = 1;
+}
+
+message GetOrgByIDResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.org.v1.Org org = 2;
+}
+
+message SearchOrgsRequest {
+    zitadel.v1.Search meta_data = 1;
+    zitadel.org.v1.OrgFieldName sorting_column = 2;
+    repeated zitadel.org.v1.OrgQuery queries = 3;
+}
+
+message SearchOrgsResponse {
+    zitadel.v1.Search meta_data = 1;
+    zitadel.org.v1.OrgFieldName sorting_column = 2;
+    repeated zitadel.org.v1.Org result = 3;
+}
+
 message SetUpOrgRequest {
-    zitadel.v1.org.CreateOrgRequest org = ;
-    zitadel.v1.user.CreateUserRequest user = ;
+    zitadel.org.v1.Org org = 1;
+    zitadel.user.v1.User user = 2;
 }
 
 message SetUpOrgResponse {
-    zitadel.v1.org.CreateOrgResponse org = ;
-    zitadel.v1.user.CreateUserResponse user = ;
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.org.v1.Org org = 2;
+    zitadel.user.v1.User user = 3;
 }
+
+
+
+
+
+
+
+
+
 
 message GetViewsRequest {}
 
@@ -154,6 +269,92 @@ message RemoveFailedEventRequest {
 }
 
 message RemoveFailedEventResponse {}
+
+
+
+
+
+
+message GetIDPByIDRequest {
+    string id = 1;
+}
+
+message GetIDPByIDResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.idp.v1.IDP idp = 2;
+}
+
+message SearchIDPsRequest {
+    zitadel.v1.Search meta_data = 1;
+    zitadel.idp.v1.IDPFieldName sorting_column = 2;
+    repeated zitadel.idp.v1.IDPQuery queries = 3;
+}
+
+message SearchIDPsResponse {
+    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.IDPFieldName sorting_column = 2;
+    repeated zitadel.idp.v1.IDP result = 3;
+}
+
+message CreateIDPRequest {
+    zitadel.idp.v1.IDP idp = 1;
+}
+
+message CreateIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.idp.v1.IDP idp = 2;
+}
+
+message DeactivateIDPRequest {
+    string id = 1;
+}
+
+message DeactivateIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ReactivateIDPRequest {
+    string id = 1;
+}
+
+message ReactivateIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveIDPRequest {
+    string id = 1;
+}
+
+message RemoveIDPRequest {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UpdateIDPRequest {
+    string id = 1;
+    string name = 2;
+    zitadel.idp.v1.IDPStylingType styling_type = 3;
+}
+
+message UpdateIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    string id = 2;
+    zitadel.idp.v1.IDPState state = 3;
+    string name = 4;
+    zitadel.idp.v1.IDPStylingType styling_type = 5;
+}
+
+message UpdateIDPOIDCConfigRequest {
+    string idp_id = 1;
+    zitadel.idp.v1.OIDCConfig config = 2;
+}
+
+message UpdateIDPOIDCConfigResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.idp.v1.OIDCConfig config = 2;
+}
+
+
+
 
 message View {
     string database = 1;
