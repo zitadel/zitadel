@@ -1,0 +1,25 @@
+<form class="form" (ngSubmit)="add(redInput)">
+    <cnsl-form-field class="formfield">
+        <cnsl-label>{{ title }}</cnsl-label>
+
+        <input #redInput cnslInput placeholder="ex. https://" [formControl]="redirectControl">
+    </cnsl-form-field>
+    <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button
+        [disabled]="redirectControl.invalid || !canWrite">
+        <mat-icon>add</mat-icon>
+    </button>
+</form>
+
+<div class="uri-list">
+    <div *ngFor="let uri of urisList" class="uri-line">
+        <span class="uri"
+            [ngClass]="{'green': !devMode && uri?.startsWith('https://'), 'red': !devMode && !uri?.startsWith('https://')}">{{uri}}</span>
+        <span class="fill-space"></span>
+        <button matTooltip="{{'ACTIONS.DELETE' | translate}}" mat-icon-button (click)="remove(uri)" class="icon-button">
+            <mat-icon>cancel</mat-icon>
+        </button>
+    </div>
+</div>
+
+<p *ngIf="redirectControl.value && redirectControl.invalid" class="error">
+    {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>

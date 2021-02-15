@@ -8,11 +8,21 @@
     display: block;
   }
 
-  h1 {
-    font-size: 1.2rem;
-    margin: 0 1rem;
+  .title-col {
     margin-left: 2rem;
-    font-weight: normal;
+    margin-right: 1rem;
+    min-width: 200px;
+
+    h1 {
+        font-size: 1.2rem;
+        margin: 0 0 0 0;
+        font-weight: normal;
+    }
+
+    span {
+        font-size: 12px;
+        color: var(--grey);
+    }
   }
 
   .desc {
@@ -20,6 +30,7 @@
     display: block;
     font-size: .9rem;
     color: var(--grey);
+    margin-top: 1.5rem;
   }
 
   .zitadel-warning {
@@ -41,10 +52,10 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  align-items: center;
 
   .toggle {
     outline: none;
-    align-self: flex-start;
     margin-top: 1rem;
     margin-right: 1rem;
     border-radius: .5rem;
@@ -91,6 +102,11 @@
     align-items: center;
   }
 
+  .redirect-section {
+      flex: 1;
+      margin: 0 .5rem;
+  }
+
   .formfield {
     flex: 1 1 30%;
     margin: 0 .5rem;
@@ -99,27 +115,9 @@
       flex-basis: 100%;
     }
   }
-
-  .chiplist {
-    margin-bottom: 1rem;
-  }
-
-  .chip-form {
-    width: 100%;
-    display: flex;
-    align-items: center;
-
-    .formfield {
-      flex: 1;
-    }
-
-    button {
-      margin-top: 1rem;
-    }
-  }
-
+  
   .section-title {
-    margin-bottom: 1.5rem;
+      margin: 1.5rem 0 0 0;
   }
 
   .full-width {
@@ -168,15 +166,6 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
-}
-
-.chip {
-  border-radius: 4px;
-  height: 40px;
-}
-
-.chip[color='green'] {
-  background-color: #56a392 !important;
 }
 
 .divider {

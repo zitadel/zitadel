@@ -930,6 +930,12 @@
                     "1": "Aktiv",
                     "2": "Inaktiv"
                 }
+            },
+            "DIALOG": {
+                "DELETE": {
+                    "TITLE": "App löschen",
+                    "DESCRIPTION":"Wollen Sie diese App wirklich löschen?"
+                }
             }
         },
         "NAME": "Name",
@@ -991,13 +997,58 @@
             "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
             "IDTOKENUSERINFOASSERTION":"User Info im ID Token",
             "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
-            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen."
+            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen.",
+            "RECOMMENDED":"Empfohlen",
+            "NOTRECOMMENDED":"nicht empfohlen",
+            "SELECTION":{
+                "APPTYPE": {
+                    "WEB": {
+                        "TITLE":"Web",
+                        "DESCRIPTION":"Regular Web applications like .net, PHP, Node.js, Java, etc."
+                    },
+                    "NATIVE": {
+                        "TITLE":"NATIVE",
+                        "DESCRIPTION":"Mobile Apps, Desktop, Smart Devices, etc."
+                    },
+                    "USERAGENT": {
+                        "TITLE":"User Agent",
+                        "DESCRIPTION":"Single Page Apüplications (SPA) and in general all js frameworks executed in browsers"
+                    }
+                },
+                "AUTHMETHOD": {
+                    "CODE": {
+                        "TITLE":"Code",
+                        "DESCRIPTION":"Exchange the authorization code for the tokens"
+                    },
+                    "PKCE": {
+                        "TITLE":"PKCE",
+                        "DESCRIPTION":"Use a random hash instead of a static client secret for more security"
+                    },
+                    "POST": {
+                        "TITLE":"POST",
+                        "DESCRIPTION":"Send client_id and client_secret as part of the form"
+                    },
+                    "PK_JWT": {
+                        "TITLE":"Private Key JWT",
+                        "DESCRIPTION":"Use a private key to authorize your application"
+                    },
+                    "IMPLICIT": {
+                        "TITLE":"Implicit",
+                        "DESCRIPTION":"Get the tokens directly from the authorization endpoint"
+                    },
+                    "CUSTOM": {
+                        "TITLE":"Custom",
+                        "DESCRIPTION":"Your setting doesn't correspond to any other option."
+                    }
+                }
+            }
         },
         "TOAST": {
             "REACTIVATED":"Anwendung reaktiviert.",
             "DEACTIVATED":"Anwendung deaktiviert.",
             "OIDCUPDATED":"OIDC-Konfiguration geändert.",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC-Client Secret generiert."
+            "OIDCCLIENTSECRETREGENERATED":"OIDC-Client Secret generiert.",
+            "DELETED":"App gelöscht."
         }
     },
     "GENDERS": {

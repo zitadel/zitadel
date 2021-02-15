@@ -5,6 +5,8 @@
 @import './styles/link.scss';
 @import './styles/sidenav-list';
 @import 'src/app/modules/avatar/avatar.component';
+@import 'src/app/modules/app-radio/app-type-radio/app-type-radio.component';
+@import 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 @import 'src/app/modules/changes/changes.component';
 @import 'src/app/modules/info-section/info-section.component';
 @import 'src/app/modules/detail-layout/detail-layout.component';
@@ -18,6 +20,8 @@
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
+  @include app-type-radio-theme($theme);
+  @include app-auth-method-radio-theme($theme);
   @include card-theme($theme);
   @include table-theme($theme);
   @include detail-layout-theme($theme);

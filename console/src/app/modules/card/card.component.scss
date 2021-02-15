@@ -24,6 +24,8 @@
         font-size: 16px;
         text-transform: uppercase;
         letter-spacing: .05em;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
 
       .fill-space {
