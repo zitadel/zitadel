@@ -114,7 +114,7 @@ spec:
           type: object
         spec:
           properties:
-            database:
+            iam:
               type: object
             kind:
               type: string
@@ -131,6 +131,8 @@ spec:
                     namespace:
                       type: string
                   type: object
+                gitops:
+                  type: boolean
                 nodeSelector:
                   additionalProperties:
                     type: string
@@ -187,7 +189,7 @@ spec:
             version:
               type: string
           required:
-          - database
+          - iam
           - kind
           - spec
           - version
@@ -420,6 +422,8 @@ spec:
                   description: 'Use this registry to pull the Database operator image
                     from @default: ghcr.io'
                   type: string
+                gitOps:
+                  type: boolean
                 nodeSelector:
                   additionalProperties:
                     type: string
