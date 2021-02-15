@@ -71,7 +71,7 @@ func DeleteAuthNKey(db *gorm.DB, table, keyID string) error {
 	return delete(db)
 }
 
-func DeleteAuthNKeysByUserID(db *gorm.DB, table, userID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.AuthNKeySearchKey(key_model.AuthNKeyObjectID), userID)
+func DeleteAuthNKeysByObjectID(db *gorm.DB, table, objectID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.AuthNKeySearchKey(key_model.AuthNKeyObjectID), objectID)
 	return delete(db)
 }
