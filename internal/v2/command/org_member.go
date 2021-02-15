@@ -42,7 +42,7 @@ func (r *CommandSide) addOrgMember(ctx context.Context, orgAgg *org.Aggregate, a
 		return errors.ThrowAlreadyExists(nil, "Org-PtXi1", "Errors.Org.Member.AlreadyExists")
 	}
 
-	orgAgg.PushEvents(org.NewMemberAddedEvent(ctx, member.UserID, member.Roles...))
+	orgAgg.PushEvents(org.NewMemberAddedEvent(ctx, orgAgg.ID(), member.UserID, member.Roles...))
 
 	return nil
 }
@@ -89,7 +89,7 @@ func (r *CommandSide) RemoveOrgMember(ctx context.Context, orgID, userID string)
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	orgAgg.PushEvents(org.NewMemberRemovedEvent(ctx, userID))
+	orgAgg.PushEvents(org.NewMemberRemovedEvent(ctx, orgAgg.ID(), userID))
 
 	return r.eventstore.PushAggregate(ctx, m, orgAgg)
 }

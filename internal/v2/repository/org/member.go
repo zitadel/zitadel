@@ -19,6 +19,7 @@ type MemberAddedEvent struct {
 
 func NewMemberAddedEvent(
 	ctx context.Context,
+	aggregateID,
 	userID string,
 	roles ...string,
 ) *MemberAddedEvent {
@@ -28,6 +29,7 @@ func NewMemberAddedEvent(
 				ctx,
 				MemberAddedEventType,
 			),
+			aggregateID,
 			userID,
 			roles...,
 		),
@@ -80,6 +82,7 @@ type MemberRemovedEvent struct {
 
 func NewMemberRemovedEvent(
 	ctx context.Context,
+	aggregateID,
 	userID string,
 ) *MemberRemovedEvent {
 
@@ -89,6 +92,7 @@ func NewMemberRemovedEvent(
 				ctx,
 				MemberRemovedEventType,
 			),
+			aggregateID,
 			userID,
 		),
 	}
