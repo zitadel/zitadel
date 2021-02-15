@@ -233,7 +233,7 @@ func GetClientKey(keys []*ClientKey, id string) (int, *ClientKey) {
 
 type ClientKey struct {
 	es_models.ObjectRoot `json:"-"`
-	ApplicationID        string    `json:"applicationID,omitempty"`
+	ApplicationID        string    `json:"applicationId,omitempty"`
 	ClientID             string    `json:"clientId,omitempty"`
 	KeyID                string    `json:"keyId,omitempty"`
 	Type                 int32     `json:"type,omitempty"`

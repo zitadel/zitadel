@@ -777,7 +777,7 @@ func (es *ProjectEventstore) ChangeAPIConfig(ctx context.Context, config *proj_m
 	}
 	var app *proj_model.Application
 	if _, app = existingProject.GetApp(config.AppID); app == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Rgu63", "Errors.Project.AppNoExisting")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Rgu63", "Errors.Project.AppNotExisting")
 	}
 	if app.Type != proj_model.AppTypeAPI {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-RHj63", "Errors.Project.AppIsNotAPI")
@@ -978,7 +978,7 @@ func (es *ProjectEventstore) RemoveApplicationKey(ctx context.Context, projectID
 	}
 	var app *proj_model.Application
 	if _, app = existingProject.GetApp(applicationID); app == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-ADfzz", "Errors.Project.AppNoExisting")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-ADfzz", "Errors.Project.AppNotExisting")
 	}
 	if app.Type != proj_model.AppTypeOIDC {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-ADffh", "Errors.Project.AppIsNotOIDC")
