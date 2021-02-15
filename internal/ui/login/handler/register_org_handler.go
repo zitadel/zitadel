@@ -4,10 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 
-	auth_model "github.com/caos/zitadel/internal/auth/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -61,11 +58,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	registerOrg := &auth_model.RegisterOrg{
-		User: data.toUserModel(),
-		Org:  data.toOrgModel(),
-	}
-	user, err := l.authRepo.RegisterOrg(setContext(r.Context(), ""), registerOrg)
+	err = l.command.SetUpOrg(setContext(r.Context(), ""), data.toOrgDomain(), data.toUserDomain())
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
@@ -74,7 +67,6 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
 		return
 	}
-	authRequest.LoginName = user.PreferredLoginName
 	l.renderNextStep(w, r, authRequest)
 }
 
@@ -117,29 +109,27 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegisterOrg], data, nil)
 }
 
-func (d registerOrgFormData) toUserModel() *usr_model.User {
+func (d registerOrgFormData) toUserDomain() *domain.Human {
 	if d.Username == "" {
 		d.Username = d.Email
 	}
-	return &usr_model.User{
-		UserName: d.Username,
-		Human: &usr_model.Human{
-			Profile: &usr_model.Profile{
-				FirstName: d.Firstname,
-				LastName:  d.Lastname,
-			},
-			Password: &usr_model.Password{
-				SecretString: d.Password,
-			},
-			Email: &usr_model.Email{
-				EmailAddress: d.Email,
-			},
+	return &domain.Human{
+		Username: d.Username,
+		Profile: &domain.Profile{
+			FirstName: d.Firstname,
+			LastName:  d.Lastname,
+		},
+		Password: &domain.Password{
+			SecretString: d.Password,
+		},
+		Email: &domain.Email{
+			EmailAddress: d.Email,
 		},
 	}
 }
 
-func (d registerOrgFormData) toOrgModel() *org_model.Org {
-	return &org_model.Org{
+func (d registerOrgFormData) toOrgDomain() *domain.Org {
+	return &domain.Org{
 		Name: d.RegisterOrgName,
 	}
 }

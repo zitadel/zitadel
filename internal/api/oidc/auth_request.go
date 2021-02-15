@@ -131,7 +131,7 @@ func (o *OPStorage) GetKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err e
 }
 
 func (o *OPStorage) SaveNewKeyPair(ctx context.Context) error {
-	return o.repo.GenerateSigningKeyPair(ctx, o.signingKeyAlgorithm)
+	return o.command.GenerateSigningKeyPair(ctx, o.signingKeyAlgorithm)
 }
 
 func (o *OPStorage) assertProjectRoleScopes(app *proj_model.ApplicationView, scopes []string) ([]string, error) {
