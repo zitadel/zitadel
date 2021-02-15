@@ -22,7 +22,8 @@ type TokenVerifier struct {
 type authZRepo interface {
 	VerifyAccessToken(ctx context.Context, token, clientID string) (userID, agentID, prefLang string, err error)
 	VerifierClientID(ctx context.Context, name string) (clientID string, err error)
-	ResolveGrants(ctx context.Context) (grant *Grant, err error)
+	SearchMyZitadelPermissions(ctx context.Context) ([]string, error)
+	SearchMyMemberships(ctx context.Context) ([]*Membership, error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
 	ExistsOrg(ctx context.Context, orgID string) error
 }
@@ -87,10 +88,16 @@ func (v *TokenVerifier) clientIDFromMethod(ctx context.Context, method string) (
 	return c.id, nil
 }
 
-func (v *TokenVerifier) ResolveGrant(ctx context.Context) (_ *Grant, err error) {
+func (v *TokenVerifier) SearchMyZitadelPermissions(ctx context.Context) (_ []string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return v.authZRepo.ResolveGrants(ctx)
+	return v.authZRepo.SearchMyZitadelPermissions(ctx)
+}
+
+func (v *TokenVerifier) SearchMyMemberships(ctx context.Context) (_ []*Membership, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	return v.authZRepo.SearchMyMemberships(ctx)
 }
 
 func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (_ string, _ []string, err error) {
