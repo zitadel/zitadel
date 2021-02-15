@@ -19,15 +19,15 @@
             <div class="app-specs">
                 <div class="row" *ngIf="method && method.responseType != undefined">
                     <span>{{'APP.OIDC.RESPONSE' | translate}}</span>
-                    <span>{{('APP.OIDC.RESPONSE'+method.responseType) | translate}}</span>
+                    <span>{{('APP.OIDC.RESPONSE'+method.responseType.toString()) | translate}}</span>
                 </div>
                 <div class="row" *ngIf="method.grantType != undefined">
                     <span>{{'APP.GRANT' | translate}}</span>
-                    <span>{{('APP.OIDC.GRANT'+method.grantType) | translate}}</span>
+                    <span>{{('APP.OIDC.GRANT'+method.grantType.toString()) | translate}}</span>
                 </div>
                 <div class="row" *ngIf="method.authMethod != undefined">
                     <span>{{'APP.OIDC.AUTHMETHOD' | translate}}</span>
-                    <span>{{('APP.OIDC.AUTHMETHOD'+method.authMethod) | translate}}</span>
+                    <span>{{('APP.OIDC.AUTHMETHOD'+method.authMethod.toString()) | translate}}</span>
                 </div>
             </div>
         </label>

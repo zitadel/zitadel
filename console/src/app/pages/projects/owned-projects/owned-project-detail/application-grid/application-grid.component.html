@@ -13,7 +13,7 @@
     <div [routerLink]="['/projects', projectId, 'apps', app.id ]" class="app-wrap"
         *ngFor="let app of appsSubject | async"
         matTooltip="{{'APP.OIDC.APPTYPE'+app.oidcConfig.applicationType | translate}}">
-        <div class="morph-card" matRipple>
+        <cnsl-app-card class="grid-card" matRipple [type]="app.oidcConfig?.applicationType">
             {{ app.name.charAt(0)}}
             <i *ngIf="app.oidcConfig.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE"
                 class="las la-mobile"></i>
@@ -21,7 +21,7 @@
                 class="las la-code"></i>
             <i *ngIf="app.oidcConfig.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT"
                 class="las la-code"></i>
-        </div>
+        </cnsl-app-card>
         <span class="name">{{app.name}}</span>
         <span class="type">{{'APP.OIDC.APPTYPE'+app.oidcConfig.applicationType | translate}}</span>
 
@@ -29,9 +29,9 @@
 
     <ng-template appHasRole [appHasRole]="['project.app.write']">
         <div class="app-wrap" *ngIf="!disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']">
-            <div class="morph-card add" matRipple>
+            <cnsl-app-card class="grid-card add" matRipple>
                 <mat-icon>add</mat-icon>
-            </div>
+            </cnsl-app-card>
             <span class="name">{{ 'ACTIONS.NEW' | translate }}</span>
         </div>
     </ng-template>

@@ -1,87 +1,62 @@
-@import '~@angular/material/theming';
 
-@mixin application-grid-theme($theme) {
-  /* stylelint-disable */
-  $primary: map-get($theme, primary);
-  $primary-dark: mat-color($primary, A900);
-  $accent: map-get($theme, accent);
-  $accent-color: mat-color($primary, 500);
-  /* stylelint-enable */
 
-  .app-grid-header {
+.app-grid-header {
     display: flex;
     align-items: center;
 
     .fill-space {
-      flex: 1;
+        flex: 1;
     }
-  }
+}
 
-  .app-container {
+.app-container {
     display: flex;
     flex-wrap: wrap;
     margin: 0 -1rem;
     padding-bottom: 2rem;
 
     .sp-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: calc(82px + 2rem);
-      height: calc(82px + 2rem);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: calc(82px + 2rem);
+        height: calc(82px + 2rem);
     }
 
     .app-wrap {
-      outline: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      max-width: 150px;
-
-      .morph-card {
-        cursor: pointer;
-        animation: all .2s;
+        outline: none;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
-        font-size: 2rem;
-        height: 80px;
-        width: 80px;
-        margin: 1rem;
-        text-transform: uppercase;
-        border-radius: .5rem;
-        border: 2px solid $accent-color;
-        font-weight: 800;
-        background-color: $primary-dark;
-        transition: background-color box-shadow .3s ease-in;
-        background-image:
-          linear-gradient(transparent 11px, rgba($accent-color, .5) 12px, transparent 12px),
-          linear-gradient(90deg, transparent 11px, rgba($accent-color, .5) 12px, transparent 12px);
-        background-size: 100% 12px, 12px 100%;
+        max-width: 150px;
 
-        &:hover {
-          background-color: rgba($accent-color, .1);
+        .grid-card {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            height: 80px;
+            width: 80px;
+            margin: 1rem;
+            text-transform: uppercase;
+            border-radius: .5rem;
+            font-weight: 800;
+            box-sizing: border-box;
+
+            &.add {
+                border: 2px solid var(--grey);
+            }
         }
 
-        &.add {
-          background: $accent-color;
-          color: white;
-
-          &:hover {
-            background-color: rgba($accent-color, .8);
-          }
+        .name {
+            font-size: 14px;
         }
-      }
 
-      .name {
-        font-size: 14px;
-      }
-
-      .type {
-        font-size: 14px;
-        color: #8a868a;
-      }
+        .type {
+            font-size: 12px;
+            color: #8a868a;
+        }
     }
-  }
 }

@@ -59,10 +59,12 @@
             <p><strong>Issuer:</strong> {{docs.issuer}}</p>
         </cnsl-info-section> -->
 
-        <div class="compliance" *ngIf="app.oidcConfig">
-            <cnsl-info-section class="problem" *ngIf="app.oidcConfig.complianceProblemsList?.length">
+        <div class="compliance"
+            *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
+            <cnsl-info-section class="problem">
                 <ul style="margin: 0;">
-                    <li style="margin: 0 0 .5rem 0;" *ngFor="let problem of app.oidcConfig.complianceProblemsList">
+                    <li style="margin: 0 0 .5rem 0;"
+                        *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
                         {{problem.localizedMessage}}</li>
                 </ul>
             </cnsl-info-section>
