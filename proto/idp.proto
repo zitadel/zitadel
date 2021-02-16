@@ -71,6 +71,7 @@ enum IDPFieldName {
     IDP_FIELD_NAME_NAME = 1;
 }
 
+//TODO: discuss
 message IDPLink {
     string user_id = 1;
     string idp_id = 2;

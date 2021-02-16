@@ -74,7 +74,7 @@ service ManagementService {
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
         option (google.api.http) = {
             post: "/users"
-            body: "*"
+            body: "user"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -82,7 +82,7 @@ service ManagementService {
         };
     }
 
-    rpc DeactivateUser(zitadel.user.v1.UserIDRequest) returns (DeactivateUserResponse) {
+    rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
         option (google.api.http) = {
             put: "/users/{id}/_deactivate"
             body: "*"
@@ -159,7 +159,7 @@ service ManagementService {
     rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/profile"
-            body: "*"
+            body: "profile"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
