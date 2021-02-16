@@ -231,7 +231,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public authMethodFromPartialConfig(config: OIDCConfig.AsObject): string {
         const key = getAuthMethodFromPartialConfig(config);
-        console.log(key);
         return key;
     }
 
