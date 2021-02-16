@@ -125,7 +125,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 	//create orgs
 	aggregates := make([]eventstore.Aggregater, 0)
 	for _, organisation := range step1.Orgs {
-		orgAgg, userAgg, orgMemberAgg, err := r.setUpOrg(ctx,
+		orgAgg, userAgg, orgMemberAgg, claimedUsers, err := r.setUpOrg(ctx,
 			&domain.Org{
 				Name:    organisation.Name,
 				Domains: []*domain.OrgDomain{{Domain: organisation.Domain}},
@@ -156,6 +156,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 			}
 		}
 		aggregates = append(aggregates, orgAgg, userAgg, orgMemberAgg)
+		aggregates = append(aggregates, claimedUsers...)
 		if organisation.Name == step1.GlobalOrg {
 			err = r.setGlobalOrg(ctx, iamAgg, iamWriteModel, orgAgg.ID())
 			if err != nil {

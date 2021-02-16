@@ -47,7 +47,7 @@ func (p *LabelPolicy) AggregateTypes() []es_models.AggregateType {
 }
 
 func (p *LabelPolicy) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestLabelPolicySequence("")
+	sequence, err := p.view.GetLatestLabelPolicySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +56,8 @@ func (p *LabelPolicy) EventQuery() (*es_models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (p *LabelPolicy) CurrentSequence(event *es_models.Event) (uint64, error) {
-	sequence, err := p.view.GetLatestLabelPolicySequence(string(event.AggregateType))
+func (p *LabelPolicy) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestLabelPolicySequence()
 	if err != nil {
 		return 0, err
 	}

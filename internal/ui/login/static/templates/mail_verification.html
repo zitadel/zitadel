@@ -1,6 +1,6 @@
 {{template "main-top" .}}
 
-<div class="head">
+<div class="lgn-head">
     {{ template "user-profile" . }}
 
     <p>{{t "EmailVerification.Description"}}</p>
@@ -14,21 +14,26 @@
     <input type="hidden" name="userID" value="{{ .UserID }}" />
 
     <div class="fields">
-        <div class="field">
-            <label class="label" for="code">{{t "EmailVerification.Code"}}</label>
-            <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
-        </div>
+        <label class="lgn-label" for="code">{{t "EmailVerification.Code"}}</label>
+        <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
     </div>
 
     {{ template "error-message" .}}
 
-    <div class="actions">
-        <button type="submit" id="submit-button" name="resend" value="false" class="primary right">{{t "Actions.Next"}}</button>
+    <div class="lgn-actions lgn-reverse-order">
+        <button type="submit" id="submit-button" name="resend" value="false"
+        class="lgn-primary lgn-raised-button">{{t "Actions.Next"}}
+        </button>
+
+        <span class="fill-space"></span>
+
         {{ if .UserID }}
-        <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend"}}</button>
+        <button type="submit" name="resend" value="true" class="lgn-stroked-button lgn-primary" formnovalidate>{{t "Actions.Resend"}}</button>
         {{ end }}
-        <a class="button secondary" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+
+        <a class="lgn-icon-button lgn-left-action" name="resetlinking" value="true" href="{{ loginUrl }}"
+            formnovalidate>
+            <i class="lgn-icon-arrow-left-solid"></i>
         </a>
     </div>
 </form>
@@ -36,4 +41,3 @@
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 
 {{template "main-bottom" .}}
- 

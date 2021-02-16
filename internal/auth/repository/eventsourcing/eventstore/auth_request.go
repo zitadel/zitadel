@@ -696,13 +696,6 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 
 func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, error) {
 	policy, err := repo.View.LoginPolicyByAggregateID(orgID)
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.LoginPolicyByAggregateID(repo.IAMID)
-		if err != nil {
-			return nil, err
-		}
-		policy.Default = true
-	}
 	if err != nil {
 		return nil, err
 	}

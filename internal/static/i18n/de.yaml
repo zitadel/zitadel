@@ -132,6 +132,16 @@ Errors:
         AlreadyExists: Multifaktor existiert bereits
         NotExisting: Multifaktor existiert nicht
         Unspecified: Multifaktor ungültig
+    MailTemplate:
+      NotFound: Default Mail Template nicht gefunden
+      NotChanged: Default Mail Template wurde nicht verändert
+      AlreadyExists: Default Mail Template existiert bereits
+      Invalid: Default Mail Template ist ungültig
+    MailText:
+      NotFound: Default Mail Text konnte nicht gefunden werden
+      NotChanged: Default Mail Text wurde nicht verändert
+      AlreadyExists: Default Mail Text existiert bereits
+      Invalid: Default Mail Text ist ungültig
     PasswordComplexity:
       NotFound: Password Komplexitäts Policy konnte nicht gefunden werden
       Empty: Passwort Komplexitäts Policy ist leer
@@ -234,6 +244,16 @@ Errors:
     LabelPolicy:
       NotFound: Default Private Label Policy konnte nicht gefunden
       NotChanged: Default Private Label Policy wurde nicht verändert
+    MailTemplate:
+      NotFound: Default Mail Template konnte nicht gefunden werden
+      NotChanged: Default Mail Template wurde nicht verändert
+      AlreadyExists: Default Mail Template existiert bereits
+      Invalid: Default Mail Template ist ungültig
+    MailText:
+      NotFound: Default Mail Text konnte nicht gefunden werden
+      NotChanged: Default Mail Text wurde nicht verändert
+      AlreadyExists: Default Mail Text existiert bereits
+      Invalid: Default Mail Text ist ungültig
     PasswordComplexityPolicy:
       NotFound: Default Password Complexity Policy konnte nicht gefunden werden
       NotExisting: Default Password Complexity Policy existiert nicht
@@ -269,6 +289,9 @@ Errors:
     NotActive: Benutzer Berechtigung ist nicht aktiv
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
+    RoleKeyNotFound: Rolle konnte nicht gefunden werden
+  Member:
+    AlreadyExists: Member existiert bereits
   IDPConfig:
     AlreadyExists: IDP Konfiguration mit diesem Name existiert bereits
   Changes:

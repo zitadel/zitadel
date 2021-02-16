@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/user/model"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -327,4 +328,20 @@ func idpProviderTypeStringToModel(providerType string) (iam_model.IDPProviderTyp
 	default:
 		return 0, caos_errors.ThrowPreconditionFailed(nil, "MGMT-6is9f", "Errors.Org.IDP.InvalidSearchQuery")
 	}
+}
+
+func externalIDPViewsToDomain(idps []*model.ExternalIDPView) []*domain.ExternalIDP {
+	externalIDPs := make([]*domain.ExternalIDP, len(idps))
+	for i, idp := range idps {
+		externalIDPs[i] = &domain.ExternalIDP{
+			ObjectRoot: models.ObjectRoot{
+				AggregateID:   idp.UserID,
+				ResourceOwner: idp.ResourceOwner,
+			},
+			IDPConfigID:    idp.IDPConfigID,
+			ExternalUserID: idp.ExternalUserID,
+			DisplayName:    idp.UserDisplayName,
+		}
+	}
+	return externalIDPs
 }

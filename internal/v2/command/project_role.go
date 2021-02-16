@@ -2,7 +2,9 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/project"
 )
@@ -49,7 +51,6 @@ func (r *CommandSide) addProjectRoles(ctx context.Context, projectAgg *project.A
 				projectRole.DisplayName,
 				projectRole.Group,
 				projectID,
-				resourceOwner,
 			),
 		)
 	}
@@ -92,7 +93,7 @@ func (r *CommandSide) ChangeProjectRole(ctx context.Context, projectRole *domain
 	return roleWriteModelToRole(existingRole), nil
 }
 
-func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, resourceOwner string) (err error) {
+func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, resourceOwner string, cascadingProjectGrantIds []string, cascadeUserGrantIDs ...string) (err error) {
 	if projectID == "" || key == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
 	}
@@ -103,12 +104,29 @@ func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, res
 	if existingRole.State == domain.ProjectRoleStateUnspecified || existingRole.State == domain.ProjectRoleStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-m9vMf", "Errors.Project.Role.NotExisting")
 	}
-
+	aggregates := make([]eventstore.Aggregater, 0)
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
-	projectAgg.PushEvents(project.NewRoleRemovedEvent(ctx, key, projectID, existingRole.ResourceOwner))
-	//TODO: Update UserGrants (remove roles if on usergrants)
+	projectAgg.PushEvents(project.NewRoleRemovedEvent(ctx, key, projectID))
+	for _, projectGrantID := range cascadingProjectGrantIds {
+		_, err = r.removeRoleFromProjectGrant(ctx, projectAgg, projectID, projectGrantID, key, true)
+		if err != nil {
+			logging.LogWithFields("COMMAND-6n77g", "projectgrantid", projectGrantID).WithError(err).Warn("could not cascade remove role from project grant")
+			continue
+		}
+	}
+	aggregates = append(aggregates, projectAgg)
 
-	return r.eventstore.PushAggregate(ctx, existingRole, projectAgg)
+	for _, grantID := range cascadeUserGrantIDs {
+		grantAgg, _, err := r.removeRoleFromUserGrant(ctx, grantID, []string{key}, true)
+		if err != nil {
+			logging.LogWithFields("COMMAND-mK0of", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
+			continue
+		}
+		aggregates = append(aggregates, grantAgg)
+	}
+
+	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	return err
 }
 
 func (r *CommandSide) getProjectRoleWriteModelByID(ctx context.Context, key, projectID, resourceOwner string) (*ProjectRoleWriteModel, error) {

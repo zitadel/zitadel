@@ -1,5 +1,5 @@
 SystemDefaults:
-  DefaultLanguage: 'de'
+  DefaultLanguage: 'en'
   Domain: $ZITADEL_DEFAULT_DOMAIN
   ZitadelDocs:
     Issuer: $ZITADEL_ISSUER
@@ -130,3 +130,10 @@ SystemDefaults:
     OriginLogin: $ZITADEL_ACCOUNTS
     OriginConsole: $ZITADEL_CONSOLE
     DisplayName: ZITADEL
+  KeyConfig:
+    Size: 2048
+    PrivateKeyLifetime: 6h
+    PublicKeyLifetime: 30h
+    EncryptionConfig:
+      EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
+    SigningKeyRotation: 10s

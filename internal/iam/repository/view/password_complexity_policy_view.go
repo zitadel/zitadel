@@ -11,8 +11,8 @@ import (
 
 func GetPasswordComplexityPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.PasswordComplexityPolicyView, error) {
 	policy := new(model.PasswordComplexityPolicyView)
-	userIDQuery := &model.PasswordComplexityPolicySearchQuery{Key: iam_model.PasswordComplexityPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, userIDQuery)
+	aggregateIDQuery := &model.PasswordComplexityPolicySearchQuery{Key: iam_model.PasswordComplexityPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.IAM.PasswordComplexityPolicy.NotExisting")

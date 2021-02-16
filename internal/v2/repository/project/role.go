@@ -11,24 +11,24 @@ import (
 )
 
 var (
-	uniqueRoleType      = "project_role"
+	UniqueRoleType      = "project_role"
 	roleEventTypePrefix = projectEventTypePrefix + "role."
 	RoleAddedType       = roleEventTypePrefix + "added"
 	RoleChangedType     = roleEventTypePrefix + "changed"
 	RoleRemovedType     = roleEventTypePrefix + "removed"
 )
 
-func NewAddProjectRoleUniqueConstraint(roleKey, projectID, resourceOwner string) *eventstore.EventUniqueConstraint {
+func NewAddProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueRoleType,
-		fmt.Sprintf("%s:%s:%s", roleKey, projectID, resourceOwner),
+		UniqueRoleType,
+		fmt.Sprintf("%s:%s", roleKey, projectID),
 		"Errors.Project.Role.AlreadyExists")
 }
 
-func NewRemoveProjectRoleUniqueConstraint(roleKey, projectID, resourceOwner string) *eventstore.EventUniqueConstraint {
+func NewRemoveProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueRoleType,
-		fmt.Sprintf("%s:%s:%s", roleKey, projectID, resourceOwner))
+		UniqueRoleType,
+		fmt.Sprintf("%s:%s", roleKey, projectID))
 }
 
 type RoleAddedEvent struct {
@@ -45,7 +45,7 @@ func (e *RoleAddedEvent) Data() interface{} {
 }
 
 func (e *RoleAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.projectID, e.Aggregate().ResourceOwner)}
+	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.projectID)}
 }
 
 func NewRoleAddedEvent(
@@ -155,7 +155,7 @@ type RoleRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Key       string `json:"key,omitempty"`
-	projectID string
+	projectID string `json:"-"`
 }
 
 func (e *RoleRemovedEvent) Data() interface{} {
@@ -163,7 +163,7 @@ func (e *RoleRemovedEvent) Data() interface{} {
 }
 
 func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.projectID, e.Aggregate().ResourceOwner)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.projectID)}
 }
 
 func NewRoleRemovedEvent(

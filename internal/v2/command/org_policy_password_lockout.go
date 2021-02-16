@@ -8,8 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
-func (r *CommandSide) AddPasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
-	addedPolicy := NewOrgPasswordLockoutPolicyWriteModel(policy.AggregateID)
+func (r *CommandSide) AddPasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+	addedPolicy := NewOrgPasswordLockoutPolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -29,8 +29,8 @@ func (r *CommandSide) AddPasswordLockoutPolicy(ctx context.Context, policy *doma
 	return writeModelToPasswordLockoutPolicy(&addedPolicy.PasswordLockoutPolicyWriteModel), nil
 }
 
-func (r *CommandSide) ChangePasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
-	existingPolicy := NewOrgPasswordLockoutPolicyWriteModel(policy.AggregateID)
+func (r *CommandSide) ChangePasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+	existingPolicy := NewOrgPasswordLockoutPolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err

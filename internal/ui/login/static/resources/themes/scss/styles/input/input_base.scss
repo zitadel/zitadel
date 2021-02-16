@@ -1,0 +1,32 @@
+$lgn-input-padding-start: 10px !default;
+$lgn-input-padding: 10px !default;
+$lgn-input-margin: 0 0 2px 0 !default;
+$lgn-input-line-height: 40px !default;
+$lgn-input-border-radius: 4px !default;
+$lgn-input-border-width: 1px !default;
+$lgn-input-placeholder-font-size: 14px !default;
+
+@mixin lgn-input-base {
+    display: block;
+    box-sizing: border-box;
+    padding-inline-start: $lgn-input-padding-start;
+    outline: none;
+    display: inline-block;
+    text-align: start;
+    cursor: text;
+    border-radius: $lgn-input-border-radius;
+    transform: all .2 linear;
+    font-size: 1rem;
+    border-style: solid;
+    border-width: $lgn-input-border-width;
+    height: $lgn-input-line-height;
+    padding: $lgn-input-padding;
+    transition: border-color .2s ease-in-out;
+    width: 100%;
+    margin: $lgn-input-margin;
+
+    &::placeholder {
+        font-size: $lgn-input-placeholder-font-size;
+        font-style: italic;
+    }
+}

@@ -31,6 +31,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(LoginPolicyMultiFactorRemovedEventType, MultiFactorRemovedEventEventMapper).
 		RegisterFilterEventMapper(LoginPolicyIDPProviderAddedEventType, IdentityProviderAddedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyIDPProviderRemovedEventType, IdentityProviderRemovedEventMapper).
+		RegisterFilterEventMapper(LoginPolicyIDPProviderCascadeRemovedEventType, IdentityProviderCascadeRemovedEventMapper).
 		RegisterFilterEventMapper(OrgIAMPolicyAddedEventType, OrgIAMPolicyAddedEventMapper).
 		RegisterFilterEventMapper(OrgIAMPolicyChangedEventType, OrgIAMPolicyChangedEventMapper).
 		RegisterFilterEventMapper(OrgIAMPolicyRemovedEventType, OrgIAMPolicyRemovedEventMapper).
@@ -42,5 +43,18 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(PasswordComplexityPolicyRemovedEventType, PasswordComplexityPolicyRemovedEventMapper).
 		RegisterFilterEventMapper(PasswordLockoutPolicyAddedEventType, PasswordLockoutPolicyAddedEventMapper).
 		RegisterFilterEventMapper(PasswordLockoutPolicyChangedEventType, PasswordLockoutPolicyChangedEventMapper).
-		RegisterFilterEventMapper(PasswordLockoutPolicyRemovedEventType, PasswordLockoutPolicyRemovedEventMapper)
+		RegisterFilterEventMapper(PasswordLockoutPolicyRemovedEventType, PasswordLockoutPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(MailTemplateAddedEventType, MailTemplateAddedEventMapper).
+		RegisterFilterEventMapper(MailTemplateChangedEventType, MailTemplateChangedEventMapper).
+		RegisterFilterEventMapper(MailTemplateRemovedEventType, MailTemplateRemovedEventMapper).
+		RegisterFilterEventMapper(MailTextAddedEventType, MailTextAddedEventMapper).
+		RegisterFilterEventMapper(MailTextChangedEventType, MailTextChangedEventMapper).
+		RegisterFilterEventMapper(MailTextRemovedEventType, MailTextRemovedEventMapper).
+		RegisterFilterEventMapper(IDPConfigAddedEventType, IDPConfigAddedEventMapper).
+		RegisterFilterEventMapper(IDPConfigChangedEventType, IDPConfigChangedEventMapper).
+		RegisterFilterEventMapper(IDPConfigRemovedEventType, IDPConfigRemovedEventMapper).
+		RegisterFilterEventMapper(IDPConfigDeactivatedEventType, IDPConfigDeactivatedEventMapper).
+		RegisterFilterEventMapper(IDPConfigReactivatedEventType, IDPConfigReactivatedEventMapper).
+		RegisterFilterEventMapper(IDPOIDCConfigAddedEventType, IDPOIDCConfigAddedEventMapper).
+		RegisterFilterEventMapper(IDPOIDCConfigChangedEventType, IDPOIDCConfigChangedEventMapper)
 }

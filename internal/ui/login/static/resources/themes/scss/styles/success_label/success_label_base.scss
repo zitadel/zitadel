@@ -1,0 +1,8 @@
+$lgn-success-label-padding: .5rem;
+$lgn-success-label-border-radius: .5rem;
+
+
+@mixin lgn-success-label-base {
+    border-radius: $lgn-success-label-border-radius;
+    padding: $lgn-success-label-padding;
+}

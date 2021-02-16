@@ -46,7 +46,7 @@ func (r *CommandSide) addProjectMember(ctx context.Context, projectAgg *project.
 		return errors.ThrowAlreadyExists(nil, "PROJECT-PtXi1", "Errors.Project.Member.AlreadyExists")
 	}
 
-	projectAgg.PushEvents(project.NewProjectMemberAddedEvent(ctx, member.UserID, member.Roles...))
+	projectAgg.PushEvents(project.NewProjectMemberAddedEvent(ctx, projectAgg.ID(), member.UserID, member.Roles...))
 
 	return nil
 }
@@ -93,7 +93,7 @@ func (r *CommandSide) RemoveProjectMember(ctx context.Context, projectID, userID
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	projectAgg.PushEvents(project.NewProjectMemberRemovedEvent(ctx, userID))
+	projectAgg.PushEvents(project.NewProjectMemberRemovedEvent(ctx, projectAgg.ID(), userID))
 
 	return r.eventstore.PushAggregate(ctx, m, projectAgg)
 }

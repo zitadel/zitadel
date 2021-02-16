@@ -49,17 +49,6 @@ func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner)
 }
 
-//
-//func (wm *IAMLabelPolicyWriteModel) HasChanged(primaryColor, secondaryColor string) bool {
-//	if primaryColor != "" && wm.PrimaryColor != primaryColor {
-//		return true
-//	}
-//	if secondaryColor != "" && wm.SecondaryColor != secondaryColor {
-//		return true
-//	}
-//	return false
-//}
-
 func IAMAggregateFromWriteModel(wm *eventstore.WriteModel) *iam.Aggregate {
 	return &iam.Aggregate{
 		Aggregate: *eventstore.AggregateFromWriteModel(wm, iam.AggregateType, iam.AggregateVersion),

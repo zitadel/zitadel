@@ -36,6 +36,7 @@ type LoginPolicySearchKey int32
 const (
 	LoginPolicySearchKeyUnspecified LoginPolicySearchKey = iota
 	LoginPolicySearchKeyAggregateID
+	LoginPolicySearchKeyDefault
 )
 
 type LoginPolicySearchQuery struct {

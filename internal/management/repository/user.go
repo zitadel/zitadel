@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	UserByID(ctx context.Context, id string) (*model.UserView, error)
 	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
+	UserIDsByDomain(ctx context.Context, domain string) ([]string, error)
 
 	GetUserByLoginNameGlobal(ctx context.Context, email string) (*model.UserView, error)
 	IsUserUnique(ctx context.Context, userName, email string) (bool, error)
@@ -22,6 +23,8 @@ type UserRepository interface {
 	GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error)
 
 	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
+	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*model.ExternalIDPView, error)
+	ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Context, idpConfigID, resourceOwner string) ([]*model.ExternalIDPView, error)
 
 	SearchMachineKeys(ctx context.Context, request *model.MachineKeySearchRequest) (*model.MachineKeySearchResponse, error)
 	GetMachineKey(ctx context.Context, userID, keyID string) (*model.MachineKeyView, error)

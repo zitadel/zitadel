@@ -35,6 +35,22 @@ func (repo *UserGrantRepo) UserGrantsByProjectID(ctx context.Context, projectID 
 	return model.UserGrantsToModel(grants), nil
 }
 
+func (repo *UserGrantRepo) UserGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) ([]*grant_model.UserGrantView, error) {
+	grants, err := repo.View.UserGrantsByProjectIDAndRoleKey(projectID, roleKey)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserGrantsToModel(grants), nil
+}
+
+func (repo *UserGrantRepo) UserGrantsByProjectAndGrantID(ctx context.Context, projectID, grantID string) ([]*grant_model.UserGrantView, error) {
+	grants, err := repo.View.UserGrantsByProjectAndGrantID(projectID, grantID)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserGrantsToModel(grants), nil
+}
+
 func (repo *UserGrantRepo) UserGrantsByUserID(ctx context.Context, userID string) ([]*grant_model.UserGrantView, error) {
 	grants, err := repo.View.UserGrantsByUserID(userID)
 	if err != nil {
@@ -45,7 +61,7 @@ func (repo *UserGrantRepo) UserGrantsByUserID(ctx context.Context, userID string
 
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, sequenceErr := repo.View.GetLatestUserGrantSequence("")
+	sequence, sequenceErr := repo.View.GetLatestUserGrantSequence()
 	logging.Log("EVENT-5Viwf").OnError(sequenceErr).Warn("could not read latest user grant sequence")
 
 	result := handleSearchUserGrantPermissions(ctx, request, sequence)

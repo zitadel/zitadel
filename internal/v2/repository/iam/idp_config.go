@@ -61,7 +61,8 @@ type IDPConfigChangedEvent struct {
 func NewIDPConfigChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	configID string,
+	configID,
+	oldName string,
 	changes []idpconfig.IDPConfigChanges,
 ) (*IDPConfigChangedEvent, error) {
 	changeEvent, err := idpconfig.NewIDPConfigChangedEvent(
@@ -70,6 +71,7 @@ func NewIDPConfigChangedEvent(
 			aggregate,
 			IDPConfigChangedEventType),
 		configID,
+		oldName,
 		changes,
 	)
 	if err != nil {

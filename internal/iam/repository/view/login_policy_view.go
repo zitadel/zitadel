@@ -9,10 +9,23 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+func GetDefaultLoginPolicies(db *gorm.DB, table string) ([]*model.LoginPolicyView, error) {
+	loginPolicies := make([]*model.LoginPolicyView, 0)
+	queries := []*iam_model.LoginPolicySearchQuery{
+		{Key: iam_model.LoginPolicySearchKeyDefault, Value: true, Method: global_model.SearchMethodEquals},
+	}
+	query := repository.PrepareSearchQuery(table, model.LoginPolicySearchRequest{Queries: queries})
+	_, err := query(db, &loginPolicies)
+	if err != nil {
+		return nil, err
+	}
+	return loginPolicies, nil
+}
+
 func GetLoginPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.LoginPolicyView, error) {
 	policy := new(model.LoginPolicyView)
-	userIDQuery := &model.LoginPolicySearchQuery{Key: iam_model.LoginPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, userIDQuery)
+	aggregateIDQuery := &model.LoginPolicySearchQuery{Key: iam_model.LoginPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.IAM.LoginPolicy.NotExisting")
@@ -23,6 +36,15 @@ func GetLoginPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model
 func PutLoginPolicy(db *gorm.DB, table string, policy *model.LoginPolicyView) error {
 	save := repository.PrepareSave(table)
 	return save(db, policy)
+}
+
+func PutLoginPolicies(db *gorm.DB, table string, policies ...*model.LoginPolicyView) error {
+	save := repository.PrepareBulkSave(table)
+	u := make([]interface{}, len(policies))
+	for i, user := range policies {
+		u[i] = user
+	}
+	return save(db, u...)
 }
 
 func DeleteLoginPolicy(db *gorm.DB, table, aggregateID string) error {

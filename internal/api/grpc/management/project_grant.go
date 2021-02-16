@@ -36,7 +36,11 @@ func (s *Server) CreateProjectGrant(ctx context.Context, in *management.ProjectG
 	return projectGrantFromDomain(grant), nil
 }
 func (s *Server) UpdateProjectGrant(ctx context.Context, in *management.ProjectGrantUpdate) (*management.ProjectGrant, error) {
-	grant, err := s.command.ChangeProjectGrant(ctx, projectGrantUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
+	userGrants, err := s.usergrant.UserGrantsByProjectAndGrantID(ctx, in.ProjectId, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	grant, err := s.command.ChangeProjectGrant(ctx, projectGrantUpdateToDomain(in), authz.GetCtxData(ctx).OrgID, userGrantsToIDs(userGrants)...)
 	if err != nil {
 		return nil, err
 	}

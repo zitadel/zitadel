@@ -24,7 +24,7 @@ func (s *Server) GetDefaultPasswordComplexityPolicy(ctx context.Context, _ *empt
 }
 
 func (s *Server) CreatePasswordComplexityPolicy(ctx context.Context, policy *management.PasswordComplexityPolicyRequest) (*management.PasswordComplexityPolicy, error) {
-	result, err := s.command.AddPasswordComplexityPolicy(ctx, passwordComplexityPolicyRequestToDomain(ctx, policy))
+	result, err := s.command.AddPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID, passwordComplexityPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (s *Server) CreatePasswordComplexityPolicy(ctx context.Context, policy *man
 }
 
 func (s *Server) UpdatePasswordComplexityPolicy(ctx context.Context, policy *management.PasswordComplexityPolicyRequest) (*management.PasswordComplexityPolicy, error) {
-	result, err := s.command.ChangePasswordComplexityPolicy(ctx, passwordComplexityPolicyRequestToDomain(ctx, policy))
+	result, err := s.command.ChangePasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID, passwordComplexityPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}

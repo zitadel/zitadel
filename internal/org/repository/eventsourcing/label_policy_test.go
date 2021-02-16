@@ -30,7 +30,7 @@ func TestLabelPolicyAddedAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "add label polciy",
+			name: "add label policy",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.Org{

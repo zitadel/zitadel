@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	"github.com/caos/logging"
 
@@ -15,14 +16,27 @@ import (
 func (r *CommandSide) AddOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain) (*domain.OrgDomain, error) {
 	domainWriteModel := NewOrgDomainWriteModel(orgDomain.AggregateID, orgDomain.Domain)
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
-	err := r.addOrgDomain(ctx, orgAgg, domainWriteModel, orgDomain)
+	userAggregates, err := r.addOrgDomain(ctx, orgAgg, domainWriteModel, orgDomain)
 	if err != nil {
 		return nil, err
 	}
-	err = r.eventstore.PushAggregate(ctx, domainWriteModel, orgAgg)
+	if len(userAggregates) == 0 {
+		err = r.eventstore.PushAggregate(ctx, domainWriteModel, orgAgg)
+		if err != nil {
+			return nil, err
+		}
+		return orgDomainWriteModelToOrgDomain(domainWriteModel), nil
+	}
+
+	aggregates := make([]eventstore.Aggregater, 0)
+	aggregates = append(aggregates, orgAgg)
+	aggregates = append(aggregates, userAggregates...)
+	resultEvents, err := r.eventstore.PushAggregates(ctx, aggregates...)
 	if err != nil {
 		return nil, err
 	}
+	domainWriteModel.AppendEvents(resultEvents...)
+	domainWriteModel.Reduce()
 	return orgDomainWriteModelToOrgDomain(domainWriteModel), nil
 }
 
@@ -63,7 +77,7 @@ func (r *CommandSide) GenerateOrgDomainValidation(ctx context.Context, orgDomain
 	return token, url, nil
 }
 
-func (r *CommandSide) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain) error {
+func (r *CommandSide) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs ...string) error {
 	if orgDomain == nil || !orgDomain.IsValid() {
 		return caos_errs.ThrowPreconditionFailed(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
 	}
@@ -89,8 +103,20 @@ func (r *CommandSide) ValidateOrgDomain(ctx context.Context, orgDomain *domain.O
 	err = r.domainVerificationValidator(domainWriteModel.Domain, validationCode, validationCode, checkType)
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
 	if err == nil {
+		aggregates := make([]eventstore.Aggregater, 0)
 		orgAgg.PushEvents(org.NewDomainVerifiedEvent(ctx, orgDomain.Domain))
-		return r.eventstore.PushAggregate(ctx, domainWriteModel, orgAgg)
+		aggregates = append(aggregates, orgAgg)
+
+		for _, userID := range claimedUserIDs {
+			userAgg, _, err := r.userDomainClaimed(ctx, userID)
+			if err != nil {
+				logging.LogWithFields("COMMAND-5m8fs", "userid", userID).WithError(err).Warn("could not claim user")
+				continue
+			}
+			aggregates = append(aggregates, userAgg)
+		}
+		_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+		return err
 	}
 	orgAgg.PushEvents(org.NewDomainVerificationFailedEvent(ctx, orgDomain.Domain))
 	err = r.eventstore.PushAggregate(ctx, domainWriteModel, orgAgg)
@@ -136,24 +162,33 @@ func (r *CommandSide) RemoveOrgDomain(ctx context.Context, orgDomain *domain.Org
 	return r.eventstore.PushAggregate(ctx, domainWriteModel, orgAgg)
 }
 
-func (r *CommandSide) addOrgDomain(ctx context.Context, orgAgg *org.Aggregate, addedDomain *OrgDomainWriteModel, orgDomain *domain.OrgDomain) error {
+func (r *CommandSide) addOrgDomain(ctx context.Context, orgAgg *org.Aggregate, addedDomain *OrgDomainWriteModel, orgDomain *domain.OrgDomain, claimedUserIDs ...string) ([]eventstore.Aggregater, error) {
 	err := r.eventstore.FilterToQueryReducer(ctx, addedDomain)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if addedDomain.State == domain.OrgDomainStateActive {
-		return caos_errs.ThrowAlreadyExists(nil, "COMMA-Bd2jj", "Errors.Org.Domain.AlreadyExists")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMA-Bd2jj", "Errors.Org.Domain.AlreadyExists")
 	}
+
 	orgAgg.PushEvents(org.NewDomainAddedEvent(ctx, orgDomain.Domain))
+
+	userAggregates := make([]eventstore.Aggregater, 0)
 	if orgDomain.Verified {
-		//TODO: uniqueness verified domain
-		//TODO: users with verified domain -> domain claimed
 		orgAgg.PushEvents(org.NewDomainVerifiedEvent(ctx, orgDomain.Domain))
+		for _, userID := range claimedUserIDs {
+			userAgg, _, err := r.userDomainClaimed(ctx, userID)
+			if err != nil {
+				logging.LogWithFields("COMMAND-nn8Jf", "userid", userID).WithError(err).Warn("could not claim user")
+				continue
+			}
+			userAggregates = append(userAggregates, userAgg)
+		}
 	}
 	if orgDomain.Primary {
 		orgAgg.PushEvents(org.NewDomainPrimarySetEvent(ctx, orgDomain.Domain))
 	}
-	return nil
+	return userAggregates, nil
 }
 
 func (r *CommandSide) getOrgDomainWriteModel(ctx context.Context, orgID, domain string) (*OrgDomainWriteModel, error) {

@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	UniqueOrgDomain                      = "org_domain"
 	domainEventPrefix                    = orgEventTypePrefix + "domain."
 	OrgDomainAddedEventType              = domainEventPrefix + "added"
 	OrgDomainVerificationAddedEventType  = domainEventPrefix + "verification.added"
@@ -20,6 +21,19 @@ const (
 	OrgDomainPrimarySetEventType         = domainEventPrefix + "primary.set"
 	OrgDomainRemovedEventType            = domainEventPrefix + "removed"
 )
+
+func NewAddOrgDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		UniqueOrgDomain,
+		orgDomain,
+		"Errors.Org.Domain.AlreadyExists")
+}
+
+func NewRemoveOrgDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		UniqueOrgDomain,
+		orgDomain)
+}
 
 type DomainAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -152,7 +166,7 @@ func (e *DomainVerifiedEvent) Data() interface{} {
 }
 
 func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
 }
 
 func NewDomainVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainVerifiedEvent {
@@ -218,7 +232,8 @@ func DomainPrimarySetEventMapper(event *repository.Event) (eventstore.EventReade
 type DomainRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Domain string `json:"domain,omitempty"`
+	Domain     string `json:"domain,omitempty"`
+	isVerified bool
 }
 
 func (e *DomainRemovedEvent) Data() interface{} {
@@ -226,7 +241,10 @@ func (e *DomainRemovedEvent) Data() interface{} {
 }
 
 func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	if !e.isVerified {
+		return nil
+	}
+	return []*eventstore.EventUniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
 }
 
 func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainRemovedEvent {

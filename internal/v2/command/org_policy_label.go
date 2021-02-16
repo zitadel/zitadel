@@ -8,8 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
-func (r *CommandSide) AddLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
-	addedPolicy := NewOrgLabelPolicyWriteModel(policy.AggregateID)
+func (r *CommandSide) AddLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+	addedPolicy := NewOrgLabelPolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -29,8 +29,8 @@ func (r *CommandSide) AddLabelPolicy(ctx context.Context, policy *domain.LabelPo
 	return writeModelToLabelPolicy(&addedPolicy.LabelPolicyWriteModel), nil
 }
 
-func (r *CommandSide) ChangeLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
-	existingPolicy := NewOrgLabelPolicyWriteModel(policy.AggregateID)
+func (r *CommandSide) ChangeLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+	existingPolicy := NewOrgLabelPolicyWriteModel(resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err

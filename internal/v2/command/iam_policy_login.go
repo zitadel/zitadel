@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -101,7 +103,7 @@ func (r *CommandSide) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, id
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) error {
+func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) error {
 	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.IDPConfigID)
 	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
@@ -110,10 +112,35 @@ func (r *CommandSide) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Contex
 	if idpModel.State == domain.IdentityProviderStateUnspecified || idpModel.State == domain.IdentityProviderStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "IAM-39fjs", "Errors.IAM.LoginPolicy.IDP.NotExisting")
 	}
+
+	aggregates := make([]eventstore.Aggregater, 0)
 	iamAgg := IAMAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
 	iamAgg.PushEvents(iam_repo.NewIdentityProviderRemovedEvent(ctx, idpProvider.IDPConfigID))
 
-	return r.eventstore.PushAggregate(ctx, idpModel, iamAgg)
+	userAggregates := r.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, false, cascadeExternalIDPs...)
+	aggregates = append(aggregates, iamAgg)
+	aggregates = append(aggregates, userAggregates...)
+	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	return err
+}
+
+func (r *CommandSide) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, idpProvider *domain.IDPProvider, cascade bool, cascadeExternalIDPs ...*domain.ExternalIDP) []eventstore.Aggregater {
+	if cascade {
+		iamAgg.PushEvents(iam_repo.NewIdentityProviderCascadeRemovedEvent(ctx, idpProvider.IDPConfigID))
+		return nil
+	}
+	iamAgg.PushEvents(iam_repo.NewIdentityProviderRemovedEvent(ctx, idpProvider.IDPConfigID))
+
+	userAggregates := make([]eventstore.Aggregater, 0)
+	for _, idp := range cascadeExternalIDPs {
+		userAgg, _, err := r.removeHumanExternalIDP(ctx, idp, true)
+		if err != nil {
+			logging.LogWithFields("COMMAND-4nfsf", "userid", idp.AggregateID, "idp-id", idp.IDPConfigID).WithError(err).Warn("could not cascade remove externalidp in remove provider from policy")
+			continue
+		}
+		userAggregates = append(userAggregates, userAgg)
+	}
+	return userAggregates
 }
 
 func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) (domain.SecondFactorType, error) {
@@ -128,7 +155,7 @@ func (r *CommandSide) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, s
 		return domain.SecondFactorTypeUnspecified, err
 	}
 
-	return domain.SecondFactorType(secondFactorModel.MFAType), nil
+	return secondFactorModel.MFAType, nil
 }
 
 func (r *CommandSide) addSecondFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *iam_repo.Aggregate, secondFactorModel *IAMSecondFactorWriteModel, secondFactor domain.SecondFactorType) error {

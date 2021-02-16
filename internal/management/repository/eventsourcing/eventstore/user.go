@@ -59,7 +59,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 
 func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest) (*usr_model.UserSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, sequenceErr := repo.View.GetLatestUserSequence("")
+	sequence, sequenceErr := repo.View.GetLatestUserSequence()
 	logging.Log("EVENT-Lcn7d").OnError(sequenceErr).Warn("could not read latest user sequence")
 	users, count, err := repo.View.SearchUsers(request)
 	if err != nil {
@@ -76,6 +76,10 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
+}
+
+func (repo *UserRepo) UserIDsByDomain(ctx context.Context, domain string) ([]string, error) {
+	return repo.View.UserIDsByDomain(domain)
 }
 
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
@@ -145,7 +149,7 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 
 func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model.ExternalIDPSearchRequest) (*usr_model.ExternalIDPSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, seqErr := repo.View.GetLatestExternalIDPSequence("")
+	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
 	logging.Log("EVENT-Qs7uf").OnError(seqErr).Warn("could not read latest external idp sequence")
 	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
 	if err != nil {
@@ -164,6 +168,22 @@ func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model
 	return result, nil
 }
 
+func (repo *UserRepo) ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
+}
+
+func (repo *UserRepo) ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Context, idpConfigID, resourceOwner string) ([]*usr_model.ExternalIDPView, error) {
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigIDAndResourceOwner(idpConfigID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
+}
+
 func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (*usr_model.MachineKeyView, error) {
 	key, err := repo.View.MachineKeyByIDs(userID, keyID)
 	if err != nil {
@@ -174,7 +194,7 @@ func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (
 
 func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *usr_model.MachineKeySearchRequest) (*usr_model.MachineKeySearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, seqErr := repo.View.GetLatestMachineKeySequence("")
+	sequence, seqErr := repo.View.GetLatestMachineKeySequence()
 	logging.Log("EVENT-Sk8fs").OnError(seqErr).Warn("could not read latest user sequence")
 	keys, count, err := repo.View.SearchMachineKeys(request)
 	if err != nil {
@@ -228,7 +248,7 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 
 func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_model.UserMembershipSearchRequest) (*usr_model.UserMembershipSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence("")
+	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
 	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
 
 	result := handleSearchUserMembershipsPermissions(ctx, request, sequence)

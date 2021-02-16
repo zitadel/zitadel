@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -83,7 +84,7 @@ func (r *CommandSide) ChangeProject(ctx context.Context, projectChange *domain.P
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
-	changedEvent, hasChanged, err := existingProject.NewChangedEvent(ctx, projectChange.Name, projectChange.ProjectRoleAssertion, projectChange.ProjectRoleCheck)
+	changedEvent, hasChanged, err := existingProject.NewChangedEvent(ctx, existingProject.ResourceOwner, projectChange.Name, projectChange.ProjectRoleAssertion, projectChange.ProjectRoleCheck)
 	if err != nil {
 		return nil, err
 	}
@@ -140,12 +141,12 @@ func (r *CommandSide) ReactivateProject(ctx context.Context, projectID string, r
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	projectAgg.PushEvents(project.NewProjectDeactivatedEvent(ctx))
+	projectAgg.PushEvents(project.NewProjectReactivatedEvent(ctx))
 
 	return r.eventstore.PushAggregate(ctx, existingProject, projectAgg)
 }
 
-func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingGrantIDs ...string) error {
+func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingUserGrantIDs ...string) error {
 	if projectID == "" || resourceOwner == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-66hM9", "Errors.Project.ProjectIDMissing")
 	}
@@ -163,10 +164,11 @@ func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwne
 	projectAgg.PushEvents(project.NewProjectRemovedEvent(ctx, existingProject.Name, existingProject.ResourceOwner))
 	aggregates = append(aggregates, projectAgg)
 
-	for _, grantID := range cascadingGrantIDs {
+	for _, grantID := range cascadingUserGrantIDs {
 		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
-			return err
+			logging.LogWithFields("COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
+			continue
 		}
 		aggregates = append(aggregates, grantAgg)
 	}

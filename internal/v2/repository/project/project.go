@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	uniqueProjectnameType  = "project_names"
+	UniqueProjectnameType  = "project_names"
 	projectEventTypePrefix = eventstore.EventType("project.")
 	ProjectAddedType       = projectEventTypePrefix + "added"
 	ProjectChangedType     = projectEventTypePrefix + "changed"
@@ -21,14 +21,14 @@ const (
 
 func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueProjectnameType,
+		UniqueProjectnameType,
 		projectName+resourceOwner,
 		"Errors.Project.AlreadyExists")
 }
 
 func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueProjectnameType,
+		UniqueProjectnameType,
 		projectName+resourceOwner)
 }
 
@@ -82,6 +82,7 @@ type ProjectChangeEvent struct {
 	Name                 *string `json:"name,omitempty"`
 	ProjectRoleAssertion *bool   `json:"projectRoleAssertion,omitempty"`
 	ProjectRoleCheck     *bool   `json:"projectRoleCheck,omitempty"`
+	oldName              string
 }
 
 func (e *ProjectChangeEvent) Data() interface{} {
@@ -89,12 +90,19 @@ func (e *ProjectChangeEvent) Data() interface{} {
 }
 
 func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	if e.oldName != "" {
+		return []*eventstore.EventUniqueConstraint{
+			NewRemoveProjectNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
+			NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
+		}
+	}
 	return nil
 }
 
 func NewProjectChangeEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	oldName string,
 	changes []ProjectChanges,
 ) (*ProjectChangeEvent, error) {
 	if len(changes) == 0 {
@@ -106,6 +114,7 @@ func NewProjectChangeEvent(
 			aggregate,
 			ProjectChangedType,
 		),
+		oldName: oldName,
 	}
 	for _, change := range changes {
 		change(changeEvent)

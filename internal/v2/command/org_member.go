@@ -63,7 +63,7 @@ func (r *CommandSide) ChangeOrgMember(ctx context.Context, member *domain.Member
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-LiaZi", "Errors.Org.Member.RolesNotChanged")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	orgAgg.PushEvents(org.NewMemberChangedEvent(ctx, member.UserID, member.Roles...))
+	org.NewMemberChangedEvent(ctx, orgAgg, member.UserID, member.Roles...)
 
 	events, err := r.eventstore.PushAggregates(ctx, orgAgg)
 	if err != nil {
@@ -88,7 +88,7 @@ func (r *CommandSide) RemoveOrgMember(ctx context.Context, orgID, userID string)
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	orgAgg.PushEvents(org.NewMemberRemovedEvent(ctx, userID))
+	org.NewMemberRemovedEvent(ctx, orgAgg, userID)
 
 	return r.eventstore.PushAggregate(ctx, m, orgAgg)
 }

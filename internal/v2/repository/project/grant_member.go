@@ -12,22 +12,22 @@ import (
 )
 
 var (
-	uniqueProjectGrantType = "project_grant"
-	GrantMemberAddedType   = grantEventTypePrefix + member.AddedEventType
-	GrantMemberChangedType = grantEventTypePrefix + member.ChangedEventType
-	GrantMemberRemovedType = grantEventTypePrefix + member.RemovedEventType
+	UniqueProjectGrantMemberType = "project_grant_member"
+	GrantMemberAddedType         = grantEventTypePrefix + member.AddedEventType
+	GrantMemberChangedType       = grantEventTypePrefix + member.ChangedEventType
+	GrantMemberRemovedType       = grantEventTypePrefix + member.RemovedEventType
 )
 
 func NewAddProjectGrantMemberUniqueConstraint(projectID, userID, grantID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueProjectGrantType,
+		UniqueProjectGrantMemberType,
 		fmt.Sprintf("%s:%s:%s", projectID, userID, grantID),
 		"Errors.Project.Member.AlreadyExists")
 }
 
 func NewRemoveProjectGrantMemberUniqueConstraint(projectID, userID, grantID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueProjectGrantType,
+		UniqueProjectGrantMemberType,
 		fmt.Sprintf("%s:%s:%s", projectID, userID, grantID),
 	)
 }

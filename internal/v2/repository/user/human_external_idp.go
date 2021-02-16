@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	uniqueExternalIDPType    = "external_idps"
+	UniqueExternalIDPType    = "external_idps"
 	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
 	externalLoginEventPrefix = humanEventPrefix + "externallogin."
 
@@ -23,23 +23,23 @@ const (
 
 func NewAddExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueExternalIDPType,
+		UniqueExternalIDPType,
 		idpConfigID+externalUserID,
 		"Errors.User.ExternalIDP.AlreadyExists")
 }
 
 func NewRemoveExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueExternalIDPType,
+		UniqueExternalIDPType,
 		idpConfigID+externalUserID)
 }
 
 type HumanExternalIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPConfigID string `json:"idpConfigId,omitempty"`
-	UserID      string `json:"userId,omitempty"`
-	DisplayName string `json:"displayName,omitempty"`
+	IDPConfigID    string `json:"idpConfigId,omitempty"`
+	ExternalUserID string `json:"userId,omitempty"`
+	DisplayName    string `json:"displayName,omitempty"`
 }
 
 func (e *HumanExternalIDPAddedEvent) Data() interface{} {
@@ -47,7 +47,7 @@ func (e *HumanExternalIDPAddedEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
+	return []*eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
 func NewHumanExternalIDPAddedEvent(
@@ -63,9 +63,9 @@ func NewHumanExternalIDPAddedEvent(
 			aggregate,
 			HumanExternalIDPAddedType,
 		),
-		IDPConfigID: idpConfigID,
-		DisplayName: displayName,
-		UserID:      externalUserID,
+		IDPConfigID:    idpConfigID,
+		DisplayName:    displayName,
+		ExternalUserID: externalUserID,
 	}
 }
 
@@ -85,8 +85,8 @@ func HumanExternalIDPAddedEventMapper(event *repository.Event) (eventstore.Event
 type HumanExternalIDPRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPConfigID string `json:"idpConfigId"`
-	UserID      string `json:"userId,omitempty"`
+	IDPConfigID    string `json:"idpConfigId"`
+	ExternalUserID string `json:"userId,omitempty"`
 }
 
 func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
@@ -94,7 +94,7 @@ func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
 func NewHumanExternalIDPRemovedEvent(
@@ -109,8 +109,8 @@ func NewHumanExternalIDPRemovedEvent(
 			aggregate,
 			HumanExternalIDPRemovedType,
 		),
-		IDPConfigID: idpConfigID,
-		UserID:      externalUserID,
+		IDPConfigID:    idpConfigID,
+		ExternalUserID: externalUserID,
 	}
 }
 
@@ -130,8 +130,8 @@ func HumanExternalIDPRemovedEventMapper(event *repository.Event) (eventstore.Eve
 type HumanExternalIDPCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPConfigID string `json:"idpConfigId"`
-	UserID      string `json:"userId,omitempty"`
+	IDPConfigID    string `json:"idpConfigId"`
+	ExternalUserID string `json:"userId,omitempty"`
 }
 
 func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
@@ -139,7 +139,7 @@ func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
 func NewHumanExternalIDPCascadeRemovedEvent(
@@ -154,8 +154,8 @@ func NewHumanExternalIDPCascadeRemovedEvent(
 			aggregate,
 			HumanExternalIDPCascadeRemovedType,
 		),
-		IDPConfigID: idpConfigID,
-		UserID:      externalUserID,
+		IDPConfigID:    idpConfigID,
+		ExternalUserID: externalUserID,
 	}
 }
 

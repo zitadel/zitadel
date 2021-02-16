@@ -2,22 +2,39 @@ package member
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
+	UniqueMember     = "member"
 	AddedEventType   = "member.added"
 	ChangedEventType = "member.changed"
 	RemovedEventType = "member.removed"
 )
 
+func NewAddMemberUniqueConstraint(aggregateID, userID string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		UniqueMember,
+		fmt.Sprintf("%s:%s", aggregateID, userID),
+		"Errors.Member.AlreadyExists")
+}
+
+func NewRemoveMemberUniqueConstraint(aggregateID, userID string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		UniqueMember,
+		fmt.Sprintf("%s:%s", aggregateID, userID),
+	)
+}
+
 type MemberAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Roles  []string `json:"roles"`
-	UserID string   `json:"userId"`
+	Roles       []string `json:"roles"`
+	UserID      string   `json:"userId"`
+	aggregateID string
 }
 
 func (e *MemberAddedEvent) Data() interface{} {
@@ -25,19 +42,21 @@ func (e *MemberAddedEvent) Data() interface{} {
 }
 
 func (e *MemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewAddMemberUniqueConstraint(e.aggregateID, e.UserID)}
 }
 
 func NewMemberAddedEvent(
 	base *eventstore.BaseEvent,
+	aggregateID,
 	userID string,
 	roles ...string,
 ) *MemberAddedEvent {
 
 	return &MemberAddedEvent{
-		BaseEvent: *base,
-		Roles:     roles,
-		UserID:    userID,
+		BaseEvent:   *base,
+		aggregateID: aggregateID,
+		Roles:       roles,
+		UserID:      userID,
 	}
 }
 
@@ -97,7 +116,8 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 type MemberRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId"`
+	UserID      string `json:"userId"`
+	aggregateID string
 }
 
 func (e *MemberRemovedEvent) Data() interface{} {
@@ -105,17 +125,19 @@ func (e *MemberRemovedEvent) Data() interface{} {
 }
 
 func (e *MemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewRemoveMemberUniqueConstraint(e.aggregateID, e.UserID)}
 }
 
 func NewRemovedEvent(
 	base *eventstore.BaseEvent,
+	aggregateID,
 	userID string,
 ) *MemberRemovedEvent {
 
 	return &MemberRemovedEvent{
-		BaseEvent: *base,
-		UserID:    userID,
+		BaseEvent:   *base,
+		aggregateID: aggregateID,
+		UserID:      userID,
 	}
 }
 

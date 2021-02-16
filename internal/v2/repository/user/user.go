@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	uniqueUsername            = "usernames"
+	UniqueUsername            = "usernames"
 	userEventTypePrefix       = eventstore.EventType("user.")
 	UserLockedType            = userEventTypePrefix + "locked"
 	UserUnlockedType          = userEventTypePrefix + "unlocked"
@@ -30,7 +30,7 @@ func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMus
 		uniqueUserName = userName + resourceOwner
 	}
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueUsername,
+		UniqueUsername,
 		uniqueUserName,
 		"Errors.User.AlreadyExists")
 }
@@ -41,7 +41,7 @@ func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, userLogin
 		uniqueUserName = userName + resourceOwner
 	}
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueUsername,
+		UniqueUsername,
 		uniqueUserName)
 }
 
@@ -257,7 +257,9 @@ func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName string `json:"userName"`
+	UserName              string `json:"userName"`
+	oldUserName           string `json:"-"`
+	userLoginMustBeDomain bool   `json:"-"`
 }
 
 func (e *DomainClaimedEvent) Data() interface{} {
@@ -265,13 +267,18 @@ func (e *DomainClaimedEvent) Data() interface{} {
 }
 
 func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+	}
 }
 
 func NewDomainClaimedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userName string,
+	userName,
+	oldUserName string,
+	userLoginMustBeDomain bool,
 ) *DomainClaimedEvent {
 	return &DomainClaimedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -279,7 +286,9 @@ func NewDomainClaimedEvent(
 			aggregate,
 			UserDomainClaimedType,
 		),
-		UserName: userName,
+		UserName:              userName,
+		oldUserName:           oldUserName,
+		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
@@ -330,8 +339,8 @@ type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	OldUserName           string
-	UserLoginMustBeDomain bool
+	oldUserName           string `json:"-"`
+	userLoginMustBeDomain bool   `json:"-"`
 }
 
 func (e *UsernameChangedEvent) Data() interface{} {
@@ -340,8 +349,8 @@ func (e *UsernameChangedEvent) Data() interface{} {
 
 func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.OldUserName, e.Aggregate().ResourceOwner, e.UserLoginMustBeDomain),
-		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.UserLoginMustBeDomain),
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
 }
 
@@ -359,8 +368,8 @@ func NewUsernameChangedEvent(
 			UserUserNameChangedType,
 		),
 		UserName:              newUserName,
-		OldUserName:           oldUserName,
-		UserLoginMustBeDomain: userLoginMustBeDomain,
+		oldUserName:           oldUserName,
+		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 

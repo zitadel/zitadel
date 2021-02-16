@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"strings"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -40,7 +41,7 @@ func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID stri
 
 func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestIAMMemberSequence("")
+	sequence, err := repo.View.GetLatestIAMMemberSequence()
 	logging.Log("EVENT-Slkci").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
 	members, count, err := repo.View.SearchIAMMembers(request)
 	if err != nil {
@@ -70,9 +71,7 @@ func (repo *IAMRepository) GetIAMMemberRoles() []string {
 }
 
 func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID string) error {
-	// if repo.IAMV2Command != nil {
-	// 	return repo.IAMV2Command.
-	// }
+
 	aggregates := make([]*es_models.Aggregate, 0)
 	idp := iam_model.NewIDPConfig(repo.SystemDefaults.IamID, idpConfigID)
 	_, agg, err := repo.IAMEventstore.PrepareRemoveIDPConfig(ctx, idp)
@@ -113,9 +112,42 @@ func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID stri
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
+func (repo *IAMRepository) IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
+	providers, err := repo.View.IDPProvidersByIdpConfigID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.IDPProviderViewsToModel(providers), nil
+}
+
+func (repo *IAMRepository) ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
+}
+
+func (repo *IAMRepository) ExternalIDPsByIDPConfigIDFromDefaultPolicy(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
+	policies, err := repo.View.AllDefaultLoginPolicies()
+	if err != nil {
+		return nil, err
+	}
+	resourceOwners := make([]string, len(policies))
+	for i, policy := range policies {
+		resourceOwners[i] = policy.AggregateID
+	}
+
+	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigIDAndResourceOwners(idpConfigID, resourceOwners)
+	if err != nil {
+		return nil, err
+	}
+	return model.ExternalIDPViewsToModel(externalIDPs), nil
+}
+
 func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, err := repo.View.GetLatestIDPConfigSequence("")
+	sequence, err := repo.View.GetLatestIDPConfigSequence()
 	logging.Log("EVENT-Dk8si").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest idp config sequence")
 	idps, count, err := repo.View.SearchIDPConfigs(request)
 	if err != nil {
@@ -132,31 +164,6 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
-}
-
-func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, viewErr := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if caos_errs.IsNotFound(viewErr) {
-		policy = new(iam_es_model.LabelPolicyView)
-	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
-	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4bM0s", "Errors.IAM.LabelPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.LabelPolicyViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.LabelPolicyViewToModel(policy), nil
-		}
-	}
-	return iam_es_model.LabelPolicyViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
@@ -187,7 +194,7 @@ func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
-	sequence, err := repo.View.GetLatestIDPProviderSequence("")
+	sequence, err := repo.View.GetLatestIDPProviderSequence()
 	logging.Log("EVENT-Tuiks").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
 	providers, count, err := repo.View.SearchIDPProviders(request)
 	if err != nil {
@@ -351,4 +358,88 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 		}
 	}
 	return iam_es_model.OrgIAMViewToModel(policy), nil
+}
+
+func (repo *IAMRepository) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddOrgIAMPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeOrgIAMPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddLabelPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
+	policy.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeLabelPolicy(ctx, policy)
+}
+
+func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
+	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTemplateViewToModel(template), err
+}
+
+func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestIAMMemberSequence()
+	logging.Log("EVENT-Slkci").OnError(err).Warn("could not read latest iam sequence")
+	members, count, err := repo.View.SearchIAMMembers(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &iam_model.IAMMemberSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      iam_es_model.IAMMembersToModel(members),
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = result.Timestamp
+	}
+	return result, nil
+}
+
+func (repo *IAMRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
+	text, err := repo.View.MailTexts(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTextsViewToModel(text, true), err
+}
+
+func (repo *IAMRepository) GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
+	text, err := repo.View.MailTextByIDs(repo.SystemDefaults.IamID, textType, language)
+	if err != nil {
+		return nil, err
+	}
+	text.Default = true
+	return iam_es_model.MailTextViewToModel(text), err
+}
+
+func (repo *IAMRepository) AddDefaultMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	text.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.AddMailText(ctx, text)
+}
+
+func (repo *IAMRepository) ChangeDefaultMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
+	text.AggregateID = repo.SystemDefaults.IamID
+	return repo.IAMEventstore.ChangeMailText(ctx, text)
 }

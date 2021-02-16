@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	LoginPolicyIDPProviderAddedEventType   = iamEventTypePrefix + policy.LoginPolicyIDPProviderAddedType
-	LoginPolicyIDPProviderRemovedEventType = iamEventTypePrefix + policy.LoginPolicyIDPProviderRemovedType
+	LoginPolicyIDPProviderAddedEventType          = iamEventTypePrefix + policy.LoginPolicyIDPProviderAddedType
+	LoginPolicyIDPProviderRemovedEventType        = iamEventTypePrefix + policy.LoginPolicyIDPProviderRemovedType
+	LoginPolicyIDPProviderCascadeRemovedEventType = iamEventTypePrefix + policy.LoginPolicyIDPProviderCascadeRemovedType
 )
 
 type IdentityProviderAddedEvent struct {
@@ -74,5 +75,31 @@ func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.Eve
 
 	return &IdentityProviderRemovedEvent{
 		IdentityProviderRemovedEvent: *e.(*policy.IdentityProviderRemovedEvent),
+	}, nil
+}
+
+type IdentityProviderCascadeRemovedEvent struct {
+	policy.IdentityProviderCascadeRemovedEvent
+}
+
+func NewIdentityProviderCascadeRemovedEvent(
+	ctx context.Context,
+	idpConfigID string,
+) *IdentityProviderCascadeRemovedEvent {
+	return &IdentityProviderCascadeRemovedEvent{
+		IdentityProviderCascadeRemovedEvent: *policy.NewIdentityProviderCascadeRemovedEvent(
+			eventstore.NewBaseEventForPush(ctx, LoginPolicyIDPProviderCascadeRemovedEventType),
+			idpConfigID),
+	}
+}
+
+func IdentityProviderCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.IdentityProviderCascadeRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IdentityProviderCascadeRemovedEvent{
+		IdentityProviderCascadeRemovedEvent: *e.(*policy.IdentityProviderCascadeRemovedEvent),
 	}, nil
 }

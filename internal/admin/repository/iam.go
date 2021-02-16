@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
@@ -18,7 +19,18 @@ type IAMRepository interface {
 	SearchDefaultSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error)
 	SearchDefaultMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error)
 
+	IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error)
+	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
+	ExternalIDPsByIDPConfigIDFromDefaultPolicy(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
+
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+
+	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
+
+	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
+	GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error)
+	AddDefaultMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
+	ChangeDefaultMailText(ctx context.Context, policy *iam_model.MailText) (*iam_model.MailText, error)
 
 	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
 

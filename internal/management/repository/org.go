@@ -27,6 +27,7 @@ type OrgRepository interface {
 	GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
 	GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
+	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
 	SearchSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error)
 	SearchMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error)
 
@@ -38,4 +39,13 @@ type OrgRepository interface {
 
 	GetPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error)
 	GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error)
+
+	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
+	GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
+
+	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
+	GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
+	AddMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
+	ChangeMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
+	RemoveMailText(ctx context.Context, mailText *iam_model.MailText) error
 }

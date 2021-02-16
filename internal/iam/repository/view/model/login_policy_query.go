@@ -53,6 +53,8 @@ func (key LoginPolicySearchKey) ToColumnName() string {
 	switch iam_model.LoginPolicySearchKey(key) {
 	case iam_model.LoginPolicySearchKeyAggregateID:
 		return LoginPolicyKeyAggregateID
+	case iam_model.LoginPolicySearchKeyDefault:
+		return LoginPolicyKeyDefault
 	default:
 		return ""
 	}

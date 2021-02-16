@@ -25,6 +25,9 @@ func (v *View) ExternalIDPsByIDPConfigID(idpConfigID string) ([]*model.ExternalI
 	return view.ExternalIDPsByIDPConfigID(v.Db, externalIDPTable, idpConfigID)
 }
 
+func (v *View) ExternalIDPsByIDPConfigIDAndResourceOwner(idpConfigID, resourceOwner string) ([]*model.ExternalIDPView, error) {
+	return view.ExternalIDPsByIDPConfigIDAndResourceOwner(v.Db, externalIDPTable, idpConfigID, resourceOwner)
+}
 func (v *View) ExternalIDPsByUserID(userID string) ([]*model.ExternalIDPView, error) {
 	return view.ExternalIDPsByUserID(v.Db, externalIDPTable, userID)
 }
@@ -64,8 +67,8 @@ func (v *View) DeleteExternalIDPsByUserID(userID string, event *models.Event) er
 	}
 	return v.ProcessedExternalIDPSequence(event)
 }
-func (v *View) GetLatestExternalIDPSequence(aggregateType string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(externalIDPTable, aggregateType)
+func (v *View) GetLatestExternalIDPSequence() (*global_view.CurrentSequence, error) {
+	return v.latestSequence(externalIDPTable)
 }
 
 func (v *View) ProcessedExternalIDPSequence(event *models.Event) error {

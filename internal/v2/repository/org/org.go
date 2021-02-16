@@ -18,12 +18,6 @@ const (
 	OrgRemovedEventType     = orgEventTypePrefix + "removed"
 )
 
-type OrgnameUniqueConstraint struct {
-	uniqueType string
-	orgName    string
-	action     eventstore.UniqueConstraintAction
-}
-
 func NewAddOrgNameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		uniqueOrgname,
@@ -77,7 +71,8 @@ func OrgAddedEventMapper(event *repository.Event) (eventstore.EventReader, error
 type OrgChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name string `json:"name,omitempty"`
+	Name    string `json:"name,omitempty"`
+	oldName string `json:"-"`
 }
 
 func (e *OrgChangedEvent) Data() interface{} {
@@ -85,17 +80,21 @@ func (e *OrgChangedEvent) Data() interface{} {
 }
 
 func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{
+		NewRemoveOrgNameUniqueConstraint(e.oldName),
+		NewAddOrgNameUniqueConstraint(e.Name),
+	}
 }
 
-func NewOrgChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgChangedEvent {
+func NewOrgChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, oldName, newName string) *OrgChangedEvent {
 	return &OrgChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			OrgChangedEventType,
 		),
-		Name: name,
+		Name:    newName,
+		oldName: oldName,
 	}
 }
 

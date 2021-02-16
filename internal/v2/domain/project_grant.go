@@ -28,3 +28,22 @@ const (
 func (p *ProjectGrant) IsValid() bool {
 	return p.GrantedOrgID != ""
 }
+
+func GetRemovedRoles(existingRoles, newRoles []string) []string {
+	removed := make([]string, 0)
+	for _, role := range existingRoles {
+		if !containsKey(newRoles, role) {
+			removed = append(removed, role)
+		}
+	}
+	return removed
+}
+
+func containsKey(roles []string, key string) bool {
+	for _, role := range roles {
+		if role == key {
+			return true
+		}
+	}
+	return false
+}

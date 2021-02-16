@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	uniqueAppNameType          = "appname"
+	UniqueAppNameType          = "appname"
 	applicationEventTypePrefix = projectEventTypePrefix + "application."
 	ApplicationAddedType       = applicationEventTypePrefix + "added"
 	ApplicationChangedType     = applicationEventTypePrefix + "changed"
@@ -22,14 +22,14 @@ const (
 
 func NewAddApplicationUniqueConstraint(name, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueAppNameType,
+		UniqueAppNameType,
 		fmt.Sprintf("%s:%s", name, projectID),
 		"Errors.Project.App.AlreadyExists")
 }
 
 func NewRemoveApplicationUniqueConstraint(name, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueAppNameType,
+		UniqueAppNameType,
 		fmt.Sprintf("%s:%s", name, projectID))
 }
 

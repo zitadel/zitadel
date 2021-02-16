@@ -84,13 +84,16 @@ func (wm *OrgIDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventRead
 
 func (wm *OrgIDPConfigWriteModel) NewChangedEvent(
 	ctx context.Context,
+	resourceOwner,
 	configID,
 	name string,
 	stylingType domain.IDPConfigStylingType,
 ) (*org.IDPConfigChangedEvent, bool) {
 
 	changes := make([]idpconfig.IDPConfigChanges, 0)
+	oldName := ""
 	if wm.Name != name {
+		oldName = wm.Name
 		changes = append(changes, idpconfig.ChangeName(name))
 	}
 	if stylingType.Valid() && wm.StylingType != stylingType {
@@ -99,7 +102,7 @@ func (wm *OrgIDPConfigWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changeEvent, err := org.NewIDPConfigChangedEvent(ctx, configID, changes)
+	changeEvent, err := org.NewIDPConfigChangedEvent(ctx, resourceOwner, configID, oldName, changes)
 	if err != nil {
 		return nil, false
 	}

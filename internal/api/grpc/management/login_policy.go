@@ -26,7 +26,7 @@ func (s *Server) GetDefaultLoginPolicy(ctx context.Context, _ *empty.Empty) (*ma
 }
 
 func (s *Server) CreateLoginPolicy(ctx context.Context, policy *management.LoginPolicyRequest) (*management.LoginPolicy, error) {
-	result, err := s.command.AddLoginPolicy(ctx, loginPolicyRequestToDomain(ctx, policy))
+	result, err := s.command.AddLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, loginPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (s *Server) CreateLoginPolicy(ctx context.Context, policy *management.Login
 }
 
 func (s *Server) UpdateLoginPolicy(ctx context.Context, policy *management.LoginPolicyRequest) (*management.LoginPolicy, error) {
-	result, err := s.command.ChangeLoginPolicy(ctx, loginPolicyRequestToDomain(ctx, policy))
+	result, err := s.command.ChangeLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, loginPolicyRequestToDomain(ctx, policy))
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (s *Server) GetLoginPolicyIdpProviders(ctx context.Context, request *manage
 }
 
 func (s *Server) AddIdpProviderToLoginPolicy(ctx context.Context, provider *management.IdpProviderAdd) (*management.IdpProvider, error) {
-	result, err := s.command.AddIDPProviderToLoginPolicy(ctx, idpProviderAddToDomain(ctx, provider))
+	result, err := s.command.AddIDPProviderToLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, idpProviderAddToDomain(ctx, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,11 @@ func (s *Server) AddIdpProviderToLoginPolicy(ctx context.Context, provider *mana
 }
 
 func (s *Server) RemoveIdpProviderFromLoginPolicy(ctx context.Context, provider *management.IdpProviderID) (*empty.Empty, error) {
-	err := s.command.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderIDToDomain(ctx, provider))
+	externalIDPs, err := s.user.ExternalIDPsByIDPConfigIDAndResourceOwner(ctx, provider.IdpConfigId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	err = s.command.RemoveIDPProviderFromLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, idpProviderIDToDomain(ctx, provider), externalIDPViewsToDomain(externalIDPs)...)
 	return &empty.Empty{}, err
 }
 

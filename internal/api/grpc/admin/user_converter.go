@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
@@ -193,4 +194,20 @@ func humanFromModel(user *usr_model.Human) *admin.HumanResponse {
 		human.StreetAddress = user.StreetAddress
 	}
 	return human
+}
+
+func externalIDPViewsToDomain(idps []*usr_model.ExternalIDPView) []*domain.ExternalIDP {
+	externalIDPs := make([]*domain.ExternalIDP, len(idps))
+	for i, idp := range idps {
+		externalIDPs[i] = &domain.ExternalIDP{
+			ObjectRoot: models.ObjectRoot{
+				AggregateID:   idp.UserID,
+				ResourceOwner: idp.ResourceOwner,
+			},
+			IDPConfigID:    idp.IDPConfigID,
+			ExternalUserID: idp.ExternalUserID,
+			DisplayName:    idp.UserDisplayName,
+		}
+	}
+	return externalIDPs
 }

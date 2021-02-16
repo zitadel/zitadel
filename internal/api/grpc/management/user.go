@@ -88,7 +88,11 @@ func (s *Server) UnlockUser(ctx context.Context, in *management.UserID) (*empty.
 }
 
 func (s *Server) DeleteUser(ctx context.Context, in *management.UserID) (*empty.Empty, error) {
-	err := s.command.RemoveUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID)
+	grants, err := s.usergrant.UserGrantsByUserID(ctx, in.Id)
+	if err != nil {
+		return &empty.Empty{}, err
+	}
+	err = s.command.RemoveUser(ctx, in.Id, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants)...)
 	return &empty.Empty{}, err
 }
 
