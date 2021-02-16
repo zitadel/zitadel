@@ -1,5 +1,5 @@
 SystemDefaults:
-  DefaultLanguage: 'de'
+  DefaultLanguage: 'en'
   Domain: $ZITADEL_DEFAULT_DOMAIN
   ZitadelDocs:
     Issuer: $ZITADEL_ISSUER

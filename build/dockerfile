@@ -89,7 +89,11 @@ COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
 ## Go test
 FROM go-base as go-test
 COPY . .
-RUN go test -race -v -coverprofile=profile.cov ./...
+#Migrations for cockroach-secure
+RUN go install github.com/rakyll/statik
+RUN ./build/operator/prebuild.sh ./migrations
+
+RUN go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
 
 ## Go test
 FROM scratch as go-codecov
@@ -114,16 +118,16 @@ RUN go get github.com/go-delve/delve/cmd/dlv
 #######################
 FROM alpine:latest as artifact
 RUN adduser -D zitadel
-COPY cmd/zitadel/*.yaml /
-COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-amd64 /zitadel
-RUN chmod a+x zitadel
+COPY cmd/zitadel/*.yaml /app/
+COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-amd64 /app/zitadel
+RUN chmod a+x /app/zitadel
 RUN ls -la /
 
 ## Scratch Image
 FROM  scratch as final
 COPY --from=artifact /etc/passwd /etc/passwd
-## TODO copy should be removed once the operator branch is merged
-COPY --from=artifact / /
+COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
+COPY --from=artifact /app /
 USER zitadel
 HEALTHCHECK NONE
 ENTRYPOINT ["/zitadel"]

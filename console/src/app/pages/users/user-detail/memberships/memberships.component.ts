@@ -3,8 +3,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
+import { AuthServiceClient } from 'src/app/proto/generated/auth_grpc_web_pb';
 import { MemberType, UserMembershipSearchResponse, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -33,12 +35,14 @@ export class MembershipsComponent implements OnInit {
     public loading: boolean = false;
     public memberships!: UserMembershipSearchResponse.AsObject;
 
+    @Input() public auth: boolean = false;
     @Input() public user!: UserView.AsObject;
     @Input() public disabled: boolean = false;
 
     public MemberType: any = MemberType;
 
     constructor(
+        private authService: GrpcAuthService,
         private mgmtService: ManagementService,
         private adminService: AdminService,
         private dialog: MatDialog,
@@ -51,10 +55,17 @@ export class MembershipsComponent implements OnInit {
     }
 
     public async loadManager(userId: string): Promise<void> {
-        this.mgmtService.SearchUserMemberships(userId, 100, 0, []).then(response => {
-            this.memberships = response.toObject();
-            this.loading = false;
-        });
+        if (this.auth) {
+            this.authService.SearchUserMemberships(100, 0, []).then(response => {
+                this.memberships = response.toObject();
+                this.loading = false;
+            });
+        } else {
+            this.mgmtService.SearchUserMemberships(userId, 100, 0, []).then(response => {
+                this.memberships = response.toObject();
+                this.loading = false;
+            });
+        }
     }
 
     public navigateToObject(): void {
