@@ -418,6 +418,17 @@ service AuthService {
       permission: "authenticated"
     };
   }
+
+  rpc SearchMyUserMemberships(UserMembershipSearchRequest) returns (UserMembershipSearchResponse) {
+    option (google.api.http) = {
+      post: "/users/me/memberships/_search"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
 }
 
 message UserSessionViews {
@@ -856,4 +867,52 @@ message ExternalIDPView {
   string external_user_display_name = 5;
   google.protobuf.Timestamp creation_date = 6;
   google.protobuf.Timestamp change_date = 7;
+}
+
+
+message UserMembershipSearchResponse {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated UserMembershipView result = 4;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
+}
+
+message UserMembershipSearchRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  repeated UserMembershipSearchQuery queries = 3;
+}
+
+message UserMembershipSearchQuery {
+  UserMembershipSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+  SearchMethod method = 2 [(validate.rules).enum = {in: [0]}];
+  string value = 3;
+}
+
+enum UserMembershipSearchKey {
+  USERMEMBERSHIPSEARCHKEY_UNSPECIFIED = 0;
+  USERMEMBERSHIPSEARCHKEY_TYPE = 1;
+  USERMEMBERSHIPSEARCHKEY_OBJECT_ID = 2;
+}
+
+message UserMembershipView {
+  string user_id = 1;
+  MemberType member_type = 2;
+  string aggregate_id = 3;
+  string object_id = 4;
+  repeated string roles = 5;
+  string display_name = 6;
+  google.protobuf.Timestamp creation_date = 7;
+  google.protobuf.Timestamp change_date = 8;
+  uint64 sequence = 9;
+  string resource_owner = 10;
+}
+
+enum MemberType {
+  MEMBERTYPE_UNSPECIFIED = 0;
+  MEMBERTYPE_ORGANISATION = 1;
+  MEMBERTYPE_PROJECT = 2;
+  MEMBERTYPE_PROJECT_GRANT = 3;
 }
