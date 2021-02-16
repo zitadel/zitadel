@@ -16,7 +16,7 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.13.2
+	github.com/caos/oidc v0.14.0
 	github.com/caos/orbos v1.5.14-0.20210205131708-6dc812182dc0
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
@@ -82,5 +82,3 @@ require (
 	k8s.io/apiextensions-apiserver v0.18.5
 	k8s.io/apimachinery v0.18.5
 )
-
-replace github.com/caos/oidc => /Users/livio/workspaces/go/src/github.com/caos/oidc
