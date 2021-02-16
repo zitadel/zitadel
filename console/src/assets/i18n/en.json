@@ -9,16 +9,16 @@
         "STEPS_TITLE":"Complete the following steps in the order you want:",
         "STEPS": {
             "1": {
-                "TITLE":"Projekt erstellen",
-                "DESC":"Erstellen Sie Ihr erstes Projekt und legen Sie Zugangsberechtigungen eventueller Mitarbeiter fest."
+                "TITLE":"Create a project",
+                "DESC":"Create your first project and define access rights for any employees."
             },
             "2": {
-                "TITLE":"Applikation erstellen",
-                "DESC":"Erstellen Sie eine Applikation innerhalb Ihres Projektes und legen Sie dessen Eigenschaften fest."
+                "TITLE":"Create Application",
+                "DESC":"Create an application within your project and define its properties."
             },
             "3": {
-                "TITLE":"Sicherheit verbessern",
-                "DESC":"Erweitern Sie die Zugangsrichtlinien und erhöhen Sie dadurch die Sicherheit ihrer Benutzer."
+                "TITLE":"Improve security",
+                "DESC":"Extend the access policies and thereby increase the security of your users."
             }
         },
         "START":"Start",
