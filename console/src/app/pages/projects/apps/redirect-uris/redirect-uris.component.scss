@@ -29,6 +29,16 @@
             flex: 1;
         }
 
+        i.green {
+            font-size: 1rem;
+            line-height: 35px;
+            height: 30px;
+        }
+
+        i.red {
+            font-size: 1.2rem;
+        }
+
         .icon-button {
             height: 30px;
             line-height: 30px;
@@ -36,10 +46,10 @@
             mat-icon {
                 font-size: 1rem !important;
             }
-        }
 
-        &:not(:hover) {
-            color: var(--grey);
+            &:not(:hover) {
+                color: var(--grey);
+            }
         }
     }
 }

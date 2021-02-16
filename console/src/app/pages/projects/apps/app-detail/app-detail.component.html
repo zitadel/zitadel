@@ -89,12 +89,12 @@
 
             <div style="margin: .5rem" class="divider"></div>
 
-            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode"
+            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode?.value"
                 (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
                 title="{{ 'APP.OIDC.REDIRECT' | translate }}">
             </cnsl-redirect-uris>
 
-            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode"
+            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode?.value"
                 (changedUris)="postLogoutRedirectUrisList = $event" [urisList]="postLogoutRedirectUrisList"
                 title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
             </cnsl-redirect-uris>

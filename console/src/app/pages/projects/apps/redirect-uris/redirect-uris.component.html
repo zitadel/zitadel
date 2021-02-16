@@ -15,6 +15,9 @@
         <span class="uri"
             [ngClass]="{'green': !devMode && uri?.startsWith('https://'), 'red': !devMode && !uri?.startsWith('https://')}">{{uri}}</span>
         <span class="fill-space"></span>
+        <i *ngIf="!devMode && !uri?.startsWith('https://')" class="las la-exclamation red"></i>
+        <!-- <i *ngIf="!devMode && uri?.startsWith('https://')" class="las la-check green"></i> -->
+
         <button matTooltip="{{'ACTIONS.DELETE' | translate}}" mat-icon-button (click)="remove(uri)" class="icon-button">
             <mat-icon>cancel</mat-icon>
         </button>
