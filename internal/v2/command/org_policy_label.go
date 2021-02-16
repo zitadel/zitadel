@@ -19,13 +19,14 @@ func (r *CommandSide) AddLabelPolicy(ctx context.Context, resourceOwner string, 
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
-	orgAgg.PushEvents(org.NewLabelPolicyAddedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor))
-
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, org.NewLabelPolicyAddedEvent(ctx, orgAgg, policy.PrimaryColor, policy.SecondaryColor))
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToLabelPolicy(&addedPolicy.LabelPolicyWriteModel), nil
 }
 
@@ -39,19 +40,20 @@ func (r *CommandSide) ChangeLabelPolicy(ctx context.Context, resourceOwner strin
 		return nil, caos_errs.ThrowNotFound(nil, "Org-0K9dq", "Errors.Org.LabelPolicy.NotFound")
 	}
 
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.PrimaryColor, policy.SecondaryColor)
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.PrimaryColor, policy.SecondaryColor)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
 	}
 
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	orgAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToLabelPolicy(&existingPolicy.LabelPolicyWriteModel), nil
 }
 
@@ -65,7 +67,6 @@ func (r *CommandSide) RemoveLabelPolicy(ctx context.Context, orgID string) error
 		return caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LabelPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	orgAgg.PushEvents(org.NewLabelPolicyRemovedEvent(ctx))
-
-	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	_, err = r.eventstore.PushEvents(ctx, org.NewLabelPolicyRemovedEvent(ctx, orgAgg))
+	return err
 }

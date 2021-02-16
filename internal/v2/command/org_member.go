@@ -15,16 +15,19 @@ import (
 func (r *CommandSide) AddOrgMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	addedMember := NewOrgMemberWriteModel(member.AggregateID, member.UserID)
 	orgAgg := OrgAggregateFromWriteModel(&addedMember.WriteModel)
-	err := r.addOrgMember(ctx, orgAgg, addedMember, member)
+	event, err := r.addOrgMember(ctx, orgAgg, addedMember, member)
 	if err != nil {
 		return nil, err
 	}
 
-	err = r.eventstore.PushAggregate(ctx, addedMember, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, event)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(addedMember, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
@@ -63,15 +66,9 @@ func (r *CommandSide) ChangeOrgMember(ctx context.Context, member *domain.Member
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-LiaZi", "Errors.Org.Member.RolesNotChanged")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	org.NewMemberChangedEvent(ctx, orgAgg, member.UserID, member.Roles...)
-
-	events, err := r.eventstore.PushAggregates(ctx, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, org.NewMemberChangedEvent(ctx, orgAgg, member.UserID, member.Roles...))
+	err = AppendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
-		return nil, err
-	}
-
-	existingMember.AppendEvents(events...)
-	if err = existingMember.Reduce(); err != nil {
 		return nil, err
 	}
 
@@ -88,9 +85,8 @@ func (r *CommandSide) RemoveOrgMember(ctx context.Context, orgID, userID string)
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	org.NewMemberRemovedEvent(ctx, orgAgg, userID)
-
-	return r.eventstore.PushAggregate(ctx, m, orgAgg)
+	_, err = r.eventstore.PushEvents(ctx, org.NewMemberRemovedEvent(ctx, orgAgg, userID))
+	return err
 }
 
 func (r *CommandSide) orgMemberWriteModelByID(ctx context.Context, orgID, userID string) (member *OrgMemberWriteModel, err error) {

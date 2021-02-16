@@ -53,6 +53,7 @@ func (wm *OrgLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
@@ -79,7 +80,7 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewLoginPolicyChangedEvent(ctx, changes)
+	changedEvent, err := org.NewLoginPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

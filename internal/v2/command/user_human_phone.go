@@ -32,7 +32,6 @@ func (r *CommandSide) ChangeHumanPhone(ctx context.Context, phone *domain.Phone)
 	}
 
 	events := []eventstore.EventPusher{changedEvent}
-
 	if phone.IsPhoneVerified {
 		events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 	} else {

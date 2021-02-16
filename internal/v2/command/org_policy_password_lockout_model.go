@@ -46,7 +46,11 @@ func (wm *OrgPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBui
 		ResourceOwner(wm.ResourceOwner)
 }
 
-func (wm *OrgPasswordLockoutPolicyWriteModel) NewChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) (*org.PasswordLockoutPolicyChangedEvent, bool) {
+func (wm *OrgPasswordLockoutPolicyWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	maxAttempts uint64,
+	showLockoutFailure bool) (*org.PasswordLockoutPolicyChangedEvent, bool) {
 	changes := make([]policy.PasswordLockoutPolicyChanges, 0)
 	if wm.MaxAttempts != maxAttempts {
 		changes = append(changes, policy.ChangeMaxAttempts(maxAttempts))
@@ -57,7 +61,7 @@ func (wm *OrgPasswordLockoutPolicyWriteModel) NewChangedEvent(ctx context.Contex
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewPasswordLockoutPolicyChangedEvent(ctx, changes)
+	changedEvent, err := org.NewPasswordLockoutPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

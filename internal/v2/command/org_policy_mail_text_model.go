@@ -50,6 +50,7 @@ func (wm *OrgMailTextWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *OrgMailTextWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mailTextType,
 	language,
 	title,
@@ -81,7 +82,7 @@ func (wm *OrgMailTextWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewMailTextChangedEvent(ctx, mailTextType, language, changes)
+	changedEvent, err := org.NewMailTextChangedEvent(ctx, aggregate, mailTextType, language, changes)
 	if err != nil {
 		return nil, false
 	}

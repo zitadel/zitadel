@@ -46,6 +46,7 @@ func (wm *OrgLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	primaryColor,
 	secondaryColor string,
 ) (*org.LabelPolicyChangedEvent, bool) {
@@ -59,7 +60,7 @@ func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewLabelPolicyChangedEvent(ctx, changes)
+	changedEvent, err := org.NewLabelPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

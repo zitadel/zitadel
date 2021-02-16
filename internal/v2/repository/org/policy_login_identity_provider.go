@@ -84,11 +84,12 @@ type IdentityProviderCascadeRemovedEvent struct {
 
 func NewIdentityProviderCascadeRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	idpConfigID string,
 ) *IdentityProviderCascadeRemovedEvent {
 	return &IdentityProviderCascadeRemovedEvent{
 		IdentityProviderCascadeRemovedEvent: *policy.NewIdentityProviderCascadeRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyIDPProviderRemovedEventType),
+			eventstore.NewBaseEventForPush(ctx, aggregate, LoginPolicyIDPProviderRemovedEventType),
 			idpConfigID),
 	}
 }

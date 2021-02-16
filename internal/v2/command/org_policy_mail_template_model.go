@@ -50,6 +50,7 @@ func (wm *OrgMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *OrgMailTemplateWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	template []byte,
 ) (*org.MailTemplateChangedEvent, bool) {
 	changes := make([]policy.MailTemplateChanges, 0)
@@ -59,7 +60,7 @@ func (wm *OrgMailTemplateWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewMailTemplateChangedEvent(ctx, changes)
+	changedEvent, err := org.NewMailTemplateChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}
