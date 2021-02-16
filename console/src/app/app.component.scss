@@ -11,9 +11,14 @@
   left: 0;
   right: 0;
 
+  .org-button {
+      font-weight: bold;
+      padding-right: .5rem;
+  }
+
   .logo {
-    max-height: 50px;
-    width: 160px;
+    max-height: 40px;
+    width: 40px;
   }
 
   .title {
@@ -22,7 +27,6 @@
     font-size: 1.2rem;
     font-weight: 400;
     line-height: 1.2rem;
-    margin-right: 1rem;
   }
 
   .context-menu {
@@ -82,7 +86,7 @@
   padding-top: 60px;
 
   .sidenav {
-    width: 300px;
+    width: 280px;
     border-right: none;
 
     .side-column {
@@ -90,6 +94,7 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
+      height: calc(100% - 60px);
 
       .list {
         width: 100%;
@@ -123,7 +128,6 @@
           .label {
             margin-bottom: 0;
             font-size: 14px;
-            letter-spacing: .05em;
           }
 
           .c_label {
@@ -132,7 +136,6 @@
             justify-content: space-between;
             align-items: center;
             font-size: 14px;
-            letter-spacing: .03em;
 
             .count {
               font-size: 12px;
@@ -140,7 +143,7 @@
           }
 
           &:hover {
-            background-color: #00000010;
+            // background-color: #00000010;
             border-top-right-radius: 1.5rem;
             border-bottom-right-radius: 1.5rem;
           }
@@ -148,6 +151,7 @@
           &.active {
             border-top-right-radius: 1.5rem;
             border-bottom-right-radius: 1.5rem;
+            font-weight: bold;
           }
         }
 
@@ -158,6 +162,43 @@
 
       .fill-space {
         flex: 1 1 auto;
+      }
+
+      .toc-line {
+        margin: 2rem 2rem;
+
+        .toc {
+            font-size: 12px;
+            color: var(--grey);
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        .sp-status {
+            font-size: 12px;
+            color: var(--grey);
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        .sp-status .sp-status-badge.sp-status-ok { 
+            background: darkgreen; 
+        }
+        .sp-status .sp-status-badge.sp-status-scheduled { 
+            background: darkblue; 
+        }
+        .sp-status .sp-status-badge.sp-status-minor { 
+            background: darkorange; 
+        }
+        .sp-status .sp-status-badge.sp-status-major { 
+            background: darkred; 
+        }
       }
 
       .logout-button {

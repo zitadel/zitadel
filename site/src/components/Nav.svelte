@@ -1,17 +1,28 @@
 <script>
-    import LanguageSwitcher from './LanguageSwitcher.svelte'
-    import NavItem from './NavItem.svelte'
-	import { setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Icon from './Icon.svelte';
 	export let segment;
-    export let logo;
+    export let page;
     export let title;
-    import { _ } from 'svelte-i18n';
+	export let logo;
+
 	const current = writable(null);
 	setContext('nav', current);
+	let open = false;
 	let visible = true;
-	
+    // hide nav whenever we navigate
+    page.subscribe(() => {
+        open = false;
+    });
+	function intercept_touchstart(event) {
+		if (!open) {
+			event.preventDefault();
+			event.stopPropagation();
+			open = true;
+		}
+	}
+	// Prevents navbar to show/hide when clicking in docs sidebar
 	let hash_changed = false;
 	function handle_hashchange() {
 		hash_changed = true;
@@ -31,14 +42,13 @@
 <style>
 	header {
         box-sizing: border-box;
-        position: fixed;
-        top: 0;
+		position: fixed;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		width: 100vw;
 		height: var(--nav-h);
-		padding: 0 16px;
+		padding: 0 1rem;
 		margin: 0 auto;
 		box-shadow: 0 -0.4rem 0.9rem 0.2rem rgba(0,0,0,.5);
 		z-index: 100;
@@ -46,6 +56,8 @@
 		transform: translate(0,calc(-100% - 1rem));
         transition: transform 0.2s;
         backdrop-filter: saturate(100%) blur(10px);
+        -webkit-backdrop-filter: saturate(100%) blur(10px);
+        background-color: #1b153030;
 	}
 	header.visible {
 		transform: none;
@@ -56,49 +68,215 @@
 		top: 0;
 		left: 0;
 		width: 100vw;
-		height: var(--nav-h);
-		padding: 0 16px 0 16px;
+        height: var(--nav-h);
+		padding: 0 1rem 0 1rem;
 		display: flex;
 		align-items: center;
-		background-color: transparent;
-		transform: none;
+        background-color: transparent;
+        transform: none;
 		transition: none;
 		box-shadow: none;
-    }
-    
+	}
+
     .fill-space {
         flex: 1;
     }
-    
-	.home {
-        line-height: 22px;
-        font-size: 22px;
+
+    .home {
         display: flex;
         align-items: center;
+        line-height: 22px;
+        font-size: 22px;
     }
 
-    .home:hover {
+    .home .docs {
+        color: var(--second);
+        margin-left: 3px;
+    }
+
+    a img {
+        max-height: 45px;
+        padding: 0;
+        width: 160px;
+    }
+
+	.primary {
+		list-style: none;
+		margin: 0;
+		line-height: 1;
+	}
+
+	ul :global(li),
+    ul :global(.login-button) {
+		display: block;
+        display: none;
+        font-size: 14px;
+        line-height: 14px;
+	}
+
+	ul :global(li).active {
+		display: block;
+	}
+
+	ul {
+        position: relative;
+        text-align: center;
+	}
+
+	ul::after {
+		/* prevent clicks from registering if nav is closed */
+		position: absolute;
+		content: '';
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+	}
+
+	ul.open {
+		padding: 0 0 1em 0;
+        background-color: #20244e;
+		align-self: start;
+        border-bottom-left-radius: .5rem;
+        border-bottom-right-radius: .5rem;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
+	}
+
+	ul.open :global(li),
+    ul.open :global(.login-button){
+		display: block;
+		text-align: right;
+	}
+
+	ul.open::after {
+		display: none;
+    }
+
+	ul :global(li) :global(a) {
+        font-weight: 500;
+        padding: 1rem 1rem;
+		border: none;
         color: inherit;
-        text-decoration:none;
-        border: none;
+        text-decoration: none;
+	}
+	ul.open :global(li) :global(a) {
+        padding: 1.5rem 1rem;
+		display: block;
+    }
+
+    ul :global(li).active :global(a){
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    ul :global(li).active :global(.bars) {
+        display: inline-block;
+    }
+
+    ul.open :global(li) :global(.bars) {
+        display: none;
+    }
+    
+	.primary :global(svg) {
+		width: 2rem;
+		height: 2rem;
+    }
+    
+	.home {
+        margin-right: 1rem;
+    }
+
+    .home img {
+        display: block;
+    }
+    
+     /* TODO remove global color */
+	ul :global(li).active :global(a) {
+        color: var(--second); 
+        white-space: nowrap;
+    }
+
+    ul :global(i) {
+        color: var(--second);
+    }
+    
+	.modal-background {
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+		/* background-color: rgba(255, 255, 255, 0.9); */
     }
     
 	a {
 		color: inherit;
 		border-bottom: none;
         transition: none;
-        padding: 0;
     }
 
-    .home span {
-        color: var(--second);
-        margin-left: 3px;
+    .show-if-desktop {
+        display: none;
     }
 
-    a img {
-        width: 160px;
-        max-height: 45px;
-        padding: 0;
+	@media (min-width: 1040px) {
+		ul {
+			padding: 0;
+            background: none;
+        }
+
+        ul :global(.login-button) {
+            display: inline;
+        }
+        
+		ul.open {
+			padding: 0;
+            background-color: transparent;
+			border: none;
+			align-self: initial;
+        }
+        
+		ul.open :global(li),
+        ul.open :global(.login-button){
+			display: inline;
+			text-align: left;
+        }
+        
+		ul.open :global(li) :global(a) {
+            display: inline;
+            white-space: nowrap;
+        }
+
+        ul :global(li).active :global(.bars) {
+            display: none;
+        }
+
+        ul :global(li).active :global(a){
+            display: inline;
+        }
+        
+		ul::after {
+			display: none;
+        }
+        
+		ul :global(li) {
+            display: inline !important;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        ul :global(li) :global(.bars) {
+            display: none;
+        }
+        
+		.hide-if-desktop {
+			display: none !important;
+        }
+
+        .show-if-desktop {
+            display: block;
+        }
     }
 
     button {
@@ -129,21 +307,11 @@
         text-align: center;
         margin: auto;
     }
-
-    .show-on-desktop {
-        display: none;
-    }
-
-    @media (min-width: 832px) {
-        .show-on-desktop {
-            display: flex;
-        }
-    }
 </style>
 
 <svelte:window on:hashchange={handle_hashchange} on:scroll={handle_scroll} />
 
-<header class:visible="{visible}">
+<header class:visible="{visible || open}">
 	<nav>
 		<a
 			rel="prefetch"
@@ -156,26 +324,30 @@
             {:else if title}
                 {title}
             {/if}
-            <span>DOCS</span>
+            <span class="docs">DOCS</span>
         </a>
 
+		{#if open}
+			<div class="modal-background hide-if-desktop" on:click="{() => open = false}"></div>
+		{/if}
+
         <span class="fill-space"></span>
-        <div class="show-on-desktop">
-            <NavItem external="https://zitadel.ch" title="GitHub Repo">
-                {$_('moreabout')}
-            </NavItem>
 
-            <a href='https://console.zitadel.ch'>
-                <button>
-                    <span>{$_('login')}</span>
-                </button>
-            </a>
+		<ul
+			class="primary"
+			class:open
+			on:touchstart|capture={intercept_touchstart}
+			on:mouseenter="{() => open = true}"
+			on:mouseleave="{() => open = false}">
+			<slot></slot>
+		</ul>
 
-            <a href='https://accounts.zitadel.ch/register'>
-                <button style="border-color: var(--second); margin-left: 0;">
-                    <span>{$_('register')}</span>
-                </button>
-            </a>
-        </div>
+        <span class="fill-space show-if-desktop"></span>
+
+        <a class="show-if-desktop" href="https://console.zitadel.ch">
+            <button>
+                <span>LOGIN</span>
+            </button>
+        </a>
 	</nav>
 </header>
