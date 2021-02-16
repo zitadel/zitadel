@@ -39,7 +39,7 @@ func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *gran
 	result := &grant_model.UserGrantSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.UserGrantsToModel(grants),
 	}
 	if err == nil {
@@ -258,40 +258,13 @@ func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_mode
 
 func orgRespToOrgResp(orgs []*org_view_model.OrgView, count uint64) *grant_model.ProjectOrgSearchResponse {
 	resp := &grant_model.ProjectOrgSearchResponse{
-		TotalResult: uint64(count),
+		TotalResult: count,
 	}
 	resp.Result = make([]*grant_model.Org, len(orgs))
 	for i, o := range orgs {
 		resp.Result[i] = &grant_model.Org{OrgID: o.ID, OrgName: o.Name}
 	}
 	return resp
-}
-
-func mergeOrgAndAdminGrant(ctxData authz.CtxData, orgGrant, iamAdminGrant *model.UserGrantView) (grant *authz.Grant) {
-	if orgGrant != nil {
-		roles := orgGrant.RoleKeys
-		if iamAdminGrant != nil {
-			roles = addIamAdminRoles(roles, iamAdminGrant.RoleKeys)
-		}
-		grant = &authz.Grant{OrgID: orgGrant.ResourceOwner, Roles: roles}
-	} else if iamAdminGrant != nil {
-		grant = &authz.Grant{
-			OrgID: ctxData.OrgID,
-			Roles: iamAdminGrant.RoleKeys,
-		}
-	}
-	return grant
-}
-
-func addIamAdminRoles(orgRoles, iamAdminRoles []string) []string {
-	result := make([]string, 0)
-	result = append(result, iamAdminRoles...)
-	for _, role := range orgRoles {
-		if !authz.ExistsPerm(result, role) {
-			result = append(result, role)
-		}
-	}
-	return result
 }
 
 func containsOrg(orgs []*grant_model.Org, resourceOwner string) bool {

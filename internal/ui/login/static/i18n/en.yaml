@@ -133,7 +133,7 @@ EmailVerificationDone:
   Title: E-Mail Verification
   Description: Your email address has been successfully verified.
 
-RegistrationOption:
+RegisterOption:
   Title: Registration Options
   Description: Choose how you'd like to register
   RegisterUsernamePassword: With username password
