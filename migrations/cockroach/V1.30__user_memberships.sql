@@ -36,11 +36,12 @@ INSERT INTO authz.current_sequences (
      last_successful_spooler_run,
      aggregate_type
      )
-SELECT view_name,
+SELECT 'authz.user_memberships',
     event_timestamp,
     current_sequence,
     last_successful_spooler_run,
     aggregate_type
-FROM auth.current_sequences;
+FROM auth.current_sequences
+WHERE view_name = 'auth.user_memberships';
 
 COMMIT;
