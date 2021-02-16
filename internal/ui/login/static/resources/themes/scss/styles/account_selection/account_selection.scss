@@ -21,16 +21,21 @@ $lgn-container-margin: 0px auto 50px auto;
             display: block;
             margin: .5rem; 
             text-align: start;
+            overflow: hidden;
 
             .lgn-displayname{
                 font-size: 16px;
                 margin: .5rem 0;
                 margin-bottom: 0;
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
 
             .lgn-loginname{
                 font-size: 14px;
                 margin: 0;
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
 
             .lgn-session-state {
