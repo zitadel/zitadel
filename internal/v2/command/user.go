@@ -2,19 +2,19 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
 	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/eventstore/models"
 
-
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
-	"github.com/caos/zitadel/internal/eventstore/v2"
 )
 
 func (cs *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userName string) error {
@@ -152,10 +152,9 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	if err != nil {
 		return err
 	}
-	aggregates := make([]eventstore.Aggregater, 0)
+	var events []eventstore.EventPusher
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	userAgg.PushEvents(user.NewUserRemovedEvent(ctx, existingUser.ResourceOwner, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
-	aggregates = append(aggregates, userAgg)
+	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
 
 	for _, grantID := range cascadingGrantIDs {
 		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
@@ -223,7 +222,7 @@ func (r *CommandSide) CreateUserToken(ctx context.Context, orgID, agentID, clien
 	}, nil
 }
 
-func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (_ *user.Aggregate, _ *UserWriteModel, err error) {
+func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (events []eventstore.EventPusher, _ *UserWriteModel, err error) {
 	existingUser, err := r.userWriteModelByID(ctx, userID, "")
 	if err != nil {
 		return nil, nil, err
@@ -243,8 +242,14 @@ func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (_ *
 	if err != nil {
 		return nil, nil, err
 	}
-	userAgg.PushEvents(user.NewDomainClaimedEvent(ctx, fmt.Sprintf("%s@temporary.%s", id, r.iamDomain), existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
-	return userAgg, changedUserGrant, nil
+	return []eventstore.EventPusher{
+		user.NewDomainClaimedEvent(
+			ctx,
+			userAgg,
+			fmt.Sprintf("%s@temporary.%s", id, r.iamDomain),
+			existingUser.UserName,
+			orgIAMPolicy.UserLoginMustBeDomain),
+	}, changedUserGrant, nil
 }
 
 func (r *CommandSide) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {

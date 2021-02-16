@@ -45,11 +45,8 @@ func (r *CommandSide) AddHumanOTP(ctx context.Context, userID, resourceowner str
 	if err != nil {
 		return nil, err
 	}
-	userAgg.PushEvents(
-		user.NewHumanOTPAddedEvent(ctx, secret),
-	)
+	_, err = r.eventstore.PushEvents(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, secret))
 
-	err = r.eventstore.PushAggregate(ctx, otpWriteModel, userAgg)
 	if err != nil {
 		return nil, err
 	}
@@ -81,11 +78,9 @@ func (r *CommandSide) HumanCheckMFAOTPSetup(ctx context.Context, userID, code, u
 		return err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
-	userAgg.PushEvents(
-		user.NewHumanOTPVerifiedEvent(ctx, userAgentID),
-	)
 
-	return r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
+	_, err = r.eventstore.PushEvents(ctx, user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID))
+	return err
 }
 
 func (r *CommandSide) HumanCheckMFAOTP(ctx context.Context, userID, code, resourceowner string, authRequest *domain.AuthRequest) error {
@@ -102,13 +97,10 @@ func (r *CommandSide) HumanCheckMFAOTP(ctx context.Context, userID, code, resour
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	err = domain.VerifyMFAOTP(code, existingOTP.Secret, r.multifactors.OTP.CryptoMFA)
 	if err == nil {
-		userAgg.PushEvents(
-			user.NewHumanOTPCheckSucceededEvent(ctx, authRequestDomainToAuthRequestInfo(authRequest)),
-		)
-		return r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
+		_, err = r.eventstore.PushEvents(ctx, user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+		return err
 	}
-	userAgg.PushEvents(user.NewHumanOTPCheckFailedEvent(ctx, authRequestDomainToAuthRequestInfo(authRequest)))
-	pushErr := r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
+	_, pushErr := r.eventstore.PushEvents(ctx, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	logging.Log("COMMAND-9fj7s").OnError(pushErr).Error("error create password check failed event")
 	return err
 }
@@ -126,11 +118,8 @@ func (r *CommandSide) HumanRemoveOTP(ctx context.Context, userID, resourceOwner 
 		return caos_errs.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
-	userAgg.PushEvents(
-		user.NewHumanOTPRemovedEvent(ctx),
-	)
-
-	return r.eventstore.PushAggregate(ctx, existingOTP, userAgg)
+	_, err = r.eventstore.PushEvents(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
+	return err
 }
 
 func (r *CommandSide) otpWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanOTPWriteModel, err error) {

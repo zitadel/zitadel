@@ -257,7 +257,7 @@ func (r *CommandSide) removeUserGrant(ctx context.Context, grantID, resourceOwne
 		userGrantAgg.PushEvents(
 			usergrant.NewUserGrantRemovedEvent(
 				ctx,
-				existingUserGrant.ResourceOwner,
+				userGrantAgg,
 				existingUserGrant.UserID,
 				existingUserGrant.ProjectID,
 				existingUserGrant.ProjectGrantID),

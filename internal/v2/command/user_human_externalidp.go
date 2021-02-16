@@ -39,36 +39,31 @@ func (r *CommandSide) addHumanExternalIDP(ctx context.Context, aggregate *events
 }
 
 func (r *CommandSide) RemoveHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP) error {
-	userAgg, writemodel, err := r.removeHumanExternalIDP(ctx, externalIDP, false)
+	event, err := r.removeHumanExternalIDP(ctx, externalIDP, false)
 	if err != nil {
 		return err
 	}
-	return r.eventstore.PushAggregate(ctx, writemodel, userAgg)
+	_, err = r.eventstore.PushEvents(ctx, event)
+	return err
 }
 
-func (r *CommandSide) removeHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP, cascade bool) (*user.Aggregate, *HumanExternalIDPWriteModel, error) {
+func (r *CommandSide) removeHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP, cascade bool) (eventstore.EventPusher, error) {
 	if externalIDP.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.IDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.IDMissing")
 	}
 
 	existingExternalIDP, err := r.externalIDPWriteModelByID(ctx, externalIDP.AggregateID, externalIDP.IDPConfigID, externalIDP.ExternalUserID, externalIDP.ResourceOwner)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if existingExternalIDP.State == domain.ExternalIDPStateUnspecified || existingExternalIDP.State == domain.ExternalIDPStateRemoved {
-		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1M9xR", "Errors.User.ExternalIDP.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-1M9xR", "Errors.User.ExternalIDP.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingExternalIDP.WriteModel)
-	if !cascade {
-		userAgg.PushEvents(
-			user.NewHumanExternalIDPRemovedEvent(ctx, externalIDP.IDPConfigID, externalIDP.ExternalUserID),
-		)
-	} else {
-		userAgg.PushEvents(
-			user.NewHumanExternalIDPCascadeRemovedEvent(ctx, externalIDP.IDPConfigID, externalIDP.ExternalUserID),
-		)
+	if cascade {
+		return user.NewHumanExternalIDPCascadeRemovedEvent(ctx, userAgg, externalIDP.IDPConfigID, externalIDP.ExternalUserID), nil
 	}
-	return userAgg, existingExternalIDP, nil
+	return user.NewHumanExternalIDPRemovedEvent(ctx, userAgg, externalIDP.IDPConfigID, externalIDP.ExternalUserID), nil
 }
 
 func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, userID string, authRequest *domain.AuthRequest) (err error) {
