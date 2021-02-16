@@ -29,7 +29,7 @@ func (r *CommandSide) ResendInitialMail(ctx context.Context, userID, email, reso
 	var events []eventstore.EventPusher
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	if email != "" && existingCode.Email != email {
-		changedEvent, _ := existingCode.NewChangedEvent(ctx, email)
+		changedEvent, _ := existingCode.NewChangedEvent(ctx, userAgg, email)
 		events = append(events, changedEvent)
 	}
 	initCode, err := domain.NewInitUserCode(r.initializeUserCode)

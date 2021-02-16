@@ -23,11 +23,11 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
 	}
-	changedEvent, hasChanged := existingEmail.NewChangedEvent(ctx, email.EmailAddress)
+	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
+	changedEvent, hasChanged := existingEmail.NewChangedEvent(ctx, userAgg, email.EmailAddress)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2b7fM", "Errors.User.Email.NotChanged")
 	}
-	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 
 	events := []eventstore.EventPusher{changedEvent}
 
@@ -41,7 +41,11 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 		events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry))
 	}
 
-	_, err = r.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingEmail, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

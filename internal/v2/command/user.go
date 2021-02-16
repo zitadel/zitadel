@@ -157,15 +157,15 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
 
 	for _, grantID := range cascadingGrantIDs {
-		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
+		removeEvent, err := r.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-5m9oL", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
-		aggregates = append(aggregates, grantAgg)
+		events = append(events, removeEvent)
 	}
 
-	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	_, err = r.eventstore.PushEvents(ctx, events...)
 	return err
 }
 

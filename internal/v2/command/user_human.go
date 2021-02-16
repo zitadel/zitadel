@@ -103,8 +103,6 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	if err != nil {
 		return nil, nil, err
 	}
-	//TODO: adlerhurst shouldn't 107 be after 114?
-	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
 	if err := human.CheckOrgIAMPolicy(orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}
@@ -112,6 +110,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	if err := human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true); err != nil {
 		return nil, nil, err
 	}
+	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
 	//TODO: adlerhurst maybe we could simplify the code below
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
 	var events []eventstore.EventPusher

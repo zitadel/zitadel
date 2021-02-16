@@ -77,6 +77,7 @@ func (wm *HumanAddressWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *HumanAddressWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	country,
 	locality,
 	postalCode,
@@ -84,7 +85,7 @@ func (wm *HumanAddressWriteModel) NewChangedEvent(
 	streetAddress string,
 ) (*user.HumanAddressChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := user.NewHumanAddressChangedEvent(ctx)
+	changedEvent := user.NewHumanAddressChangedEvent(ctx, aggregate)
 	if wm.Country != country {
 		hasChanged = true
 		changedEvent.Country = &country

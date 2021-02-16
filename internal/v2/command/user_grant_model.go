@@ -66,8 +66,6 @@ func (wm *UserGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return query
 }
 
-func UserGrantAggregateFromWriteModel(wm *eventstore.WriteModel) *usergrant.Aggregate {
-	return &usergrant.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, usergrant.AggregateType, usergrant.AggregateVersion),
-	}
+func UserGrantAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModel(wm, usergrant.AggregateType, usergrant.AggregateVersion)
 }

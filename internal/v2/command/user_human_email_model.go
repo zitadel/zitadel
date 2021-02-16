@@ -73,10 +73,11 @@ func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *HumanEmailWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	email string,
 ) (*user.HumanEmailChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := user.NewHumanEmailChangedEvent(ctx)
+	changedEvent := user.NewHumanEmailChangedEvent(ctx, aggregate)
 	if wm.Email != email {
 		hasChanged = true
 		changedEvent.EmailAddress = email
