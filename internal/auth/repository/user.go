@@ -89,4 +89,6 @@ type myUserRepo interface {
 	ChangeMyUsername(ctx context.Context, username string) error
 
 	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
+
+	SearchMyUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
 }

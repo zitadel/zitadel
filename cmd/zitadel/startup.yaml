@@ -17,6 +17,7 @@ Metrics:
     MeterName: 'github.com/caos/zitadel'
 
 AuthZ:
+  Domain: $ZITADEL_DEFAULT_DOMAIN
   Repository:
     Eventstore:
       ServiceName: 'AuthZ'

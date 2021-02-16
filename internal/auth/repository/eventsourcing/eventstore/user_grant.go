@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -39,7 +38,7 @@ func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *gran
 	result := &grant_model.UserGrantSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: uint64(count),
+		TotalResult: count,
 		Result:      model.UserGrantsToModel(grants),
 	}
 	if err == nil {
@@ -94,7 +93,43 @@ func membershipsToOrgResp(memberships []*user_view_model.UserMembershipView, cou
 	}
 }
 
+func (repo *UserGrantRepo) SearchMyUserMemberships(ctx context.Context, request *user_model.UserMembershipSearchRequest) (*user_model.UserMembershipSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
+	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
+
+	memberships, count, err := repo.View.SearchUserMemberships(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &user_model.UserMembershipSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      user_view_model.UserMembershipsToModel(memberships),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
+}
+
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
+	memberships, err := repo.searchUserMemberships(ctx)
+	if err != nil {
+		return nil, err
+	}
+	permissions := &grant_model.Permissions{Permissions: []string{}}
+	for _, membership := range memberships {
+		for _, role := range membership.Roles {
+			permissions = repo.mapRoleToPermission(permissions, membership, role)
+		}
+	}
+	return permissions.Permissions, nil
+}
+
+func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*user_view_model.UserMembershipView, error) {
 	ctxData := authz.GetCtxData(ctx)
 	orgMemberships, orgCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
 		Queries: []*user_model.UserMembershipSearchQuery{
@@ -131,16 +166,9 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 		return nil, err
 	}
 	if orgCount == 0 && iamCount == 0 {
-		return []string{}, nil
+		return []*user_view_model.UserMembershipView{}, nil
 	}
-	orgMemberships = append(orgMemberships, iamMemberships...)
-	permissions := &grant_model.Permissions{Permissions: []string{}}
-	for _, membership := range orgMemberships {
-		for _, role := range membership.Roles {
-			permissions = repo.mapRoleToPermission(permissions, membership, role)
-		}
-	}
-	return permissions.Permissions, nil
+	return append(orgMemberships, iamMemberships...), nil
 }
 
 func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]string, error) {
@@ -258,40 +286,13 @@ func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_mode
 
 func orgRespToOrgResp(orgs []*org_view_model.OrgView, count uint64) *grant_model.ProjectOrgSearchResponse {
 	resp := &grant_model.ProjectOrgSearchResponse{
-		TotalResult: uint64(count),
+		TotalResult: count,
 	}
 	resp.Result = make([]*grant_model.Org, len(orgs))
 	for i, o := range orgs {
 		resp.Result[i] = &grant_model.Org{OrgID: o.ID, OrgName: o.Name}
 	}
 	return resp
-}
-
-func mergeOrgAndAdminGrant(ctxData authz.CtxData, orgGrant, iamAdminGrant *model.UserGrantView) (grant *authz.Grant) {
-	if orgGrant != nil {
-		roles := orgGrant.RoleKeys
-		if iamAdminGrant != nil {
-			roles = addIamAdminRoles(roles, iamAdminGrant.RoleKeys)
-		}
-		grant = &authz.Grant{OrgID: orgGrant.ResourceOwner, Roles: roles}
-	} else if iamAdminGrant != nil {
-		grant = &authz.Grant{
-			OrgID: ctxData.OrgID,
-			Roles: iamAdminGrant.RoleKeys,
-		}
-	}
-	return grant
-}
-
-func addIamAdminRoles(orgRoles, iamAdminRoles []string) []string {
-	result := make([]string, 0)
-	result = append(result, iamAdminRoles...)
-	for _, role := range orgRoles {
-		if !authz.ExistsPerm(result, role) {
-			result = append(result, role)
-		}
-	}
-	return result
 }
 
 func containsOrg(orgs []*grant_model.Org, resourceOwner string) bool {
@@ -301,4 +302,21 @@ func containsOrg(orgs []*grant_model.Org, resourceOwner string) bool {
 		}
 	}
 	return false
+}
+
+func userMembershipToMembership(membership *user_view_model.UserMembershipView) *authz.Membership {
+	return &authz.Membership{
+		MemberType:  authz.MemberType(membership.MemberType),
+		AggregateID: membership.AggregateID,
+		ObjectID:    membership.ObjectID,
+		Roles:       membership.Roles,
+	}
+}
+
+func userMembershipsToMemberships(memberships []*user_view_model.UserMembershipView) []*authz.Membership {
+	result := make([]*authz.Membership, len(memberships))
+	for i, m := range memberships {
+		result[i] = userMembershipToMembership(m)
+	}
+	return result
 }
