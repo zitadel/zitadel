@@ -61,7 +61,7 @@
 
         <div class="compliance"
             *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
-            <cnsl-info-section class="problem">
+            <cnsl-info-section class="problem" type="WARN">
                 <ul style="margin: 0;">
                     <li style="margin: 0 0 .5rem 0;"
                         *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
