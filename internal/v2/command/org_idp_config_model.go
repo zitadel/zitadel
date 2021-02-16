@@ -84,7 +84,7 @@ func (wm *OrgIDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventRead
 
 func (wm *OrgIDPConfigWriteModel) NewChangedEvent(
 	ctx context.Context,
-	resourceOwner,
+	aggregate *eventstore.Aggregate,
 	configID,
 	name string,
 	stylingType domain.IDPConfigStylingType,
@@ -102,7 +102,7 @@ func (wm *OrgIDPConfigWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changeEvent, err := org.NewIDPConfigChangedEvent(ctx, resourceOwner, configID, oldName, changes)
+	changeEvent, err := org.NewIDPConfigChangedEvent(ctx, aggregate, configID, oldName, changes)
 	if err != nil {
 		return nil, false
 	}

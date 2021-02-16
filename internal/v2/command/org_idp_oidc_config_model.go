@@ -76,6 +76,7 @@ func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *IDPOIDCConfigWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	idpConfigID,
 	clientID,
 	issuer,
@@ -114,7 +115,7 @@ func (wm *IDPOIDCConfigWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := org.NewIDPOIDCConfigChangedEvent(ctx, idpConfigID, changes)
+	changeEvent, err := org.NewIDPOIDCConfigChangedEvent(ctx, aggregate, idpConfigID, changes)
 	if err != nil {
 		return nil, false, err
 	}

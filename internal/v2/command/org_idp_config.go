@@ -30,28 +30,31 @@ func (r *CommandSide) AddIDPConfig(ctx context.Context, config *domain.IDPConfig
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedConfig.WriteModel)
-	orgAgg.PushEvents(
+	events := []eventstore.EventPusher{
 		org_repo.NewIDPConfigAddedEvent(
 			ctx,
-			orgAgg.ResourceOwner(),
+			orgAgg,
 			idpConfigID,
 			config.Name,
 			config.Type,
 			config.StylingType,
 		),
-	)
-	orgAgg.PushEvents(
 		org_repo.NewIDPOIDCConfigAddedEvent(
-			ctx, config.OIDCConfig.ClientID,
+			ctx,
+			orgAgg,
+			config.OIDCConfig.ClientID,
 			idpConfigID,
 			config.OIDCConfig.Issuer,
 			clientSecret,
 			config.OIDCConfig.IDPDisplayNameMapping,
 			config.OIDCConfig.UsernameMapping,
-			config.OIDCConfig.Scopes...,
-		),
-	)
-	err = r.eventstore.PushAggregate(ctx, addedConfig, orgAgg)
+			config.OIDCConfig.Scopes...),
+	}
+	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(addedConfig, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,9 +70,10 @@ func (r *CommandSide) ChangeIDPConfig(ctx context.Context, config *domain.IDPCon
 		return nil, caos_errs.ThrowNotFound(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotExisting")
 	}
 
+	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
 	changedEvent, hasChanged := existingIDP.NewChangedEvent(
 		ctx,
-		existingIDP.ResourceOwner,
+		orgAgg,
 		config.IDPConfigID,
 		config.Name,
 		config.StylingType)
@@ -77,10 +81,11 @@ func (r *CommandSide) ChangeIDPConfig(ctx context.Context, config *domain.IDPCon
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
 	}
-	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	orgAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingIDP, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingIDP, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,9 +101,8 @@ func (r *CommandSide) DeactivateIDPConfig(ctx context.Context, idpID, orgID stri
 		return caos_errs.ThrowPreconditionFailed(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	orgAgg.PushEvents(org_repo.NewIDPConfigDeactivatedEvent(ctx, idpID))
-
-	return r.eventstore.PushAggregate(ctx, existingIDP, orgAgg)
+	_, err = r.eventstore.PushEvents(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
+	return err
 }
 
 func (r *CommandSide) ReactivateIDPConfig(ctx context.Context, idpID, orgID string) error {
@@ -110,9 +114,8 @@ func (r *CommandSide) ReactivateIDPConfig(ctx context.Context, idpID, orgID stri
 		return caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	orgAgg.PushEvents(org_repo.NewIDPConfigReactivatedEvent(ctx, idpID))
-
-	return r.eventstore.PushAggregate(ctx, existingIDP, orgAgg)
+	_, err = r.eventstore.PushEvents(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
+	return err
 }
 
 func (r *CommandSide) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.ExternalIDP) error {
@@ -128,18 +131,16 @@ func (r *CommandSide) RemoveIDPConfig(ctx context.Context, idpID, orgID string, 
 		return caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
 	}
 
-	aggregates := make([]eventstore.Aggregater, 0)
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	orgAgg.PushEvents(org_repo.NewIDPConfigRemovedEvent(ctx, existingIDP.ResourceOwner, idpID, existingIDP.Name))
-
-	userAggregates := make([]eventstore.Aggregater, 0)
-	if cascadeRemoveProvider {
-		userAggregates = r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true, cascadeExternalIDPs...)
+	events := []eventstore.EventPusher{
+		org_repo.NewIDPConfigRemovedEvent(ctx, orgAgg, idpID, existingIDP.Name),
 	}
-	aggregates = append(aggregates, orgAgg)
-	aggregates = append(aggregates, userAggregates...)
 
-	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	if cascadeRemoveProvider {
+		removeIDPEvents := r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true, cascadeExternalIDPs...)
+		events = append(events, removeIDPEvents...)
+	}
+	_, err = r.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
