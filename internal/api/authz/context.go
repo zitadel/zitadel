@@ -36,6 +36,27 @@ type Grant struct {
 	Roles []string
 }
 
+type Memberships []*Membership
+
+type Membership struct {
+	MemberType  MemberType
+	AggregateID string
+	//ObjectID differs from aggregate id if obejct is sub of an aggregate
+	ObjectID string
+
+	Roles []string
+}
+
+type MemberType int32
+
+const (
+	MemberTypeUnspecified MemberType = iota
+	MemberTypeOrganisation
+	MemberTypeProject
+	MemberTypeProjectGrant
+	MemberTypeIam
+)
+
 func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *TokenVerifier, method string) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

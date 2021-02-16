@@ -128,7 +128,7 @@ jobs:
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
-            VERSION=${{ steps.version.outputs.version }}
+            VERSION=${{ needs.refs.outputs.version }}
       - shell: bash
         run: |
           mv /tmp/operator/zitadelctl /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
@@ -150,7 +150,7 @@ jobs:
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
-            VERSION=${{ steps.version.outputs.version }}
+            VERSION=${{ needs.refs.outputs.version }}
 
 
   crdb-image:
