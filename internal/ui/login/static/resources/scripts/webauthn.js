@@ -8,7 +8,7 @@ function checkWebauthnSupported(button, func) {
         for (let item of support) {
             item.classList.add('hidden');
         }
-        return
+        return;
     }
     document.getElementById(button).addEventListener('click', func);
 }

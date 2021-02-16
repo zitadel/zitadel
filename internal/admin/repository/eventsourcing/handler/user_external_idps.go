@@ -69,8 +69,8 @@ func (i *ExternalIDP) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
 }
 
-func (i *ExternalIDP) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := i.view.GetLatestExternalIDPSequence(string(event.AggregateType))
+func (i *ExternalIDP) CurrentSequence() (uint64, error) {
+	sequence, err := i.view.GetLatestExternalIDPSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -78,7 +78,7 @@ func (i *ExternalIDP) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (i *ExternalIDP) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestExternalIDPSequence("")
+	sequence, err := i.view.GetLatestExternalIDPSequence()
 	if err != nil {
 		return nil, err
 	}

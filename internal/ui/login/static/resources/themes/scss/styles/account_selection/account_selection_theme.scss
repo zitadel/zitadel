@@ -1,0 +1,62 @@
+@import './account_selection.scss';
+
+@mixin lgn-account-selection-theme($theme-or-color-config) {
+    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+    $color: lgn-get-color-config($theme);
+
+    @if $color != null {
+        @include lgn-account-selection-color($color);
+    }
+}
+
+@mixin lgn-account-selection-color($config-or-theme) {
+    $config: lgn-get-color-config($config-or-theme);
+    $warn: map-get($config, warn);
+    $primary: map-get($config, primary);
+    $foreground: map-get($config, foreground);
+    $background: map-get($config, background);
+
+    .lgn-account-selection{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    
+        .lgn-account {
+            color: inherit;
+            background: transparent;
+            box-shadow: inset 0 -1px lgn-color($foreground, footer-line);
+            cursor: pointer;
+
+            &:hover {
+                $primary: map-get($config, primary);
+                background-color: lgn-color($background, account-selector-hover);
+            }
+
+            &:focus {
+                background-color: lgn-color($background, account-selector-active);
+            }
+
+            &:active {
+                background-color: lgn-color($background, account-selector-active);
+            }
+
+            .lgn-loginname{
+                font-size: 14px;
+                color: lgn-color($foreground, label);
+            }
+
+            .lgn-session-state {
+                color: lgn-color($foreground, label);
+
+                &.i0 {
+                    color: #85d996;
+                }
+
+                &.i1 {
+                    $warn: map-get($config, warn);
+                    color: lgn-color($warn, default);
+                }
+            }
+        }
+    }
+}

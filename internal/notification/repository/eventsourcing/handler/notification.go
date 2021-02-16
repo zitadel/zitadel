@@ -3,6 +3,9 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/user/model"
+	model2 "github.com/caos/zitadel/internal/user/repository/view/model"
+	"golang.org/x/text/language"
 	"net/http"
 	"time"
 
@@ -89,8 +92,8 @@ func (_ *Notification) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.UserAggregate}
 }
 
-func (n *Notification) CurrentSequence(event *models.Event) (uint64, error) {
-	sequence, err := n.view.GetLatestNotificationSequence(string(event.AggregateType))
+func (n *Notification) CurrentSequence() (uint64, error) {
+	sequence, err := n.view.GetLatestNotificationSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -98,7 +101,7 @@ func (n *Notification) CurrentSequence(event *models.Event) (uint64, error) {
 }
 
 func (n *Notification) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := n.view.GetLatestNotificationSequence("")
+	sequence, err := n.view.GetLatestNotificationSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -150,12 +153,12 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	text, err := n.getMailText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -189,12 +192,12 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	text, err := n.getMailText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -227,12 +230,12 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	text, err := n.getMailText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -255,7 +258,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil || alreadyHandled {
 		return nil
 	}
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -276,7 +279,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		logging.Log("HANDLE-Gghq2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "HANDLE-7hgj3", "could not unmarshal event")
 	}
-	user, err := n.view.NotifyUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -290,7 +293,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage[len(user.PreferredLanguage)-2:])
+	text, err := n.getMailText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -382,12 +385,17 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemp
 }
 
 // Read organization specific texts
-func (n *Notification) getMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
+func (n *Notification) getMailText(ctx context.Context, textType string, lang string) (*iam_model.MailTextView, error) {
+	langTag := language.Make(lang)
+	if langTag == language.Und {
+		langTag = n.systemDefaults.DefaultLanguage
+	}
+	base, _ := langTag.Base()
 	// read from Org
-	mailText, err := n.view.MailTextByIDs(authz.GetCtxData(ctx).OrgID, textType, language, mailTextTableOrg)
+	mailText, err := n.view.MailTextByIDs(authz.GetCtxData(ctx).OrgID, textType, base.String(), mailTextTableOrg)
 	if errors.IsNotFound(err) {
 		// read from default
-		mailText, err = n.view.MailTextByIDs(n.systemDefaults.IamID, textType, language, mailTextTableDef)
+		mailText, err = n.view.MailTextByIDs(n.systemDefaults.IamID, textType, base.String(), mailTextTableDef)
 		if err != nil {
 			return nil, err
 		}
@@ -397,4 +405,28 @@ func (n *Notification) getMailText(ctx context.Context, textType string, languag
 		return nil, err
 	}
 	return iam_es_model.MailTextViewToModel(mailText), err
+}
+
+func (n *Notification) getUserByID(userID string) (*model2.NotifyUser, error) {
+	user, usrErr := n.view.NotifyUserByID(userID)
+	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+		return nil, usrErr
+	}
+	if user == nil {
+		user = &model2.NotifyUser{}
+	}
+	events, err := n.getUserEvents(userID, user.Sequence)
+	if err != nil {
+		return user, usrErr
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return user, nil
+		}
+	}
+	if userCopy.State == int32(model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
+	}
+	return &userCopy, nil
 }

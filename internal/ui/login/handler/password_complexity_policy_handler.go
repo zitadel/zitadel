@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"net/http"
 	"regexp"
 	"strconv"
+
+	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/errors"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
 const (
@@ -46,24 +47,24 @@ func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, userID stri
 }
 
 func (l *Login) generatePolicyDescription(r *http.Request, policy *iam_model.PasswordComplexityPolicyView) (string, error) {
-	description := "<ul id=\"passwordcomplexity\">"
+	description := "<ul class=\"lgn-no-dots lgn-policy\" id=\"passwordcomplexity\">"
 	minLength := l.renderer.LocalizeFromRequest(r, "Password.MinLength", nil)
-	description += "<li id=\"minlength\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + minLength + " " + strconv.Itoa(int(policy.MinLength)) + "</li>"
+	description += "<li id=\"minlength\" class=\"invalid\"><i class=\"lgn-icon-times-solid lgn-warn\"></i><span>" + minLength + " " + strconv.Itoa(int(policy.MinLength)) + "</span></li>"
 	if policy.HasUppercase {
 		uppercase := l.renderer.LocalizeFromRequest(r, "Password.HasUppercase", nil)
-		description += "<li id=\"uppercase\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + uppercase + "</li>"
+		description += "<li id=\"uppercase\" class=\"invalid\"><i class=\"lgn-icon-times-solid lgn-warn\"></i><span>" + uppercase + "</span></li>"
 	}
 	if policy.HasLowercase {
 		lowercase := l.renderer.LocalizeFromRequest(r, "Password.HasLowercase", nil)
-		description += "<li id=\"lowercase\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + lowercase + "</li>"
+		description += "<li id=\"lowercase\" class=\"invalid\"><i class=\"lgn-icon-times-solid lgn-warn\"></i><span>" + lowercase + "</span></li>"
 	}
 	if policy.HasNumber {
 		hasnumber := l.renderer.LocalizeFromRequest(r, "Password.HasNumber", nil)
-		description += "<li id=\"number\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + hasnumber + "</li>"
+		description += "<li id=\"number\" class=\"invalid\"><i class=\"lgn-icon-times-solid lgn-warn\"></i><span>" + hasnumber + "</span></li>"
 	}
 	if policy.HasSymbol {
 		hassymbol := l.renderer.LocalizeFromRequest(r, "Password.HasSymbol", nil)
-		description += "<li id=\"symbol\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + hassymbol + "</li>"
+		description += "<li id=\"symbol\" class=\"invalid\"><i class=\"lgn-icon-times-solid lgn-warn\"></i><span>" + hassymbol + "</span></li>"
 	}
 
 	description += "</ul>"

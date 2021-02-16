@@ -49,8 +49,8 @@ func (v *View) DeleteUserGrant(grantID string, event *models.Event) error {
 	return v.ProcessedUserGrantSequence(event)
 }
 
-func (v *View) GetLatestUserGrantSequence(aggregateType string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(userGrantTable, aggregateType)
+func (v *View) GetLatestUserGrantSequence() (*repository.CurrentSequence, error) {
+	return v.latestSequence(userGrantTable)
 }
 
 func (v *View) ProcessedUserGrantSequence(event *models.Event) error {
