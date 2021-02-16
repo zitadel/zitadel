@@ -28,9 +28,13 @@ func (r *CommandSide) AddProjectGrantMember(ctx context.Context, member *domain.
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-16dVN", "Errors.Project.Member.AlreadyExists")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
-	projectAgg.PushEvents(project.NewProjectGrantMemberAddedEvent(ctx, member.AggregateID, member.UserID, member.GrantID, member.Roles...))
-
-	err = r.eventstore.PushAggregate(ctx, addedMember, projectAgg)
+	pushedEvents, err := r.eventstore.PushEvents(
+		ctx,
+		project.NewProjectGrantMemberAddedEvent(ctx, projectAgg, member.AggregateID, member.UserID, member.GrantID, member.Roles...))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(addedMember, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -55,15 +59,14 @@ func (r *CommandSide) ChangeProjectGrantMember(ctx context.Context, member *doma
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-2n8vx", "Errors.Project.Member.RolesNotChanged")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.WriteModel)
-	projectAgg.PushEvents(project.NewProjectGrantMemberChangedEvent(ctx, member.UserID, member.GrantID, member.Roles...))
-
-	events, err := r.eventstore.PushAggregates(ctx, projectAgg)
+	pushedEvents, err := r.eventstore.PushEvents(
+		ctx,
+		project.NewProjectGrantMemberChangedEvent(ctx, projectAgg, member.UserID, member.GrantID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
-
-	existingMember.AppendEvents(events...)
-	if err = existingMember.Reduce(); err != nil {
+	err = AppendAndReduce(existingMember, pushedEvents...)
+	if err != nil {
 		return nil, err
 	}
 
@@ -77,9 +80,8 @@ func (r *CommandSide) RemoveProjectGrantMember(ctx context.Context, projectID, u
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.WriteModel)
-	projectAgg.PushEvents(project.NewProjectGrantMemberRemovedEvent(ctx, projectID, userID, grantID))
-
-	return r.eventstore.PushAggregate(ctx, m, projectAgg)
+	_, err = r.eventstore.PushEvents(ctx, project.NewProjectGrantMemberRemovedEvent(ctx, projectAgg, projectID, userID, grantID))
+	return err
 }
 
 func (r *CommandSide) projectGrantMemberWriteModelByID(ctx context.Context, projectID, userID, grantID string) (member *ProjectGrantMemberWriteModel, err error) {

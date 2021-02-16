@@ -201,22 +201,23 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
-	//EventTypes(
-	//	project.ApplicationAddedType,
-	//	project.ApplicationChangedType,
-	//	project.ApplicationDeactivatedType,
-	//	project.ApplicationReactivatedType,
-	//	project.ApplicationRemovedType,
-	//	project.OIDCConfigAddedType,
-	//	project.OIDCConfigChangedType,
-	//	project.OIDCConfigSecretChangedType,
-	//	project.ProjectRemovedType,
-	//)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			project.ApplicationAddedType,
+			project.ApplicationChangedType,
+			project.ApplicationDeactivatedType,
+			project.ApplicationReactivatedType,
+			project.ApplicationRemovedType,
+			project.OIDCConfigAddedType,
+			project.OIDCConfigChangedType,
+			project.OIDCConfigSecretChangedType,
+			project.ProjectRemovedType,
+		)
 }
 
 func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	appID,
 	clientID string,
 	redirectURIS,
@@ -281,7 +282,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := project.NewOIDCConfigChangedEvent(ctx, appID, changes)
+	changeEvent, err := project.NewOIDCConfigChangedEvent(ctx, aggregate, appID, changes)
 	if err != nil {
 		return nil, false, err
 	}

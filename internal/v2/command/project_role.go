@@ -17,9 +17,15 @@ func (r *CommandSide) AddProjectRole(ctx context.Context, projectRole *domain.Pr
 
 	roleWriteModel := NewProjectRoleWriteModelWithKey(projectRole.Key, projectRole.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
-	r.addProjectRoles(ctx, projectAgg, projectRole.AggregateID, resourceOwner, projectRole)
-
-	err = r.eventstore.PushAggregate(ctx, roleWriteModel, projectAgg)
+	events, err := r.addProjectRoles(ctx, projectAgg, projectRole.AggregateID, projectRole)
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(roleWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -34,28 +40,32 @@ func (r *CommandSide) BulkAddProjectRole(ctx context.Context, projectID, resourc
 
 	roleWriteModel := NewProjectRoleWriteModel(projectID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
-	r.addProjectRoles(ctx, projectAgg, projectID, resourceOwner, projectRoles...)
-
-	return r.eventstore.PushAggregate(ctx, roleWriteModel, projectAgg)
-}
-
-func (r *CommandSide) addProjectRoles(ctx context.Context, projectAgg *project.Aggregate, projectID, resourceOwner string, projectRoles ...*domain.ProjectRole) error {
-	for _, projectRole := range projectRoles {
-		if !projectRole.IsValid() {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
-		}
-		projectAgg.PushEvents(
-			project.NewRoleAddedEvent(
-				ctx,
-				projectRole.Key,
-				projectRole.DisplayName,
-				projectRole.Group,
-				projectID,
-			),
-		)
+	events, err := r.addProjectRoles(ctx, projectAgg, projectID, projectRoles...)
+	if err != nil {
+		return err
 	}
 
-	return nil
+	_, err = r.eventstore.PushEvents(ctx, events...)
+	return err
+}
+
+func (r *CommandSide) addProjectRoles(ctx context.Context, projectAgg *eventstore.Aggregate, projectID string, projectRoles ...*domain.ProjectRole) ([]eventstore.EventPusher, error) {
+	var events []eventstore.EventPusher
+	for _, projectRole := range projectRoles {
+		if !projectRole.IsValid() {
+			return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
+		}
+		events = append(events, project.NewRoleAddedEvent(
+			ctx,
+			projectAgg,
+			projectRole.Key,
+			projectRole.DisplayName,
+			projectRole.Group,
+			projectID,
+		))
+	}
+
+	return events, nil
 }
 
 func (r *CommandSide) ChangeProjectRole(ctx context.Context, projectRole *domain.ProjectRole, resourceOwner string) (_ *domain.ProjectRole, err error) {
@@ -77,16 +87,19 @@ func (r *CommandSide) ChangeProjectRole(ctx context.Context, projectRole *domain
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
 
-	changeEvent, changed, err := existingRole.NewProjectRoleChangedEvent(ctx, projectRole.Key, projectRole.DisplayName, projectRole.Group)
+	changeEvent, changed, err := existingRole.NewProjectRoleChangedEvent(ctx, projectAgg, projectRole.Key, projectRole.DisplayName, projectRole.Group)
 	if err != nil {
 		return nil, err
 	}
 	if !changed {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0cs", "Errors.NoChangesFound")
 	}
-	projectAgg.PushEvents(changeEvent)
 
-	err = r.eventstore.PushAggregate(ctx, existingRole, projectAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changeEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingRole, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -104,28 +117,30 @@ func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, res
 	if existingRole.State == domain.ProjectRoleStateUnspecified || existingRole.State == domain.ProjectRoleStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-m9vMf", "Errors.Project.Role.NotExisting")
 	}
-	aggregates := make([]eventstore.Aggregater, 0)
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
-	projectAgg.PushEvents(project.NewRoleRemovedEvent(ctx, key, projectID))
+	events := []eventstore.EventPusher{
+		project.NewRoleRemovedEvent(ctx, projectAgg, key, projectID),
+	}
+
 	for _, projectGrantID := range cascadingProjectGrantIds {
-		_, err = r.removeRoleFromProjectGrant(ctx, projectAgg, projectID, projectGrantID, key, true)
+		event, _, err := r.removeRoleFromProjectGrant(ctx, projectAgg, projectID, projectGrantID, key, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-6n77g", "projectgrantid", projectGrantID).WithError(err).Warn("could not cascade remove role from project grant")
 			continue
 		}
+		events = append(events, event)
 	}
-	aggregates = append(aggregates, projectAgg)
 
 	for _, grantID := range cascadeUserGrantIDs {
-		grantAgg, _, err := r.removeRoleFromUserGrant(ctx, grantID, []string{key}, true)
+		event, err := r.removeRoleFromUserGrant(ctx, grantID, []string{key}, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-mK0of", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
-		aggregates = append(aggregates, grantAgg)
+		events = append(events, event)
 	}
 
-	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	_, err = r.eventstore.PushEvents(ctx, events...)
 	return err
 }
 

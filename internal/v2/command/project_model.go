@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/project"
@@ -69,7 +68,7 @@ func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *ProjectWriteModel) NewChangedEvent(
 	ctx context.Context,
-	resourceOwner,
+	aggregate *eventstore.Aggregate,
 	name string,
 	projectRoleAssertion,
 	projectRoleCheck bool,
@@ -91,15 +90,13 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := project.NewProjectChangeEvent(ctx, resourceOwner, oldName, changes)
+	changeEvent, err := project.NewProjectChangeEvent(ctx, aggregate, oldName, changes)
 	if err != nil {
 		return nil, false, err
 	}
 	return changeEvent, true, nil
 }
 
-func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *project.Aggregate {
-	return &project.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, project.AggregateType, project.AggregateVersion),
-	}
+func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModel(wm, project.AggregateType, project.AggregateVersion)
 }

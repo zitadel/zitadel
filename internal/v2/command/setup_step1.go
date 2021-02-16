@@ -206,7 +206,7 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.Aggregate, project *domain.Project, oidcApp OIDCApp, resourceOwner string) error {
 	app := &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: projectAgg.ID(),
+			AggregateID: projectAgg.ID,
 		},
 		AppName:         oidcApp.Name,
 		RedirectUris:    oidcApp.RedirectUris,
@@ -217,7 +217,7 @@ func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.A
 		DevMode:         oidcApp.DevMode,
 	}
 
-	_, err := r.addOIDCApplication(ctx, projectAgg, project, app, resourceOwner)
+	events, _, err := r.addOIDCApplication(ctx, projectAgg, project, app, resourceOwner)
 	if err != nil {
 		return err
 	}

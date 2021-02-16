@@ -3,27 +3,29 @@ package command
 import (
 	"context"
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore/v2"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/project"
 )
 
 func (r *CommandSide) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
-	projectAgg, addedProject, err := r.addProject(ctx, project, resourceOwner, ownerUserID)
+	events, addedProject, err := r.addProject(ctx, project, resourceOwner, ownerUserID)
 	if err != nil {
 		return nil, err
 	}
-	err = r.eventstore.PushAggregate(ctx, addedProject, projectAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(addedProject, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return projectWriteModelToProject(addedProject), nil
 }
 
-func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID string) (_ *project.Aggregate, _ *ProjectWriteModel, err error) {
+func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID string) (_ []eventstore.EventPusher, _ *ProjectWriteModel, err error) {
 	if !projectAdd.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
 	}
@@ -42,11 +44,11 @@ func (r *CommandSide) addProject(ctx context.Context, projectAdd *domain.Project
 	if iam.GlobalOrgID == resourceOwner {
 		projectRole = domain.RoleProjectOwnerGlobal
 	}
-	projectAgg.PushEvents(
-		project.NewProjectAddedEvent(ctx, projectAdd.Name, resourceOwner),
-		project.NewProjectMemberAddedEvent(ctx, ownerUserID, projectRole),
-	)
-	return projectAgg, addedProject, nil
+	events := []eventstore.EventPusher{
+		project.NewProjectAddedEvent(ctx, projectAgg, projectAdd.Name),
+		project.NewProjectMemberAddedEvent(ctx, projectAgg, ownerUserID, projectRole),
+	}
+	return events, addedProject, nil
 }
 
 func (r *CommandSide) getProjectByID(ctx context.Context, projectID, resourceOwner string) (*domain.Project, error) {
@@ -84,21 +86,22 @@ func (r *CommandSide) ChangeProject(ctx context.Context, projectChange *domain.P
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
-	changedEvent, hasChanged, err := existingProject.NewChangedEvent(ctx, existingProject.ResourceOwner, projectChange.Name, projectChange.ProjectRoleAssertion, projectChange.ProjectRoleCheck)
+	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
+	changedEvent, hasChanged, err := existingProject.NewChangedEvent(ctx, projectAgg, projectChange.Name, projectChange.ProjectRoleAssertion, projectChange.ProjectRoleCheck)
 	if err != nil {
 		return nil, err
 	}
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.NoChangesFound")
 	}
-	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	projectAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingProject, projectAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(existingProject, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return projectWriteModelToProject(existingProject), nil
 }
 
@@ -119,9 +122,8 @@ func (r *CommandSide) DeactivateProject(ctx context.Context, projectID string, r
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	projectAgg.PushEvents(project.NewProjectDeactivatedEvent(ctx))
-
-	return r.eventstore.PushAggregate(ctx, existingProject, projectAgg)
+	_, err = r.eventstore.PushEvents(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
+	return err
 }
 
 func (r *CommandSide) ReactivateProject(ctx context.Context, projectID string, resourceOwner string) error {
@@ -141,9 +143,8 @@ func (r *CommandSide) ReactivateProject(ctx context.Context, projectID string, r
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	projectAgg.PushEvents(project.NewProjectReactivatedEvent(ctx))
-
-	return r.eventstore.PushAggregate(ctx, existingProject, projectAgg)
+	_, err = r.eventstore.PushEvents(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
+	return err
 }
 
 func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingUserGrantIDs ...string) error {
@@ -158,22 +159,21 @@ func (r *CommandSide) RemoveProject(ctx context.Context, projectID, resourceOwne
 	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
-
-	aggregates := make([]eventstore.Aggregater, 0)
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	projectAgg.PushEvents(project.NewProjectRemovedEvent(ctx, existingProject.Name, existingProject.ResourceOwner))
-	aggregates = append(aggregates, projectAgg)
+	events := []eventstore.EventPusher{
+		project.NewProjectRemovedEvent(ctx, projectAgg, existingProject.Name),
+	}
 
 	for _, grantID := range cascadingUserGrantIDs {
-		grantAgg, _, err := r.removeUserGrant(ctx, grantID, "", true)
+		event, err := r.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
-		aggregates = append(aggregates, grantAgg)
+		events = append(events, event)
 	}
 
-	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	_, err = r.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
