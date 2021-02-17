@@ -5,7 +5,7 @@ package zitadel.org.v1;
 import "zitadel/object.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
-import "protoc-gen-swagger/options/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/api/field_behavior.proto";
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/org";
