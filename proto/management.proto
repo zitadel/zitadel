@@ -5,9 +5,7 @@ import "zitadel/user.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "protoc-gen-openapiv2/options/openapiv2.proto";
 import "google/api/field_behavior.proto";
 import "validate/validate.proto";
 
@@ -112,7 +110,7 @@ service ManagementService {
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
         option (google.api.http) = {
             post: "/users"
-            body: "user"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
