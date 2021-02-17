@@ -54,8 +54,4 @@ protoc \
   --validate_out=lang=go:${GOPATH}/src \
   /proto/include/zitadel/auth.proto
 
-move "admin"
-move "auth"
-move "management"
-
 echo "done generating grpc"
