@@ -72,13 +72,6 @@ RUN ./tools/install.sh
 FROM go-dep as go-base
 COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
-RUN build/zitadel/generate-authoption.sh
-RUN go-bindata \
-        -pkg main \
-        -prefix internal/protoc/protoc-gen-authoption \
-        -o ./internal/protoc/protoc-gen-authoption/templates.gen.go \
-        ./internal/protoc/protoc-gen-authoption/templates \
-    && go install ./internal/protoc/protoc-gen-authoption
 RUN build/zitadel/generate-grpc.sh
 
 # ## Go test
