@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"time"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
@@ -8,7 +9,8 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
-	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	project_events "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -31,15 +33,21 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 }
 
 type EventstoreRepos struct {
-	IAMEvents *iam_events.IAMEventstore
+	IAMEvents     *eventsourcing.IAMEventstore
+	OrgEvents     *org_events.OrgEventstore
+	ProjectEvents *project_events.ProjectEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		newUserGrant(
-			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
+			handler{view, bulkLimit, configs.cycleDuration("UserGrants"), errorCount, es},
 			repos.IAMEvents,
 			systemDefaults.IamID),
+		newUserMembership(
+			handler{view, bulkLimit, configs.cycleDuration("UserMemberships"), errorCount, es},
+			repos.OrgEvents,
+			repos.ProjectEvents),
 		newApplication(
 			handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newOrg(

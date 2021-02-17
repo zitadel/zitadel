@@ -1,5 +1,0 @@
----
-title: Architektur
----
-
-> TBD
