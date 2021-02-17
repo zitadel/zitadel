@@ -35,11 +35,6 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1
 
 #zitadel protos
 COPY /proto/ include/zitadel/.
-# COPY /proto/admin.proto include/zitadel/admin.proto
-# COPY /proto/auth.proto include/zitadel/auth.proto
-# COPY /proto/management.proto include/zitadel/management.proto
-# COPY /proto/message.proto include/zitadel/message.proto
-# COPY /proto/options.proto include/zitadel/options.proto
 
 #######################
 ## With this step we prepare all node_modules, this helps caching the build
