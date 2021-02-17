@@ -16,17 +16,16 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.13.2
+	github.com/caos/oidc v0.14.0
 	github.com/caos/orbos v1.5.14-0.20210205131708-6dc812182dc0
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
-	github.com/envoyproxy/protoc-gen-validate v0.1.0
+	github.com/envoyproxy/protoc-gen-validate v0.1.0 // indirect
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3
 	github.com/golang/snappy v0.0.2 // indirect
-	github.com/google/go-cmp v0.5.3 // indirect
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
@@ -55,24 +54,24 @@ require (
 	github.com/rs/cors v1.7.0
 	github.com/sony/sonyflake v1.0.0
 	github.com/spf13/cobra v0.0.7
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.1.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.13.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.13.0
-	go.opentelemetry.io/otel v0.13.0
+	go.opentelemetry.io/otel v0.17.0
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.13.0
 	go.opentelemetry.io/otel/exporters/otlp v0.13.0
-	go.opentelemetry.io/otel/exporters/stdout v0.13.0
-	go.opentelemetry.io/otel/sdk v0.13.0
+	go.opentelemetry.io/otel/exporters/stdout v0.17.0
+	go.opentelemetry.io/otel/sdk v0.17.0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	golang.org/x/net v0.0.0-20201031054903-ff519b6c9102 // indirect
 	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
-	golang.org/x/text v0.3.4
+	golang.org/x/text v0.3.5
 	golang.org/x/tools v0.0.0-20201103235415-b653051172e4
 	google.golang.org/api v0.34.0
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20201103154000-415bd0cd5df6
+	google.golang.org/genproto v0.0.0-20201103154000-415bd0cd5df6 // indirect
 	google.golang.org/grpc v1.34.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
