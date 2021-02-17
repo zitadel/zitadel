@@ -1054,7 +1054,7 @@
                     },
                     "CUSTOM": {
                         "TITLE":"Custom",
-                        "DESCRIPTION":"Your setting doesn't correspond to any other option."
+                        "DESCRIPTION":"Deine Konfiguration entspricht keiner anderen Option."
                     }
                 }
             }
