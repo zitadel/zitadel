@@ -44,7 +44,7 @@ message LoginPolicy {
     PasswordlessType passwordless_type = 5;
 }
 
-enum PasswordlessType {
+enum PasswordlessType { //TODO: naming
     PASSWORDLESS_TYPE_NOT_ALLOWED = 0;
     PASSWORDLESS_TYPE_ALLOWED = 1;
 }

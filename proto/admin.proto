@@ -5,6 +5,7 @@ import "zitadel/user.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/org.proto";
+import "zitade/policy.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -466,8 +467,8 @@ message CreateIDPRequest {
     message OIDCConfig {
         string issuer = 1;
         repeated string scopes = 2;
-        OIDCMappingField idp_display_name_mapping = 3;
-        OIDCMappingField username_mapping = 4;
+        zitadel.idp.v1.OIDCMappingField idp_display_name_mapping = 3;
+        zitadel.idp.v1.OIDCMappingField username_mapping = 4;
     }
 
     string name = 1;
@@ -605,7 +606,7 @@ message UpdateDefaultLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    PasswordlessType passwordless_type = 5;
+    zitadel.policy.v1.PasswordlessType passwordless_type = 5;
 }
 
 message UpdateDefaultLoginPolicyResponse {
