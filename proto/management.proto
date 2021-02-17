@@ -84,12 +84,6 @@ service ManagementService {
                 }
                 //TODO: errors
             };
-            security: {
-                security_requirement: {
-                    key: "oauth2";
-                    scope: //TODO: define
-                }
-            }
         };
     }
 
