@@ -254,7 +254,7 @@ service AdminService {
     // it was IDPProvider bevore but i think identity provider provider is redundant
     rpc ListDefaultLoginPolicyIDPs(ListDefaultLoginPolicyIDPsRequest) returns (ListDefaultLoginPolicyIDPsResponse) {
         option (google.api.http) = {
-            post: "/policies/login/idpproviders/_search"
+            post: "/policies/login/idps/_search"
             body: "*"
         };
 
@@ -267,7 +267,7 @@ service AdminService {
     // if we want to link an existing IDP to the policy we should also name it LinkIDP
     rpc AddDefaultLoginPolicyIDP(AddDefaultLoginPolicyIDPRequest) returns (AddDefaultLoginPolicyIDPResponse) {
         option (google.api.http) = {
-            post: "/policies/login/idpproviders"
+            post: "/policies/login/idps"
             body: "*"
         };
 
@@ -280,7 +280,7 @@ service AdminService {
     // unlink might be better
     rpc RemoveDefaultLoginPolicyIDP(RemoveDefaultLoginPolicyIDPRequest) returns (RemoveDefaultLoginPolicyIDPResponse) {
         option (google.api.http) = {
-            delete: "/policies/login/idpproviders/{idp_config_id}"
+            delete: "/policies/login/idps/{idp_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -622,7 +622,9 @@ message AddDefaultLoginPolicyIDPRequest {}
 
 message AddDefaultLoginPolicyIDPResponse {}
 
-message RemoveDefaultLoginPolicyIDPRequest {}
+message RemoveDefaultLoginPolicyIDPRequest {
+    string idp_id = 1;
+}
 
 message RemoveDefaultLoginPolicyIDPResponse {}
 
