@@ -14,7 +14,7 @@ package zitadel.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/auth";
 
-option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "auth service";
         version: "1.0";
