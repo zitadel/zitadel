@@ -28,7 +28,16 @@ func NewIAMIDPConfigWriteModel(configID string) *IAMIDPConfigWriteModel {
 func (wm *IAMIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.IDPConfigAddedEventType,
+			iam.IDPConfigChangedEventType,
+			iam.IDPConfigDeactivatedEventType,
+			iam.IDPConfigReactivatedEventType,
+			iam.IDPConfigRemovedEventType,
+			iam.IDPOIDCConfigAddedEventType,
+			iam.IDPOIDCConfigChangedEventType,
+		)
 }
 
 func (wm *IAMIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {

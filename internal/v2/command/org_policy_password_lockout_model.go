@@ -30,8 +30,8 @@ func (wm *OrgPasswordLockoutPolicyWriteModel) AppendEvents(events ...eventstore.
 			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyAddedEvent)
 		case *org.PasswordLockoutPolicyChangedEvent:
 			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyChangedEvent)
-		case *org.PasswordComplexityPolicyRemovedEvent:
-			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordComplexityPolicyRemovedEvent)
+		case *org.PasswordLockoutPolicyRemovedEvent:
+			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyRemovedEvent)
 		}
 	}
 }
@@ -43,7 +43,10 @@ func (wm *OrgPasswordLockoutPolicyWriteModel) Reduce() error {
 func (wm *OrgPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.PasswordLockoutPolicyWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(org.PasswordLockoutPolicyAddedEventType,
+			org.PasswordLockoutPolicyChangedEventType,
+			org.PasswordLockoutPolicyRemovedEventType)
 }
 
 func (wm *OrgPasswordLockoutPolicyWriteModel) NewChangedEvent(

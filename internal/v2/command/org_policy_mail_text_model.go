@@ -31,6 +31,8 @@ func (wm *OrgMailTextWriteModel) AppendEvents(events ...eventstore.EventReader) 
 			wm.MailTextWriteModel.AppendEvents(&e.MailTextAddedEvent)
 		case *org.MailTextChangedEvent:
 			wm.MailTextWriteModel.AppendEvents(&e.MailTextChangedEvent)
+		case *org.MailTextRemovedEvent:
+			wm.MailTextWriteModel.AppendEvents(&e.MailTextRemovedEvent)
 		}
 	}
 }
@@ -41,7 +43,10 @@ func (wm *OrgMailTextWriteModel) Reduce() error {
 
 func (wm *OrgMailTextWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.MailTextWriteModel.AggregateID)
+		AggregateIDs(wm.MailTextWriteModel.AggregateID).
+		EventTypes(org.MailTextAddedEventType,
+			org.MailTextChangedEventType,
+			org.MailTextRemovedEventType)
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}

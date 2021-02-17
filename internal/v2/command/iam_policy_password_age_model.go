@@ -42,7 +42,10 @@ func (wm *IAMPasswordAgePolicyWriteModel) Reduce() error {
 func (wm *IAMPasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.PasswordAgePolicyWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.PasswordAgePolicyAddedEventType,
+			iam.PasswordAgePolicyChangedEventType)
 }
 
 func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(

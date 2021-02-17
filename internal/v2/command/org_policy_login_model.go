@@ -48,7 +48,11 @@ func (wm *OrgLoginPolicyWriteModel) Reduce() error {
 func (wm *OrgLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.LoginPolicyWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.LoginPolicyAddedEventType,
+			org.LoginPolicyChangedEventType,
+			org.LoginPolicyRemovedEventType)
 }
 
 func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(

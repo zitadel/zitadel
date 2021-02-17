@@ -42,7 +42,10 @@ func (wm *IAMOrgIAMPolicyWriteModel) Reduce() error {
 func (wm *IAMOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.PolicyOrgIAMWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.OrgIAMPolicyAddedEventType,
+			iam.OrgIAMPolicyChangedEventType)
 }
 
 func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(

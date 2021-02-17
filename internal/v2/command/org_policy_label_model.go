@@ -41,7 +41,10 @@ func (wm *OrgLabelPolicyWriteModel) Reduce() error {
 func (wm *OrgLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.LabelPolicyWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.LabelPolicyAddedEventType,
+			org.LabelPolicyChangedEventType)
 }
 
 func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(

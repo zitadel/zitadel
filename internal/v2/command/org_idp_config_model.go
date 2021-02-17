@@ -28,7 +28,15 @@ func NewOrgIDPConfigWriteModel(configID, orgID string) *OrgIDPConfigWriteModel {
 func (wm *OrgIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.IDPConfigAddedEventType,
+			org.IDPConfigChangedEventType,
+			org.IDPConfigDeactivatedEventType,
+			org.IDPConfigReactivatedEventType,
+			org.IDPConfigRemovedEventType,
+			org.IDPOIDCConfigAddedEventType,
+			org.IDPOIDCConfigChangedEventType)
 }
 
 func (wm *OrgIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {

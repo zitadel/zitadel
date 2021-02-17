@@ -51,7 +51,8 @@ func (wm *KeyPairWriteModel) Reduce() error {
 func (wm *KeyPairWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(keypair.AddedEventType)
 }
 
 func KeyPairAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {

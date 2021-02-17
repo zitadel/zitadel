@@ -41,7 +41,11 @@ func (wm *OrgWriteModel) Reduce() error {
 func (wm *OrgWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.OrgAddedEventType,
+			org.OrgChangedEventType,
+			org.OrgDomainPrimarySetEventType)
 }
 
 func OrgAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {

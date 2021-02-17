@@ -71,7 +71,13 @@ func (wm *IDPOIDCConfigWriteModel) Reduce() error {
 func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.IDPOIDCConfigAddedEventType,
+			org.IDPOIDCConfigChangedEventType,
+			org.IDPConfigReactivatedEventType,
+			org.IDPConfigDeactivatedEventType,
+			org.IDPConfigRemovedEventType)
 }
 
 func (wm *IDPOIDCConfigWriteModel) NewChangedEvent(

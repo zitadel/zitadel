@@ -30,6 +30,8 @@ func (wm *ORGOrgIAMPolicyWriteModel) AppendEvents(events ...eventstore.EventRead
 			wm.PolicyOrgIAMWriteModel.AppendEvents(&e.OrgIAMPolicyAddedEvent)
 		case *org.OrgIAMPolicyChangedEvent:
 			wm.PolicyOrgIAMWriteModel.AppendEvents(&e.OrgIAMPolicyChangedEvent)
+		case *org.OrgIAMPolicyRemovedEvent:
+			wm.PolicyOrgIAMWriteModel.AppendEvents(&e.OrgIAMPolicyRemovedEvent)
 		}
 	}
 }
@@ -41,7 +43,10 @@ func (wm *ORGOrgIAMPolicyWriteModel) Reduce() error {
 func (wm *ORGOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.PolicyOrgIAMWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(org.OrgIAMPolicyAddedEventType,
+			org.OrgIAMPolicyChangedEventType,
+			org.OrgIAMPolicyRemovedEventType)
 }
 
 func (wm *ORGOrgIAMPolicyWriteModel) NewChangedEvent(

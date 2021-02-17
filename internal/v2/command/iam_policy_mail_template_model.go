@@ -43,7 +43,10 @@ func (wm *IAMMailTemplateWriteModel) Reduce() error {
 func (wm *IAMMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.MailTemplateWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.MailTemplateAddedEventType,
+			iam.MailTemplateChangedEventType)
 }
 
 func (wm *IAMMailTemplateWriteModel) NewChangedEvent(

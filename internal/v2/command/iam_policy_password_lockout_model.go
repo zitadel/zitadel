@@ -42,7 +42,10 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) Reduce() error {
 func (wm *IAMPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.PasswordLockoutPolicyWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.PasswordLockoutPolicyAddedEventType,
+			iam.PasswordLockoutPolicyChangedEventType)
 }
 
 func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(
