@@ -1,8 +1,11 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
 
 package zitadel.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/object";
 
 message MetaData {
     //sequence represents the order of events. It's always upcounting
@@ -11,7 +14,7 @@ message MetaData {
     //
     // on manipulation: the timestamp of the event(s) added by the manipulation
     uint64 sequence = 1 [
-        (google.api.field_behavior) = READ_ONLY
+        (google.api.field_behavior) = OUTPUT_ONLY
     ];
     //creation_date is the timestamp where the first operation on the object was made
     //
@@ -19,19 +22,19 @@ message MetaData {
     //
     // on create: the timestamp of the event(s) added by the manipulation
     google.protobuf.Timestamp creation_date = 2 [
-        (google.api.field_behavior) = READ_ONLY
+        (google.api.field_behavior) = OUTPUT_ONLY
     ];
     //change_date is the timestamp when the object was changed
     //
     // on read: the timestamp of the last event reduced by the projection
     //
     // on manipulation: the
-    google.protobuf.Timestamp change_date = 2 [
-        (google.api.field_behavior) = READ_ONLY
+    google.protobuf.Timestamp change_date = 3 [
+        (google.api.field_behavior) = OUTPUT_ONLY
     ];
     //resource_owner is the organisation an object belongs to
     string resource_owner = 4 [
-        (google.api.field_behavior) = READ_ONLY
+        (google.api.field_behavior) = OUTPUT_ONLY
     ];
 }
 
@@ -57,22 +60,22 @@ message Search {
 }
 
 enum TextQueryMethod {//TODO: validate
-    TEXTQUERYMETHOD_UNSPECIFIED = 0;
-    TEXTQUERYMETHOD_EQUALS = 1;
-    TEXTQUERYMETHOD_EQUALS_IGNORE_CASE = ;
-    TEXTQUERYMETHOD_STARTS_WITH = 2;
-    TEXTQUERYMETHOD_STARTS_WITH_IGNORE_CASE = ;
-    TEXTQUERYMETHOD_CONTAINS = 3;
-    TEXTQUERYMETHOD_CONTAINS_IGNORE_CASE = ;
-    TEXTQUERYMETHOD_ENDS_WITH = 4;
-    TEXTQUERYMETHOD_ENDS_WITH_IGNORE_CASE = ;
+    TEXT_QUERY_METHOD_UNSPECIFIED = 0;
+    TEXT_QUERY_METHOD_EQUALS = 1;
+    TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE = 2;
+    TEXT_QUERY_METHOD_STARTS_WITH = 3;
+    TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE = 4;
+    TEXT_QUERY_METHOD_CONTAINS = 5;
+    TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE = 6;
+    TEXT_QUERY_METHOD_ENDS_WITH = 7;
+    TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE = 8;
 }
 
 enum ListQueryMethod {
-    LISTQUERYMETHOD_UNSPECIFIED = ;
+    LISTQUERYMETHOD_UNSPECIFIED = 0;
     //TODO: better alternatives?
     // the list must contain at least ONE of the items
-    LISTQUERYMETHOD_CONTAINS_ONE = ;
+    LISTQUERYMETHOD_CONTAINS_ONE = 1;
     // the list must contain ALL items
-    LISTQUERYMETHOD_CONTAINS_ALL = ;
+    LISTQUERYMETHOD_CONTAINS_ALL = 2;
 }

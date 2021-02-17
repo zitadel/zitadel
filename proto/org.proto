@@ -1,10 +1,14 @@
 syntax = "proto3";
 
+package zitadel.org.v1;
+
+import "zitadel/object.proto";
+import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "google/api/field_behavior.proto";
 
-import "object.proto";
-
-package zitadel.v1.org;
+option go_package ="github.com/caos/zitadel/pkg/grpc/org";
 
 message Org {
     string id = 1 [
@@ -63,39 +67,39 @@ enum OrgFieldName {
 
 message DomainSearchQuery {
     oneof query {
-        DomainQuery domain = ;
+        DomainQuery domain = 1;
     }
 }
 
 message DomainQuery {
-    string domain = ;
-    zitadel.v1.TextQueryMethod method = ;
+    string domain = 1;
+    zitadel.v1.TextQueryMethod method = 2;
 }
 
 message MemberSearchQuery {
     oneof query {
-        MemberFirstNameQuery first_name = ;
-        MemberLastNameQuery last_name = ;
-        MemberLoginNameQuery login_name = ;
-        MemberUserIDQuery user_id = ;
+        MemberFirstNameQuery first_name = 1;
+        MemberLastNameQuery last_name = 2;
+        MemberLoginNameQuery login_name = 3;
+        MemberUserIDQuery user_id = 4;
     }
 }
 
 message MemberFirstNameQuery {
-    string first_name = ;
-    zitadel.v1.TextQueryMethod = ;
+    string first_name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
 }
 
 message MemberLastNameQuery {
-    string last_name = ;
-    zitadel.v1.TextQueryMethod method = ;
+    string last_name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
 }
 
 message MemberLoginNameQuery {
-    string login_name = ;
-    zitadel.v1.TextQueryMethod method = ;
+    string login_name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
 }
 
 message MemberUserIDQuery {
-    string user_id = ;
+    string user_id = 1;
 }

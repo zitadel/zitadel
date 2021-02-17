@@ -1,10 +1,14 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-
-import "object.proto";
-
 package zitadel.user.v1;
+
+import "zitadel/object.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "google/api/field_behavior.proto";
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/user";
 
 message UserCommand {
     string id = 1 [
@@ -67,8 +71,8 @@ message User {
         (google.api.field_behavior) = OUTPUT_ONLY
     ];
     oneof type {
-        Human human = ;
-        Machine machine = ;
+        Human human = 7;
+        Machine machine = 8;
     }
 }
 
@@ -129,7 +133,7 @@ enum Gender {
     GENDER_DIVERSE = 3;
 }
 
-message SearchQuery {
+message SearchQuery {
     oneof query {
         UserNameQuery user_name = 1;
         FirstNameQuery first_name = 2;
@@ -144,37 +148,37 @@ message SearchQuery {
 
 message UserNameQuery {
     string user_name = 1;//TODO: validate
-    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
 }
 
 message FirstNameQuery {
     string first_name = 1;//TODO: validate
-    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
 }
 
 message LastNameQuery {
     string last_name = 1;//TODO: validate
-    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
 }
 
 message NickNameQuery {
     string nick_name = 1;//TODO: validate
-    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
 }
 
 message DisplayNameQuery {
     string display_name = 1;//TODO: validate
-    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
 }
 
 message EmailQuery {
     string email_address = 1; //TODO: validate
-    caos.zitadel.v1.api.TextQueryMethod method = 2;//TODO: validate
+    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
 }
 
 //UserStateQuery is always equals
 message StateQuery {
-    State state = 1; //TODO: validate
+    UserState state = 1; //TODO: validate
 }
 
 //UserTypeQuery is always equals

@@ -1,10 +1,14 @@
 syntax = "proto3";
 
+import "zitadel/object.proto";
+import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
-
-import "object.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "google/api/field_behavior.proto";
 
 package zitadel.idp.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
 
 message IDP {
     string id = 1 [
@@ -24,7 +28,11 @@ message IDP {
     }
 }
 
-enum StylingType {
+enum IDPState {
+    IDP_STATE_UNSPECIFIED = 0;
+}
+
+enum IDPStylingType {
     STYLING_TYPE_UNSPECIFIED = 0;
     STYLING_TYPE_GOOGLE = 1;
 }
