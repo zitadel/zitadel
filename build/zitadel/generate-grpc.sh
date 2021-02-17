@@ -4,8 +4,12 @@ set -eux
 
 echo "Generate grpc"
 
+OPENAPI_PATH=${GOPATH}/src/github.com/caos/zitadel/openapi/v2
+GRPC_PATH=${GOPATH}/src/github.com/caos/zitadel/pkg/grpc
+PROTO_PATH=/proto/include/zitadel
+
 # output folder for openapi v2
-mkdir -p $GOPATH/src/github.com/caos/zitadel/openapi/v2
+mkdir -p ${OPENAPI_PATH}
 
 ls /proto/include
 
@@ -14,46 +18,46 @@ protoc \
   --go_out $GOPATH/src \
   --go-grpc_out $GOPATH/src \
   --go-grpc_opt paths=source_relative \
-  /proto/include/zitadel/message.proto
+  ${PROTO_PATH}/message.proto
 
 protoc \
   -I=/proto/include \
   --go_out ${GOPATH}/src \
   --go-grpc_out ${GOPATH}/src \
   --go-grpc_opt paths=source_relative \
-  --grpc-gateway_out $GOPATH/src/github.com/caos/zitadel/pkg/grpc \
+  --grpc-gateway_out ${GRPC_PATH} \
   --grpc-gateway_opt logtostderr=true \
-  --authoption_out=${GOPATH}/src/github.com/caos/zitadel/pkg/grpc \
+  --openapiv2_out ${OPENAPI_PATH} \
+  --openapiv2_opt logtostderr=true,paths=source_relative \ 
+  --authoption_out=${GRPC_PATH} \
   --validate_out=lang=go:${GOPATH}/src \
-  /proto/include/zitadel/admin.proto
-  # --openapiv2_out $GOPATH/src/github.com/caos/zitadel/openapi/v2 \
-  # --openapiv2_opt logtostderr=true \ 
+  ${PROTO_PATH}/admin.proto
 
 protoc \
   -I=/proto/include \
   --go_out $GOPATH/src \
   --go-grpc_out $GOPATH/src \
   --go-grpc_opt paths=source_relative \
-  --grpc-gateway_out $GOPATH/src/github.com/caos/zitadel/pkg/grpc \
+  --grpc-gateway_out ${GRPC_PATH} \
   --grpc-gateway_opt logtostderr=true,paths=source_relative \
   --grpc-gateway_opt allow_delete_body=true \
-  --authoption_out=${GOPATH}/src/github.com/caos/zitadel/pkg/grpc \
+  --openapiv2_out ${OPENAPI_PATH} \
+  --openapiv2_opt logtostderr=true \ 
+  --authoption_out=${GRPC_PATH} \
   --validate_out=lang=go:${GOPATH}/src \
-  /proto/include/zitadel/management.proto
-  # --openapiv2_out $GOPATH/src/github.com/caos/zitadel/openapi/v2 \
-  # --openapiv2_opt logtostderr=true \ 
+  ${PROTO_PATH}/management.proto
 
 protoc \
   -I=/proto/include \
   --go_out $GOPATH/src \
   --go-grpc_out $GOPATH/src \
   --go-grpc_opt paths=source_relative \
-  --grpc-gateway_out $GOPATH/src/github.com/caos/zitadel/pkg/grpc \
+  --grpc-gateway_out ${GRPC_PATH} \
   --grpc-gateway_opt logtostderr=true \
-  --openapiv2_out $GOPATH/src/github.com/caos/zitadel/openapi/v2 \
+  --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \ 
-  --authoption_out=${GOPATH}/src/github.com/caos/zitadel/pkg/grpc \
+  --authoption_out=${GRPC_PATH} \
   --validate_out=lang=go:${GOPATH}/src \
-  /proto/include/zitadel/auth.proto
+  ${PROTO_PATH}/auth.proto
 
 echo "done generating grpc"
