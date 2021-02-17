@@ -170,7 +170,7 @@ service AdminService {
             get: "/orgs/default/policies/orgiam"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -181,7 +181,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -191,7 +191,7 @@ service AdminService {
             get: "/orgs/default/policies/label"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -202,7 +202,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -212,7 +212,7 @@ service AdminService {
             get: "/policies/mailtemplate"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -223,7 +223,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -233,7 +233,7 @@ service AdminService {
             get: "/orgs/default/policies/login"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -244,7 +244,7 @@ service AdminService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -257,7 +257,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -270,7 +270,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -282,7 +282,7 @@ service AdminService {
             delete: "/policies/login/idpproviders/{idp_config_id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -292,7 +292,7 @@ service AdminService {
             get: "/policies/password/complexity"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -303,7 +303,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -313,7 +313,7 @@ service AdminService {
             get: "/policies/password/age"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -324,7 +324,7 @@ service AdminService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -334,7 +334,7 @@ service AdminService {
             get: "/policies/password/lockout"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -345,7 +345,7 @@ service AdminService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
