@@ -42,116 +42,116 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
 		case *org.OrgAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), org.NewAddOrgNameUniqueConstraint(e.Name))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgNameUniqueConstraint(e.Name))
 		case *org.OrgChangedEvent:
-			rm.changeUniqueConstraint(e.AggregateID(), e.AggregateID(), org.NewAddOrgNameUniqueConstraint(e.Name))
+			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgNameUniqueConstraint(e.Name))
 		case *org.DomainVerificationAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), org.NewAddOrgNameUniqueConstraint(e.Domain))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgNameUniqueConstraint(e.Domain))
 		case *org.DomainRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.AggregateID(), org.UniqueOrgDomain)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.UniqueOrgDomain)
 		case *iam.IDPConfigAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.ResourceOwner()))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner))
 		case *iam.IDPConfigChangedEvent:
-			rm.changeUniqueConstraint(e.AggregateID(), e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.ResourceOwner()))
+			rm.changeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner))
 		case *iam.IDPConfigRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.ConfigID, idpconfig.UniqueIDPConfigNameType)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.UniqueIDPConfigNameType)
 		case *org.IDPConfigAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.ResourceOwner()))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner))
 		case *org.IDPConfigChangedEvent:
-			rm.changeUniqueConstraint(e.AggregateID(), e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.ResourceOwner()))
+			rm.changeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner))
 		case *org.IDPConfigRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.ConfigID, idpconfig.UniqueIDPConfigNameType)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.UniqueIDPConfigNameType)
 		case *iam.MailTextAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.MailTextType+e.Language, policy.NewAddMailTextUniqueConstraint(e.AggregateID(), e.MailTextType, e.Language))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.MailTextType+e.Language, policy.NewAddMailTextUniqueConstraint(e.Aggregate().ID, e.MailTextType, e.Language))
 		case *org.MailTextAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.MailTextType+e.Language, policy.NewAddMailTextUniqueConstraint(e.AggregateID(), e.MailTextType, e.Language))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.MailTextType+e.Language, policy.NewAddMailTextUniqueConstraint(e.Aggregate().ID, e.MailTextType, e.Language))
 		case *org.MailTextRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.MailTextType+e.Language, policy.UniqueMailText)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.MailTextType+e.Language, policy.UniqueMailText)
 		case *project.ProjectAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), project.NewAddProjectNameUniqueConstraint(e.Name, e.ResourceOwner()))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, project.NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner))
 		case *project.ProjectChangeEvent:
-			rm.changeUniqueConstraint(e.AggregateID(), e.AggregateID(), project.NewAddProjectNameUniqueConstraint(*e.Name, e.ResourceOwner()))
+			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, project.NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner))
 		case *project.ProjectRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.AggregateID(), project.UniqueProjectnameType)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, project.UniqueProjectnameType)
 		case *project.ApplicationAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.AppID, project.NewAddApplicationUniqueConstraint(e.Name, e.AggregateID()))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID))
 		case *project.ApplicationChangedEvent:
-			rm.changeUniqueConstraint(e.AggregateID(), e.AppID, project.NewAddApplicationUniqueConstraint(e.Name, e.AggregateID()))
+			rm.changeUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID))
 		case *project.ApplicationRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.AppID, project.UniqueAppNameType)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.AppID, project.UniqueAppNameType)
 		case *project.GrantAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.GrantID, project.NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.AggregateID()))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.GrantID, project.NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.Aggregate().ID))
 		case *project.GrantRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.GrantID, project.UniqueGrantType)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.GrantID, project.UniqueGrantType)
 		case *project.GrantMemberAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.GrantID+e.UserID, project.NewAddProjectGrantMemberUniqueConstraint(e.AggregateID(), e.UserID, e.GrantID))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.GrantID+e.UserID, project.NewAddProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID))
 		case *project.GrantMemberRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.GrantID+e.UserID, project.UniqueProjectGrantMemberType)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.GrantID+e.UserID, project.UniqueProjectGrantMemberType)
 		case *project.RoleAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.Key, project.NewAddProjectRoleUniqueConstraint(e.Key, e.AggregateID()))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Key, project.NewAddProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID))
 		case *project.RoleRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.Key, project.UniqueRoleType)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.Key, project.UniqueRoleType)
 		case *user.HumanAddedEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.ResourceOwner())
+			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-0k9Gs").WithError(err).Error("could not read policy for human added event unique constraint")
 				continue
 			}
-			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), user.NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), policy.UserLoginMustBeDomain))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.HumanRegisteredEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.ResourceOwner())
+			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-m9fod").WithError(err).Error("could not read policy for human registered event unique constraint")
 				continue
 			}
-			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), user.NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), policy.UserLoginMustBeDomain))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.MachineAddedEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.ResourceOwner())
+			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-2n8vs").WithError(err).Error("could not read policy for machine added event unique constraint")
 				continue
 			}
-			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), user.NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), policy.UserLoginMustBeDomain))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.UserRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.AggregateID(), user.UniqueUsername)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.UniqueUsername)
 		case *user.UsernameChangedEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.ResourceOwner())
+			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-5n8gk").WithError(err).Error("could not read policy for username changed event unique constraint")
 				continue
 			}
-			rm.changeUniqueConstraint(e.AggregateID(), e.AggregateID(), user.NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), policy.UserLoginMustBeDomain))
+			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.DomainClaimedEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.ResourceOwner())
+			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-xb8uf").WithError(err).Error("could not read policy for domain claimed event unique constraint")
 				continue
 			}
-			rm.changeUniqueConstraint(e.AggregateID(), e.AggregateID(), user.NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), policy.UserLoginMustBeDomain))
+			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.HumanExternalIDPAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.IDPConfigID+e.ExternalUserID, user.NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID))
 		case *user.HumanExternalIDPRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.IDPConfigID+e.ExternalUserID, user.UniqueExternalIDPType)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueExternalIDPType)
 		case *user.HumanExternalIDPCascadeRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.IDPConfigID+e.ExternalUserID, user.UniqueExternalIDPType)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueExternalIDPType)
 		case *usergrant.UserGrantAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), usergrant.NewAddUserGrantUniqueConstraint(e.ResourceOwner(), e.UserID, e.ProjectID, e.ProjectGrantID))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, usergrant.NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID))
 		case *usergrant.UserGrantRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.AggregateID(), usergrant.UniqueUserGrant)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, usergrant.UniqueUserGrant)
 		case *usergrant.UserGrantCascadeRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.AggregateID(), usergrant.UniqueUserGrant)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, usergrant.UniqueUserGrant)
 		case *iam.MemberAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.UserID, member.NewAddMemberUniqueConstraint(e.AggregateID(), e.UserID))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.UserID, member.NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID))
 		case *iam.MemberRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.UserID, member.UniqueMember)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		case *org.MemberAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.UserID, member.NewAddMemberUniqueConstraint(e.AggregateID(), e.UserID))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.UserID, member.NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID))
 		case *org.MemberRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.UserID, member.UniqueMember)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		case *project.MemberAddedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.UserID, member.NewAddMemberUniqueConstraint(e.AggregateID(), e.UserID))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.UserID, member.NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID))
 		case *project.MemberRemovedEvent:
-			rm.removeUniqueConstraint(e.AggregateID(), e.UserID, member.UniqueMember)
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		}
 	}
 	return nil

@@ -51,6 +51,7 @@ func (wm *IAMLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
@@ -77,7 +78,7 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewLoginPolicyChangedEvent(ctx, changes)
+	changedEvent, err := iam.NewLoginPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

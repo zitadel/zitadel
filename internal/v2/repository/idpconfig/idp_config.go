@@ -90,8 +90,8 @@ func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 		return nil
 	}
 	return []*eventstore.EventUniqueConstraint{
-		NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.ResourceOwner()),
-		NewAddIDPConfigNameUniqueConstraint(*e.Name, e.ResourceOwner()),
+		NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
+		NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
 	}
 }
 

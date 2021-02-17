@@ -48,6 +48,7 @@ func (wm *IAMMailTextWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *IAMMailTextWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mailTextType,
 	language,
 	title,
@@ -79,7 +80,7 @@ func (wm *IAMMailTextWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewMailTextChangedEvent(ctx, mailTextType, language, changes)
+	changedEvent, err := iam.NewMailTextChangedEvent(ctx, aggregate, mailTextType, language, changes)
 	if err != nil {
 		return nil, false
 	}

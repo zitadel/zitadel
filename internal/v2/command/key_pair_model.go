@@ -54,8 +54,7 @@ func (wm *KeyPairWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner)
 }
 
-func KeyPairAggregateFromWriteModel(wm *eventstore.WriteModel) *keypair.Aggregate {
-	return &keypair.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, keypair.AggregateType, keypair.AggregateVersion),
-	}
+func KeyPairAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModel(wm, keypair.AggregateType, keypair.AggregateVersion)
+
 }

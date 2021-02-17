@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -18,26 +19,24 @@ func (r *CommandSide) GetIAM(ctx context.Context) (*domain.IAM, error) {
 	return writeModelToIAM(iamWriteModel), nil
 }
 
-func (r *CommandSide) setGlobalOrg(ctx context.Context, iamAgg *iam.Aggregate, iamWriteModel *IAMWriteModel, orgID string) error {
+func (r *CommandSide) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, orgID string) (eventstore.EventPusher, error) {
 	err := r.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if iamWriteModel.GlobalOrgID != "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "IAM-HGG24", "Errors.IAM.GlobalOrgAlreadySet")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-HGG24", "Errors.IAM.GlobalOrgAlreadySet")
 	}
-	iamAgg.PushEvents(iam.NewGlobalOrgSetEventEvent(ctx, orgID))
-	return nil
+	return iam.NewGlobalOrgSetEventEvent(ctx, iamAgg, orgID), nil
 }
 
-func (r *CommandSide) setIAMProject(ctx context.Context, iamAgg *iam.Aggregate, iamWriteModel *IAMWriteModel, projectID string) error {
+func (r *CommandSide) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, projectID string) (eventstore.EventPusher, error) {
 	err := r.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if iamWriteModel.ProjectID != "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
 	}
-	iamAgg.PushEvents(iam.NewIAMProjectSetEvent(ctx, projectID))
-	return nil
+	return iam.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
 }

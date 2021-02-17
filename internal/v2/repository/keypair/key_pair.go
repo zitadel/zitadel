@@ -40,6 +40,7 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 
 func NewAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	usage domain.KeyUsage,
 	algorithm string,
 	privateCrypto,
@@ -49,6 +50,7 @@ func NewAddedEvent(
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			AddedEventType,
 		),
 		Usage:     usage,

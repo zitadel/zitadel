@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
-	"github.com/caos/zitadel/internal/v2/repository/project"
 )
 
 const (
@@ -84,35 +83,12 @@ type OIDCApp struct {
 	DevMode                bool
 }
 
-func (cs *CommandSide) setupStep1(ctx context.Context, step1 *Step1) error {
-	iamWriteModel := NewIAMWriteModel()
-	iamAgg := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
-	//create default login policy
-	err := cs.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(),
-		&domain.LoginPolicy{
-			AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
-			AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
-			AllowExternalIDP:      step1.DefaultLoginPolicy.AllowExternalIdp,
-		})
-	if err != nil {
-		return err
-	}
-	logging.Log("SETUP-sd2hj").Info("default login policy set up")
-
-	events := []eventstore.EventPusher{}
-
-	//create org
-	for _, org := range step1.Orgs {
-		orgAggregate
-	}
-
-}
-
 func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
+	var events []eventstore.EventPusher
 	iamWriteModel := NewIAMWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
 	//create default login policy
-	err := r.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(),
+	loginPolicyEvent, err := r.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(),
 		&domain.LoginPolicy{
 			AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
 			AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
@@ -121,11 +97,11 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 	if err != nil {
 		return err
 	}
+	events = append(events, loginPolicyEvent)
 	logging.Log("SETUP-sd2hj").Info("default login policy set up")
 	//create orgs
-	aggregates := make([]eventstore.Aggregater, 0)
 	for _, organisation := range step1.Orgs {
-		orgAgg, userAgg, orgMemberAgg, claimedUsers, err := r.setUpOrg(ctx,
+		orgAgg, humanWriteModel, _, setUpOrgEvents, err := r.setUpOrg(ctx,
 			&domain.Org{
 				Name:    organisation.Name,
 				Domains: []*domain.OrgDomain{{Domain: organisation.Domain}},
@@ -147,66 +123,70 @@ func (r *CommandSide) SetupStep1(ctx context.Context, step1 *Step1) error {
 		if err != nil {
 			return err
 		}
-		logging.LogWithFields("SETUP-Gdsfg", "id", orgAgg.ID(), "name", organisation.Name).Info("org set up")
+		events = append(events, setUpOrgEvents...)
+		logging.LogWithFields("SETUP-Gdsfg", "id", orgAgg.ID, "name", organisation.Name).Info("org set up")
 
 		if organisation.OrgIamPolicy {
-			err = r.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID()), &domain.OrgIAMPolicy{UserLoginMustBeDomain: false})
+			orgIAMPolicyEvent, err := r.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID), &domain.OrgIAMPolicy{UserLoginMustBeDomain: false})
 			if err != nil {
 				return err
 			}
+			events = append(events, orgIAMPolicyEvent)
 		}
-		aggregates = append(aggregates, orgAgg, userAgg, orgMemberAgg)
-		aggregates = append(aggregates, claimedUsers...)
 		if organisation.Name == step1.GlobalOrg {
-			err = r.setGlobalOrg(ctx, iamAgg, iamWriteModel, orgAgg.ID())
+			globalOrgEvent, err := r.setGlobalOrg(ctx, iamAgg, iamWriteModel, orgAgg.ID)
 			if err != nil {
 				return err
 			}
+			events = append(events, globalOrgEvent)
 			logging.Log("SETUP-BDn52").Info("global org set")
 		}
 		//projects
 		for _, proj := range organisation.Projects {
 			project := &domain.Project{Name: proj.Name}
-			projectAgg, _, err := r.addProject(ctx, project, orgAgg.ID(), userAgg.ID())
+			projectEvents, projectWriteModel, err := r.addProject(ctx, project, orgAgg.ID, humanWriteModel.AggregateID)
 			if err != nil {
 				return err
 			}
+			events = append(events, projectEvents...)
 			if project.Name == step1.IAMProject {
-				err = r.setIAMProject(ctx, iamAgg, iamWriteModel, projectAgg.ID())
+				iamProjectEvent, err := r.setIAMProject(ctx, iamAgg, iamWriteModel, projectWriteModel.AggregateID)
 				if err != nil {
 					return err
 				}
+				events = append(events, iamProjectEvent)
 				logging.Log("SETUP-Bdfs1").Info("IAM project set")
-				err = r.addIAMMember(ctx, iamAgg, NewIAMMemberWriteModel(userAgg.ID()), domain.NewMember(iamAgg.ID(), userAgg.ID(), domain.RoleIAMOwner))
+				iamEvent, err := r.addIAMMember(ctx, iamAgg, NewIAMMemberWriteModel(humanWriteModel.AggregateID), domain.NewMember(iamAgg.ID, humanWriteModel.AggregateID, domain.RoleIAMOwner))
 				if err != nil {
 					return err
 				}
+				events = append(events, iamEvent)
 				logging.Log("SETUP-BSf2h").Info("IAM owner set")
 			}
 			//create applications
 			for _, app := range proj.OIDCApps {
-				err = setUpApplication(ctx, r, projectAgg, project, app, orgAgg.ID())
+				applicationEvents, err := setUpApplication(ctx, r, projectWriteModel, project, app, orgAgg.ID)
 				if err != nil {
 					return err
 				}
+				events = append(events, applicationEvents...)
 			}
-			aggregates = append(aggregates, projectAgg)
 		}
 	}
 
-	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, domain.Step1))
+	events = append(events, iam_repo.NewSetupStepDoneEvent(ctx, iamAgg, domain.Step1))
 
-	_, err = r.eventstore.PushAggregates(ctx, append(aggregates, iamAgg)...)
+	_, err = r.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Gr2hh", "Setup Step1 failed")
 	}
 	return nil
 }
 
-func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.Aggregate, project *domain.Project, oidcApp OIDCApp, resourceOwner string) error {
+func setUpApplication(ctx context.Context, r *CommandSide, projectWriteModel *ProjectWriteModel, project *domain.Project, oidcApp OIDCApp, resourceOwner string) ([]eventstore.EventPusher, error) {
 	app := &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: projectAgg.ID,
+			AggregateID: projectWriteModel.AggregateID,
 		},
 		AppName:         oidcApp.Name,
 		RedirectUris:    oidcApp.RedirectUris,
@@ -217,12 +197,13 @@ func setUpApplication(ctx context.Context, r *CommandSide, projectAgg *project.A
 		DevMode:         oidcApp.DevMode,
 	}
 
+	projectAgg := ProjectAggregateFromWriteModel(&projectWriteModel.WriteModel)
 	events, _, err := r.addOIDCApplication(ctx, projectAgg, project, app, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	logging.LogWithFields("SETUP-Edgw4", "name", app.AppName, "clientID", app.ClientID).Info("application set up")
-	return nil
+	return events, nil
 }
 
 func getOIDCResponseTypes(responseTypes []string) []domain.OIDCResponseType {

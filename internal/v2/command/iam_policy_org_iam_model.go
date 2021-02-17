@@ -45,7 +45,10 @@ func (wm *IAMOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner)
 }
 
-func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(ctx context.Context, userLoginMustBeDomain bool) (*iam.OrgIAMPolicyChangedEvent, bool) {
+func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	userLoginMustBeDomain bool) (*iam.OrgIAMPolicyChangedEvent, bool) {
 	changes := make([]policy.OrgIAMPolicyChanges, 0)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
 		changes = append(changes, policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain))
@@ -53,7 +56,7 @@ func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(ctx context.Context, userLo
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewOrgIAMPolicyChangedEvent(ctx, changes)
+	changedEvent, err := iam.NewOrgIAMPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

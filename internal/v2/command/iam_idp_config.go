@@ -2,9 +2,8 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v2"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 
@@ -30,18 +29,19 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *domain.ID
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&addedConfig.WriteModel)
-	iamAgg.PushEvents(
+	events := []eventstore.EventPusher{
 		iam_repo.NewIDPConfigAddedEvent(
 			ctx,
+			iamAgg,
 			idpConfigID,
 			config.Name,
 			config.Type,
 			config.StylingType,
 		),
-	)
-	iamAgg.PushEvents(
 		iam_repo.NewIDPOIDCConfigAddedEvent(
-			ctx, config.OIDCConfig.ClientID,
+			ctx,
+			iamAgg,
+			config.OIDCConfig.ClientID,
 			idpConfigID,
 			config.OIDCConfig.Issuer,
 			clientSecret,
@@ -49,8 +49,13 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *domain.ID
 			config.OIDCConfig.UsernameMapping,
 			config.OIDCConfig.Scopes...,
 		),
-	)
-	err = r.eventstore.PushAggregate(ctx, addedConfig, iamAgg)
+	}
+
+	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(addedConfig, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,14 +71,16 @@ func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotExisting")
 	}
 
-	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, existingIDP.ResourceOwner, config.IDPConfigID, config.Name, config.StylingType)
+	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
+	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, iamAgg, config.IDPConfigID, config.Name, config.StylingType)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
-	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	iamAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingIDP, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,9 +96,8 @@ func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, idpID stri
 		return caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotActive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewIDPConfigDeactivatedEvent(ctx, idpID))
-
-	return r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
+	_, err = r.eventstore.PushEvents(ctx, iam_repo.NewIDPConfigDeactivatedEvent(ctx, iamAgg, idpID))
+	return err
 }
 
 func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) error {
@@ -103,9 +109,8 @@ func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID stri
 		return caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewIDPConfigReactivatedEvent(ctx, idpID))
-
-	return r.eventstore.PushAggregate(ctx, existingIDP, iamAgg)
+	_, err = r.eventstore.PushEvents(ctx, iam_repo.NewIDPConfigReactivatedEvent(ctx, iamAgg, idpID))
+	return err
 }
 
 func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.ExternalIDP) error {
@@ -117,22 +122,22 @@ func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string, 
 		return caos_errs.ThrowNotFound(nil, "IAM-4M0xy", "Errors.IAM.IDPConfig.NotExisting")
 	}
 
-	aggregates := make([]eventstore.Aggregater, 0)
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	iamAgg.PushEvents(iam_repo.NewIDPConfigRemovedEvent(ctx, existingIDP.ResourceOwner, idpID, existingIDP.Name))
-
-	userAggregates := make([]eventstore.Aggregater, 0)
-	for _, idpProvider := range idpProviders {
-		if idpProvider.AggregateID == domain.IAMID {
-			userAggregates = r.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, true, externalIDPs...)
-		}
-		orgAgg := OrgAggregateFromWriteModel(&NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpID).WriteModel)
-		r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true)
+	events := []eventstore.EventPusher{
+		iam_repo.NewIDPConfigRemovedEvent(ctx, iamAgg, idpID, existingIDP.Name),
 	}
 
-	aggregates = append(aggregates, iamAgg)
-	aggregates = append(aggregates, userAggregates...)
-	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	for _, idpProvider := range idpProviders {
+		if idpProvider.AggregateID == domain.IAMID {
+			userEvents := r.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, true, externalIDPs...)
+			events = append(events, userEvents...)
+		}
+		orgAgg := OrgAggregateFromWriteModel(&NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpID).WriteModel)
+		orgEvents := r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true)
+		events = append(events, orgEvents...)
+	}
+
+	_, err = r.eventstore.PushEvents(ctx, events...)
 	return err
 }
 

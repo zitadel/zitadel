@@ -47,6 +47,7 @@ func (wm *IAMPasswordComplexityPolicyWriteModel) Query() *eventstore.SearchQuery
 
 func (wm *IAMPasswordComplexityPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	minLength uint64,
 	hasLowercase,
 	hasUppercase,
@@ -73,7 +74,7 @@ func (wm *IAMPasswordComplexityPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewPasswordComplexityPolicyChangedEvent(ctx, changes)
+	changedEvent, err := iam.NewPasswordComplexityPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

@@ -49,8 +49,6 @@ func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner)
 }
 
-func IAMAggregateFromWriteModel(wm *eventstore.WriteModel) *iam.Aggregate {
-	return &iam.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, iam.AggregateType, iam.AggregateVersion),
-	}
+func IAMAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModel(wm, iam.AggregateType, iam.AggregateVersion)
 }

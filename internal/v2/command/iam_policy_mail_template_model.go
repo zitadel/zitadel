@@ -48,6 +48,7 @@ func (wm *IAMMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *IAMMailTemplateWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	template []byte,
 ) (*iam.MailTemplateChangedEvent, bool) {
 	changes := make([]policy.MailTemplateChanges, 0)
@@ -57,7 +58,7 @@ func (wm *IAMMailTemplateWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewMailTemplateChangedEvent(ctx, changes)
+	changedEvent, err := iam.NewMailTemplateChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

@@ -37,10 +37,14 @@ func (e *MigrateUniqueConstraintEvent) UniqueConstraints() []*eventstore.EventUn
 	return constraints
 }
 
-func NewMigrateUniqueConstraintEvent(ctx context.Context, uniqueConstraintMigrations []*domain.UniqueConstraintMigration) *MigrateUniqueConstraintEvent {
+func NewMigrateUniqueConstraintEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	uniqueConstraintMigrations []*domain.UniqueConstraintMigration) *MigrateUniqueConstraintEvent {
 	return &MigrateUniqueConstraintEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UniqueConstraintsMigratedEventType,
 		),
 		uniqueConstraintMigrations: uniqueConstraintMigrations,

@@ -47,6 +47,7 @@ func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	primaryColor,
 	secondaryColor string,
 ) (*iam.LabelPolicyChangedEvent, bool) {
@@ -60,7 +61,7 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewLabelPolicyChangedEvent(ctx, changes)
+	changedEvent, err := iam.NewLabelPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}
