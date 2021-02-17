@@ -63,7 +63,13 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 
 func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		EventTypes(user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.HumanPasswordChangedType,
+			user.HumanPasswordCodeAddedType,
+			user.HumanEmailVerifiedType,
+			user.UserRemovedType)
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}

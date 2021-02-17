@@ -71,7 +71,15 @@ func (wm *MachineWriteModel) Reduce() error {
 func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(user.MachineAddedEventType,
+			user.UserUserNameChangedType,
+			user.MachineChangedEventType,
+			user.UserLockedType,
+			user.UserUnlockedType,
+			user.UserDeactivatedType,
+			user.UserReactivatedType,
+			user.UserRemovedType)
 }
 
 func (wm *MachineWriteModel) NewChangedEvent(

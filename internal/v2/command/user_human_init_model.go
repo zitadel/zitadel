@@ -65,7 +65,14 @@ func (wm *HumanInitCodeWriteModel) Reduce() error {
 
 func (wm *HumanInitCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		EventTypes(user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.HumanEmailChangedType,
+			user.HumanEmailVerifiedType,
+			user.HumanInitialCodeAddedType,
+			user.HumanInitializedCheckSucceededType,
+			user.UserRemovedType)
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}

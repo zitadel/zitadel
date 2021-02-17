@@ -94,7 +94,16 @@ func (wm *HumanWebAuthNWriteModel) appendVerifiedEvent(e *user.HumanWebAuthNVeri
 func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(user.HumanU2FTokenAddedType,
+			user.HumanPasswordlessTokenAddedType,
+			user.HumanU2FTokenAddedType,
+			user.HumanPasswordlessTokenAddedType,
+			user.HumanU2FTokenSignCountChangedType,
+			user.HumanPasswordlessTokenSignCountChangedType,
+			user.HumanU2FTokenRemovedType,
+			user.HumanPasswordlessTokenRemovedType,
+			user.UserRemovedType)
 }
 
 type HumanU2FTokensReadModel struct {

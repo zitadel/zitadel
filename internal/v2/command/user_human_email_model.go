@@ -64,7 +64,13 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 
 func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		EventTypes(user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.HumanEmailChangedType,
+			user.HumanEmailCodeAddedType,
+			user.HumanEmailVerifiedType,
+			user.UserRemovedType)
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}
