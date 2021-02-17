@@ -1042,7 +1042,7 @@
                     },
                     "POST": {
                         "TITLE":"POST",
-                        "DESCRIPTION":"Send client_id and client_secret as part of the form"
+                        "DESCRIPTION":"Sende client_id und client_secret im (HTML) Formular"
                     },
                     "PK_JWT": {
                         "TITLE":"Private Key JWT",
