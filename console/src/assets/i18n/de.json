@@ -1046,7 +1046,7 @@
                     },
                     "PK_JWT": {
                         "TITLE":"Private Key JWT",
-                        "DESCRIPTION":"Use a private key to authorize your application"
+                        "DESCRIPTION":"Nutze einen Private Key um deine Application zu authentifizieren"
                     },
                     "IMPLICIT": {
                         "TITLE":"Implicit",
