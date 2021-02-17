@@ -1,8 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+
+enum InfoSectionType {
+    INFO = 'INFO',
+    WARN = 'WARN',
+}
 
 @Component({
     selector: 'cnsl-info-section',
     templateUrl: './info-section.component.html',
     styleUrls: ['./info-section.component.scss'],
 })
-export class InfoSectionComponent { }
+export class InfoSectionComponent {
+
+    @Input() type = InfoSectionType.INFO;
+}

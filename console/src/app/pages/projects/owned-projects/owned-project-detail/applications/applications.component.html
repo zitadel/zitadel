@@ -24,10 +24,17 @@
             </ng-container>
 
             <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.NAME' | translate }} </th>
-                <td class="pointer" [routerLink]="['/projects', projectId, 'apps', role.id ]" mat-cell
-                    *matCellDef="let role">
-                    {{role.name}} </td>
+                <th mat-header-cell *matHeaderCellDef> {{ 'APP.NAME' | translate }} </th>
+                <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id ]" mat-cell
+                    *matCellDef="let app">
+                    {{app.name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef> {{ 'APP.OIDC.APPTYPE' | translate }} </th>
+                <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id ]" mat-cell
+                    *matCellDef="let app">
+                    {{'APP.OIDC.APPTYPE'+app?.oidcConfig?.applicationType | translate}} </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

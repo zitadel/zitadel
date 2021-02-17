@@ -26,7 +26,7 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
     public dataSource!: ProjectApplicationsDataSource;
     public selection: SelectionModel<Application.AsObject> = new SelectionModel<Application.AsObject>(true, []);
 
-    public displayedColumns: string[] = ['select', 'name'];
+    public displayedColumns: string[] = ['select', 'name', 'type'];
 
     constructor(private mgmtService: ManagementService, private toast: ToastService) { }
 
