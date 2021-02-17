@@ -163,7 +163,7 @@ func (r *CommandSide) HumanSkipMFAInit(ctx context.Context, userID, resourceowne
 	if err != nil {
 		return err
 	}
-	if isUserStateExists(existingHuman.UserState) {
+	if !isUserStateExists(existingHuman.UserState) {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-m9cV8", "Errors.User.NotFound")
 	}
 
