@@ -1050,7 +1050,7 @@
                     },
                     "IMPLICIT": {
                         "TITLE":"Implicit",
-                        "DESCRIPTION":"Get the tokens directly from the authorization endpoint"
+                        "DESCRIPTION":"Erhalte die Token direkt vom authorize Endpoint"
                     },
                     "CUSTOM": {
                         "TITLE":"Custom",
