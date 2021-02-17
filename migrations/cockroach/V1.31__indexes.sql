@@ -1,0 +1,1 @@
+CREATE INDEX ON eventstore.events (event_type, resource_owner);
