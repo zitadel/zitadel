@@ -27,9 +27,8 @@ RUN curl -OL https://github.com/grpc/grpc-web/releases/download/${GRPC_WEB_VERSI
 
 #proto dependencies
 RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1/validate/validate.proto --create-dirs -o include/validate/validate.proto  \
-    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o include/protoc-gen-swagger/options/annotations.proto \
-    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto --create-dirs -o include/protoc-gen-swagger/options/openapiv2.proto \
-    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o include/protoc-gen-swagger/options/annotations.proto \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v2.2.0/protoc-gen-openapiv2/options/annotations.proto --create-dirs -o include/protoc-gen-openapiv2/options/annotations.proto \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v2.2.0/protoc-gen-openapiv2/options/openapiv2.proto --create-dirs -o include/protoc-gen-openapiv2/options/openapiv2.proto \
     && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto --create-dirs -o include/google/api/annotations.proto \
     && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto --create-dirs -o include/google/api/http.proto \
     && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/field_behavior.proto --create-dirs -o include/google/api/field_behavior.proto
@@ -71,7 +70,7 @@ WORKDIR /go/src/github.com/caos/zitadel/
 RUN go mod download
 RUN ./tools/install.sh
 #ugly bastel for protoc
-RUN mv /go/bin/protoc-gen-go-grpc /go/bin/protoc-gen-go_grpc
+RUN cp /go/bin/protoc-gen-go-grpc /go/bin/protoc-gen-go_grpc
 
 #######################
 ## Go base build
