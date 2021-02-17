@@ -15,21 +15,37 @@ package zitadel.v1;
 option go_package ="github.com/caos/zitadel/pkg/grpc/management";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+    swagger: "2.0",
     info: {
-        title: "management service";
+        title: "management api of ZITADEL";
         version: "1.0";
+        description: "it's for managing organisation internal and extnernal objects.";
         contact:{
-            url: "https://github.com/caos/zitadel/api/management" //TODO: should be swagger path
+            name: "CAOS developers of ZITADEL"
+            url: "https://zitadel.ch"
+            email: "hi@caos.ch" //TODO: is there a zitadel@caos.ch?
+        }
+        license: {
+            name: "Apache License 2.0",
+            url: "https://github.com/caos/zitadel/blob/master/LICENSE"
         };
     };
 
     schemes: HTTPS;
-
     consumes: "application/json";
-    consumes: "application/grpc";
-
     produces: "application/json";
+    
+    consumes: "application/grpc";
     produces: "application/grpc";
+
+    consumes: "application/grpc-web+proto";
+    produces: "application/grpc-web+proto";
+
+
+    external_docs: {
+        description: "Detailed information about ZITADEL",
+        url: "https://docs.zitadel.ch"
+    }
 };
 
 
@@ -54,10 +70,33 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.global.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Search a user within all organisations by it's loginname";
+            description: "The request only returns data if the login name matches exactly."
+            tags: "user";
+            tags: "global";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+                //TODO: errors
+            };
+            request: {
+
+            };
+            security: {
+                security_requirement: {
+                    key: "oauth2";
+                    scope: //TODO: define
+                }
+            }
+        };
     }
 
     // Limit should always be set, there is a default limit set by the service
-    rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse) {
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
         option (google.api.http) = {
             post: "/users/_search"
             body: "*"
@@ -314,7 +353,7 @@ service ManagementService {
         };
     }
 
-    rpc SearchOrgIDPs(SearchOrgIDPsRequest) returns (SearchOrgIDPsResponse) {
+    rpc ListOrgIDPs(ListOrgIDPsRequest) returns (ListOrgIDPsResponse) {
         option (google.api.http) = {
             post: "/orgs/me/idps/_search"
             body: "*"
@@ -411,13 +450,13 @@ message GetUserByLoginNameGlobalResponse {
     zitadel.user.v1.User user = 1;
 }
 
-message SearchUsersRequest {
+message ListUsersRequest {
     zitadel.v1.Search meta_data = 1;
     zitadel.user.v1.UserFieldName sorting_column = 2;
     zitadel.user.v1.SearchQuery query = 3;
 }
 
-message SearchUsersResponse {
+message ListUsersResponse {
     zitadel.v1.Search meta_data = 1;
     zitadel.user.v1.UserFieldName sorting_column = 2;
     repeated zitadel.user.v1.User result = 3;
@@ -675,13 +714,13 @@ message GetOrgIDPByIDResponse {
     zitadel.idp.v1.IDP idp = 2;
 }
 
-message SearchOrgIDPsRequest {
+message ListOrgIDPsRequest {
     zitadel.v1.Search meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDPQuery queries = 3;
 }
 
-message SearchOrgIDPsResponse {
+message ListOrgIDPsResponse {
     zitadel.v1.Search meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDP result = 3;

@@ -112,7 +112,7 @@ service AuthService {
 
     rpc VerifyMyEmail(VerifyMyEmailRequest) returns (VerifyMyEmailResponse) {
         option (google.api.http) = {
-            post: "/users/me/email/_verify"
+            post: "/users/me/email:verify"
             body: "*"
         };
 
@@ -206,7 +206,7 @@ service AuthService {
         };
     }
 
-    rpc SearchMyLinkedIDPs(SearchMyLinkedIDPsRequest) returns (SearchMyLinkedIDPsResponse) {
+    rpc ListMyLinkedIDPs(ListMyLinkedIDPsRequest) returns (ListMyLinkedIDPsResponse) {
         option (google.api.http) = {
             post: "/users/me/idps/_search"
             body: "*"
@@ -343,12 +343,12 @@ message UpdateMyAddressResponse {
     zitadel.user.v1.Address address = 2;
 }
 
-message SearchMyLinkedIDPsRequest {
+message ListMyLinkedIDPsRequest {
     zitadel.v1.Search meta_data = 1;
     //TODO: maybe search for idp name and linked login name?
 }
 
-message SearchMyLinkedIDPsResponse {
+message ListMyLinkedIDPsResponse {
     zitadel.v1.Search meta_data = 1;
     
 }

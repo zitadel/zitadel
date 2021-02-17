@@ -39,10 +39,10 @@ enum IDPStylingType {
 
 message OIDCConfig {
     string client_id = 1 [
-        (google.api.field_behavior) = REQUIRED
+        (google.api.field_behavior) = OUTPUT_ONLY
     ];
     string client_secret = 2 [
-        (google.api.field_behavior) = INPUT_ONLY
+        (google.api.field_behavior) = OUTPUT_ONLY
     ];
     string issuer = 3 [
         (google.api.field_behavior) = REQUIRED

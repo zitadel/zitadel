@@ -57,7 +57,7 @@ service AdminService {
         };
     }
 
-    rpc SearchOrgs(SearchOrgsRequest) returns (SearchOrgsResponse) {
+    rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search"
             body: "*"
@@ -89,7 +89,7 @@ service AdminService {
         };
     }
 
-    rpc SearchIDPs(SearchIDPsRequest) returns (SearchIDPsResponse) {
+    rpc ListIDPs(ListIDPsRequest) returns (ListIDPsResponse) {
         option (google.api.http) = {
             post: "/idps/_search"
             body: "*"
@@ -165,7 +165,7 @@ service AdminService {
         };
     }
 
-    rpc GetViews(GetViewsRequest) returns (GetViewsResponse) {
+    rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
         option (google.api.http) = {
             get: "/views"
         };
@@ -185,7 +185,7 @@ service AdminService {
         };
     }
 
-    rpc GetFailedEvents(GetFailedEventsRequest) returns (GetFailedEventsResponse) {
+    rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
             get: "/failedevents"
         };
@@ -224,13 +224,13 @@ message GetOrgByIDResponse {
     zitadel.org.v1.Org org = 2;
 }
 
-message SearchOrgsRequest {
+message ListOrgsRequest {
     zitadel.v1.Search meta_data = 1;
     zitadel.org.v1.OrgFieldName sorting_column = 2;
     repeated zitadel.org.v1.OrgQuery queries = 3;
 }
 
-message SearchOrgsResponse {
+message ListOrgsResponse {
     zitadel.v1.Search meta_data = 1;
     zitadel.org.v1.OrgFieldName sorting_column = 2;
     repeated zitadel.org.v1.Org result = 3;
@@ -256,9 +256,9 @@ message SetUpOrgResponse {
 
 
 
-message GetViewsRequest {}
+message ListViewsRequest {}
 
-message GetViewsResponse {
+message ListViewsResponse {
     repeated View views = 1;
 }
 
@@ -269,9 +269,9 @@ message ClearViewRequest {
 
 message ClearViewResponse {}
 
-message GetFailedEventsRequest {}
+message ListFailedEventsRequest {}
 
-message GetFailedEventsResponse {
+message ListFailedEventsResponse {
     repeated FailedEvent result = 1;
 }
 
@@ -297,13 +297,13 @@ message GetIDPByIDResponse {
     zitadel.idp.v1.IDP idp = 2;
 }
 
-message SearchIDPsRequest {
+message ListIDPsRequest {
     zitadel.v1.Search meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDPQuery queries = 3;
 }
 
-message SearchIDPsResponse {
+message ListIDPsResponse {
     zitadel.v1.Search meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDP result = 3;
