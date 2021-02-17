@@ -1028,7 +1028,7 @@
                     },
                     "USERAGENT": {
                         "TITLE":"User Agent",
-                        "DESCRIPTION":"Single Page Apüplications (SPA) and in general all js frameworks executed in browsers"
+                        "DESCRIPTION":"Single Page Applications (SPA) and in general all JS frameworks executed in browsers"
                     }
                 },
                 "AUTHMETHOD": {
