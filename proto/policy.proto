@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/field_behavior.proto";
+
+package zitadel.policy.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
+
+
+
+message OrgIAMPolicy {
+    //TODO: should we add org_id?
+    bool user_login_must_be_domain = 1; //TODO: could be name_must_be_domain
+    bool is_default = 2;
+    string description = 3;
+}
+
+message LabelPolicy {
+    string primary_color = 1;
+    string secondary_color = 2;
+    //TODO: description?
+}
+
+message MailTemplatePolicy {
+    string mail_text_type = 1; //TODO: type sounds like an enum
+    string language = 2; //TODO: theoretically an enum like phone prefix
+    string title = 3;
+    string pre_header = 4;
+    string subject = 5;
+    string greeting = 6;
+    string text = 7;
+    string button_text = 8;
+}
+
+message LoginPolicy {
+    bool allow_username_password = 1;
+    bool allow_register = 2;
+    bool allow_external_idp = 3;
+    bool force_mfa = 4;
+    PasswordlessType passwordless_type = 5;
+}
+
+enum PasswordlessType {
+    PASSWORDLESS_TYPE_NOT_ALLOWED = 0;
+    PASSWORDLESS_TYPE_ALLOWED = 1;
+}
+
+message PasswordComplexityPolicy {
+    uint64 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
+}
+
+message PasswordAgePolicy {
+    uint64 max_age_days = 1;
+    uint64 expire_warn_days = 2;
+}
+
+message PasswordLockoutPolicy {
+    uint64 max_attempts = 1;
+    bool show_lockout_failure = 2;
+}
