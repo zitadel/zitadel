@@ -107,7 +107,8 @@ Auth:
     PublicKeyLifetime: 30h
     EncryptionConfig:
       EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
-    SigningKeyRotation: 10s
+    SigningKeyRotationCheck: 10s
+    SigningKeyGracefulPeriod: 10m
 
 Admin:
   SearchLimit: 1000

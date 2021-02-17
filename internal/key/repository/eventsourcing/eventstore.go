@@ -25,11 +25,12 @@ type KeyEventstore struct {
 }
 
 type KeyConfig struct {
-	Size               int
-	PrivateKeyLifetime types.Duration
-	PublicKeyLifetime  types.Duration
-	EncryptionConfig   *crypto.KeyConfig
-	SigningKeyRotation types.Duration
+	Size                     int
+	PrivateKeyLifetime       types.Duration
+	PublicKeyLifetime        types.Duration
+	EncryptionConfig         *crypto.KeyConfig
+	SigningKeyRotationCheck  types.Duration
+	SigningKeyGracefulPeriod types.Duration
 }
 
 func StartKey(eventstore es_int.Eventstore, config KeyConfig, keyAlgorithm crypto.EncryptionAlgorithm, generator id.Generator) (*KeyEventstore, error) {

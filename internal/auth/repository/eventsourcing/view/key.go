@@ -19,6 +19,14 @@ func (v *View) KeyByIDAndType(keyID string, private bool) (*model.KeyView, error
 	return view.KeyByIDAndType(v.Db, keyTable, keyID, private)
 }
 
+func (v *View) GetActivePrivateKeyForSigning(expiry time.Time) (*key_model.KeyView, error) {
+	key, err := view.GetSigningKey(v.Db, keyTable, expiry)
+	if err != nil {
+		return nil, err
+	}
+	return model.KeyViewToModel(key), nil
+}
+
 func (v *View) GetSigningKey(expiry time.Time) (*key_model.SigningKey, time.Time, error) {
 	key, err := view.GetSigningKey(v.Db, keyTable, expiry)
 	if err != nil {
