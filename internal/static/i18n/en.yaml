@@ -156,8 +156,12 @@ Errors:
     AppInvalid: Application invalid
     AppNotExisting: Application doesn't exist
     OIDCConfigInvalid: OIDC configuration is invalid
-    AppIsNotOIDC: Application is not type oidc
-    OIDCAuthMethodNoneSecret: OIDC Auth Method None does not require a secret
+    APIConfigInvalid: OIDC configuration is invalid
+    AppIsNotOIDC: Application is not type OIDC
+    AppIsNotAPI: Application is not type API
+    OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
+    APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
+    AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
     RequiredFieldsMissing: Some required fields are missing
     GrantNotFound: Grant not found
     GrantInvalid: Project grant is invalid

@@ -20,16 +20,12 @@ import (
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/id"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
-)
-
-const (
-	yearLayout            = "2006-01-02"
-	defaultExpirationDate = "9999-01-01"
 )
 
 type UserEventstore struct {
@@ -1630,7 +1626,7 @@ func (es *UserEventstore) AddMachineKey(ctx context.Context, key *usr_model.Mach
 	}
 
 	if key.ExpirationDate.IsZero() {
-		key.ExpirationDate, err = time.Parse(yearLayout, defaultExpirationDate)
+		key.ExpirationDate, err = key_model.DefaultExpiration()
 		if err != nil {
 			logging.Log("EVENT-vzibi").WithError(err).Warn("unable to set default date")
 			return nil, errors.ThrowInternal(err, "EVENT-j68fg", "Errors.Internal")

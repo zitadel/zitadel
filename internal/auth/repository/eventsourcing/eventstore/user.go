@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	key_model "github.com/caos/zitadel/internal/key/model"
 
 	"github.com/caos/logging"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
+	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -515,10 +517,10 @@ func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
 	return nil
 }
 
-func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*model.MachineKeyView, error) {
-	key, err := repo.View.MachineKeyByID(keyID)
+func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*key_model.AuthNKeyView, error) {
+	key, err := repo.View.AuthNKeyByID(keyID)
 	if err != nil {
 		return nil, err
 	}
-	return usr_view_model.MachineKeyToModel(key), nil
+	return key_view_model.AuthNKeyToModel(key), nil
 }
