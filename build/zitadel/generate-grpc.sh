@@ -5,7 +5,7 @@ set -eux
 echo "Generate grpc"
 
 # output folder for openapi v2
-mkdir $GOPATH/src/github.com/caos/zitadel/openapi/v2
+mkdir -p $GOPATH/src/github.com/caos/zitadel/openapi/v2
 
 protoc \
   -I=/proto/include \
