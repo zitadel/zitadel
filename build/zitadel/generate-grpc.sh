@@ -20,10 +20,12 @@ protoc \
 
 protoc \
   -I=/proto/include \
-  --go_out $GOPATH/src \
-  --go-grpc_out $GOPATH/src \
-  --grpc-gateway_out=logtostderr=true:$GOPATH/src \
-  --swagger_out=logtostderr=true:/proto/output \
+  --go_out ${GOPATH}/src \
+  --go-grpc_out ${GOPATH}/src \
+  --grpc-gateway_out $GOPATH/src/github.com/caos/zitadel/pkg/grpc \
+  --grpc-gateway_opt logtostderr=true \
+  --openapiv2_out $GOPATH/src/github.com/caos/zitadel/swagger \
+  --openapiv2_opt logtostderr=true \ 
   --authoption_out=/proto/output \
   --validate_out=lang=go:${GOPATH}/src \
   /proto/include/zitadel/admin.proto
@@ -32,8 +34,11 @@ protoc \
   -I=/proto/include \
   --go_out $GOPATH/src \
   --go-grpc_out $GOPATH/src \
-  --grpc-gateway_out=logtostderr=true,allow_delete_body=true:${GOPATH}/src \
-  --swagger_out=logtostderr=true,allow_delete_body=true:/proto/output \
+  --grpc-gateway_out $GOPATH/src/github.com/caos/zitadel/pkg/grpc \
+  --grpc-gateway_opt logtostderr=true \
+  --grpc-gateway_opt allow_delete_body=true \
+  --openapiv2_out $GOPATH/src/github.com/caos/zitadel/swagger \
+  --openapiv2_opt logtostderr=true \ 
   --authoption_out=/proto/output \
   --validate_out=lang=go:${GOPATH}/src \
   /proto/include/zitadel/management.proto
@@ -42,8 +47,10 @@ protoc \
   -I=/proto/include \
   --go_out $GOPATH/src \
   --go-grpc_out $GOPATH/src \
-  --grpc-gateway_out=logtostderr=true:$GOPATH/src \
-  --swagger_out=logtostderr=true:/proto/output \
+  --grpc-gateway_out $GOPATH/src/github.com/caos/zitadel/pkg/grpc \
+  --grpc-gateway_opt logtostderr=true \
+  --openapiv2_out $GOPATH/src/github.com/caos/zitadel/swagger \
+  --openapiv2_opt logtostderr=true \ 
   --authoption_out=/proto/output \
   --validate_out=lang=go:${GOPATH}/src \
   /proto/include/zitadel/auth.proto
