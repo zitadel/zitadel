@@ -1362,4 +1362,11 @@ export class ManagementService {
     public UpdateOIDCAppConfig(req: OIDCConfigUpdate): Promise<OIDCConfig> {
         return this.grpcService.mgmt.updateApplicationOIDCConfig(req);
     }
+
+    public RemoveApplication(projectId: string, appId: string): Promise<Empty> {
+        const req = new ApplicationID();
+        req.setId(appId);
+        req.setProjectId(projectId);
+        return this.grpcService.mgmt.removeApplication(req);
+    }
 }

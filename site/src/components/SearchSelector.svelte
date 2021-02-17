@@ -1,6 +1,5 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { _ } from 'svelte-i18n';
 
     export let sections;
     export let slug;
@@ -214,9 +213,9 @@
 <div class="search-field">
     <div class="search-line">
         <i class="las la-search"></i>
-        <input placeholder="{$_('search_input_placeholder')}" bind:value={searchValue} use:init>
+        <input placeholder="Search for something" bind:value={searchValue} use:init>
     </div>
-        <p class="result-d">{$_('search_results')}: </p>
+        <p class="result-d">Search Results: </p>
     <div tabindex="-1" class="result-list">
         {#each filteredResults as result, i}
         <a tabindex="0" class="result-item" href="{slug}#{result.slug}" on:click="{closeSearch}" id="{i}">

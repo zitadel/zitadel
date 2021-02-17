@@ -1,5 +1,29 @@
 {
     "APP_NAME": "ZITADEL",
+    "ONBOARDING": {
+        "HEADER":"First Steps",
+        "TITLE":"Learn how to use ZITADEL",
+        "LOGINDESC":"You need to log in to control your ZITADEL settings.",
+        "LOGIN":"Login",
+        "DESCRIPTION":"We at ZITADEL care a lot about security and performance. Carry out the following steps and adapt ZITADEL optimally to your needs.",
+        "STEPS_TITLE":"Complete the following steps in the order you want:",
+        "STEPS": {
+            "1": {
+                "TITLE":"Create a project",
+                "DESC":"Create your first project and define access rights for any employees."
+            },
+            "2": {
+                "TITLE":"Create Application",
+                "DESC":"Create an application within your project and define its properties."
+            },
+            "3": {
+                "TITLE":"Improve security",
+                "DESC":"Extend the access policies and thereby increase the security of your users."
+            }
+        },
+        "START":"Start",
+        "DOCS":"Docs"
+    },
     "HOME": {
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Data Protection and Personalisation",
@@ -32,9 +56,15 @@
         "WELCOME":"Welcome",
         "WELCOMESENTENCE":"Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
         "DISCLAIMER":"You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
-        "DISCLAIMERLINK":"Further information"
+        "DISCLAIMERLINK":"Further information",
+        "QUICKSTARTS": {
+            "LABEL":"First Steps",
+            "TITLE":"Quickstarts",
+            "DESCRIPTION":"Get started with ZITADEL quickly."
+        }
     },
     "MENU": {
+        "DASHBOARD":"Overview",
         "PERSONAL_INFO": "Personal Information",
         "DOCUMENTATION":"Documentation",
         "IAMPOLICIES":"IAM",
@@ -54,6 +84,7 @@
         "SHOWORGS":"Show All Organisations",
         "GRANTSECTION":"Authorization Section",
         "GRANTS":"Authorizations",
+        "TOC":"Privacy Policy and TOC",
         "TOOLTIP": {
             "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
             "IAMPOLICIES":"Manage ZITADELs global Access policies und elect ZITADEL Managers",
@@ -930,12 +961,34 @@
                     "1": "Active",
                     "2": "Inactive"
                 }
+            },
+            "DIALOG": {
+                "DELETE": {
+                    "TITLE": "Delete App",
+                    "DESCRIPTION":"Do you really want to delete this application?"
+                }
+            },
+            "NEXTSTEPS": {
+                "TITLE":"Next Steps",
+                "0": {
+                    "TITLE":"Add roles",
+                    "DESC":"Enter your project roles"
+                },
+                "1": {
+                    "TITLE":"Add users",
+                    "DESC":"Add new users of your organization"
+                },
+                "2": {
+                    "TITLE":"Help & Support",
+                    "DESC":"Read our documentation on creating applications or contact our support"
+                }
             }
         },
         "NAME": "Name",
         "TYPE":"Application Type",
         "GRANT":"Grant Types",
         "OIDC": {
+            "CURRENT":"Current Config",
             "TOKENSECTIONTITLE":"AuthToken Options",
             "REDIRECTSECTIONTITLE":"Redirect Settings",
             "PROSWITCH":"I'm a pro. Skip this wizard.",
@@ -991,13 +1044,58 @@
             "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the ID token.",
             "IDTOKENUSERINFOASSERTION":"User Info inside ID Token",
             "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Enables clients to retrieve profile, email, phone and address claims from ID token.",
-            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf."
+            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
+            "RECOMMENDED":"recommended",
+            "NOTRECOMMENDED":"not recommended",
+            "SELECTION":{
+                "APPTYPE": {
+                    "WEB": {
+                        "TITLE":"Web",
+                        "DESCRIPTION":"Regular Web applications like .net, PHP, Node.js, Java, etc."
+                    },
+                    "NATIVE": {
+                        "TITLE":"NATIVE",
+                        "DESCRIPTION":"Mobile Apps, Desktop, Smart Devices, etc."
+                    },
+                    "USERAGENT": {
+                        "TITLE":"User Agent",
+                        "DESCRIPTION":"Single Page Applications (SPA) and in general all JS frameworks executed in browsers"
+                    }
+                },
+                "AUTHMETHOD": {
+                    "CODE": {
+                        "TITLE":"Code",
+                        "DESCRIPTION":"Exchange the authorization code for the tokens"
+                    },
+                    "PKCE": {
+                        "TITLE":"PKCE",
+                        "DESCRIPTION":"Use a random hash instead of a static client secret for more security"
+                    },
+                    "POST": {
+                        "TITLE":"POST",
+                        "DESCRIPTION":"Send client_id and client_secret as part of the form"
+                    },
+                    "PK_JWT": {
+                        "TITLE":"Private Key JWT",
+                        "DESCRIPTION":"Use a private key to authorize your application"
+                    },
+                    "IMPLICIT": {
+                        "TITLE":"Implicit",
+                        "DESCRIPTION":"Get the tokens directly from the authorization endpoint"
+                    },
+                    "CUSTOM": {
+                        "TITLE":"Custom",
+                        "DESCRIPTION":"Your setting doesn't correspond to any other option."
+                    }
+                }
+            }
         },
         "TOAST": {
             "REACTIVATED":"Application reactivated.",
             "DEACTIVATED":"Application deactivated.",
             "OIDCUPDATED":"OIDC configuration updated.",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated."
+            "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated.",
+            "DELETED":"App deleted."
         }
     },
     "GENDERS": {
