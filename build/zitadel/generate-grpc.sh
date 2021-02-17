@@ -25,7 +25,7 @@ protoc \
   --go-grpc_opt paths=source_relative \
   --grpc-gateway_out ${GRPC_PATH} \
   --grpc-gateway_opt logtostderr=true \
-  --openapiv2_out . \
+  --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --authoption_out=${GRPC_PATH} \
   --validate_out=lang=go:${GOPATH}/src \
