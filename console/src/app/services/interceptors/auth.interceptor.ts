@@ -55,6 +55,7 @@ export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
                 titleKey: 'ERRORS.TOKENINVALID.TITLE',
                 descriptionKey: 'ERRORS.TOKENINVALID.DESCRIPTION',
             },
+            disableClose: true,
             width: '400px',
         });
 

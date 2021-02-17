@@ -17,6 +17,7 @@
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
 @import 'src/app/modules/meta-layout/meta.scss';
+@import 'src/app/modules/onboarding/onboarding.component.scss';
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
@@ -38,4 +39,5 @@
   @include link-theme($theme);
   @include meta-theme($theme);
   @include info-section-theme($theme);
+  @include onboarding-theme($theme);
 }

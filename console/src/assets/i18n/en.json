@@ -1,5 +1,29 @@
 {
     "APP_NAME": "ZITADEL",
+    "ONBOARDING": {
+        "HEADER":"First Steps",
+        "TITLE":"Learn how to use ZITADEL",
+        "LOGINDESC":"You need to log in to control your ZITADEL settings.",
+        "LOGIN":"Login",
+        "DESCRIPTION":"We at ZITADEL care a lot about security and performance. Carry out the following steps and adapt ZITADEL optimally to your needs.",
+        "STEPS_TITLE":"Complete the following steps in the order you want:",
+        "STEPS": {
+            "1": {
+                "TITLE":"Create a project",
+                "DESC":"Create your first project and define access rights for any employees."
+            },
+            "2": {
+                "TITLE":"Create Application",
+                "DESC":"Create an application within your project and define its properties."
+            },
+            "3": {
+                "TITLE":"Improve security",
+                "DESC":"Extend the access policies and thereby increase the security of your users."
+            }
+        },
+        "START":"Start",
+        "DOCS":"Docs"
+    },
     "HOME": {
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Data Protection and Personalisation",
@@ -32,9 +56,15 @@
         "WELCOME":"Welcome",
         "WELCOMESENTENCE":"Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
         "DISCLAIMER":"You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
-        "DISCLAIMERLINK":"Further information"
+        "DISCLAIMERLINK":"Further information",
+        "QUICKSTARTS": {
+            "LABEL":"First Steps",
+            "TITLE":"Quickstarts",
+            "DESCRIPTION":"Get started with ZITADEL quickly."
+        }
     },
     "MENU": {
+        "DASHBOARD":"Overview",
         "PERSONAL_INFO": "Personal Information",
         "DOCUMENTATION":"Documentation",
         "IAMPOLICIES":"IAM",
@@ -54,6 +84,7 @@
         "SHOWORGS":"Show All Organisations",
         "GRANTSECTION":"Authorization Section",
         "GRANTS":"Authorizations",
+        "TOC":"Privacy Policy and TOC",
         "TOOLTIP": {
             "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
             "IAMPOLICIES":"Manage ZITADELs global Access policies und elect ZITADEL Managers",

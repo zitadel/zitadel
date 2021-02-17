@@ -1,18 +1,18 @@
 <script context="module">
     export async function preload({params}) {
-        const {lang, slug} = params;
-        const {docs, seo} = await this.fetch(`${slug}.json`).then(r => r.json());
-        return { sections: docs, seo, slug };
+        const { slug } = params;
+        const {sections, seo} = await this.fetch(`${slug}.json`).then(r => r.json());
+        return { sections, seo, slug };
     }
 </script>
 
 <script>
-    import DocsHeader from '../components/DocsHeader.svelte';
     import manifest from '../../static/manifest.json';
     import Docs from "../components/Docs.svelte";
     export let slug;
     export let sections;
     export let seo;
+
     import { onMount } from 'svelte';
     import { initPhotoSwipeFromDOM } from '../utils/photoswipe.js';
 
@@ -37,5 +37,4 @@
    {/if}
 </svelte:head>
 
-<DocsHeader {slug}></DocsHeader>
 <Docs {sections} dir="{slug}"/>

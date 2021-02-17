@@ -39,7 +39,7 @@
     <h1 class="h1">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h1>
     <p class="desc">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
 
-    <app-members-table *ngIf="grant" style="width: 100%;" [dataSource]="dataSource" [canWrite]="(['project.grant.member.write','project.grant.member.write:' + grant.id] | hasRole | async)"
+    <app-members-table *ngIf="grant" style="width: 100%;" [dataSource]="dataSource" [canWrite]="['project.grant.member.write','project.grant.member.write:' + grant.id] | hasRole | async"
         [memberRoleOptions]="memberRoleOptions" (updateRoles)="updateMemberRoles($event.member, $event.change)"
         [factoryLoadFunc]="changePageFactory" (changedSelection)="selection = $event" [refreshTrigger]="changePage">
         <button selectactions (click)="removeProjectMemberSelection()"

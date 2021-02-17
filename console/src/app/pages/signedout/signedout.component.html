@@ -7,8 +7,9 @@
             </ng-template>
             <p>{{'USER.SIGNEDOUT' | translate}}</p>
 
-            <button color="primary" mat-raised-button
-                [routerLink]="[ '/users/me' ]">{{'USER.SIGNEDOUT_BTN' | translate}}</button>
+            <button matTooltip="{{'ACTIONS.LOGIN' | translate}}" color="primary" mat-raised-button
+                [routerLink]="[ '/users/me' ]">{{'USER.SIGNEDOUT_BTN' |
+                translate}} <i class="las la-sign-in-alt"></i></button>
         </div>
     </div>
 </div>

@@ -29,7 +29,7 @@ SELECT
     sequence
 FROM auth.user_memberships;
 
-INSERT INTO authz.current_sequences (
+UPSERT INTO authz.current_sequences (
      view_name,
      event_timestamp,
      current_sequence,
