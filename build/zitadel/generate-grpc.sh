@@ -14,12 +14,12 @@ move() {
 
 protoc \
   -I=/proto/include \
-  --go_out=plugins=grpc:$GOPATH/src \
+  --go-grpc_out=plugins=grpc:$GOPATH/src \
   /proto/include/zitadel/message.proto
 
 protoc \
   -I=/proto/include \
-  --go_out=plugins=grpc:$GOPATH/src \
+  --go-grpc_out=plugins=grpc:$GOPATH/src \
   --grpc-gateway_out=logtostderr=true:$GOPATH/src \
   --swagger_out=logtostderr=true:/proto/output \
   --authoption_out=/proto/output \
@@ -28,7 +28,7 @@ protoc \
 
 protoc \
   -I=/proto/include \
-  --go_out=plugins=grpc:$GOPATH/src \
+  --go-grpc_out=plugins=grpc:$GOPATH/src \
   --grpc-gateway_out=logtostderr=true,allow_delete_body=true:${GOPATH}/src \
   --swagger_out=logtostderr=true,allow_delete_body=true:/proto/output \
   --authoption_out=/proto/output \
@@ -37,7 +37,7 @@ protoc \
 
 protoc \
   -I=/proto/include \
-  --go_out=plugins=grpc:$GOPATH/src \
+  --go-grpc_out=plugins=grpc:$GOPATH/src \
   --grpc-gateway_out=logtostderr=true:$GOPATH/src \
   --swagger_out=logtostderr=true:/proto/output \
   --authoption_out=/proto/output \

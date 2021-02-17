@@ -3,8 +3,6 @@ syntax = "proto3";
 package zitadel.v1;
 
 import "google/protobuf/descriptor.proto";
-import "google/api/annotations.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption";
 
