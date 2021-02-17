@@ -15,7 +15,7 @@ package zitadel.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/management";
 
-option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     swagger: "2.0",
     info: {
         title: "management api of ZITADEL";
