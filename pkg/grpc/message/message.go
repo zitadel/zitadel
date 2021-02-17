@@ -1,6 +1,6 @@
 package message
 
-/* func (m *LocalizedMessage) LocalizationKey() string {
+func (m *LocalizedMessage) LocalizationKey() string {
 	return m.Key
 }
 
@@ -14,4 +14,4 @@ func NewLocalizedEventType(key string) *LocalizedMessage {
 
 func NewLocalizedMessage(key string) *LocalizedMessage {
 	return &LocalizedMessage{Key: key}
-} */
+}
