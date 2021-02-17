@@ -158,7 +158,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 }
 
 func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType, org.AggregateType, project.AggregateType, user.AggregateType, usergrant.AggregateType).
 		AggregateIDs(rm.AggregateID).
 		ResourceOwner(rm.ResourceOwner).
 		EventTypes(

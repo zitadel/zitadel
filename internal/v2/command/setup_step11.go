@@ -22,6 +22,9 @@ func (s *Step11) execute(ctx context.Context, commandSide *CommandSide) error {
 
 func (r *CommandSide) SetupStep11(ctx context.Context, step *Step11) error {
 	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+		if !step.MigrateV1EventstoreToV2 {
+			return []eventstore.EventPusher{}, nil
+		}
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 		uniqueConstraints := NewUniqueConstraintReadModel(ctx, r)
 		err := r.eventstore.FilterToQueryReducer(ctx, uniqueConstraints)
