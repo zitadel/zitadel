@@ -1,6 +1,14 @@
 syntax = "proto3";
 
-import "user.proto";
+import "zitadel/idp.proto";
+import "zitadel/user.proto";
+import "zitadel/object.proto";
+import "zitadel/options.proto";
+import "zitadel/org.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "google/api/field_behavior.proto";
 
 package zitadel.v1;
 
@@ -33,7 +41,7 @@ service AuthService {
             get: "/users/me"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -44,7 +52,7 @@ service AuthService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -55,7 +63,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -65,7 +73,7 @@ service AuthService {
             get: "/users/me/profile"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -76,7 +84,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -86,7 +94,7 @@ service AuthService {
             get: "/users/me/email"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -97,7 +105,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -108,7 +116,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -119,17 +127,17 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
 
-    rpc GetMyPhone(GetByPhoneRequest) returns (GetMyPhoneResponse) {
+    rpc GetMyPhone(GetMyPhoneRequest) returns (GetMyPhoneResponse) {
         option (google.api.http) = {
             get: "/users/me/phone"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -140,7 +148,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -151,7 +159,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -162,7 +170,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -172,7 +180,7 @@ service AuthService {
             delete: "/users/me/phone"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -182,7 +190,7 @@ service AuthService {
             get: "/users/me/address"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -193,7 +201,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -204,7 +212,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -214,7 +222,7 @@ service AuthService {
             delete: "/users/me/idps/{idp_id}/{linked_user_id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -241,18 +249,18 @@ message UpdateMyUserNameResponse {
 
 message UpdateMyPasswordRequest {
     //TODO: current_password?
-    string password = ;
+    string password = 1;
 }
 
 message UpdateMyPasswordResponse {
-    zitadel.v1.MetaData meta_data = ;
+    zitadel.v1.MetaData meta_data = 1;
 }
 
-message GetMyHumanProfileRequest {}
+message GetMyProfileRequest {}
 
-message GetMyHumanProfileResponse {
-    zitadel.v1.MetaData meta_data = ;
-    zitadel.user.v1.Profile profile = ;
+message GetMyProfileResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.Profile profile = 2;
 }
 
 message UpdateMyProfileRequest {
@@ -267,21 +275,21 @@ message UpdateMyProfileResponse {
 message GetMyEmailRequest {}
 
 message GetMyEmailResponse {
-    zitadel.v1.ReadMetaData meta_data = ;
-    zitadel.user.v1.Email email = ;
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.Email email = 2;
 }
 
 message UpdateMyEmailRequest {
-    zitadel.user.v1.Email email = ;
+    zitadel.user.v1.Email email = 1;
 }
 
 message UpdateMyEmailResponse {
-    zitadel.v1.UpdateMetaData = ;
-    zitadel.user.v1.Email = ;
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.Email email = 2;
 }
 
 message VerifyMyEmailRequest {
-    string code = ;
+    string code = 1;
 }
 
 message VerifyMyEmailResponse {}
@@ -293,21 +301,21 @@ message ResendMyEmailVerificationResponse {}
 message GetMyPhoneRequest {}
 
 message GetMyPhoneResponse {
-    zitadel.v1.MetaData meta_data = ;
-    zitadel.user.v1.Phone phone = ;
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.Phone phone = 2;
 }
 
 message UpdateMyPhoneRequest {
-    zitadel.user.v1.Email email = ;
+    zitadel.user.v1.Email email = 1;
 }
 
 message UpdateMyPhoneResponse {
-    zitadel.v1.MetaData meta_data = ;
-    zitadel.user.v1.Email email = ;
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.Email email = 2;
 }
 
 message VerifyMyPhoneRequest {
-    string code = ;
+    string code = 1;
 }
 
 message VerifyMyPhoneResponse {}
@@ -322,17 +330,17 @@ message RemoveMyPhoneResponse {}
 message GetMyAddressRequest {}
 
 message GetMyAddressResponse {
-    zitadel.v1.ReadMetaData meta_data = ;
-    zitadel.user.v1.Address address = ;
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.Address address = 2;
 }
 
 message UpdateMyAddressRequest {
-    zitadel.user.v1.Address address = ;
+    zitadel.user.v1.Address address = 1;
 }
 
 message UpdateMyAddressResponse {
-    zitadel.v1.UpdateMetaData meta_data = ;
-    zitadel.user.v1.Address address = ;
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.Address address = 2;
 }
 
 message SearchMyLinkedIDPsRequest {

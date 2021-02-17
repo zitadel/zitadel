@@ -1,5 +1,18 @@
 syntax = "proto3";
 
+import "zitadel/idp.proto";
+import "zitadel/user.proto";
+import "zitadel/object.proto";
+import "zitadel/options.proto";
+import "zitadel/org.proto";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+import "protoc-gen-swagger/options/annotations.proto";
+
+import "validate/validate.proto";
+
 package zitadel.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/admin";
@@ -29,17 +42,17 @@ service AdminService {
             get: "/orgs/_isunique"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.read"
         };
     }
 
-    rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDReResponse) {
+    rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
             get: "/orgs/{id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.read"
         };
     }
@@ -50,7 +63,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.read"
         };
     }
@@ -61,7 +74,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.write"
         };
     }
@@ -71,7 +84,7 @@ service AdminService {
             get: "/idps/{id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.idp.read"
         };
     }
@@ -82,7 +95,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.idp.read"
         };
     }
@@ -93,7 +106,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
     }
@@ -104,7 +117,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
     }
@@ -115,7 +128,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
     }
@@ -125,7 +138,7 @@ service AdminService {
             delete: "/idps/{id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
     }
@@ -136,7 +149,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
     }
@@ -147,7 +160,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
     }
@@ -157,7 +170,7 @@ service AdminService {
             get: "/views"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.read"
         };
     }
@@ -167,7 +180,7 @@ service AdminService {
             post: "/views/{database}/{view_name}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.write"
         };
     }
@@ -177,7 +190,7 @@ service AdminService {
             get: "/failedevents"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.read"
         };
     }
@@ -187,7 +200,7 @@ service AdminService {
             delete: "/failedevents/{database}/{view_name}/{failed_sequence}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.write"
         };
     }
@@ -199,7 +212,7 @@ message IsOrgUniqueRequest {
 }
 
 message IsOrgUniqueResponse {
-    bool is_unique = ;
+    bool is_unique = 1;
 }
 
 message GetOrgByIDRequest {
@@ -246,7 +259,7 @@ message SetUpOrgResponse {
 message GetViewsRequest {}
 
 message GetViewsResponse {
-    repeated View views = ;
+    repeated View views = 1;
 }
 
 message ClearViewRequest {
@@ -259,7 +272,7 @@ message ClearViewResponse {}
 message GetFailedEventsRequest {}
 
 message GetFailedEventsResponse {
-    repeated FailedEvent result = ;
+    repeated FailedEvent result = 1;
 }
 
 message RemoveFailedEventRequest {
@@ -292,7 +305,7 @@ message SearchIDPsRequest {
 
 message SearchIDPsResponse {
     zitadel.v1.Search meta_data = 1;
-    zitadel.v1.IDPFieldName sorting_column = 2;
+    zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDP result = 3;
 }
 
@@ -325,7 +338,7 @@ message RemoveIDPRequest {
     string id = 1;
 }
 
-message RemoveIDPRequest {
+message RemoveIDPResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
 

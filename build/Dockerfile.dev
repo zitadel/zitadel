@@ -1,0 +1,116 @@
+#######################
+## This step sets up the folder structure,
+## initalices go mods,
+## downloads the protofiles, 
+## protoc and protoc-gen-grpc-web for later use
+#######################
+FROM golang:1.15.8 AS base
+
+RUN apt-get update && apt-get install -y unzip
+
+ARG PROTOC_VERSION=3.14.0
+ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-x86_64.zip
+ARG GRPC_WEB_VERSION=1.2.1
+ARG GRPC_WEB=protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64
+
+WORKDIR /proto
+#protoc
+RUN curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/$PROTOC_ZIP \
+    && unzip -o $PROTOC_ZIP -d /usr/local bin/protoc \
+    && unzip -o $PROTOC_ZIP -d /proto include/* \
+    && rm -f $PROTOC_ZIP
+
+#grpc web
+RUN curl -OL https://github.com/grpc/grpc-web/releases/download/${GRPC_WEB_VERSION}/${GRPC_WEB} \
+    && mv ${GRPC_WEB} /usr/local/bin/protoc-gen-grpc-web \
+    && chmod +x /usr/local/bin/protoc-gen-grpc-web
+
+#proto dependencies
+RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1/validate/validate.proto --create-dirs -o include/validate/validate.proto  \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o include/protoc-gen-swagger/options/annotations.proto \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto --create-dirs -o include/protoc-gen-swagger/options/openapiv2.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto --create-dirs -o include/google/api/annotations.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto --create-dirs -o include/google/api/http.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/field_behavior.proto --create-dirs -o include/google/api/field_behavior.proto
+
+#zitadel protos
+COPY /proto/ include/zitadel/.
+# COPY /proto/admin.proto include/zitadel/admin.proto
+# COPY /proto/auth.proto include/zitadel/auth.proto
+# COPY /proto/management.proto include/zitadel/management.proto
+# COPY /proto/message.proto include/zitadel/message.proto
+# COPY /proto/options.proto include/zitadel/options.proto
+
+#######################
+## With this step we prepare all node_modules, this helps caching the build
+## Speed up this step by mounting your local node_modules directory
+#######################
+FROM node:15.8.0 as npm-base
+WORKDIR console
+COPY console/package.json console/package-lock.json ./
+RUN npm install \
+    && mkdir proto
+
+COPY console .
+COPY --from=base /proto proto
+COPY --from=base /usr/local/bin /usr/local/bin/.
+COPY build/console build/console/
+RUN build/console/generate-grpc.sh
+
+FROM npm-base as prod-angular-build
+RUN npm run prodbuild
+
+#######################
+## Go dependencies
+#######################
+FROM golang:1.15.8 as go-dep
+RUN mkdir -p src/github.com/caos/zitadel
+COPY . src/github.com/caos/zitadel/
+WORKDIR /go/src/github.com/caos/zitadel/
+RUN go mod download
+RUN ./tools/install.sh
+#ugly bastel for protoc
+RUN mv /go/bin/protoc-gen-go-grpc /go/bin/protoc-gen-go_grpc
+
+#######################
+## Go base build
+## Speed up this step by mounting your local go mod pkg directory
+#######################
+FROM go-dep as go-base
+COPY --from=base /proto /proto
+COPY --from=base /usr/local/bin /usr/local/bin/.
+RUN build/zitadel/generate-authoption.sh
+RUN go-bindata \
+        -pkg main \
+        -prefix internal/protoc/protoc-gen-authoption \
+        -o ./internal/protoc/protoc-gen-authoption/templates.gen.go \
+        ./internal/protoc/protoc-gen-authoption/templates \
+    && go install ./internal/protoc/protoc-gen-authoption
+RUN build/zitadel/generate-grpc.sh
+
+# ## Go test
+# FROM go-base as go-test
+# RUN go test -race -v -coverprofile=profile.cov ./...
+
+# ## Go test
+# FROM scratch as go-codecov
+# COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
+
+## Go prod build
+FROM go-base as prod-go-build
+COPY --from=prod-angular-build console/dist/console console/dist/console/
+RUN ./build/console/generate-static.sh \
+    && ./build/login/generate-static.sh \
+    && ./build/notification/generate-static.sh \
+    && ./build/zitadel/generate-static.sh
+
+# `skaffold debug` sets SKAFFOLD_GO_GCFLAGS to disable compiler optimizations
+ARG SKAFFOLD_GO_GCFLAGS
+RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /app cmd/zitadel/main.go
+
+FROM golang:1.15.6
+# Define GOTRACEBACK to mark this container as using the Go language runtime
+# for `skaffold debug` (https://skaffold.dev/docs/workflows/debug/).
+ENV GOTRACEBACK=single
+CMD ["./app"]
+COPY --from=prod-go-build /app . 
