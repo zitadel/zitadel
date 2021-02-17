@@ -480,11 +480,22 @@ message IsUserUniqueResponse {
 }
 
 message CreateUserRequest {
-    zitadel.user.v1.User user = 1;
+    string user_name = 1;
+    oneof type {
+        zitadel.user.v1.Human human = 2;
+        zitadel.user.v1.Machine machine = 3;
+    }
 }
 
 message CreateUserResponse {
-    zitadel.user.v1.User user = 1;
+    string id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+    zitadel.user.v1.UserState state = 3;
+    string user_name = 4;
+    oneof type {
+        zitadel.user.v1.Human human = 5;
+        zitadel.user.v1.Machine machine = 6;
+    }
 }
 
 message DeactivateUserRequest {
