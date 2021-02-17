@@ -84,9 +84,6 @@ service ManagementService {
                 }
                 //TODO: errors
             };
-            request: {
-
-            };
             security: {
                 security_requirement: {
                     key: "oauth2";
