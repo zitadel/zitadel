@@ -207,11 +207,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                     PKCE_METHOD,
                     CUSTOM_METHOD,
                 ];
-
-                // automatically set to PKCE and skip step
-                // this.app.oidcConfig.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
-                // this.app.oidcConfig.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
-                // this.app.oidcConfig.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
                 break;
             case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
                 this.authMethods = [

@@ -56,8 +56,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         PKCE_METHOD,
         CODE_METHOD,
         POST_METHOD,
-        // PK_JWT_METHOD,
-        // IMPLICIT_METHOD,
     ];
 
     public oidcAuthMethodType: { type: OIDCAuthMethodType, checked: boolean, disabled: boolean; }[] = [
@@ -230,10 +228,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             this.router.navigate(['projects', this.projectId, 'apps', app.id]);
         }
     }
-
-    // moreThanOneOption(options: Array<{ type: OIDCGrantType, checked: boolean, disabled: boolean; }>): boolean {
-    //     return options.filter(option => option.disabled === false).length > 1;
-    // }
 
     get name(): AbstractControl | null {
         return this.firstFormGroup.get('name');
