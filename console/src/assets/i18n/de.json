@@ -1038,7 +1038,7 @@
                     },
                     "PKCE": {
                         "TITLE":"PKCE",
-                        "DESCRIPTION":"Use a random hash instead of a static client secret for more security"
+                        "DESCRIPTION":"Nutze einen Zufalls Hash Wert anstelle des Client Secret für mehr Sicherheit"
                     },
                     "POST": {
                         "TITLE":"POST",
