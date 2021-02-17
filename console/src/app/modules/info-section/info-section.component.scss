@@ -7,24 +7,36 @@
 
   .info-section-row {
     display: flex;
-    background-color: if($is-dark-theme, #ffffff13, #f3f3f3);
     border-radius: 4px;
     padding: .5rem 0;
     padding-right: 1rem;
-    color: if($is-dark-theme, #d6d6d6, #3c4257);
     font-size: 14px;
 
     .icon {
-      margin-right: 1rem;
-      height: 1.2rem;
-      line-height: 1.2rem;
-      font-size: 1.2rem;
-      margin-left: .5rem;
-      color: $primary-color;
+        margin-right: 1rem;
+        height: 1.2rem;
+        line-height: 1.2rem;
+        font-size: 1.2rem;
+        margin-left: .5rem;
     }
 
+
     .info-section-content {
-      flex: 1;
+        flex: 1;
+    }
+
+    &.info {
+        background-color: if($is-dark-theme, #4f566b, #cbf4c9);
+        color: if($is-dark-theme, #cbf4c9, #0e6245);
+
+        .icon {
+            color: $primary-color;
+        }
+    }
+
+    &.warn {
+        background-color: if($is-dark-theme, #4f566b, #ffc1c1);
+        color: if($is-dark-theme, #ffc1c1, #620e0e);
     }
   }
 }

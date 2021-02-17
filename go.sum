@@ -140,8 +140,6 @@ github.com/caos/logging v0.0.0-20191210002624-b3260f690a6a/go.mod h1:9LKiDE2ChuG
 github.com/caos/logging v0.0.2 h1:ebg5C/HN0ludYR+WkvnFjwSExF4wvyiWPyWGcKMYsoo=
 github.com/caos/logging v0.0.2/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX7Wp0=
 github.com/caos/oidc v0.6.2/go.mod h1:ozoi3b+aY33gzdvjz4w90VZShIHGsmDa0goruuV0arQ=
-github.com/caos/oidc v0.13.2 h1:52oP3KB1UrZuwraBTLuwM9ItRIhJQMYOm1J5uQ0sYXw=
-github.com/caos/oidc v0.13.2/go.mod h1:dLvfYUiAt9ORfl77L/KkcWuR/N0ll8Ry1nD2ERsamDY=
 github.com/caos/oidc v0.14.0 h1:l7mTqYDpqNRZF9Vwzq5KAQd1wQCThdceL5HpsEMGoao=
 github.com/caos/oidc v0.14.0/go.mod h1:CPsubVrA110OyLnCKwVZjTdsAVwq67DTbYIvux7UgbY=
 github.com/caos/orbos v1.5.14-0.20210205131708-6dc812182dc0 h1:N+KYBwuQO3QPr/nTUaNwjAetjp3NU4MP8Nv9Iue53UE=

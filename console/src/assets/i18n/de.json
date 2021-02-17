@@ -961,12 +961,34 @@
                     "1": "Aktiv",
                     "2": "Inaktiv"
                 }
+            },
+            "DIALOG": {
+                "DELETE": {
+                    "TITLE": "App löschen",
+                    "DESCRIPTION":"Wollen Sie diese App wirklich löschen?"
+                }
+            },
+            "NEXTSTEPS": {
+                "TITLE":"Nächste Schritte",
+                "0": {
+                    "TITLE":"Rollen festlegen",
+                    "DESC":"Erfassen Sie Rollen für ihr Projekt"
+                },
+                "1": {
+                    "TITLE":"Benutzer hinzufügen",
+                    "DESC":"Fügen Sie Nutzer ihrer Organisation hinzu"
+                },
+                "2": {
+                    "TITLE":"Hilfe & Support",
+                    "DESC":"Lesen Sie unsere Dokumentation zum Erstellen von Applikation oder kontaktieren Sie unseren Support"
+                }
             }
         },
         "NAME": "Name",
         "TYPE":"Anwendungstyp",
         "GRANT":"Berechtigungstypen",
         "OIDC": {
+            "CURRENT":"Aktuelle Konfiguration",
             "TOKENSECTIONTITLE":"AuthToken Optionen",
             "REDIRECTSECTIONTITLE":"Weiterleitungseinstellungen",
             "PROSWITCH":"Konfigurator überspringen",
@@ -1022,13 +1044,58 @@
             "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
             "IDTOKENUSERINFOASSERTION":"User Info im ID Token",
             "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
-            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen."
+            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen.",
+            "RECOMMENDED":"Empfohlen",
+            "NOTRECOMMENDED":"nicht empfohlen",
+            "SELECTION":{
+                "APPTYPE": {
+                    "WEB": {
+                        "TITLE":"Web",
+                        "DESCRIPTION":"Standard Web applications wie .net, PHP, Node.js, Java, etc."
+                    },
+                    "NATIVE": {
+                        "TITLE":"NATIVE",
+                        "DESCRIPTION":"Mobile Apps, Desktop, Smart Devices, etc."
+                    },
+                    "USERAGENT": {
+                        "TITLE":"User Agent",
+                        "DESCRIPTION":"Single Page Applications (SPA) und grundsätzlich alle im Browser aufgeführten JS Frameworks"
+                    }
+                },
+                "AUTHMETHOD": {
+                    "CODE": {
+                        "TITLE":"Code",
+                        "DESCRIPTION":"Tausche den Authorization Code gegen Tokens ein"
+                    },
+                    "PKCE": {
+                        "TITLE":"PKCE",
+                        "DESCRIPTION":"Nutze einen Zufalls Hash Wert anstelle des Client Secret für mehr Sicherheit"
+                    },
+                    "POST": {
+                        "TITLE":"POST",
+                        "DESCRIPTION":"Sende client_id und client_secret im (HTML) Formular"
+                    },
+                    "PK_JWT": {
+                        "TITLE":"Private Key JWT",
+                        "DESCRIPTION":"Nutze einen Private Key um deine Application zu authentifizieren"
+                    },
+                    "IMPLICIT": {
+                        "TITLE":"Implicit",
+                        "DESCRIPTION":"Erhalte die Token direkt vom authorize Endpoint"
+                    },
+                    "CUSTOM": {
+                        "TITLE":"Custom",
+                        "DESCRIPTION":"Deine Konfiguration entspricht keiner anderen Option."
+                    }
+                }
+            }
         },
         "TOAST": {
             "REACTIVATED":"Anwendung reaktiviert.",
             "DEACTIVATED":"Anwendung deaktiviert.",
             "OIDCUPDATED":"OIDC-Konfiguration geändert.",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC-Client Secret generiert."
+            "OIDCCLIENTSECRETREGENERATED":"OIDC-Client Secret generiert.",
+            "DELETED":"App gelöscht."
         }
     },
     "GENDERS": {

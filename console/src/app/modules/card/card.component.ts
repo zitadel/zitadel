@@ -18,7 +18,7 @@ import { Component, Input } from '@angular/core';
     ],
 })
 export class CardComponent {
-    public expanded: boolean = true;
+    @Input() public expanded: boolean = true;
     @Input() public title: string = '';
     @Input() public description: string = '';
     @Input() public animate: boolean = false;

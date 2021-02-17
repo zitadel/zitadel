@@ -45,8 +45,8 @@ func (v *View) DeleteAuthNKey(keyID string, event *models.Event) error {
 	return v.ProcessedAuthNKeySequence(event)
 }
 
-func (v *View) DeleteAuthNKeysByObjectID(userID string, event *models.Event) error {
-	err := view.DeleteAuthNKey(v.Db, authNKeyTable, userID)
+func (v *View) DeleteAuthNKeysByObjectID(objectID string, event *models.Event) error {
+	err := view.DeleteAuthNKey(v.Db, authNKeyTable, objectID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

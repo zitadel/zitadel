@@ -9,16 +9,16 @@
         "STEPS_TITLE":"Complete the following steps in the order you want:",
         "STEPS": {
             "1": {
-                "TITLE":"Projekt erstellen",
-                "DESC":"Erstellen Sie Ihr erstes Projekt und legen Sie Zugangsberechtigungen eventueller Mitarbeiter fest."
+                "TITLE":"Create a project",
+                "DESC":"Create your first project and define access rights for any employees."
             },
             "2": {
-                "TITLE":"Applikation erstellen",
-                "DESC":"Erstellen Sie eine Applikation innerhalb Ihres Projektes und legen Sie dessen Eigenschaften fest."
+                "TITLE":"Create Application",
+                "DESC":"Create an application within your project and define its properties."
             },
             "3": {
-                "TITLE":"Sicherheit verbessern",
-                "DESC":"Erweitern Sie die Zugangsrichtlinien und erhöhen Sie dadurch die Sicherheit ihrer Benutzer."
+                "TITLE":"Improve security",
+                "DESC":"Extend the access policies and thereby increase the security of your users."
             }
         },
         "START":"Start",
@@ -961,12 +961,34 @@
                     "1": "Active",
                     "2": "Inactive"
                 }
+            },
+            "DIALOG": {
+                "DELETE": {
+                    "TITLE": "Delete App",
+                    "DESCRIPTION":"Do you really want to delete this application?"
+                }
+            },
+            "NEXTSTEPS": {
+                "TITLE":"Next Steps",
+                "0": {
+                    "TITLE":"Add roles",
+                    "DESC":"Enter your project roles"
+                },
+                "1": {
+                    "TITLE":"Add users",
+                    "DESC":"Add new users of your organization"
+                },
+                "2": {
+                    "TITLE":"Help & Support",
+                    "DESC":"Read our documentation on creating applications or contact our support"
+                }
             }
         },
         "NAME": "Name",
         "TYPE":"Application Type",
         "GRANT":"Grant Types",
         "OIDC": {
+            "CURRENT":"Current Config",
             "TOKENSECTIONTITLE":"AuthToken Options",
             "REDIRECTSECTIONTITLE":"Redirect Settings",
             "PROSWITCH":"I'm a pro. Skip this wizard.",
@@ -1022,13 +1044,58 @@
             "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the ID token.",
             "IDTOKENUSERINFOASSERTION":"User Info inside ID Token",
             "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Enables clients to retrieve profile, email, phone and address claims from ID token.",
-            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf."
+            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
+            "RECOMMENDED":"recommended",
+            "NOTRECOMMENDED":"not recommended",
+            "SELECTION":{
+                "APPTYPE": {
+                    "WEB": {
+                        "TITLE":"Web",
+                        "DESCRIPTION":"Regular Web applications like .net, PHP, Node.js, Java, etc."
+                    },
+                    "NATIVE": {
+                        "TITLE":"NATIVE",
+                        "DESCRIPTION":"Mobile Apps, Desktop, Smart Devices, etc."
+                    },
+                    "USERAGENT": {
+                        "TITLE":"User Agent",
+                        "DESCRIPTION":"Single Page Applications (SPA) and in general all JS frameworks executed in browsers"
+                    }
+                },
+                "AUTHMETHOD": {
+                    "CODE": {
+                        "TITLE":"Code",
+                        "DESCRIPTION":"Exchange the authorization code for the tokens"
+                    },
+                    "PKCE": {
+                        "TITLE":"PKCE",
+                        "DESCRIPTION":"Use a random hash instead of a static client secret for more security"
+                    },
+                    "POST": {
+                        "TITLE":"POST",
+                        "DESCRIPTION":"Send client_id and client_secret as part of the form"
+                    },
+                    "PK_JWT": {
+                        "TITLE":"Private Key JWT",
+                        "DESCRIPTION":"Use a private key to authorize your application"
+                    },
+                    "IMPLICIT": {
+                        "TITLE":"Implicit",
+                        "DESCRIPTION":"Get the tokens directly from the authorization endpoint"
+                    },
+                    "CUSTOM": {
+                        "TITLE":"Custom",
+                        "DESCRIPTION":"Your setting doesn't correspond to any other option."
+                    }
+                }
+            }
         },
         "TOAST": {
             "REACTIVATED":"Application reactivated.",
             "DEACTIVATED":"Application deactivated.",
             "OIDCUPDATED":"OIDC configuration updated.",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated."
+            "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated.",
+            "DELETED":"App deleted."
         }
     },
     "GENDERS": {
