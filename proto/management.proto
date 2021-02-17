@@ -479,12 +479,6 @@ message CreateUserRequest {
 message CreateUserResponse {
     string id = 1;
     zitadel.v1.MetaData meta_data = 2;
-    zitadel.user.v1.UserState state = 3;
-    string user_name = 4;
-    oneof type {
-        zitadel.user.v1.Human human = 5;
-        zitadel.user.v1.Machine machine = 6;
-    }
 }
 
 message DeactivateUserRequest {
@@ -548,7 +542,6 @@ message UpdateUserNameRequest {
 
 message UpdateUserNameResponse {
     zitadel.v1.MetaData meta_data = 1;
-    string user_name = 2;
 }
 
 message GetHumanProfileRequest {
@@ -560,7 +553,6 @@ message GetHumanProfileRequest {
 message GetHumanProfileResponse {
     string user_id = 1;
     zitadel.v1.MetaData meta_data = 2;
-    zitadel.user.v1.Profile profile = 3;
 }
 
 message UpdateHumanProfileRequest {
@@ -574,7 +566,6 @@ message UpdateHumanProfileRequest {
 
 message UpdateHumanProfileResponse {
     string user_id = 1;
-    zitadel.user.v1.Profile profile = 2;
     zitadel.v1.MetaData meta_data = 3;
 }
 
@@ -586,7 +577,6 @@ message GetHumanEmailRequest {
 
 message GetHumanEmailResponse {
     string user_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
     zitadel.user.v1.Email email = 3;
 }
 
@@ -602,7 +592,6 @@ message UpdateHumanEmailRequest {
 message UpdateHumanEmailResponse {
     string user_id = 1;
     zitadel.v1.MetaData meta_data = 2;
-    zitadel.user.v1.Email email = 3;
 }
 
 message ResendHumanInitializationRequest {
@@ -630,7 +619,6 @@ message GetHumanPhoneRequest {
 message GetHumanPhoneResponse {
     string user_id = 1;
     zitadel.v1.MetaData meta_data = 2;
-    zitadel.user.v1.Phone phone = 3;
 }
 
 message UpdateHumanPhoneRequest {
@@ -645,7 +633,6 @@ message UpdateHumanPhoneRequest {
 message UpdateHumanPhoneResponse {
     string user_id = 1;
     zitadel.v1.MetaData meta_data = 2;
-    zitadel.user.v1.Email email = 3;
 }
 
 message RemoveHumanPhoneRequest {
@@ -673,7 +660,6 @@ message GetHumanAddressRequest {
 message GetHumanAddressResponse {
     string user_id = 1;
     zitadel.v1.MetaData meta_data = 2;
-    zitadel.user.v1.Address address = 3;
 }
 
 message UpdateHumanAddressRequest {
@@ -688,7 +674,6 @@ message UpdateHumanAddressRequest {
 message UpdateHumanAddressResponse {
     string user_id = 1;
     zitadel.v1.MetaData meta_data = 2;
-    zitadel.user.v1.Address address = 3;
 }
 
 message SetInitialPasswordRequest {
