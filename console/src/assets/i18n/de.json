@@ -1034,7 +1034,7 @@
                 "AUTHMETHOD": {
                     "CODE": {
                         "TITLE":"Code",
-                        "DESCRIPTION":"Exchange the authorization code for the tokens"
+                        "DESCRIPTION":"Tausche den Authorization Code gegen Tokens ein"
                     },
                     "PKCE": {
                         "TITLE":"PKCE",
