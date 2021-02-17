@@ -1020,7 +1020,7 @@
                 "APPTYPE": {
                     "WEB": {
                         "TITLE":"Web",
-                        "DESCRIPTION":"Regular Web applications like .net, PHP, Node.js, Java, etc."
+                        "DESCRIPTION":"Standard Web applications wie .net, PHP, Node.js, Java, etc."
                     },
                     "NATIVE": {
                         "TITLE":"NATIVE",
