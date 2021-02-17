@@ -11,8 +11,6 @@ PROTO_PATH=/proto/include/zitadel
 # output folder for openapi v2
 mkdir -p ${OPENAPI_PATH}
 
-ls /proto/include
-
 protoc \
   -I=/proto/include \
   --go_out $GOPATH/src \
@@ -27,8 +25,8 @@ protoc \
   --go-grpc_opt paths=source_relative \
   --grpc-gateway_out ${GRPC_PATH} \
   --grpc-gateway_opt logtostderr=true \
-  --openapiv2_out ${OPENAPI_PATH} \
-  --openapiv2_opt logtostderr=true,paths=source_relative \ 
+  --openapiv2_out . \
+  --openapiv2_opt logtostderr=true \ 
   --authoption_out=${GRPC_PATH} \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/admin.proto
@@ -39,7 +37,7 @@ protoc \
   --go-grpc_out $GOPATH/src \
   --go-grpc_opt paths=source_relative \
   --grpc-gateway_out ${GRPC_PATH} \
-  --grpc-gateway_opt logtostderr=true,paths=source_relative \
+  --grpc-gateway_opt logtostderr=true \
   --grpc-gateway_opt allow_delete_body=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \ 

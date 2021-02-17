@@ -64,8 +64,6 @@ COPY . src/github.com/caos/zitadel/
 WORKDIR /go/src/github.com/caos/zitadel/
 RUN go mod download
 RUN ./tools/install.sh
-#ugly bastel for protoc
-RUN cp /go/bin/protoc-gen-go-grpc /go/bin/protoc-gen-go_grpc
 
 #######################
 ## Go base build
