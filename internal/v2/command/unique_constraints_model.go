@@ -44,9 +44,9 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 		case *org.OrgAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgNameUniqueConstraint(e.Name))
 		case *org.OrgChangedEvent:
-			rm.changeUniqueConstraint(e.AggregateID(), e.AggregateID(), org.NewAddOrgNameUniqueConstraint(e.Name))
+			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgNameUniqueConstraint(e.Name))
 		case *org.DomainVerifiedEvent:
-			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), org.NewAddOrgNameUniqueConstraint(e.Domain))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgNameUniqueConstraint(e.Domain))
 		case *org.DomainRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.UniqueOrgDomain)
 		case *iam.IDPConfigAddedEvent:
@@ -158,7 +158,13 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 }
 
 func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType, org.AggregateType, project.AggregateType, user.AggregateType, usergrant.AggregateType).
+	return eventstore.NewSearchQueryBuilder(
+		eventstore.ColumnsEvent,
+		iam.AggregateType,
+		org.AggregateType,
+		project.AggregateType,
+		user.AggregateType,
+		usergrant.AggregateType).
 		EventTypes(
 			org.OrgAddedEventType,
 			org.OrgChangedEventType,
