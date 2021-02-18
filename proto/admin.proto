@@ -187,6 +187,55 @@ service AdminService {
         };
     }
 
+    rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/{org_id}/policies/orgiam"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc CreateCustomOrgIAMPolicy(CreateCustomOrgIAMPolicyRequest) returns (CreateCustomOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/{org_id}/policies/orgiam"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc UpdateCustomOrgIAMPolicy(UpdateCustomOrgIAMPolicyRequest) returns (UpdateCustomOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            put: "/orgs/{org_id}/policies/orgiam"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc ResetOrgIAMPolicyToDefault(ResetOrgIAMPolicyToDefaultRequest) returns (ResetOrgIAMPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/{org_id}/policies/orgiam"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
+
+
+
+
+
+
+
     rpc GetDefaultLabelPolicy(GetDefaultLabelPolicyRequest) returns (GetDefaultLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/orgs/default/policies/label"
@@ -218,7 +267,7 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultMailTemplate(UpdateDefaultMailTemplatePolicyRequest) returns (UpdateDefaultMailTemplatePolicyResponse) {
+    rpc UpdateDefaultMailTemplatePolicy(UpdateDefaultMailTemplatePolicyRequest) returns (UpdateDefaultMailTemplatePolicyResponse) {
         option (google.api.http) = {
             put: "/policies/mailtemplate"
             body: "*"
@@ -250,8 +299,7 @@ service AdminService {
         };
     }
 
-    //TODO: imo we can just return an zitadel.idp.v1.IDP 
-    // it was IDPProvider bevore but i think identity provider provider is redundant
+
     rpc ListDefaultLoginPolicyIDPs(ListDefaultLoginPolicyIDPsRequest) returns (ListDefaultLoginPolicyIDPsResponse) {
         option (google.api.http) = {
             post: "/policies/login/idps/_search"
@@ -263,9 +311,8 @@ service AdminService {
         };
     }
 
-    //TODO: add is IMO configure a new one
-    // if we want to link an existing IDP to the policy we should also name it LinkIDP
-    rpc AddDefaultLoginPolicyIDP(AddDefaultLoginPolicyIDPRequest) returns (AddDefaultLoginPolicyIDPResponse) {
+    //TODO: discuss EnableIDPOnDefaultLoginPolicy
+    rpc AddIDPToDefaultLoginPolicy(AddIDPToDefaultLoginPolicyRequest) returns (AddIDPToDefaultLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/idps"
             body: "*"
@@ -276,9 +323,8 @@ service AdminService {
         };
     }
 
-    //TODO: remove is IMO not optimal because it could also be removed
-    // unlink might be better
-    rpc RemoveDefaultLoginPolicyIDP(RemoveDefaultLoginPolicyIDPRequest) returns (RemoveDefaultLoginPolicyIDPResponse) {
+    //TODO: discuss DisableIDPOnDefaultLoginPolicy
+    rpc RemoveIDPFromDefaultLoginPolicy(RemoveIDPFromDefaultLoginPolicyRequest) returns (RemoveIDPFromDefaultLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/idps/{idp_id}"
         };
@@ -287,6 +333,85 @@ service AdminService {
             permission: "iam.policy.write"
         };
     }
+
+    rpc ListDefaultLoginPolicySecondFactors(ListDefaultLoginPolicySecondFactorsRequest) returns (ListDefaultLoginPolicySecondFactorsResponse) {
+        option (google.api.http) = {
+            get: "/policies/login/secondfactors/_search"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    //TODO: discuss EnableSecondFactorFromDefaultLoginPolicy
+    rpc AddSecondFactorToDefaultLoginPolicy(AddSecondFactorToDefaultLoginPolicyRequest) returns (AddSecondFactorToDefaultLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/login/secondfactors"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    //TODO: discuss DisableSecondFactorFromDefaultLoginPolicy
+    rpc RemoveSecondFactorFromDefaultLoginPolicy(RemoveSecondFactorFromDefaultLoginPolicyRequest) returns (RemoveSecondFactorFromDefaultLoginPolicyResponse) {
+        option (google.api.http) = {
+            delete: "/policies/login/secondfactors/{type}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc ListDefaultLoginPolicyMultiFactors(ListDefaultLoginPolicyMultiFactorsRequest) returns (ListDefaultLoginPolicyMultiFactorsResponse) {
+        option (google.api.http) = {
+            get: "/policies/login/multifactors/_search" //TODO: shouldnt it be post?
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    //TODO: discuss EnableMultiFactorToDefaultLoginPolicy
+    rpc AddMultiFactorToDefaultLoginPolicy(AddMultiFactorToDefaultLoginPolicyRequest) returns (AddMultiFactorToDefaultLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/login/multifactors"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    //TODO: discuss DisableMultiFactorToDefaultLoginPolicy
+    rpc RemoveMultiFactorFromDefaultLoginPolicy(RemoveMultiFactorFromDefaultLoginPolicyRequest) returns (RemoveMultiFactorFromDefaultLoginPolicyResponse) {
+        option (google.api.http) = {
+            delete: "/policies/login/multifactors/{multi_factor}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     rpc GetDefaultPasswordComplexityPolicy(GetDefaultPasswordComplexityPolicyRequest) returns (GetDefaultPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
@@ -351,14 +476,58 @@ service AdminService {
         };
     }
 
-    
+    rpc ListIAMMemberRoles(ListIAMMemberRolesRequest) returns (ListIAMMemberRolesResponse) {
+        option (google.api.http) = {
+            get: "/members/roles"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.read"
+        };
+    }
 
+    rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
+        option (google.api.http) = {
+            post: "/members/_search"
+            body: "*"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.read"
+        };
+    }
 
+    rpc AddIAMMember(AddIAMMemberRequest) returns (AddIAMMemberResponse) {
+        option (google.api.http) = {
+            post: "/members"
+            body: "*"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.write"
+        };
+    }
 
+    rpc UpdateIAMMember(UpdateIAMMemberRequest) returns (UpdateIAMMemberRequest) {
+        option (google.api.http) = {
+            put: "/members/{user_id}"
+            body: "*"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.write"
+        };
+    }
+
+    rpc RemoveIAMMember(RemoveIAMMemberRequest) returns (RemoveIAMMemberResponse) {
+        option (google.api.http) = {
+            delete: "/members/{user_id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.delete"
+        };
+    }
 
     rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
         option (google.api.http) = {
@@ -547,13 +716,46 @@ message GetDefaultOrgIAMPolicyResponse {
 }
 
 message UpdateDefaultOrgIAMPolicyRequest {
-    string description = 1;
-    bool user_login_must_be_domain = 2;
+    bool user_login_must_be_domain = 1;
 }
 
 message UpdateDefaultOrgIAMPolicyResponse {
     zitadel.v1.MetaData meta_data = 1;
-    //TODO: do policies have an id?
+}
+
+message GetOrgIAMPolicyRequest {
+    string org_id = 1;
+}
+
+message GetOrgIAMPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.OrgIAMPolicy policy = 2;
+}
+
+message CreateCustomOrgIAMPolicyRequest {
+    string org_id = 1;
+    bool user_login_must_be_domain = 1;
+}
+
+message CreateCustomOrgIAMPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UpdateCustomOrgIAMPolicyRequest {
+    string org_id = 1;
+    bool user_login_must_be_domain = 1;
+}
+
+message UpdateCustomOrgIAMPolicyRequest {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ResetOrgIAMPolicyToDefaultRequest {
+    string org_id = 1;
+}
+
+message ResetOrgIAMPolicyToDefaultResponse {
+    zitadel.v1.MetaData meta_data = 1;
 }
 
 message GetDefaultLabelPolicyRequest {}
@@ -614,19 +816,89 @@ message UpdateDefaultLoginPolicyResponse {
     //TODO: do policies have an id?
 }
 
-message ListDefaultLoginPolicyIDPsRequest {}
+message ListDefaultLoginPolicyIDPsRequest {
+    zitadel.v1.Search meta_data = 1;
+}
 
-message ListDefaultLoginPolicyIDPsResponse {}
+message ListDefaultLoginPolicyIDPsResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.idp.v1.IDPLink result = 2;
+}
 
-message AddDefaultLoginPolicyIDPRequest {}
-
-message AddDefaultLoginPolicyIDPResponse {}
-
-message RemoveDefaultLoginPolicyIDPRequest {
+message AddIDPToDefaultLoginPolicyRequest {
     string idp_id = 1;
 }
 
-message RemoveDefaultLoginPolicyIDPResponse {}
+message AddIDPToDefaultLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveIDPFromDefaultLoginPolicyRequest {
+    string idp_id = 1;
+}
+
+message RemoveIDPFromDefaultLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ListDefaultLoginPolicySecondFactorsRequest {}
+
+message ListDefaultLoginPolicySecondFactorsResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.user.v1.SecondFactor result = 2;
+}
+
+message AddSecondFactorToDefaultLoginPolicyRequest {
+    zitadel.user.v1.SecondFactorType type = 1;
+}
+
+message AddSecondFactorToDefaultLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveSecondFactorFromDefaultLoginPolicyRequest {
+    zitadel.user.v1.SecondFactorType type = 1;
+}
+
+message RemoveSecondFactorFromDefaultLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ListDefaultLoginPolicyMultiFactorsRequest {}
+
+message ListDefaultLoginPolicyMultiFactorsResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.user.v1.MultiFactor result = 2;
+}
+
+message AddMultiFactorToDefaultLoginPolicyRequest {
+    zitadel.user.v1.MultiFactorType type = 1;
+}
+
+message AddMultiFactorToDefaultLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveMultiFactorFromDefaultLoginPolicyRequest {
+    zitadel.user.v1.MultiFactorType type = 1;
+}
+
+message RemoveMultiFactorFromDefaultLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 message GetDefaultPasswordComplexityPolicyRequest {}
@@ -635,7 +907,6 @@ message GetDefaultPasswordComplexityPolicyResponse {
     zitadel.v1.MetaData meta_data = 1;
     zitadel.policy.v1.PasswordComplexityPolicy policy = 2;
 }
-
 
 message UpdateDefaultPasswordComplexityPolicyRequest {
     uint32 min_length = 1;
@@ -656,7 +927,6 @@ message GetDefaultPasswordAgePolicyResponse {
     zitadel.policy.v1.PasswordAgePolicy policy = 2;
 }
 
-
 message UpdateDefaultPasswordAgePolicyRequest {
     uint64 max_age_days = 1;
     uint64 expire_warn_days = 2;
@@ -673,7 +943,6 @@ message GetDefaultPasswordLockoutPolicyResponse {
     zitadel.policy.v1.PasswordLockoutPolicy policy = 2;
 }
 
-
 message UpdateDefaultPasswordLockoutPolicyRequest {
     uint64 max_attempts = 1;
     bool show_lockout_failure = 2;
@@ -683,18 +952,50 @@ message UpdateDefaultPasswordLockoutPolicyResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
 
+message AddIAMMemberRequest {
+    string user_id = 1;
+    repeated string roles = 2;
+}
 
+message AddIAMMemberResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
 
+message UpdateIAMMemberRequest {
+    string user_id = 1;
+    repeated string roles = 2;
+}
 
+message UpdateIAMMemberResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
 
+message RemoveIAMMemberRequest {
+    string user_id = 1;
+}
 
+message RemoveIAMMemberResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
 
+message ListIAMMemberRolesRequest {}
 
+message ListIAMMemberRolesResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated string roles = 2;
+}
 
+message ListIAMMembersRequest {
+    zitadel.v1.Search meta_data = 1;
+    zitadel.member.v1.MemberFieldName sorting_column = 2;
+    zitadel.member.v1.SearchQuery query = 3;
+}
 
-
-
-
+message ListIAMMembersResponse {
+    zitadel.v1.Search meta_data = 1;
+    zitadel.member.v1.MemberFieldName sorting_column = 2;
+    repeated zitadel.member.v1.Member result = 3;
+}
 
 message ListViewsRequest {}
 

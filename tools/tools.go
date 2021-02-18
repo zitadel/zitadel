@@ -19,6 +19,6 @@ import (
 	_ "github.com/rakyll/statik"
 	//proto
 	_ "google.golang.org/grpc/cmd/protoc-gen-go-grpc"
-	//moack
+	//mock
 	_ "github.com/golang/mock/mockgen"
 )

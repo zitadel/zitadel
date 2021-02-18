@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package zitadel.policy.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/change";
+
+message UserEvent {
+    Event event = 1;
+    oneof type {
+        UserCreated created = 2;
+    }
+}
+
+message Event {
+    google.protobuf.Timestamp change_date = 1;
+    uint64 sequence = 3;
+    string editor_id = 4;
+    string editor = 5; //TODO: maybe preferred login name?
+    //TODO: do we have to provide the org?
+}

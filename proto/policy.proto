@@ -13,16 +13,13 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
 
 
 message OrgIAMPolicy {
-    //TODO: should we add org_id?
     bool user_login_must_be_domain = 1; //TODO: could be name_must_be_domain
     bool is_default = 2;
-    string description = 3;
 }
 
 message LabelPolicy {
     string primary_color = 1;
     string secondary_color = 2;
-    //TODO: description?
 }
 
 message MailTemplatePolicy {
@@ -44,9 +41,10 @@ message LoginPolicy {
     PasswordlessType passwordless_type = 5;
 }
 
-enum PasswordlessType { //TODO: naming
+enum PasswordlessType {
     PASSWORDLESS_TYPE_NOT_ALLOWED = 0;
     PASSWORDLESS_TYPE_ALLOWED = 1;
+    //TODO: PASSWORDLESS_TYPE_WITH_CERT
 }
 
 message PasswordComplexityPolicy {

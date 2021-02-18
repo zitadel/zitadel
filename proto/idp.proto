@@ -28,6 +28,12 @@ message IDP {
     }
 }
 
+message IDPLink {
+    string idp_id = 1;
+    string idp_name = 2;
+    IDPType idp_type = 3;
+}
+
 enum IDPState {
     IDP_STATE_UNSPECIFIED = 0;
 }
@@ -35,6 +41,12 @@ enum IDPState {
 enum IDPStylingType {
     STYLING_TYPE_UNSPECIFIED = 0;
     STYLING_TYPE_GOOGLE = 1;
+}
+
+enum IDPType {
+    IDPTYPE_UNSPECIFIED = 0;
+    IDPTYPE_OIDC = 1;
+    IDPTYPE_SAML = 2;
 }
 
 message OIDCConfig {

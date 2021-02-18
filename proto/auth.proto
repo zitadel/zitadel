@@ -57,6 +57,16 @@ service AuthService {
         };
     }
 
+    rpc GetMyPasswordComplexityPolicy(GetMyPasswordComplexityPolicyRequest) returns (GetMyPasswordComplexityPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/passwords/complexity"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     rpc UpdateMyPassword(UpdateMyPasswordRequest) returns (UpdateMyPasswordResponse) {
         option (google.api.http) = {
             put: "/users/me/passwords/_change"
@@ -99,7 +109,7 @@ service AuthService {
         };
     }
 
-    rpc UpdateMyEmail(UpdateMyEmailRequest) returns (UpdateMyEmailResponse) {
+    rpc SetMyEmail(SetMyEmailRequest) returns (SetMyEmailResponse) {
         option (google.api.http) = {
             put: "/users/me/email"
             body: "*"
@@ -142,7 +152,7 @@ service AuthService {
         };
     }
 
-    rpc UpdateMyPhone(UpdateMyPhoneRequest) returns (UpdateMyPhoneResponse) {
+    rpc SetMyPhone(SetMyPhoneRequest) returns (SetMyPhoneResponse) {
         option (google.api.http) = {
             put: "/users/me/phone"
             body: "*"
@@ -226,6 +236,118 @@ service AuthService {
             permission: "authenticated"
         };
     }
+
+    rpc ListMyMFAs(ListMyMFAsRequest) returns (ListMyMFAsResponse) {
+        option (google.api.http) = {
+            get: "/users/me/mfas"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc AddMyMFAOTP(AddMyMFAOTPRequest) returns (AddMyMFAOTPResponse) {
+        option (google.api.http) = {
+            post: "/users/me/mfas/otp"
+            body: "*"
+        };
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyMFAOTP(VerifyMyMFAOTPRequest) returns (VerifyMyMFAOTPResponse) {
+        option (google.api.http) = {
+            put: "/users/me/mfas/otp/_verify"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyMFAOTP(RemoveMyMFAOTPRequest) returns (RemoveMyMFAOTPResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/mfas/otp"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc AddMyMFAU2F(AddMyMFAU2FRequest returns (AddMyMFAU2FResponse) {
+        option (google.api.http) = {
+            post: "/users/me/mfas/u2f"
+            body: "*"
+        };
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyMFAU2F(VerifyMyMFAU2FRequest) returns (VerifyMyMFAU2FResponse) {
+        option (google.api.http) = {
+            put: "/users/me/mfas/u2f/_verify"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyMFAU2F(RemoveMyMFAU2FRequest) returns (RemoveMyMFAU2FResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/mfas/u2f/{token_id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyPasswordless(ListMyPasswordlessRequest) returns (ListMyPasswordlessResponse) {
+        option (google.api.http) = {
+            get: "/users/me/passwordless"
+        };
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc AddMyPasswordless(AddMyPasswordlessRequest) returns (AddMyPasswordlessResponse) {
+        option (google.api.http) = {
+            post: "/users/me/passwordless"
+            body: "*"
+        };
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyPasswordless(VerifyMyPasswordlessRequest) returns (VerifyMyPasswordlessResponse) {
+        option (google.api.http) = {
+            put: "/users/me/passwordless/_verify"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyPasswordless(RemoveMyPasswordlessRequest) returns (RemoveMyPasswordlessResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/passwordless/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
 }
 
 //GetMyUserRequest is an empty request
@@ -245,6 +367,13 @@ message UpdateMyUserNameRequest {
 message UpdateMyUserNameResponse {
     zitadel.v1.MetaData meta_data = 1;
     string user_name = 2;
+}
+
+message GetMyPasswordComplexityPolicyRequest {}
+
+message GetMyPasswordComplexityPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.PasswordComplexityPolicy policy = 2;
 }
 
 message UpdateMyPasswordRequest {
@@ -279,11 +408,11 @@ message GetMyEmailResponse {
     zitadel.user.v1.Email email = 2;
 }
 
-message UpdateMyEmailRequest {
+message SetMyEmailRequest {
     zitadel.user.v1.Email email = 1;
 }
 
-message UpdateMyEmailResponse {
+message SetMyEmailResponse {
     zitadel.v1.MetaData meta_data = 1;
     zitadel.user.v1.Email email = 2;
 }
@@ -305,11 +434,11 @@ message GetMyPhoneResponse {
     zitadel.user.v1.Phone phone = 2;
 }
 
-message UpdateMyPhoneRequest {
+message SetMyPhoneRequest {
     zitadel.user.v1.Email email = 1;
 }
 
-message UpdateMyPhoneResponse {
+message SetMyPhoneResponse {
     zitadel.v1.MetaData meta_data = 1;
     zitadel.user.v1.Email email = 2;
 }
@@ -350,7 +479,7 @@ message ListMyLinkedIDPsRequest {
 
 message ListMyLinkedIDPsResponse {
     zitadel.v1.Search meta_data = 1;
-    
+    //TODO: result
 }
 
 message RemoveMyLinkedIDPRequest {
@@ -359,5 +488,86 @@ message RemoveMyLinkedIDPRequest {
 }
 
 message RemoveMyLinkedIDPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ListMyMFAsRequest {}
+
+message ListMyMFAsResponse {
+    repeated zitadel.user.v1.MultiFactor result = 1;
+}
+
+message AddMyMFAOTPRequest {}
+
+message AddMyMFAOTPResponse {
+    string url = 1;
+    string secret = 2;
+    zitadel.v1.MetaData meta_data = 3;
+}
+
+message VerifyMyMFAOTPRequest {
+    string code = 1;
+}
+
+message VerifyMyMFAOTPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveMyMFAOTPRequest {}
+
+message RemoveMyMFAOTPResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message AddMyMFAU2FRequest {}
+
+message AddMyMFAU2FResponse {
+    zitadel.user.v1.WebAuthNKey key = 1;
+    zitadel.v1.MetaData meta_data = 2;
+}
+
+message VerifyMyMFAU2FRequest {
+    zitadel.user.v1.WebAuthNVerification verification = 1;
+}
+
+message VerifyMyMFAU2FResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveMyMFAU2FRequest {
+    string token_id = 1;
+}
+
+message RemoveMyMFAU2FResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+
+message ListMyPasswordlessRequest {}
+
+message ListMyPasswordlessResponse {
+    repeated zitadel.user.v1.Passwordless result = 1; 
+}
+
+message AddMyPasswordlessRequest {}
+
+message AddMyPasswordlessResponse {
+    zitadel.user.v1.WebAuthNKey key = 1;
+    zitadel.v1.MetaData meta_data = 2;
+}
+
+message VerifyMyPasswordlessRequest {
+    zitadel.user.v1.WebAuthNVerification verification = 1;
+}
+
+message VerifyMyPasswordlessResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveMyPasswordlessRequest {
+    string token_id = 1;
+}
+
+message RemoveMyPasswordlessResponse {
     zitadel.v1.MetaData meta_data = 1;
 }

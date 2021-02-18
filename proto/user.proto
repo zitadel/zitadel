@@ -10,47 +10,6 @@ import "google/api/field_behavior.proto";
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/user";
 
-// message UserCommand {
-//     string id = 1 [
-//         (google.api.field_behavior) = OUTPUT_ONLY
-//     ];
-//     UserState state = 3 [
-//         (google.api.field_behavior) = OUTPUT_ONLY
-//     ];
-//     string user_name = 4 [
-//         (google.api.field_behavior) = REQUIRED
-//     ];
-//     oneof type {
-//         Human human = ;
-//         Machine machine = ;
-//     }
-// }
-
-// message UserQuery {
-//     string id = 1 [
-//         (google.api.field_behavior) = OUTPUT_ONLY
-//     ];
-//     zitadel.v1.MetaData meta_data = 2 [
-//         (google.api.field_behavior) = OUTPUT_ONLY
-//     ];
-//     UserState state = 3 [
-//         (google.api.field_behavior) = OUTPUT_ONLY
-//     ];
-//     string user_name = 4 [
-//         (google.api.field_behavior) = REQUIRED
-//     ];
-//     repeated string login_names = 5 [
-//         (google.api.field_behavior) = OUTPUT_ONLY
-//     ];
-//     string preferred_login_name = 6 [
-//         (google.api.field_behavior) = OUTPUT_ONLY
-//     ];
-//     oneof type {
-//         Human human = ;
-//         Machine machine = ;
-//     }
-// }
-
 message User {
     string id = 1 [
         (google.api.field_behavior) = OUTPUT_ONLY
@@ -203,3 +162,53 @@ enum UserFieldName {
     USERFIELDNAME_STATE = 7;
     USERFIELDNAME_TYPE = 8;
 }
+
+message MultiFactor {
+    MFAState state = 1;
+    oneof type {
+        MFAOTP otp = 2;
+        MFAU2F u2f = 3;
+    }
+}
+
+enum MFAState {
+    MFA_STATE_UNSPECIFIED = 0;
+    MFA_STATE_NOT_READY = 1;
+    MFA_STATE_READY = 2;
+    MFA_STATE_REMOVED = 3;
+}
+
+message MFAOTP {}
+
+message MFAU2F {
+    string id = 1;
+    string name = 2;
+}
+
+message Passwordless {
+    string id = 1;
+    string name = 2;
+    MFAState state = 3;
+}
+
+message WebAuthNKey {
+    string id = 1;
+    bytes public_key = 2;
+}
+
+message WebAuthNVerification {
+    bytes public_key_credential = 1;
+    string token_name = 2;
+}
+
+//TODO: analog multi factor?
+message SecondFactor {
+    SecondFactorType type = 1;
+}
+
+enum SecondFactorType {
+    SECOND_FACTOR_TYPE_UNSPECIFIED = 0;
+    SECOND_FACTOR_TYPE_OTP = 1;
+    SECOND_FACTOR_TYPE_U2F = 2;
+}
+
