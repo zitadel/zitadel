@@ -26,6 +26,9 @@ import {
     UpdateUserProfileRequest,
     UserAddress,
     UserEmail,
+    UserMembershipSearchQuery,
+    UserMembershipSearchRequest,
+    UserMembershipSearchResponse,
     UserPhone,
     UserProfile,
     UserProfileView,
@@ -239,6 +242,16 @@ export class GrpcAuthService {
         return this.grpcService.auth.getMyUserSessions(
             new Empty(),
         );
+    }
+
+    public SearchUserMemberships(limit: number, offset: number, queryList?: UserMembershipSearchQuery[]): Promise<UserMembershipSearchResponse> {
+        const req = new UserMembershipSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return this.grpcService.auth.searchMyUserMemberships(req);
     }
 
     public GetMyUserEmail(): Promise<UserEmail> {

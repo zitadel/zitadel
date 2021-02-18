@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
@@ -460,5 +459,95 @@ func ctxToObjectRoot(ctx context.Context) models.ObjectRoot {
 	return models.ObjectRoot{
 		AggregateID:   ctxData.UserID,
 		ResourceOwner: ctxData.ResourceOwner,
+	}
+}
+
+func userMembershipSearchResponseFromModel(response *usr_model.UserMembershipSearchResponse) *auth.UserMembershipSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-Hs8jd").OnError(err).Debug("unable to parse timestamp")
+	return &auth.UserMembershipSearchResponse{
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            userMembershipViewsFromModel(response.Result),
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     timestamp,
+	}
+}
+
+func userMembershipViewsFromModel(memberships []*usr_model.UserMembershipView) []*auth.UserMembershipView {
+	converted := make([]*auth.UserMembershipView, len(memberships))
+	for i, membership := range memberships {
+		converted[i] = userMembershipViewFromModel(membership)
+	}
+	return converted
+}
+
+func userMembershipViewFromModel(membership *usr_model.UserMembershipView) *auth.UserMembershipView {
+	creationDate, err := ptypes.TimestampProto(membership.CreationDate)
+	logging.Log("GRPC-Msnu8").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(membership.ChangeDate)
+	logging.Log("GRPC-Slco9").OnError(err).Debug("unable to parse timestamp")
+
+	return &auth.UserMembershipView{
+		UserId:        membership.UserID,
+		AggregateId:   membership.AggregateID,
+		ObjectId:      membership.ObjectID,
+		MemberType:    memberTypeFromModel(membership.MemberType),
+		DisplayName:   membership.DisplayName,
+		Roles:         membership.Roles,
+		CreationDate:  creationDate,
+		ChangeDate:    changeDate,
+		Sequence:      membership.Sequence,
+		ResourceOwner: membership.ResourceOwner,
+	}
+}
+
+func userMembershipSearchRequestsToModel(request *auth.UserMembershipSearchRequest) *usr_model.UserMembershipSearchRequest {
+	return &usr_model.UserMembershipSearchRequest{
+		Offset:  request.Offset,
+		Limit:   request.Limit,
+		Queries: userMembershipSearchQueriesToModel(request.Queries),
+	}
+}
+
+func userMembershipSearchQueriesToModel(queries []*auth.UserMembershipSearchQuery) []*usr_model.UserMembershipSearchQuery {
+	converted := make([]*usr_model.UserMembershipSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = userMembershipSearchQueryToModel(q)
+	}
+	return converted
+}
+
+func userMembershipSearchQueryToModel(query *auth.UserMembershipSearchQuery) *usr_model.UserMembershipSearchQuery {
+	return &usr_model.UserMembershipSearchQuery{
+		Key:    userMembershipSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func userMembershipSearchKeyToModel(key auth.UserMembershipSearchKey) usr_model.UserMembershipSearchKey {
+	switch key {
+	case auth.UserMembershipSearchKey_USERMEMBERSHIPSEARCHKEY_TYPE:
+		return usr_model.UserMembershipSearchKeyMemberType
+	case auth.UserMembershipSearchKey_USERMEMBERSHIPSEARCHKEY_OBJECT_ID:
+		return usr_model.UserMembershipSearchKeyObjectID
+	default:
+		return usr_model.UserMembershipSearchKeyUnspecified
+	}
+}
+
+func memberTypeFromModel(memberType usr_model.MemberType) auth.MemberType {
+	switch memberType {
+	case usr_model.MemberTypeOrganisation:
+		return auth.MemberType_MEMBERTYPE_ORGANISATION
+	case usr_model.MemberTypeProject:
+		return auth.MemberType_MEMBERTYPE_PROJECT
+	case usr_model.MemberTypeProjectGrant:
+		return auth.MemberType_MEMBERTYPE_PROJECT_GRANT
+	default:
+		return auth.MemberType_MEMBERTYPE_UNSPECIFIED
 	}
 }

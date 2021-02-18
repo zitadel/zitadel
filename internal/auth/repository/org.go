@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
 type OrgRepository interface {

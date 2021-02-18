@@ -14,8 +14,9 @@ import (
 )
 
 type TokenRepo struct {
-	UserEvents *user_event.UserEventstore
-	View       *view.View
+	UserEvents    *user_event.UserEventstore
+	ProjectEvents *proj_event.ProjectEventstore
+	View          *view.View
 }
 
 func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error) {

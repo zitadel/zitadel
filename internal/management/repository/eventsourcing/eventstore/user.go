@@ -9,6 +9,11 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	key_model "github.com/caos/zitadel/internal/key/model"
+	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -184,27 +189,27 @@ func (repo *UserRepo) ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Cont
 	return model.ExternalIDPViewsToModel(externalIDPs), nil
 }
 
-func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (*usr_model.MachineKeyView, error) {
-	key, err := repo.View.MachineKeyByIDs(userID, keyID)
+func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (*key_model.AuthNKeyView, error) {
+	key, err := repo.View.AuthNKeyByIDs(userID, keyID)
 	if err != nil {
 		return nil, err
 	}
-	return model.MachineKeyToModel(key), nil
+	return key_view_model.AuthNKeyToModel(key), nil
 }
 
-func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *usr_model.MachineKeySearchRequest) (*usr_model.MachineKeySearchResponse, error) {
+func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	sequence, seqErr := repo.View.GetLatestMachineKeySequence()
-	logging.Log("EVENT-Sk8fs").OnError(seqErr).Warn("could not read latest user sequence")
-	keys, count, err := repo.View.SearchMachineKeys(request)
+	sequence, seqErr := repo.View.GetLatestAuthNKeySequence()
+	logging.Log("EVENT-Sk8fs").OnError(seqErr).Warn("could not read latest authn key sequence")
+	keys, count, err := repo.View.SearchAuthNKeys(request)
 	if err != nil {
 		return nil, err
 	}
-	result := &usr_model.MachineKeySearchResponse{
+	result := &key_model.AuthNKeySearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      model.MachineKeysToModel(keys),
+		Result:      key_view_model.AuthNKeysToModel(keys),
 	}
 	if seqErr == nil {
 		result.Sequence = sequence.CurrentSequence

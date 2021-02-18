@@ -19,6 +19,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { AppRadioModule } from 'src/app/modules/app-radio/app-radio.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
@@ -29,15 +30,20 @@ import { AppCreateComponent } from './app-create/app-create.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
 import { AppSecretDialogComponent } from './app-secret-dialog/app-secret-dialog.component';
 import { AppsRoutingModule } from './apps-routing.module';
+import { A11yModule } from '@angular/cdk/a11y';
+import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
 
 @NgModule({
     declarations: [
         AppCreateComponent,
         AppDetailComponent,
         AppSecretDialogComponent,
+        RedirectUrisComponent,
     ],
     imports: [
         CommonModule,
+        A11yModule,
+        AppRadioModule,
         AppsRoutingModule,
         FormsModule,
         TranslateModule,

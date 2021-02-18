@@ -189,10 +189,14 @@ Errors:
       Invalid: Applikation ist ungültig
       NotExisting: Applikation exisitert nicht
       IsNotOIDC: Applikation ist nicht vom Typ OIDC
+      IsNotAPI: Applikation ist nicht vom Typ API
       NotActive: Applikation ist nicht aktiv
       NotInactive: Applikation ist nickt inaktiv
       OIDCConfigInvalid: OIDC Konfiguration ist ungültig
-    OIDCAuthMethodNoneSecret: OIDC Auth Method None benötigt kein Secret
+      APIConfigInvalid: API Konfiguration ist ungültig
+      OIDCAuthMethodNoSecret: Gewählte OIDC Auth Method benötigt kein Secret
+      APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
+      AuthMethodNoPrivateKeyJWT: Gewählte Auth Method benötigt keinen Key
     RequiredFieldsMissing: Benötigte Felder fehlen
     Grant:
       AlreadyExists: Projekt Grant existiert bereits

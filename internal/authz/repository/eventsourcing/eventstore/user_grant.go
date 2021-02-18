@@ -2,6 +2,9 @@ package eventstore
 
 import (
 	"context"
+	global_model "github.com/caos/zitadel/internal/model"
+	user_model "github.com/caos/zitadel/internal/user/model"
+	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
@@ -24,44 +27,68 @@ func (repo *UserGrantRepo) Health() error {
 	return repo.View.Health()
 }
 
-func (repo *UserGrantRepo) ResolveGrants(ctx context.Context) (*authz.Grant, error) {
-	err := repo.FillIamProjectID(ctx)
+func (repo *UserGrantRepo) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
+	memberships, err := repo.searchUserMemberships(ctx)
 	if err != nil {
 		return nil, err
 	}
-	ctxData := authz.GetCtxData(ctx)
-
-	orgGrant, err := repo.View.UserGrantByIDs(ctxData.OrgID, repo.IamProjectID, ctxData.UserID)
-	if err != nil && !caos_errs.IsNotFound(err) {
-		return nil, err
-	}
-	iamAdminGrant, err := repo.View.UserGrantByIDs(repo.IamID, repo.IamProjectID, ctxData.UserID)
-	if err != nil && !caos_errs.IsNotFound(err) {
-		return nil, err
-	}
-
-	return mergeOrgAndAdminGrant(ctxData, orgGrant, iamAdminGrant), nil
+	return userMembershipsToMemberships(memberships), nil
 }
 
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
-	grant, err := repo.ResolveGrants(ctx)
+	memberships, err := repo.searchUserMemberships(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	if grant == nil {
-		return []string{}, nil
-	}
 	permissions := &grant_model.Permissions{Permissions: []string{}}
-	for _, role := range grant.Roles {
-		roleName, ctxID := authz.SplitPermission(role)
-		for _, mapping := range repo.Auth.RolePermissionMappings {
-			if mapping.Role == roleName {
-				permissions.AppendPermissions(ctxID, mapping.Permissions...)
-			}
+	for _, membership := range memberships {
+		for _, role := range membership.Roles {
+			permissions = repo.mapRoleToPermission(permissions, membership, role)
 		}
 	}
 	return permissions.Permissions, nil
+}
+
+func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*user_view_model.UserMembershipView, error) {
+	ctxData := authz.GetCtxData(ctx)
+	orgMemberships, orgCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
+		Queries: []*user_model.UserMembershipSearchQuery{
+			{
+				Key:    user_model.UserMembershipSearchKeyUserID,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.UserID,
+			},
+			{
+				Key:    user_model.UserMembershipSearchKeyResourceOwner,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.OrgID,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	iamMemberships, iamCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
+		Queries: []*user_model.UserMembershipSearchQuery{
+			{
+				Key:    user_model.UserMembershipSearchKeyUserID,
+				Method: global_model.SearchMethodEquals,
+				Value:  ctxData.UserID,
+			},
+			{
+				Key:    user_model.UserMembershipSearchKeyAggregateID,
+				Method: global_model.SearchMethodEquals,
+				Value:  repo.IamID,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if orgCount == 0 && iamCount == 0 {
+		return []*user_view_model.UserMembershipView{}, nil
+	}
+	return append(orgMemberships, iamMemberships...), nil
 }
 
 func (repo *UserGrantRepo) FillIamProjectID(ctx context.Context) error {
@@ -79,29 +106,32 @@ func (repo *UserGrantRepo) FillIamProjectID(ctx context.Context) error {
 	return nil
 }
 
-func mergeOrgAndAdminGrant(ctxData authz.CtxData, orgGrant, iamAdminGrant *model.UserGrantView) (grant *authz.Grant) {
-	if orgGrant != nil {
-		roles := orgGrant.RoleKeys
-		if iamAdminGrant != nil {
-			roles = addIamAdminRoles(roles, iamAdminGrant.RoleKeys)
-		}
-		grant = &authz.Grant{OrgID: orgGrant.ResourceOwner, Roles: roles}
-	} else if iamAdminGrant != nil {
-		grant = &authz.Grant{
-			OrgID: ctxData.OrgID,
-			Roles: iamAdminGrant.RoleKeys,
+func (repo *UserGrantRepo) mapRoleToPermission(permissions *grant_model.Permissions, membership *user_view_model.UserMembershipView, role string) *grant_model.Permissions {
+	for _, mapping := range repo.Auth.RolePermissionMappings {
+		if mapping.Role == role {
+			ctxID := ""
+			if membership.MemberType == int32(user_model.MemberTypeProject) || membership.MemberType == int32(user_model.MemberTypeProjectGrant) {
+				ctxID = membership.ObjectID
+			}
+			permissions.AppendPermissions(ctxID, mapping.Permissions...)
 		}
 	}
-	return grant
+	return permissions
 }
 
-func addIamAdminRoles(orgRoles, iamAdminRoles []string) []string {
-	result := make([]string, 0)
-	result = append(result, iamAdminRoles...)
-	for _, role := range orgRoles {
-		if !authz.ExistsPerm(result, role) {
-			result = append(result, role)
-		}
+func userMembershipToMembership(membership *user_view_model.UserMembershipView) *authz.Membership {
+	return &authz.Membership{
+		MemberType:  authz.MemberType(membership.MemberType),
+		AggregateID: membership.AggregateID,
+		ObjectID:    membership.ObjectID,
+		Roles:       membership.Roles,
+	}
+}
+
+func userMembershipsToMemberships(memberships []*user_view_model.UserMembershipView) []*authz.Membership {
+	result := make([]*authz.Membership, len(memberships))
+	for i, m := range memberships {
+		result[i] = userMembershipToMembership(m)
 	}
 	return result
 }
