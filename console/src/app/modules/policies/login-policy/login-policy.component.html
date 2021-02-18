@@ -28,28 +28,36 @@
                 [(ngModel)]="loginData.allowUsernamePassword">
                 {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
             </mat-slide-toggle>
-            <p>{{'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate}}</p>
+            <cnsl-info-section class="info">
+                {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate}}
+            </cnsl-info-section>
         </div>
         <div class="row">
             <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.allowRegister">
                 {{'POLICY.DATA.ALLOWREGISTER' | translate}}
             </mat-slide-toggle>
-            <p> {{'POLICY.DATA.ALLOWREGISTER_DESC' | translate}} </p>
+            <cnsl-info-section class="info">
+                {{'POLICY.DATA.ALLOWREGISTER_DESC' | translate}}
+            </cnsl-info-section>
         </div>
         <div class="row">
             <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.allowExternalIdp">
                 {{'POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
             </mat-slide-toggle>
-            <p> {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}} </p>
+            <cnsl-info-section class="info">
+                {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}}
+            </cnsl-info-section>
         </div>
         <div class="row">
             <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.forceMfa">
                 {{'POLICY.DATA.FORCEMFA' | translate}}
             </mat-slide-toggle>
-            <p> {{'POLICY.DATA.FORCEMFA_DESC' | translate}} </p>
+            <cnsl-info-section class="info">
+                {{'POLICY.DATA.FORCEMFA_DESC' | translate}}
+            </cnsl-info-section>
         </div>
         <div class="row">
             <cnsl-form-field class="form-field" label="Access Code" required="true">
@@ -96,16 +104,17 @@
             <span class="meta">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.TYPES.'+idp.type | translate }}</span>
             <span class="meta">{{ 'IDP.ID' | translate }}: {{idp.idpConfigId}}</span>
         </div>
-        <div *ngIf="!disabled" class="new-idp" (click)="openDialog()">
+        <div *ngIf="!disabled" class="new-idp" (click)="openDialog()" matRipple>
             <mat-icon>add</mat-icon>
         </div>
     </div>
 
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
-        <h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>
-        <p>{{ 'IDP.LIST.DESCRIPTION' | translate }}</p>
-        <app-idp-table [service]="service" [serviceType]="serviceType"
-            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
-        </app-idp-table>
+        <app-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}"
+            [expanded]="false">
+            <app-idp-table [service]="service" [serviceType]="serviceType"
+                [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
+            </app-idp-table>
+        </app-card>
     </ng-template>
 </app-detail-layout>

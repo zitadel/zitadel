@@ -175,7 +175,7 @@
   background-color: rgba(#8795a1, .2);
 }
 
-.next-steps {
+.next-steps {    
     h5 {
         text-transform: uppercase;
         font-size: 14px;
@@ -186,6 +186,7 @@
         width: 100%;
         display: flex;
         overflow-x: auto;
+        padding-bottom: .5rem;
 
         .step {
             min-width: 220px;

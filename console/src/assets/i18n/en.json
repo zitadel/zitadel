@@ -859,7 +859,7 @@
             "1":"active",
             "2":"inactive"
         },
-        "MAPPINTFIELD": {
+        "MAPPINGFIELD": {
           "1": "Preferred Username",
           "2": "Email"
         },
