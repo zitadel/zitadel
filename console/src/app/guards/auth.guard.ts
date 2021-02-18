@@ -3,18 +3,19 @@ import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angul
 import { Observable } from 'rxjs';
 
 import { AuthenticationService } from '../services/authentication.service';
+import { GrpcAuthService } from '../services/grpc-auth.service';
 
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-    constructor(private auth: AuthenticationService) { }
+    constructor(private auth: AuthenticationService, private authService: GrpcAuthService) { }
 
     public canActivate(
         _: ActivatedRouteSnapshot,
         state: RouterStateSnapshot,
-    ): Observable<boolean> | Promise<boolean> | boolean {
+    ): Observable<boolean> | Promise<boolean> | Promise<any> | boolean {
         if (!this.auth.authenticated) {
             return this.auth.authenticate();
         }

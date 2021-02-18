@@ -22,7 +22,8 @@ export function initPhotoSwipeFromDOM(gallerySelector) {
 
             linkEl = figureEl.children[0]; // <a> element
 
-            size = linkEl.getAttribute('data-size').split('x');
+            const dataSize = linkEl.getAttribute('data-size');
+            size = dataSize ? dataSize.split('x') : '1920x1080'.split('x');
 
             // create slide object
             item = {

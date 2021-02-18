@@ -448,15 +448,20 @@ i {
   display: block;
   margin: 0.5rem;
   text-align: start;
+  overflow: hidden;
 }
 .lgn-account-selection .lgn-account .lgn-names .lgn-displayname {
   font-size: 16px;
   margin: 0.5rem 0;
   margin-bottom: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .lgn-account-selection .lgn-account .lgn-names .lgn-loginname {
   font-size: 14px;
   margin: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .lgn-account-selection .lgn-account .lgn-names .lgn-session-state {
   margin: 0;

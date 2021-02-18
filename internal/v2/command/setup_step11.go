@@ -22,17 +22,19 @@ func (s *Step11) execute(ctx context.Context, commandSide *CommandSide) error {
 
 func (r *CommandSide) SetupStep11(ctx context.Context, step *Step11) error {
 	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
-		if !step.MigrateV1EventstoreToV2 {
-			return []eventstore.EventPusher{}, nil
-		}
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		uniqueConstraints := NewUniqueConstraintReadModel(ctx, r)
-		err := r.eventstore.FilterToQueryReducer(ctx, uniqueConstraints)
-		if err != nil {
-			return nil, err
+		var uniqueContraintMigrations []*domain.UniqueConstraintMigration
+		if step.MigrateV1EventstoreToV2 {
+			uniqueConstraints := NewUniqueConstraintReadModel(ctx, r)
+			err := r.eventstore.FilterToQueryReducer(ctx, uniqueConstraints)
+			if err != nil {
+				return nil, err
+			}
+			uniqueContraintMigrations = uniqueConstraints.UniqueConstraints
 		}
+		iamAgg.PushEvents(iam_repo.NewMigrateUniqueConstraintEvent(ctx, uniqueContraintMigrations))
 		logging.Log("SETUP-M9fsd").Info("migrate v1 eventstore to v2")
-		return []eventstore.EventPusher{iam_repo.NewMigrateUniqueConstraintEvent(ctx, iamAgg, uniqueConstraints.UniqueConstraints)}, nil
+		return []eventstore.EventPusher{iam_repo.NewMigrateUniqueConstraintEvent(ctx, iamAgg, uniqueContraintMigrations)}, nil
 	}
 	return r.setup(ctx, step, fn)
 }

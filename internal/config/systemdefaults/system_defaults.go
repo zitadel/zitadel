@@ -40,6 +40,7 @@ type SecretGenerators struct {
 	PhoneVerificationCode    crypto.GeneratorConfig
 	PasswordVerificationCode crypto.GeneratorConfig
 	MachineKeySize           uint32
+	ClientKeySize            uint32
 }
 
 type MultifactorConfig struct {

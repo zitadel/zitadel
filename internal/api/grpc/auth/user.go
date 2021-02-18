@@ -229,3 +229,13 @@ func (s *Server) GetMyUserChanges(ctx context.Context, request *auth.ChangesRequ
 	}
 	return userChangesToResponse(changes, request.GetSequenceOffset(), request.GetLimit()), nil
 }
+
+func (s *Server) SearchMyUserMemberships(ctx context.Context, in *auth.UserMembershipSearchRequest) (*auth.UserMembershipSearchResponse, error) {
+	request := userMembershipSearchRequestsToModel(in)
+	request.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
+	response, err := s.repo.SearchMyUserMemberships(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return userMembershipSearchResponseFromModel(response), nil
+}

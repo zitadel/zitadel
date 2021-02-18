@@ -2,9 +2,6 @@ package oidc
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
 	"time"
 
 	"github.com/caos/logging"
@@ -15,7 +12,10 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/query"
 )
 
 type OPHandlerConfig struct {
@@ -34,11 +34,12 @@ type StorageConfig struct {
 }
 
 type EndpointConfig struct {
-	Auth       *Endpoint
-	Token      *Endpoint
-	Userinfo   *Endpoint
-	EndSession *Endpoint
-	Keys       *Endpoint
+	Auth          *Endpoint
+	Token         *Endpoint
+	Introspection *Endpoint
+	Userinfo      *Endpoint
+	EndSession    *Endpoint
+	Keys          *Endpoint
 }
 
 type Endpoint struct {
@@ -74,6 +75,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 		),
 		op.WithCustomAuthEndpoint(op.NewEndpointWithURL(config.Endpoints.Auth.Path, config.Endpoints.Auth.URL)),
 		op.WithCustomTokenEndpoint(op.NewEndpointWithURL(config.Endpoints.Token.Path, config.Endpoints.Token.URL)),
+		op.WithCustomIntrospectionEndpoint(op.NewEndpointWithURL(config.Endpoints.Introspection.Path, config.Endpoints.Introspection.URL)),
 		op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(config.Endpoints.Userinfo.Path, config.Endpoints.Userinfo.URL)),
 		op.WithCustomEndSessionEndpoint(op.NewEndpointWithURL(config.Endpoints.EndSession.Path, config.Endpoints.EndSession.URL)),
 		op.WithCustomKeysEndpoint(op.NewEndpointWithURL(config.Endpoints.Keys.Path, config.Endpoints.Keys.URL)),

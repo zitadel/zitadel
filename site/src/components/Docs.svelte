@@ -1,8 +1,7 @@
 <script>
   import { onMount } from "svelte";
-  import GuideContents from "./GuideContents.svelte"; // TODO rename
+  import GuideContents from "./GuideContents.svelte";
   import Icon from "./Icon.svelte";
-  import manifest from '../../static/manifest.json';
   export let owner = "caos";
   export let path = "docs";
   export let project = "zitadel";	
@@ -11,7 +10,6 @@
   export let sections;
   import SearchSelector from './SearchSelector.svelte';
   import SearchTrigger from './SearchTrigger.svelte';
-  import LanguageSwitcher from './LanguageSwitcher.svelte';
   let searchEnabled = false;
   let active_section;
 
@@ -137,22 +135,6 @@
     z-index: 2;
   }
 
-  aside::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 3em;
-    background: linear-gradient(
-      to bottom,
-       #1a1f3600 0%,
-       #1a1f3680 50%,
-      #1a1f36 100%
-    );
-    pointer-events: none;
-  }
-
   .sidebar {
     position: absolute;
     font-family: var(--font);
@@ -165,10 +147,6 @@
 
   .sidebar :global(.language-switcher) {
         position: relative;
-  }
-
-  aside.open .sidebar .home {
-      display: none;
   }
 
   aside .sidebar :global(.search-trigger) {
@@ -201,7 +179,7 @@
   .content {
     width: 100%;
     margin: 0;
-    padding: var(--top-offset) var(--side-nav);
+    padding: calc(var(--top-offset) + 100px) var(--side-nav);
     tab-size: 2;
     -moz-tab-size: 2;
   }
@@ -226,12 +204,6 @@
       display: none;
     }
 
-    aside::after {
-      content: "";
-      bottom: 0;
-      height: var(--top-offset);
-    }
-
     aside button {
       display: none;
     }
@@ -247,28 +219,6 @@
       height: 100%;
       bottom: auto;
       width: 100%;
-    }
-
-    .sidebar .home {
-      position: fixed;
-      top: 0;
-      left: calc(var(--sidebar-w)/2);
-      margin: 2rem 0;
-      transform: translateX(-50%);
-      border-bottom: none;
-      display: flex;
-      align-items: center;
-      font-size: 22px;
-      padding: 0;
-    }
-
-    .sidebar .home img {
-        width: 170px;
-    }
-
-    .sidebar .home span {
-        margin-left: 3px;
-        color: var(--second);
     }
 
     .sidebar :global(.language-switcher) {
@@ -296,7 +246,7 @@
   }
 
   .content h2 {
-    margin-top: 4rem;
+    margin-top: 8rem;
     padding: 2rem 1.6rem 4rem 0.2rem;
     border-top: var(--border-w) solid #6767785b; /* based on --second */
     color: var(--heading);
@@ -518,17 +468,10 @@
 
 <aside bind:this={aside} class="sidebar-container" class:open={show_contents}>
   <div class="sidebar" on:click={() => (show_contents = false)}>
-    <a rel="prefetch" href="." class="home" title="Zitadel Docs">
-      <img src="logos/zitadel-logo-light.svg" alt="zitadel-logo" />
-      <span>DOCS</span>
-    </a>
-
     <SearchTrigger on:click={handleSearch}/>
 
     <!-- scroll container -->
     <GuideContents {dir} {sections} {active_section} {show_contents} />
-
-    <LanguageSwitcher></LanguageSwitcher>
   </div>
 
   <button on:click={() => (show_contents = !show_contents)}>

@@ -4,7 +4,8 @@
             <h2 class="title">{{title}}</h2>
             <span class="fill-space"></span>
             <ng-content select="[card-actions]"></ng-content>
-            <button class="button" matTooltip="Expand or collapse" mat-icon-button (click)="expanded = !expanded">
+            <button class="button" type="button" matTooltip="Expand or collapse" mat-icon-button
+                (click)="expanded = !expanded">
                 <mat-icon *ngIf="!expanded">keyboard_arrow_down</mat-icon>
                 <mat-icon *ngIf="expanded">keyboard_arrow_up</mat-icon>
             </button>

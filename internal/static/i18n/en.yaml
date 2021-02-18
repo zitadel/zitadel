@@ -190,8 +190,13 @@ Errors:
       IsNotOIDC: Application is not type oidc
       NotActive:: Application is not active
       NotInactive: Application is not inactive
-    OIDCConfigInvalid: OIDC configuration is invalid
-    OIDCAuthMethodNoneSecret: OIDC Auth Method None does not require a secret
+      OIDCConfigInvalid: OIDC configuration is invalid
+      APIConfigInvalid: OIDC configuration is invalid
+      IsNotOIDC: Application is not type oidc
+      IsNotAPI: Application is not type API
+      OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
+      APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
+      AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
     RequiredFieldsMissing: Some required fields are missing
     Grant:
       AlreadyExists: Project grant already exists

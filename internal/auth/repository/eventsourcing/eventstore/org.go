@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
@@ -50,6 +51,14 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
+}
+
+func (repo *OrgRepository) OrgByPrimaryDomain(primaryDomain string) (*org_model.OrgView, error) {
+	org, err := repo.View.OrgByPrimaryDomain(primaryDomain)
+	if err != nil {
+		return nil, err
+	}
+	return model.OrgToModel(org), nil
 }
 
 func (repo *OrgRepository) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
