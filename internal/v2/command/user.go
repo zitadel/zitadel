@@ -3,10 +3,8 @@ package command
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
-	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/eventstore/models"
 
 	"github.com/caos/logging"
@@ -169,8 +167,7 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	return err
 }
 
-//TODO: adlerhurst rename to AddUserToken
-func (r *CommandSide) CreateUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
+func (r *CommandSide) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
 	if orgID == "" || userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-55n8M", "Errors.IDMissing")
 	}
@@ -183,12 +180,7 @@ func (r *CommandSide) CreateUserToken(ctx context.Context, orgID, agentID, clien
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
 
-	//TODO: adlerhurst would make a seperate function for testability
-	for _, scope := range scopes {
-		if strings.HasPrefix(scope, auth_req_model.ProjectIDScope) && strings.HasSuffix(scope, auth_req_model.AudSuffix) {
-			audience = append(audience, strings.TrimSuffix(strings.TrimPrefix(scope, auth_req_model.ProjectIDScope), auth_req_model.AudSuffix))
-		}
-	}
+	audience = domain.AddAudScopeToAudience(audience, scopes)
 
 	preferredLanguage := ""
 	existingHuman, err := r.getHumanWriteModelByID(ctx, userID, orgID)

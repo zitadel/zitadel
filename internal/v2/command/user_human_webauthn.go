@@ -16,7 +16,6 @@ func (r *CommandSide) getHumanU2FTokens(ctx context.Context, userID, resourceown
 	if err != nil {
 		return nil, err
 	}
-	//TODO: adlerhurst what if no token was found? in user.go we check for state deleted and unspecified
 	if tokenReadModel.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-4M0ds", "Errors.User.NotFound")
 	}
@@ -29,7 +28,6 @@ func (r *CommandSide) getHumanPasswordlessTokens(ctx context.Context, userID, re
 	if err != nil {
 		return nil, err
 	}
-	//TODO: adlerhurst what if no token was found? in user.go we check for state deleted and unspecified
 	if tokenReadModel.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Mv9sd", "Errors.User.NotFound")
 	}
@@ -42,7 +40,6 @@ func (r *CommandSide) getHumanU2FLogin(ctx context.Context, userID, authReqID, r
 	if err != nil {
 		return nil, err
 	}
-	//TODO: adlerhurst what if no token was found? in user.go we check for state deleted and unspecified
 	if tokenReadModel.State == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5m88U", "Errors.User.NotFound")
 	}
@@ -57,7 +54,6 @@ func (r *CommandSide) getHumanPasswordlessLogin(ctx context.Context, userID, aut
 	if err != nil {
 		return nil, err
 	}
-	//TODO: adlerhurst what if no token was found? in user.go we check for state deleted and unspecified
 	if tokenReadModel.State == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fm84R", "Errors.User.NotFound")
 	}
@@ -76,7 +72,6 @@ func (r *CommandSide) HumanAddU2FSetup(ctx context.Context, userID, resourceowne
 		return nil, err
 	}
 
-	//TODO: adlerhurst move to r.addHumanWebAuthN
 	events, err := r.eventstore.PushEvents(ctx, usr_repo.NewHumanU2FAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
 	if err != nil {
 		return nil, err
@@ -272,7 +267,6 @@ func (r *CommandSide) HumanBeginPasswordlessLogin(ctx context.Context, userID, r
 			authRequestDomainToAuthRequestInfo(authRequest),
 		),
 	)
-	//TODO: adlerhurst append events on login?
 	return webAuthNLogin, err
 }
 

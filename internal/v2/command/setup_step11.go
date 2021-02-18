@@ -32,7 +32,6 @@ func (r *CommandSide) SetupStep11(ctx context.Context, step *Step11) error {
 			}
 			uniqueContraintMigrations = uniqueConstraints.UniqueConstraints
 		}
-		iamAgg.PushEvents(iam_repo.NewMigrateUniqueConstraintEvent(ctx, uniqueContraintMigrations))
 		logging.Log("SETUP-M9fsd").Info("migrate v1 eventstore to v2")
 		return []eventstore.EventPusher{iam_repo.NewMigrateUniqueConstraintEvent(ctx, iamAgg, uniqueContraintMigrations)}, nil
 	}
