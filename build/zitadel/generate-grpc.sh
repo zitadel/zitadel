@@ -40,7 +40,7 @@ protoc \
   --grpc-gateway_opt logtostderr=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
-  --authoption_out=${GOPATH}/src \
+  --authoption_out=${GRPC_PATH}/admin \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/admin.proto
 
@@ -53,7 +53,7 @@ protoc \
   --grpc-gateway_opt allow_delete_body=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
-  --authoption_out=${GOPATH}/src \
+  --authoption_out=${GRPC_PATH}/management \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/management.proto
 
@@ -65,7 +65,7 @@ protoc \
   --grpc-gateway_opt logtostderr=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
-  --authoption_out=${GOPATH}/src \
+  --authoption_out=${GRPC_PATH}/auth \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/auth.proto
 
