@@ -316,6 +316,15 @@ func TestBucket_AdaptClean(t *testing.T) {
 	namespace := "testNs"
 
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "BucketBackup", "v0"), "testComponent")
+	k8sLabels := map[string]string{
+		"app.kubernetes.io/component":  "testComponent",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       "backup-serviceaccountjson",
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
 
 	timestamp := "test"
 	nodeselector := map[string]string{"test": "test"}
@@ -344,7 +353,7 @@ func TestBucket_AdaptClean(t *testing.T) {
 		return nil
 	}
 
-	SetClean(client, namespace, backupName)
+	SetClean(client, namespace, backupName, k8sLabels, saJson)
 
 	query, _, _, err := AdaptFunc(
 		backupName,

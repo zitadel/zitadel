@@ -159,7 +159,7 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 
 	features := []string{restore.Instant, clean.Instant}
 	bucket.SetRestore(k8sClient, namespace, backupName, labels, saJson)
-	bucket.SetClean(k8sClient, namespace, backupName)
+	bucket.SetClean(k8sClient, namespace, backupName, labels, saJson)
 	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(60)).Times(2)
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)

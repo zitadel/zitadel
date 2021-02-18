@@ -207,24 +207,45 @@ func AdaptFunc(
 				}
 
 				queriers := make([]operator.QueryFunc, 0)
+				cleanupQueries := make([]operator.QueryFunc, 0)
 				if databases != nil && len(databases) != 0 {
 					for _, feature := range features {
 						switch feature {
-						case backup.Normal, backup.Instant:
+						case backup.Normal:
 							queriers = append(queriers,
 								operator.ResourceQueryToZitadelQuery(queryS),
 								queryB,
 							)
+						case backup.Instant:
+							queriers = append(queriers,
+								operator.ResourceQueryToZitadelQuery(queryS),
+								queryB,
+							)
+							cleanupQueries = append(cleanupQueries,
+								operator.EnsureFuncToQueryFunc(backup.GetCleanupFunc(monitor, namespace, name)),
+							)
 						case clean.Instant:
 							queriers = append(queriers,
+								operator.ResourceQueryToZitadelQuery(queryS),
 								queryC,
+							)
+							cleanupQueries = append(cleanupQueries,
+								operator.EnsureFuncToQueryFunc(clean.GetCleanupFunc(monitor, namespace, name)),
 							)
 						case restore.Instant:
 							queriers = append(queriers,
+								operator.ResourceQueryToZitadelQuery(queryS),
 								queryR,
+							)
+							cleanupQueries = append(cleanupQueries,
+								operator.EnsureFuncToQueryFunc(restore.GetCleanupFunc(monitor, namespace, name)),
 							)
 						}
 					}
+				}
+
+				for _, cleanup := range cleanupQueries {
+					queriers = append(queriers, cleanup)
 				}
 
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)

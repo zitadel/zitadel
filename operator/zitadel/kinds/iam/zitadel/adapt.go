@@ -245,6 +245,7 @@ func AdaptFunc(
 							//migration
 							queryM,
 							queryReadyM,
+							operator.EnsureFuncToQueryFunc(migration.GetCleanupFunc(monitor, namespace, action)),
 						)
 					case "iam":
 						queriers = append(queriers,
