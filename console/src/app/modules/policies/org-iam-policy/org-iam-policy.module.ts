@@ -9,6 +9,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { InfoSectionModule } from '../../info-section/info-section.module';
 
 import { OrgIamPolicyRoutingModule } from './org-iam-policy-routing.module';
 import { OrgIamPolicyComponent } from './org-iam-policy.component';
@@ -25,6 +26,7 @@ import { OrgIamPolicyComponent } from './org-iam-policy.component';
         MatIconModule,
         HasRoleModule,
         MatTooltipModule,
+        InfoSectionModule,
         TranslateModule,
         DetailLayoutModule,
     ],

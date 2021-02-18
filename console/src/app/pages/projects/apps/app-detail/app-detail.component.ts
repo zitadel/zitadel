@@ -1,5 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
@@ -7,7 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
@@ -96,6 +97,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public OIDCTokenType: any = OIDCTokenType;
 
     public ChangeType: any = ChangeType;
+
+    public requestRedirectValuesSubject$: Subject<void> = new Subject();
+    public copiedKey: any = '';
+    public environmentMap: { [key: string]: string; } = {};
+
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
@@ -106,7 +112,19 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private mgmtService: ManagementService,
         private authService: GrpcAuthService,
         private router: Router,
+        private http: HttpClient,
     ) {
+        this.http.get('./assets/environment.json')
+            .toPromise().then((env: any) => {
+
+                this.environmentMap = {
+                    issuer: env.issuer,
+                    adminServiceUrl: env.adminServiceUrl,
+                    mgmtServiceUrl: env.mgmtServiceUrl,
+                    authServiceUrl: env.adminServiceUrl,
+                };
+            });
+
         this.appNameForm = this.fb.group({
             state: [{ value: '', disabled: true }, []],
             name: [{ value: '', disabled: true }, [Validators.required]],
@@ -297,6 +315,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
 
     public saveOIDCApp(): void {
+        this.requestRedirectValuesSubject$.next();
         if (this.appNameForm.valid) {
             this.app.name = this.name?.value;
         }

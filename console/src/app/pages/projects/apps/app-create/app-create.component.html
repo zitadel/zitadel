@@ -15,7 +15,8 @@
         {{'APP.OIDC.PROSWITCH' | translate}}
     </mat-checkbox>
 
-    <mat-horizontal-stepper class="stepper" *ngIf="!devmode" linear #stepper labelPosition="bottom">
+    <mat-horizontal-stepper class="stepper" *ngIf="!devmode" linear #stepper labelPosition="bottom"
+        (selectionChange)="changeStep($event)">
         <mat-step [stepControl]="firstFormGroup" [editable]="true">
             <form [formGroup]="firstFormGroup">
                 <ng-template matStepLabel>{{'APP.OIDC.NAMEANDTYPESECTION' | translate}}</ng-template>
@@ -69,7 +70,7 @@
 
             <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
                 (changedUris)="oidcApp.redirectUrisList = $event" [urisList]="oidcApp.redirectUrisList"
-                title="{{ 'APP.OIDC.REDIRECT' | translate }}">
+                [getValues]="requestRedirectValuesSubject$" title="{{ 'APP.OIDC.REDIRECT' | translate }}">
             </cnsl-redirect-uris>
 
             <p class="step-title">{{'APP.OIDC.POSTREDIRECTTITLE' | translate}}</p>
@@ -82,7 +83,8 @@
 
             <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
                 (changedUris)="oidcApp.postLogoutRedirectUrisList = $event"
-                [urisList]="oidcApp.postLogoutRedirectUrisList" title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
+                [urisList]="oidcApp.postLogoutRedirectUrisList" title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+                [getValues]="requestRedirectValuesSubject$">
             </cnsl-redirect-uris>
 
             <div class="actions">
@@ -220,13 +222,14 @@
                 <div class="formfield full-width">
                     <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
                         (changedUris)="oidcApp.redirectUrisList = $event" [urisList]="oidcApp.redirectUrisList"
-                        title="{{ 'APP.OIDC.REDIRECT' | translate }}">
+                        title="{{ 'APP.OIDC.REDIRECT' | translate }}" [getValues]="requestRedirectValuesSubject$">
                     </cnsl-redirect-uris>
 
                     <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
                         (changedUris)="oidcApp.postLogoutRedirectUrisList = $event"
                         [urisList]="oidcApp.postLogoutRedirectUrisList"
-                        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
+                        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+                        [getValues]="requestRedirectValuesSubject$">
                     </cnsl-redirect-uris>
                 </div>
             </div>

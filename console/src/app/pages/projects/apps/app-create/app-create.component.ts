@@ -4,7 +4,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import {
@@ -26,6 +26,7 @@ import {
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import { CODE_METHOD, getPartialConfigFromAuthMethod, IMPLICIT_METHOD, PKCE_METHOD, PK_JWT_METHOD, POST_METHOD } from '../authmethods';
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
 
 
 @Component({
@@ -87,6 +88,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         ];
 
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
+    public requestRedirectValuesSubject$: Subject<void> = new Subject();
 
     constructor(
         private router: Router,
@@ -178,6 +180,12 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.subscription?.unsubscribe();
     }
 
+    public changeStep(event: StepperSelectionEvent) {
+        if (event.selectedIndex >= 2) {
+            this.requestRedirectValuesSubject$.next();
+        };
+    }
+
     public changedAppType(type: OIDCApplicationType) {
         this.firstFormGroup.controls['applicationType'].setValue(type);
     }
@@ -197,6 +205,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     }
 
     public saveOIDCApp(): void {
+        this.requestRedirectValuesSubject$.next();
+
         this.loading = true;
         this.mgmtService
             .CreateOIDCApp(this.oidcApp)

@@ -988,6 +988,10 @@
         "TYPE":"Anwendungstyp",
         "GRANT":"Berechtigungstypen",
         "OIDC": {
+            "INFO": {
+                "ISSUER":"Issuer",
+                "CLIENTID":"Client Id"
+            },
             "CURRENT":"Aktuelle Konfiguration",
             "TOKENSECTIONTITLE":"AuthToken Optionen",
             "REDIRECTSECTIONTITLE":"Weiterleitungseinstellungen",

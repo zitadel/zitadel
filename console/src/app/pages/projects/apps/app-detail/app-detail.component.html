@@ -59,6 +59,36 @@
             <p><strong>Issuer:</strong> {{docs.issuer}}</p>
         </cnsl-info-section> -->
 
+        <div class="environment-wrapper">
+
+            <div class="environment" *ngIf="app?.oidcConfig?.clientId">
+                <span class="key">{{'APP.OIDC.INFO.CLIENTID' | translate}}</span>
+                <div class="environment-row">
+                    <span>{{this.app.oidcConfig?.clientId}}</span>
+                    <button color="primary" [disabled]="copiedKey == this.app.oidcConfig?.clientId"
+                        [matTooltip]="(copiedKey != this.app.oidcConfig?.clientId ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                        appCopyToClipboard [valueToCopy]="this.app.oidcConfig?.clientId"
+                        (copiedValue)="copiedKey = 'clientId'" mat-icon-button>
+                        <i *ngIf="copiedKey != 'clientId'" class="las la-clipboard"></i>
+                        <i *ngIf="copiedKey == 'clientId'" class="las la-clipboard-check"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="environment" *ngFor="let environmentV of (environmentMap | keyvalue)">
+                <span class="key">{{environmentV.key}}</span>
+                <div class="environment-row">
+                    <span>{{environmentV.value}}</span>
+                    <button color="primary" [disabled]="copiedKey == environmentV.value"
+                        [matTooltip]="(copiedKey != environmentV.value ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                        appCopyToClipboard [valueToCopy]="environmentV.value"
+                        (copiedValue)="copiedKey = environmentV.key" mat-icon-button>
+                        <i *ngIf="copiedKey != environmentV.key" class="las la-clipboard"></i>
+                        <i *ngIf="copiedKey == environmentV.key" class="las la-clipboard-check"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="compliance"
             *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
             <cnsl-info-section class="problem" type="WARN">
@@ -90,13 +120,13 @@
             <div style="margin: .5rem" class="divider"></div>
 
             <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode?.value"
-                (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
-                title="{{ 'APP.OIDC.REDIRECT' | translate }}">
+                [getValues]="requestRedirectValuesSubject$" (changedUris)="redirectUrisList = $event"
+                [urisList]="redirectUrisList" title="{{ 'APP.OIDC.REDIRECT' | translate }}">
             </cnsl-redirect-uris>
 
             <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode?.value"
                 (changedUris)="postLogoutRedirectUrisList = $event" [urisList]="postLogoutRedirectUrisList"
-                title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
+                [getValues]="requestRedirectValuesSubject$" title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
             </cnsl-redirect-uris>
         </div>
 

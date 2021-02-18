@@ -988,6 +988,10 @@
         "TYPE":"Application Type",
         "GRANT":"Grant Types",
         "OIDC": {
+            "INFO": {
+                "ISSUER":"Issuer",
+                "CLIENTID":"Client Id"
+            },
             "CURRENT":"Current Config",
             "TOKENSECTIONTITLE":"AuthToken Options",
             "REDIRECTSECTIONTITLE":"Redirect Settings",
