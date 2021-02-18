@@ -10,7 +10,7 @@
         {{(componentType == LoginMethodComponentType.SecondFactor ? 'MFA.SECONDFACTORTYPES.':
         LoginMethodComponentType.MultiFactor ? 'MFA.MULTIFACTORTYPES.': '')+mfa | translate}}
     </div>
-    <div class="mfa" (click)="addMfa()" matRipple>
+    <div class="new-mfa" (click)="addMfa()" matRipple>
         <mat-icon>add</mat-icon>
     </div>
 </div>

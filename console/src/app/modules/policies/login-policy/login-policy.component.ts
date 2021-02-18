@@ -9,6 +9,7 @@ import {
     DefaultLoginPolicyRequest,
     DefaultLoginPolicyView,
     IdpProviderView as AdminIdpProviderView,
+    IdpStylingType,
     IdpView as AdminIdpView,
     PasswordlessType as AdminPasswordlessType,
 } from 'src/app/proto/generated/admin_pb';
@@ -46,6 +47,8 @@ export class LoginPolicyComponent implements OnDestroy {
 
     public loading: boolean = false;
     public disabled: boolean = true;
+
+    public IdpStylingType: any = IdpStylingType;
     constructor(
         private route: ActivatedRoute,
         private toast: ToastService,
