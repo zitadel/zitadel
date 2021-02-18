@@ -53,6 +53,14 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 	return result, nil
 }
 
+func (repo *OrgRepository) OrgByPrimaryDomain(primaryDomain string) (*org_model.OrgView, error) {
+	org, err := repo.View.OrgByPrimaryDomain(primaryDomain)
+	if err != nil {
+		return nil, err
+	}
+	return model.OrgToModel(org), nil
+}
+
 func (repo *OrgRepository) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
 	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {

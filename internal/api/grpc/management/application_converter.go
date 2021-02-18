@@ -2,18 +2,20 @@ package management
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/v2/domain"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
+
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
@@ -24,6 +26,28 @@ func appFromDomain(app domain.Application) *management.Application {
 		State: appStateFromDomain(app.GetState()),
 		Name:  app.GetApplicationName(),
 	}
+}
+func appFromModel(app *proj_model.Application) *management.Application {
+	changeDate, err := ptypes.TimestampProto(app.ChangeDate)
+	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
+
+	return &management.Application{
+		Id:         app.AppID,
+		State:      appStateFromModel(app.State),
+		ChangeDate: changeDate,
+		Name:       app.Name,
+		Sequence:   app.Sequence,
+		AppConfig:  appConfigFromModel(app),
+	}
+}
+
+func appConfigFromModel(app *proj_model.Application) management.AppConfig {
+	if app.Type == proj_model.AppTypeAPI {
+		return &management.Application_ApiConfig{
+			ApiConfig: apiConfigFromModel(app.APIConfig),
+		}
+	}
+	return nil
 }
 
 func oidcAppFromDomain(app *domain.OIDCApp) *management.Application {
@@ -83,11 +107,11 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *manage
 		ClientId:                 app.OIDCClientID,
 		AuthMethodType:           oidcAuthMethodTypeFromModel(app.OIDCAuthMethodType),
 		PostLogoutRedirectUris:   app.OIDCPostLogoutRedirectUris,
-		Version:                  oidcVersionFromModel(app.OIDCVersion),
+		Version:                  oidcVersionFromDomain(domain.OIDCVersion(app.OIDCVersion)),
 		NoneCompliant:            app.NoneCompliant,
 		ComplianceProblems:       complianceProblemsToLocalizedMessages(app.ComplianceProblems),
 		DevMode:                  app.DevMode,
-		AccessTokenType:          oidcTokenTypeFromModel(app.AccessTokenType),
+		AccessTokenType:          oidcTokenTypeFromDomain(domain.OIDCTokenType(app.AccessTokenType)),
 		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
 		IdTokenRoleAssertion:     app.IDTokenRoleAssertion,
 		IdTokenUserinfoAssertion: app.IDTokenUserinfoAssertion,
@@ -447,7 +471,7 @@ func oidcAuthMethodTypeToDomain(authType management.OIDCAuthMethodType) domain.O
 	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
 		return domain.OIDCAuthMethodTypeNone
 	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT:
-		return proj_model.OIDCAuthMethodTypePrivateKeyJWT
+		return domain.OIDCAuthMethodTypePrivateKeyJWT
 	default:
 		return domain.OIDCAuthMethodTypeBasic
 	}
@@ -493,23 +517,7 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) managem
 }
 
 func oidcTokenTypeToDomain(tokenType management.OIDCTokenType) domain.OIDCTokenType {
-	func
-	apiAuthMethodTypeFromModel(authType
-	proj_model.APIAuthMethodType) management.APIAuthMethodType{
-		switch authType{
-	case proj_model.APIAuthMethodTypeBasic:
-		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
-	case proj_model.APIAuthMethodTypePrivateKeyJWT:
-		return management.APIAuthMethodType_APIAUTHMETHODTYPE_PRIVATE_KEY_JWT
-	default:
-		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
-	}
-	}
-
-	func
-	oidcTokenTypeToModel(tokenType
-	management.OIDCTokenType) proj_model.OIDCTokenType{
-		switch tokenType{
+	switch tokenType {
 	case management.OIDCTokenType_OIDCTokenType_Bearer:
 		return domain.OIDCTokenTypeBearer
 	case management.OIDCTokenType_OIDCTokenType_JWT:
@@ -517,12 +525,10 @@ func oidcTokenTypeToDomain(tokenType management.OIDCTokenType) domain.OIDCTokenT
 	default:
 		return domain.OIDCTokenTypeBearer
 	}
-	}
+}
 
-	func
-	oidcTokenTypeFromDomain(tokenType
-	domain.OIDCTokenType) management.OIDCTokenType{
-		switch tokenType{
+func oidcTokenTypeFromDomain(tokenType domain.OIDCTokenType) management.OIDCTokenType {
+	switch tokenType {
 	case domain.OIDCTokenTypeBearer:
 		return management.OIDCTokenType_OIDCTokenType_Bearer
 	case domain.OIDCTokenTypeJWT:
@@ -530,131 +536,106 @@ func oidcTokenTypeToDomain(tokenType management.OIDCTokenType) domain.OIDCTokenT
 	default:
 		return management.OIDCTokenType_OIDCTokenType_Bearer
 	}
-	}
+}
 
-	func
-	oidcTokenTypeFromModel(tokenType
-	proj_model.OIDCTokenType) management.OIDCTokenType{
-		switch tokenType{
-	case proj_model.OIDCTokenTypeBearer:
-		return management.OIDCTokenType_OIDCTokenType_Bearer
-	case proj_model.OIDCTokenTypeJWT:
-		return management.OIDCTokenType_OIDCTokenType_JWT
+func apiAuthMethodTypeFromModel(authType proj_model.APIAuthMethodType) management.APIAuthMethodType {
+	switch authType {
+	case proj_model.APIAuthMethodTypeBasic:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
+	case proj_model.APIAuthMethodTypePrivateKeyJWT:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_PRIVATE_KEY_JWT
 	default:
-		return management.OIDCTokenType_OIDCTokenType_Bearer
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
 	}
-	}
+}
 
-	func
-	oidcVersionFromDomain(version
-	domain.OIDCVersion) management.OIDCVersion{
-		switch version{
+func oidcVersionFromDomain(version domain.OIDCVersion) management.OIDCVersion {
+	switch version {
 	case domain.OIDCVersionV1:
 		return management.OIDCVersion_OIDCV1_0
 	default:
 		return management.OIDCVersion_OIDCV1_0
 	}
-	}
+}
 
-	func
-	oidcVersionFromModel(version
-	proj_model.OIDCVersion) management.OIDCVersion{
-		switch version{
-	case proj_model.OIDCVersionV1:
-		return management.OIDCVersion_OIDCV1_0
-	default:
-		return management.OIDCVersion_OIDCV1_0
+func appChangesToResponse(response *proj_model.ApplicationChanges, offset uint64, limit uint64) (_ *management.Changes) {
+	return &management.Changes{
+		Limit:   limit,
+		Offset:  offset,
+		Changes: appChangesToMgtAPI(response),
 	}
-	}
+}
 
-	func
-	appChangesToResponse(response*proj_model.ApplicationChanges, offset
-	uint64, limit
-	uint64) (_ * management.Changes)
-	{
-		return &management.Changes{
-			Limit:   limit,
-			Offset:  offset,
-			Changes: appChangesToMgtAPI(response),
+func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*management.Change) {
+	result := make([]*management.Change, len(changes.Changes))
+
+	for i, change := range changes.Changes {
+		b, err := json.Marshal(change.Data)
+		data := &structpb.Struct{}
+		err = protojson.Unmarshal(b, data)
+		if err != nil {
+		}
+		result[i] = &management.Change{
+			ChangeDate: change.ChangeDate,
+			EventType:  message.NewLocalizedEventType(change.EventType),
+			Sequence:   change.Sequence,
+			Editor:     change.ModifierName,
+			EditorId:   change.ModifierId,
+			Data:       data,
 		}
 	}
 
-	func
-	appChangesToMgtAPI(changes * proj_model.ApplicationChanges)(_
-	[]*management.Change) {
-		result := make([]*management.Change, len(changes.Changes))
+	return result
+}
 
-		for i, change := range changes.Changes {
-			b, err := json.Marshal(change.Data)
-			data := &structpb.Struct{}
-			err = protojson.Unmarshal(b, data)
-			if err != nil {
-			}
-			result[i] = &management.Change{
-				ChangeDate: change.ChangeDate,
-				EventType:  message.NewLocalizedEventType(change.EventType),
-				Sequence:   change.Sequence,
-				Editor:     change.ModifierName,
-				EditorId:   change.ModifierId,
-				Data:       data,
-			}
-		}
-
-		return result
-	}
-
-	func
-	clientKeyViewsFromModel(keys... * key_model.AuthNKeyView) []*management.ClientKeyView{
-		keyViews := make([]*management.ClientKeyView, len(keys))
-		for i, key := range keys{
+func clientKeyViewsFromModel(keys ...*key_model.AuthNKeyView) []*management.ClientKeyView {
+	keyViews := make([]*management.ClientKeyView, len(keys))
+	for i, key := range keys {
 		keyViews[i] = clientKeyViewFromModel(key)
 	}
-		return keyViews
-	}
+	return keyViews
+}
 
-	func
-	clientKeyViewFromModel(key*key_model.AuthNKeyView) * management.ClientKeyView{
-		creationDate, err, := ptypes.TimestampProto(key.CreationDate)
-		logging.Log("MANAG-DAs2t").OnError(err).Debug("unable to parse timestamp")
+func clientKeyViewFromModel(key *key_model.AuthNKeyView) *management.ClientKeyView {
+	creationDate, err := ptypes.TimestampProto(key.CreationDate)
+	logging.Log("MANAG-DAs2t").OnError(err).Debug("unable to parse timestamp")
 
-		expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
-		logging.Log("MANAG-BDgh4").OnError(err).Debug("unable to parse timestamp")
+	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
+	logging.Log("MANAG-BDgh4").OnError(err).Debug("unable to parse timestamp")
 
-		return &management.ClientKeyView{
+	return &management.ClientKeyView{
 		Id:             key.ID,
 		CreationDate:   creationDate,
 		ExpirationDate: expirationDate,
 		Sequence:       key.Sequence,
 		Type:           authNKeyTypeFromModel(key.Type),
 	}
-	}
+}
 
-	func
-	addClientKeyToModel(key*management.AddClientKeyRequest) * proj_model.ClientKey{
-		expirationDate := time.Time{}
-		if key.ExpirationDate != nil{
+func addClientKeyToModel(key *management.AddClientKeyRequest) *proj_model.ClientKey {
+	expirationDate := time.Time{}
+	if key.ExpirationDate != nil {
 		var err error
 		expirationDate, err = ptypes.Timestamp(key.ExpirationDate)
 		logging.Log("MANAG-Dgt42").OnError(err).Debug("unable to parse expiration date")
 	}
 
-		return &proj_model.ClientKey{
+	return &proj_model.ClientKey{
 		ExpirationDate: expirationDate,
 		Type:           authNKeyTypeToModel(key.Type),
 		ApplicationID:  key.ApplicationId,
 		ObjectRoot:     models.ObjectRoot{AggregateID: key.ProjectId},
 	}
-	}
+}
 
-	func
-	addClientKeyFromModel(key*proj_model.ClientKey) * management.AddClientKeyResponse{
-		creationDate, err, := ptypes.TimestampProto(key.CreationDate)
-		logging.Log("MANAG-FBzz4").OnError(err).Debug("unable to parse cretaion date")
+func addClientKeyFromModel(key *proj_model.ClientKey) *management.AddClientKeyResponse {
+	creationDate, err := ptypes.TimestampProto(key.CreationDate)
+	logging.Log("MANAG-FBzz4").OnError(err).Debug("unable to parse cretaion date")
 
-		expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
-		logging.Log("MANAG-sag21").OnError(err).Debug("unable to parse cretaion date")
+	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
+	logging.Log("MANAG-sag21").OnError(err).Debug("unable to parse cretaion date")
 
-		detail, err := json.Marshal(struct{
+	detail, err := json.Marshal(struct {
 		Type     string `json:"type"`
 		KeyID    string `json:"keyId"`
 		Key      string `json:"key"`
@@ -667,9 +648,9 @@ func oidcTokenTypeToDomain(tokenType management.OIDCTokenType) domain.OIDCTokenT
 		AppID:    key.ApplicationID,
 		ClientID: key.ClientID,
 	})
-		logging.Log("MANAG-adt42").OnError(err).Warn("unable to marshall key")
+	logging.Log("MANAG-adt42").OnError(err).Warn("unable to marshall key")
 
-		return &management.AddClientKeyResponse{
+	return &management.AddClientKeyResponse{
 		Id:             key.KeyID,
 		CreationDate:   creationDate,
 		ExpirationDate: expirationDate,
@@ -677,56 +658,50 @@ func oidcTokenTypeToDomain(tokenType management.OIDCTokenType) domain.OIDCTokenT
 		KeyDetails:     detail,
 		Type:           authNKeyTypeFromModel(key.Type),
 	}
-	}
+}
 
-	func
-	authNKeyTypeToModel(typ
-	management.AuthNKeyType) key_model.AuthNKeyType{
-		switch typ{
+func authNKeyTypeToModel(typ management.AuthNKeyType) key_model.AuthNKeyType {
+	switch typ {
 	case management.AuthNKeyType_AUTHNKEY_JSON:
 		return key_model.AuthNKeyTypeJSON
 	default:
 		return key_model.AuthNKeyTypeNONE
 	}
-	}
+}
 
-	func
-	authNKeyTypeFromModel(typ
-	key_model.AuthNKeyType) management.AuthNKeyType{
-		switch typ{
+func authNKeyTypeFromModel(typ key_model.AuthNKeyType) management.AuthNKeyType {
+	switch typ {
 	case key_model.AuthNKeyTypeJSON:
 		return management.AuthNKeyType_AUTHNKEY_JSON
 	default:
 		return management.AuthNKeyType_AUTHNKEY_UNSPECIFIED
 	}
-	}
+}
 
-	func
-	clientKeySearchRequestToModel(req*management.ClientKeySearchRequest) * key_model.AuthNKeySearchRequest{
-		return &key_model.AuthNKeySearchRequest{
+func clientKeySearchRequestToModel(req *management.ClientKeySearchRequest) *key_model.AuthNKeySearchRequest {
+	return &key_model.AuthNKeySearchRequest{
 		Offset: req.Offset,
 		Limit:  req.Limit,
 		Asc:    req.Asc,
 		Queries: []*key_model.AuthNKeySearchQuery{
-	{
-		Key:    key_model.AuthNKeyObjectType,
-		Method: model.SearchMethodEquals,
-		Value:  key_model.AuthNKeyObjectTypeApplication,
-	},{
-		Key:    key_model.AuthNKeyObjectID,
-		Method: model.SearchMethodEquals,
-		Value:  req.ApplicationId,
-	},
-	},
+			{
+				Key:    key_model.AuthNKeyObjectType,
+				Method: model.SearchMethodEquals,
+				Value:  key_model.AuthNKeyObjectTypeApplication,
+			}, {
+				Key:    key_model.AuthNKeyObjectID,
+				Method: model.SearchMethodEquals,
+				Value:  req.ApplicationId,
+			},
+		},
 	}
-	}
+}
 
-	func
-	clientKeySearchResponseFromModel(req*key_model.AuthNKeySearchResponse) * management.ClientKeySearchResponse{
-		viewTimestamp, err, := ptypes.TimestampProto(req.Timestamp)
-		logging.Log("MANAG-Sk9ds").OnError(err).Debug("unable to parse cretaion date")
+func clientKeySearchResponseFromModel(req *key_model.AuthNKeySearchResponse) *management.ClientKeySearchResponse {
+	viewTimestamp, err := ptypes.TimestampProto(req.Timestamp)
+	logging.Log("MANAG-Sk9ds").OnError(err).Debug("unable to parse cretaion date")
 
-		return &management.ClientKeySearchResponse{
+	return &management.ClientKeySearchResponse{
 		Offset:            req.Offset,
 		Limit:             req.Limit,
 		TotalResult:       req.TotalResult,
@@ -734,4 +709,4 @@ func oidcTokenTypeToDomain(tokenType management.OIDCTokenType) domain.OIDCTokenT
 		ViewTimestamp:     viewTimestamp,
 		Result:            clientKeyViewsFromModel(req.Result...),
 	}
-	}
+}

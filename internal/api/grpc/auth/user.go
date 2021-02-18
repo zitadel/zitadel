@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/internal/api/authz"

@@ -90,6 +90,7 @@ const (
 	OIDCAuthMethodTypeBasic OIDCAuthMethodType = iota
 	OIDCAuthMethodTypePost
 	OIDCAuthMethodTypeNone
+	OIDCAuthMethodTypePrivateKeyJWT
 )
 
 type Compliance struct {

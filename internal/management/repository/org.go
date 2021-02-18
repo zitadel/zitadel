@@ -48,16 +48,4 @@ type OrgRepository interface {
 	AddMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
 	ChangeMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
 	RemoveMailText(ctx context.Context, mailText *iam_model.MailText) error
-
-	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
-	GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
-	AddMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error)
-	ChangeMailTemplate(ctx context.Context, template *iam_model.MailTemplate) (*iam_model.MailTemplate, error)
-	RemoveMailTemplate(ctx context.Context) error
-
-	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
-	GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
-	AddMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
-	ChangeMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
-	RemoveMailText(ctx context.Context, mailText *iam_model.MailText) error
 }

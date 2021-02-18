@@ -443,11 +443,3 @@ func (repo *IAMRepository) ChangeDefaultMailText(ctx context.Context, text *iam_
 	text.AggregateID = repo.SystemDefaults.IamID
 	return repo.IAMEventstore.ChangeMailText(ctx, text)
 }
-
-func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
-	policy, err := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.LoginPolicyViewToModel(policy), err
-}

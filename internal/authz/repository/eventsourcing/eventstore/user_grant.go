@@ -2,16 +2,15 @@ package eventstore
 
 import (
 	"context"
-	global_model "github.com/caos/zitadel/internal/model"
-	user_model "github.com/caos/zitadel/internal/user/model"
-	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	global_model "github.com/caos/zitadel/internal/model"
+	user_model "github.com/caos/zitadel/internal/user/model"
+	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 )
 

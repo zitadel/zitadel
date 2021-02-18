@@ -2,15 +2,17 @@ package eventstore
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/errors"
+	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"time"
-
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 )
 
 type TokenRepo struct {
