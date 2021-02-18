@@ -229,6 +229,10 @@ func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID s
 	return model.ApplicationViewToModel(app), nil
 }
 
+func (repo *ProjectRepo) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
+	return repo.ProjectEvents.AddApplication(ctx, app)
+}
+
 func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_model.ApplicationSearchRequest) (*proj_model.ApplicationSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, sequenceErr := repo.View.GetLatestApplicationSequence()

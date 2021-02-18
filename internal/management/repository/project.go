@@ -25,11 +25,6 @@ type ProjectRepository interface {
 
 	ApplicationByID(ctx context.Context, projectID, appID string) (*model.ApplicationView, error)
 	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)
-	ChangeApplication(ctx context.Context, app *model.Application) (*model.Application, error)
-	DeactivateApplication(ctx context.Context, projectID, appID string) (*model.Application, error)
-	ReactivateApplication(ctx context.Context, projectID, appID string) (*model.Application, error)
-	RemoveApplication(ctx context.Context, projectID, appID string) error
-	ChangeOIDCConfig(ctx context.Context, config *model.OIDCConfig) (*model.OIDCConfig, error)
 	ChangeAPIConfig(ctx context.Context, config *model.APIConfig) (*model.APIConfig, error)
 	ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
 	ChangeAPIConfigSecret(ctx context.Context, projectID, appID string) (*model.APIConfig, error)
