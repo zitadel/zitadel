@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/org"
@@ -11,33 +12,30 @@ import (
 func (r *CommandSide) AddOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
 	addedPolicy := NewORGOrgIAMPolicyWriteModel(resourceOwner)
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	err := r.addOrgIAMPolicy(ctx, orgAgg, addedPolicy, policy)
+	event, err := r.addOrgIAMPolicy(ctx, orgAgg, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
-	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-5M0ds", "Errors.Org.OrgIAMPolicy.AlreadyExists")
-	}
-	orgAgg.PushEvents(org.NewOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain))
-
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, event)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return orgWriteModelToOrgIAMPolicy(addedPolicy), nil
 }
 
-func (r *CommandSide) addOrgIAMPolicy(ctx context.Context, orgAgg *org.Aggregate, addedPolicy *ORGOrgIAMPolicyWriteModel, policy *domain.OrgIAMPolicy) error {
+func (r *CommandSide) addOrgIAMPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, addedPolicy *ORGOrgIAMPolicyWriteModel, policy *domain.OrgIAMPolicy) (eventstore.EventPusher, error) {
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return caos_errs.ThrowAlreadyExists(nil, "ORG-1M8ds", "Errors.Org.OrgIAMPolicy.AlreadyExists")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-1M8ds", "Errors.Org.OrgIAMPolicy.AlreadyExists")
 	}
-	orgAgg.PushEvents(org.NewOrgIAMPolicyAddedEvent(ctx, policy.UserLoginMustBeDomain))
-	return nil
+	return org.NewOrgIAMPolicyAddedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain), nil
 }
 
 func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
@@ -49,19 +47,20 @@ func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner stri
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-2N9sd", "Errors.Org.OrgIAMPolicy.NotFound")
 	}
 
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.UserLoginMustBeDomain)
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
 	}
 
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	orgAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return orgWriteModelToOrgIAMPolicy(existingPolicy), nil
 }
 
@@ -75,9 +74,8 @@ func (r *CommandSide) RemoveOrgIAMPolicy(ctx context.Context, orgID string) erro
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	orgAgg.PushEvents(org.NewOrgIAMPolicyRemovedEvent(ctx))
-
-	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	_, err = r.eventstore.PushEvents(ctx, org.NewOrgIAMPolicyRemovedEvent(ctx, orgAgg))
+	return err
 }
 
 func (r *CommandSide) getOrgIAMPolicy(ctx context.Context, orgID string) (*domain.OrgIAMPolicy, error) {

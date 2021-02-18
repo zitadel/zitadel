@@ -3,8 +3,8 @@ package command
 import (
 	"context"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 type Step10 struct {
@@ -21,20 +21,24 @@ func (s *Step10) execute(ctx context.Context, commandSide *CommandSide) error {
 }
 
 func (r *CommandSide) SetupStep10(ctx context.Context, step *Step10) error {
-	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		err := r.addDefaultMailTemplate(ctx, iamAgg, NewIAMMailTemplateWriteModel(), &step.DefaultMailTemplate)
+		mailTemplateEvent, err := r.addDefaultMailTemplate(ctx, iamAgg, NewIAMMailTemplateWriteModel(), &step.DefaultMailTemplate)
 		if err != nil {
 			return nil, err
 		}
+		events := []eventstore.EventPusher{
+			mailTemplateEvent,
+		}
 		for _, text := range step.DefaultMailTexts {
-			r.addDefaultMailText(ctx, iamAgg, NewIAMMailTextWriteModel(text.MailTextType, text.Language), &text)
+			defaultTextEvent, err := r.addDefaultMailText(ctx, iamAgg, NewIAMMailTextWriteModel(text.MailTextType, text.Language), &text)
 			if err != nil {
 				return nil, err
 			}
+			events = append(events, defaultTextEvent)
 		}
 		logging.Log("SETUP-3N9fs").Info("default mail template/text set up")
-		return iamAgg, nil
+		return events, nil
 	}
 	return r.setup(ctx, step, fn)
 }

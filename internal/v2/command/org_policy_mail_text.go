@@ -22,10 +22,11 @@ func (r *CommandSide) AddMailText(ctx context.Context, resourceOwner string, mai
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.MailTextWriteModel.WriteModel)
-	orgAgg.PushEvents(
+	pushedEvents, err := r.eventstore.PushEvents(
+		ctx,
 		org.NewMailTextAddedEvent(
 			ctx,
-			resourceOwner,
+			orgAgg,
 			mailText.MailTextType,
 			mailText.Language,
 			mailText.Title,
@@ -34,8 +35,10 @@ func (r *CommandSide) AddMailText(ctx context.Context, resourceOwner string, mai
 			mailText.Greeting,
 			mailText.Text,
 			mailText.ButtonText))
-
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, orgAgg)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(addedPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +59,10 @@ func (r *CommandSide) ChangeMailText(ctx context.Context, resourceOwner string, 
 		return nil, caos_errs.ThrowNotFound(nil, "Org-3n8fM", "Errors.Org.MailText.NotFound")
 	}
 
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.MailTextWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
 		ctx,
+		orgAgg,
 		mailText.MailTextType,
 		mailText.Language,
 		mailText.Title,
@@ -70,10 +75,11 @@ func (r *CommandSide) ChangeMailText(ctx context.Context, resourceOwner string, 
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-2n9fs", "Errors.Org.MailText.NotChanged")
 	}
 
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.MailTextWriteModel.WriteModel)
-	orgAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +97,6 @@ func (r *CommandSide) RemoveMailText(ctx context.Context, resourceOwner, mailTex
 		return caos_errs.ThrowNotFound(nil, "Org-3b8Jf", "Errors.Org.MailText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	orgAgg.PushEvents(org.NewMailTextRemovedEvent(ctx, mailTextType, language, resourceOwner))
-
-	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	_, err = r.eventstore.PushEvents(ctx, org.NewMailTextRemovedEvent(ctx, orgAgg, mailTextType, language))
+	return err
 }

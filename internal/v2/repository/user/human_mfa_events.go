@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
@@ -23,10 +24,11 @@ func (e *HumanMFAInitSkippedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
-func NewHumanMFAInitSkippedEvent(ctx context.Context) *HumanMFAInitSkippedEvent {
+func NewHumanMFAInitSkippedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanMFAInitSkippedEvent {
 	return &HumanMFAInitSkippedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanMFAInitSkippedType,
 		),
 	}

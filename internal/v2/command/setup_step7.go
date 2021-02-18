@@ -2,11 +2,11 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/v2/domain"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 type Step7 struct {
@@ -22,18 +22,18 @@ func (s *Step7) execute(ctx context.Context, commandSide *CommandSide) error {
 }
 
 func (r *CommandSide) SetupStep7(ctx context.Context, step *Step7) error {
-	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
 		secondFactorModel := NewIAMSecondFactorWriteModel()
 		iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 		if !step.OTP {
-			return iamAgg, nil
+			return []eventstore.EventPusher{}, nil
 		}
-		err := r.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, domain.SecondFactorTypeOTP)
+		event, err := r.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, domain.SecondFactorTypeOTP)
 		if err != nil {
 			return nil, err
 		}
 		logging.Log("SETUP-Dggsg").Info("added OTP to 2FA login policy")
-		return iamAgg, nil
+		return []eventstore.EventPusher{event}, nil
 	}
 	return r.setup(ctx, step, fn)
 }

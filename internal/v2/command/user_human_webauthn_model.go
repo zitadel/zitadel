@@ -22,13 +22,13 @@ type HumanWebAuthNWriteModel struct {
 	State domain.MFAState
 }
 
-func NewHumanWebAuthNWriteModel(userID, wbAuthNTokenID, resourceOwner string) *HumanWebAuthNWriteModel {
+func NewHumanWebAuthNWriteModel(userID, webAuthNTokenID, resourceOwner string) *HumanWebAuthNWriteModel {
 	return &HumanWebAuthNWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
-		WebauthNTokenID: wbAuthNTokenID,
+		WebauthNTokenID: webAuthNTokenID,
 	}
 }
 
@@ -94,7 +94,16 @@ func (wm *HumanWebAuthNWriteModel) appendVerifiedEvent(e *user.HumanWebAuthNVeri
 func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(user.HumanU2FTokenAddedType,
+			user.HumanPasswordlessTokenAddedType,
+			user.HumanU2FTokenAddedType,
+			user.HumanPasswordlessTokenAddedType,
+			user.HumanU2FTokenSignCountChangedType,
+			user.HumanPasswordlessTokenSignCountChangedType,
+			user.HumanU2FTokenRemovedType,
+			user.HumanPasswordlessTokenRemovedType,
+			user.UserRemovedType)
 }
 
 type HumanU2FTokensReadModel struct {
@@ -124,7 +133,7 @@ func (wm *HumanU2FTokensReadModel) Reduce() error {
 			token := &HumanWebAuthNWriteModel{}
 			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
 			token.WriteModel = eventstore.WriteModel{
-				AggregateID: e.AggregateID(),
+				AggregateID: e.Aggregate().ID,
 			}
 			replaced := false
 			for i, existingTokens := range wm.WebAuthNTokens {
@@ -204,7 +213,7 @@ func (wm *HumanPasswordlessTokensReadModel) Reduce() error {
 			token := &HumanWebAuthNWriteModel{}
 			token.appendAddedEvent(&e.HumanWebAuthNAddedEvent)
 			token.WriteModel = eventstore.WriteModel{
-				AggregateID: e.AggregateID(),
+				AggregateID: e.Aggregate().ID,
 			}
 			replaced := false
 			for i, existingTokens := range wm.WebAuthNTokens {

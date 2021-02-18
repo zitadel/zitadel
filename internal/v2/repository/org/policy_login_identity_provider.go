@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -20,13 +21,17 @@ type IdentityProviderAddedEvent struct {
 
 func NewIdentityProviderAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	idpConfigID string,
 	idpProviderType domain.IdentityProviderType,
 ) *IdentityProviderAddedEvent {
 
 	return &IdentityProviderAddedEvent{
 		IdentityProviderAddedEvent: *policy.NewIdentityProviderAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyIDPProviderAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicyIDPProviderAddedEventType),
 			idpConfigID,
 			idpProviderType),
 	}
@@ -49,11 +54,15 @@ type IdentityProviderRemovedEvent struct {
 
 func NewIdentityProviderRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	idpConfigID string,
 ) *IdentityProviderRemovedEvent {
 	return &IdentityProviderRemovedEvent{
 		IdentityProviderRemovedEvent: *policy.NewIdentityProviderRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyIDPProviderRemovedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicyIDPProviderRemovedEventType),
 			idpConfigID),
 	}
 }
@@ -75,11 +84,12 @@ type IdentityProviderCascadeRemovedEvent struct {
 
 func NewIdentityProviderCascadeRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	idpConfigID string,
 ) *IdentityProviderCascadeRemovedEvent {
 	return &IdentityProviderCascadeRemovedEvent{
 		IdentityProviderCascadeRemovedEvent: *policy.NewIdentityProviderCascadeRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyIDPProviderRemovedEventType),
+			eventstore.NewBaseEventForPush(ctx, aggregate, LoginPolicyIDPProviderRemovedEventType),
 			idpConfigID),
 	}
 }

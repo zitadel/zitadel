@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	"github.com/caos/logging"
 
@@ -63,16 +64,20 @@ func (r *CommandSide) StartSetup(ctx context.Context, step domain.Step) (*domain
 	if iamWriteModel.SetUpStarted >= step || iamWriteModel.SetUpStarted != iamWriteModel.SetUpDone {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "setup error")
 	}
-	aggregate := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel).PushEvents(iam_repo.NewSetupStepStartedEvent(ctx, step))
-	err = r.eventstore.PushAggregate(ctx, iamWriteModel, aggregate)
+	aggregate := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, iam_repo.NewSetupStepStartedEvent(ctx, aggregate, step))
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Grgh1", "Setup start failed")
+	}
+	err = AppendAndReduce(iamWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
 	}
 	logging.LogWithFields("SETUP-fhh21", "step", step).Info("setup step started")
 	return writeModelToIAM(iamWriteModel), nil
 }
 
-func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider func(*IAMWriteModel) (*iam_repo.Aggregate, error)) error {
+func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider func(*IAMWriteModel) ([]eventstore.EventPusher, error)) error {
 	iam, err := r.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
@@ -80,13 +85,14 @@ func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider
 	if iam.SetUpStarted != step.Step() && iam.SetUpDone+1 != step.Step() {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dge32", "wrong step")
 	}
-	iamAgg, err := iamAggregateProvider(iam)
+	events, err := iamAggregateProvider(iam)
 	if err != nil {
 		return err
 	}
-	iamAgg.PushEvents(iam_repo.NewSetupStepDoneEvent(ctx, step.Step()))
+	iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
+	events = append(events, iam_repo.NewSetupStepDoneEvent(ctx, iamAgg, step.Step()))
 
-	_, err = r.eventstore.PushAggregates(ctx, iamAgg)
+	_, err = r.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailedf(nil, "EVENT-dbG31", "Setup %v failed", step.Step())
 	}

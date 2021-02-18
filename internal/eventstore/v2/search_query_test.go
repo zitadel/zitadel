@@ -488,7 +488,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(query, tt.res.query) {
-				t.Errorf("NewSearchQueryFactory() = %+v, want %+v", factory, tt.res)
+				t.Errorf("NewSearchQueryFactory() = %+v, want %+v", factory, tt.res.query)
 			}
 		})
 	}

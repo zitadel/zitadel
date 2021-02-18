@@ -27,10 +27,15 @@ func (e *GlobalOrgSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstra
 	return nil
 }
 
-func NewGlobalOrgSetEventEvent(ctx context.Context, orgID string) *GlobalOrgSetEvent {
+func NewGlobalOrgSetEventEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	orgID string,
+) *GlobalOrgSetEvent {
 	return &GlobalOrgSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GlobalOrgSetEventType,
 		),
 		OrgID: orgID,

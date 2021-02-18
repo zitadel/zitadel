@@ -3,11 +3,12 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"time"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
-	"time"
 )
 
 const (
@@ -35,6 +36,7 @@ func (e *MachineKeyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 
 func NewMachineKeyAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	keyID string,
 	keyType domain.MachineKeyType,
 	expirationDate time.Time,
@@ -43,6 +45,7 @@ func NewMachineKeyAddedEvent(
 	return &MachineKeyAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			MachineKeyAddedEventType,
 		),
 		KeyID:          keyID,
@@ -80,11 +83,13 @@ func (e *MachineKeyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 
 func NewMachineKeyRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	keyID string,
 ) *MachineKeyRemovedEvent {
 	return &MachineKeyRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			MachineKeyRemovedEventType,
 		),
 		KeyID: keyID,

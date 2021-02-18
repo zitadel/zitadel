@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/policy"
 )
 
@@ -19,6 +18,7 @@ type MailTextAddedEvent struct {
 
 func NewMailTextAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mailTextType,
 	language,
 	title,
@@ -30,7 +30,7 @@ func NewMailTextAddedEvent(
 ) *MailTextAddedEvent {
 	return &MailTextAddedEvent{
 		MailTextAddedEvent: *policy.NewMailTextAddedEvent(
-			eventstore.NewBaseEventForPushWithResourceOwner(ctx, MailTextAddedEventType, domain.IAMID),
+			eventstore.NewBaseEventForPush(ctx, aggregate, MailTextAddedEventType),
 			mailTextType,
 			language,
 			title,
@@ -57,12 +57,13 @@ type MailTextChangedEvent struct {
 
 func NewMailTextChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mailTextType,
 	language string,
 	changes []policy.MailTextChanges,
 ) (*MailTextChangedEvent, error) {
 	changedEvent, err := policy.NewMailTextChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, MailTextChangedEventType),
+		eventstore.NewBaseEventForPush(ctx, aggregate, MailTextChangedEventType),
 		mailTextType,
 		language,
 		changes,

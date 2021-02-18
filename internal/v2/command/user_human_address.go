@@ -15,18 +15,19 @@ func (r *CommandSide) ChangeHumanAddress(ctx context.Context, address *domain.Ad
 	if existingAddress.State == domain.AddressStateUnspecified || existingAddress.State == domain.AddressStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-0pLdo", "Errors.User.Address.NotFound")
 	}
-	changedEvent, hasChanged := existingAddress.NewChangedEvent(ctx, address.Country, address.Locality, address.PostalCode, address.Region, address.StreetAddress)
+	userAgg := UserAggregateFromWriteModel(&existingAddress.WriteModel)
+	changedEvent, hasChanged := existingAddress.NewChangedEvent(ctx, userAgg, address.Country, address.Locality, address.PostalCode, address.Region, address.StreetAddress)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0cs", "Errors.User.Address.NotChanged")
 	}
-	userAgg := UserAggregateFromWriteModel(&existingAddress.WriteModel)
-	userAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingAddress, userAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(existingAddress, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToAddress(existingAddress), nil
 }
 

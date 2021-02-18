@@ -29,15 +29,14 @@ func (r *CommandSide) GenerateSigningKeyPair(ctx context.Context, algorithm stri
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	keyAgg.PushEvents(
-		keypair.NewAddedEvent(
-			ctx,
-			domain.KeyUsageSigning,
-			algorithm,
-			privateCrypto, publicCrypto,
-			privateKeyExp, publicKeyExp),
-	)
-	return r.eventstore.PushAggregate(ctx, keyPairWriteModel, keyAgg)
+	_, err = r.eventstore.PushEvents(ctx, keypair.NewAddedEvent(
+		ctx,
+		keyAgg,
+		domain.KeyUsageSigning,
+		algorithm,
+		privateCrypto, publicCrypto,
+		privateKeyExp, publicKeyExp))
+	return err
 }
 
 func setOIDCCtx(ctx context.Context) context.Context {

@@ -20,7 +20,7 @@ type MailTextAddedEvent struct {
 
 func NewMailTextAddedEvent(
 	ctx context.Context,
-	resourceOwner,
+	aggregate *eventstore.Aggregate,
 	mailTextType,
 	language,
 	title,
@@ -32,7 +32,7 @@ func NewMailTextAddedEvent(
 ) *MailTextAddedEvent {
 	return &MailTextAddedEvent{
 		MailTextAddedEvent: *policy.NewMailTextAddedEvent(
-			eventstore.NewBaseEventForPushWithResourceOwner(ctx, MailTextAddedEventType, resourceOwner),
+			eventstore.NewBaseEventForPush(ctx, aggregate, MailTextAddedEventType),
 			mailTextType,
 			language,
 			title,
@@ -59,12 +59,13 @@ type MailTextChangedEvent struct {
 
 func NewMailTextChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mailTextType,
 	language string,
 	changes []policy.MailTextChanges,
 ) (*MailTextChangedEvent, error) {
 	changedEvent, err := policy.NewMailTextChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, MailTextChangedEventType),
+		eventstore.NewBaseEventForPush(ctx, aggregate, MailTextChangedEventType),
 		mailTextType,
 		language,
 		changes,
@@ -90,13 +91,13 @@ type MailTextRemovedEvent struct {
 
 func NewMailTextRemovedEvent(
 	ctx context.Context,
-	resourceOwner,
+	aggregate *eventstore.Aggregate,
 	mailTextType,
 	language string,
 ) *MailTextRemovedEvent {
 	return &MailTextRemovedEvent{
 		MailTextRemovedEvent: *policy.NewMailTextRemovedEvent(
-			eventstore.NewBaseEventForPushWithResourceOwner(ctx, MailTextRemovedEventType, resourceOwner),
+			eventstore.NewBaseEventForPush(ctx, aggregate, MailTextRemovedEventType),
 			mailTextType,
 			language,
 		),

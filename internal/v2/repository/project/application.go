@@ -49,10 +49,17 @@ func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return []*eventstore.EventUniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.projectID)}
 }
 
-func NewApplicationAddedEvent(ctx context.Context, appID, name, projectID string) *ApplicationAddedEvent {
+func NewApplicationAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID,
+	name,
+	projectID string,
+) *ApplicationAddedEvent {
 	return &ApplicationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ApplicationAddedType,
 		),
 		AppID:     appID,
@@ -94,10 +101,18 @@ func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	}
 }
 
-func NewApplicationChangedEvent(ctx context.Context, appID, oldName, newName, projectID string) *ApplicationChangedEvent {
+func NewApplicationChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID,
+	oldName,
+	newName,
+	projectID string,
+) *ApplicationChangedEvent {
 	return &ApplicationChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ApplicationChangedType,
 		),
 		AppID:     appID,
@@ -134,10 +149,15 @@ func (e *ApplicationDeactivatedEvent) UniqueConstraints() []*eventstore.EventUni
 	return nil
 }
 
-func NewApplicationDeactivatedEvent(ctx context.Context, appID string) *ApplicationDeactivatedEvent {
+func NewApplicationDeactivatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID string,
+) *ApplicationDeactivatedEvent {
 	return &ApplicationDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ApplicationDeactivatedType,
 		),
 		AppID: appID,
@@ -171,10 +191,15 @@ func (e *ApplicationReactivatedEvent) UniqueConstraints() []*eventstore.EventUni
 	return nil
 }
 
-func NewApplicationReactivatedEvent(ctx context.Context, appID string) *ApplicationReactivatedEvent {
+func NewApplicationReactivatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID string,
+) *ApplicationReactivatedEvent {
 	return &ApplicationReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ApplicationReactivatedType,
 		),
 		AppID: appID,
@@ -210,10 +235,17 @@ func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.projectID)}
 }
 
-func NewApplicationRemovedEvent(ctx context.Context, appID, name, projectID string) *ApplicationRemovedEvent {
+func NewApplicationRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID,
+	name,
+	projectID string,
+) *ApplicationRemovedEvent {
 	return &ApplicationRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ApplicationRemovedType,
 		),
 		AppID:     appID,

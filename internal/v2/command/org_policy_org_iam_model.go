@@ -30,6 +30,8 @@ func (wm *ORGOrgIAMPolicyWriteModel) AppendEvents(events ...eventstore.EventRead
 			wm.PolicyOrgIAMWriteModel.AppendEvents(&e.OrgIAMPolicyAddedEvent)
 		case *org.OrgIAMPolicyChangedEvent:
 			wm.PolicyOrgIAMWriteModel.AppendEvents(&e.OrgIAMPolicyChangedEvent)
+		case *org.OrgIAMPolicyRemovedEvent:
+			wm.PolicyOrgIAMWriteModel.AppendEvents(&e.OrgIAMPolicyRemovedEvent)
 		}
 	}
 }
@@ -41,10 +43,16 @@ func (wm *ORGOrgIAMPolicyWriteModel) Reduce() error {
 func (wm *ORGOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.PolicyOrgIAMWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(org.OrgIAMPolicyAddedEventType,
+			org.OrgIAMPolicyChangedEventType,
+			org.OrgIAMPolicyRemovedEventType)
 }
 
-func (wm *ORGOrgIAMPolicyWriteModel) NewChangedEvent(ctx context.Context, userLoginMustBeDomain bool) (*org.OrgIAMPolicyChangedEvent, bool) {
+func (wm *ORGOrgIAMPolicyWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	userLoginMustBeDomain bool) (*org.OrgIAMPolicyChangedEvent, bool) {
 	changes := make([]policy.OrgIAMPolicyChanges, 0)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
 		changes = append(changes, policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain))
@@ -52,7 +60,7 @@ func (wm *ORGOrgIAMPolicyWriteModel) NewChangedEvent(ctx context.Context, userLo
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewOrgIAMPolicyChangedEvent(ctx, changes)
+	changedEvent, err := org.NewOrgIAMPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

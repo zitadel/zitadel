@@ -32,10 +32,6 @@ func NewHumanProfileWriteModel(userID, resourceOwner string) *HumanProfileWriteM
 	}
 }
 
-func (wm *HumanProfileWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *HumanProfileWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -84,7 +80,11 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 func (wm *HumanProfileWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.HumanProfileChangedType,
+			user.UserRemovedType)
 }
 
 func (wm *HumanProfileWriteModel) NewChangedEvent(
@@ -97,7 +97,7 @@ func (wm *HumanProfileWriteModel) NewChangedEvent(
 	gender domain.Gender,
 ) (*user.HumanProfileChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := user.NewHumanProfileChangedEvent(ctx)
+	changedEvent := user.NewHumanProfileChangedEvent(ctx, UserAggregateFromWriteModel(&wm.WriteModel))
 	if wm.FirstName != firstName {
 		hasChanged = true
 		changedEvent.FirstName = firstName

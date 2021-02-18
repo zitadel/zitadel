@@ -25,10 +25,6 @@ func NewIAMWriteModel() *IAMWriteModel {
 	}
 }
 
-func (wm *IAMWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *IAMWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -50,11 +46,14 @@ func (wm *IAMWriteModel) Reduce() error {
 func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.ProjectSetEventType,
+			iam.GlobalOrgSetEventType,
+			iam.SetupStartedEventType,
+			iam.SetupDoneEventType)
 }
 
-func IAMAggregateFromWriteModel(wm *eventstore.WriteModel) *iam.Aggregate {
-	return &iam.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, iam.AggregateType, iam.AggregateVersion),
-	}
+func IAMAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModel(wm, iam.AggregateType, iam.AggregateVersion)
 }

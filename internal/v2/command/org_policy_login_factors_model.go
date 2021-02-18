@@ -2,7 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
 type OrgSecondFactorWriteModel struct {
@@ -23,8 +23,10 @@ func NewOrgSecondFactorWriteModel(orgID string) *OrgSecondFactorWriteModel {
 func (wm *OrgSecondFactorWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *iam.LoginPolicySecondFactorAddedEvent:
+		case *org.LoginPolicySecondFactorAddedEvent:
 			wm.WriteModel.AppendEvents(&e.SecondFactorAddedEvent)
+		case *org.LoginPolicySecondFactorRemovedEvent:
+			wm.WriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
 		}
 	}
 }
@@ -34,9 +36,12 @@ func (wm *OrgSecondFactorWriteModel) Reduce() error {
 }
 
 func (wm *OrgSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.WriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.LoginPolicySecondFactorAddedEventType,
+			org.LoginPolicySecondFactorRemovedEventType)
 }
 
 type OrgMultiFactorWriteModel struct {
@@ -57,8 +62,10 @@ func NewOrgMultiFactorWriteModel(orgID string) *OrgMultiFactorWriteModel {
 func (wm *OrgMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *iam.LoginPolicyMultiFactorAddedEvent:
+		case *org.LoginPolicyMultiFactorAddedEvent:
 			wm.WriteModel.AppendEvents(&e.MultiFactorAddedEvent)
+		case *org.LoginPolicyMultiFactorRemovedEvent:
+			wm.WriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
 		}
 	}
 }
@@ -68,7 +75,10 @@ func (wm *OrgMultiFactorWriteModel) Reduce() error {
 }
 
 func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.WriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.LoginPolicyMultiFactorAddedEventType,
+			org.LoginPolicyMultiFactorRemovedEventType)
 }

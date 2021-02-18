@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -50,6 +51,7 @@ func (e *GrantMemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 
 func NewProjectGrantMemberAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	projectID,
 	userID,
 	grantID string,
@@ -58,6 +60,7 @@ func NewProjectGrantMemberAddedEvent(
 	return &GrantMemberAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GrantMemberAddedType,
 		),
 		projectID: projectID,
@@ -98,6 +101,7 @@ func (e *GrantMemberChangedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 
 func NewProjectGrantMemberChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	userID,
 	grantID string,
 	roles ...string,
@@ -105,6 +109,7 @@ func NewProjectGrantMemberChangedEvent(
 	return &GrantMemberChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GrantMemberAddedType,
 		),
 		UserID:  userID,
@@ -144,6 +149,7 @@ func (e *GrantMemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 
 func NewProjectGrantMemberRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	projectID,
 	userID,
 	grantID string,
@@ -151,6 +157,7 @@ func NewProjectGrantMemberRemovedEvent(
 	return &GrantMemberRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GrantMemberRemovedType,
 		),
 		UserID:    userID,

@@ -34,13 +34,23 @@ func (r *CommandSide) AddPasswordComplexityPolicy(ctx context.Context, resourceO
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	orgAgg.PushEvents(org.NewPasswordComplexityPolicyAddedEvent(ctx, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol))
-
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(
+		ctx,
+		org.NewPasswordComplexityPolicyAddedEvent(
+			ctx,
+			orgAgg,
+			policy.MinLength,
+			policy.HasLowercase,
+			policy.HasUppercase,
+			policy.HasNumber,
+			policy.HasSymbol))
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToPasswordComplexityPolicy(&addedPolicy.PasswordComplexityPolicyWriteModel), nil
 }
 
@@ -58,18 +68,20 @@ func (r *CommandSide) ChangePasswordComplexityPolicy(ctx context.Context, resour
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-Dgs3g", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-DAs21", "Errors.Org.PasswordComplexityPolicy.NotChanged")
 	}
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
-	orgAgg.PushEvents(changedEvent)
 
-	err = r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToPasswordComplexityPolicy(&existingPolicy.PasswordComplexityPolicyWriteModel), nil
 }
 
@@ -83,6 +95,6 @@ func (r *CommandSide) RemovePasswordComplexityPolicy(ctx context.Context, orgID 
 		return caos_errs.ThrowNotFound(nil, "ORG-ADgs2", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	orgAgg.PushEvents(org.NewPasswordComplexityPolicyRemovedEvent(ctx))
-	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	_, err = r.eventstore.PushEvents(ctx, org.NewPasswordComplexityPolicyRemovedEvent(ctx, orgAgg))
+	return err
 }

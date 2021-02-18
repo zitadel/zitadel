@@ -89,7 +89,7 @@ func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (_ str
 		userAgentID = authReq.AgentID
 		applicationID = authReq.ApplicationID
 	}
-	resp, err := o.command.CreateUserToken(ctx, authReq.UserOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.command.AddUserToken(ctx, authReq.UserOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}

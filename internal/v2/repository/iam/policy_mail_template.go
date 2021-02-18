@@ -18,11 +18,12 @@ type MailTemplateAddedEvent struct {
 
 func NewMailTemplateAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	template []byte,
 ) *MailTemplateAddedEvent {
 	return &MailTemplateAddedEvent{
 		MailTemplateAddedEvent: *policy.NewMailTemplateAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, MailTemplateAddedEventType),
+			eventstore.NewBaseEventForPush(ctx, aggregate, MailTemplateAddedEventType),
 			template),
 	}
 }
@@ -42,10 +43,11 @@ type MailTemplateChangedEvent struct {
 
 func NewMailTemplateChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	changes []policy.MailTemplateChanges,
 ) (*MailTemplateChangedEvent, error) {
 	changedEvent, err := policy.NewMailTemplateChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, MailTemplateChangedEventType),
+		eventstore.NewBaseEventForPush(ctx, aggregate, MailTemplateChangedEventType),
 		changes,
 	)
 	if err != nil {

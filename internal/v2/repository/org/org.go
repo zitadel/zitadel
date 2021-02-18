@@ -45,10 +45,11 @@ func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint 
 	return []*eventstore.EventUniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
 }
 
-func NewOrgAddedEvent(ctx context.Context, name string) *OrgAddedEvent {
+func NewOrgAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgAddedEvent {
 	return &OrgAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgAddedEventType,
 		),
 		Name: name,
@@ -80,15 +81,16 @@ func (e *OrgChangedEvent) Data() interface{} {
 
 func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{
-		NewRemoveOrgDomainUniqueConstraint(e.oldName),
+		NewRemoveOrgNameUniqueConstraint(e.oldName),
 		NewAddOrgNameUniqueConstraint(e.Name),
 	}
 }
 
-func NewOrgChangedEvent(ctx context.Context, oldName, newName string) *OrgChangedEvent {
+func NewOrgChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, oldName, newName string) *OrgChangedEvent {
 	return &OrgChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgChangedEventType,
 		),
 		Name:    newName,
@@ -120,10 +122,11 @@ func (e *OrgDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return nil
 }
 
-func NewOrgDeactivatedEvent(ctx context.Context) *OrgDeactivatedEvent {
+func NewOrgDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *OrgDeactivatedEvent {
 	return &OrgDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgDeactivatedEventType,
 		),
 	}
@@ -153,10 +156,11 @@ func (e *OrgReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return nil
 }
 
-func NewOrgReactivatedEvent(ctx context.Context) *OrgReactivatedEvent {
+func NewOrgReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *OrgReactivatedEvent {
 	return &OrgReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgReactivatedEventType,
 		),
 	}
@@ -187,10 +191,11 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 	return []*eventstore.EventUniqueConstraint{NewRemoveOrgNameUniqueConstraint(e.name)}
 }
 
-func NewOrgRemovedEvent(ctx context.Context, name string) *OrgRemovedEvent {
+func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgRemovedEvent {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgRemovedEventType,
 		),
 		name: name,

@@ -50,5 +50,8 @@ func (wm *ProjectMemberWriteModel) Reduce() error {
 func (wm *ProjectMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
 		AggregateIDs(wm.MemberWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(project.MemberAddedType,
+			project.MemberChangedType,
+			project.MemberRemovedType)
 }

@@ -2,11 +2,12 @@ package user
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"golang.org/x/text/language"
-	"time"
 )
 
 const (
@@ -59,6 +60,8 @@ const (
 
 func NewUserV1AddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+
 	userName,
 	firstName,
 	lastName,
@@ -77,6 +80,7 @@ func NewUserV1AddedEvent(
 	return &HumanAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1AddedType,
 		),
 		UserName:          userName,
@@ -98,6 +102,8 @@ func NewUserV1AddedEvent(
 
 func NewUserV1RegisteredEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+
 	userName,
 	firstName,
 	lastName,
@@ -116,6 +122,7 @@ func NewUserV1RegisteredEvent(
 	return &HumanRegisteredEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1RegisteredType,
 		),
 		UserName:          userName,
@@ -137,12 +144,14 @@ func NewUserV1RegisteredEvent(
 
 func NewUserV1InitialCodeAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 ) *HumanInitialCodeAddedEvent {
 	return &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1InitialCodeAddedType,
 		),
 		Code:   code,
@@ -150,37 +159,41 @@ func NewUserV1InitialCodeAddedEvent(
 	}
 }
 
-func NewUserV1InitialCodeSentEvent(ctx context.Context) *HumanInitialCodeSentEvent {
+func NewUserV1InitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitialCodeSentEvent {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1InitialCodeSentType,
 		),
 	}
 }
 
-func NewUserV1InitializedCheckSucceededEvent(ctx context.Context) *HumanInitializedCheckSucceededEvent {
+func NewUserV1InitializedCheckSucceededEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitializedCheckSucceededEvent {
 	return &HumanInitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1InitializedCheckSucceededType,
 		),
 	}
 }
 
-func NewUserV1InitializedCheckFailedEvent(ctx context.Context) *HumanInitializedCheckFailedEvent {
+func NewUserV1InitializedCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitializedCheckFailedEvent {
 	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1InitializedCheckFailedType,
 		),
 	}
 }
 
-func NewUserV1SignedOutEvent(ctx context.Context) *HumanSignedOutEvent {
+func NewUserV1SignedOutEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanSignedOutEvent {
 	return &HumanSignedOutEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1SignedOutType,
 		),
 	}
@@ -188,12 +201,14 @@ func NewUserV1SignedOutEvent(ctx context.Context) *HumanSignedOutEvent {
 
 func NewUserV1PasswordChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	secret *crypto.CryptoValue,
 	changeRequired bool,
 ) *HumanPasswordChangedEvent {
 	return &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PasswordChangedType,
 		),
 		Secret:         secret,
@@ -203,6 +218,7 @@ func NewUserV1PasswordChangedEvent(
 
 func NewUserV1PasswordCodeAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	notificationType domain.NotificationType,
@@ -210,6 +226,7 @@ func NewUserV1PasswordCodeAddedEvent(
 	return &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PasswordCodeAddedType,
 		),
 		Code:             code,
@@ -218,56 +235,66 @@ func NewUserV1PasswordCodeAddedEvent(
 	}
 }
 
-func NewUserV1PasswordCodeSentEvent(ctx context.Context) *HumanPasswordCodeSentEvent {
+func NewUserV1PasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordCodeSentEvent {
 	return &HumanPasswordCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PasswordCodeSentType,
 		),
 	}
 }
 
-func NewUserV1PasswordCheckSucceededEvent(ctx context.Context) *HumanPasswordCheckSucceededEvent {
+func NewUserV1PasswordCheckSucceededEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordCheckSucceededEvent {
 	return &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PasswordCheckSucceededType,
 		),
 	}
 }
 
-func NewUserV1PasswordCheckFailedEvent(ctx context.Context) *HumanPasswordCheckFailedEvent {
+func NewUserV1PasswordCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordCheckFailedEvent {
 	return &HumanPasswordCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PasswordCheckFailedType,
 		),
 	}
 }
 
-func NewUserV1EmailChangedEvent(ctx context.Context, emailAddress string) *HumanEmailChangedEvent {
+func NewUserV1EmailChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	emailAddress string,
+) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1EmailChangedType,
 		),
 		EmailAddress: emailAddress,
 	}
 }
 
-func NewUserV1EmailVerifiedEvent(ctx context.Context) *HumanEmailVerifiedEvent {
+func NewUserV1EmailVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailVerifiedEvent {
 	return &HumanEmailVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1EmailVerifiedType,
 		),
 	}
 }
 
-func NewUserV1EmailVerificationFailedEvent(ctx context.Context) *HumanEmailVerificationFailedEvent {
+func NewUserV1EmailVerificationFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailVerificationFailedEvent {
 	return &HumanEmailVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1EmailVerificationFailedType,
 		),
 	}
@@ -275,12 +302,14 @@ func NewUserV1EmailVerificationFailedEvent(ctx context.Context) *HumanEmailVerif
 
 func NewUserV1EmailCodeAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 ) *HumanEmailCodeAddedEvent {
 	return &HumanEmailCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1EmailCodeAddedType,
 		),
 		Code:   code,
@@ -288,47 +317,56 @@ func NewUserV1EmailCodeAddedEvent(
 	}
 }
 
-func NewUserV1EmailCodeSentEvent(ctx context.Context) *HumanEmailCodeSentEvent {
+func NewUserV1EmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailCodeSentEvent {
 	return &HumanEmailCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1EmailCodeSentType,
 		),
 	}
 }
 
-func NewUserV1PhoneChangedEvent(ctx context.Context, phone string) *HumanPhoneChangedEvent {
+func NewUserV1PhoneChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	phone string,
+) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PhoneChangedType,
 		),
 		PhoneNumber: phone,
 	}
 }
 
-func NewUserV1PhoneRemovedEvent(ctx context.Context) *HumanPhoneRemovedEvent {
+func NewUserV1PhoneRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneRemovedEvent {
 	return &HumanPhoneRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PhoneRemovedType,
 		),
 	}
 }
 
-func NewUserV1PhoneVerifiedEvent(ctx context.Context) *HumanPhoneVerifiedEvent {
+func NewUserV1PhoneVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneVerifiedEvent {
 	return &HumanPhoneVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PhoneVerifiedType,
 		),
 	}
 }
 
-func NewUserV1PhoneVerificationFailedEvent(ctx context.Context) *HumanPhoneVerificationFailedEvent {
+func NewUserV1PhoneVerificationFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneVerificationFailedEvent {
 	return &HumanPhoneVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PhoneVerificationFailedType,
 		),
 	}
@@ -336,12 +374,14 @@ func NewUserV1PhoneVerificationFailedEvent(ctx context.Context) *HumanPhoneVerif
 
 func NewUserV1PhoneCodeAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 ) *HumanPhoneCodeAddedEvent {
 	return &HumanPhoneCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PhoneCodeAddedType,
 		),
 		Code:   code,
@@ -349,10 +389,11 @@ func NewUserV1PhoneCodeAddedEvent(
 	}
 }
 
-func NewUserV1PhoneCodeSentEvent(ctx context.Context) *HumanPhoneCodeSentEvent {
+func NewUserV1PhoneCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneCodeSentEvent {
 	return &HumanPhoneCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1PhoneCodeSentType,
 		),
 	}
@@ -360,10 +401,12 @@ func NewUserV1PhoneCodeSentEvent(ctx context.Context) *HumanPhoneCodeSentEvent {
 
 func NewUserV1ProfileChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 ) *HumanProfileChangedEvent {
 	return &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1ProfileChangedType,
 		),
 	}
@@ -371,6 +414,7 @@ func NewUserV1ProfileChangedEvent(
 
 func NewUserV1AddressChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	country,
 	locality,
 	postalCode,
@@ -380,15 +424,17 @@ func NewUserV1AddressChangedEvent(
 	return &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1AddressChangedType,
 		),
 	}
 }
 
-func NewUserV1MFAInitSkippedEvent(ctx context.Context) *HumanMFAInitSkippedEvent {
+func NewUserV1MFAInitSkippedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanMFAInitSkippedEvent {
 	return &HumanMFAInitSkippedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1MFAInitSkippedType,
 		),
 	}
@@ -396,48 +442,54 @@ func NewUserV1MFAInitSkippedEvent(ctx context.Context) *HumanMFAInitSkippedEvent
 
 func NewUserV1MFAOTPAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	secret *crypto.CryptoValue,
 ) *HumanOTPAddedEvent {
 	return &HumanOTPAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1MFAOTPAddedType,
 		),
 		Secret: secret,
 	}
 }
 
-func NewUserV1MFAOTPVerifiedEvent(ctx context.Context) *HumanOTPVerifiedEvent {
+func NewUserV1MFAOTPVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanOTPVerifiedEvent {
 	return &HumanOTPVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1MFAOTPVerifiedType,
 		),
 	}
 }
 
-func NewUserV1MFAOTPRemovedEvent(ctx context.Context) *HumanOTPRemovedEvent {
+func NewUserV1MFAOTPRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanOTPRemovedEvent {
 	return &HumanOTPRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1MFAOTPRemovedType,
 		),
 	}
 }
 
-func NewUserV1MFAOTPCheckSucceededEvent(ctx context.Context) *HumanOTPCheckSucceededEvent {
+func NewUserV1MFAOTPCheckSucceededEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanOTPCheckSucceededEvent {
 	return &HumanOTPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1MFAOTPCheckSucceededType,
 		),
 	}
 }
 
-func NewUserV1MFAOTPCheckFailedEvent(ctx context.Context) *HumanOTPCheckFailedEvent {
+func NewUserV1MFAOTPCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanOTPCheckFailedEvent {
 	return &HumanOTPCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			UserV1MFAOTPCheckFailedType,
 		),
 	}

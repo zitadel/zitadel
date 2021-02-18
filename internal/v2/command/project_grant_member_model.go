@@ -49,6 +49,8 @@ func (wm *ProjectGrantMemberWriteModel) AppendEvents(events ...eventstore.EventR
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		case *project.ProjectRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -72,11 +74,11 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 
 func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
-		AggregateIDs(wm.AggregateID)
-	//EventTypes(
-	//	project.GrantMemberAddedType,
-	//	project.GrantMemberChangedType,
-	//	project.GrantMemberRemovedType,
-	//	project.GrantRemovedType,
-	//	project.ProjectRemovedType)
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			project.GrantMemberAddedType,
+			project.GrantMemberChangedType,
+			project.GrantMemberRemovedType,
+			project.GrantRemovedType,
+			project.ProjectRemovedType)
 }

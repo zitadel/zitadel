@@ -2,7 +2,7 @@ package eventstore
 
 import "time"
 
-//MemberReadModel is the minimum representation of a View model.
+//ReadModel is the minimum representation of a View model.
 // It implements a basic reducer
 // it might be saved in a database or in memory
 type ReadModel struct {
@@ -29,10 +29,10 @@ func (rm *ReadModel) Reduce() error {
 	}
 
 	if rm.AggregateID == "" {
-		rm.AggregateID = rm.Events[0].AggregateID()
+		rm.AggregateID = rm.Events[0].Aggregate().ID
 	}
 	if rm.ResourceOwner == "" {
-		rm.ResourceOwner = rm.Events[0].ResourceOwner()
+		rm.ResourceOwner = rm.Events[0].Aggregate().ResourceOwner
 	}
 
 	if rm.CreationDate.IsZero() {

@@ -3,11 +3,12 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"time"
 )
 
 const (
@@ -34,10 +35,11 @@ func (e *HumanPhoneChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func NewHumanPhoneChangedEvent(ctx context.Context) *HumanPhoneChangedEvent {
+func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPhoneChangedType,
 		),
 	}
@@ -67,10 +69,11 @@ func (e *HumanPhoneRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func NewHumanPhoneRemovedEvent(ctx context.Context) *HumanPhoneRemovedEvent {
+func NewHumanPhoneRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneRemovedEvent {
 	return &HumanPhoneRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPhoneRemovedType,
 		),
 	}
@@ -96,10 +99,11 @@ func (e *HumanPhoneVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func NewHumanPhoneVerifiedEvent(ctx context.Context) *HumanPhoneVerifiedEvent {
+func NewHumanPhoneVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneVerifiedEvent {
 	return &HumanPhoneVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPhoneVerifiedType,
 		),
 	}
@@ -124,10 +128,11 @@ func (e *HumanPhoneVerificationFailedEvent) UniqueConstraints() []*eventstore.Ev
 	return nil
 }
 
-func NewHumanPhoneVerificationFailedEvent(ctx context.Context) *HumanPhoneVerificationFailedEvent {
+func NewHumanPhoneVerificationFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneVerificationFailedEvent {
 	return &HumanPhoneVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPhoneVerificationFailedType,
 		),
 	}
@@ -156,12 +161,14 @@ func (e *HumanPhoneCodeAddedEvent) UniqueConstraints() []*eventstore.EventUnique
 
 func NewHumanPhoneCodeAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 ) *HumanPhoneCodeAddedEvent {
 	return &HumanPhoneCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPhoneCodeAddedType,
 		),
 		Code:   code,
@@ -193,10 +200,11 @@ func (e *HumanPhoneCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func NewHumanPhoneCodeSentEvent(ctx context.Context) *HumanPhoneCodeSentEvent {
+func NewHumanPhoneCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneCodeSentEvent {
 	return &HumanPhoneCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanPhoneCodeSentType,
 		),
 	}

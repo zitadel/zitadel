@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -29,11 +30,12 @@ func (e *MachineAddedEvent) Data() interface{} {
 }
 
 func (e *MachineAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.ResourceOwner(), e.UserLoginMustBeDomain)}
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.UserLoginMustBeDomain)}
 }
 
 func NewMachineAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	userName,
 	name,
 	description string,
@@ -42,6 +44,7 @@ func NewMachineAddedEvent(
 	return &MachineAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			MachineAddedEventType,
 		),
 		UserName:              userName,
@@ -82,10 +85,12 @@ func (e *MachineChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 
 func NewMachineChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 ) *MachineChangedEvent {
 	return &MachineChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			MachineChangedEventType,
 		),
 	}

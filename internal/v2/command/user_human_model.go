@@ -47,11 +47,6 @@ func NewHumanWriteModel(userID, resourceOwner string) *HumanWriteModel {
 	}
 }
 
-func (wm *HumanWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
-//TODO: Compute OTPState? initial/active
 func (wm *HumanWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -99,7 +94,21 @@ func (wm *HumanWriteModel) Reduce() error {
 func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.UserUserNameChangedType,
+			user.HumanProfileChangedType,
+			user.HumanEmailChangedType,
+			user.HumanEmailVerifiedType,
+			user.HumanPhoneChangedType,
+			user.HumanPhoneVerifiedType,
+			user.HumanPasswordChangedType,
+			user.UserLockedType,
+			user.UserUnlockedType,
+			user.UserDeactivatedType,
+			user.UserReactivatedType,
+			user.UserRemovedType)
 }
 
 func (wm *HumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {

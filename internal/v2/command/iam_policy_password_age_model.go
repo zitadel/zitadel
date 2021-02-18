@@ -42,10 +42,17 @@ func (wm *IAMPasswordAgePolicyWriteModel) Reduce() error {
 func (wm *IAMPasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.PasswordAgePolicyWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.PasswordAgePolicyAddedEventType,
+			iam.PasswordAgePolicyChangedEventType)
 }
 
-func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(ctx context.Context, expireWarnDays, maxAgeDays uint64) (*iam.PasswordAgePolicyChangedEvent, bool) {
+func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	expireWarnDays,
+	maxAgeDays uint64) (*iam.PasswordAgePolicyChangedEvent, bool) {
 	changes := make([]policy.PasswordAgePolicyChanges, 0)
 	if wm.ExpireWarnDays != expireWarnDays {
 		changes = append(changes, policy.ChangeExpireWarnDays(expireWarnDays))
@@ -56,7 +63,7 @@ func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(ctx context.Context, e
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewPasswordAgePolicyChangedEvent(ctx, changes)
+	changedEvent, err := iam.NewPasswordAgePolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

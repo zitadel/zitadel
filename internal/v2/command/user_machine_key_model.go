@@ -1,10 +1,11 @@
 package command
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
-	"time"
 )
 
 type MachineKeyWriteModel struct {
@@ -31,6 +32,8 @@ func (wm *MachineKeyWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.MachineKeyAddedEvent:
+			//TODO: adlerhurst we should decide who should handle the correct event appending
+			// IMO in this append events we should only get events with the correct keyID
 			if wm.KeyID != e.KeyID {
 				continue
 			}
@@ -71,4 +74,8 @@ func (wm *MachineKeyWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.MachineKeyAddedEventType,
 			user.MachineKeyRemovedEventType,
 			user.UserRemovedType)
+}
+
+func (wm *MachineKeyWriteModel) Exists() bool {
+	return wm.State != domain.MachineKeyStateUnspecified && wm.State != domain.MachineKeyStateRemoved
 }

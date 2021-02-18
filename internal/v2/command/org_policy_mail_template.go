@@ -22,13 +22,14 @@ func (r *CommandSide) AddMailTemplate(ctx context.Context, resourceOwner string,
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.MailTemplateWriteModel.WriteModel)
-	orgAgg.PushEvents(org.NewMailTemplateAddedEvent(ctx, policy.Template))
-
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, org.NewMailTemplateAddedEvent(ctx, orgAgg, policy.Template))
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToMailTemplate(&addedPolicy.MailTemplateWriteModel), nil
 }
 
@@ -45,19 +46,20 @@ func (r *CommandSide) ChangeMailTemplate(ctx context.Context, resourceOwner stri
 		return nil, caos_errs.ThrowNotFound(nil, "Org-5m9ie", "Errors.Org.MailTemplate.NotFound")
 	}
 
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, policy.Template)
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.MailTemplateWriteModel.WriteModel)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.Template)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.MailTemplate.NotChanged")
 	}
 
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.MailTemplateWriteModel.WriteModel)
-	orgAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToMailTemplate(&existingPolicy.MailTemplateWriteModel), nil
 }
 
@@ -71,7 +73,7 @@ func (r *CommandSide) RemoveMailTemplate(ctx context.Context, orgID string) erro
 		return caos_errs.ThrowNotFound(nil, "Org-3b8Jf", "Errors.Org.MailTemplate.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	orgAgg.PushEvents(org.NewMailTemplateRemovedEvent(ctx))
 
-	return r.eventstore.PushAggregate(ctx, existingPolicy, orgAgg)
+	_, err = r.eventstore.PushEvents(ctx, org.NewMailTemplateRemovedEvent(ctx, orgAgg))
+	return err
 }

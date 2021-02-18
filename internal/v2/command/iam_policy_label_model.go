@@ -42,11 +42,15 @@ func (wm *IAMLabelPolicyWriteModel) Reduce() error {
 func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.LabelPolicyWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.LabelPolicyAddedEventType,
+			iam.LabelPolicyChangedEventType)
 }
 
 func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	primaryColor,
 	secondaryColor string,
 ) (*iam.LabelPolicyChangedEvent, bool) {
@@ -60,7 +64,7 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewLabelPolicyChangedEvent(ctx, changes)
+	changedEvent, err := iam.NewLabelPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

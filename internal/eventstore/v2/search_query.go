@@ -93,7 +93,7 @@ func (factory *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 	if factory == nil ||
 		len(factory.aggregateTypes) < 1 ||
 		factory.columns.Validate() != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-tGAD3", "factory invalid")
+		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "factory invalid")
 	}
 	filters := []*repository.Filter{
 		factory.aggregateTypeFilter(),

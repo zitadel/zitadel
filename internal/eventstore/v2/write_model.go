@@ -15,9 +15,8 @@ type WriteModel struct {
 
 //AppendEvents adds all the events to the read model.
 // The function doesn't compute the new state of the read model
-func (rm *WriteModel) AppendEvents(events ...EventReader) *WriteModel {
+func (rm *WriteModel) AppendEvents(events ...EventReader) {
 	rm.Events = append(rm.Events, events...)
-	return rm
 }
 
 //Reduce is the basic implementaion of reducer
@@ -28,10 +27,10 @@ func (wm *WriteModel) Reduce() error {
 	}
 
 	if wm.AggregateID == "" {
-		wm.AggregateID = wm.Events[0].AggregateID()
+		wm.AggregateID = wm.Events[0].Aggregate().ID
 	}
 	if wm.ResourceOwner == "" {
-		wm.ResourceOwner = wm.Events[0].ResourceOwner()
+		wm.ResourceOwner = wm.Events[0].Aggregate().ResourceOwner
 	}
 
 	wm.ProcessedSequence = wm.Events[len(wm.Events)-1].Sequence()

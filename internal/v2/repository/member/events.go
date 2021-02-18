@@ -32,9 +32,8 @@ func NewRemoveMemberUniqueConstraint(aggregateID, userID string) *eventstore.Eve
 type MemberAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Roles       []string `json:"roles"`
-	UserID      string   `json:"userId"`
-	aggregateID string
+	Roles  []string `json:"roles"`
+	UserID string   `json:"userId"`
 }
 
 func (e *MemberAddedEvent) Data() interface{} {
@@ -42,21 +41,19 @@ func (e *MemberAddedEvent) Data() interface{} {
 }
 
 func (e *MemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddMemberUniqueConstraint(e.aggregateID, e.UserID)}
+	return []*eventstore.EventUniqueConstraint{NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
 }
 
 func NewMemberAddedEvent(
 	base *eventstore.BaseEvent,
-	aggregateID,
 	userID string,
 	roles ...string,
 ) *MemberAddedEvent {
 
 	return &MemberAddedEvent{
-		BaseEvent:   *base,
-		aggregateID: aggregateID,
-		Roles:       roles,
-		UserID:      userID,
+		BaseEvent: *base,
+		Roles:     roles,
+		UserID:    userID,
 	}
 }
 
@@ -116,8 +113,7 @@ func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 type MemberRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID      string `json:"userId"`
-	aggregateID string
+	UserID string `json:"userId"`
 }
 
 func (e *MemberRemovedEvent) Data() interface{} {
@@ -125,19 +121,17 @@ func (e *MemberRemovedEvent) Data() interface{} {
 }
 
 func (e *MemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveMemberUniqueConstraint(e.aggregateID, e.UserID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
 }
 
 func NewRemovedEvent(
 	base *eventstore.BaseEvent,
-	aggregateID,
 	userID string,
 ) *MemberRemovedEvent {
 
 	return &MemberRemovedEvent{
-		BaseEvent:   *base,
-		aggregateID: aggregateID,
-		UserID:      userID,
+		BaseEvent: *base,
+		UserID:    userID,
 	}
 }
 

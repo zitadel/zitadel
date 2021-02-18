@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -47,10 +48,18 @@ func (e *RoleAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint
 	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.projectID)}
 }
 
-func NewRoleAddedEvent(ctx context.Context, key, displayName, group, projectID string) *RoleAddedEvent {
+func NewRoleAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	key,
+	displayName,
+	group,
+	projectID string,
+) *RoleAddedEvent {
 	return &RoleAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			RoleAddedType,
 		),
 		Key:         key,
@@ -91,13 +100,16 @@ func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 
 func NewRoleChangedEvent(
 	ctx context.Context,
-	changes []RoleChanges) (*RoleChangedEvent, error) {
+	aggregate *eventstore.Aggregate,
+	changes []RoleChanges,
+) (*RoleChangedEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-eR9vx", "Errors.NoChangesFound")
 	}
 	changeEvent := &RoleChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			RoleChangedType,
 		),
 	}
@@ -154,10 +166,15 @@ func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.projectID)}
 }
 
-func NewRoleRemovedEvent(ctx context.Context, key, projectID string) *RoleRemovedEvent {
+func NewRoleRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	key,
+	projectID string) *RoleRemovedEvent {
 	return &RoleRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			RoleRemovedType,
 		),
 		Key:       key,

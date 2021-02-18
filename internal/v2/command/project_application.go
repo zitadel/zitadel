@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/project"
@@ -24,15 +23,16 @@ func (r *CommandSide) ChangeApplication(ctx context.Context, projectID string, a
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	projectAgg.PushEvents(
-		project.NewApplicationChangedEvent(ctx, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName(), projectID),
-	)
-
-	err = r.eventstore.PushAggregate(ctx, existingApp, projectAgg)
+	pushedEvents, err := r.eventstore.PushEvents(
+		ctx,
+		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName(), projectID))
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(existingApp, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return applicationWriteModelToApplication(existingApp), nil
 }
 
@@ -52,9 +52,8 @@ func (r *CommandSide) DeactivateApplication(ctx context.Context, projectID, appI
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dsh35", "Errors.Project.App.NotActive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	projectAgg.PushEvents(project.NewApplicationDeactivatedEvent(ctx, appID))
-
-	return r.eventstore.PushAggregate(ctx, existingApp, projectAgg)
+	_, err = r.eventstore.PushEvents(ctx, project.NewApplicationDeactivatedEvent(ctx, projectAgg, appID))
+	return err
 }
 
 func (r *CommandSide) ReactivateApplication(ctx context.Context, projectID, appID, resourceOwner string) error {
@@ -73,9 +72,9 @@ func (r *CommandSide) ReactivateApplication(ctx context.Context, projectID, appI
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1n8cM", "Errors.Project.App.NotInactive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	projectAgg.PushEvents(project.NewApplicationReactivatedEvent(ctx, appID))
 
-	return r.eventstore.PushAggregate(ctx, existingApp, projectAgg)
+	_, err = r.eventstore.PushEvents(ctx, project.NewApplicationReactivatedEvent(ctx, projectAgg, appID))
+	return err
 }
 
 func (r *CommandSide) RemoveApplication(ctx context.Context, projectID, appID, resourceOwner string) error {
@@ -91,9 +90,9 @@ func (r *CommandSide) RemoveApplication(ctx context.Context, projectID, appID, r
 		return caos_errs.ThrowNotFound(nil, "COMMAND-0po9s", "Errors.Project.App.NotExisting")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	projectAgg.PushEvents(project.NewApplicationRemovedEvent(ctx, appID, existingApp.Name, projectID))
 
-	return r.eventstore.PushAggregate(ctx, existingApp, projectAgg)
+	_, err = r.eventstore.PushEvents(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, projectID))
+	return err
 }
 
 func (r *CommandSide) getApplicationWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*ApplicationWriteModel, error) {

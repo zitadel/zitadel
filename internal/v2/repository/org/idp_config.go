@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -22,7 +23,7 @@ type IDPConfigAddedEvent struct {
 
 func NewIDPConfigAddedEvent(
 	ctx context.Context,
-	resourceOwner,
+	aggregate *eventstore.Aggregate,
 	configID,
 	name string,
 	configType domain.IDPConfigType,
@@ -31,10 +32,10 @@ func NewIDPConfigAddedEvent(
 
 	return &IDPConfigAddedEvent{
 		IDPConfigAddedEvent: *idpconfig.NewIDPConfigAddedEvent(
-			eventstore.NewBaseEventForPushWithResourceOwner(
+			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				IDPConfigAddedEventType,
-				resourceOwner,
 			),
 			configID,
 			name,
@@ -59,13 +60,15 @@ type IDPConfigChangedEvent struct {
 
 func NewIDPConfigChangedEvent(
 	ctx context.Context,
-	resourceOwner,
+	aggregate *eventstore.Aggregate,
 	configID,
 	oldName string,
 	changes []idpconfig.IDPConfigChanges,
 ) (*IDPConfigChangedEvent, error) {
 	changeEvent, err := idpconfig.NewIDPConfigChangedEvent(
-		eventstore.NewBaseEventForPushWithResourceOwner(ctx, IDPConfigChangedEventType, resourceOwner),
+		eventstore.NewBaseEventForPush(ctx,
+			aggregate,
+			IDPConfigChangedEventType),
 		configID,
 		oldName,
 		changes,
@@ -91,17 +94,17 @@ type IDPConfigRemovedEvent struct {
 
 func NewIDPConfigRemovedEvent(
 	ctx context.Context,
-	resourceOwner,
+	aggregate *eventstore.Aggregate,
 	configID,
 	name string,
 ) *IDPConfigRemovedEvent {
 
 	return &IDPConfigRemovedEvent{
 		IDPConfigRemovedEvent: *idpconfig.NewIDPConfigRemovedEvent(
-			eventstore.NewBaseEventForPushWithResourceOwner(
+			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				IDPConfigRemovedEventType,
-				resourceOwner,
 			),
 			configID,
 			name,
@@ -124,6 +127,7 @@ type IDPConfigDeactivatedEvent struct {
 
 func NewIDPConfigDeactivatedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	configID string,
 ) *IDPConfigDeactivatedEvent {
 
@@ -131,6 +135,7 @@ func NewIDPConfigDeactivatedEvent(
 		IDPConfigDeactivatedEvent: *idpconfig.NewIDPConfigDeactivatedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				IDPConfigDeactivatedEventType,
 			),
 			configID,
@@ -153,6 +158,7 @@ type IDPConfigReactivatedEvent struct {
 
 func NewIDPConfigReactivatedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	configID string,
 ) *IDPConfigReactivatedEvent {
 
@@ -160,6 +166,7 @@ func NewIDPConfigReactivatedEvent(
 		IDPConfigReactivatedEvent: *idpconfig.NewIDPConfigReactivatedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				IDPConfigReactivatedEventType,
 			),
 			configID,

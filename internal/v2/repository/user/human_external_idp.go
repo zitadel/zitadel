@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -49,10 +50,17 @@ func (e *HumanExternalIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniq
 	return []*eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
-func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName, externalUserID string) *HumanExternalIDPAddedEvent {
+func NewHumanExternalIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID,
+	displayName,
+	externalUserID string,
+) *HumanExternalIDPAddedEvent {
 	return &HumanExternalIDPAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanExternalIDPAddedType,
 		),
 		IDPConfigID:    idpConfigID,
@@ -89,10 +97,16 @@ func (e *HumanExternalIDPRemovedEvent) UniqueConstraints() []*eventstore.EventUn
 	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
-func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPRemovedEvent {
+func NewHumanExternalIDPRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID,
+	externalUserID string,
+) *HumanExternalIDPRemovedEvent {
 	return &HumanExternalIDPRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanExternalIDPRemovedType,
 		),
 		IDPConfigID:    idpConfigID,
@@ -128,10 +142,16 @@ func (e *HumanExternalIDPCascadeRemovedEvent) UniqueConstraints() []*eventstore.
 	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
-func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPCascadeRemovedEvent {
+func NewHumanExternalIDPCascadeRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID,
+	externalUserID string,
+) *HumanExternalIDPCascadeRemovedEvent {
 	return &HumanExternalIDPCascadeRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanExternalIDPCascadeRemovedType,
 		),
 		IDPConfigID:    idpConfigID,
@@ -165,10 +185,14 @@ func (e *HumanExternalIDPCheckSucceededEvent) UniqueConstraints() []*eventstore.
 	return nil
 }
 
-func NewHumanExternalIDPCheckSucceededEvent(ctx context.Context, info *AuthRequestInfo) *HumanExternalIDPCheckSucceededEvent {
+func NewHumanExternalIDPCheckSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo) *HumanExternalIDPCheckSucceededEvent {
 	return &HumanExternalIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanExternalLoginCheckSucceededType,
 		),
 		AuthRequestInfo: info,

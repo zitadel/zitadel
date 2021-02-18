@@ -51,6 +51,7 @@ func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 
 func NewOIDCConfigAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	version domain.OIDCVersion,
 	appID string,
 	clientID string,
@@ -71,6 +72,7 @@ func NewOIDCConfigAddedEvent(
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OIDCConfigAddedType,
 		),
 		Version:                  version,
@@ -136,6 +138,7 @@ func (e *OIDCConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 
 func NewOIDCConfigChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	appID string,
 	changes []OIDCConfigChanges,
 ) (*OIDCConfigChangedEvent, error) {
@@ -146,6 +149,7 @@ func NewOIDCConfigChangedEvent(
 	changeEvent := &OIDCConfigChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OIDCConfigChangedType,
 		),
 		AppID: appID,
@@ -272,12 +276,14 @@ func (e *OIDCConfigSecretChangedEvent) UniqueConstraints() []*eventstore.EventUn
 
 func NewOIDCConfigSecretChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	appID string,
 	clientSecret *crypto.CryptoValue,
 ) *OIDCConfigSecretChangedEvent {
 	return &OIDCConfigSecretChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OIDCConfigSecretChangedType,
 		),
 		AppID:        appID,
@@ -314,11 +320,13 @@ func (e *OIDCConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.
 
 func NewOIDCConfigSecretCheckSucceededEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	appID string,
 ) *OIDCConfigSecretCheckSucceededEvent {
 	return &OIDCConfigSecretCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OIDCClientSecretCheckSucceededType,
 		),
 		AppID: appID,
@@ -354,11 +362,13 @@ func (e *OIDCConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.Eve
 
 func NewOIDCConfigSecretCheckFailedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	appID string,
 ) *OIDCConfigSecretCheckFailedEvent {
 	return &OIDCConfigSecretCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OIDCClientSecretCheckFailedType,
 		),
 		AppID: appID,

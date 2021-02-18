@@ -2,11 +2,12 @@ package command
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
-	"time"
 )
 
 type HumanEmailWriteModel struct {
@@ -29,10 +30,6 @@ func NewHumanEmailWriteModel(userID, resourceOwner string) *HumanEmailWriteModel
 			ResourceOwner: resourceOwner,
 		},
 	}
-}
-
-func (wm *HumanEmailWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
 }
 
 func (wm *HumanEmailWriteModel) Reduce() error {
@@ -67,7 +64,13 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 
 func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		EventTypes(user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.HumanEmailChangedType,
+			user.HumanEmailCodeAddedType,
+			user.HumanEmailVerifiedType,
+			user.UserRemovedType)
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}
@@ -76,10 +79,11 @@ func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *HumanEmailWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	email string,
 ) (*user.HumanEmailChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := user.NewHumanEmailChangedEvent(ctx)
+	changedEvent := user.NewHumanEmailChangedEvent(ctx, aggregate)
 	if wm.Email != email {
 		hasChanged = true
 		changedEvent.EmailAddress = email

@@ -49,10 +49,11 @@ func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 	return nil
 }
 
-func NewDomainAddedEvent(ctx context.Context, domain string) *DomainAddedEvent {
+func NewDomainAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainAddedEvent {
 	return &DomainAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgDomainAddedEventType,
 		),
 		Domain: domain,
@@ -89,12 +90,14 @@ func (e *DomainVerificationAddedEvent) UniqueConstraints() []*eventstore.EventUn
 
 func NewDomainVerificationAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	domain string,
 	validationType domain.OrgDomainValidationType,
 	validationCode *crypto.CryptoValue) *DomainVerificationAddedEvent {
 	return &DomainVerificationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgDomainVerificationAddedEventType,
 		),
 		Domain:         domain,
@@ -129,10 +132,11 @@ func (e *DomainVerificationFailedEvent) UniqueConstraints() []*eventstore.EventU
 	return nil
 }
 
-func NewDomainVerificationFailedEvent(ctx context.Context, domain string) *DomainVerificationFailedEvent {
+func NewDomainVerificationFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainVerificationFailedEvent {
 	return &DomainVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgDomainVerificationFailedEventType,
 		),
 		Domain: domain,
@@ -165,10 +169,11 @@ func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return []*eventstore.EventUniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
 }
 
-func NewDomainVerifiedEvent(ctx context.Context, domain string) *DomainVerifiedEvent {
+func NewDomainVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainVerifiedEvent {
 	return &DomainVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgDomainVerifiedEventType,
 		),
 		Domain: domain,
@@ -201,10 +206,11 @@ func (e *DomainPrimarySetEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
-func NewDomainPrimarySetEvent(ctx context.Context, domain string) *DomainPrimarySetEvent {
+func NewDomainPrimarySetEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainPrimarySetEvent {
 	return &DomainPrimarySetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgDomainPrimarySetEventType,
 		),
 		Domain: domain,
@@ -241,10 +247,11 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 	return []*eventstore.EventUniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
 }
 
-func NewDomainRemovedEvent(ctx context.Context, domain string) *DomainRemovedEvent {
+func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainRemovedEvent {
 	return &DomainRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			OrgDomainRemovedEventType,
 		),
 		Domain: domain,

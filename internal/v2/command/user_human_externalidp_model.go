@@ -27,10 +27,6 @@ func NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID, resource
 	}
 }
 
-func (wm *HumanExternalIDPWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *HumanExternalIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -53,5 +49,9 @@ func (wm *HumanExternalIDPWriteModel) Reduce() error {
 func (wm *HumanExternalIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(user.HumanExternalIDPAddedType,
+			user.HumanExternalIDPRemovedType,
+			user.HumanExternalIDPCascadeRemovedType,
+			user.UserRemovedType)
 }

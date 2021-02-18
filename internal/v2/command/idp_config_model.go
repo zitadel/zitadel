@@ -15,6 +15,7 @@ type IDPConfigWriteModel struct {
 	Name        string
 	StylingType domain.IDPConfigStylingType
 
+	//TODO: sub writemodels not used anymore?
 	OIDCConfig *OIDCConfigWriteModel
 }
 

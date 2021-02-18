@@ -21,6 +21,7 @@ type IDPOIDCConfigAddedEvent struct {
 
 func NewIDPOIDCConfigAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	clientID,
 	idpConfigID,
 	issuer string,
@@ -34,6 +35,7 @@ func NewIDPOIDCConfigAddedEvent(
 		OIDCConfigAddedEvent: *idpconfig.NewOIDCConfigAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				IDPOIDCConfigAddedEventType,
 			),
 			clientID,
@@ -62,11 +64,15 @@ type IDPOIDCConfigChangedEvent struct {
 
 func NewIDPOIDCConfigChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	idpConfigID string,
 	changes []idpconfig.OIDCConfigChanges,
 ) (*IDPOIDCConfigChangedEvent, error) {
 	changeEvent, err := idpconfig.NewOIDCConfigChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, IDPOIDCConfigChangedEventType),
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			IDPOIDCConfigChangedEventType),
 		idpConfigID,
 		changes,
 	)

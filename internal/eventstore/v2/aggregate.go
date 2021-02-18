@@ -1,86 +1,66 @@
 package eventstore
 
-type Aggregater interface {
-	//ID returns the aggreagte id
-	ID() string
-	//KeyType returns the aggregate type
-	Type() AggregateType
-	//Events returns the events which will be pushed
-	Events() []EventPusher
-	//ResourceOwner returns the organisation id which manages this aggregate
-	// resource owner is only on the inital push needed
-	// afterwards the resource owner of the previous event is taken
-	ResourceOwner() string
-	//Version represents the semantic version of the aggregate
-	Version() Version
-}
+import (
+	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
+)
+
+type aggregateOpt func(*Aggregate)
+
+//NewAggregate is the default constructor of an aggregate
+// opts overwrite values calculated by given parameters
 func NewAggregate(
+	ctx context.Context,
 	id string,
 	typ AggregateType,
-	resourceOwner string,
 	version Version,
+	opts ...aggregateOpt,
 ) *Aggregate {
-	return &Aggregate{
-		id:            id,
-		typ:           typ,
-		resourceOwner: resourceOwner,
-		version:       version,
-		events:        []EventPusher{},
+	a := &Aggregate{
+		ID:            id,
+		Typ:           typ,
+		ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		Version:       version,
+	}
+
+	for _, opt := range opts {
+		opt(a)
+	}
+
+	return a
+}
+
+//WithResourceOwner overwrites the resource owner of the aggregate
+// by default the resource owner is set by the context
+func WithResourceOwner(resourceOwner string) aggregateOpt {
+	return func(aggregate *Aggregate) {
+		aggregate.ResourceOwner = resourceOwner
 	}
 }
 
+//AggregateFromWriteModel maps the given WriteModel to an Aggregate
 func AggregateFromWriteModel(
 	wm *WriteModel,
 	typ AggregateType,
 	version Version,
 ) *Aggregate {
 	return &Aggregate{
-		id:            wm.AggregateID,
-		typ:           typ,
-		resourceOwner: wm.ResourceOwner,
-		version:       version,
-		events:        []EventPusher{},
+		ID:            wm.AggregateID,
+		Typ:           typ,
+		ResourceOwner: wm.ResourceOwner,
+		Version:       version,
 	}
 }
 
 //Aggregate is the basic implementation of Aggregater
 type Aggregate struct {
-	id            string        `json:"-"`
-	typ           AggregateType `json:"-"`
-	events        []EventPusher `json:"-"`
-	resourceOwner string        `json:"-"`
-	version       Version       `json:"-"`
-}
-
-//PushEvents adds all the events to the aggregate.
-// The added events will be pushed to eventstore
-func (a *Aggregate) PushEvents(events ...EventPusher) *Aggregate {
-	a.events = append(a.events, events...)
-	return a
-}
-
-//ID implements Aggregater
-func (a *Aggregate) ID() string {
-	return a.id
-}
-
-//KeyType implements Aggregater
-func (a *Aggregate) Type() AggregateType {
-	return a.typ
-}
-
-//Events implements Aggregater
-func (a *Aggregate) Events() []EventPusher {
-	return a.events
-}
-
-//ResourceOwner implements Aggregater
-func (a *Aggregate) ResourceOwner() string {
-	return a.resourceOwner
-}
-
-//Version implements Aggregater
-func (a *Aggregate) Version() Version {
-	return a.version
+	//ID is the unique identitfier of this aggregate
+	ID string `json:"-"`
+	//Typ is the name of the aggregate.
+	Typ AggregateType `json:"-"`
+	//ResourceOwner is the org this aggregates belongs to
+	ResourceOwner string `json:"-"`
+	//Version is the semver this aggregate represents
+	Version Version `json:"-"`
 }

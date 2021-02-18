@@ -130,14 +130,3 @@ func (rm *ReadModel) AppendAndReduce(events ...eventstore.EventReader) error {
 func (rm *ReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).AggregateIDs(rm.AggregateID)
 }
-
-func IAMAggregateFromReadModel(rm *ReadModel) *iam.Aggregate {
-	return &iam.Aggregate{
-		Aggregate: *eventstore.NewAggregate(
-			rm.AggregateID,
-			iam.AggregateType,
-			rm.ResourceOwner,
-			iam.AggregateVersion,
-		),
-	}
-}

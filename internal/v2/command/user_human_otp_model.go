@@ -23,10 +23,6 @@ func NewHumanOTPWriteModel(userID, resourceOwner string) *HumanOTPWriteModel {
 	}
 }
 
-func (wm *HumanOTPWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *HumanOTPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -46,7 +42,11 @@ func (wm *HumanOTPWriteModel) Reduce() error {
 
 func (wm *HumanOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		EventTypes(user.HumanMFAOTPAddedType,
+			user.HumanMFAOTPVerifiedType,
+			user.HumanMFAOTPRemovedType,
+			user.UserRemovedType)
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}
