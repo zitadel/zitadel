@@ -71,7 +71,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			repos.OrgEvents,
 			repos.IamEvents,
 			systemDefaults.IamID),
-		newMachineKeys(
+		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
 		newLoginPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),

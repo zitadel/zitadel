@@ -32,6 +32,13 @@ func (s *Server) CreateOIDCApplication(ctx context.Context, in *management.OIDCA
 	}
 	return oidcAppFromDomain(app), nil
 }
+func (s *Server) CreateAPIApplication(ctx context.Context, in *management.APIApplicationCreate) (*management.Application, error) {
+	app, err := s.project.AddApplication(ctx, apiAppCreateToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return appFromModel(app), nil
+}
 func (s *Server) UpdateApplication(ctx context.Context, in *management.ApplicationUpdate) (*management.Application, error) {
 	app, err := s.command.ChangeApplication(ctx, in.ProjectId, appUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
@@ -61,8 +68,24 @@ func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *management
 	return oidcConfigFromDomain(config), nil
 }
 
+func (s *Server) UpdateApplicationAPIConfig(ctx context.Context, in *management.APIConfigUpdate) (*management.APIConfig, error) {
+	config, err := s.project.ChangeAPIConfig(ctx, apiConfigUpdateToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return apiConfigFromModel(config), nil
+}
+
 func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *management.ApplicationID) (*management.ClientSecret, error) {
 	config, err := s.command.ChangeOIDCApplicationSecret(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &management.ClientSecret{ClientSecret: config.ClientSecretString}, nil
+}
+
+func (s *Server) RegenerateAPIClientSecret(ctx context.Context, in *management.ApplicationID) (*management.ClientSecret, error) {
+	config, err := s.project.ChangeAPIConfigSecret(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -75,4 +98,33 @@ func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *managem
 		return nil, err
 	}
 	return appChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
+}
+
+func (s *Server) SearchClientKeys(ctx context.Context, req *management.ClientKeySearchRequest) (*management.ClientKeySearchResponse, error) {
+	result, err := s.project.SearchClientKeys(ctx, clientKeySearchRequestToModel(req))
+	if err != nil {
+		return nil, err
+	}
+	return clientKeySearchResponseFromModel(result), nil
+}
+
+func (s *Server) GetClientKey(ctx context.Context, req *management.ClientKeyIDRequest) (*management.ClientKeyView, error) {
+	key, err := s.project.GetClientKey(ctx, req.ProjectId, req.ApplicationId, req.KeyId)
+	if err != nil {
+		return nil, err
+	}
+	return clientKeyViewFromModel(key), nil
+}
+
+func (s *Server) AddClientKey(ctx context.Context, req *management.AddClientKeyRequest) (*management.AddClientKeyResponse, error) {
+	key, err := s.project.AddClientKey(ctx, addClientKeyToModel(req))
+	if err != nil {
+		return nil, err
+	}
+	return addClientKeyFromModel(key), nil
+}
+
+func (s *Server) DeleteClientKey(ctx context.Context, req *management.ClientKeyIDRequest) (*empty.Empty, error) {
+	err := s.project.RemoveClientKey(ctx, req.ProjectId, req.ApplicationId, req.KeyId)
+	return &empty.Empty{}, err
 }

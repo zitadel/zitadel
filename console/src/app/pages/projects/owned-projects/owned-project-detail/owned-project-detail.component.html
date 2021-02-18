@@ -8,7 +8,7 @@
             <ng-template appHasRole [appHasRole]="['project.write:'+projectId, 'project.write']">
                 <button matTooltip="{{'ACTIONS.EDIT' | translate}}" mat-icon-button (click)="editstate = !editstate"
                     aria-label="Edit project name" *ngIf="isZitadel === false">
-                    <mat-icon *ngIf="!editstate">edit</mat-icon>
+                    <i *ngIf="!editstate" class="las la-edit"></i>
                     <mat-icon *ngIf="editstate">close</mat-icon>
                 </button>
             </ng-template>
@@ -24,11 +24,13 @@
             <button mat-stroked-button color="warn"
                 [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.projectId]| hasRole | async) == false"
                 *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE"
-                (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
+                (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' |
+                translate}}</button>
             <button mat-stroked-button color="warn"
                 [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.projectId]| hasRole | async) == false"
                 *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE"
-                (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
+                (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' |
+                translate}}</button>
 
             <div class="full-width">
                 <div class="line">
@@ -78,7 +80,7 @@
                 </ng-template>
 
                 <ng-template appHasRole [appHasRole]="['project.role.read:' + project.projectId, 'project.role.read']">
-                    <app-card title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
+                    <app-card id="roles" title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
                         description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
                         <p>{{'PROJECT.ROLE.OPTIONS' | translate}}</p>
                         <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()"
@@ -118,7 +120,8 @@
             <div class="meta-row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
                 <span *ngIf="project && project.state !== undefined" class="state"
-                    [ngClass]="{'active': project.state === ProjectState.PROJECTSTATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECTSTATE_INACTIVE}">{{'PROJECT.STATE.'+project.state | translate}}</span>
+                    [ngClass]="{'active': project.state === ProjectState.PROJECTSTATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECTSTATE_INACTIVE}">{{'PROJECT.STATE.'+project.state
+                    | translate}}</span>
             </div>
         </div>
 

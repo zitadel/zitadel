@@ -24,9 +24,10 @@ type verifierMock struct{}
 func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, error) {
 	return "", "", "", "", nil
 }
-func (v *verifierMock) ResolveGrants(ctx context.Context) (*authz.Grant, error) {
+func (v *verifierMock) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
 	return nil, nil
 }
+
 func (v *verifierMock) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
 	return "", nil, nil
 }

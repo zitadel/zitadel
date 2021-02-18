@@ -1,15 +1,16 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/v2/domain"
 	"net/http"
 	"strings"
 
+	"github.com/caos/oidc/pkg/client/rp"
 	"github.com/caos/oidc/pkg/oidc"
-	"github.com/caos/oidc/pkg/rp"
+
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {

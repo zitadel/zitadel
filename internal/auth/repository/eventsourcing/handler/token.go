@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -68,9 +69,6 @@ func (p *Token) CurrentSequence() (uint64, error) {
 
 func (t *Token) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := t.view.GetLatestTokenSequence()
-	if err != nil {
-		return nil, err
-	}
 	if err != nil {
 		return nil, err
 	}

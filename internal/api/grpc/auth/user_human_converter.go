@@ -3,7 +3,7 @@ package auth
 import (
 	"github.com/caos/logging"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	auth "github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/caos/zitadel/pkg/grpc/auth"
 	"github.com/golang/protobuf/ptypes"
 )
 

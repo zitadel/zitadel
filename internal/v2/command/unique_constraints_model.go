@@ -45,7 +45,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), org.NewAddOrgNameUniqueConstraint(e.Name))
 		case *org.OrgChangedEvent:
 			rm.changeUniqueConstraint(e.AggregateID(), e.AggregateID(), org.NewAddOrgNameUniqueConstraint(e.Name))
-		case *org.DomainVerificationAddedEvent:
+		case *org.DomainVerifiedEvent:
 			rm.addUniqueConstraint(e.AggregateID(), e.AggregateID(), org.NewAddOrgNameUniqueConstraint(e.Domain))
 		case *org.DomainRemovedEvent:
 			rm.removeUniqueConstraint(e.AggregateID(), e.AggregateID(), org.UniqueOrgDomain)
@@ -158,9 +158,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 }
 
 func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AggregateIDs(rm.AggregateID).
-		ResourceOwner(rm.ResourceOwner).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType, org.AggregateType, project.AggregateType, user.AggregateType, usergrant.AggregateType).
 		EventTypes(
 			org.OrgAddedEventType,
 			org.OrgChangedEventType,

@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/v2/query"
+	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 
@@ -22,6 +23,7 @@ import (
 )
 
 type Config struct {
+	Domain      string
 	Eventstore  es_int.Config
 	AuthRequest cache.Config
 	View        types.SQL
@@ -60,6 +62,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 	if err != nil {
 		return nil, err
 	}
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
+
 	project, err := es_proj.StartProject(es_proj.ProjectConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
@@ -82,7 +86,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 		return nil, err
 	}
 
-	repos := handler.EventstoreRepos{IAMEvents: iam}
+	repos := handler.EventstoreRepos{IAMEvents: iam, OrgEvents: org, ProjectEvents: project}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
 	return &EsRepository{

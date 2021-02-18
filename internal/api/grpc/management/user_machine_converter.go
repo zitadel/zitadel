@@ -12,6 +12,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
@@ -52,7 +53,7 @@ func machineViewFromModel(machine *usr_model.MachineView) *management.MachineVie
 	}
 }
 
-func machineKeyViewsFromModel(keys ...*usr_model.MachineKeyView) []*management.MachineKeyView {
+func authnKeyViewsFromModel(keys ...*key_model.AuthNKeyView) []*management.MachineKeyView {
 	keyViews := make([]*management.MachineKeyView, len(keys))
 	for i, key := range keys {
 		keyViews[i] = machineKeyViewFromModel(key)
@@ -60,7 +61,7 @@ func machineKeyViewsFromModel(keys ...*usr_model.MachineKeyView) []*management.M
 	return keyViews
 }
 
-func machineKeyViewFromModel(key *usr_model.MachineKeyView) *management.MachineKeyView {
+func machineKeyViewFromModel(key *key_model.AuthNKeyView) *management.MachineKeyView {
 	creationDate, err := ptypes.TimestampProto(key.CreationDate)
 	logging.Log("MANAG-gluk7").OnError(err).Debug("unable to parse timestamp")
 
@@ -133,23 +134,27 @@ func machineKeyTypeFromDomain(typ domain.MachineKeyType) management.MachineKeyTy
 	}
 }
 
-func machineKeyTypeFromModel(typ usr_model.MachineKeyType) management.MachineKeyType {
+func machineKeyTypeFromModel(typ key_model.AuthNKeyType) management.MachineKeyType {
 	switch typ {
-	case usr_model.MachineKeyTypeJSON:
+	case key_model.AuthNKeyTypeJSON:
 		return management.MachineKeyType_MACHINEKEY_JSON
 	default:
 		return management.MachineKeyType_MACHINEKEY_UNSPECIFIED
 	}
 }
 
-func machineKeySearchRequestToModel(req *management.MachineKeySearchRequest) *usr_model.MachineKeySearchRequest {
-	return &usr_model.MachineKeySearchRequest{
+func machineKeySearchRequestToModel(req *management.MachineKeySearchRequest) *key_model.AuthNKeySearchRequest {
+	return &key_model.AuthNKeySearchRequest{
 		Offset: req.Offset,
 		Limit:  req.Limit,
 		Asc:    req.Asc,
-		Queries: []*usr_model.MachineKeySearchQuery{
+		Queries: []*key_model.AuthNKeySearchQuery{
 			{
-				Key:    usr_model.MachineKeyKeyUserID,
+				Key:    key_model.AuthNKeyObjectType,
+				Method: model.SearchMethodEquals,
+				Value:  key_model.AuthNKeyObjectTypeUser,
+			}, {
+				Key:    key_model.AuthNKeyObjectID,
 				Method: model.SearchMethodEquals,
 				Value:  req.UserId,
 			},
@@ -157,7 +162,7 @@ func machineKeySearchRequestToModel(req *management.MachineKeySearchRequest) *us
 	}
 }
 
-func machineKeySearchResponseFromModel(req *usr_model.MachineKeySearchResponse) *management.MachineKeySearchResponse {
+func machineKeySearchResponseFromModel(req *key_model.AuthNKeySearchResponse) *management.MachineKeySearchResponse {
 	viewTimestamp, err := ptypes.TimestampProto(req.Timestamp)
 	logging.Log("MANAG-Sk9ds").OnError(err).Debug("unable to parse cretaion date")
 
@@ -167,6 +172,6 @@ func machineKeySearchResponseFromModel(req *usr_model.MachineKeySearchResponse) 
 		TotalResult:       req.TotalResult,
 		ProcessedSequence: req.Sequence,
 		ViewTimestamp:     viewTimestamp,
-		Result:            machineKeyViewsFromModel(req.Result...),
+		Result:            authnKeyViewsFromModel(req.Result...),
 	}
 }
