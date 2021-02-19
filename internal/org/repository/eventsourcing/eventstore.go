@@ -2,8 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"encoding/json"
-
 	"github.com/caos/logging"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -16,7 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/golang/protobuf/ptypes"
 )
 
 type OrgEventstore struct {
@@ -109,63 +106,6 @@ func isUniqueValidation(unique *bool) func(events ...*es_models.Event) error {
 
 		return nil
 	}
-}
-
-func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
-	query := ChangesQuery(id, lastSequence, limit, sortAscending)
-
-	events, err := es.Eventstore.FilterEvents(context.Background(), query)
-	if err != nil {
-		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
-		return nil, errors.ThrowInternal(err, "EVENT-328b1", "Errors.Org.NotFound")
-	}
-	if len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-FpQqK", "Errors.Changes.NotFound")
-	}
-
-	changes := make([]*org_model.OrgChange, len(events))
-
-	for i, event := range events {
-		creationDate, err := ptypes.TimestampProto(event.CreationDate)
-		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
-		change := &org_model.OrgChange{
-			ChangeDate: creationDate,
-			EventType:  event.Type.String(),
-			ModifierId: event.EditorUser,
-			Sequence:   event.Sequence,
-		}
-
-		if event.Data != nil {
-			org := new(model.Org)
-			err := json.Unmarshal(event.Data, org)
-			logging.Log("EVENT-XCLEm").OnError(err).Debug("unable to unmarshal data")
-			change.Data = org
-		}
-
-		changes[i] = change
-		if lastSequence < event.Sequence {
-			lastSequence = event.Sequence
-		}
-	}
-
-	return &org_model.OrgChanges{
-		Changes:      changes,
-		LastSequence: lastSequence,
-	}, nil
-}
-
-func ChangesQuery(orgID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
-	query := es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate)
-
-	if !sortAscending {
-		query.OrderDesc()
-	}
-
-	query.LatestSequenceFilter(latestSequence).
-		AggregateIDFilter(orgID).
-		SetLimit(limit)
-	return query
 }
 
 func (es *OrgEventstore) GetOrgIAMPolicy(ctx context.Context, orgID string) (*iam_model.OrgIAMPolicy, error) {

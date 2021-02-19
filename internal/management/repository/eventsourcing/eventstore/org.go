@@ -2,11 +2,14 @@ package eventstore
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/golang/protobuf/ptypes"
 	"strings"
 
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
@@ -22,6 +25,7 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -95,7 +99,7 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 }
 
 func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
-	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit, sortAscending)
+	changes, err := repo.getOrgChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
@@ -510,6 +514,49 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 		return nil, err
 	}
 	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
+}
+
+func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
+	query := org_view.ChangesQuery(orgID, lastSequence, limit, sortAscending)
+
+	events, err := repo.Eventstore.FilterEvents(context.Background(), query)
+	if err != nil {
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, errors.ThrowInternal(err, "EVENT-328b1", "Errors.Org.NotFound")
+	}
+	if len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-FpQqK", "Errors.Changes.NotFound")
+	}
+
+	changes := make([]*org_model.OrgChange, len(events))
+
+	for i, event := range events {
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
+		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
+		change := &org_model.OrgChange{
+			ChangeDate: creationDate,
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
+		}
+
+		if event.Data != nil {
+			org := new(org_es_model.Org)
+			err := json.Unmarshal(event.Data, org)
+			logging.Log("EVENT-XCLEm").OnError(err).Debug("unable to unmarshal data")
+			change.Data = org
+		}
+
+		changes[i] = change
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
+		}
+	}
+
+	return &org_model.OrgChanges{
+		Changes:      changes,
+		LastSequence: lastSequence,
+	}, nil
 }
 
 func (repo *OrgRepository) userByID(ctx context.Context, id string) (*usr_model.UserView, error) {
