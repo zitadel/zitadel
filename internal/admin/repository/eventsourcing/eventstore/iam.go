@@ -10,8 +10,6 @@ import (
 	"github.com/caos/logging"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -68,48 +66,6 @@ func (repo *IAMRepository) GetIAMMemberRoles() []string {
 		}
 	}
 	return roles
-}
-
-func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID string) error {
-
-	aggregates := make([]*es_models.Aggregate, 0)
-	idp := iam_model.NewIDPConfig(repo.SystemDefaults.IamID, idpConfigID)
-	_, agg, err := repo.IAMEventstore.PrepareRemoveIDPConfig(ctx, idp)
-	if err != nil {
-		return err
-	}
-	aggregates = append(aggregates, agg)
-
-	providers, err := repo.View.IDPProvidersByIdpConfigID(idpConfigID)
-	if err != nil {
-		return err
-	}
-	for _, p := range providers {
-		if p.AggregateID == repo.SystemDefaults.IamID {
-			continue
-		}
-		provider := &iam_model.IDPProvider{ObjectRoot: es_models.ObjectRoot{AggregateID: p.AggregateID}, IDPConfigID: p.IDPConfigID}
-		providerAgg := new(es_models.Aggregate)
-		_, providerAgg, err = repo.OrgEvents.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider, true)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, providerAgg)
-	}
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
-	if err != nil {
-		return err
-	}
-	for _, externalIDP := range externalIDPs {
-		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
-		idpAgg := make([]*es_models.Aggregate, 0)
-		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, idpAgg...)
-	}
-	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
 func (repo *IAMRepository) IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
@@ -211,31 +167,6 @@ func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, reques
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
-}
-
-func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error {
-	aggregates := make([]*es_models.Aggregate, 0)
-	provider.AggregateID = repo.SystemDefaults.IamID
-	_, removeAgg, err := repo.IAMEventstore.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider)
-	if err != nil {
-		return err
-	}
-	aggregates = append(aggregates, removeAgg)
-
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(provider.IDPConfigID)
-	if err != nil {
-		return err
-	}
-	for _, externalIDP := range externalIDPs {
-		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
-		idpAgg := make([]*es_models.Aggregate, 0)
-		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, idpAgg...)
-	}
-	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
 func (repo *IAMRepository) SearchDefaultSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error) {
