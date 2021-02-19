@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "google/protobuf/duration.proto";
+
+package zitadel.app.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/app";
+
+message App {
+    string id = 1;
+    AppState state = 2;
+    string name = 5;
+    oneof app_config {
+        OIDCConfig oidc_config = 8;
+    }
+}
+
+enum AppState {
+    APP_STATE_UNSPECIFIED = 0;
+}
+
+message AppQuery {
+    oneof query {
+        AppNameQuery name = 1;
+    }
+}
+
+message AppNameQuery {
+    string name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
+}
+
+message OIDCConfig {
+    repeated string redirect_uris = 1;
+    repeated OIDCResponseType response_types = 2;
+    repeated OIDCGrantType grant_types = 3;
+    OIDCApplicationType application_type = 4;
+    string client_id = 5;
+    string client_secret = 6;
+    OIDCAuthMethodType auth_method_type = 7;
+    repeated string post_logout_redirect_uris = 8;
+    OIDCVersion version = 9;
+    bool none_compliant = 10;
+    repeated zitadel.v1.LocalizedMessage compliance_problems = 11;
+    bool dev_mode = 12;
+    OIDCTokenType access_token_type = 13;
+    bool access_token_role_assertion = 14;
+    bool id_token_role_assertion = 15;
+    bool id_token_userinfo_assertion = 16;
+    google.protobuf.Duration clock_skew = 17;
+}
+
+enum OIDCResponseType {}
+
+enum OIDCGrantType{}
+
+enum OIDCApplicationType {}
+
+enum OIDCAuthMethodType {}
+
+enum OIDCVersion {}
+
+enum OIDCTokenType {}
+
+enum APIAuthMethodType {}
+
+message APIConfig {
+    string client_id = 1;
+    string client_secret = 2;
+    APIAuthMethodType auth_method_type = 3;
+}
+
+message APIClientKey {
+    string id = 1;
+    AuthNKeyType type = 2;
+    zitadel.v1.MetaData meta_data = 3;
+}
+
+enum AuthNKeyType {
+    AUTHNKEY_UNSPECIFIED = 0;
+    AUTHNKEY_JSON = 1;
+  }

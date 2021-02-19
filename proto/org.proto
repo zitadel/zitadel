@@ -20,8 +20,8 @@ enum OrgState {
 
 message Domain {
     string domain = 1;
-    bool verified = 2;
-    bool primary = 3;
+    bool is_verified = 2;
+    bool is_primary = 3;
     DomainValidationType validation_type = 4;
 }
 
@@ -58,6 +58,7 @@ message DomainQuery {
     zitadel.v1.TextQueryMethod method = 2;
 }
 
+//TODO: replace with member.searchquery
 message MemberSearchQuery {
     oneof query {
         MemberFirstNameQuery first_name = 1;
@@ -84,4 +85,10 @@ message MemberLoginNameQuery {
 
 message MemberUserIDQuery {
     string user_id = 1;
+}
+
+enum OrgDomainValidationType {
+    ORG_DOMAIN_VALIDATION_TYPE_UNSPECIFIED = 0;
+    ORG_DOMAIN_VALIDATION_TYPE_HTTP = 1;
+    ORG_DOMAIN_VALIDATION_TYPE_DNS = 2;
 }

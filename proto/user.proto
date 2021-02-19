@@ -211,3 +211,34 @@ enum MachineKeyType {
     MACHINE_KEY_UNSPECIFIED = 0;
     MACHINE_KEY_JSON = 1;
 }
+
+message Membership {
+    string user_id = 1;
+    repeated string roles = 2;
+    string display_name = 3;
+    oneof type {
+        string org_id = 4;
+        string project_id = 5;
+        string project_grant_id = 6;
+    }
+}
+
+message MembershipQuery {
+    oneof query {
+        MembershipOrganisationQuery org = 1;
+        MembershipProjectQuery project = 2;
+        MembershipProjectGrantQuery project_grant = 3;
+    }
+}
+
+message MembershipOrganisationQuery {
+    string org_id = 1;
+}
+
+message MembershipProjectQuery {
+    string project_id = 1;
+}
+
+message MembershipProjectGrantQuery {
+    string project_grant_id = 1;
+}

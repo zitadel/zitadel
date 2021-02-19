@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+
+package zitadel.project.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/project";
+
+message Project {
+    string id = 1;
+    string name = 2;
+    ProjectState state = 3;
+    zitadel.v1.MetaData meta_data = 4;
+}
+
+message GrantedProject {
+    string grant_id = 1;
+    string granted_org_id = 2;
+    string granted_org_name = 3;
+    repeated string granted_role_keys = 4;
+    ProjectGrantState state = 5;
+    
+    string project_id = 6;
+    string project_name = 7;
+    string project_owner_id = 8;
+    string project_owner_name = 9;
+
+    zitadel.v1.MetaData meta_data = 10;
+}
+
+enum ProjectState {
+    PROJECT_STATE_UNSPECIFIED = 0;
+}
+
+enum ProjectGrantState {
+    PROJECT_GRANT_STATE_UNSPECIFIED = 0;
+}
+
+message ProjectQuery {
+    oneof query {
+        ProjectNameQuery name = 1;
+    }
+}
+
+message ProjectNameQuery {
+    string name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
+}
+
+//TODO: seperate file
+message Role {
+    string key = 1;
+    string display_name = 2;
+    string group = 3;
+}
+
+//TODO: seperate file
+message RoleQuery {
+    oneof query {
+        RoleKeyQuery key = 1;
+        RoleDisplayNameQuery display_name = 2;
+    }
+}
+
+message RoleKeyQuery {
+    string key = 1;
+    zitadel.v1.TextQueryMethod method = 2;
+}
+
+message RoleDisplayNameQuery {
+    string display_name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
+}
