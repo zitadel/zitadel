@@ -10,7 +10,7 @@ import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/api/field_behavior.proto";
 
-package zitadel.v1;
+package zitadel.auth.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/auth";
 

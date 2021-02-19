@@ -11,7 +11,7 @@ import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-package zitadel.v1;
+package zitadel.management.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/management";
 

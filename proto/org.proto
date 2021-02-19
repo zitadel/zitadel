@@ -3,7 +3,6 @@ syntax = "proto3";
 package zitadel.org.v1;
 
 import "zitadel/object.proto";
-import "google/api/field_behavior.proto";
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/org";
 

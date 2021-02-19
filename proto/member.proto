@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "zitadel/object.proto";
 
-package zitadel.policy.v1;
+package zitadel.member.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/member";
 

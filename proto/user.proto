@@ -4,7 +4,6 @@ package zitadel.user.v1;
 
 import "zitadel/object.proto";
 import "google/protobuf/timestamp.proto";
-import "google/api/field_behavior.proto";
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/user";
 
@@ -162,6 +161,10 @@ enum MFAState {
     MFA_STATE_NOT_READY = 1;
     MFA_STATE_READY = 2;
     MFA_STATE_REMOVED = 3;
+}
+
+enum MFAType {
+    MFA_TYPE_UNSPECIFIED = 0;
 }
 
 message MFAOTP {}
