@@ -1,29 +1,7 @@
 package model
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/golang/protobuf/ptypes/timestamp"
-)
-
-type User struct {
-	es_models.ObjectRoot
-	State    UserState
-	UserName string
-
-	*Human
-	*Machine
-}
-
-type UserState int32
-
-const (
-	UserStateUnspecified UserState = iota
-	UserStateActive
-	UserStateInactive
-	UserStateDeleted
-	UserStateLocked
-	UserStateSuspend
-	UserStateInitial
 )
 
 type UserChanges struct {
