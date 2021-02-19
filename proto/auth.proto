@@ -1,14 +1,12 @@
 syntax = "proto3";
 
-import "zitadel/idp.proto";
 import "zitadel/user.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
-import "zitadel/org.proto";
+import "zitadel/policy.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "google/api/field_behavior.proto";
 
 package zitadel.auth.v1;
 

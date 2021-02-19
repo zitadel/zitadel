@@ -1,15 +1,8 @@
 syntax = "proto3";
 
-package zitadel.policy.v1;
+import "google/protobuf/timestamp.proto";
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/change";
-
-message UserEvent {
-    Event event = 1;
-    oneof type {
-        UserCreated created = 2;
-    }
-}
 
 message Event {
     google.protobuf.Timestamp change_date = 1;
