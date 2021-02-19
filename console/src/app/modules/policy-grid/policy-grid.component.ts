@@ -21,6 +21,7 @@ export class PolicyGridComponent implements OnInit {
     public PolicyGridType: any = PolicyGridType;
 
     public complexityPolicy!: MgmtPasswordComplexityPolicyView.AsObject | AdminPasswordComplexityPolicyView.AsObject | any;
+
     constructor(private mgmtService: ManagementService, private adminService: AdminService) { }
 
     public ngOnInit(): void {

@@ -833,6 +833,9 @@
             "DELETED":"Deleted Project."
         }
     },
+    "NEXTSTEPS": {
+        "TITLE":"Next Steps"
+    },
     "IDP":{
         "LIST": {
             "TITLE":"Identity Providers",

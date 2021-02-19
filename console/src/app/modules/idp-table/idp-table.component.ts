@@ -36,7 +36,7 @@ export class IdpTableComponent implements OnInit {
     public IdpProviderType: any = IdpProviderType;
     public IdpState: any = IdpState;
     public IdpStylingType: any = IdpStylingType;
-    @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state'];
+    @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'dates', 'state'];
 
     @Output() public changedSelection: EventEmitter<Array<AdminIdpView.AsObject | MgmtIdpView.AsObject>>
         = new EventEmitter();

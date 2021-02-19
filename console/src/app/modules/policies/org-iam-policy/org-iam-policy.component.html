@@ -23,4 +23,6 @@
         <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
             }}</button>
     </div>
+
+    <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
 </app-detail-layout>

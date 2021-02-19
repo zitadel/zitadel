@@ -833,6 +833,9 @@
             "DELETED":"Projekt gelöscht."
         }
     },
+    "NEXTSTEPS": {
+        "TITLE":"Nächste Schritte"
+    },
     "IDP":{
         "LIST": {
             "TITLE":"Identitäts Provider",
@@ -969,7 +972,6 @@
                 }
             },
             "NEXTSTEPS": {
-                "TITLE":"Nächste Schritte",
                 "0": {
                     "TITLE":"Rollen festlegen",
                     "DESC":"Erfassen Sie Rollen für ihr Projekt"

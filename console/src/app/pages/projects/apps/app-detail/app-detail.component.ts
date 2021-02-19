@@ -5,13 +5,14 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { Subject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { CnslLinks } from 'src/app/modules/links/links.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
     Application,
@@ -101,6 +102,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public requestRedirectValuesSubject$: Subject<void> = new Subject();
     public copiedKey: any = '';
     public environmentMap: { [key: string]: string; } = {};
+    public nextLinks: Array<CnslLinks> = [];
 
     constructor(
         public translate: TranslateService,
@@ -156,8 +158,30 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.subscription?.unsubscribe();
     }
 
+    private initLinks(): void {
+        this.nextLinks = [
+            {
+                i18nTitle: 'APP.PAGES.NEXTSTEPS.0.TITLE',
+                i18nDesc: 'APP.PAGES.NEXTSTEPS.0.DESC',
+                routerLink: ['/projects', this.projectId],
+            },
+            {
+                i18nTitle: 'APP.PAGES.NEXTSTEPS.1.TITLE',
+                i18nDesc: 'APP.PAGES.NEXTSTEPS.1.DESC',
+                routerLink: ['/users', 'create'],
+            }, {
+                i18nTitle: 'APP.PAGES.NEXTSTEPS.2.TITLE',
+                i18nDesc: 'APP.PAGES.NEXTSTEPS.2.DESC',
+                href: 'https://docs.zitadel.ch'
+            },
+        ];
+    }
+
     private async getData({ projectid, id }: Params): Promise<void> {
         this.projectId = projectid;
+
+        this.initLinks();
+
         this.mgmtService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });

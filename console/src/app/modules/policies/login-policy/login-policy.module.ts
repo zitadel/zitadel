@@ -17,6 +17,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { MfaTableModule } from 'src/app/modules/mfa-table/mfa-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
+import { LinksModule } from '../../links/links.module';
 
 import { AddIdpDialogModule } from './add-idp-dialog/add-idp-dialog.module';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
@@ -45,6 +46,7 @@ import { LoginPolicyComponent } from './login-policy.component';
         MatProgressSpinnerModule,
         MatSelectModule,
         MatRippleModule,
+        LinksModule,
     ],
 })
 export class LoginPolicyModule { }
