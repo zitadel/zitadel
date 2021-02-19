@@ -10,7 +10,7 @@ message Member {
     string user_id = 1;
     zitadel.v1.MetaData meta_data = 2;
     repeated string roles = 3;
-    string user_name = 4; //TOOD: user name or preffered login name(s)
+    string preferred_login_name = 4;
     string email = 5;
     string first_name = 6;
     string last_name = 7;

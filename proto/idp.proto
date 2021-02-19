@@ -1,24 +1,14 @@
 syntax = "proto3";
 
-import "google/api/field_behavior.proto";
-
 package zitadel.idp.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
 
 message IDP {
-    string id = 1 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
-    IDPState state = 2 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
-    string name = 3 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    IDPStylingType styling_type = 4 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string id = 1;
+    IDPState state = 2;
+    string name = 3;
+    IDPStylingType styling_type = 4;
     oneof config {
         OIDCConfig oidc_config = 5;
     }
@@ -36,6 +26,8 @@ message IDPLink {
 
 enum IDPState {
     IDP_STATE_UNSPECIFIED = 0;
+    IDP_STATE_ACTIVE = 1;
+    IDP_STATE_INACTIVE = 2;
 }
 
 enum IDPStylingType {
@@ -50,24 +42,12 @@ enum IDPType {
 }
 
 message OIDCConfig {
-    string client_id = 1 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
-    string client_secret = 2 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
-    string issuer = 3 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    repeated string scopes = 4 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    OIDCMappingField idp_display_name_mapping = 5 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    OIDCMappingField username_mapping = 6 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string client_id = 1;
+    string client_secret = 2;
+    string issuer = 3;
+    repeated string scopes = 4;
+    OIDCMappingField idp_display_name_mapping = 5;
+    OIDCMappingField username_mapping = 6;
 }
 
 enum OIDCMappingField {

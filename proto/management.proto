@@ -388,25 +388,25 @@ service ManagementService {
 
 
 
-    rpc GetMyOrg(google.protobuf.Empty) returns (OrgView) {
+    rpc GetMyOrg(GetMyOrgRequest) returns (GetMyOrgResponse) {
         option (google.api.http) = {
-          get: "/orgs/me"
+            get: "/orgs/me"
         };
-    
-        option (caos.zitadel.utils.v1.auth_option) = {
-          permission: "org.read"
-        };
-      }
 
-      rpc GetOrgByDomainGlobal(Domain) returns (OrgView) {
-        option (google.api.http) = {
-          get: "/global/orgs/_bydomain"
-        };
-    
         option (caos.zitadel.utils.v1.auth_option) = {
-          permission: "org.global.read"
+            permission: "org.read"
         };
-      }
+    }
+
+    rpc GetOrgByDomainGlobal(GetOrgByDomainGlobalRequest) returns (GetOrgByDomainGlobalResponse) {
+        option (google.api.http) = {
+            get: "/global/orgs/_bydomain"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.global.read"
+        };
+    }
 
     rpc CreateOrg(CreateOrgRequest) returns (CreateOrgResponse) {
         option (google.api.http) = {
@@ -837,6 +837,39 @@ message RemoveMachineKeyRequest {
 message RemoveMachineKeyResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
+
+
+
+
+
+
+
+message GetMyOrgRequest {}
+
+message GetMyOrgResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.org.v1.Org org = 2;
+}
+
+message GetOrgByDomainGlobalRequest {
+    string domain = 1;
+}
+
+message GetOrgByDomainGlobalResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.org.v1.Org org = 2;
+}
+
+message CreateOrgRequest {
+    string name = 1;
+}
+
+message CreateOrgResponse {
+    string id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+}
+
+
 
 
 
