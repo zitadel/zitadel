@@ -21,19 +21,17 @@ import (
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 )
 
 type ProjectRepo struct {
 	es_int.Eventstore
-	SearchLimit     uint64
-	ProjectEvents   *proj_event.ProjectEventstore
-	UserGrantEvents *usr_grant_event.UserGrantEventStore
-	UserEvents      *usr_event.UserEventstore
-	IAMEvents       *iam_event.IAMEventstore
-	View            *view.View
-	Roles           []string
-	IAMID           string
+	SearchLimit   uint64
+	ProjectEvents *proj_event.ProjectEventstore
+	UserEvents    *usr_event.UserEventstore
+	IAMEvents     *iam_event.IAMEventstore
+	View          *view.View
+	Roles         []string
+	IAMID         string
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
@@ -335,16 +333,8 @@ func (repo *ProjectRepo) RemoveClientKey(ctx context.Context, projectID, applica
 	return repo.ProjectEvents.RemoveApplicationKey(ctx, projectID, applicationID, keyID)
 }
 
-func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
-	return repo.ProjectEvents.ChangeOIDCConfig(ctx, config)
-}
-
 func (repo *ProjectRepo) ChangeAPIConfig(ctx context.Context, config *proj_model.APIConfig) (*proj_model.APIConfig, error) {
 	return repo.ProjectEvents.ChangeAPIConfig(ctx, config)
-}
-
-func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
-	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
 }
 
 func (repo *ProjectRepo) ChangeAPIConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.APIConfig, error) {

@@ -18,18 +18,16 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type UserRepo struct {
 	es_int.Eventstore
-	SearchLimit     uint64
-	UserEvents      *usr_event.UserEventstore
-	OrgEvents       *org_event.OrgEventstore
-	UserGrantEvents *usr_grant_event.UserGrantEventStore
-	View            *view.View
-	SystemDefaults  systemdefaults.SystemDefaults
+	SearchLimit    uint64
+	UserEvents     *usr_event.UserEventstore
+	OrgEvents      *org_event.OrgEventstore
+	View           *view.View
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserView, error) {

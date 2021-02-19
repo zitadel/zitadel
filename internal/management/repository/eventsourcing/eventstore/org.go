@@ -11,9 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -21,10 +18,8 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -57,39 +52,6 @@ func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string)
 		return nil, err
 	}
 	return repo.OrgByID(ctx, verifiedDomain.OrgID)
-}
-
-func (repo *OrgRepository) CreateOrg(ctx context.Context, name string) (*org_model.Org, error) {
-	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, &org_model.Org{Name: name}, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	member := org_model.NewOrgMemberWithRoles(org.AggregateID, authz.GetCtxData(ctx).UserID, orgOwnerRole)
-	_, memberAggregate, err := repo.OrgEventstore.PrepareAddOrgMember(ctx, member, org.AggregateID)
-	if err != nil {
-		return nil, err
-	}
-	aggregates = append(aggregates, memberAggregate)
-
-	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, org.AppendEvents, aggregates...)
-	if err != nil {
-		return nil, err
-	}
-
-	return org_es_model.OrgToModel(org), nil
-}
-
-func (repo *OrgRepository) UpdateOrg(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {
-	return nil, errors.ThrowUnimplemented(nil, "EVENT-RkurR", "not implemented")
-}
-
-func (repo *OrgRepository) DeactivateOrg(ctx context.Context, id string) (*org_model.Org, error) {
-	return repo.OrgEventstore.DeactivateOrg(ctx, id)
-}
-
-func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_model.Org, error) {
-	return repo.OrgEventstore.ReactivateOrg(ctx, id)
 }
 
 func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
@@ -129,38 +91,6 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 	return result, nil
 }
 
-func (repo *OrgRepository) AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
-	domain.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddOrgDomain(ctx, domain)
-}
-
-func (repo *OrgRepository) GenerateMyOrgDomainValidation(ctx context.Context, domain *org_model.OrgDomain) (string, string, error) {
-	domain.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.GenerateOrgDomainValidation(ctx, domain)
-}
-
-func (repo *OrgRepository) ValidateMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
-	domain.AggregateID = authz.GetCtxData(ctx).OrgID
-	users := func(ctx context.Context, domain string) ([]*es_models.Aggregate, error) {
-		userIDs, err := repo.View.UserIDsByDomain(domain)
-		if err != nil {
-			return nil, err
-		}
-		return repo.UserEvents.PrepareDomainClaimed(ctx, userIDs)
-	}
-	return repo.OrgEventstore.ValidateOrgDomain(ctx, domain, users)
-}
-
-func (repo *OrgRepository) SetMyPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
-	domain.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.SetPrimaryOrgDomain(ctx, domain)
-}
-
-func (repo *OrgRepository) RemoveMyOrgDomain(ctx context.Context, domain string) error {
-	d := org_model.NewOrgDomain(authz.GetCtxData(ctx).OrgID, domain)
-	return repo.OrgEventstore.RemoveOrgDomain(ctx, d)
-}
-
 func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
 	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
@@ -187,21 +117,6 @@ func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID stri
 		return nil, err
 	}
 	return model.OrgMemberToModel(member), nil
-}
-
-func (repo *OrgRepository) AddMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
-	member.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddOrgMember(ctx, member)
-}
-
-func (repo *OrgRepository) ChangeMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
-	member.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangeOrgMember(ctx, member)
-}
-
-func (repo *OrgRepository) RemoveMyOrgMember(ctx context.Context, userID string) error {
-	member := org_model.NewOrgMember(authz.GetCtxData(ctx).OrgID, userID)
-	return repo.OrgEventstore.RemoveOrgMember(ctx, member)
 }
 
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
@@ -243,52 +158,6 @@ func (repo *OrgRepository) IDPConfigByID(ctx context.Context, idpConfigID string
 	}
 	return iam_view_model.IDPConfigViewToModel(idp), nil
 }
-func (repo *OrgRepository) AddOIDCIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
-	idp.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddIDPConfig(ctx, idp)
-}
-
-func (repo *OrgRepository) ChangeIDPConfig(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
-	idp.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangeIDPConfig(ctx, idp)
-}
-
-func (repo *OrgRepository) DeactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
-	return repo.OrgEventstore.DeactivateIDPConfig(ctx, authz.GetCtxData(ctx).OrgID, idpConfigID)
-}
-
-func (repo *OrgRepository) ReactivateIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
-	return repo.OrgEventstore.ReactivateIDPConfig(ctx, authz.GetCtxData(ctx).OrgID, idpConfigID)
-}
-
-func (repo *OrgRepository) RemoveIDPConfig(ctx context.Context, idpConfigID string) error {
-	aggregates := make([]*es_models.Aggregate, 0)
-	idp := iam_model.NewIDPConfig(authz.GetCtxData(ctx).OrgID, idpConfigID)
-	_, agg, err := repo.OrgEventstore.PrepareRemoveIDPConfig(ctx, idp)
-	if err != nil {
-
-	}
-	aggregates = append(aggregates, agg)
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
-	if err != nil {
-		return err
-	}
-	for _, externalIDP := range externalIDPs {
-		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
-		idpAgg := make([]*es_models.Aggregate, 0)
-		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, idpAgg...)
-	}
-	return sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
-}
-
-func (repo *OrgRepository) ChangeOIDCIDPConfig(ctx context.Context, oidcConfig *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
-	oidcConfig.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangeIDPOIDCConfig(ctx, oidcConfig)
-}
 
 func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
@@ -326,16 +195,6 @@ func (repo *OrgRepository) GetLabelPolicy(ctx context.Context) (*iam_model.Label
 		return nil, err
 	}
 	return iam_es_model.LabelPolicyViewToModel(policy), err
-}
-
-func (repo *OrgRepository) AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddLabelPolicy(ctx, policy)
-}
-
-func (repo *OrgRepository) ChangeLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangeLabelPolicy(ctx, policy)
 }
 
 func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
@@ -397,23 +256,6 @@ func (repo *OrgRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 	return iam_es_model.LoginPolicyViewToModel(policy), nil
 }
 
-func (repo *OrgRepository) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddLoginPolicy(ctx, policy)
-}
-
-func (repo *OrgRepository) ChangeLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangeLoginPolicy(ctx, policy)
-}
-
-func (repo *OrgRepository) RemoveLoginPolicy(ctx context.Context) error {
-	policy := &iam_model.LoginPolicy{ObjectRoot: models.ObjectRoot{
-		AggregateID: authz.GetCtxData(ctx).OrgID,
-	}}
-	return repo.OrgEventstore.RemoveLoginPolicy(ctx, policy)
-}
-
 func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
 	policy, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
@@ -444,35 +286,6 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	return result, nil
 }
 
-func (repo *OrgRepository) AddIDPProviderToLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) (*iam_model.IDPProvider, error) {
-	provider.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddIDPProviderToLoginPolicy(ctx, provider)
-}
-
-func (repo *OrgRepository) RemoveIDPProviderFromIdpProvider(ctx context.Context, provider *iam_model.IDPProvider) error {
-	aggregates := make([]*es_models.Aggregate, 0)
-	provider.AggregateID = authz.GetCtxData(ctx).OrgID
-	_, agg, err := repo.OrgEventstore.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider, false)
-	if err != nil {
-		return err
-	}
-	aggregates = append(aggregates, agg)
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(provider.IDPConfigID)
-	if err != nil {
-		return err
-	}
-	for _, externalIDP := range externalIDPs {
-		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
-		idpAgg := make([]*es_models.Aggregate, 0)
-		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, idpAgg...)
-	}
-	return sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
-}
-
 func (repo *OrgRepository) SearchSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error) {
 	policy, err := repo.GetLoginPolicy(ctx)
 	if err != nil {
@@ -484,14 +297,6 @@ func (repo *OrgRepository) SearchSecondFactors(ctx context.Context) (*iam_model.
 	}, nil
 }
 
-func (repo *OrgRepository) AddSecondFactorToLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) (iam_model.SecondFactorType, error) {
-	return repo.OrgEventstore.AddSecondFactorToLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, mfa)
-}
-
-func (repo *OrgRepository) RemoveSecondFactorFromLoginPolicy(ctx context.Context, mfa iam_model.SecondFactorType) error {
-	return repo.OrgEventstore.RemoveSecondFactorFromLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, mfa)
-}
-
 func (repo *OrgRepository) SearchMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error) {
 	policy, err := repo.GetLoginPolicy(ctx)
 	if err != nil {
@@ -501,14 +306,6 @@ func (repo *OrgRepository) SearchMultiFactors(ctx context.Context) (*iam_model.M
 		TotalResult: uint64(len(policy.MultiFactors)),
 		Result:      policy.MultiFactors,
 	}, nil
-}
-
-func (repo *OrgRepository) AddMultiFactorToLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) (iam_model.MultiFactorType, error) {
-	return repo.OrgEventstore.AddMultiFactorToLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, mfa)
-}
-
-func (repo *OrgRepository) RemoveMultiFactorFromLoginPolicy(ctx context.Context, mfa iam_model.MultiFactorType) error {
-	return repo.OrgEventstore.RemoveMultiFactorFromLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, mfa)
 }
 
 func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
@@ -562,23 +359,6 @@ func (repo *OrgRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 	return iam_es_model.PasswordComplexityViewToModel(policy), nil
 }
 
-func (repo *OrgRepository) AddPasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddPasswordComplexityPolicy(ctx, policy)
-}
-
-func (repo *OrgRepository) ChangePasswordComplexityPolicy(ctx context.Context, policy *iam_model.PasswordComplexityPolicy) (*iam_model.PasswordComplexityPolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangePasswordComplexityPolicy(ctx, policy)
-}
-
-func (repo *OrgRepository) RemovePasswordComplexityPolicy(ctx context.Context) error {
-	policy := &iam_model.PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{
-		AggregateID: authz.GetCtxData(ctx).OrgID,
-	}}
-	return repo.OrgEventstore.RemovePasswordComplexityPolicy(ctx, policy)
-}
-
 func (repo *OrgRepository) GetPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
 	policy, viewErr := repo.View.PasswordAgePolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
@@ -628,23 +408,6 @@ func (repo *OrgRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	}
 	policy.Default = true
 	return iam_es_model.PasswordAgeViewToModel(policy), nil
-}
-
-func (repo *OrgRepository) AddPasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddPasswordAgePolicy(ctx, policy)
-}
-
-func (repo *OrgRepository) ChangePasswordAgePolicy(ctx context.Context, policy *iam_model.PasswordAgePolicy) (*iam_model.PasswordAgePolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangePasswordAgePolicy(ctx, policy)
-}
-
-func (repo *OrgRepository) RemovePasswordAgePolicy(ctx context.Context) error {
-	policy := &iam_model.PasswordAgePolicy{ObjectRoot: models.ObjectRoot{
-		AggregateID: authz.GetCtxData(ctx).OrgID,
-	}}
-	return repo.OrgEventstore.RemovePasswordAgePolicy(ctx, policy)
 }
 
 func (repo *OrgRepository) GetPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error) {
@@ -698,23 +461,6 @@ func (repo *OrgRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 	return iam_es_model.PasswordLockoutViewToModel(policy), nil
 }
 
-func (repo *OrgRepository) AddPasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddPasswordLockoutPolicy(ctx, policy)
-}
-
-func (repo *OrgRepository) ChangePasswordLockoutPolicy(ctx context.Context, policy *iam_model.PasswordLockoutPolicy) (*iam_model.PasswordLockoutPolicy, error) {
-	policy.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangePasswordLockoutPolicy(ctx, policy)
-}
-
-func (repo *OrgRepository) RemovePasswordLockoutPolicy(ctx context.Context) error {
-	policy := &iam_model.PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{
-		AggregateID: authz.GetCtxData(ctx).OrgID,
-	}}
-	return repo.OrgEventstore.RemovePasswordLockoutPolicy(ctx, policy)
-}
-
 func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
 	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
@@ -761,21 +507,6 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 		return nil, err
 	}
 	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
-}
-
-func (repo *OrgRepository) AddMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
-	text.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.AddMailText(ctx, text)
-}
-
-func (repo *OrgRepository) ChangeMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
-	text.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.ChangeMailText(ctx, text)
-}
-
-func (repo *OrgRepository) RemoveMailText(ctx context.Context, text *iam_model.MailText) error {
-	text.AggregateID = authz.GetCtxData(ctx).OrgID
-	return repo.OrgEventstore.RemoveMailText(ctx, text)
 }
 
 func (repo *OrgRepository) userByID(ctx context.Context, id string) (*usr_model.UserView, error) {
