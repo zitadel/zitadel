@@ -108,17 +108,6 @@ func isUniqueValidation(unique *bool) func(events ...*es_models.Event) error {
 	}
 }
 
-func (es *OrgEventstore) GetOrgIAMPolicy(ctx context.Context, orgID string) (*iam_model.OrgIAMPolicy, error) {
-	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
-	if err != nil {
-		return nil, err
-	}
-	if existingOrg.OrgIamPolicy == nil {
-		return nil, errors.ThrowNotFound(nil, "EVENT-3F9sf", "Errors.Org.OrgIAM.NotExisting")
-	}
-	return existingOrg.OrgIamPolicy, nil
-}
-
 func (es *OrgEventstore) GetIDPConfig(ctx context.Context, aggregateID, idpConfigID string) (*iam_model.IDPConfig, error) {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(aggregateID))
 	if err != nil {
