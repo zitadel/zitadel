@@ -18,7 +18,7 @@
 		"compression": "^1.7.4",
 		"golden-fleece": "^1.0.9",
 		"highlight.js": "^10.5.0",
-		"marked": "^1.2.8",
+		"marked": "^2.0.0",
 		"polka": "^0.5.2",
 		"prismjs": "^1.23.0",
 		"sirv": "^1.0.11"
