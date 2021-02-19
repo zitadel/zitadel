@@ -291,32 +291,12 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 	return iam_es_model.OrgIAMViewToModel(policy), nil
 }
 
-func (repo *IAMRepository) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.AddOrgIAMPolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.ChangeOrgIAMPolicy(ctx, policy)
-}
-
 func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
 	return iam_es_model.LabelPolicyViewToModel(policy), err
-}
-
-func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.AddLabelPolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.ChangeLabelPolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
@@ -363,14 +343,4 @@ func (repo *IAMRepository) GetDefaultMailText(ctx context.Context, textType stri
 	}
 	text.Default = true
 	return iam_es_model.MailTextViewToModel(text), err
-}
-
-func (repo *IAMRepository) AddDefaultMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
-	text.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.AddMailText(ctx, text)
-}
-
-func (repo *IAMRepository) ChangeDefaultMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
-	text.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.ChangeMailText(ctx, text)
 }

@@ -18,10 +18,6 @@ import (
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
-const (
-	orgOwnerRole = "ORG_OWNER"
-)
-
 type OrgRepo struct {
 	Eventstore     eventstore.Eventstore
 	OrgEventstore  *org_es.OrgEventstore
@@ -80,16 +76,4 @@ func (repo *OrgRepo) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.Org
 	}
 	policy.Default = true
 	return iam_es_model.OrgIAMViewToModel(policy), err
-}
-
-func (repo *OrgRepo) CreateOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	return repo.OrgEventstore.AddOrgIAMPolicy(ctx, policy)
-}
-
-func (repo *OrgRepo) ChangeOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	return repo.OrgEventstore.ChangeOrgIAMPolicy(ctx, policy)
-}
-
-func (repo *OrgRepo) RemoveOrgIAMPolicy(ctx context.Context, id string) error {
-	return repo.OrgEventstore.RemoveOrgIAMPolicy(ctx, id)
 }
