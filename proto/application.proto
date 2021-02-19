@@ -52,19 +52,33 @@ message OIDCConfig {
     google.protobuf.Duration clock_skew = 17;
 }
 
-enum OIDCResponseType {}
+enum OIDCResponseType {
+    OIDC_REPSPONSE_TYPE_UNSPECIFIED = 0;
+}
 
-enum OIDCGrantType{}
+enum OIDCGrantType{
+    OIDC_GRANT_TYPE_UNSPECIFIED = 0;
+}
 
-enum OIDCApplicationType {}
+enum OIDCApplicationType {
+    OIDC_APPLICATION_TYPE_UNSPECIFIED = 0;
+}
 
-enum OIDCAuthMethodType {}
+enum OIDCAuthMethodType {
+    OIDC_AUTH_METHOD_TYPE_UNSPECIFIED = 0;
+}
 
-enum OIDCVersion {}
+enum OIDCVersion {
+    OIDC_VERSION_UNSPECIFIED = 0;
+}
 
-enum OIDCTokenType {}
+enum OIDCTokenType {
+    OIDC_TOKEN_TYPE_UNSPECIFIED = 0;
+}
 
-enum APIAuthMethodType {}
+enum APIAuthMethodType {
+    API_AUTH_METHOD_TYPE_UNSPECIFIED = 0;
+}
 
 message APIConfig {
     string client_id = 1;
