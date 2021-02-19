@@ -113,20 +113,24 @@
                 <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
             </cnsl-info-section>
 
-            <p class="step-description"
+            <cnsl-info-section class="step-description"
                 *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
-                {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
+                {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}
+            </cnsl-info-section>
 
             <div style="margin: .5rem" class="divider"></div>
-
-            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode?.value"
-                [getValues]="requestRedirectValuesSubject$" (changedUris)="redirectUrisList = $event"
-                [urisList]="redirectUrisList" title="{{ 'APP.OIDC.REDIRECT' | translate }}">
+            <cnsl-redirect-uris *ngIf="applicationType?.value !== undefined" class="redirect-section"
+                [canWrite]="canWrite" [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
+                (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
+                title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+                [isNative]="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
             </cnsl-redirect-uris>
 
-            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode?.value"
-                (changedUris)="postLogoutRedirectUrisList = $event" [urisList]="postLogoutRedirectUrisList"
-                [getValues]="requestRedirectValuesSubject$" title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
+            <cnsl-redirect-uris *ngIf="applicationType?.value !== undefined" class="redirect-section"
+                [canWrite]="canWrite" [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $event"
+                [urisList]="postLogoutRedirectUrisList" [getValues]="requestRedirectValuesSubject$"
+                title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+                [isNative]="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
             </cnsl-redirect-uris>
         </div>
 

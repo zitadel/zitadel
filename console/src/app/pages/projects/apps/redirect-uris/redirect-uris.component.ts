@@ -11,6 +11,7 @@ export class RedirectUrisComponent implements OnInit, OnDestroy {
     @Input() title: string = '';
     @Input() devMode: boolean = false;
     @Input() canWrite: boolean = false;
+    @Input() isNative!: boolean;
     @Input() public urisList: string[] = [];
     @Input() public redirectControl: FormControl = new FormControl({ value: '', disabled: true });
     @Input() public changedUris: EventEmitter<string[]> = new EventEmitter();

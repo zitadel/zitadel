@@ -69,6 +69,7 @@
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
             <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
+                [isNative]="oidcApp.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE"
                 (changedUris)="oidcApp.redirectUrisList = $event" [urisList]="oidcApp.redirectUrisList"
                 [getValues]="requestRedirectValuesSubject$" title="{{ 'APP.OIDC.REDIRECT' | translate }}">
             </cnsl-redirect-uris>
@@ -84,7 +85,8 @@
             <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
                 (changedUris)="oidcApp.postLogoutRedirectUrisList = $event"
                 [urisList]="oidcApp.postLogoutRedirectUrisList" title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
-                [getValues]="requestRedirectValuesSubject$">
+                [getValues]="requestRedirectValuesSubject$"
+                [isNative]="oidcApp.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
             </cnsl-redirect-uris>
 
             <div class="actions">
@@ -222,14 +224,16 @@
                 <div class="formfield full-width">
                     <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
                         (changedUris)="oidcApp.redirectUrisList = $event" [urisList]="oidcApp.redirectUrisList"
-                        title="{{ 'APP.OIDC.REDIRECT' | translate }}" [getValues]="requestRedirectValuesSubject$">
+                        title="{{ 'APP.OIDC.REDIRECT' | translate }}" [getValues]="requestRedirectValuesSubject$"
+                        [isNative]="oidcApp.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
                     </cnsl-redirect-uris>
 
                     <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
                         (changedUris)="oidcApp.postLogoutRedirectUrisList = $event"
                         [urisList]="oidcApp.postLogoutRedirectUrisList"
                         title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
-                        [getValues]="requestRedirectValuesSubject$">
+                        [getValues]="requestRedirectValuesSubject$"
+                        [isNative]="oidcApp.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
                     </cnsl-redirect-uris>
                 </div>
             </div>
