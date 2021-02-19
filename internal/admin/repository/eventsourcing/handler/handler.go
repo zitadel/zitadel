@@ -10,7 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -33,9 +32,8 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 }
 
 type EventstoreRepos struct {
-	UserEvents *usr_event.UserEventstore
-	IamEvents  *iam_event.IAMEventstore
-	OrgEvents  *org_event.OrgEventstore
+	IamEvents *iam_event.IAMEventstore
+	OrgEvents *org_event.OrgEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
@@ -43,8 +41,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newIAMMember(
-			handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount, es},
-			repos.UserEvents),
+			handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
 		newLabelPolicy(

@@ -16,7 +16,6 @@ import (
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -26,17 +25,14 @@ const (
 
 type ProjectGrantMember struct {
 	handler
-	userEvents   *usr_event.UserEventstore
 	subscription *eventstore.Subscription
 }
 
 func newProjectGrantMember(
 	handler handler,
-	userEvents *usr_event.UserEventstore,
 ) *ProjectGrantMember {
 	h := &ProjectGrantMember{
-		handler:    handler,
-		userEvents: userEvents,
+		handler: handler,
 	}
 
 	h.subscribe()

@@ -2,7 +2,9 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"strings"
@@ -20,14 +22,12 @@ import (
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type ProjectRepo struct {
 	es_int.Eventstore
 	SearchLimit   uint64
 	ProjectEvents *proj_event.ProjectEventstore
-	UserEvents    *usr_event.UserEventstore
 	IAMEvents     *iam_event.IAMEventstore
 	View          *view.View
 	Roles         []string
@@ -494,7 +494,7 @@ func (repo *ProjectRepo) userByID(ctx context.Context, id string) (*usr_model.Us
 	if caos_errs.IsNotFound(viewErr) {
 		user = new(usr_es_model.UserView)
 	}
-	events, esErr := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
+	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4n8Fs", "Errors.User.NotFound")
 	}
@@ -512,4 +512,12 @@ func (repo *ProjectRepo) userByID(ctx context.Context, id string) (*usr_model.Us
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2m0Fs", "Errors.User.NotFound")
 	}
 	return usr_es_model.UserToModel(&userCopy), nil
+}
+
+func (r *ProjectRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return r.Eventstore.FilterEvents(ctx, query)
 }

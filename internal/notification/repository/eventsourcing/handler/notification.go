@@ -25,7 +25,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -48,7 +47,6 @@ const (
 type Notification struct {
 	handler
 	command        *command.CommandSide
-	userEvents     *usr_event.UserEventstore
 	systemDefaults sd.SystemDefaults
 	AesCrypto      crypto.EncryptionAlgorithm
 	i18n           *i18n.Translator
@@ -59,7 +57,6 @@ type Notification struct {
 func newNotification(
 	handler handler,
 	command *command.CommandSide,
-	userEvents *usr_event.UserEventstore,
 	defaults sd.SystemDefaults,
 	aesCrypto crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
@@ -68,7 +65,6 @@ func newNotification(
 	h := &Notification{
 		handler:        handler,
 		command:        command,
-		userEvents:     userEvents,
 		systemDefaults: defaults,
 		i18n:           translator,
 		statikDir:      statikDir,
@@ -110,7 +106,7 @@ func (n *Notification) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return usr_event.UserQuery(sequence.CurrentSequence), nil
+	return view.UserQuery(sequence.CurrentSequence), nil
 }
 
 func (n *Notification) Reduce(event *models.Event) (err error) {

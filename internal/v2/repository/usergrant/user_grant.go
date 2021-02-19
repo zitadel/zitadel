@@ -32,7 +32,7 @@ func NewAddUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGr
 func NewRemoveUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
 		UniqueUserGrant,
-		fmt.Sprintf("%s:%s:%s:%S", resourceOwner, userID, projectID, projectGrantID))
+		fmt.Sprintf("%s:%s:%s:%s", resourceOwner, userID, projectID, projectGrantID))
 }
 
 type UserGrantAddedEvent struct {

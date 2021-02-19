@@ -15,13 +15,11 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type OrgRepo struct {
-	Eventstore     eventstore.Eventstore
-	OrgEventstore  *org_es.OrgEventstore
-	UserEventstore *usr_es.UserEventstore
+	Eventstore    eventstore.Eventstore
+	OrgEventstore *org_es.OrgEventstore
 
 	View *admin_view.View
 

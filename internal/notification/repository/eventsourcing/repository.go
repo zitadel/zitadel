@@ -14,7 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/spooler"
 	noti_view "github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"golang.org/x/text/language"
 )
 
@@ -45,13 +44,6 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, c
 		return nil, err
 	}
 
-	user, err := es_usr.StartUser(es_usr.UserConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
 	translator, err := i18n.NewTranslator(dir, i18n.TranslatorConfig{DefaultLanguage: conf.DefaultLanguage})
@@ -65,7 +57,7 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, c
 	if err != nil {
 		return nil, err
 	}
-	eventstoreRepos := handler.EventstoreRepos{UserEvents: user, OrgEvents: org, IAMEvents: iam}
+	eventstoreRepos := handler.EventstoreRepos{OrgEvents: org, IAMEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, eventstoreRepos, systemDefaults, translator, dir)
 
 	return &EsRepository{

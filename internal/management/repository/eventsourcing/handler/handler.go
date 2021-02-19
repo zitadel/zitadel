@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -35,7 +34,6 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 
 type EventstoreRepos struct {
 	ProjectEvents *proj_event.ProjectEventstore
-	UserEvents    *usr_event.UserEventstore
 	OrgEvents     *org_event.OrgEventstore
 	IamEvents     *iam_event.IAMEventstore
 }
@@ -50,10 +48,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			repos.OrgEvents),
 		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es},
 			repos.ProjectEvents),
-		newProjectMember(handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount, es},
-			repos.UserEvents),
-		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es},
-			repos.UserEvents),
+		newProjectMember(handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount, es}),
+		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es}),
 		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es},
 			repos.ProjectEvents),
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
@@ -62,13 +58,11 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			defaults.IamID),
 		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
 			repos.ProjectEvents,
-			repos.UserEvents,
 			repos.OrgEvents),
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newOrgMember(
-			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es},
-			repos.UserEvents),
+			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es}),
 		newOrgDomain(
 			handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount, es}),
 		newUserMembership(

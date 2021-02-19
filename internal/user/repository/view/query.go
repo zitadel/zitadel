@@ -19,3 +19,16 @@ func UserQuery(latestSequence uint64) *es_models.SearchQuery {
 		AggregateTypeFilter(model.UserAggregate).
 		LatestSequenceFilter(latestSequence)
 }
+
+func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
+	query := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.UserAggregate)
+	if !sortAscending {
+		query.OrderDesc()
+	}
+
+	query.LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(userID).
+		SetLimit(limit)
+	return query
+}

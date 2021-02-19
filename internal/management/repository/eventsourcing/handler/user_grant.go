@@ -19,7 +19,6 @@ import (
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_events "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	grant_es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
@@ -32,7 +31,6 @@ const (
 type UserGrant struct {
 	handler
 	projectEvents *proj_event.ProjectEventstore
-	userEvents    *usr_events.UserEventstore
 	orgEvents     *org_events.OrgEventstore
 	subscription  *eventstore.Subscription
 }
@@ -40,13 +38,11 @@ type UserGrant struct {
 func newUserGrant(
 	handler handler,
 	projectEvents *proj_event.ProjectEventstore,
-	userEvents *usr_events.UserEventstore,
 	orgEvents *org_events.OrgEventstore,
 ) *UserGrant {
 	h := &UserGrant{
 		handler:       handler,
 		projectEvents: projectEvents,
-		userEvents:    userEvents,
 		orgEvents:     orgEvents,
 	}
 

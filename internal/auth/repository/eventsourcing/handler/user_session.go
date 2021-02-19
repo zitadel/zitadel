@@ -8,9 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	user_events "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -20,17 +19,14 @@ const (
 
 type UserSession struct {
 	handler
-	userEvents   *user_events.UserEventstore
 	subscription *eventstore.Subscription
 }
 
 func newUserSession(
 	handler handler,
-	userEvents *user_events.UserEventstore,
 ) *UserSession {
 	h := &UserSession{
-		handler:    handler,
-		userEvents: userEvents,
+		handler: handler,
 	}
 
 	h.subscribe()
@@ -68,7 +64,7 @@ func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.UserQuery(sequence.CurrentSequence), nil
+	return view.UserQuery(sequence.CurrentSequence), nil
 }
 
 func (u *UserSession) Reduce(event *models.Event) (err error) {

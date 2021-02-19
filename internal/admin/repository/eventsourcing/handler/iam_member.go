@@ -15,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -25,14 +24,12 @@ const (
 
 type IAMMember struct {
 	handler
-	userEvents   *usr_event.UserEventstore
 	subscription *eventstore.Subscription
 }
 
-func newIAMMember(handler handler, userEvents *usr_event.UserEventstore) *IAMMember {
+func newIAMMember(handler handler) *IAMMember {
 	iamMember := &IAMMember{
-		handler:    handler,
-		userEvents: userEvents,
+		handler: handler,
 	}
 
 	iamMember.subscribe()

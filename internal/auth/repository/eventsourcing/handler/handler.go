@@ -12,7 +12,6 @@ import (
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/types"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -35,7 +34,6 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 }
 
 type EventstoreRepos struct {
-	UserEvents    *usr_event.UserEventstore
 	ProjectEvents *proj_event.ProjectEventstore
 	OrgEvents     *org_events.OrgEventstore
 	IamEvents     *iam_events.IAMEventstore
@@ -49,8 +47,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			repos.IamEvents,
 			systemDefaults.IamID),
 		newUserSession(
-			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es},
-			repos.UserEvents),
+			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}),
 		newUserMembership(
 			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es},
 			repos.OrgEvents,
@@ -67,7 +64,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUserGrant(
 			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
 			repos.ProjectEvents,
-			repos.UserEvents,
 			repos.OrgEvents,
 			repos.IamEvents,
 			systemDefaults.IamID),

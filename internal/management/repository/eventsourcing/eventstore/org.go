@@ -2,6 +2,10 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"strings"
 
@@ -20,7 +24,6 @@ import (
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -31,7 +34,7 @@ const (
 type OrgRepository struct {
 	SearchLimit uint64
 	*org_es.OrgEventstore
-	UserEvents     *usr_es.UserEventstore
+	Eventstore     eventstore.Eventstore
 	IAMEventstore  *iam_es.IAMEventstore
 	View           *mgmt_view.View
 	Roles          []string
@@ -517,7 +520,7 @@ func (repo *OrgRepository) userByID(ctx context.Context, id string) (*usr_model.
 	if errors.IsNotFound(viewErr) {
 		user = new(usr_es_model.UserView)
 	}
-	events, esErr := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
+	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3nF8s", "Errors.User.NotFound")
 	}
@@ -531,8 +534,17 @@ func (repo *OrgRepository) userByID(ctx context.Context, id string) (*usr_model.
 			return usr_es_model.UserToModel(user), nil
 		}
 	}
-	if userCopy.State == int32(usr_model.UserStateDeleted) {
+	if userCopy.State == int32(usr_es_model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3n8Fs", "Errors.User.NotFound")
 	}
 	return usr_es_model.UserToModel(&userCopy), nil
+}
+
+func (r *OrgRepository) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Eventstore.FilterEvents(ctx, query)
 }

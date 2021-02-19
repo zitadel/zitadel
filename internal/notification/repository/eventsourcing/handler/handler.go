@@ -15,7 +15,6 @@ import (
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -38,9 +37,8 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 }
 
 type EventstoreRepos struct {
-	UserEvents *usr_event.UserEventstore
-	OrgEvents  *org_event.OrgEventstore
-	IAMEvents  *iam_es.IAMEventstore
+	OrgEvents *org_event.OrgEventstore
+	IAMEvents *iam_es.IAMEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, command *command.CommandSide, repos EventstoreRepos, systemDefaults sd.SystemDefaults, i18n *i18n.Translator, dir http.FileSystem) []query.Handler {
@@ -58,7 +56,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newNotification(
 			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
 			command,
-			repos.UserEvents,
 			systemDefaults,
 			aesCrypto,
 			i18n,

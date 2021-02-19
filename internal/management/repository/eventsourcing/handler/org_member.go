@@ -14,7 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -25,17 +24,14 @@ const (
 
 type OrgMember struct {
 	handler
-	userEvents   *usr_event.UserEventstore
 	subscription *eventstore.Subscription
 }
 
 func newOrgMember(
 	handler handler,
-	userEvents *usr_event.UserEventstore,
 ) *OrgMember {
 	h := &OrgMember{
-		handler:    handler,
-		userEvents: userEvents,
+		handler: handler,
 	}
 
 	h.subscribe()

@@ -8,7 +8,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 
-	admin_model "github.com/caos/zitadel/internal/admin/model"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -26,13 +25,6 @@ func orgCreateRequestToDomain(org *admin.CreateOrgRequest) *domain.Org {
 	}
 
 	return o
-}
-
-func setUpOrgResponseFromModel(setUp *admin_model.SetupOrg) *admin.OrgSetUpResponse {
-	return &admin.OrgSetUpResponse{
-		Org:  orgFromModel(setUp.Org),
-		User: userFromModel(setUp.User),
-	}
 }
 
 func orgSearchResponseFromModel(request *org_model.OrgSearchResult) *admin.OrgSearchResponse {

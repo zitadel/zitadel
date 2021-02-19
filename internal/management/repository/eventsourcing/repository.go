@@ -16,7 +16,6 @@ import (
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
@@ -60,16 +59,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
-	user, err := es_usr.StartUser(es_usr.UserConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
-	if err != nil {
-		return nil, err
-	}
 	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
@@ -83,14 +72,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
-	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project, UserEvents: user, OrgEvents: org, IamEvents: iam}
+	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project, OrgEvents: org, IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults)
 
 	return &EsRepository{
 		spooler:       spool,
-		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, user, iam, view, roles, systemDefaults},
-		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, user, iam, view, roles, systemDefaults.IamID},
-		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, user, org, view, systemDefaults},
+		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, es, iam, view, roles, systemDefaults},
+		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, iam, view, roles, systemDefaults.IamID},
+		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, org, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view},
 		IAMRepository: eventstore.IAMRepository{
 			IAMV2Query: iamV2Query,

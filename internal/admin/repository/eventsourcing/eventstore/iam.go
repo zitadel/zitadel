@@ -16,14 +16,12 @@ import (
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type IAMRepository struct {
 	SearchLimit uint64
 	*iam_es.IAMEventstore
 	OrgEvents      *org_es.OrgEventstore
-	UserEvents     *usr_es.UserEventstore
 	View           *admin_view.View
 	SystemDefaults systemdefaults.SystemDefaults
 	Roles          []string

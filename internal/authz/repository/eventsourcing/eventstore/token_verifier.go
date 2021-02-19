@@ -2,6 +2,9 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	"strings"
 	"time"
 
@@ -14,16 +17,15 @@ import (
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type TokenVerifierRepo struct {
 	TokenVerificationKey [32]byte
 	IAMID                string
+	Eventstore           eventstore.Eventstore
 	IAMEvents            *iam_event.IAMEventstore
 	ProjectEvents        *proj_event.ProjectEventstore
-	UserEvents           *usr_event.UserEventstore
 	View                 *view.View
 }
 
@@ -38,7 +40,7 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 		token.UserID = userID
 	}
 
-	events, esErr := repo.UserEvents.UserEventsByID(ctx, userID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, token.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -119,4 +121,12 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 		return "", err
 	}
 	return app.OIDCClientID, nil
+}
+
+func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return r.Eventstore.FilterEvents(ctx, query)
 }
