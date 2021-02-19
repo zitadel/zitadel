@@ -67,7 +67,7 @@ service AuthService {
             get: "/policies/passwords/complexity"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -247,7 +247,7 @@ service AuthService {
             get: "/users/me/mfas"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -257,7 +257,7 @@ service AuthService {
             post: "/users/me/mfas/otp"
             body: "*"
         };
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -268,7 +268,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -278,7 +278,7 @@ service AuthService {
             delete: "/users/me/mfas/otp"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -288,7 +288,7 @@ service AuthService {
             post: "/users/me/mfas/u2f"
             body: "*"
         };
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -299,7 +299,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -309,7 +309,7 @@ service AuthService {
             delete: "/users/me/mfas/u2f/{token_id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -318,7 +318,7 @@ service AuthService {
         option (google.api.http) = {
             get: "/users/me/passwordless"
         };
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -328,7 +328,7 @@ service AuthService {
             post: "/users/me/passwordless"
             body: "*"
         };
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -339,7 +339,7 @@ service AuthService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -349,7 +349,7 @@ service AuthService {
             delete: "/users/me/passwordless/{id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
     }

@@ -210,7 +210,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -221,7 +221,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -231,7 +231,7 @@ service AdminService {
             delete: "/orgs/{org_id}/policies/orgiam"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.delete"
         };
     }
@@ -346,7 +346,7 @@ service AdminService {
             get: "/policies/login/secondfactors/_search"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -358,7 +358,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -369,7 +369,7 @@ service AdminService {
             delete: "/policies/login/secondfactors/{type}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -379,7 +379,7 @@ service AdminService {
             get: "/policies/login/multifactors/_search" //TODO: shouldnt it be post?
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read"
         };
     }
@@ -391,7 +391,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -402,7 +402,7 @@ service AdminService {
             delete: "/policies/login/multifactors/{multi_factor}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write"
         };
     }
@@ -488,7 +488,7 @@ service AdminService {
             get: "/members/roles"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.member.read"
         };
     }
@@ -499,7 +499,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.member.read"
         };
     }
@@ -510,7 +510,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.member.write"
         };
     }
@@ -521,7 +521,7 @@ service AdminService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.member.write"
         };
     }
@@ -531,7 +531,7 @@ service AdminService {
             delete: "/members/{user_id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "iam.member.delete"
         };
     }
