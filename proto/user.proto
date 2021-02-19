@@ -212,3 +212,13 @@ enum SecondFactorType {
     SECOND_FACTOR_TYPE_U2F = 2;
 }
 
+message MachineKey {
+    string id = 1;
+    MachineKeyType type = 2;
+    google.protobuf.Timestamp expiration_date = 3;
+}
+
+enum MachineKeyType {
+    MACHINE_KEY_UNSPECIFIED = 0;
+    MACHINE_KEY_JSON = 1;
+}

@@ -28,10 +28,14 @@ message IDP {
     }
 }
 
+//TODO: discuss
 message IDPLink {
-    string idp_id = 1;
-    string idp_name = 2;
-    IDPType idp_type = 3;
+    string user_id = 1;
+    string idp_id = 2;
+    string idp_name = 3;
+    string linked_user_id = 4;
+    string linked_user_name = 5;
+    IDPType idp_type = 6;
 }
 
 enum IDPState {
@@ -89,13 +93,4 @@ message UserIDQuery {
 enum IDPFieldName {
     IDP_FIELD_NAME_UNSPECIFIED = 0;
     IDP_FIELD_NAME_NAME = 1;
-}
-
-//TODO: discuss
-message IDPLink {
-    string user_id = 1;
-    string idp_id = 2;
-    string idp_name = 3;
-    string linked_user_id = 4;
-    string linked_user_name = 5;
 }

@@ -49,6 +49,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 
 service ManagementService {
+    rpc Healthz(HealthzRequest) returns (HealthzResponse) {
+        option (google.api.http) = {
+            get: "/healthz"
+        };
+    }
+
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -322,6 +328,96 @@ service ManagementService {
         };
     }
 
+    rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
+        option (google.api.http) = {
+            put: "/users/{id}/machine"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/keys/{key_id}"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    rpc ListMachineKeys(ListMachineKeysRequest) returns (ListMachineKeysResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/keys/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    rpc AddMachineKey(AddMachineKeyRequest) returns (AddMachineKeyResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/keys"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/keys/{key_id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+
+
+
+
+
+    rpc GetMyOrg(google.protobuf.Empty) returns (OrgView) {
+        option (google.api.http) = {
+          get: "/orgs/me"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+          permission: "org.read"
+        };
+      }
+
+      rpc GetOrgByDomainGlobal(Domain) returns (OrgView) {
+        option (google.api.http) = {
+          get: "/global/orgs/_bydomain"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+          permission: "org.global.read"
+        };
+      }
+
+    rpc CreateOrg(CreateOrgRequest) returns (CreateOrgResponse) {
+        option (google.api.http) = {
+            post: "/orgs"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.create"
+        };
+    }
+
 
 
 
@@ -419,6 +515,10 @@ service ManagementService {
         };
     }
 }
+
+message HealthzRequest {}
+
+message HealthzResponse {}
 
 message GetUserByIDRequest {
     string id = 1 [
@@ -681,8 +781,61 @@ message SetInitialPasswordRequest {
     string password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
 }
 
-message SetInitialPasswordResponse {}
+message SetInitialPasswordResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
 
+message UpdateMachineRequest {
+    string user_id = 1;
+    //TODO: discuss with or without description?
+    string description = 2 [(validate.rules).string.max_len = 500];
+    string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateMachineResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message GetMachineKeyByIDsRequest {
+    string user_id = 1;
+    string key_id = 2;
+}
+
+message GetMachineKeyByIDsResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.user.v1.MachineKey key = 2;
+}
+
+message ListMachineKeysRequest {
+    string user_id = 1;
+    zitadel.v1.Search meta_data = 2;
+}
+
+message ListMachineKeysResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.user.v1.MachineKey result = 2;
+}
+
+message AddMachineKeyRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    zitadel.user.v1.MachineKeyType type = 2 [(validate.rules).enum = {not_in: [0]}];
+    google.protobuf.Timestamp expiration_date = 3;
+}
+  
+message AddMachineKeyResponse {
+    string id = 1;
+    bytes key_details = 2;
+    zitadel.v1.MetaData meta_data = 3;
+}
+
+message RemoveMachineKeyRequest {
+    string user_id = 1;
+    string key_id = 2;
+}
+
+message RemoveMachineKeyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
 
 
 

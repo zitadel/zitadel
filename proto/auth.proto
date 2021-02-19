@@ -34,7 +34,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 
 service AuthService {
-
+    rpc Healthz(HealthzRequest) returns (HealthzResponse) {
+        option (google.api.http) = {
+            get: "/healthz"
+        };
+    }
+    
     //User
     rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
         option (google.api.http) = {
@@ -349,6 +354,10 @@ service AuthService {
         };
     }
 }
+
+message HealthzRequest {}
+
+message HealthzResponse {}
 
 //GetMyUserRequest is an empty request
 // the request parameters are read from the token-header

@@ -38,6 +38,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 
 service AdminService {
+    rpc Healthz(HealthzRequest) returns (HealthzResponse) {
+        option (google.api.http) = {
+            get: "/healthz"
+        };
+    }
+    
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
         option (google.api.http) = {
             get: "/orgs/_isunique"
@@ -569,6 +575,10 @@ service AdminService {
         };
     }
 }
+
+message HealthzRequest {}
+
+message HealthzResponse {}
 
 message IsOrgUniqueRequest {
     string name = 1 [(validate.rules).string.min_len = 1];
