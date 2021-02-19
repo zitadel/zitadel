@@ -4,6 +4,8 @@ import { catchError, debounceTime, scan, take, takeUntil, tap } from 'rxjs/opera
 import { Change, Changes } from 'src/app/proto/generated/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { KeyValue } from '@angular/common';
 
 export enum ChangeType {
     MYUSER = 'myuser',
@@ -11,6 +13,18 @@ export enum ChangeType {
     ORG = 'org',
     PROJECT = 'project',
     APP = 'app',
+}
+
+export interface MappedChange {
+    key: string,
+    values: Array<{
+        data: any[];
+        dates: Timestamp.AsObject[];
+        editorId: string;
+        editorName: string;
+        eventTypes: string[];
+        sequences: number[];
+    }>;
 }
 
 @Component({
@@ -31,7 +45,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
     private _data: BehaviorSubject<any> = new BehaviorSubject([]);
 
     loading: Observable<boolean> = this._loading.asObservable();
-    public data!: Observable<Change.AsObject[]>;
+    public data!: Observable<MappedChange[]>;
     public changes!: Changes.AsObject;
     private destroyed$: Subject<void> = new Subject();
     constructor(private mgmtUserService: ManagementService, private authUserService: GrpcAuthService) {
@@ -125,8 +139,12 @@ export class ChangesComponent implements OnInit, OnDestroy {
                 take(1),
                 tap((res: Changes) => {
                     const values = res.toObject().changesList;
+                    console.log(values);
+                    const mapped = this.mapChanges(values);
+                    console.log(mapped);
                     // update source with new values, done loading
-                    this._data.next(values);
+                    // this._data.next(values);
+                    this._data.next(mapped);
 
                     this._loading.next(false);
 
@@ -143,4 +161,82 @@ export class ChangesComponent implements OnInit, OnDestroy {
             ).subscribe();
         }
     }
+
+    mapChanges(changes: Change.AsObject[]) {
+        const splitted: { [editorId: string]: any[]; } = {};
+        changes.forEach((change) => {
+            if (change.changeDate) {
+                const index = this.getDateString(change.changeDate);//change.changeDate?.seconds;//this.getDateString(change.changeDate);
+
+                if (index) {
+                    if (splitted[index]) {
+                        const userData: any = {
+                            editor: change.editor,
+                            editorId: change.editorId,
+
+                            dates: [change.changeDate],
+                            data: [change.data],
+                            eventTypes: [change.eventType],
+                            sequences: [change.sequence],
+                        };
+                        const lastIndex = splitted[index].length - 1;
+                        if (lastIndex > -1 && splitted[index][lastIndex].editor === change.editor) {
+                            splitted[index][lastIndex].dates.push(change.changeDate);
+                            splitted[index][lastIndex].data.push(change.data);
+                            splitted[index][lastIndex].eventTypes.push(change.eventType);
+                            splitted[index][lastIndex].sequences.push(change.sequence);
+                        } else {
+                            splitted[index].push(userData);
+                        }
+                    } else {
+                        splitted[index] = [
+                            {
+                                editorName: change.editor,
+                                editorId: change.editorId,
+                                dates: [change.changeDate],
+                                data: [change.data],
+                                eventTypes: [change.eventType],
+                                sequences: [change.sequence],
+                            }
+                        ];
+                    }
+                }
+            }
+        });
+        const arr = Object.keys(splitted).map(key => {
+            return { key: key, values: splitted[key] };
+        });
+
+        arr.sort((a, b) => {
+            return parseFloat(b.key) - parseFloat(a.key);
+        });
+        console.log(arr);
+
+        return arr;
+    }
+
+    getDateString(ts: Timestamp.AsObject) {
+        const date = new Date(ts.seconds * 1000 + ts.nanos / 1000 / 1000);
+        return date.getUTCFullYear() + this.pad(date.getUTCMonth() + 1) + this.pad(date.getUTCDate());
+    }
+
+    getTimestampIndex(date: any): number {
+        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000 / 1000);
+        console.log(ts);
+        return ts.getTime();
+    }
+
+    pad(n: number): string {
+        return n < 10 ? '0' + n : n.toString();
+    }
+
+    // Order by ascending property value
+    valueAscOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
+        return a.value.localeCompare(b.value);
+    };
+
+    // Order by descending property key
+    keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
+        return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
+    };
 }

@@ -10,6 +10,7 @@ import { ScrollableModule } from 'src/app/directives/scrollable/scrollable.modul
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
+import { AvatarModule } from '../avatar/avatar.module';
 
 import { ChangesComponent } from './changes.component';
 
@@ -30,6 +31,7 @@ import { ChangesComponent } from './changes.component';
         LocalizedDatePipeModule,
         TimestampToDatePipeModule,
         MatTooltipModule,
+        AvatarModule
     ],
     exports: [
         ChangesComponent,
