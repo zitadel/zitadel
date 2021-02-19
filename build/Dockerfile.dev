@@ -41,13 +41,12 @@ COPY /proto/ include/zitadel/.
 ## Speed up this step by mounting your local node_modules directory
 #######################
 FROM node:15.8.0 as npm-base
-WORKDIR console
+WORKDIR /console
 COPY console/package.json console/package-lock.json ./
-RUN npm install \
-    && mkdir proto
+RUN npm install
 
 COPY console .
-COPY --from=base /proto proto
+COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
 COPY build/console build/console/
 RUN build/console/generate-grpc.sh
