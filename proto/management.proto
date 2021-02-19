@@ -1521,7 +1521,7 @@ message GetOrgIAMPolicyRequest {}
 
 message GetOrgIAMPolicyResponse {
     zitadel.v1.MetaData meta_data = 1;
-    zitadel.org.v1.OrgIAMPolicy policy = 2;
+    zitadel.policy.v1.OrgIAMPolicy policy = 2;
 }
 
 message ListOrgDomainsRequest {
@@ -1546,7 +1546,7 @@ message RemoveOrgDomainRequest {
     string domain = 1;
 }
 
-message RemoveOrgDomainRequest {
+message RemoveOrgDomainResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
 
@@ -1714,7 +1714,7 @@ message ListProjectMemberRolesResponse {
 message ListProjectRolesRequest {
     string project_id = 1;
     zitadel.v1.Search meta_data = 2;
-    repeated zitadel.project.RoleQuery queries = 3;
+    repeated zitadel.project.v1.RoleQuery queries = 3;
 }
 
 message ListProjectRolesResponse {
