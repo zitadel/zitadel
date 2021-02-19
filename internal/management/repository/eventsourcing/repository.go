@@ -17,7 +17,6 @@ import (
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 )
 
 type Config struct {
@@ -68,10 +67,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
-	usergrant, err := es_grant.StartUserGrant(es_grant.UserGrantConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	})
 	if err != nil {
 		return nil, err
 	}
@@ -94,9 +89,9 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	return &EsRepository{
 		spooler:       spool,
 		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, user, iam, view, roles, systemDefaults},
-		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, usergrant, user, iam, view, roles, systemDefaults.IamID},
-		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, user, org, usergrant, view, systemDefaults},
-		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
+		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, user, iam, view, roles, systemDefaults.IamID},
+		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, user, org, view, systemDefaults},
+		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view},
 		IAMRepository: eventstore.IAMRepository{
 			IAMV2Query: iamV2Query,
 		},

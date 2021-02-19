@@ -10,10 +10,6 @@ type ProjectRole struct {
 	Group       string
 }
 
-func NewProjectRole(projectID, key string) *ProjectRole {
-	return &ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, Key: key}
-}
-
 func (p *ProjectRole) IsValid() bool {
 	return p.AggregateID != "" && p.Key != ""
 }
