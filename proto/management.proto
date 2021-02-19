@@ -4,6 +4,7 @@ import "zitadel/idp.proto";
 import "zitadel/user.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
+import "zitadel/org.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
