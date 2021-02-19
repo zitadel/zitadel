@@ -283,7 +283,7 @@ service AuthService {
         };
     }
 
-    rpc AddMyMFAU2F(AddMyMFAU2FRequest returns (AddMyMFAU2FResponse) {
+    rpc AddMyMFAU2F(AddMyMFAU2FRequest) returns (AddMyMFAU2FResponse) {
         option (google.api.http) = {
             post: "/users/me/mfas/u2f"
             body: "*"
