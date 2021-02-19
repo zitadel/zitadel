@@ -336,7 +336,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -347,7 +347,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -358,7 +358,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -369,7 +369,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -379,7 +379,7 @@ service ManagementService {
             delete: "/users/{user_id}/keys/{key_id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -394,7 +394,7 @@ service ManagementService {
             get: "/orgs/me"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "org.read"
         };
     }
@@ -404,7 +404,7 @@ service ManagementService {
             get: "/global/orgs/_bydomain"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "org.global.read"
         };
     }
@@ -415,7 +415,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "org.create"
         };
     }
