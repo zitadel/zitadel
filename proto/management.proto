@@ -5,8 +5,9 @@ import "zitadel/user.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "google/api/annotations.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 package zitadel.v1;
