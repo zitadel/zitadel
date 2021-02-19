@@ -2,6 +2,9 @@ package eventstore
 
 import (
 	"context"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"strings"
 
 	"github.com/caos/logging"
@@ -183,13 +186,13 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
-			if user.Human != nil {
+			if user.HumanView != nil {
 				change.ModifierName = user.DisplayName
 			}
-			if user.Machine != nil {
-				change.ModifierName = user.Machine.Name
+			if user.MachineView != nil {
+				change.ModifierName = user.MachineView.Name
 			}
 		}
 	}
@@ -261,13 +264,13 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appI
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
-			if user.Human != nil {
+			if user.HumanView != nil {
 				change.ModifierName = user.DisplayName
 			}
-			if user.Machine != nil {
-				change.ModifierName = user.Machine.Name
+			if user.MachineView != nil {
+				change.ModifierName = user.MachineView.Name
 			}
 		}
 	}
@@ -491,4 +494,32 @@ func (repo *ProjectRepo) GetProjectGrantMemberRoles() []string {
 		}
 	}
 	return roles
+}
+
+func (repo *ProjectRepo) userByID(ctx context.Context, id string) (*usr_model.UserView, error) {
+	user, viewErr := repo.View.UserByID(id)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		user = new(usr_es_model.UserView)
+	}
+	events, esErr := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4n8Fs", "Errors.User.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
+		return usr_es_model.UserToModel(user), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return usr_es_model.UserToModel(user), nil
+		}
+	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2m0Fs", "Errors.User.NotFound")
+	}
+	return usr_es_model.UserToModel(&userCopy), nil
 }

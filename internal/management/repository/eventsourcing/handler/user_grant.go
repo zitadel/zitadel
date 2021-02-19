@@ -2,10 +2,14 @@ package handler
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/user/repository/view"
+	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -141,7 +145,7 @@ func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 		if len(grants) == 0 {
 			return u.view.ProcessedUserGrantSequence(event)
 		}
-		user, err := u.userEvents.UserByID(context.Background(), event.AggregateID)
+		user, err := u.getUserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
@@ -178,7 +182,7 @@ func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 }
 
 func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner string) (err error) {
-	user, err := u.userEvents.UserByID(context.Background(), grant.UserID)
+	user, err := u.getUserByID(grant.UserID)
 	if err != nil {
 		return err
 	}
@@ -197,16 +201,16 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 	return nil
 }
 
-func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_model.User) {
+func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_view_model.UserView) {
 	grant.UserName = user.UserName
-	if user.Human != nil {
+	if user.HumanView != nil {
 		grant.FirstName = user.FirstName
 		grant.LastName = user.LastName
 		grant.DisplayName = user.FirstName + " " + user.LastName
-		grant.Email = user.EmailAddress
+		grant.Email = user.Email
 	}
-	if user.Machine != nil {
-		grant.DisplayName = user.Machine.Name
+	if user.MachineView != nil {
+		grant.DisplayName = user.MachineView.Name
 	}
 }
 
@@ -232,4 +236,37 @@ func (u *UserGrant) OnError(event *es_models.Event, err error) error {
 
 func (u *UserGrant) OnSuccess() error {
 	return spooler.HandleSuccess(u.view.UpdateUserGrantSpoolerRunTimestamp)
+}
+
+func (u *UserGrant) getUserByID(userID string) (*usr_view_model.UserView, error) {
+	user, usrErr := u.view.UserByID(userID)
+	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+		return nil, usrErr
+	}
+	if user == nil {
+		user = &usr_view_model.UserView{}
+	}
+	events, err := u.getUserEvents(userID, user.Sequence)
+	if err != nil {
+		return user, usrErr
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return user, nil
+		}
+	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-m9dos", "Errors.User.NotFound")
+	}
+	return &userCopy, nil
+}
+
+func (u *UserGrant) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.es.FilterEvents(context.Background(), query)
 }

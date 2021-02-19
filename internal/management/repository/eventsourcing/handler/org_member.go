@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/user/repository/view"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,6 +16,7 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 const (
@@ -133,7 +136,7 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 		if len(members) == 0 {
 			return m.view.ProcessedOrgMemberSequence(event)
 		}
-		user, err := m.userEvents.UserByID(context.Background(), event.AggregateID)
+		user, err := m.getUserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
@@ -149,7 +152,7 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 }
 
 func (m *OrgMember) fillData(member *org_model.OrgMemberView) (err error) {
-	user, err := m.userEvents.UserByID(context.Background(), member.UserID)
+	user, err := m.getUserByID(member.UserID)
 	if err != nil {
 		return err
 	}
@@ -157,16 +160,16 @@ func (m *OrgMember) fillData(member *org_model.OrgMemberView) (err error) {
 	return nil
 }
 
-func (m *OrgMember) fillUserData(member *org_model.OrgMemberView, user *usr_model.User) {
+func (m *OrgMember) fillUserData(member *org_model.OrgMemberView, user *usr_view_model.UserView) {
 	member.UserName = user.UserName
-	if user.Human != nil {
+	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.DisplayName = user.FirstName + " " + user.LastName
-		member.Email = user.EmailAddress
+		member.Email = user.Email
 	}
-	if user.Machine != nil {
-		member.DisplayName = user.Machine.Name
+	if user.MachineView != nil {
+		member.DisplayName = user.MachineView.Name
 	}
 }
 func (m *OrgMember) OnError(event *models.Event, err error) error {
@@ -176,4 +179,37 @@ func (m *OrgMember) OnError(event *models.Event, err error) error {
 
 func (o *OrgMember) OnSuccess() error {
 	return spooler.HandleSuccess(o.view.UpdateOrgMemberSpoolerRunTimestamp)
+}
+
+func (u *OrgMember) getUserByID(userID string) (*usr_view_model.UserView, error) {
+	user, usrErr := u.view.UserByID(userID)
+	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+		return nil, usrErr
+	}
+	if user == nil {
+		user = &usr_view_model.UserView{}
+	}
+	events, err := u.getUserEvents(userID, user.Sequence)
+	if err != nil {
+		return user, usrErr
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return user, nil
+		}
+	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-m9dos", "Errors.User.NotFound")
+	}
+	return &userCopy, nil
+}
+
+func (u *OrgMember) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.es.FilterEvents(context.Background(), query)
 }

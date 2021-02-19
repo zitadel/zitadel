@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/v2/command"
@@ -331,7 +332,7 @@ func (n *Notification) checkIfAlreadyHandled(userID string, sequence uint64, eve
 }
 
 func (n *Notification) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
-	query, err := usr_event.UserByIDQuery(userID, sequence)
+	query, err := view.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err
 	}

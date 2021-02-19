@@ -92,13 +92,13 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierID
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierID)
+		user, _ := repo.UserByID(ctx, change.ModifierID)
 		if user != nil {
-			if user.Human != nil {
-				change.ModifierName = user.Human.DisplayName
+			if user.HumanView != nil {
+				change.ModifierName = user.HumanView.DisplayName
 			}
-			if user.Machine != nil {
-				change.ModifierName = user.Machine.Name
+			if user.MachineView != nil {
+				change.ModifierName = user.MachineView.Name
 			}
 		}
 	}

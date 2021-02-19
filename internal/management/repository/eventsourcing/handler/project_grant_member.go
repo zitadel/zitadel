@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/user/repository/view"
+	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	"github.com/caos/logging"
 
@@ -140,7 +143,7 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 		if len(members) == 0 {
 			return p.view.ProcessedProjectGrantMemberSequence(event)
 		}
-		user, err := p.userEvents.UserByID(context.Background(), event.AggregateID)
+		user, err := p.getUserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
@@ -154,7 +157,7 @@ func (p *ProjectGrantMember) processUser(event *models.Event) (err error) {
 }
 
 func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView) (err error) {
-	user, err := p.userEvents.UserByID(context.Background(), member.UserID)
+	user, err := p.getUserByID(member.UserID)
 	if err != nil {
 		return err
 	}
@@ -162,16 +165,16 @@ func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView)
 	return nil
 }
 
-func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberView, user *usr_model.User) {
+func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberView, user *usr_view_model.UserView) {
 	member.UserName = user.UserName
-	if user.Human != nil {
+	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.DisplayName = user.FirstName + " " + user.LastName
-		member.Email = user.EmailAddress
+		member.Email = user.Email
 	}
-	if user.Machine != nil {
-		member.DisplayName = user.Machine.Name
+	if user.MachineView != nil {
+		member.DisplayName = user.MachineView.Name
 	}
 }
 
@@ -182,4 +185,37 @@ func (p *ProjectGrantMember) OnError(event *models.Event, err error) error {
 
 func (p *ProjectGrantMember) OnSuccess() error {
 	return spooler.HandleSuccess(p.view.UpdateProjectGrantMemberSpoolerRunTimestamp)
+}
+
+func (u *ProjectGrantMember) getUserByID(userID string) (*usr_view_model.UserView, error) {
+	user, usrErr := u.view.UserByID(userID)
+	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+		return nil, usrErr
+	}
+	if user == nil {
+		user = &usr_view_model.UserView{}
+	}
+	events, err := u.getUserEvents(userID, user.Sequence)
+	if err != nil {
+		return user, usrErr
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return user, nil
+		}
+	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-m9dos", "Errors.User.NotFound")
+	}
+	return &userCopy, nil
+}
+
+func (u *ProjectGrantMember) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.es.FilterEvents(context.Background(), query)
 }

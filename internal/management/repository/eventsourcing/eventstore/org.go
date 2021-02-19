@@ -26,6 +26,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 const (
@@ -167,13 +168,13 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
-			if user.Human != nil {
+			if user.HumanView != nil {
 				change.ModifierName = user.DisplayName
 			}
-			if user.Machine != nil {
-				change.ModifierName = user.Machine.Name
+			if user.MachineView != nil {
+				change.ModifierName = user.MachineView.Name
 			}
 		}
 	}
@@ -775,4 +776,32 @@ func (repo *OrgRepository) ChangeMailText(ctx context.Context, text *iam_model.M
 func (repo *OrgRepository) RemoveMailText(ctx context.Context, text *iam_model.MailText) error {
 	text.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.RemoveMailText(ctx, text)
+}
+
+func (repo *OrgRepository) userByID(ctx context.Context, id string) (*usr_model.UserView, error) {
+	user, viewErr := repo.View.UserByID(id)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if errors.IsNotFound(viewErr) {
+		user = new(usr_es_model.UserView)
+	}
+	events, esErr := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3nF8s", "Errors.User.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
+		return usr_es_model.UserToModel(user), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return usr_es_model.UserToModel(user), nil
+		}
+	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3n8Fs", "Errors.User.NotFound")
+	}
+	return usr_es_model.UserToModel(&userCopy), nil
 }
