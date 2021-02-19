@@ -29,6 +29,14 @@ type UserGrantView struct {
 	Sequence uint64
 }
 
+type UserGrantState int32
+
+const (
+	UserGrantStateActive UserGrantState = iota
+	UserGrantStateInactive
+	UserGrantStateRemoved
+)
+
 type UserGrantSearchRequest struct {
 	Offset        uint64
 	Limit         uint64
