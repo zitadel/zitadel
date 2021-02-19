@@ -164,12 +164,15 @@ func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, err
 	return mfas, nil
 }
 
-func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error) {
-	return repo.UserEvents.GetPasswordless(ctx, userID)
-}
-
-func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error) {
-	return repo.UserEvents.GetPasswordless(ctx, authz.GetCtxData(ctx).UserID)
+func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNView, error) {
+	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "USER-9kF98", "Errors.User.NotHuman")
+	}
+	return user.HumanView.PasswordlessTokens, nil
 }
 
 func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error) {

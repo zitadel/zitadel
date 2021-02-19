@@ -135,8 +135,15 @@ func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model
 	return mfas, nil
 }
 
-func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
-	return repo.UserEvents.GetPasswordless(ctx, userID)
+func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNView, error) {
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9anf8", "Errors.User.NotHuman")
+	}
+	return user.HumanView.PasswordlessTokens, nil
 }
 
 func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {

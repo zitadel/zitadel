@@ -11,8 +11,6 @@ import (
 type UserRepository interface {
 	myUserRepo
 
-	GetPasswordless(ctx context.Context, id string) ([]*model.WebAuthNToken, error)
-
 	UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error)
 
 	UserByID(ctx context.Context, userID string) (*model.UserView, error)
@@ -36,7 +34,7 @@ type myUserRepo interface {
 
 	MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error)
 
-	GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error)
+	GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNView, error)
 
 	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
 
