@@ -998,6 +998,7 @@ export class ManagementService {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
+        req.setAsc(true);
         req.setSequenceOffset(sequenceoffset);
         return this.grpcService.mgmt.userChanges(req);
     }

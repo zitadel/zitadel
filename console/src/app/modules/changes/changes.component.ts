@@ -22,7 +22,7 @@ export interface MappedChange {
         dates: Timestamp.AsObject[];
         editorId: string;
         editorName: string;
-        eventTypes: string[];
+        eventTypes: Array<{ key: string; localizedMessage: string; }>;
         sequences: number[];
     }>;
 }
@@ -97,6 +97,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
 
     private more(): void {
         const cursor = this.getCursor();
+        console.log('cursor' + cursor);
 
         let more: Promise<Changes>;
 
@@ -119,9 +120,13 @@ export class ChangesComponent implements OnInit, OnDestroy {
     // Determines the snapshot to paginate query
     private getCursor(): number {
         const current = this._data.value;
+        console.log(current);
+
         if (current.length) {
-            return !this.sortDirectionAsc ? current[0].sequence :
-                current[current.length - 1].sequence;
+            const lastElementValues = current[current.length - 1].values;
+            const seq = lastElementValues[lastElementValues.length - 1].sequences;
+            console.log(seq);
+            return seq[seq.length - 1];
         }
         return 0;
     }
@@ -139,9 +144,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
                 take(1),
                 tap((res: Changes) => {
                     const values = res.toObject().changesList;
-                    console.log(values);
                     const mapped = this.mapChanges(values);
-                    console.log(mapped);
                     // update source with new values, done loading
                     // this._data.next(values);
                     this._data.next(mapped);
@@ -210,7 +213,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
         arr.sort((a, b) => {
             return parseFloat(b.key) - parseFloat(a.key);
         });
-        console.log(arr);
 
         return arr;
     }

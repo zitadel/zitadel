@@ -8,29 +8,33 @@
 <div class="scroll-container" appScrollable (scrollPosition)="scrollHandler($event)">
     <li class="item change-item-back" *ngFor="let hist of data | async; index as histindex">
         <span *ngIf="hist.values[0].dates[0]" class="date">{{
-            hist.values[0]?.dates[0]| timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+            hist.values[0]?.dates[0]| timestampToDate | localizedDate: 'dd. MMMM YYYY' }}</span>
         <div class="item" *ngFor="let dayelement of hist.values; index as i">
             <div class="row">
-                <app-avatar *ngIf="dayelement.editorName" class="avatar" [name]="dayelement.editorName" [size]="32">
+                <app-avatar *ngIf="dayelement.editorName; else spacer" class="avatar" [name]="dayelement.editorName"
+                    [size]="32">
                 </app-avatar>
+                <ng-template #spacer>
+                    <div class="spacer"></div>
+                </ng-template>
                 <div class="actions">
                     <div class="action" *ngFor="let action of dayelement.eventTypes; index as j">
                         <button disabled mat-icon-button aria-label="Restore history">
                             <mat-icon class="icon">schedule</mat-icon>
                         </button>
 
-                        <span *ngIf="histindex > 0 || i > 0 || j > 0">
-                            <span>{{ action }}</span>
+                        <span>
+                            <span>{{ action.localizedMessage }}</span>
                             <span class="block">{{
-                                dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
+                                dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm'
                                 }}</span>
                         </span>
-                        <span *ngIf="histindex === 0 && i === 0 && j === 0">
+                        <!-- <span *ngIf="histindex === 0 && i === 0 && j === 0">
                             <span>current file</span>
                             <span class="block">{{
-                                dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
+                                dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm'
                                 }}</span>
-                        </span>
+                        </span> -->
 
                         <!-- <button mat-icon-button disabled>
                             <mat-icon class="icon red" color="warn">error_outline

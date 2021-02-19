@@ -21,114 +21,120 @@
 }
 
 @mixin changes-theme($theme) {
-  .scroll-container {
-    max-height: 50vh;
-    overflow-y: scroll;
-    border-bottom: 1px solid #ffffff20;
-    margin-bottom: 0.5rem;	
-    // display: flex;
-    // flex-direction: column;
-
-    .date {
-        font-weight: 500;
-        font-size: 0.8rem;
-        display: block;
-    }
-
-    .item {
+    .scroll-container {
+        max-height: 50vh;
+        overflow-y: scroll;
+        border-bottom: 1px solid #ffffff20;
+        margin-bottom: 0.5rem;	
         // display: flex;
-        display: block;
-        padding: 1rem 0;
-        font-size: 0.8rem;
-        .row {
-            display: flex;
-            flex-direction: row;
-        
-        .actions {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            margin-top: -0.5rem;
+        // flex-direction: column;
 
-            .action {
+        .date {
+            font-weight: 500;
+            font-size: 0.8rem;
+            display: block;
+            margin-bottom: .5rem;
+        }
+
+        .item {
+            // display: flex;
+            display: block;
+            padding: .5rem 0;
+            font-size: 0.8rem;
+            .row {
                 display: flex;
                 flex-direction: row;
-                align-items: center;
-                flex: 1;
 
-                .icon {
+                .spacer {
                     width: 32px;
-                    display: inline-block;
-                    height: 1.2rem;
-                    line-height: 1.2rem;
-                    font-size: 1.2rem;
-                    color: #e8eaed;
-
-                    &.red {
-                        color: #e91e63;
-                    }
                 }
-
-                span {
+            
+                .actions {
                     flex: 1;
-                    font-weight: 500;
-                    font-size: 0.8rem;
-                }
+                    display: flex;
+                    flex-direction: column;
+                    margin-top: -0.5rem;
 
-                .block {
-                    display: block;
-                }
+                    .action {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        flex: 1;
 
-                .restore {
-                    visibility: hidden;
-                    display: none;
-                    opacity: 0;
-                    margin-left: 1rem;
-                    transform: opacity 0.2s ease-in-out;
-                }
+                        .icon {
+                            width: 32px;
+                            display: inline-block;
+                            height: 1.2rem;
+                            line-height: 1.2rem;
+                            font-size: 1.2rem;
+                            color: #e8eaed;
 
-                &:hover {
-                    .restore {
-                        visibility: visible;
-                        display: inline-block;
-                        opacity: 1;
-                        color: #81868a;
+                            &.red {
+                                color: #e91e63;
+                            }
+                        }
 
-                        &[disabled] {
+                        span {
+                            flex: 1;
+                            font-weight: 500;
+                            font-size: 0.8rem;
+                        }
+
+                        .block {
+                            display: block;
+                        }
+
+                        .restore {
                             visibility: hidden;
+                            display: none;
+                            opacity: 0;
+                            margin-left: 1rem;
+                            transform: opacity 0.2s ease-in-out;
                         }
 
                         &:hover {
-                            color: white;
+                            .restore {
+                                visibility: visible;
+                                display: inline-block;
+                                opacity: 1;
+                                color: #81868a;
+
+                                &[disabled] {
+                                    visibility: hidden;
+                                }
+
+                                &:hover {
+                                    color: white;
+                                }
+                            }
                         }
                     }
                 }
+
+                /* stylelint-disable */
+                $primary: map-get($theme, primary);
+                $primary-dark: mat-color($primary, A800);
+                /* stylelint-enable */
+
+                &.change-item-back {
+                    background-color: rgba($primary-dark, .93);
+                    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+                }
+            }
+
+            .sp-wrapper {
+                padding: .5rem;
+                display: flex;
+                justify-content: center;
+            }
+
+            .end-container {
+                font-size: 12px;
+                color: var(--grey);
+                font-size: 14px;
+                margin: 1rem 0;
+                color: var(--grey);
             }
         }
-
-
-
-      /* stylelint-disable */
-      $primary: map-get($theme, primary);
-      $primary-dark: mat-color($primary, A800);
-      /* stylelint-enable */
-
-      &.change-item-back {
-        background-color: rgba($primary-dark, .93);
-        transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
-      }
     }
-
-    .sp-wrapper {
-      padding: .5rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    .end-container {
-      font-size: 12px;
-      color: var(--grey);
-    }
-  }
-}
 }
