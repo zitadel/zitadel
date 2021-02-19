@@ -21,54 +21,120 @@
 }
 
 @mixin changes-theme($theme) {
-  .scroll-container {
-    max-height: 50vh;
-    overflow-y: scroll;
+    .scroll-container {
+        max-height: 50vh;
+        overflow-y: scroll;
+        border-bottom: 1px solid #ffffff20;
+        margin-bottom: 0.5rem;	
+        // display: flex;
+        // flex-direction: column;
 
-    .item {
-      box-sizing: border-box;
-      padding: .5rem;
-      margin: .25rem 0;
-      border-radius: .5rem;
-      display: flex;
-      flex-direction: column;
+        .date {
+            font-weight: 500;
+            font-size: 0.8rem;
+            display: block;
+            margin-bottom: .5rem;
+        }
 
-      .editor {
-        color: var(--grey);
-        font-size: 12px;
-        align-self: flex-end;
-      }
+        .item {
+            // display: flex;
+            display: block;
+            padding: .5rem 0;
+            font-size: 0.8rem;
+            .row {
+                display: flex;
+                flex-direction: row;
 
-      .seq {
-        color: var(--grey);
-        font-size: 12px;
-        align-self: flex-end;
-      }
+                .spacer {
+                    width: 32px;
+                }
+            
+                .actions {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    margin-top: -0.5rem;
 
-      .desc {
-        overflow-x: auto;
-        font-size: 14px;
-      }
-      /* stylelint-disable */
-      $primary: map-get($theme, primary);
-      $primary-dark: mat-color($primary, A800);
-      /* stylelint-enable */
+                    .action {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        flex: 1;
 
-      &.change-item-back {
-        background-color: rgba($primary-dark, .93);
-        transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
-      }
+                        .icon {
+                            width: 32px;
+                            display: inline-block;
+                            height: 1.2rem;
+                            line-height: 1.2rem;
+                            font-size: 1.2rem;
+                            color: #e8eaed;
+
+                            &.red {
+                                color: #e91e63;
+                            }
+                        }
+
+                        span {
+                            flex: 1;
+                            font-weight: 500;
+                            font-size: 0.8rem;
+                        }
+
+                        .block {
+                            display: block;
+                        }
+
+                        .restore {
+                            visibility: hidden;
+                            display: none;
+                            opacity: 0;
+                            margin-left: 1rem;
+                            transform: opacity 0.2s ease-in-out;
+                        }
+
+                        &:hover {
+                            .restore {
+                                visibility: visible;
+                                display: inline-block;
+                                opacity: 1;
+                                color: #81868a;
+
+                                &[disabled] {
+                                    visibility: hidden;
+                                }
+
+                                &:hover {
+                                    color: white;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                /* stylelint-disable */
+                $primary: map-get($theme, primary);
+                $primary-dark: mat-color($primary, A800);
+                /* stylelint-enable */
+
+                &.change-item-back {
+                    background-color: rgba($primary-dark, .93);
+                    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+                }
+            }
+
+            .sp-wrapper {
+                padding: .5rem;
+                display: flex;
+                justify-content: center;
+            }
+
+            .end-container {
+                font-size: 12px;
+                color: var(--grey);
+                font-size: 14px;
+                margin: 1rem 0;
+                color: var(--grey);
+            }
+        }
     }
-
-    .sp-wrapper {
-      padding: .5rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    .end-container {
-      font-size: 12px;
-      color: var(--grey);
-    }
-  }
 }

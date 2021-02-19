@@ -5,7 +5,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class RedirectPipe implements PipeTransform {
     public transform(uri: string, isNative: boolean): boolean {
-        console.log(uri, isNative);
         if (isNative) {
             if (uri.startsWith('http://localhost')) {
                 return true;

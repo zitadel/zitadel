@@ -974,6 +974,7 @@ export class ManagementService {
         req.setId(id);
         req.setSecId(secId);
         req.setLimit(limit);
+        req.setAsc(false);
         req.setSequenceOffset(offset);
         return this.grpcService.mgmt.applicationChanges(req);
     }
@@ -982,6 +983,7 @@ export class ManagementService {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
+        req.setAsc(false);
         req.setSequenceOffset(offset);
         return this.grpcService.mgmt.orgChanges(req);
     }
@@ -990,6 +992,7 @@ export class ManagementService {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
+        req.setAsc(false);
         req.setSequenceOffset(offset);
         return this.grpcService.mgmt.projectChanges(req);
     }
@@ -998,6 +1001,7 @@ export class ManagementService {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
+        req.setAsc(false);
         req.setSequenceOffset(sequenceoffset);
         return this.grpcService.mgmt.userChanges(req);
     }
