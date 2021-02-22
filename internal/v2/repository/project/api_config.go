@@ -39,7 +39,7 @@ func (e *APIConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 func NewAPIConfigAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	appID string,
+	appID,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	authMethodType domain.APIAuthMethodType,
