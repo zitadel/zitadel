@@ -13,7 +13,7 @@ protoc \
   -I=/proto/include/ \
   --go_out $GOPATH/src \
   --go-grpc_out $GOPATH/src \
-  ${PROTO_PATH}/options.proto
+  $(find ${PROTO_PATH} -iname *.proto | grep -v "management|admin|auth")
 
 go-bindata \
   -pkg main \
@@ -40,9 +40,10 @@ protoc \
   --grpc-gateway_opt logtostderr=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
-  --authoption_out=${GRPC_PATH}/admin \
+  --authoption_out ${GRPC_PATH}/admin \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/admin.proto
+mv ${ZITADEL_PATH}/pkg/grpc/admin/zitadel/* ${ZITADEL_PATH}/pkg/grpc/admin
 
 protoc \
   -I=/proto/include \
@@ -54,9 +55,10 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --authoption_out=${GRPC_PATH}/management \
+  --authoption_out ${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/management.proto
+mv ${ZITADEL_PATH}/pkg/grpc/management/zitadel/* ${ZITADEL_PATH}/pkg/grpc/management
 
 protoc \
   -I=/proto/include \
@@ -69,5 +71,6 @@ protoc \
   --authoption_out=${GRPC_PATH}/auth \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/auth.proto
+mv ${ZITADEL_PATH}/pkg/grpc/auth/zitadel/* ${ZITADEL_PATH}/pkg/grpc/auth
 
 echo "done generating grpc"
