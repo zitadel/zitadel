@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -32,8 +31,7 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 }
 
 type EventstoreRepos struct {
-	ProjectEvents *proj_event.ProjectEventstore
-	IamEvents     *iam_event.IAMEventstore
+	IamEvents *iam_event.IAMEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
@@ -41,19 +39,15 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newProject(
 			handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount, es}),
 		newProjectGrant(
-			handler{view, bulkLimit, configs.cycleDuration("ProjectGrant"), errorCount, es},
-			repos.ProjectEvents),
-		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es},
-			repos.ProjectEvents),
+			handler{view, bulkLimit, configs.cycleDuration("ProjectGrant"), errorCount, es}),
+		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
 		newProjectMember(handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount, es}),
 		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es}),
-		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es},
-			repos.ProjectEvents),
+		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			repos.IamEvents,
 			defaults.IamID),
-		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
-			repos.ProjectEvents),
+		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es}),
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newOrgMember(
@@ -61,8 +55,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newOrgDomain(
 			handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount, es}),
 		newUserMembership(
-			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es},
-			repos.ProjectEvents),
+			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
 		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount, es}),
 		newIDPConfig(

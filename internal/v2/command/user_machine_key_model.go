@@ -12,7 +12,7 @@ type MachineKeyWriteModel struct {
 	eventstore.WriteModel
 
 	KeyID          string
-	KeyType        domain.MachineKeyType
+	KeyType        domain.AuthNKeyType
 	ExpirationDate time.Time
 
 	State domain.MachineKeyState

@@ -2,14 +2,17 @@ package handler
 
 import (
 	"context"
+
+	"github.com/caos/logging"
+	"k8s.io/apimachinery/pkg/api/errors"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-
-	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -18,7 +21,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -32,17 +34,14 @@ const (
 
 type UserGrant struct {
 	handler
-	projectEvents *proj_event.ProjectEventstore
-	subscription  *eventstore.Subscription
+	subscription *eventstore.Subscription
 }
 
 func newUserGrant(
 	handler handler,
-	projectEvents *proj_event.ProjectEventstore,
 ) *UserGrant {
 	h := &UserGrant{
-		handler:       handler,
-		projectEvents: projectEvents,
+		handler: handler,
 	}
 
 	h.subscribe()
@@ -163,7 +162,7 @@ func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 		if len(grants) == 0 {
 			return u.view.ProcessedUserGrantSequence(event)
 		}
-		project, err := u.projectEvents.ProjectByID(context.Background(), event.AggregateID)
+		project, err := u.getProjectByID(context.Background(), event.AggregateID)
 		if err != nil {
 			return err
 		}
@@ -182,7 +181,7 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 		return err
 	}
 	u.fillUserData(grant, user)
-	project, err := u.projectEvents.ProjectByID(context.Background(), grant.ProjectID)
+	project, err := u.getProjectByID(context.Background(), grant.ProjectID)
 	if err != nil {
 		return err
 	}
@@ -286,4 +285,25 @@ func (u *UserGrant) getOrgByID(ctx context.Context, orgID string) (*org_model.Or
 	}
 
 	return org_es_model.OrgToModel(esOrg), nil
+}
+
+func (u *UserGrant) getProjectByID(ctx context.Context, projID string) (*proj_model.Project, error) {
+	query, err := proj_view.ProjectByIDQuery(projID, 0)
+	if err != nil {
+		return nil, err
+	}
+	esProject := &proj_es_model.Project{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esProject.AppendEvents, query)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if esProject.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Dfb42", "Errors.Project.NotFound")
+	}
+
+	return proj_es_model.ProjectToModel(esProject), nil
 }

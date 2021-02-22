@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/v2/query"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -14,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type Config struct {
@@ -32,6 +32,7 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
 	eventstore.IAMRepository
+	view *mgmt_view.View
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -51,13 +52,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		return nil, err
 	}
 
-	project, err := es_proj.StartProject(es_proj.ProjectConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
 	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
@@ -70,23 +64,24 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
-	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project, IamEvents: iam}
+	eventstoreRepos := handler.EventstoreRepos{IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults)
 
 	return &EsRepository{
 		spooler:       spool,
 		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, es, iam, view, roles, systemDefaults},
-		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, iam, view, roles, systemDefaults.IamID},
+		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, iam, view, roles, systemDefaults.IamID},
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view},
 		IAMRepository: eventstore.IAMRepository{
 			IAMV2Query: iamV2Query,
 		},
+		view: view,
 	}, nil
 }
 
 func (repo *EsRepository) Health() error {
-	return repo.ProjectEvents.Health(context.Background())
+	return repo.view.Health()
 }
 
 func (repo *EsRepository) IAMByID(ctx context.Context, id string) (*iam_model.IAM, error) {

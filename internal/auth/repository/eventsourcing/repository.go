@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/handler"
@@ -16,7 +17,6 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/id"
-	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/v2/command"
 	"github.com/caos/zitadel/internal/v2/query"
 )
@@ -83,23 +83,12 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		return nil, err
 	}
 
-	project, err := es_proj.StartProject(
-		es_proj.ProjectConfig{
-			Cache:      conf.Eventstore.Cache,
-			Eventstore: es,
-		},
-		systemDefaults,
-	)
-	if err != nil {
-		return nil, err
-	}
-
 	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
 
-	repos := handler.EventstoreRepos{ProjectEvents: project, IamEvents: iam}
+	repos := handler.EventstoreRepos{IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
 	userRepo := eventstore.UserRepo{
@@ -133,17 +122,16 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IAMID:                      systemDefaults.IamID,
 		},
 		eventstore.TokenRepo{
-			Eventstore:    es,
-			ProjectEvents: project,
-			View:          view,
+			Eventstore: es,
+			View:       view,
 		},
 		eventstore.KeyRepository{
 			View:               view,
 			SigningKeyRotation: systemDefaults.KeyConfig.SigningKeyRotation.Duration,
 		},
 		eventstore.ApplicationRepo{
-			View:          view,
-			ProjectEvents: project,
+			Commands: command,
+			View:     view,
 		},
 
 		eventstore.UserSessionRepo{

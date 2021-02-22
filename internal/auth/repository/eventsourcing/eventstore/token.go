@@ -2,25 +2,24 @@ package eventstore
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
-	"time"
 
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/errors"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type TokenRepo struct {
-	Eventstore    eventstore.Eventstore
-	ProjectEvents *proj_event.ProjectEventstore
-	View          *view.View
+	Eventstore eventstore.Eventstore
+	View       *view.View
 }
 
 func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error) {

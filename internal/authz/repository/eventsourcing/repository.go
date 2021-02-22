@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/v2/query"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -16,7 +17,6 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/id"
-	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type Config struct {
@@ -59,19 +59,12 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 	if err != nil {
 		return nil, err
 	}
-	project, err := es_proj.StartProject(es_proj.ProjectConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
 	iamV2, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
 
-	repos := handler.EventstoreRepos{IAMEvents: iam, ProjectEvents: project}
+	repos := handler.EventstoreRepos{IAMEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
 	return &EsRepository{
@@ -89,11 +82,10 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 		},
 		eventstore.TokenVerifierRepo{
 			//TODO: Add Token Verification Key
-			Eventstore:    es,
-			IAMID:         systemDefaults.IamID,
-			IAMEvents:     iam,
-			ProjectEvents: project,
-			View:          view,
+			Eventstore: es,
+			IAMID:      systemDefaults.IamID,
+			IAMEvents:  iam,
+			View:       view,
 		},
 	}, nil
 }

@@ -20,10 +20,10 @@ const (
 type MachineKeyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	KeyID          string                `json:"keyId,omitempty"`
-	KeyType        domain.MachineKeyType `json:"type,omitempty"`
-	ExpirationDate time.Time             `json:"expirationDate,omitempty"`
-	PublicKey      []byte                `json:"publicKey,omitempty"`
+	KeyID          string              `json:"keyId,omitempty"`
+	KeyType        domain.AuthNKeyType `json:"type,omitempty"`
+	ExpirationDate time.Time           `json:"expirationDate,omitempty"`
+	PublicKey      []byte              `json:"publicKey,omitempty"`
 }
 
 func (e *MachineKeyAddedEvent) Data() interface{} {
@@ -38,7 +38,7 @@ func NewMachineKeyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	keyID string,
-	keyType domain.MachineKeyType,
+	keyType domain.AuthNKeyType,
 	expirationDate time.Time,
 	publicKey []byte,
 ) *MachineKeyAddedEvent {

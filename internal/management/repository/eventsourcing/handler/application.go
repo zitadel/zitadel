@@ -5,13 +5,15 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
@@ -21,17 +23,14 @@ const (
 
 type Application struct {
 	handler
-	projectEvents *proj_event.ProjectEventstore
-	subscription  *eventstore.Subscription
+	subscription *eventstore.Subscription
 }
 
 func newApplication(
 	handler handler,
-	projectEvents *proj_event.ProjectEventstore,
 ) *Application {
 	h := &Application{
-		handler:       handler,
-		projectEvents: projectEvents,
+		handler: handler,
 	}
 
 	h.subscribe()
@@ -69,14 +68,14 @@ func (a *Application) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
+	return proj_view.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (a *Application) Reduce(event *models.Event) (err error) {
 	app := new(view_model.ApplicationView)
 	switch event.Type {
 	case es_model.ApplicationAdded:
-		project, err := a.projectEvents.ProjectByID(context.Background(), event.AggregateID)
+		project, err := a.getProjectByID(context.Background(), event.AggregateID)
 		if err != nil {
 			return err
 		}
@@ -138,4 +137,25 @@ func (a *Application) OnError(event *models.Event, spoolerError error) error {
 
 func (a *Application) OnSuccess() error {
 	return spooler.HandleSuccess(a.view.UpdateApplicationSpoolerRunTimestamp)
+}
+
+func (a *Application) getProjectByID(ctx context.Context, projID string) (*proj_model.Project, error) {
+	query, err := proj_view.ProjectByIDQuery(projID, 0)
+	if err != nil {
+		return nil, err
+	}
+	esProject := &es_model.Project{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projID,
+		},
+	}
+	err = es_sdk.Filter(ctx, a.Eventstore().FilterEvents, esProject.AppendEvents, query)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if esProject.Sequence == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-ADvfs", "Errors.Project.NotFound")
+	}
+
+	return es_model.ProjectToModel(esProject), nil
 }
