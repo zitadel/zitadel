@@ -181,7 +181,7 @@
                     </span>
                     <span class="right">
                         <span>
-                            {{'APP.API.AUTHMETHOD.'+oidcApp?.authMethodType | translate}}
+                            {{'APP.API.AUTHMETHOD.'+apiApp?.authMethodType | translate}}
                         </span>
                     </span>
                 </div>
@@ -189,14 +189,14 @@
 
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary" (click)="saveOIDCApp()">{{'ACTIONS.CREATE' |
+                <button mat-raised-button color="primary" (click)="createApp()">{{'ACTIONS.CREATE' |
                     translate}}</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>
 
     <div *ngIf="devmode" class="dev">
-        <form [formGroup]="form" (ngSubmit)="saveOIDCApp()">
+        <form [formGroup]="form" (ngSubmit)="createApp()">
             <div class="content">
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>

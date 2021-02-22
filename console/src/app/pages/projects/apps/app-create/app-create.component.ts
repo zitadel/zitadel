@@ -8,11 +8,13 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import {
+    APIApplicationCreate,
     APIAuthMethodType,
     Application,
     OIDCApplicationCreate,
     OIDCApplicationType,
     OIDCAuthMethodType,
+    OIDCConfig,
     OIDCGrantType,
     OIDCResponseType,
 } from 'src/app/proto/generated/management_pb';
@@ -44,7 +46,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     public devmode: boolean = false;
     public projectId: string = '';
     public loading: boolean = false;
+
     public oidcApp: OIDCApplicationCreate.AsObject = new OIDCApplicationCreate().toObject();
+    public apiApp: APIApplicationCreate.AsObject = new APIApplicationCreate().toObject();
 
     public oidcResponseTypes: { type: OIDCResponseType, checked: boolean; disabled: boolean; }[] = [
         { type: OIDCResponseType.OIDCRESPONSETYPE_CODE, checked: false, disabled: false },
@@ -131,13 +135,12 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.firstFormGroup.valueChanges.subscribe(value => {
             if (this.firstFormGroup.valid) {
                 this.oidcApp.name = this.name?.value;
-                console.log(value, this.appType?.value);
+                this.apiApp.name = this.name?.value;
 
                 const isOIDC = (this.appType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
                 const isAPI = (this.appType?.value as RadioItemAppType).createType == AppCreateType.API;
 
                 if (isOIDC) {
-                    console.log('oidc');
                     const oidcAppType = (this.appType?.value as RadioItemAppType).oidcApplicationType;
                     if (oidcAppType !== undefined) {
                         this.oidcApp.applicationType = oidcAppType;
@@ -174,7 +177,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                             break;
                     }
                 } else if (isAPI) {
-                    console.log('api');
                     this.authMethods = [
                         PK_JWT_METHOD,
                         BASIC_AUTH_METHOD,
@@ -190,11 +192,13 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         });
         this.secondFormGroup.valueChanges.subscribe(form => {
             const partialConfig = getPartialConfigFromAuthMethod(form.authMethod);
-
+            console.log(partialConfig);
             if (partialConfig) {
-                this.oidcApp.responseTypesList = partialConfig.responseTypesList ?? [];
-                this.oidcApp.grantTypesList = partialConfig.grantTypesList ?? [];
-                this.oidcApp.authMethodType = partialConfig.authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+                this.oidcApp.responseTypesList = partialConfig.oidc?.responseTypesList ?? [];
+                this.oidcApp.grantTypesList = partialConfig.oidc?.grantTypesList ?? [];
+                this.oidcApp.authMethodType = partialConfig.oidc?.authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+
+                this.apiApp.authMethodType = partialConfig.api?.authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
             }
         });
     }
@@ -257,31 +261,55 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     private async getData({ projectid }: Params): Promise<void> {
         this.projectId = projectid;
         this.oidcApp.projectId = projectid;
+        this.apiApp.projectId = projectid;
     }
 
     public close(): void {
         this._location.back();
     }
 
-    public saveOIDCApp(): void {
-        this.requestRedirectValuesSubject$.next();
+    public createApp(): void {
+        const isOIDC = (this.appType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
+        const isAPI = (this.appType?.value as RadioItemAppType).createType == AppCreateType.API;
 
-        this.loading = true;
-        this.mgmtService
-            .CreateOIDCApp(this.oidcApp)
-            .then((data: Application) => {
-                this.loading = false;
-                const response = data.toObject();
-                if (response.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
-                    this.showSavedDialog(response);
-                } else {
-                    this.router.navigate(['projects', this.projectId, 'apps', response.id]);
-                }
-            })
-            .catch(error => {
-                this.loading = false;
-                this.toast.showError(error);
-            });
+        if (isOIDC) {
+            this.requestRedirectValuesSubject$.next();
+
+            this.loading = true;
+            this.mgmtService
+                .CreateOIDCApp(this.oidcApp)
+                .then((data: Application) => {
+                    this.loading = false;
+                    const response = data.toObject();
+                    if (response.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
+                        this.showSavedDialog(response);
+                    } else {
+                        this.router.navigate(['projects', this.projectId, 'apps', response.id]);
+                    }
+                })
+                .catch(error => {
+                    this.loading = false;
+                    this.toast.showError(error);
+                });
+        } else if (isAPI) {
+            console.log(this.apiApp);
+            this.loading = true;
+            this.mgmtService
+                .CreateAPIApplication(this.apiApp)
+                .then((data: Application) => {
+                    this.loading = false;
+                    const response = data.toObject();
+                    if (response.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
+                        this.showSavedDialog(response);
+                    } else {
+                        this.router.navigate(['projects', this.projectId, 'apps', response.id]);
+                    }
+                })
+                .catch(error => {
+                    this.loading = false;
+                    this.toast.showError(error);
+                });
+        }
     }
 
     public showSavedDialog(app: Application.AsObject): void {

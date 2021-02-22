@@ -15,6 +15,8 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { CnslLinks } from 'src/app/modules/links/links.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
+    APIAuthMethodType,
+    APIConfig,
     Application,
     AppState,
     OIDCApplicationType,
@@ -275,10 +277,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         const partialConfig = getPartialConfigFromAuthMethod(authMethod);
 
         if (partialConfig && this.app.oidcConfig) {
-            this.app.oidcConfig.responseTypesList = partialConfig.responseTypesList ?? [];
-            this.app.oidcConfig.grantTypesList = partialConfig.grantTypesList ?? [];
-            this.app.oidcConfig.authMethodType = partialConfig.authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+            this.app.oidcConfig.responseTypesList = (partialConfig as Partial<OIDCConfig.AsObject>).responseTypesList ?? [];
+            this.app.oidcConfig.grantTypesList = (partialConfig as Partial<OIDCConfig.AsObject>).grantTypesList ?? [];
+            this.app.oidcConfig.authMethodType = (partialConfig as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
             this.appForm.patchValue(this.app.oidcConfig);
+        } else if (this.app.apiConfig) {
+            this.app.apiConfig.authMethodType = (partialConfig as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
+            this.appForm.patchValue(this.app.apiConfig);
         }
     }
 

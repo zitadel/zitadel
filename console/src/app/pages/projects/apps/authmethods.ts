@@ -1,5 +1,5 @@
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
-import { OIDCAuthMethodType, OIDCConfig, OIDCGrantType, OIDCResponseType } from 'src/app/proto/generated/management_pb';
+import { APIAuthMethodType, APIConfig, OIDCAuthMethodType, OIDCConfig, OIDCGrantType, OIDCResponseType } from 'src/app/proto/generated/management_pb';
 
 export const CODE_METHOD: RadioItemAuthType = {
     key: 'CODE',
@@ -44,9 +44,10 @@ export const PK_JWT_METHOD: RadioItemAuthType = {
     disabled: false,
     prefix: 'JWT',
     background: 'rgb(80 110 92)',
-    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+    // responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+    // grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+    // authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+    apiAuthMethod: APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT,
     recommended: true,
 };
 export const BASIC_AUTH_METHOD: RadioItemAuthType = {
@@ -83,42 +84,69 @@ export const CUSTOM_METHOD: RadioItemAuthType = {
     background: '#333',
 };
 
-export function getPartialConfigFromAuthMethod(authMethod: string): Partial<OIDCConfig.AsObject> | undefined {
-    let config: Partial<OIDCConfig.AsObject>;
+export function getPartialConfigFromAuthMethod(authMethod: string): {
+    oidc?: Partial<OIDCConfig.AsObject>;
+    api?: Partial<APIConfig.AsObject>;
+} | undefined {
+    let config: {
+        oidc?: Partial<OIDCConfig.AsObject>,
+        api?: Partial<APIConfig.AsObject>,
+    };
     switch (authMethod) {
         case CODE_METHOD.key:
             config = {
-                responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-                grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-                authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+                oidc: {
+                    responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+                    grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+                    authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+                },
             };
             return config;
         case PKCE_METHOD.key:
             config = {
-                responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-                grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-                authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+                oidc: {
+                    responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+                    grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+                    authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+                }
             };
             return config;
         case POST_METHOD.key:
             config = {
-                responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-                grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-                authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+                oidc: {
+                    responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+                    grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+                    authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+                }
             };
             return config;
-        // case PK_JWT_METHOD.key:
-        //     config = {
-        //         responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-        //         grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-        //         authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-        //     };
-        //     return config;
+        case PK_JWT_METHOD.key:
+            config = {
+                api: {
+                    authMethodType: APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT,
+                }
+            };
+            return config;
+        case BASIC_AUTH_METHOD.key:
+            config = {
+                oidc: {
+                    authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+                },
+                api: {
+                    authMethodType: APIAuthMethodType.APIAUTHMETHODTYPE_BASIC,
+                }
+            };
+            return config;
         case IMPLICIT_METHOD.key:
             config = {
-                responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN],
-                grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_IMPLICIT],
-                authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+                oidc: {
+                    responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN],
+                    grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_IMPLICIT],
+                    authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+                },
+                api: {
+                    authMethodType: APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT,
+                }
             };
             return config;
         default:
