@@ -10,6 +10,7 @@ import (
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_events "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
@@ -67,7 +68,7 @@ func (p *ProjectRole) EventQuery() (*es_models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return proj_events.ProjectQuery(sequence.CurrentSequence), nil
+	return proj_view.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectRole) Reduce(event *es_models.Event) (err error) {

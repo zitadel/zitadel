@@ -41,10 +41,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newProject(
 			handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount, es}),
 		newProjectGrant(
-			handler{view, bulkLimit, configs.cycleDuration("ProjectGrant"), errorCount, es},
-			repos.ProjectEvents),
-		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es},
-			repos.ProjectEvents),
+			handler{view, bulkLimit, configs.cycleDuration("ProjectGrant"), errorCount, es}),
+		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
 		newProjectMember(handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount, es}),
 		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es}),
 		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es},
@@ -52,8 +50,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			repos.IamEvents,
 			defaults.IamID),
-		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
-			repos.ProjectEvents),
+		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es}),
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newOrgMember(
@@ -61,8 +58,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newOrgDomain(
 			handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount, es}),
 		newUserMembership(
-			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es},
-			repos.ProjectEvents),
+			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
 		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount, es}),
 		newIDPConfig(

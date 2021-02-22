@@ -5,15 +5,19 @@ import (
 	"encoding/json"
 
 	"github.com/caos/logging"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -118,7 +122,7 @@ func (t *Token) Reduce(event *models.Event) (err error) {
 		return t.view.DeleteApplicationTokens(event, application.AppID)
 	case project_es_model.ProjectDeactivated,
 		project_es_model.ProjectRemoved:
-		project, err := t.ProjectEvents.ProjectByID(context.Background(), event.AggregateID)
+		project, err := t.getProjectByID(context.Background(), event.AggregateID)
 		if err != nil {
 			return err
 		}
@@ -157,4 +161,25 @@ func applicationFromSession(event *models.Event) (*project_es_model.Application,
 
 func (t *Token) OnSuccess() error {
 	return spooler.HandleSuccess(t.view.UpdateTokenSpoolerRunTimestamp)
+}
+
+func (t *Token) getProjectByID(ctx context.Context, projID string) (*proj_model.Project, error) {
+	query, err := proj_view.ProjectByIDQuery(projID, 0)
+	if err != nil {
+		return nil, err
+	}
+	esProject := &project_es_model.Project{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projID,
+		},
+	}
+	err = es_sdk.Filter(ctx, t.Eventstore().FilterEvents, esProject.AppendEvents, query)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if esProject.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Dsdw2", "Errors.Project.NotFound")
+	}
+
+	return project_es_model.ProjectToModel(esProject), nil
 }

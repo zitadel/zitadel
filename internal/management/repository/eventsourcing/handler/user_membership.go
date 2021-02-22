@@ -2,9 +2,14 @@ package handler
 
 import (
 	"context"
+
+	"k8s.io/apimachinery/pkg/api/errors"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	proj_model "github.com/caos/zitadel/internal/project/model"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 
 	"github.com/caos/logging"
 
@@ -15,7 +20,6 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -28,17 +32,14 @@ const (
 
 type UserMembership struct {
 	handler
-	projectEvents *proj_event.ProjectEventstore
-	subscription  *eventstore.Subscription
+	subscription *eventstore.Subscription
 }
 
 func newUserMembership(
 	handler handler,
-	projectEvents *proj_event.ProjectEventstore,
 ) *UserMembership {
 	h := &UserMembership{
-		handler:       handler,
-		projectEvents: projectEvents,
+		handler: handler,
 	}
 
 	h.subscribe()
@@ -219,7 +220,7 @@ func (m *UserMembership) processProject(event *es_models.Event) (err error) {
 }
 
 func (m *UserMembership) fillProjectDisplayName(member *usr_es_model.UserMembershipView) (err error) {
-	project, err := m.projectEvents.ProjectByID(context.Background(), member.AggregateID)
+	project, err := m.getProjectByID(context.Background(), member.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -228,7 +229,7 @@ func (m *UserMembership) fillProjectDisplayName(member *usr_es_model.UserMembers
 }
 
 func (m *UserMembership) updateProjectDisplayName(event *es_models.Event) error {
-	project, err := m.projectEvents.ProjectByID(context.Background(), event.AggregateID)
+	project, err := m.getProjectByID(context.Background(), event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -281,4 +282,25 @@ func (u *UserMembership) getOrgByID(ctx context.Context, orgID string) (*org_mod
 	}
 
 	return org_es_model.OrgToModel(esOrg), nil
+}
+
+func (u *UserMembership) getProjectByID(ctx context.Context, projID string) (*proj_model.Project, error) {
+	query, err := proj_view.ProjectByIDQuery(projID, 0)
+	if err != nil {
+		return nil, err
+	}
+	esProject := &proj_es_model.Project{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: projID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esProject.AppendEvents, query)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if esProject.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Bg32b", "Errors.Project.NotFound")
+	}
+
+	return proj_es_model.ProjectToModel(esProject), nil
 }

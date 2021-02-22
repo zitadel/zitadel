@@ -2,18 +2,17 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_view "github.com/caos/zitadel/internal/user/repository/view"
-	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"k8s.io/apimachinery/pkg/api/errors"
+	"encoding/json"
 	"strings"
 
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
@@ -21,7 +20,11 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
+	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type ProjectRepo struct {
@@ -43,7 +46,7 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 		project = new(model.ProjectView)
 	}
 
-	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
+	events, esErr := repo.getProjectEvents(ctx, id, project.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8yfKu", "Errors.Project.NotFound")
 	}
@@ -178,7 +181,7 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID strin
 }
 
 func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
-	changes, err := repo.ProjectEvents.ProjectChanges(ctx, id, lastSequence, limit, sortAscending)
+	changes, err := repo.getProjectChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +210,7 @@ func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID s
 		app.ID = appID
 	}
 
-	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, projectID, app.Sequence)
+	events, esErr := repo.getProjectEvents(ctx, projectID, app.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Fshu8", "Errors.Application.NotFound")
 	}
@@ -228,10 +231,6 @@ func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID s
 		}
 	}
 	return model.ApplicationViewToModel(app), nil
-}
-
-func (repo *ProjectRepo) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
-	return repo.ProjectEvents.AddApplication(ctx, app)
 }
 
 func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_model.ApplicationSearchRequest) (*proj_model.ApplicationSearchResponse, error) {
@@ -256,7 +255,7 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 }
 
 func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
-	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, id, appId, lastSequence, limit, sortAscending)
+	changes, err := repo.getApplicationChanges(ctx, id, appId, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
@@ -302,7 +301,7 @@ func (repo *ProjectRepo) GetClientKey(ctx context.Context, projectID, applicatio
 		return nil, viewErr
 	}
 
-	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, projectID, key.Sequence)
+	events, esErr := repo.getProjectEvents(ctx, projectID, key.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-SFf2g", "Errors.User.KeyNotFound")
 	}
@@ -323,22 +322,6 @@ func (repo *ProjectRepo) GetClientKey(ctx context.Context, projectID, applicatio
 		}
 	}
 	return key_view_model.AuthNKeyToModel(key), nil
-}
-
-func (repo *ProjectRepo) AddClientKey(ctx context.Context, key *proj_model.ClientKey) (*proj_model.ClientKey, error) {
-	return repo.ProjectEvents.AddClientKey(ctx, key)
-}
-
-func (repo *ProjectRepo) RemoveClientKey(ctx context.Context, projectID, applicationID, keyID string) error {
-	return repo.ProjectEvents.RemoveApplicationKey(ctx, projectID, applicationID, keyID)
-}
-
-func (repo *ProjectRepo) ChangeAPIConfig(ctx context.Context, config *proj_model.APIConfig) (*proj_model.APIConfig, error) {
-	return repo.ProjectEvents.ChangeAPIConfig(ctx, config)
-}
-
-func (repo *ProjectRepo) ChangeAPIConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.APIConfig, error) {
-	return repo.ProjectEvents.ChangeAPIConfigSecret(ctx, projectID, appID)
 }
 
 func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (*proj_model.ProjectGrantView, error) {
@@ -520,4 +503,106 @@ func (r *ProjectRepo) getUserEvents(ctx context.Context, userID string, sequence
 		return nil, err
 	}
 	return r.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *ProjectRepo) getProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
+	query := proj_view.ChangesQuery(id, lastSequence, limit, sortAscending)
+
+	events, err := repo.Eventstore.FilterEvents(context.Background(), query)
+	if err != nil {
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, caos_errs.ThrowInternal(err, "EVENT-328b1", "Errors.Internal")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-FpQqK", "Errors.Changes.NotFound")
+	}
+
+	changes := make([]*proj_model.ProjectChange, len(events))
+
+	for i, event := range events {
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
+		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
+		change := &proj_model.ProjectChange{
+			ChangeDate: creationDate,
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
+		}
+
+		if event.Data != nil {
+			var data interface{}
+			if strings.Contains(change.EventType, "application") {
+				data = new(proj_model.Application)
+			} else {
+				data = new(proj_model.Project)
+			}
+			err = json.Unmarshal(event.Data, data)
+			logging.Log("EVENT-NCkpN").OnError(err).Debug("unable to unmarshal data")
+			change.Data = data
+		}
+
+		changes[i] = change
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
+		}
+	}
+
+	return &proj_model.ProjectChanges{
+		Changes:      changes,
+		LastSequence: lastSequence,
+	}, nil
+}
+
+func (repo *ProjectRepo) getProjectEvents(ctx context.Context, id string, sequence uint64) ([]*models.Event, error) {
+	query, err := proj_view.ProjectByIDQuery(id, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *ProjectRepo) getApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
+	query := proj_view.ChangesQuery(projectID, lastSequence, limit, sortAscending)
+
+	events, err := repo.Eventstore.FilterEvents(ctx, query)
+	if err != nil {
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, caos_errs.ThrowInternal(err, "EVENT-sw6Ku", "Errors.Internal")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-9IHLP", "Errors.Changes.NotFound")
+	}
+
+	result := make([]*proj_model.ApplicationChange, 0)
+	for _, event := range events {
+		if !strings.Contains(event.Type.String(), "application") || event.Data == nil {
+			continue
+		}
+
+		app := new(proj_model.Application)
+		err := json.Unmarshal(event.Data, app)
+		logging.Log("EVENT-GIiKD").OnError(err).Debug("unable to unmarshal data")
+		if app.AppID != appID {
+			continue
+		}
+
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
+		logging.Log("EVENT-MJzeN").OnError(err).Debug("unable to parse timestamp")
+
+		result = append(result, &proj_model.ApplicationChange{
+			ChangeDate: creationDate,
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
+			Data:       app,
+		})
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
+		}
+	}
+
+	return &proj_model.ApplicationChanges{
+		Changes:      result,
+		LastSequence: lastSequence,
+	}, nil
 }

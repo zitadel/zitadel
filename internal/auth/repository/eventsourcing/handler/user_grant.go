@@ -4,6 +4,7 @@ import (
 	"context"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"strings"
@@ -182,7 +183,7 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		project, err := u.projectEvents.ProjectByID(context.Background(), event.AggregateID)
+		project, err := u.getProjectByID(context.Background(), event.AggregateID)
 		if err != nil {
 			return err
 		}
@@ -362,7 +363,7 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 		return err
 	}
 	u.fillUserData(grant, user)
-	project, err := u.projectEvents.ProjectByID(context.Background(), grant.ProjectID)
+	project, err := u.getProjectByID(context.Background(), grant.ProjectID)
 	if err != nil {
 		return err
 	}
@@ -466,4 +467,25 @@ func (u *UserGrant) getOrgByID(ctx context.Context, orgID string) (*org_model.Or
 	}
 
 	return org_es_model.OrgToModel(esOrg), nil
+}
+
+func (u *UserGrant) getProjectByID(ctx context.Context, projID string) (*proj_model.Project, error) {
+	query, err := proj_view.ProjectByIDQuery(projID, 0)
+	if err != nil {
+		return nil, err
+	}
+	esProject := &proj_es_model.Project{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esProject.AppendEvents, query)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if esProject.Sequence == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-DAfng", "Errors.Project.NotFound")
+	}
+
+	return proj_es_model.ProjectToModel(esProject), nil
 }
