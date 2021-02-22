@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/golang/protobuf/ptypes/empty"
@@ -32,13 +33,15 @@ func (s *Server) CreateOIDCApplication(ctx context.Context, in *management.OIDCA
 	}
 	return oidcAppFromDomain(app), nil
 }
+
 func (s *Server) CreateAPIApplication(ctx context.Context, in *management.APIApplicationCreate) (*management.Application, error) {
-	app, err := s.project.AddApplication(ctx, apiAppCreateToModel(in))
+	app, err := s.command.AddAPIApplication(ctx, apiAppCreateToModel(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return appFromModel(app), nil
+	return apiAppFromDomain(app), nil
 }
+
 func (s *Server) UpdateApplication(ctx context.Context, in *management.ApplicationUpdate) (*management.Application, error) {
 	app, err := s.command.ChangeApplication(ctx, in.ProjectId, appUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
@@ -46,10 +49,12 @@ func (s *Server) UpdateApplication(ctx context.Context, in *management.Applicati
 	}
 	return appFromDomain(app), nil
 }
+
 func (s *Server) DeactivateApplication(ctx context.Context, in *management.ApplicationID) (*empty.Empty, error) {
 	err := s.command.DeactivateApplication(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }
+
 func (s *Server) ReactivateApplication(ctx context.Context, in *management.ApplicationID) (*empty.Empty, error) {
 	err := s.command.ReactivateApplication(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
@@ -69,15 +74,15 @@ func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *management
 }
 
 func (s *Server) UpdateApplicationAPIConfig(ctx context.Context, in *management.APIConfigUpdate) (*management.APIConfig, error) {
-	config, err := s.project.ChangeAPIConfig(ctx, apiConfigUpdateToModel(in))
+	config, err := s.command.ChangeAPIApplication(ctx, apiConfigUpdateToDomain(in), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return apiConfigFromModel(config), nil
+	return apiConfigFromDomain(config), nil
 }
 
 func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *management.ApplicationID) (*management.ClientSecret, error) {
-	config, err := s.command.ChangeOIDCApplicationSecret(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).ResourceOwner)
+	config, err := s.command.ChangeOIDCApplicationSecret(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +90,7 @@ func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *management.
 }
 
 func (s *Server) RegenerateAPIClientSecret(ctx context.Context, in *management.ApplicationID) (*management.ClientSecret, error) {
-	config, err := s.project.ChangeAPIConfigSecret(ctx, in.ProjectId, in.Id)
+	config, err := s.command.ChangeAPIApplicationSecret(ctx, in.ProjectId, in.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -117,14 +122,14 @@ func (s *Server) GetClientKey(ctx context.Context, req *management.ClientKeyIDRe
 }
 
 func (s *Server) AddClientKey(ctx context.Context, req *management.AddClientKeyRequest) (*management.AddClientKeyResponse, error) {
-	key, err := s.project.AddClientKey(ctx, addClientKeyToModel(req))
+	key, err := s.command.AddApplicationKey(ctx, addClientKeyToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return addClientKeyFromModel(key), nil
+	return addClientKeyFromDomain(key), nil
 }
 
 func (s *Server) DeleteClientKey(ctx context.Context, req *management.ClientKeyIDRequest) (*empty.Empty, error) {
-	err := s.project.RemoveClientKey(ctx, req.ProjectId, req.ApplicationId, req.KeyId)
+	err := s.command.RemoveApplicationKey(ctx, req.ProjectId, req.ApplicationId, req.KeyId, authz.GetCtxData(ctx).OrgID)
 	return &empty.Empty{}, err
 }

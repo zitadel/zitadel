@@ -35,7 +35,7 @@ type OIDCApplicationWriteModel struct {
 	State                    domain.AppState
 }
 
-func NewOIDCApplicationWriteModelWithAppIDC(projectID, appID, resourceOwner string) *OIDCApplicationWriteModel {
+func NewOIDCApplicationWriteModelWithAppID(projectID, appID, resourceOwner string) *OIDCApplicationWriteModel {
 	return &OIDCApplicationWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   projectID,
@@ -154,9 +154,6 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 }
 
 func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigChangedEvent) {
-	if e.ClientID != nil {
-		wm.ClientID = *e.ClientID
-	}
 	if e.RedirectUris != nil {
 		wm.RedirectUris = *e.RedirectUris
 	}
@@ -218,8 +215,7 @@ func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	appID,
-	clientID string,
+	appID string,
 	redirectURIS,
 	postLogoutRedirectURIs []string,
 	responseTypes []domain.OIDCResponseType,
@@ -237,9 +233,6 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
 
-	if wm.ClientID != clientID {
-		changes = append(changes, project.ChangeClientID(clientID))
-	}
 	if !reflect.DeepEqual(wm.RedirectUris, redirectURIS) {
 		changes = append(changes, project.ChangeRedirectURIs(redirectURIS))
 	}

@@ -40,25 +40,6 @@ func StartProject(conf ProjectConfig, systemDefaults sd.SystemDefaults) (*Projec
 		passwordAlg:   passwordAlg,
 		pwGenerator:   pwGenerator,
 		idGenerator:   id.SonyFlakeGenerator,
-		ClientKeySize: int(systemDefaults.SecretGenerators.ClientKeySize),
+		ClientKeySize: int(systemDefaults.SecretGenerators.ApplicationKeySize),
 	}, nil
 }
-
-//
-//func (es *ProjectEventstore) ProjectByID(ctx context.Context, id string) (*proj_model.Project, error) {
-//	project := es.projectCache.getProject(id)
-//
-//	query, err := ProjectByIDQuery(project.AggregateID, project.Sequence)
-//	if err != nil {
-//		return nil, err
-//	}
-//	err = es_sdk.Filter(ctx, es.FilterEvents, project.AppendEvents, query)
-//	if err != nil && !(caos_errs.IsNotFound(err) && project.Sequence != 0) {
-//		return nil, err
-//	}
-//	if project.State == int32(proj_model.ProjectStateRemoved) {
-//		return nil, caos_errs.ThrowNotFound(nil, "EVENT-dG8ie", "Errors.Project.NotFound")
-//	}
-//	es.projectCache.cacheProject(project)
-//	return model.ProjectToModel(project), nil
-//}

@@ -112,8 +112,6 @@ type OIDCConfigChangedEvent struct {
 
 	Version                  *domain.OIDCVersion         `json:"oidcVersion,omitempty"`
 	AppID                    string                      `json:"appId"`
-	ClientID                 *string                     `json:"clientId,omitempty"`
-	ClientSecret             *crypto.CryptoValue         `json:"clientSecret,omitempty"`
 	RedirectUris             *[]string                   `json:"redirectUris,omitempty"`
 	ResponseTypes            *[]domain.OIDCResponseType  `json:"responseTypes,omitempty"`
 	GrantTypes               *[]domain.OIDCGrantType     `json:"grantTypes,omitempty"`
@@ -165,12 +163,6 @@ type OIDCConfigChanges func(event *OIDCConfigChangedEvent)
 func ChangeVersion(version domain.OIDCVersion) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.Version = &version
-	}
-}
-
-func ChangeClientID(clientID string) func(event *OIDCConfigChangedEvent) {
-	return func(e *OIDCConfigChangedEvent) {
-		e.ClientID = &clientID
 	}
 }
 

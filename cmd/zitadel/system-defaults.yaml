@@ -45,7 +45,7 @@ SystemDefaults:
       IncludeDigits: true
       IncludeSymbols: false
     MachineKeySize: 2048
-    ClientKeySize: 2048
+    ApplicationKeySize: 2048
   Multifactors:
     OTP:
       Issuer: 'ZITADEL'

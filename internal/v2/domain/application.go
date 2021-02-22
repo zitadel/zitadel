@@ -15,6 +15,10 @@ const (
 	AppStateRemoved
 )
 
+func (a AppState) Exists() bool {
+	return !(a == AppStateUnspecified || a == AppStateRemoved)
+}
+
 type ChangeApp struct {
 	AppID   string
 	AppName string

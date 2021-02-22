@@ -9,7 +9,7 @@ import (
 
 const (
 	mfaEventPrefix          = humanEventPrefix + "mfa."
-	HumanMFAInitSkippedType = mfaEventPrefix + "init.skiped"
+	HumanMFAInitSkippedType = mfaEventPrefix + "init.skipped"
 )
 
 type HumanMFAInitSkippedEvent struct {

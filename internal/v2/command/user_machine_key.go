@@ -2,17 +2,11 @@ package command
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
-)
-
-var (
-	//most of us won't survive until 12-31-9999 23:59:59, maybe ZITADEL does
-	defaultExpDate = time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC)
 )
 
 func (r *CommandSide) AddUserMachineKey(ctx context.Context, machineKey *domain.MachineKey, resourceOwner string) (*domain.MachineKey, error) {
@@ -30,15 +24,11 @@ func (r *CommandSide) AddUserMachineKey(ctx context.Context, machineKey *domain.
 		return nil, err
 	}
 
-	if machineKey.ExpirationDate.IsZero() {
-		machineKey.ExpirationDate = defaultExpDate
-	}
-	if machineKey.ExpirationDate.Before(time.Now()) {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-38vns", "Errors.MachineKey.ExpireBeforeNow")
+	if err = domain.EnsureValidExpirationDate(machineKey); err != nil {
+		return nil, err
 	}
 
-	err = machineKey.GenerateNewMachineKeyPair(r.machineKeySize)
-	if err != nil {
+	if err = domain.SetNewAuthNKeyPair(machineKey, r.machineKeySize); err != nil {
 		return nil, err
 	}
 
