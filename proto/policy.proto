@@ -53,6 +53,12 @@ message SecondFactor {
     }
 }
 
+enum SecondFactorType {
+    SECOND_FACTOR_TYPE_UNSPECIFIED = 0;
+    SECOND_FACTOR_TYPE_OTP = 1;
+    SECOND_FACTOR_TYPE_U2F = 2;
+}
+
 enum PasswordlessType {
     PASSWORDLESS_TYPE_NOT_ALLOWED = 0;
     PASSWORDLESS_TYPE_ALLOWED = 1;

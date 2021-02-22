@@ -647,8 +647,8 @@ message SetUpOrgRequest {
     }
     Org org = 1;
     oneof user {
-        Human human = 1;
-        Machine machine = 2;
+        Human human = 2;
+        Machine machine = 3;
     }
 }
 
