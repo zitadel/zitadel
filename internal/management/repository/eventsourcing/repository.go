@@ -32,6 +32,7 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
 	eventstore.IAMRepository
+	view *mgmt_view.View
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -75,11 +76,12 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		IAMRepository: eventstore.IAMRepository{
 			IAMV2Query: iamV2Query,
 		},
+		view: view,
 	}, nil
 }
 
 func (repo *EsRepository) Health() error {
-	return nil
+	return repo.view.Health()
 }
 
 func (repo *EsRepository) IAMByID(ctx context.Context, id string) (*iam_model.IAM, error) {
