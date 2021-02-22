@@ -20,6 +20,22 @@ func OrgQuery(latestSequence uint64) *es_models.SearchQuery {
 		LatestSequenceFilter(latestSequence)
 }
 
+func OrgDomainUniqueQuery(domain string) *es_models.SearchQuery {
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(model.OrgDomainAggregate).
+		AggregateIDFilter(domain).
+		OrderDesc().
+		SetLimit(1)
+}
+
+func OrgNameUniqueQuery(name string) *es_models.SearchQuery {
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(model.OrgNameAggregate).
+		AggregateIDFilter(name).
+		OrderDesc().
+		SetLimit(1)
+}
+
 func ChangesQuery(orgID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
 	query := es_models.NewSearchQuery().
 		AggregateTypeFilter(model.OrgAggregate)

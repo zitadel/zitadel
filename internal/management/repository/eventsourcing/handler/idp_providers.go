@@ -2,6 +2,10 @@ package handler
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/org/repository/view"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -121,7 +125,7 @@ func (m *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 		if event.AggregateID == m.systemDefaults.IamID {
 			config, err = m.iamEvents.GetIDPConfig(context.Background(), event.AggregateID, esConfig.IDPConfigID)
 		} else {
-			config, err = m.orgEvents.GetIDPConfig(context.Background(), event.AggregateID, esConfig.IDPConfigID)
+			config, err = m.getOrgIDPConfig(context.Background(), event.AggregateID, esConfig.IDPConfigID)
 		}
 		if err != nil {
 			return err
@@ -146,7 +150,7 @@ func (m *IDPProvider) fillData(provider *iam_view_model.IDPProviderView) (err er
 	if provider.IDPProviderType == int32(iam_model.IDPProviderTypeSystem) {
 		config, err = m.iamEvents.GetIDPConfig(context.Background(), m.systemDefaults.IamID, provider.IDPConfigID)
 	} else {
-		config, err = m.orgEvents.GetIDPConfig(context.Background(), provider.AggregateID, provider.IDPConfigID)
+		config, err = m.getOrgIDPConfig(context.Background(), provider.AggregateID, provider.IDPConfigID)
 	}
 	if err != nil {
 		return err
@@ -169,4 +173,33 @@ func (m *IDPProvider) OnError(event *es_models.Event, err error) error {
 
 func (m *IDPProvider) OnSuccess() error {
 	return spooler.HandleSuccess(m.view.UpdateIDPProviderSpoolerRunTimestamp)
+}
+
+func (i *IDPProvider) getOrgIDPConfig(ctx context.Context, aggregateID, idpConfigID string) (*iam_model.IDPConfig, error) {
+	existing, err := i.getOrgByID(ctx, aggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, i := existing.GetIDP(idpConfigID); i != nil {
+		return i, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-2m9dS", "Errors.Org.IdpNotExisting")
+}
+
+func (i *IDPProvider) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
+	query, err := view.OrgByIDQuery(orgID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var esOrg *org_es_model.Org
+	err = es_sdk.Filter(ctx, i.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+	if esOrg.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4n9fs", "Errors.Org.NotFound")
+	}
+
+	return org_es_model.OrgToModel(esOrg), nil
 }

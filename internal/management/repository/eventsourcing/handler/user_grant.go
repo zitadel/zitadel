@@ -3,6 +3,9 @@ package handler
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
@@ -189,7 +192,7 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 	}
 	u.fillProjectData(grant, project)
 
-	org, err := u.orgEvents.OrgByID(context.TODO(), org_model.NewOrg(resourceOwner))
+	org, err := u.getOrgByID(context.TODO(), resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -265,4 +268,22 @@ func (u *UserGrant) getUserEvents(userID string, sequence uint64) ([]*models.Eve
 	}
 
 	return u.es.FilterEvents(context.Background(), query)
+}
+
+func (u *UserGrant) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
+	query, err := org_view.OrgByIDQuery(orgID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var esOrg *org_es_model.Org
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+	if esOrg.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-kVLb2", "Errors.Org.NotFound")
+	}
+
+	return org_es_model.OrgToModel(esOrg), nil
 }

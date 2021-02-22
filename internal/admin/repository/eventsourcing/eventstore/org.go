@@ -4,7 +4,9 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 
@@ -75,7 +77,18 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchR
 }
 
 func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
-	return repo.OrgEventstore.IsOrgUnique(ctx, name, domain)
+	var found bool
+	err = es_sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), view.OrgNameUniqueQuery(name))
+	if (err != nil && !errors.IsNotFound(err)) || found {
+		return false, err
+	}
+
+	err = es_sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), view.OrgDomainUniqueQuery(domain))
+	if err != nil && !errors.IsNotFound(err) {
+		return false, err
+	}
+
+	return !found, nil
 }
 
 func (repo *OrgRepo) GetOrgIAMPolicyByID(ctx context.Context, id string) (*iam_model.OrgIAMPolicyView, error) {
@@ -104,4 +117,15 @@ func (repo *OrgRepo) getOrgEvents(ctx context.Context, orgID string, sequence ui
 		return nil, err
 	}
 	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+func isUniqueValidation(unique *bool) func(events ...*models.Event) error {
+	return func(events ...*models.Event) error {
+		if len(events) == 0 {
+			return nil
+		}
+		*unique = *unique || events[0].Type == org_es_model.OrgDomainReserved || events[0].Type == org_es_model.OrgNameReserved
+
+		return nil
+	}
 }

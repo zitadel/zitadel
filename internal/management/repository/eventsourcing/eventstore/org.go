@@ -212,7 +212,7 @@ func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.Login
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.LoginPolicyView)
 	}
-	events, esErr := repo.OrgEventstore.OrgEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return repo.GetDefaultLoginPolicy(ctx)
 	}
@@ -323,7 +323,7 @@ func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*ia
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordComplexityPolicyView)
 	}
-	events, esErr := repo.OrgEventstore.OrgEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return repo.GetDefaultPasswordComplexityPolicy(ctx)
 	}
@@ -374,7 +374,7 @@ func (repo *OrgRepository) GetPasswordAgePolicy(ctx context.Context) (*iam_model
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordAgePolicyView)
 	}
-	events, esErr := repo.OrgEventstore.OrgEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return repo.GetDefaultPasswordAgePolicy(ctx)
 	}
@@ -425,7 +425,7 @@ func (repo *OrgRepository) GetPasswordLockoutPolicy(ctx context.Context) (*iam_m
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordLockoutPolicyView)
 	}
-	events, esErr := repo.OrgEventstore.OrgEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return repo.GetDefaultPasswordLockoutPolicy(ctx)
 	}
@@ -594,4 +594,12 @@ func (r *OrgRepository) getUserEvents(ctx context.Context, userID string, sequen
 	}
 
 	return r.Eventstore.FilterEvents(ctx, query)
+}
+
+func (es *OrgRepository) getOrgEvents(ctx context.Context, id string, sequence uint64) ([]*models.Event, error) {
+	query, err := org_view.OrgByIDQuery(id, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return es.FilterEvents(ctx, query)
 }

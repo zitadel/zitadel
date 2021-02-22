@@ -2,6 +2,10 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/errors"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/org/repository/view"
 
 	"github.com/caos/logging"
 
@@ -97,11 +101,11 @@ func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 		}
 		grantedProject.Name = project.Name
 
-		org, err := p.orgEvents.OrgByID(context.TODO(), org_model.NewOrg(grantedProject.OrgID))
+		org, err := p.getOrgByID(context.TODO(), grantedProject.OrgID)
 		if err != nil {
 			return err
 		}
-		resourceOwner, err := p.orgEvents.OrgByID(context.TODO(), org_model.NewOrg(grantedProject.ResourceOwner))
+		resourceOwner, err := p.getOrgByID(context.TODO(), grantedProject.ResourceOwner)
 		if err != nil {
 			return err
 		}
@@ -166,4 +170,22 @@ func (p *ProjectGrant) OnError(event *models.Event, err error) error {
 
 func (p *ProjectGrant) OnSuccess() error {
 	return spooler.HandleSuccess(p.view.UpdateProjectGrantSpoolerRunTimestamp)
+}
+
+func (u *ProjectGrant) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
+	query, err := view.OrgByIDQuery(orgID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var esOrg *org_es_model.Org
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if esOrg.Sequence == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
+	}
+
+	return org_es_model.OrgToModel(esOrg), nil
 }

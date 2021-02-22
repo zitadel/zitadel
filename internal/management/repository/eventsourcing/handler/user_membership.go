@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
 
 	"github.com/caos/logging"
 
@@ -155,7 +158,7 @@ func (m *UserMembership) processOrg(event *es_models.Event) (err error) {
 }
 
 func (m *UserMembership) fillOrgDisplayName(member *usr_es_model.UserMembershipView) (err error) {
-	org, err := m.orgEvents.OrgByID(context.Background(), org_model.NewOrg(member.AggregateID))
+	org, err := m.getOrgByID(context.Background(), member.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -164,7 +167,7 @@ func (m *UserMembership) fillOrgDisplayName(member *usr_es_model.UserMembershipV
 }
 
 func (m *UserMembership) updateOrgDisplayName(event *es_models.Event) error {
-	org, err := m.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.AggregateID))
+	org, err := m.getOrgByID(context.Background(), event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -260,4 +263,22 @@ func (m *UserMembership) OnError(event *es_models.Event, err error) error {
 
 func (m *UserMembership) OnSuccess() error {
 	return spooler.HandleSuccess(m.view.UpdateUserMembershipSpoolerRunTimestamp)
+}
+
+func (u *UserMembership) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
+	query, err := org_view.OrgByIDQuery(orgID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var esOrg *org_es_model.Org
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+	if esOrg.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-kVLb2", "Errors.Org.NotFound")
+	}
+
+	return org_es_model.OrgToModel(esOrg), nil
 }

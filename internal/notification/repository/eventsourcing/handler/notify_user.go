@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -157,7 +160,7 @@ func (u *NotifyUser) ProcessOrg(event *es_models.Event) (err error) {
 }
 
 func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
+	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -183,7 +186,7 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 }
 
 func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
+	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -212,7 +215,7 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) e
 }
 
 func (u *NotifyUser) fillLoginNames(user *view_model.NotifyUser) (err error) {
-	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(user.ResourceOwner))
+	org, err := u.getOrgByID(context.Background(), user.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -235,4 +238,22 @@ func (p *NotifyUser) OnError(event *es_models.Event, err error) error {
 
 func (u *NotifyUser) OnSuccess() error {
 	return spooler.HandleSuccess(u.view.UpdateNotifyUserSpoolerRunTimestamp)
+}
+
+func (u *NotifyUser) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
+	query, err := org_view.OrgByIDQuery(orgID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var esOrg *org_es_model.Org
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+	if esOrg.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-kVLb2", "Errors.Org.NotFound")
+	}
+
+	return org_es_model.OrgToModel(esOrg), nil
 }

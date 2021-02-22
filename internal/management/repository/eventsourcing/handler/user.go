@@ -2,17 +2,19 @@ package handler
 
 import (
 	"context"
-
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/org/repository/view"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -180,7 +182,7 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 }
 
 func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
-	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
+	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -202,7 +204,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 }
 
 func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
-	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
+	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -227,7 +229,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
-	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(user.ResourceOwner))
+	org, err := u.getOrgByID(context.Background(), user.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -250,4 +252,22 @@ func (u *User) OnError(event *models.Event, err error) error {
 
 func (u *User) OnSuccess() error {
 	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp)
+}
+
+func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
+	query, err := view.OrgByIDQuery(orgID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var esOrg *org_es_model.Org
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+	if esOrg.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-kVLb2", "Errors.Org.NotFound")
+	}
+
+	return org_es_model.OrgToModel(esOrg), nil
 }

@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/errors"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/org/repository/view"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -156,7 +159,7 @@ func (m *UserMembership) processOrg(event *models.Event) (err error) {
 }
 
 func (m *UserMembership) fillOrgName(member *usr_es_model.UserMembershipView) (err error) {
-	org, err := m.orgEvents.OrgByID(context.Background(), org_model.NewOrg(member.ResourceOwner))
+	org, err := m.getOrgByID(context.Background(), member.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -168,7 +171,7 @@ func (m *UserMembership) fillOrgName(member *usr_es_model.UserMembershipView) (e
 }
 
 func (m *UserMembership) updateOrgName(event *models.Event) error {
-	org, err := m.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.AggregateID))
+	org, err := m.getOrgByID(context.Background(), event.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -271,4 +274,22 @@ func (m *UserMembership) OnError(event *models.Event, err error) error {
 
 func (m *UserMembership) OnSuccess() error {
 	return spooler.HandleSuccess(m.view.UpdateUserMembershipSpoolerRunTimestamp)
+}
+
+func (u *UserMembership) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
+	query, err := view.OrgByIDQuery(orgID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var esOrg *org_es_model.Org
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if esOrg.Sequence == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
+	}
+
+	return org_es_model.OrgToModel(esOrg), nil
 }

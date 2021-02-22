@@ -2,9 +2,12 @@ package handler
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/org/repository/view"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/logging"
 
@@ -184,7 +187,7 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 }
 
 func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
-	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
+	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -206,7 +209,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 }
 
 func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
-	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
+	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -231,7 +234,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
-	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(user.ResourceOwner))
+	org, err := u.getOrgByID(context.Background(), user.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -242,6 +245,7 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 			return err
 		}
 	}
+
 	user.SetLoginNames(policy, org.Domains)
 	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
 	return nil
@@ -254,4 +258,22 @@ func (u *User) OnError(event *models.Event, err error) error {
 
 func (u *User) OnSuccess() error {
 	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp)
+}
+
+func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
+	query, err := view.OrgByIDQuery(orgID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var esOrg *org_es_model.Org
+	err = es_sdk.Filter(ctx, u.eventstore.FilterEvents, esOrg.AppendEvents, query)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if esOrg.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-kVLb2", "Errors.Org.NotFound")
+	}
+
+	return org_es_model.OrgToModel(esOrg), nil
 }
