@@ -66,6 +66,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
     }
 
     public scrollHandler(e: any): void {
+        console.log('bottom');
         if (e === 'bottom') {
             this.more();
         }
@@ -120,12 +121,10 @@ export class ChangesComponent implements OnInit, OnDestroy {
     // Determines the snapshot to paginate query
     private getCursor(): number {
         const current = this._data.value;
-        console.log(current);
 
         if (current.length) {
             const lastElementValues = current[current.length - 1].values;
             const seq = lastElementValues[lastElementValues.length - 1].sequences;
-            console.log(seq);
             return seq[seq.length - 1];
         }
         return 0;
@@ -169,13 +168,14 @@ export class ChangesComponent implements OnInit, OnDestroy {
         const splitted: { [editorId: string]: any[]; } = {};
         changes.forEach((change) => {
             if (change.changeDate) {
-                const index = this.getDateString(change.changeDate);//change.changeDate?.seconds;//this.getDateString(change.changeDate);
+                const index = `${this.getDateString(change.changeDate)}`;//`${this.getDateString(change.changeDate)}:${change.editorId}`;
 
                 if (index) {
                     if (splitted[index]) {
                         const userData: any = {
                             editor: change.editor,
                             editorId: change.editorId,
+                            editorName: change.editor,
 
                             dates: [change.changeDate],
                             data: [change.data],
@@ -194,8 +194,10 @@ export class ChangesComponent implements OnInit, OnDestroy {
                     } else {
                         splitted[index] = [
                             {
-                                editorName: change.editor,
+                                editor: change.editor,
                                 editorId: change.editorId,
+                                editorName: change.editor,
+
                                 dates: [change.changeDate],
                                 data: [change.data],
                                 eventTypes: [change.eventType],
@@ -214,6 +216,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
             return parseFloat(b.key) - parseFloat(a.key);
         });
 
+        // console.log(arr);
         return arr;
     }
 
