@@ -833,7 +833,7 @@ message ListDefaultLoginPolicyIDPsRequest {
 
 message ListDefaultLoginPolicyIDPsResponse {
     zitadel.v1.Search meta_data = 1;
-    repeated zitadel.idp.v1.IDPLink result = 2;
+    repeated zitadel.idp.v1.IDPUserLink result = 2;
 }
 
 message AddIDPToDefaultLoginPolicyRequest {

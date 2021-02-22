@@ -15,13 +15,19 @@ message IDP {
 }
 
 //TODO: discuss
-message IDPLink {
+message IDPUserLink {
     string user_id = 1;
     string idp_id = 2;
     string idp_name = 3;
     string linked_user_id = 4;
     string linked_user_name = 5;
     IDPType idp_type = 6;
+}
+
+message IDPLoginPolicyLink {
+    string idp_id = 1;
+    string idp_name = 2;
+    IDPType idp_type = 3;
 }
 
 enum IDPState {

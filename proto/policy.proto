@@ -4,8 +4,6 @@ package zitadel.policy.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
 
-
-
 message OrgIAMPolicy {
     bool user_login_must_be_domain = 1; //TODO: could be name_must_be_domain
     bool is_default = 2;

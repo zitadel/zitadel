@@ -1020,20 +1020,308 @@ service ManagementService {
         };
     }
 
+    rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/me/policies/login"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
 
+    rpc GetDefaultLoginPolicy(GetDefaultLoginPolicyRequest) returns (GetDefaultLoginPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/default/policies/login"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
 
+    rpc CreateCustomLoginPolicy(CreateCustomLoginPolicyRequest) returns (CreateCustomLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/policies/login"
+            body: "*"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
 
+    rpc UpdateCustomLoginPolicy(UpdateCustomLoginPolicyRequest) returns (UpdateCustomLoginPolicyResponse) {
+        option (google.api.http) = {
+            put: "/orgs/me/policies/login"
+            body: "*"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
 
+    rpc ResetLoginPolicyToDefault(ResetLoginPolicyToDefaultRequest) returns (ResetLoginPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me/policies/login"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
 
+    rpc ListLoginPolicyIDPs(ListLoginPolicyIDPsRequest) returns (ListLoginPolicyIDPsResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/policies/login/idpproviders/_search"
+            body: "*"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
 
+    rpc AddIDPToLoginPolicy(AddIDPToLoginPolicyRequest) returns (AddIDPToLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/policies/login/idpproviders"
+            body: "*"
+        };
 
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
 
+    rpc RemoveIDPFromLoginPolicy(RemoveIDPFromLoginPolicyRequest) returns (RemoveIDPFromLoginPolicyResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    rpc ListLoginPolicySecondFactors(ListLoginPolicySecondFactorsRequest) returns (ListLoginPolicySecondFactorsResponse) {
+        option (google.api.http) = {
+            get: "/orgs/me/policies/login/secondfactors/_search"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    rpc AddSecondFactorToLoginPolicy(AddSecondFactorToLoginPolicyRequest) returns (AddSecondFactorToLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/policies/login/secondfactors"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    rpc RemoveSecondFactorFromLoginPolicy(RemoveSecondFactorFromLoginPolicyRequest) returns (RemoveSecondFactorFromLoginPolicyResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me/policies/login/secondfactors/{second_factor}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResult) {
+        option (google.api.http) = {
+            get: "/orgs/me/policies/login/multifactors/_search"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    //TODO: mfa or multi factor?
+    rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/policies/login/multifactors"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me/policies/login/multifactors/{multi_factor}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    rpc GetPasswordComplexityPolicy(GetPasswordComplexityPolicyRequest) returns (GetPasswordComplexityPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/me/policies/complexity"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+    
+    rpc GetDefaultPasswordComplexityPolicy(GetDefaultPasswordComplexityPolicyRequest) returns (GetDefaultPasswordComplexityPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/default/policies/complexity"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+    
+    rpc CreateCustomPasswordComplexityPolicy(CreateCustomPasswordComplexityPolicyRequest) returns (CreateCustomPasswordComplexityPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/policies/complexity"
+            body: "*"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+    
+    rpc UpdateCustomPasswordComplexityPolicy(UpdateCustomPasswordComplexityPolicyRequest) returns (UpdateCustomPasswordComplexityPolicyResponse) {
+        option (google.api.http) = {
+            put: "/orgs/me/policies/complexity"
+            body: "*"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+    
+    rpc ResetPasswordComplexityPolicyToDefault(ResetPasswordComplexityPolicyToDefaultRequest) returns (ResetPasswordComplexityPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me/policies/complexity"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
+
+    rpc GetPasswordAgePolicy(GetPasswordAgePolicyRequest) returns (GetPasswordAgePolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/me/policies/age"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+    
+    rpc GetDefaultPasswordAgePolicy(GetDefaultPasswordAgePolicyRequest) returns (GetDefaultPasswordAgePolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/default/policies/age"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+    
+    rpc CreateCustomPasswordAgePolicy(CreateCustomPasswordAgePolicyRequest) returns (CreateCustomPasswordAgePolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/policies/age"
+            body: "*"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+    
+    rpc UpdateCustomPasswordAgePolicy(UpdateCustomPasswordAgePolicyRequest) returns (UpdateCustomPasswordAgePolicyResponse) {
+        option (google.api.http) = {
+            put: "/orgs/me/policies/age"
+            body: "*"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+    
+    rpc ResetPasswordAgePolicyToDefault(ResetPasswordAgePolicyToDefaultRequest) returns (ResetPasswordAgePolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me/policies/age"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
+
+    rpc GetPasswordLockoutPolicy(GetPasswordLockoutPolicyRequest) returns (GetPasswordLockoutPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/me/policies/lockout"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+    
+    rpc GetDefaultPasswordLockoutPolicy(GetDefaultPasswordLockoutPolicyRequest) returns (GetDefaultPasswordLockoutPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/default/policies/lockout"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+    
+    rpc CreateCustomPasswordLockoutPolicy(CreateCustomPasswordLockoutPolicyRequest) returns (CreateCustomPasswordLockoutPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/policies/lockout"
+            body: "*"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+    
+    rpc UpdateCustomPasswordLockoutPolicy(UpdateCustomPasswordLockoutPolicyRequest) returns (UpdateCustomPasswordLockoutPolicyResponse) {
+        option (google.api.http) = {
+            put: "/orgs/me/policies/lockout"
+            body: "*"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+    
+    rpc ResetPasswordLockoutPolicyToDefault(ResetPasswordLockoutPolicyToDefaultRequest) returns (ResetPasswordLockoutPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me/policies/lockout"
+        };
+    
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
 
 //TODO: ...OrgIDP... or is comment enough?
     rpc GetOrgIDPByID(GetOrgIDPByIDRequest) returns (GetOrgIDPByIDResponse) {
@@ -1474,12 +1762,6 @@ message ListUserMembershipsResponse {
     repeated zitadel.user.v1.Membership result = 2;
 }
 
-
-
-
-
-
-
 message GetMyOrgRequest {}
 
 message GetMyOrgResponse {
@@ -1617,9 +1899,6 @@ message RemoveOrgMemberRequest {
 message RemoveOrgMemberResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
-
-
-
 
 message GetProjectByIDRequest {
     string project_id = 1;
@@ -1793,6 +2072,7 @@ message UpdateProjectMemberRequest {
     string user_id = 2 [(validate.rules).string = {min_len: 1}];
     repeated string roles = 3;
 }
+
 message UpdateProjectMemberResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
@@ -1998,11 +2278,243 @@ message RemoveAPIClientKeyResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
 
+message GetLoginPolicyRequest {}
 
+message GetLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.LoginPolicy policy = 2;
+    bool is_default = 3;
+}
 
+message GetDefaultLoginPolicyRequest {}
 
+message GetDefaultLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.LoginPolicy policy = 2;
+}
 
+message CreateCustomLoginPolicyRequest {
+    bool allow_username_password = 1;
+    bool allow_register = 2;
+    bool allow_external_idp = 3;
+    bool force_mfa = 4;
+    PasswordlessType passwordless_type = 5;
+}
 
+message CreateCustomLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UpdateCustomLoginPolicyRequest {
+    bool allow_username_password = 1;
+    bool allow_register = 2;
+    bool allow_external_idp = 3;
+    bool force_mfa = 4;
+    PasswordlessType passwordless_type = 5;
+}
+
+message UpdateCustomLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ResetLoginPolicyToDefaultRequest {}
+
+message ResetLoginPolicyToDefaultResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ListLoginPolicyIDPsRequest {
+    zitadel.v1.Search meta_data = 1;
+}
+
+message ListLoginPolicyIDPsResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.idp.v1.IDPLoginPolicyLink result = 2;
+}
+
+message AddIDPToLoginPolicyRequest {
+    string idp_id = 1;
+    //TODO: do we need IdpProviderType?
+}
+message AddIDPToLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    //TODO: do we need IdpProviderType?
+}
+
+message RemoveIDPFromLoginPolicyRequest {
+    string idp_id = 1;
+}
+
+message RemoveIDPFromLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ListLoginPolicySecondFactorsRequest {}
+
+message ListLoginPolicySecondFactorsResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.user.v1.SecondFactor result = 2;
+}
+
+message AddSecondFactorToLoginPolicyRequest {
+    zitadel.user.v1.SecondFactor second_factor = 1;
+}
+message AddSecondFactorToLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveSecondFactorFromLoginPolicyRequest {
+    zitadel.user.v1.SecondFactor second_factor = 1;
+}
+
+message RemoveSecondFactorFromLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ListLoginPolicyMultiFactorsRequest {}
+
+message ListLoginPolicyMultiFactorsResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.user.v1.MultiFactor result = 2;
+}
+
+message AddMultiFactorToLoginPolicyRequest {
+    zitadel.user.v1.MultiFactor multi_factor = 1;
+}
+message AddMultiFactorToLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveMultiFactorFromLoginPolicyRequest {
+    zitadel.user.v1.MultiFactor multi_factor = 1;
+}
+
+message RemoveMultiFactorFromLoginPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message GetPasswordComplexityPolicyRequest {}
+
+message GetPasswordComplexityPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.PasswordComplexityPolicy policy = 2;
+    bool is_default = 3;
+}
+
+message GetDefaultPasswordComplexityPolicyRequest {}
+
+message GetDefaultPasswordComplexityPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.PasswordComplexityPolicy policy = 2;
+}
+
+message CreateCustomPasswordComplexityPolicyRequest {
+    uint64 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
+}
+
+message CreateCustomPasswordComplexityPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UpdateCustomPasswordComplexityPolicyRequest {
+    uint64 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
+}
+
+message UpdateCustomPasswordComplexityPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ResetPasswordComplexityPolicyToDefaultRequest {}
+
+message ResetPasswordComplexityPolicyToDefaultResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message GetPasswordAgePolicyRequest {}
+
+message GetPasswordAgePolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.PasswordAgePolicy policy = 2;
+    bool is_default = 3;
+}
+
+message GetDefaultPasswordAgePolicyRequest {}
+
+message GetDefaultPasswordAgePolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.PasswordAgePolicy policy = 2;
+}
+
+message CreateCustomPasswordAgePolicyRequest {
+    uint64 max_age_days = 1;
+    uint64 expire_warn_days = 2;
+}
+
+message CreateCustomPasswordAgePolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UpdateCustomPasswordAgePolicyRequest {
+    uint64 max_age_days = 1;
+    uint64 expire_warn_days = 2;
+}
+
+message UpdateCustomPasswordAgePolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ResetPasswordAgePolicyToDefaultRequest {}
+
+message ResetPasswordAgePolicyToDefaultResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message GetPasswordLockoutPolicyRequest {}
+
+message GetPasswordLockoutPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.PasswordLockoutPolicy policy = 2;
+    bool is_default = 3;
+}
+
+message GetDefaultPasswordLockoutPolicyRequest {}
+
+message GetDefaultPasswordLockoutPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+    zitadel.policy.v1.PasswordLockoutPolicy policy = 2;
+}
+
+message CreateCustomPasswordLockoutPolicyRequest {
+    uint64 max_attempts = 1;
+    bool show_lockout_failure = 2;
+}
+
+message CreateCustomPasswordLockoutPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UpdateCustomPasswordLockoutPolicyRequest {
+    uint64 max_attempts = 1;
+    bool show_lockout_failure = 2;
+}
+
+message UpdateCustomPasswordLockoutPolicyResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ResetPasswordLockoutPolicyToDefaultRequest {}
+
+message ResetPasswordLockoutPolicyToDefaultResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
 
 message GetOrgIDPByIDRequest {
     string id = 1;
