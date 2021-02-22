@@ -51,6 +51,9 @@ COPY --from=base /usr/local/bin /usr/local/bin/.
 COPY build/console build/console/
 RUN build/console/generate-grpc.sh
 
+FROM scratch as npm-copy
+COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
+
 FROM npm-base as prod-angular-build
 RUN npm run prodbuild
 
@@ -72,6 +75,10 @@ FROM go-dep as go-base
 COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
 RUN build/zitadel/generate-grpc.sh
+
+FROM scratch as go-copy
+COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ ./pkg/
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
 
 # ## Go test
 # FROM go-base as go-test

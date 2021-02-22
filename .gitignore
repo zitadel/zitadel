@@ -51,4 +51,5 @@ pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
 pkg/grpc/*/mock/*.mock.go
 **.pb.go
+**.pb.authoptions.go
 **.gen.go 
