@@ -9,6 +9,8 @@ import {
     AddMachineKeyResponse,
     AddOrgDomainRequest,
     AddOrgMemberRequest,
+    APIApplicationCreate,
+    APIAuthMethodType,
     Application,
     ApplicationID,
     ApplicationSearchQuery,
@@ -1353,6 +1355,15 @@ export class ManagementService {
         req.setPostLogoutRedirectUrisList(app.postLogoutRedirectUrisList);
 
         return this.grpcService.mgmt.createOIDCApplication(req);
+    }
+
+    public CreateAPIApplication(app: APIApplicationCreate.AsObject): Promise<Application> {
+        const req = new APIApplicationCreate();
+        req.setProjectId(app.projectId);
+        req.setName(app.name);
+        req.setAuthMethodType(app.authMethodType);
+
+        return this.grpcService.mgmt.createAPIApplication(req);
     }
 
     public UpdateApplication(projectId: string, appId: string, name: string): Promise<Application> {

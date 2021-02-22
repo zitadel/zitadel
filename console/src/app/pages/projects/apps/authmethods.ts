@@ -3,8 +3,8 @@ import { OIDCAuthMethodType, OIDCConfig, OIDCGrantType, OIDCResponseType } from 
 
 export const CODE_METHOD: RadioItemAuthType = {
     key: 'CODE',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CODE.DESCRIPTION',
+    titleI18nKey: 'APP.AUTHMETHODS.CODE.TITLE',
+    descI18nKey: 'APP.AUTHMETHODS.CODE.DESCRIPTION',
     disabled: false,
     prefix: 'CODE',
     background: 'rgb(89 115 128)',
@@ -15,8 +15,8 @@ export const CODE_METHOD: RadioItemAuthType = {
 };
 export const PKCE_METHOD: RadioItemAuthType = {
     key: 'PKCE',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.PKCE.DESCRIPTION',
+    titleI18nKey: 'APP.AUTHMETHODS.PKCE.TITLE',
+    descI18nKey: 'APP.AUTHMETHODS.PKCE.DESCRIPTION',
     disabled: false,
     prefix: 'PKCE',
     background: 'rgb(80 110 92)',
@@ -27,8 +27,8 @@ export const PKCE_METHOD: RadioItemAuthType = {
 };
 export const POST_METHOD: RadioItemAuthType = {
     key: 'POST',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.POST.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.POST.DESCRIPTION',
+    titleI18nKey: 'APP.AUTHMETHODS.POST.TITLE',
+    descI18nKey: 'APP.AUTHMETHODS.POST.DESCRIPTION',
     disabled: false,
     prefix: 'POST',
     background: '#595d80',
@@ -39,19 +39,32 @@ export const POST_METHOD: RadioItemAuthType = {
 };
 export const PK_JWT_METHOD: RadioItemAuthType = {
     key: 'PK_JWT',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.ALTERNATIVE.DESCRIPTION',
+    titleI18nKey: 'APP.AUTHMETHODS.PK_JWT.TITLE',
+    descI18nKey: 'APP.AUTHMETHODS.PK_JWT.DESCRIPTION',
     disabled: false,
-    prefix: 'PK_JWT',
-    background: '#6a506e',
+    prefix: 'JWT',
+    background: 'rgb(80 110 92)',
+    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+    recommended: true,
+};
+export const BASIC_AUTH_METHOD: RadioItemAuthType = {
+    key: 'BASIC',
+    titleI18nKey: 'APP.AUTHMETHODS.BASIC.TITLE',
+    descI18nKey: 'APP.AUTHMETHODS.BASIC.DESCRIPTION',
+    disabled: false,
+    prefix: 'BASIC',
+    background: 'rgb(144 75 75)',
     responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
     grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
     authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
 };
+
 export const IMPLICIT_METHOD: RadioItemAuthType = {
     key: 'IMPLICIT',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.IMPLICIT.DESCRIPTION',
+    titleI18nKey: 'APP.AUTHMETHODS.IMPLICIT.TITLE',
+    descI18nKey: 'APP.AUTHMETHODS.IMPLICIT.DESCRIPTION',
     disabled: false,
     prefix: 'IMP',
     background: 'rgb(144 75 75)',
@@ -60,10 +73,11 @@ export const IMPLICIT_METHOD: RadioItemAuthType = {
     authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
     notRecommended: true,
 };
+
 export const CUSTOM_METHOD: RadioItemAuthType = {
     key: 'CUSTOM',
-    titleI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CUSTOM.TITLE',
-    descI18nKey: 'APP.OIDC.SELECTION.AUTHMETHOD.CUSTOM.DESCRIPTION',
+    titleI18nKey: 'APP.AUTHMETHODS.CUSTOM.TITLE',
+    descI18nKey: 'APP.AUTHMETHODS.CUSTOM.DESCRIPTION',
     disabled: false,
     prefix: 'CUSTOM',
     background: '#333',
