@@ -2,9 +2,12 @@ package eventstore
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	"github.com/caos/logging"
@@ -13,15 +16,11 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type OrgRepo struct {
-	Eventstore     eventstore.Eventstore
-	OrgEventstore  *org_es.OrgEventstore
-	UserEventstore *usr_es.UserEventstore
+	Eventstore eventstore.Eventstore
 
 	View *admin_view.View
 
@@ -29,8 +28,29 @@ type OrgRepo struct {
 	SystemDefaults systemdefaults.SystemDefaults
 }
 
-func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
-	return repo.OrgEventstore.OrgByID(ctx, org_model.NewOrg(id))
+func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
+	org, viewErr := repo.View.OrgByID(id)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if errors.IsNotFound(viewErr) {
+		org = new(model.OrgView)
+	}
+	events, esErr := repo.getOrgEvents(ctx, id, org.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.Org.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
+		return model.OrgToModel(org), nil
+	}
+	orgCopy := *org
+	for _, event := range events {
+		if err := orgCopy.AppendEvent(event); err != nil {
+			return model.OrgToModel(&orgCopy), nil
+		}
+	}
+	return model.OrgToModel(&orgCopy), nil
 }
 
 func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error) {
@@ -55,7 +75,18 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchR
 }
 
 func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
-	return repo.OrgEventstore.IsOrgUnique(ctx, name, domain)
+	var found bool
+	err = es_sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), view.OrgNameUniqueQuery(name))
+	if (err != nil && !errors.IsNotFound(err)) || found {
+		return false, err
+	}
+
+	err = es_sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), view.OrgDomainUniqueQuery(domain))
+	if err != nil && !errors.IsNotFound(err) {
+		return false, err
+	}
+
+	return !found, nil
 }
 
 func (repo *OrgRepo) GetOrgIAMPolicyByID(ctx context.Context, id string) (*iam_model.OrgIAMPolicyView, error) {
@@ -76,4 +107,23 @@ func (repo *OrgRepo) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.Org
 	}
 	policy.Default = true
 	return iam_es_model.OrgIAMViewToModel(policy), err
+}
+
+func (repo *OrgRepo) getOrgEvents(ctx context.Context, orgID string, sequence uint64) ([]*models.Event, error) {
+	query, err := view.OrgByIDQuery(orgID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+func isUniqueValidation(unique *bool) func(events ...*models.Event) error {
+	return func(events ...*models.Event) error {
+		if len(events) == 0 {
+			return nil
+		}
+		*unique = *unique || events[0].Type == org_es_model.OrgDomainReserved || events[0].Type == org_es_model.OrgNameReserved
+
+		return nil
+	}
 }

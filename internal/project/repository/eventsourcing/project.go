@@ -10,20 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 
-func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
-	if id == "" {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "Errors.Project.ProjectIDMissing")
-	}
-	return ProjectQuery(latestSequence).
-		AggregateIDFilter(id), nil
-}
-
-func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.ProjectAggregate).
-		LatestSequenceFilter(latestSequence)
-}
-
 func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, project *model.Project) (*es_models.Aggregate, error) {
 	if project == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-doe93", "Errors.Internal")

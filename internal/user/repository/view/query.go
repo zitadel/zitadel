@@ -1,7 +1,6 @@
-package eventsourcing
+package view
 
 import (
-	"context"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -21,9 +20,15 @@ func UserQuery(latestSequence uint64) *es_models.SearchQuery {
 		LatestSequenceFilter(latestSequence)
 }
 
-func UserAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User) (*es_models.Aggregate, error) {
-	if user == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "Errors.Internal")
+func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
+	query := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.UserAggregate)
+	if !sortAscending {
+		query.OrderDesc()
 	}
-	return aggCreator.NewAggregate(ctx, user.AggregateID, model.UserAggregate, model.UserVersion, user.Sequence)
+
+	query.LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(userID).
+		SetLimit(limit)
+	return query
 }

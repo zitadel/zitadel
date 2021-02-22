@@ -108,6 +108,27 @@ type UserSearchResponse struct {
 	Timestamp   time.Time
 }
 
+type UserState int32
+
+const (
+	UserStateUnspecified UserState = iota
+	UserStateActive
+	UserStateInactive
+	UserStateDeleted
+	UserStateLocked
+	UserStateSuspend
+	UserStateInitial
+)
+
+type Gender int32
+
+const (
+	GenderUnspecified Gender = iota
+	GenderFemale
+	GenderMale
+	GenderDiverse
+)
+
 func (r *UserSearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {
 		r.Limit = limit

@@ -7,9 +7,8 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	proj_events "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
@@ -19,17 +18,14 @@ const (
 
 type ProjectRole struct {
 	handler
-	projectEvents *proj_event.ProjectEventstore
-	subscription  *eventstore.Subscription
+	subscription *eventstore.Subscription
 }
 
 func newProjectRole(
 	handler handler,
-	projectEvents *proj_events.ProjectEventstore,
 ) *ProjectRole {
 	h := &ProjectRole{
-		handler:       handler,
-		projectEvents: projectEvents,
+		handler: handler,
 	}
 
 	h.subscribe()
@@ -67,7 +63,7 @@ func (p *ProjectRole) EventQuery() (*es_models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return proj_events.ProjectQuery(sequence.CurrentSequence), nil
+	return proj_view.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectRole) Reduce(event *es_models.Event) (err error) {

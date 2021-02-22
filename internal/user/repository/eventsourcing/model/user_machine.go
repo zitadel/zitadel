@@ -5,12 +5,9 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	key_model "github.com/caos/zitadel/internal/key/model"
-	"github.com/caos/zitadel/internal/user/model"
 )
 
 type Machine struct {
@@ -46,28 +43,6 @@ func (sa *Machine) setData(event *models.Event) error {
 	return nil
 }
 
-func (sa *Machine) Changes(updatedAccount *Machine) map[string]interface{} {
-	changes := make(map[string]interface{})
-	if updatedAccount.Description != "" && updatedAccount.Description != sa.Description {
-		changes["description"] = updatedAccount.Description
-	}
-	return changes
-}
-
-func MachineFromModel(machine *model.Machine) *Machine {
-	return &Machine{
-		Description: machine.Description,
-		Name:        machine.Name,
-	}
-}
-
-func MachineToModel(machine *Machine) *model.Machine {
-	return &model.Machine{
-		Description: machine.Description,
-		Name:        machine.Name,
-	}
-}
-
 type MachineKey struct {
 	es_models.ObjectRoot `json:"-"`
 	KeyID                string    `json:"keyId,omitempty"`
@@ -99,36 +74,4 @@ func (key *MachineKey) AppendEvent(event *es_models.Event) (err error) {
 		key.ExpirationDate = event.CreationDate
 	}
 	return err
-}
-
-func MachineKeyFromModel(machine *model.MachineKey) *MachineKey {
-	return &MachineKey{
-		ObjectRoot:     machine.ObjectRoot,
-		ExpirationDate: machine.ExpirationDate,
-		KeyID:          machine.KeyID,
-		Type:           int32(machine.Type),
-	}
-}
-
-func MachineKeyToModel(machine *MachineKey) *model.MachineKey {
-	return &model.MachineKey{
-		ObjectRoot:     machine.ObjectRoot,
-		ExpirationDate: machine.ExpirationDate,
-		KeyID:          machine.KeyID,
-		PrivateKey:     machine.privateKey,
-		Type:           key_model.AuthNKeyType(machine.Type),
-	}
-}
-
-func (key *MachineKey) GenerateMachineKeyPair(keySize int, alg crypto.EncryptionAlgorithm) error {
-	privateKey, publicKey, err := crypto.GenerateKeyPair(keySize)
-	if err != nil {
-		return err
-	}
-	key.PublicKey, err = crypto.PublicKeyToBytes(publicKey)
-	if err != nil {
-		return err
-	}
-	key.privateKey = crypto.PrivateKeyToBytes(privateKey)
-	return nil
 }

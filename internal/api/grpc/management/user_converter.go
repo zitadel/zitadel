@@ -624,7 +624,7 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*management.Change
 	return result
 }
 
-func webAuthNTokensFromModel(tokens []*usr_model.WebAuthNToken) *management.WebAuthNTokens {
+func webAuthNTokensFromModel(tokens []*usr_model.WebAuthNView) *management.WebAuthNTokens {
 	result := make([]*management.WebAuthNToken, len(tokens))
 	for i, token := range tokens {
 		result[i] = webAuthNTokenFromModel(token)
@@ -632,10 +632,10 @@ func webAuthNTokensFromModel(tokens []*usr_model.WebAuthNToken) *management.WebA
 	return &management.WebAuthNTokens{Tokens: result}
 }
 
-func webAuthNTokenFromModel(token *usr_model.WebAuthNToken) *management.WebAuthNToken {
+func webAuthNTokenFromModel(token *usr_model.WebAuthNView) *management.WebAuthNToken {
 	return &management.WebAuthNToken{
-		Id:    token.WebAuthNTokenID,
-		Name:  token.WebAuthNTokenName,
+		Id:    token.TokenID,
+		Name:  token.Name,
 		State: mfaStateFromModel(token.State),
 	}
 }
