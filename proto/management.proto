@@ -1185,7 +1185,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateUserGrant(UpdateUserGrantResponse) returns (UpdateUserGrantRequest) {
+    rpc UpdateUserGrant(UpdateUserGrantRequest) returns (UpdateUserGrantResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/grants/{grant_id}"
             body: "*"
