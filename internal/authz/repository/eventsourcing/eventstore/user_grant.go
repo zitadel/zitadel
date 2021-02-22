@@ -2,11 +2,17 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	global_model "github.com/caos/zitadel/internal/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -19,7 +25,7 @@ type UserGrantRepo struct {
 	IamID        string
 	IamProjectID string
 	Auth         authz.Config
-	IamEvents    *iam_event.IAMEventstore
+	Eventstore   eventstore.Eventstore
 }
 
 func (repo *UserGrantRepo) Health() error {
@@ -94,7 +100,7 @@ func (repo *UserGrantRepo) FillIamProjectID(ctx context.Context) error {
 	if repo.IamProjectID != "" {
 		return nil
 	}
-	iam, err := repo.IamEvents.IAMByID(ctx, repo.IamID)
+	iam, err := repo.getIAMByID(ctx)
 	if err != nil {
 		return err
 	}
@@ -116,6 +122,23 @@ func (repo *UserGrantRepo) mapRoleToPermission(permissions *grant_model.Permissi
 		}
 	}
 	return permissions
+}
+
+func (u *UserGrantRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &iam_es_model.IAM{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
+	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return iam_es_model.IAMToModel(iam), nil
 }
 
 func userMembershipToMembership(membership *user_view_model.UserMembershipView) *authz.Membership {

@@ -14,9 +14,7 @@ import (
 
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 const (
@@ -24,9 +22,7 @@ const (
 )
 
 type OrgRepository struct {
-	SearchLimit    uint64
-	OrgEventstore  *org_es.OrgEventstore
-	UserEventstore *usr_es.UserEventstore
+	SearchLimit uint64
 
 	View           *auth_view.View
 	SystemDefaults systemdefaults.SystemDefaults

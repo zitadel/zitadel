@@ -1,8 +1,6 @@
-package eventsourcing
+package view
 
 import (
-	"context"
-
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -14,6 +12,12 @@ func OrgByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, err
 	}
 	return OrgQuery(latestSequence).
 		AggregateIDFilter(id), nil
+}
+
+func OrgQuery(latestSequence uint64) *es_models.SearchQuery {
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(model.OrgAggregate).
+		LatestSequenceFilter(latestSequence)
 }
 
 func OrgDomainUniqueQuery(domain string) *es_models.SearchQuery {
@@ -32,12 +36,16 @@ func OrgNameUniqueQuery(name string) *es_models.SearchQuery {
 		SetLimit(1)
 }
 
-func OrgQuery(latestSequence uint64) *es_models.SearchQuery {
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate).
-		LatestSequenceFilter(latestSequence)
-}
+func ChangesQuery(orgID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
+	query := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.OrgAggregate)
 
-func OrgAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, id string, sequence uint64) (*es_models.Aggregate, error) {
-	return aggCreator.NewAggregate(ctx, id, model.OrgAggregate, model.OrgVersion, sequence, es_models.OverwriteResourceOwner(id))
+	if !sortAscending {
+		query.OrderDesc()
+	}
+
+	query.LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(orgID).
+		SetLimit(limit)
+	return query
 }

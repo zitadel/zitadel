@@ -3,16 +3,12 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
-	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/spooler"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
-	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
@@ -35,23 +31,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 	if err != nil {
 		return nil, err
 	}
-	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
-
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
-
-	user, err := es_usr.StartUser(es_usr.UserConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
 	sqlClient, err := conf.View.Start()
 	if err != nil {
 		return nil, err
@@ -61,22 +40,18 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user, OrgEvents: org, IamEvents: iam}, systemDefaults)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
 
 	return &EsRepository{
 		spooler: spool,
 		OrgRepo: eventstore.OrgRepo{
 			Eventstore:     es,
-			OrgEventstore:  org,
-			UserEventstore: user,
 			View:           view,
 			SearchLimit:    conf.SearchLimit,
 			SystemDefaults: systemDefaults,
 		},
 		IAMRepository: eventstore.IAMRepository{
-			IAMEventstore:  iam,
-			OrgEvents:      org,
-			UserEvents:     user,
+			Eventstore:     es,
 			View:           view,
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,
@@ -89,13 +64,5 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 }
 
 func (repo *EsRepository) Health(ctx context.Context) error {
-	err := repo.Eventstore.Health(ctx)
-	if err != nil {
-		return err
-	}
-	err = repo.UserEventstore.Health(ctx)
-	if err != nil {
-		return err
-	}
-	return repo.OrgEventstore.Health(ctx)
+	return nil
 }

@@ -438,7 +438,7 @@ func verifyWebAuthNFromDomain(u2f *domain.WebAuthNToken) *auth.WebAuthNResponse 
 	}
 }
 
-func webAuthNTokensFromModel(tokens []*usr_model.WebAuthNToken) *auth.WebAuthNTokens {
+func webAuthNTokensFromModel(tokens []*usr_model.WebAuthNView) *auth.WebAuthNTokens {
 	result := make([]*auth.WebAuthNToken, len(tokens))
 	for i, token := range tokens {
 		result[i] = webAuthNTokenFromModel(token)
@@ -446,10 +446,10 @@ func webAuthNTokensFromModel(tokens []*usr_model.WebAuthNToken) *auth.WebAuthNTo
 	return &auth.WebAuthNTokens{Tokens: result}
 }
 
-func webAuthNTokenFromModel(token *usr_model.WebAuthNToken) *auth.WebAuthNToken {
+func webAuthNTokenFromModel(token *usr_model.WebAuthNView) *auth.WebAuthNToken {
 	return &auth.WebAuthNToken{
-		Id:    token.WebAuthNTokenID,
-		Name:  token.WebAuthNTokenName,
+		Id:    token.TokenID,
+		Name:  token.Name,
 		State: auth.MFAState(token.State),
 	}
 }

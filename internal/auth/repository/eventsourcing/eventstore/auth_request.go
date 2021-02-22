@@ -20,12 +20,10 @@ import (
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
-	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	grant_view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
@@ -33,8 +31,6 @@ import (
 
 type AuthRequestRepo struct {
 	Command      *command.CommandSide
-	UserEvents   *user_event.UserEventstore
-	OrgEvents    *org_event.OrgEventstore
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 
@@ -93,9 +89,6 @@ type userGrantProvider interface {
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
-	if err := repo.UserEvents.Health(ctx); err != nil {
-		return err
-	}
 	return repo.AuthRequests.Health(ctx)
 }
 

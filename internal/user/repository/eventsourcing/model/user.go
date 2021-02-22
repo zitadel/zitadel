@@ -24,42 +24,6 @@ type User struct {
 	*Machine
 }
 
-func UserFromModel(user *model.User) *User {
-	var human *Human
-	if user.Human != nil {
-		human = HumanFromModel(user.Human)
-	}
-	var machine *Machine
-	if user.Machine != nil {
-		machine = MachineFromModel(user.Machine)
-	}
-	return &User{
-		ObjectRoot: user.ObjectRoot,
-		State:      int32(user.State),
-		UserName:   user.UserName,
-		Human:      human,
-		Machine:    machine,
-	}
-}
-
-func UserToModel(user *User) *model.User {
-	var human *model.Human
-	if user.Human != nil {
-		human = HumanToModel(user.Human)
-	}
-	var machine *model.Machine
-	if user.Machine != nil {
-		machine = MachineToModel(user.Machine)
-	}
-	return &model.User{
-		ObjectRoot: user.ObjectRoot,
-		State:      model.UserState(user.State),
-		UserName:   user.UserName,
-		Human:      human,
-		Machine:    machine,
-	}
-}
-
 func (u *User) AppendEvents(events ...*es_models.Event) error {
 	for _, event := range events {
 		if err := u.AppendEvent(event); err != nil {

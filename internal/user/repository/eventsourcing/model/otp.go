@@ -21,22 +21,6 @@ type OTPVerified struct {
 	UserAgentID string `json:"userAgentID,omitempty"`
 }
 
-func OTPFromModel(otp *model.OTP) *OTP {
-	return &OTP{
-		ObjectRoot: otp.ObjectRoot,
-		Secret:     otp.Secret,
-		State:      int32(otp.State),
-	}
-}
-
-func OTPToModel(otp *OTP) *model.OTP {
-	return &model.OTP{
-		ObjectRoot: otp.ObjectRoot,
-		Secret:     otp.Secret,
-		State:      model.MFAState(otp.State),
-	}
-}
-
 func (u *Human) appendOTPAddedEvent(event *es_models.Event) error {
 	u.OTP = &OTP{
 		State: int32(model.MFAStateNotReady),

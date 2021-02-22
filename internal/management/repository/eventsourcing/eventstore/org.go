@@ -2,10 +2,16 @@ package eventstore
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/golang/protobuf/ptypes"
 	"strings"
-
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -17,10 +23,10 @@ import (
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 const (
@@ -28,10 +34,8 @@ const (
 )
 
 type OrgRepository struct {
-	SearchLimit uint64
-	*org_es.OrgEventstore
-	UserEvents     *usr_es.UserEventstore
-	IAMEventstore  *iam_es.IAMEventstore
+	SearchLimit    uint64
+	Eventstore     eventstore.Eventstore
 	View           *mgmt_view.View
 	Roles          []string
 	SystemDefaults systemdefaults.SystemDefaults
@@ -91,19 +95,19 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 }
 
 func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
-	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit, sortAscending)
+	changes, err := repo.getOrgChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
-			if user.Human != nil {
+			if user.HumanView != nil {
 				change.ModifierName = user.DisplayName
 			}
-			if user.Machine != nil {
-				change.ModifierName = user.Machine.Name
+			if user.MachineView != nil {
+				change.ModifierName = user.MachineView.Name
 			}
 		}
 	}
@@ -204,7 +208,7 @@ func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.Login
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.LoginPolicyView)
 	}
-	events, esErr := repo.OrgEventstore.OrgEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return repo.GetDefaultLoginPolicy(ctx)
 	}
@@ -237,7 +241,7 @@ func (repo *OrgRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.LoginPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, domain.IAMID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
 	}
@@ -315,7 +319,7 @@ func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*ia
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordComplexityPolicyView)
 	}
-	events, esErr := repo.OrgEventstore.OrgEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return repo.GetDefaultPasswordComplexityPolicy(ctx)
 	}
@@ -340,7 +344,7 @@ func (repo *OrgRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordComplexityPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
@@ -366,7 +370,7 @@ func (repo *OrgRepository) GetPasswordAgePolicy(ctx context.Context) (*iam_model
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordAgePolicyView)
 	}
-	events, esErr := repo.OrgEventstore.OrgEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return repo.GetDefaultPasswordAgePolicy(ctx)
 	}
@@ -391,7 +395,7 @@ func (repo *OrgRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordAgePolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.PasswordAgePolicy.NotFound")
 	}
@@ -417,7 +421,7 @@ func (repo *OrgRepository) GetPasswordLockoutPolicy(ctx context.Context) (*iam_m
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordLockoutPolicyView)
 	}
-	events, esErr := repo.OrgEventstore.OrgEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return repo.GetDefaultPasswordLockoutPolicy(ctx)
 	}
@@ -442,7 +446,7 @@ func (repo *OrgRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordLockoutPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.PasswordLockoutPolicy.NotFound")
 	}
@@ -506,4 +510,100 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 		return nil, err
 	}
 	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
+}
+
+func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
+	query := org_view.ChangesQuery(orgID, lastSequence, limit, sortAscending)
+
+	events, err := repo.Eventstore.FilterEvents(context.Background(), query)
+	if err != nil {
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, errors.ThrowInternal(err, "EVENT-328b1", "Errors.Org.NotFound")
+	}
+	if len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-FpQqK", "Errors.Changes.NotFound")
+	}
+
+	changes := make([]*org_model.OrgChange, len(events))
+
+	for i, event := range events {
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
+		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
+		change := &org_model.OrgChange{
+			ChangeDate: creationDate,
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
+		}
+
+		if event.Data != nil {
+			org := new(org_es_model.Org)
+			err := json.Unmarshal(event.Data, org)
+			logging.Log("EVENT-XCLEm").OnError(err).Debug("unable to unmarshal data")
+			change.Data = org
+		}
+
+		changes[i] = change
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
+		}
+	}
+
+	return &org_model.OrgChanges{
+		Changes:      changes,
+		LastSequence: lastSequence,
+	}, nil
+}
+
+func (repo *OrgRepository) userByID(ctx context.Context, id string) (*usr_model.UserView, error) {
+	user, viewErr := repo.View.UserByID(id)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if errors.IsNotFound(viewErr) {
+		user = new(usr_es_model.UserView)
+	}
+	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3nF8s", "Errors.User.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
+		return usr_es_model.UserToModel(user), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return usr_es_model.UserToModel(user), nil
+		}
+	}
+	if userCopy.State == int32(usr_es_model.UserStateDeleted) {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3n8Fs", "Errors.User.NotFound")
+	}
+	return usr_es_model.UserToModel(&userCopy), nil
+}
+
+func (r *OrgRepository) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Eventstore.FilterEvents(ctx, query)
+}
+
+func (es *OrgRepository) getOrgEvents(ctx context.Context, id string, sequence uint64) ([]*models.Event, error) {
+	query, err := org_view.OrgByIDQuery(id, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return es.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Eventstore.FilterEvents(ctx, query)
 }

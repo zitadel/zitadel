@@ -2,28 +2,33 @@ package eventstore
 
 import (
 	"context"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	"github.com/caos/zitadel/internal/v2/domain"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"strings"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type TokenVerifierRepo struct {
 	TokenVerificationKey [32]byte
 	IAMID                string
-	IAMEvents            *iam_event.IAMEventstore
-	ProjectEvents        *proj_event.ProjectEventstore
-	UserEvents           *usr_event.UserEventstore
+	Eventstore           eventstore.Eventstore
 	View                 *view.View
 }
 
@@ -38,7 +43,7 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 		token.UserID = userID
 	}
 
-	events, esErr := repo.UserEvents.UserEventsByID(ctx, userID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, token.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -110,7 +115,7 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
+	iam, err := repo.getIAMByID(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -119,4 +124,29 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 		return "", err
 	}
 	return app.OIDCClientID, nil
+}
+
+func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return r.Eventstore.FilterEvents(ctx, query)
+}
+
+func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &iam_es_model.IAM{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
+	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return iam_es_model.IAMToModel(iam), nil
 }

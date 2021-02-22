@@ -21,7 +21,7 @@ type UserRepository interface {
 
 	UserMFAs(ctx context.Context, userID string) ([]*model.MultiFactor, error)
 
-	GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNToken, error)
+	GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNView, error)
 
 	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
 	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*model.ExternalIDPView, error)

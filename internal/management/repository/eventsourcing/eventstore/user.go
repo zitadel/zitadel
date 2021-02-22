@@ -2,6 +2,9 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/logging"
 
@@ -14,9 +17,7 @@ import (
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
-	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
@@ -24,8 +25,6 @@ import (
 type UserRepo struct {
 	es_int.Eventstore
 	SearchLimit    uint64
-	UserEvents     *usr_event.UserEventstore
-	OrgEvents      *org_event.OrgEventstore
 	View           *view.View
 	SystemDefaults systemdefaults.SystemDefaults
 }
@@ -38,7 +37,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 	if caos_errs.IsNotFound(viewErr) {
 		user = new(model.UserView)
 	}
-	events, esErr := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
+	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
 	}
@@ -84,19 +83,19 @@ func (repo *UserRepo) UserIDsByDomain(ctx context.Context, domain string) ([]str
 }
 
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
-	changes, err := repo.UserEvents.UserChanges(ctx, id, lastSequence, limit, sortAscending)
+	changes, err := repo.getUserChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierID
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierID)
+		user, _ := repo.UserByID(ctx, change.ModifierID)
 		if user != nil {
-			if user.Human != nil {
-				change.ModifierName = user.Human.DisplayName
+			if user.HumanView != nil {
+				change.ModifierName = user.HumanView.DisplayName
 			}
-			if user.Machine != nil {
-				change.ModifierName = user.Machine.Name
+			if user.MachineView != nil {
+				change.ModifierName = user.MachineView.Name
 			}
 		}
 	}
@@ -133,8 +132,15 @@ func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model
 	return mfas, nil
 }
 
-func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNToken, error) {
-	return repo.UserEvents.GetPasswordless(ctx, userID)
+func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNView, error) {
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.HumanView == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9anf8", "Errors.User.NotHuman")
+	}
+	return user.HumanView.PasswordlessTokens, nil
 }
 
 func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
@@ -272,6 +278,58 @@ func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_mo
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
+}
+
+func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
+	query := usr_view.ChangesQuery(userID, lastSequence, limit, sortAscending)
+
+	events, err := r.Eventstore.FilterEvents(ctx, query)
+	if err != nil {
+		logging.Log("EVENT-g9HCv").WithError(err).Warn("eventstore unavailable")
+		return nil, errors.ThrowInternal(err, "EVENT-htuG9", "Errors.Internal")
+	}
+	if len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-6cAxe", "Errors.User.NoChanges")
+	}
+
+	result := make([]*usr_model.UserChange, len(events))
+
+	for i, event := range events {
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
+		logging.Log("EVENT-8GTGS").OnError(err).Debug("unable to parse timestamp")
+		change := &usr_model.UserChange{
+			ChangeDate: creationDate,
+			EventType:  event.Type.String(),
+			ModifierID: event.EditorUser,
+			Sequence:   event.Sequence,
+		}
+
+		//TODO: now all types should be unmarshalled, e.g. password
+		// if len(event.Data) != 0 {
+		// 	user := new(model.User)
+		// 	err := json.Unmarshal(event.Data, user)
+		// 	logging.Log("EVENT-Rkg7X").OnError(err).Debug("unable to unmarshal data")
+		// 	change.Data = user
+		// }
+
+		result[i] = change
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
+		}
+	}
+
+	return &usr_model.UserChanges{
+		Changes:      result,
+		LastSequence: lastSequence,
+	}, nil
+}
+
+func (r *UserRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return r.Eventstore.FilterEvents(ctx, query)
 }
 
 func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_model.UserMembershipSearchRequest, sequence *repository.CurrentSequence) *usr_model.UserMembershipSearchResponse {
