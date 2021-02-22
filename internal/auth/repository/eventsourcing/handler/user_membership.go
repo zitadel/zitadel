@@ -17,7 +17,6 @@ import (
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -31,17 +30,14 @@ const (
 
 type UserMembership struct {
 	handler
-	projectEvents *proj_event.ProjectEventstore
-	subscription  *eventstore.Subscription
+	subscription *eventstore.Subscription
 }
 
 func newUserMembership(
 	handler handler,
-	projectEvents *proj_event.ProjectEventstore,
 ) *UserMembership {
 	h := &UserMembership{
-		handler:       handler,
-		projectEvents: projectEvents,
+		handler: handler,
 	}
 
 	h.subscribe()

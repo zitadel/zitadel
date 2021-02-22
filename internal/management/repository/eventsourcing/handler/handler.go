@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -32,8 +31,7 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 }
 
 type EventstoreRepos struct {
-	ProjectEvents *proj_event.ProjectEventstore
-	IamEvents     *iam_event.IAMEventstore
+	IamEvents *iam_event.IAMEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
@@ -45,8 +43,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
 		newProjectMember(handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount, es}),
 		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es}),
-		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es},
-			repos.ProjectEvents),
+		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			repos.IamEvents,
 			defaults.IamID),

@@ -19,7 +19,6 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -29,12 +28,11 @@ import (
 
 type ProjectRepo struct {
 	es_int.Eventstore
-	SearchLimit   uint64
-	ProjectEvents *proj_event.ProjectEventstore
-	IAMEvents     *iam_event.IAMEventstore
-	View          *view.View
-	Roles         []string
-	IAMID         string
+	SearchLimit uint64
+	IAMEvents   *iam_event.IAMEventstore
+	View        *view.View
+	Roles       []string
+	IAMID       string
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {

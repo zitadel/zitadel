@@ -2,12 +2,13 @@ package handler
 
 import (
 	"context"
+	"strings"
+
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"strings"
 
 	"github.com/caos/logging"
 
@@ -23,7 +24,6 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -38,24 +38,21 @@ const (
 
 type UserGrant struct {
 	handler
-	projectEvents *proj_event.ProjectEventstore
-	iamEvents     *iam_events.IAMEventstore
-	iamID         string
-	iamProjectID  string
-	subscription  *eventstore.Subscription
+	iamEvents    *iam_events.IAMEventstore
+	iamID        string
+	iamProjectID string
+	subscription *eventstore.Subscription
 }
 
 func newUserGrant(
 	handler handler,
-	projectEvents *proj_event.ProjectEventstore,
 	iamEvents *iam_events.IAMEventstore,
 	iamID string,
 ) *UserGrant {
 	h := &UserGrant{
-		handler:       handler,
-		projectEvents: projectEvents,
-		iamEvents:     iamEvents,
-		iamID:         iamID,
+		iamEvents: iamEvents,
+		handler:   handler,
+		iamID:     iamID,
 	}
 
 	h.subscribe()

@@ -5,16 +5,14 @@ import (
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/project/model"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/command"
 )
 
 type ApplicationRepo struct {
-	Commands      *command.CommandSide
-	View          *view.View
-	ProjectEvents *proj_event.ProjectEventstore
+	Commands *command.CommandSide
+	View     *view.View
 }
 
 func (a *ApplicationRepo) ApplicationByClientID(ctx context.Context, clientID string) (*model.ApplicationView, error) {

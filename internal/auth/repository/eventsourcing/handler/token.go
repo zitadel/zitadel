@@ -15,7 +15,6 @@ import (
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -28,17 +27,14 @@ const (
 
 type Token struct {
 	handler
-	ProjectEvents *proj_event.ProjectEventstore
-	subscription  *eventstore.Subscription
+	subscription *eventstore.Subscription
 }
 
 func newToken(
 	handler handler,
-	projectEvents *proj_event.ProjectEventstore,
 ) *Token {
 	h := &Token{
-		handler:       handler,
-		ProjectEvents: projectEvents,
+		handler: handler,
 	}
 
 	h.subscribe()
