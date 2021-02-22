@@ -1025,7 +1025,7 @@ service ManagementService {
             get: "/orgs/me/policies/login"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1035,7 +1035,7 @@ service ManagementService {
             get: "/orgs/default/policies/login"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1046,7 +1046,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1057,7 +1057,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1067,7 +1067,7 @@ service ManagementService {
             delete: "/orgs/me/policies/login"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
     }
@@ -1078,7 +1078,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1089,7 +1089,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1099,7 +1099,7 @@ service ManagementService {
             delete: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1109,7 +1109,7 @@ service ManagementService {
             get: "/orgs/me/policies/login/secondfactors/_search"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1120,7 +1120,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1130,7 +1130,7 @@ service ManagementService {
             delete: "/orgs/me/policies/login/secondfactors/{second_factor}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1140,7 +1140,7 @@ service ManagementService {
             get: "/orgs/me/policies/login/multifactors/_search"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1152,7 +1152,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1162,7 +1162,7 @@ service ManagementService {
             delete: "/orgs/me/policies/login/multifactors/{multi_factor}"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1172,7 +1172,7 @@ service ManagementService {
             get: "/orgs/me/policies/complexity"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1182,7 +1182,7 @@ service ManagementService {
             get: "/orgs/default/policies/complexity"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1193,7 +1193,7 @@ service ManagementService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1204,7 +1204,7 @@ service ManagementService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1214,7 +1214,7 @@ service ManagementService {
             delete: "/orgs/me/policies/complexity"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
     }
@@ -1224,7 +1224,7 @@ service ManagementService {
             get: "/orgs/me/policies/age"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1234,7 +1234,7 @@ service ManagementService {
             get: "/orgs/default/policies/age"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1245,7 +1245,7 @@ service ManagementService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1256,7 +1256,7 @@ service ManagementService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1266,7 +1266,7 @@ service ManagementService {
             delete: "/orgs/me/policies/age"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
     }
@@ -1276,7 +1276,7 @@ service ManagementService {
             get: "/orgs/me/policies/lockout"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1286,7 +1286,7 @@ service ManagementService {
             get: "/orgs/default/policies/lockout"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -1297,7 +1297,7 @@ service ManagementService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1308,7 +1308,7 @@ service ManagementService {
             body: "*"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -1318,7 +1318,7 @@ service ManagementService {
             delete: "/orgs/me/policies/lockout"
         };
     
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
     }
