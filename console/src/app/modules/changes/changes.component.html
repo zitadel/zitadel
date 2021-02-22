@@ -19,7 +19,8 @@
                 </ng-template>
                 <div class="actions">
                     <div class="action" *ngFor="let action of dayelement.eventTypes; index as j">
-                        <button disabled mat-icon-button aria-label="Restore history">
+                        <button disabled mat-icon-button aria-label="Restore history"
+                            matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}">
                             <mat-icon class="icon">schedule</mat-icon>
                         </button>
 

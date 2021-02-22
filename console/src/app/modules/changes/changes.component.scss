@@ -67,11 +67,7 @@
                             height: 1.2rem;
                             line-height: 1.2rem;
                             font-size: 1.2rem;
-                            color: #e8eaed;
-
-                            &.red {
-                                color: #e91e63;
-                            }
+                            color: var(--grey);
                         }
 
                         span {

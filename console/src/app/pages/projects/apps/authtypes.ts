@@ -23,3 +23,11 @@ export const NATIVE_TYPE = {
     prefix: 'N',
     background: '#595d80',
 };
+
+// export const API_TYPE = {
+//     titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.TITLE',
+//     descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.DESCRIPTION',
+//     type: OIDCApplicationType.,
+//     prefix: 'N',
+//     background: '#595d80',
+// };
