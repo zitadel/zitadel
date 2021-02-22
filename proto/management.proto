@@ -12,7 +12,6 @@ import "zitadel/policy.proto";
 import "zitadel/message.proto";
 
 import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -222,7 +221,7 @@ service ManagementService {
     rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/profile"
-            body: "profile"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
