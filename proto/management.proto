@@ -713,7 +713,6 @@ service ManagementService {
         };
     }
 
-    //TODO: do we need this? i asume that these are from zitadel?
     rpc ListProjectMemberRoles(ListProjectMemberRolesRequest) returns (ListProjectMemberRolesResponse) {
         option (google.api.http) = {
             get: "/projects/members/roles"
@@ -721,18 +720,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.member.read"
-        };
-    }
-
-    rpc ListProjectRoles(ListProjectRolesRequest) returns (ListProjectRolesResponse) {
-        option (google.api.http) = {
-            post: "/projects/{project_id}/roles/_search"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "project.role.read"
-            check_field_name: "ProjectId"
         };
     }
 
@@ -782,6 +769,18 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.role.delete"
             check_field_name: "Id"
+        };
+    }
+
+    rpc ListProjectRoles(ListProjectRolesRequest) returns (ListProjectRolesResponse) {
+        option (google.api.http) = {
+            post: "/projects/{project_id}/roles/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.role.read"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -1019,6 +1018,228 @@ service ManagementService {
             check_field_name: "ProjectId"
         };
     }
+
+    rpc GetProjectGrantByID(GetProjectGrantByIDRequest) returns (GetProjectGrantByIDResponse) {
+        option (google.api.http) = {
+            get: "/projects/{project_id}/grants/{grant_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.read"
+        };
+    }
+
+    rpc ListProjectGrants(ListProjectGrantsRequest) returns (ListProjectGrantsResponse) {
+        option (google.api.http) = {
+            post: "/projects/{project_id}/grants/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.read"
+            check_field_name: "ProjectId"
+        };
+    }
+
+    rpc CreateProjectGrant(CreateProjectGrantRequest) returns (CreateProjectGrantResponse) {
+        option (google.api.http) = {
+            post: "/projects/{project_id}/grants"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.write"
+        };
+    }
+
+    rpc UpdateProjectGrant(UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
+        option (google.api.http) = {
+            put: "/projects/{project_id}/grants/{grant_id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.write"
+        };
+    }
+
+    rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
+        option (google.api.http) = {
+            put: "/projects/{project_id}/grants/{grant_id}/_deactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.write"
+        };
+    }
+
+    rpc ReactivateProjectGrant(ReactivateProjectGrantRequest) returns (ReactivateProjectGrantResponse) {
+        option (google.api.http) = {
+            put: "/projects/{project_id}/grants/{grant_id}/_reactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.write"
+        };
+    }
+
+    // RemoveProjectGrant removes project grant and all user grants for this project grant
+    rpc RemoveProjectGrant(RemoveProjectGrantRequest) returns (RemoveProjectGrantResponse) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/grants/{grant_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.delete"
+        };
+    }
+
+    rpc ListProjectGrantMemberRoles(ListProjectGrantMemberRolesRequest) returns (ListProjectGrantMemberRolesResponse) {
+        option (google.api.http) = {
+            get: "/projects/grants/members/roles"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.member.read"
+        };
+    }
+
+    rpc ListProjectGrantMembers(ListProjectGrantMembersRequest) returns (ListProjectGrantMembersResponse) {
+        option (google.api.http) = {
+            post: "/projects/{project_id}/grants/{grant_id}/members/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.member.read"
+        };
+    }
+
+    rpc AddProjectGrantMember(AddProjectGrantMemberRequest) returns (AddProjectGrantMemberResponse) {
+        option (google.api.http) = {
+            post: "/projects/{project_id}/grants/{grant_id}/members"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.member.write"
+        };
+    }
+
+    rpc UpdateProjectGrantMember(UpdateProjectGrantMemberRequest) returns (UpdateProjectGrantMemberResponse) {
+        option (google.api.http) = {
+            put: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.member.write"
+        };
+    }
+
+    rpc RemoveProjectGrantMember(RemoveProjectGrantMemberRequest) returns (RemoveProjectGrantMemberResponse) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.member.delete"
+        };
+    }
+    
+    rpc GetUserGrantByID(GetUserGrantByIDRequest) returns (GetUserGrantByIDRequestResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/grants/{grant_id}"
+        };
+        
+        option (zitadel.v1.auth_option) = {
+            permission: "user.grant.read"
+        };
+    }
+    
+    rpc ListUserGrants(ListUserGrantRequest) returns (ListUserGrantResponse) {
+        option (google.api.http) = {
+            post: "/users/grants/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.grant.read"
+        };
+    }
+
+    rpc AddUserGrant(AddUserGrantRequest) returns (AddUserGrantResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/grants"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc UpdateUserGrant(UpdateUserGrantResponse) returns (UpdateUserGrantRequest) {
+        option (google.api.http) = {
+            put: "/users/{user_id}/grants/{grant_id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
+        option (google.api.http) = {
+            put: "/users/{user_id}/grants/{grant_id}/_deactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
+        option (google.api.http) = {
+            put: "/users/{user_id}/grants/{grant_id}/_reactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc RemoveUserGrant(RemoveUserGrantRequest) returns (RemoveUserGrantResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/grants/{grant_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.grant.delete"
+        };
+    }
+
+    // remove a list of user grants in one request
+    rpc BulkRemoveUserGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {
+        option (google.api.http) = {
+            delete: "/usersgrants/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.grant.delete"
+        };
+    }
+
+
+
+
+
 
     rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
         option (google.api.http) = {
@@ -1990,17 +2211,6 @@ message ListProjectMemberRolesResponse {
     repeated string roles = 2;
 }
 
-message ListProjectRolesRequest {
-    string project_id = 1;
-    zitadel.v1.Search meta_data = 2;
-    repeated zitadel.project.v1.RoleQuery queries = 3;
-}
-
-message ListProjectRolesResponse {
-    zitadel.v1.Search meta_data = 1;
-    repeated zitadel.project.v1.Role result = 2;
-}
-
 message AddProjectRoleRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
     string key = 2 [(validate.rules).string = {min_len: 1}];
@@ -2044,6 +2254,17 @@ message RemoveProjectRoleRequest {
 }
 message RemoveProjectRoleResponse {
     zitadel.v1.MetaData meta_data = 1;
+}
+
+message ListProjectRolesRequest {
+    string project_id = 1;
+    zitadel.v1.Search meta_data = 2;
+    repeated zitadel.project.v1.RoleQuery queries = 3;
+}
+
+message ListProjectRolesResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.project.v1.Role result = 2;
 }
 
 message ListProjectMembersRequest {
@@ -2277,6 +2498,176 @@ message RemoveAPIClientKeyRequest {
 message RemoveAPIClientKeyResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
+
+message GetProjectGrantByIDRequest {
+    string project_id = 1;
+    string grant_id = 2;
+}
+
+message GetProjectGrantByIDResponse {
+    zitadel.project.v1.GrantedProject project_grant = 1;
+}
+
+message ListProjectGrantsRequest {
+    string project_id = 1;
+    zitdel.v1.Search meta_data = 2;
+    repeated zitadel.project.v1.ProjectGrantQuery queries = 3;
+}
+
+message ListProjectGrantsResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.project.v1.GrantedProject result = 2;
+}
+
+message CreateProjectGrantRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string granted_org_id = 2 [(validate.rules).string = {min_len: 1}];
+    repeated string role_keys = 3;
+}
+
+message CreateProjectGrantResponse {
+    string grant_id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+}
+
+message UpdateProjectGrantRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+    repeated string role_keys = 3;
+}
+
+message UpdateProjectGrantResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message DeactivateProjectGrantRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+}
+
+message DeactivateProjectGrantResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ReactivateProjectGrantRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+}
+message ReactivateProjectGrantResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveProjectGrantRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+}
+message RemoveProjectGrantResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ListProjectGrantMemberRolesRequest {}
+
+message ListProjectGrantMemberRolesResponse {
+    repeated string result = 1;
+}
+
+message AddProjectGrantMemberRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+    string user_id = 3 [(validate.rules).string = {min_len: 1}];
+    repeated string roles = 4;
+}
+
+message AddProjectGrantMemberResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message UpdateProjectGrantMemberRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+    string user_id = 3 [(validate.rules).string = {min_len: 1}];
+    repeated string roles = 4;
+}
+
+message UpdateProjectGrantMemberResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveProjectGrantMemberRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+    string user_id = 3 [(validate.rules).string = {min_len: 1}];
+}
+
+message RemoveProjectGrantMemberResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message GetUserGrantByIDRequest {
+    string user_id = 1;
+    string grant_id = 2;
+}
+
+message GetUserGrantByIDResponse {
+    zitadel.project.v1.UserGrant user_grant = 1;
+}
+
+message ListUserGrantRequest {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.project.v1.UserGrantQuery queries = 2;
+}
+
+message ListUserGrantResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.project.v1.UserGrant result = 2;
+}
+
+message AddUserGrantRequest {
+    string user_id = 1;
+    string grant_id = 2;
+}
+
+message AddUserGrantResponse {
+    string user_grant_id = 1;
+    zitadel.v1.MetaData meta_data = 2;
+}
+
+message UpdateUserGrantRequest {
+    string user_id = 1;
+    string grant_id = 2;
+}
+message UpdateUserGrantResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message RemoveUserGrantRequest {
+    string user_id = 1;
+    string grant_id = 2;
+}
+
+message RemoveUserGrantResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message BulkRemoveUserGrantRequest {
+    //TODO: dont we need user_id?
+    repeated string grant_id = 1;
+}
+
+message BulkRemoveUserGrantResponse {
+    message RemovedUserGrant {
+        zitadel.v1.MetaData meta_data = 1;
+        string grant_id = 2;
+    }
+
+    repeated RemovedUserGrant result = 1;
+}
+
+
+
+
+
+
 
 message GetLoginPolicyRequest {}
 
