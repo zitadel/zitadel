@@ -17,6 +17,7 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/id"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -113,8 +114,11 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
+	keyChan := make(chan *key_model.KeyView)
 	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org, IamEvents: iam}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults, keyChan)
+
+	locker := spooler.NewLocker(sqlClient)
 
 	return &EsRepository{
 		spool,
@@ -154,8 +158,12 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			View:          view,
 		},
 		eventstore.KeyRepository{
-			View:               view,
-			SigningKeyRotation: systemDefaults.KeyConfig.SigningKeyRotation.Duration,
+			View:                     view,
+			SigningKeyRotationCheck:  systemDefaults.KeyConfig.SigningKeyRotationCheck.Duration,
+			SigningKeyGracefulPeriod: systemDefaults.KeyConfig.SigningKeyGracefulPeriod.Duration,
+			KeyAlgorithm:             keyAlgorithm,
+			Locker:                   locker,
+			KeyChan:                  keyChan,
 		},
 		eventstore.ApplicationRepo{
 			Commands:      command,

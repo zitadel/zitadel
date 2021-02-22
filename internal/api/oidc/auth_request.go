@@ -120,18 +120,14 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	return o.command.HumansSignOut(ctx, userAgentID, userIDs)
 }
 
-func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, errCh chan<- error, timer <-chan time.Time) {
-	o.repo.GetSigningKey(ctx, keyCh, errCh, timer)
+func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {
+	o.repo.GetSigningKey(ctx, keyCh, o.signingKeyAlgorithm)
 }
 
 func (o *OPStorage) GetKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	return o.repo.GetKeySet(ctx)
-}
-
-func (o *OPStorage) SaveNewKeyPair(ctx context.Context) error {
-	return o.command.GenerateSigningKeyPair(ctx, o.signingKeyAlgorithm)
 }
 
 func (o *OPStorage) assertProjectRoleScopes(app *proj_model.ApplicationView, scopes []string) ([]string, error) {

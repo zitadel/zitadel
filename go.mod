@@ -83,3 +83,5 @@ require (
 	k8s.io/apiextensions-apiserver v0.18.5
 	k8s.io/apimachinery v0.18.5
 )
+
+replace github.com/caos/oidc => /Users/livio/workspaces/go/src/github.com/caos/oidc
