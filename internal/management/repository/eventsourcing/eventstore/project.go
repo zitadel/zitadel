@@ -229,10 +229,6 @@ func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID s
 	return model.ApplicationViewToModel(app), nil
 }
 
-func (repo *ProjectRepo) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
-	return repo.ProjectEvents.AddApplication(ctx, app)
-}
-
 func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_model.ApplicationSearchRequest) (*proj_model.ApplicationSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, sequenceErr := repo.View.GetLatestApplicationSequence()
@@ -334,18 +330,6 @@ func (repo *ProjectRepo) RemoveClientKey(ctx context.Context, projectID, applica
 
 func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
 	return repo.ProjectEvents.ChangeOIDCConfig(ctx, config)
-}
-
-func (repo *ProjectRepo) ChangeAPIConfig(ctx context.Context, config *proj_model.APIConfig) (*proj_model.APIConfig, error) {
-	return repo.ProjectEvents.ChangeAPIConfig(ctx, config)
-}
-
-func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
-	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
-}
-
-func (repo *ProjectRepo) ChangeAPIConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.APIConfig, error) {
-	return repo.ProjectEvents.ChangeAPIConfigSecret(ctx, projectID, appID)
 }
 
 func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (*proj_model.ProjectGrantView, error) {

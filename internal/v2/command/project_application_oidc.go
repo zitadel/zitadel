@@ -48,11 +48,11 @@ func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *events
 	}
 
 	var stringPw string
-	err = oidcApp.GenerateNewClientID(r.idGenerator, proj)
+	err = domain.SetNewClientID(oidcApp, r.idGenerator, proj)
 	if err != nil {
 		return nil, "", err
 	}
-	stringPw, err = oidcApp.GenerateClientSecretIfNeeded(r.applicationSecretGenerator)
+	stringPw, err = domain.SetNewClientSecretIfNeeded(oidcApp, r.applicationSecretGenerator)
 	if err != nil {
 		return nil, "", err
 	}
@@ -95,7 +95,6 @@ func (r *CommandSide) ChangeOIDCApplication(ctx context.Context, oidc *domain.OI
 		ctx,
 		projectAgg,
 		oidc.AppID,
-		oidc.ClientID,
 		oidc.RedirectUris,
 		oidc.PostLogoutRedirectUris,
 		oidc.ResponseTypes,
@@ -163,7 +162,7 @@ func (r *CommandSide) ChangeOIDCApplicationSecret(ctx context.Context, projectID
 	return result, err
 }
 func (r *CommandSide) getOIDCAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*OIDCApplicationWriteModel, error) {
-	appWriteModel := NewOIDCApplicationWriteModelWithAppIDC(projectID, appID, resourceOwner)
+	appWriteModel := NewOIDCApplicationWriteModelWithAppID(projectID, appID, resourceOwner)
 	err := r.eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err

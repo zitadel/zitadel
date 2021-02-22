@@ -1,16 +1,11 @@
 package domain
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/id"
 )
 
 const (
@@ -46,12 +41,24 @@ type OIDCApp struct {
 	State AppState
 }
 
-func (h OIDCApp) GetUsername() string {
+func (h OIDCApp) GetApplicationName() string {
 	return h.AppName
 }
 
 func (h OIDCApp) GetState() AppState {
 	return h.State
+}
+
+func (h OIDCApp) setClientID(clientID string) {
+	h.ClientID = clientID
+}
+
+func (h OIDCApp) setClientSecret(clientSecret *crypto.CryptoValue) {
+	h.ClientSecret = clientSecret
+}
+
+func (h OIDCApp) requiresClientSecret() bool {
+	return h.AuthMethodType == OIDCAuthMethodTypeBasic || h.AuthMethodType == OIDCAuthMethodTypePost
 }
 
 type OIDCVersion int32
@@ -114,42 +121,6 @@ func (c *OIDCApp) IsValid() bool {
 		}
 	}
 	return true
-}
-
-//ClientID random_number@projectname (eg. 495894098234@zitadel)
-func (c *OIDCApp) GenerateNewClientID(idGenerator id.Generator, project *Project) error {
-	rndID, err := idGenerator.Next()
-	if err != nil {
-		return err
-	}
-
-	c.ClientID = fmt.Sprintf("%v@%v", rndID, strings.ReplaceAll(strings.ToLower(project.Name), " ", "_"))
-	return nil
-}
-
-func (c *OIDCApp) GenerateClientSecretIfNeeded(generator crypto.Generator) (string, error) {
-	if c.AuthMethodType == OIDCAuthMethodTypeNone {
-		return "", nil
-	}
-	return c.GenerateNewClientSecret(generator)
-}
-
-func (c *OIDCApp) GenerateNewClientSecret(generator crypto.Generator) (string, error) {
-	cryptoValue, stringSecret, err := NewClientSecret(generator)
-	if err != nil {
-		return "", err
-	}
-	c.ClientSecret = cryptoValue
-	return stringSecret, nil
-}
-
-func NewClientSecret(generator crypto.Generator) (*crypto.CryptoValue, string, error) {
-	cryptoValue, stringSecret, err := crypto.NewCode(generator)
-	if err != nil {
-		logging.Log("MODEL-UpnTI").OnError(err).Error("unable to create client secret")
-		return nil, "", errors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
-	}
-	return cryptoValue, stringSecret, nil
 }
 
 func (c *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {

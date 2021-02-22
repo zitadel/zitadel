@@ -34,14 +34,15 @@ type CommandSide struct {
 	passwordVerificationCode    crypto.Generator
 	machineKeyAlg               crypto.EncryptionAlgorithm
 	machineKeySize              int
+	applicationKeySize          int
 	applicationSecretGenerator  crypto.Generator
 	domainVerificationAlg       *crypto.AESCrypto
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
 	//TODO: remove global model, or move to domain
 	multifactors global_model.Multifactors
-	webauthn     *webauthn_helper.WebAuthN
 
+	webauthn           *webauthn_helper.WebAuthN
 	keySize            int
 	keyAlgorithm       crypto.EncryptionAlgorithm
 	privateKeyLifetime time.Duration
@@ -85,6 +86,7 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	repo.userPasswordAlg = crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeyAlg = userEncryptionAlgorithm
 	repo.machineKeySize = int(config.SystemDefaults.SecretGenerators.MachineKeySize)
+	repo.applicationKeySize = int(config.SystemDefaults.SecretGenerators.ApplicationKeySize)
 
 	aesOTPCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.Multifactors.OTP.VerificationKey)
 	if err != nil {

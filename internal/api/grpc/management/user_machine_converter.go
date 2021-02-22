@@ -116,18 +116,18 @@ func addMachineKeyFromDomain(key *domain.MachineKey) *management.AddMachineKeyRe
 	}
 }
 
-func machineKeyTypeToDomain(typ management.MachineKeyType) domain.MachineKeyType {
+func machineKeyTypeToDomain(typ management.MachineKeyType) domain.AuthNKeyType {
 	switch typ {
 	case management.MachineKeyType_MACHINEKEY_JSON:
-		return domain.MachineKeyTypeJSON
+		return domain.AuthNKeyTypeJSON
 	default:
-		return domain.MachineKeyTypeNONE
+		return domain.AuthNKeyTypeNONE
 	}
 }
 
-func machineKeyTypeFromDomain(typ domain.MachineKeyType) management.MachineKeyType {
+func machineKeyTypeFromDomain(typ domain.AuthNKeyType) management.MachineKeyType {
 	switch typ {
-	case domain.MachineKeyTypeJSON:
+	case domain.AuthNKeyTypeJSON:
 		return management.MachineKeyType_MACHINEKEY_JSON
 	default:
 		return management.MachineKeyType_MACHINEKEY_UNSPECIFIED
