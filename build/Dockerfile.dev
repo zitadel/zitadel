@@ -4,7 +4,10 @@
 ## downloads the protofiles, 
 ## protoc and protoc-gen-grpc-web for later use
 #######################
-FROM golang:1.15.8 AS base
+ARG GO_VERSION=1.15.8
+ARG NODE_VERSION=15.8.0
+
+FROM golang:${GO_VERSION} AS base
 
 RUN apt-get update && apt-get install -y unzip
 
@@ -40,7 +43,7 @@ COPY /proto/ include/zitadel/.
 ## With this step we prepare all node_modules, this helps caching the build
 ## Speed up this step by mounting your local node_modules directory
 #######################
-FROM node:15.8.0 as npm-base
+FROM node:${NODE_VERSION} as npm-base
 WORKDIR /console
 COPY console/package.json console/package-lock.json ./
 RUN npm install
@@ -60,7 +63,7 @@ RUN npm run prodbuild
 #######################
 ## Go dependencies
 #######################
-FROM golang:1.15.8 as go-dep
+FROM golang:${GO_VERSION} as go-dep
 RUN mkdir -p src/github.com/caos/zitadel
 COPY . src/github.com/caos/zitadel/
 WORKDIR /go/src/github.com/caos/zitadel/
@@ -77,7 +80,7 @@ COPY --from=base /usr/local/bin /usr/local/bin/.
 RUN build/zitadel/generate-grpc.sh
 
 FROM scratch as go-copy
-COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ ./pkg/
+COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/grpc ./pkg/grpc
 COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
 
 # ## Go test
@@ -100,7 +103,7 @@ RUN ./build/console/generate-static.sh \
 ARG SKAFFOLD_GO_GCFLAGS
 RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /app cmd/zitadel/main.go
 
-FROM golang:1.15.6
+FROM golang:${GO_VERSION}
 # Define GOTRACEBACK to mark this container as using the Go language runtime
 # for `skaffold debug` (https://skaffold.dev/docs/workflows/debug/).
 ENV GOTRACEBACK=single
