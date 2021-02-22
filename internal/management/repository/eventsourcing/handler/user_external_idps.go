@@ -3,8 +3,10 @@ package handler
 import (
 	"context"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
+	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/caos/logging"
 
@@ -15,7 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -30,19 +31,16 @@ const (
 type ExternalIDP struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
-	iamEvents      *eventsourcing.IAMEventstore
 	subscription   *eventstore.Subscription
 }
 
 func newExternalIDP(
 	handler handler,
 	systemDefaults systemdefaults.SystemDefaults,
-	iamEvents *eventsourcing.IAMEventstore,
 ) *ExternalIDP {
 	h := &ExternalIDP{
 		handler:        handler,
 		systemDefaults: systemDefaults,
-		iamEvents:      iamEvents,
 	}
 
 	h.subscribe()
@@ -136,7 +134,7 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 			return err
 		}
 		if event.AggregateType == iam_es_model.IAMAggregate {
-			config, err = i.iamEvents.GetIDPConfig(context.Background(), event.AggregateID, configView.IDPConfigID)
+			config, err = i.getDefaultIDPConfig(context.Background(), configView.IDPConfigID)
 		} else {
 			config, err = i.getOrgIDPConfig(context.Background(), event.AggregateID, configView.IDPConfigID)
 		}
@@ -156,7 +154,7 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 func (i *ExternalIDP) fillData(externalIDP *usr_view_model.ExternalIDPView) error {
 	config, err := i.getOrgIDPConfig(context.Background(), externalIDP.ResourceOwner, externalIDP.IDPConfigID)
 	if caos_errs.IsNotFound(err) {
-		config, err = i.iamEvents.GetIDPConfig(context.Background(), i.systemDefaults.IamID, externalIDP.IDPConfigID)
+		config, err = i.getDefaultIDPConfig(context.Background(), externalIDP.IDPConfigID)
 	}
 	if err != nil {
 		return err
@@ -209,4 +207,32 @@ func (i *ExternalIDP) getOrgByID(ctx context.Context, orgID string) (*org_model.
 	}
 
 	return org_es_model.OrgToModel(esOrg), nil
+}
+
+func (u *ExternalIDP) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &iam_es_model.IAM{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, iam.AppendEvents, query)
+	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return iam_es_model.IAMToModel(iam), nil
+}
+
+func (u *ExternalIDP) getDefaultIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
+	existing, err := u.getIAMByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if _, existingIDP := existing.GetIDP(idpConfigID); existingIDP != nil {
+		return existingIDP, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-22Nv8", "Errors.IAM.IdpNotExisting")
 }

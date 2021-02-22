@@ -3,8 +3,6 @@ package handler
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -31,15 +29,10 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 	return h.es
 }
 
-type EventstoreRepos struct {
-	IAMEvents *eventsourcing.IAMEventstore
-}
-
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		newUserGrant(
 			handler{view, bulkLimit, configs.cycleDuration("UserGrants"), errorCount, es},
-			repos.IAMEvents,
 			systemDefaults.IamID),
 		newUserMembership(
 			handler{view, bulkLimit, configs.cycleDuration("UserMemberships"), errorCount, es}),

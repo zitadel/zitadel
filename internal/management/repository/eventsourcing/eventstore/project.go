@@ -3,6 +3,11 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"strings"
 
 	"github.com/caos/logging"
@@ -13,7 +18,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
@@ -29,7 +33,6 @@ import (
 type ProjectRepo struct {
 	es_int.Eventstore
 	SearchLimit uint64
-	IAMEvents   *iam_event.IAMEventstore
 	View        *view.View
 	Roles       []string
 	IAMID       string
@@ -440,7 +443,7 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 }
 
 func (repo *ProjectRepo) GetProjectMemberRoles(ctx context.Context) ([]string, error) {
-	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
+	iam, err := repo.GetIAMByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -603,4 +606,21 @@ func (repo *ProjectRepo) getApplicationChanges(ctx context.Context, projectID st
 		Changes:      result,
 		LastSequence: lastSequence,
 	}, nil
+}
+
+func (u *ProjectRepo) GetIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &iam_es_model.IAM{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
+	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return iam_es_model.IAMToModel(iam), nil
 }

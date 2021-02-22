@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/spooler"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
@@ -15,7 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
-	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/v2/command"
 	"github.com/caos/zitadel/internal/v2/query"
@@ -72,24 +70,12 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		return nil, err
 	}
 
-	iam, err := es_iam.StartIAM(
-		es_iam.IAMConfig{
-			Eventstore: es,
-			Cache:      conf.Eventstore.Cache,
-		},
-		systemDefaults,
-	)
-	if err != nil {
-		return nil, err
-	}
-
 	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
 
-	repos := handler.EventstoreRepos{IamEvents: iam}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,

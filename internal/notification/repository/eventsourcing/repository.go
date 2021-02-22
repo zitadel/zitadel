@@ -1,7 +1,6 @@
 package eventsourcing
 
 import (
-	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/v2/command"
 	"net/http"
 
@@ -10,7 +9,6 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/i18n"
-	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/spooler"
 	noti_view "github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 	"golang.org/x/text/language"
@@ -47,15 +45,7 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, c
 	if err != nil {
 		return nil, err
 	}
-	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
-		Eventstore: es,
-		Cache:      conf.Eventstore.Cache,
-	}, systemDefaults)
-	if err != nil {
-		return nil, err
-	}
-	eventstoreRepos := handler.EventstoreRepos{IAMEvents: iam}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, eventstoreRepos, systemDefaults, translator, dir)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, systemDefaults, translator, dir)
 
 	return &EsRepository{
 		spool,

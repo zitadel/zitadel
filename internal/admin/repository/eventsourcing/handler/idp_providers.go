@@ -4,8 +4,10 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
+	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -14,7 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -27,19 +28,16 @@ const (
 type IDPProvider struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
-	iamEvents      *eventsourcing.IAMEventstore
 	subscription   *eventstore.Subscription
 }
 
 func newIDPProvider(
 	handler handler,
 	systemDefaults systemdefaults.SystemDefaults,
-	iamEvents *eventsourcing.IAMEventstore,
 ) *IDPProvider {
 	h := &IDPProvider{
 		handler:        handler,
 		systemDefaults: systemDefaults,
-		iamEvents:      iamEvents,
 	}
 
 	h.subscribe()
@@ -117,7 +115,7 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		config, err := i.iamEvents.GetIDPConfig(context.Background(), event.AggregateID, esConfig.IDPConfigID)
+		config, err := i.getDefaultIDPConfig(context.Background(), esConfig.IDPConfigID)
 		if err != nil {
 			return err
 		}
@@ -137,7 +135,7 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 func (i *IDPProvider) fillData(provider *iam_view_model.IDPProviderView) (err error) {
 	var config *iam_model.IDPConfig
 	if provider.IDPProviderType == int32(iam_model.IDPProviderTypeSystem) {
-		config, err = i.iamEvents.GetIDPConfig(context.Background(), i.systemDefaults.IamID, provider.IDPConfigID)
+		config, err = i.getDefaultIDPConfig(context.Background(), provider.IDPConfigID)
 	} else {
 		config, err = i.getOrgIDPConfig(context.Background(), provider.AggregateID, provider.IDPConfigID)
 	}
@@ -195,4 +193,32 @@ func (i *IDPProvider) getOrgByID(ctx context.Context, orgID string) (*org_model.
 	}
 
 	return org_es_model.OrgToModel(esOrg), nil
+}
+
+func (u *IDPProvider) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &model.IAM{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, iam.AppendEvents, query)
+	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return model.IAMToModel(iam), nil
+}
+
+func (u *IDPProvider) getDefaultIDPConfig(ctx context.Context, idpConfigID string) (*iam_model.IDPConfig, error) {
+	existing, err := u.getIAMByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if _, existingIDP := existing.GetIDP(idpConfigID); existingIDP != nil {
+		return existingIDP, nil
+	}
+	return nil, errors.ThrowNotFound(nil, "EVENT-4M=Fs", "Errors.IAM.IdpNotExisting")
 }

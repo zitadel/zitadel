@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"strings"
 
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
@@ -19,7 +21,6 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -38,7 +39,6 @@ const (
 
 type UserGrant struct {
 	handler
-	iamEvents    *iam_events.IAMEventstore
 	iamID        string
 	iamProjectID string
 	subscription *eventstore.Subscription
@@ -46,13 +46,11 @@ type UserGrant struct {
 
 func newUserGrant(
 	handler handler,
-	iamEvents *iam_events.IAMEventstore,
 	iamID string,
 ) *UserGrant {
 	h := &UserGrant{
-		iamEvents: iamEvents,
-		handler:   handler,
-		iamID:     iamID,
+		handler: handler,
+		iamID:   iamID,
 	}
 
 	h.subscribe()
@@ -342,7 +340,7 @@ func (u *UserGrant) setIamProjectID() error {
 	if u.iamProjectID != "" {
 		return nil
 	}
-	iam, err := u.iamEvents.IAMByID(context.Background(), u.iamID)
+	iam, err := u.getIAMByID(context.Background())
 	if err != nil {
 		return err
 	}
@@ -485,4 +483,21 @@ func (u *UserGrant) getProjectByID(ctx context.Context, projID string) (*proj_mo
 	}
 
 	return proj_es_model.ProjectToModel(esProject), nil
+}
+
+func (u *UserGrant) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &iam_es_model.IAM{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, iam.AppendEvents, query)
+	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return iam_es_model.IAMToModel(iam), nil
 }

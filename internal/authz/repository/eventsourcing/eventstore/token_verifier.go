@@ -2,6 +2,12 @@ package eventstore
 
 import (
 	"context"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	"github.com/caos/zitadel/internal/v2/domain"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"strings"
 	"time"
 
@@ -14,7 +20,6 @@ import (
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
@@ -24,7 +29,6 @@ type TokenVerifierRepo struct {
 	TokenVerificationKey [32]byte
 	IAMID                string
 	Eventstore           eventstore.Eventstore
-	IAMEvents            *iam_event.IAMEventstore
 	View                 *view.View
 }
 
@@ -111,7 +115,7 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
+	iam, err := repo.getIAMByID(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -128,4 +132,21 @@ func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID string, se
 		return nil, err
 	}
 	return r.Eventstore.FilterEvents(ctx, query)
+}
+
+func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &iam_es_model.IAM{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
+	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return iam_es_model.IAMToModel(iam), nil
 }

@@ -11,7 +11,6 @@ import (
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -28,20 +27,17 @@ const (
 
 type User struct {
 	handler
-	iamEvents    *iam_es.IAMEventstore
 	iamID        string
 	subscription *eventstore.Subscription
 }
 
 func newUser(
 	handler handler,
-	iamEvents *iam_es.IAMEventstore,
 	iamID string,
 ) *User {
 	h := &User{
-		handler:   handler,
-		iamEvents: iamEvents,
-		iamID:     iamID,
+		handler: handler,
+		iamID:   iamID,
 	}
 
 	h.subscribe()

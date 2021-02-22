@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/project/model"
@@ -34,4 +35,6 @@ type ProjectRepository interface {
 
 	ProjectGrantMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectGrantMemberView, error)
 	GetProjectGrantMemberRoles() []string
+
+	GetIAMByID(ctx context.Context) (*iam_model.IAM, error)
 }

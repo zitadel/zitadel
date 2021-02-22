@@ -2,7 +2,11 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"strings"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -11,15 +15,14 @@ import (
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
 type IAMRepository struct {
-	SearchLimit uint64
-	*iam_es.IAMEventstore
+	Eventstore     eventstore.Eventstore
+	SearchLimit    uint64
 	View           *admin_view.View
 	SystemDefaults systemdefaults.SystemDefaults
 	Roles          []string
@@ -126,7 +129,7 @@ func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.LoginPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
 	}
@@ -195,7 +198,7 @@ func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordComplexityPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-1Mc0s", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
@@ -220,7 +223,7 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordAgePolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-vMyS3", "Errors.IAM.PasswordAgePolicy.NotFound")
 	}
@@ -245,7 +248,7 @@ func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordLockoutPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2M9oP", "Errors.IAM.PasswordLockoutPolicy.NotFound")
 	}
@@ -270,7 +273,7 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.OrgIAMPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-MkoL0", "Errors.IAM.OrgIAMPolicy.NotFound")
 	}
@@ -339,4 +342,12 @@ func (repo *IAMRepository) GetDefaultMailText(ctx context.Context, textType stri
 	}
 	text.Default = true
 	return iam_es_model.MailTextViewToModel(text), err
+}
+
+func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Eventstore.FilterEvents(ctx, query)
 }

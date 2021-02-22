@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
 	"strings"
-
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -37,7 +36,6 @@ const (
 type OrgRepository struct {
 	SearchLimit    uint64
 	Eventstore     eventstore.Eventstore
-	IAMEventstore  *iam_es.IAMEventstore
 	View           *mgmt_view.View
 	Roles          []string
 	SystemDefaults systemdefaults.SystemDefaults
@@ -243,7 +241,7 @@ func (repo *OrgRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.LoginPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, domain.IAMID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
 	}
@@ -346,7 +344,7 @@ func (repo *OrgRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordComplexityPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
@@ -397,7 +395,7 @@ func (repo *OrgRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordAgePolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.PasswordAgePolicy.NotFound")
 	}
@@ -448,7 +446,7 @@ func (repo *OrgRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordLockoutPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.PasswordLockoutPolicy.NotFound")
 	}
@@ -600,4 +598,12 @@ func (es *OrgRepository) getOrgEvents(ctx context.Context, id string, sequence u
 		return nil, err
 	}
 	return es.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Eventstore.FilterEvents(ctx, query)
 }

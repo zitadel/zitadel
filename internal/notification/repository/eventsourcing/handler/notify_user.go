@@ -15,7 +15,6 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -28,20 +27,17 @@ const (
 
 type NotifyUser struct {
 	handler
-	iamEvents    *iam_es.IAMEventstore
 	iamID        string
 	subscription *eventstore.Subscription
 }
 
 func newNotifyUser(
 	handler handler,
-	iamEvents *iam_es.IAMEventstore,
 	iamID string,
 ) *NotifyUser {
 	h := &NotifyUser{
-		handler:   handler,
-		iamEvents: iamEvents,
-		iamID:     iamID,
+		handler: handler,
+		iamID:   iamID,
 	}
 
 	h.subscribe()

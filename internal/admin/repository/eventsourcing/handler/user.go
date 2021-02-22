@@ -6,7 +6,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view"
@@ -33,19 +32,16 @@ const (
 type User struct {
 	handler
 	eventstore     eventstore.Eventstore
-	iamEvents      *iam_es.IAMEventstore
 	systemDefaults systemdefaults.SystemDefaults
 	subscription   *eventstore.Subscription
 }
 
 func newUser(
 	handler handler,
-	iamEvents *iam_es.IAMEventstore,
 	systemDefaults systemdefaults.SystemDefaults,
 ) *User {
 	h := &User{
 		handler:        handler,
-		iamEvents:      iamEvents,
 		systemDefaults: systemDefaults,
 	}
 

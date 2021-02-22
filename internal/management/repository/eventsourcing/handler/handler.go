@@ -7,7 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
-	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 )
 
@@ -30,11 +29,7 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 	return h.es
 }
 
-type EventstoreRepos struct {
-	IamEvents *iam_event.IAMEventstore
-}
-
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, defaults systemdefaults.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		newProject(
 			handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount, es}),
@@ -45,7 +40,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es}),
 		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			repos.IamEvents,
 			defaults.IamID),
 		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es}),
 		newOrg(
@@ -66,12 +60,10 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
 		newIDPProvider(
 			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-			defaults,
-			repos.IamEvents),
+			defaults),
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			defaults,
-			repos.IamEvents),
+			defaults),
 		newPasswordComplexityPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
 		newPasswordAgePolicy(

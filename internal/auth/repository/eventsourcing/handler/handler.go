@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
-	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -30,15 +29,10 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 	return h.es
 }
 
-type EventstoreRepos struct {
-	IamEvents *iam_events.IAMEventstore
-}
-
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		newUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			repos.IamEvents,
 			systemDefaults.IamID),
 		newUserSession(
 			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}),
@@ -53,7 +47,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newUserGrant(
 			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
-			repos.IamEvents,
 			systemDefaults.IamID),
 		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
@@ -63,12 +56,10 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
 		newIDPProvider(
 			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-			systemDefaults,
-			repos.IamEvents),
+			systemDefaults),
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			systemDefaults,
-			repos.IamEvents),
+			systemDefaults),
 		newPasswordComplexityPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
 		newOrgIAMPolicy(
