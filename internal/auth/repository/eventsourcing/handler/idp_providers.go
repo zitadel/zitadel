@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -31,7 +30,6 @@ type IDPProvider struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
 	iamEvents      *eventsourcing.IAMEventstore
-	orgEvents      *org_es.OrgEventstore
 	subscription   *eventstore.Subscription
 }
 
@@ -39,13 +37,11 @@ func newIDPProvider(
 	h handler,
 	defaults systemdefaults.SystemDefaults,
 	iamEvents *eventsourcing.IAMEventstore,
-	orgEvents *org_es.OrgEventstore,
 ) *IDPProvider {
 	idpProvider := &IDPProvider{
 		handler:        h,
 		systemDefaults: defaults,
 		iamEvents:      iamEvents,
-		orgEvents:      orgEvents,
 	}
 
 	idpProvider.subscribe()

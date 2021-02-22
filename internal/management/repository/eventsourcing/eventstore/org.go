@@ -24,7 +24,6 @@ import (
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -36,8 +35,7 @@ const (
 )
 
 type OrgRepository struct {
-	SearchLimit uint64
-	*org_es.OrgEventstore
+	SearchLimit    uint64
 	Eventstore     eventstore.Eventstore
 	IAMEventstore  *iam_es.IAMEventstore
 	View           *mgmt_view.View
@@ -601,5 +599,5 @@ func (es *OrgRepository) getOrgEvents(ctx context.Context, id string, sequence u
 	if err != nil {
 		return nil, err
 	}
-	return es.FilterEvents(ctx, query)
+	return es.Eventstore.FilterEvents(ctx, query)
 }

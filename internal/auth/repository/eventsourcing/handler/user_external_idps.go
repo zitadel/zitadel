@@ -16,7 +16,6 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -31,7 +30,6 @@ type ExternalIDP struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
 	iamEvents      *eventsourcing.IAMEventstore
-	orgEvents      *org_es.OrgEventstore
 	subscription   *eventstore.Subscription
 }
 
@@ -39,13 +37,11 @@ func newExternalIDP(
 	handler handler,
 	defaults systemdefaults.SystemDefaults,
 	iamEvents *eventsourcing.IAMEventstore,
-	orgEvents *org_es.OrgEventstore,
 ) *ExternalIDP {
 	h := &ExternalIDP{
 		handler:        handler,
 		systemDefaults: defaults,
 		iamEvents:      iamEvents,
-		orgEvents:      orgEvents,
 	}
 
 	h.subscribe()

@@ -17,7 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -30,7 +29,6 @@ const (
 type User struct {
 	handler
 	eventstore     eventstore.Eventstore
-	orgEvents      *org_events.OrgEventstore
 	iamEvents      *iam_es.IAMEventstore
 	systemDefaults systemdefaults.SystemDefaults
 	subscription   *eventstore.Subscription
@@ -38,13 +36,11 @@ type User struct {
 
 func newUser(
 	handler handler,
-	orgEvents *org_events.OrgEventstore,
 	iamEvents *iam_es.IAMEventstore,
 	systemDefaults systemdefaults.SystemDefaults,
 ) *User {
 	h := &User{
 		handler:        handler,
-		orgEvents:      orgEvents,
 		iamEvents:      iamEvents,
 		systemDefaults: systemDefaults,
 	}

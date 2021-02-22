@@ -20,7 +20,6 @@ import (
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -32,7 +31,6 @@ import (
 
 type AuthRequestRepo struct {
 	Command      *command.CommandSide
-	OrgEvents    *org_event.OrgEventstore
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 

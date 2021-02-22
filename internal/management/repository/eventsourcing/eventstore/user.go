@@ -17,7 +17,6 @@ import (
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
-	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -26,7 +25,6 @@ import (
 type UserRepo struct {
 	es_int.Eventstore
 	SearchLimit    uint64
-	OrgEvents      *org_event.OrgEventstore
 	View           *view.View
 	SystemDefaults systemdefaults.SystemDefaults
 }

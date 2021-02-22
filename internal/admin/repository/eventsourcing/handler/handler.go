@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -33,7 +32,6 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 
 type EventstoreRepos struct {
 	IamEvents *iam_event.IAMEventstore
-	OrgEvents *org_event.OrgEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, defaults systemdefaults.SystemDefaults) []query.Handler {
@@ -51,11 +49,9 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newIDPProvider(
 			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
 			defaults,
-			repos.IamEvents,
-			repos.OrgEvents),
+			repos.IamEvents),
 		newUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			repos.OrgEvents,
 			repos.IamEvents,
 			defaults),
 		newPasswordComplexityPolicy(
@@ -69,8 +65,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			defaults,
-			repos.IamEvents,
-			repos.OrgEvents),
+			repos.IamEvents),
 		newMailTemplate(
 			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
 		newMailText(

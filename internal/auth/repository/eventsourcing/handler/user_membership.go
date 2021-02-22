@@ -14,7 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -29,19 +28,16 @@ const (
 
 type UserMembership struct {
 	handler
-	orgEvents     *org_event.OrgEventstore
 	projectEvents *proj_event.ProjectEventstore
 	subscription  *eventstore.Subscription
 }
 
 func newUserMembership(
 	handler handler,
-	orgEvents *org_event.OrgEventstore,
 	projectEvents *proj_event.ProjectEventstore,
 ) *UserMembership {
 	h := &UserMembership{
 		handler:       handler,
-		orgEvents:     orgEvents,
 		projectEvents: projectEvents,
 	}
 

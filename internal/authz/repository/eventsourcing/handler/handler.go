@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
-	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	project_events "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
@@ -34,7 +33,6 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 
 type EventstoreRepos struct {
 	IAMEvents     *eventsourcing.IAMEventstore
-	OrgEvents     *org_events.OrgEventstore
 	ProjectEvents *project_events.ProjectEventstore
 }
 
@@ -46,7 +44,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			systemDefaults.IamID),
 		newUserMembership(
 			handler{view, bulkLimit, configs.cycleDuration("UserMemberships"), errorCount, es},
-			repos.OrgEvents,
 			repos.ProjectEvents),
 		newApplication(
 			handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),

@@ -16,7 +16,6 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/id"
-	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/v2/command"
 	"github.com/caos/zitadel/internal/v2/query"
@@ -100,15 +99,12 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		return nil, err
 	}
 
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
-
-	repos := handler.EventstoreRepos{ProjectEvents: project, OrgEvents: org, IamEvents: iam}
+	repos := handler.EventstoreRepos{ProjectEvents: project, IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,
 		Eventstore:     es,
-		OrgEvents:      org,
 		View:           view,
 		SystemDefaults: systemDefaults,
 	}
@@ -118,7 +114,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		userRepo,
 		eventstore.AuthRequestRepo{
 			Command:                    command,
-			OrgEvents:                  org,
 			AuthRequests:               authReq,
 			View:                       view,
 			UserSessionViewProvider:    view,
@@ -164,7 +159,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		eventstore.OrgRepository{
 			SearchLimit:    conf.SearchLimit,
 			View:           view,
-			OrgEventstore:  org,
 			SystemDefaults: systemDefaults,
 		},
 		eventstore.IAMRepository{

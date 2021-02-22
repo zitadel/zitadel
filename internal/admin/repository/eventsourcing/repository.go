@@ -11,7 +11,6 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 )
 
 type Config struct {
@@ -42,8 +41,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		return nil, err
 	}
 
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
-
 	sqlClient, err := conf.View.Start()
 	if err != nil {
 		return nil, err
@@ -53,20 +50,18 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{OrgEvents: org, IamEvents: iam}, systemDefaults)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{IamEvents: iam}, systemDefaults)
 
 	return &EsRepository{
 		spooler: spool,
 		OrgRepo: eventstore.OrgRepo{
 			Eventstore:     es,
-			OrgEventstore:  org,
 			View:           view,
 			SearchLimit:    conf.SearchLimit,
 			SystemDefaults: systemDefaults,
 		},
 		IAMRepository: eventstore.IAMRepository{
 			IAMEventstore:  iam,
-			OrgEvents:      org,
 			View:           view,
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,
@@ -79,9 +74,5 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 }
 
 func (repo *EsRepository) Health(ctx context.Context) error {
-	err := repo.Eventstore.Health(ctx)
-	if err != nil {
-		return err
-	}
-	return repo.OrgEventstore.Health(ctx)
+	return repo.Eventstore.Health(ctx)
 }

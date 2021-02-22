@@ -20,7 +20,6 @@ import (
 	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -39,7 +38,6 @@ const (
 type UserGrant struct {
 	handler
 	projectEvents *proj_event.ProjectEventstore
-	orgEvents     *org_events.OrgEventstore
 	iamEvents     *iam_events.IAMEventstore
 	iamID         string
 	iamProjectID  string
@@ -49,14 +47,12 @@ type UserGrant struct {
 func newUserGrant(
 	handler handler,
 	projectEvents *proj_event.ProjectEventstore,
-	orgEvents *org_events.OrgEventstore,
 	iamEvents *iam_events.IAMEventstore,
 	iamID string,
 ) *UserGrant {
 	h := &UserGrant{
 		handler:       handler,
 		projectEvents: projectEvents,
-		orgEvents:     orgEvents,
 		iamEvents:     iamEvents,
 		iamID:         iamID,
 	}

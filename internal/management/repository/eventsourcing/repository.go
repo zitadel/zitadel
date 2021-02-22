@@ -14,7 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
@@ -63,7 +62,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
 	iam, err := es_iam.StartIAM(es_iam.IAMConfig{
 		Eventstore: es,
@@ -72,14 +70,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
-	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project, OrgEvents: org, IamEvents: iam}
+	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project, IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults)
 
 	return &EsRepository{
 		spooler:       spool,
-		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, es, iam, view, roles, systemDefaults},
+		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, es, iam, view, roles, systemDefaults},
 		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, iam, view, roles, systemDefaults.IamID},
-		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, org, view, systemDefaults},
+		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view},
 		IAMRepository: eventstore.IAMRepository{
 			IAMV2Query: iamV2Query,

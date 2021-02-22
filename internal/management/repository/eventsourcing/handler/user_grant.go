@@ -17,7 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -34,19 +33,16 @@ const (
 type UserGrant struct {
 	handler
 	projectEvents *proj_event.ProjectEventstore
-	orgEvents     *org_events.OrgEventstore
 	subscription  *eventstore.Subscription
 }
 
 func newUserGrant(
 	handler handler,
 	projectEvents *proj_event.ProjectEventstore,
-	orgEvents *org_events.OrgEventstore,
 ) *UserGrant {
 	h := &UserGrant{
 		handler:       handler,
 		projectEvents: projectEvents,
-		orgEvents:     orgEvents,
 	}
 
 	h.subscribe()

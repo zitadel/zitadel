@@ -2,12 +2,12 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/org/repository/view"
 
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 )
@@ -61,7 +61,7 @@ func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.OrgQuery(sequence.CurrentSequence), nil
+	return view.OrgQuery(sequence.CurrentSequence), nil
 }
 
 func (o *Org) Reduce(event *es_models.Event) error {
