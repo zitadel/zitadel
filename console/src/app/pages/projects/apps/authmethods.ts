@@ -44,9 +44,9 @@ export const PK_JWT_METHOD: RadioItemAuthType = {
     disabled: false,
     prefix: 'JWT',
     background: 'rgb(80 110 92)',
-    // responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-    // grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-    // authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+    responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
+    grantType: OIDCGrantType.,
+    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
     apiAuthMethod: APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT,
     recommended: true,
 };
