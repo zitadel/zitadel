@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -22,16 +23,20 @@ type LoginPolicySecondFactorAddedEvent struct {
 
 func NewLoginPolicySecondFactorAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mfaType domain.SecondFactorType,
 ) *LoginPolicySecondFactorAddedEvent {
 	return &LoginPolicySecondFactorAddedEvent{
 		SecondFactorAddedEvent: *policy.NewSecondFactorAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicySecondFactorAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicySecondFactorAddedEventType),
 			mfaType),
 	}
 }
 
-func SecondFactorAddedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SecondFactorAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.SecondFactorAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -48,17 +53,21 @@ type LoginPolicySecondFactorRemovedEvent struct {
 
 func NewLoginPolicySecondFactorRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mfaType domain.SecondFactorType,
 ) *LoginPolicySecondFactorRemovedEvent {
 
 	return &LoginPolicySecondFactorRemovedEvent{
 		SecondFactorRemovedEvent: *policy.NewSecondFactorRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicySecondFactorRemovedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicySecondFactorRemovedEventType),
 			mfaType),
 	}
 }
 
-func SecondFactorRemovedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.SecondFactorRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -75,16 +84,20 @@ type LoginPolicyMultiFactorAddedEvent struct {
 
 func NewLoginPolicyMultiFactorAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mfaType domain.MultiFactorType,
 ) *LoginPolicyMultiFactorAddedEvent {
 	return &LoginPolicyMultiFactorAddedEvent{
 		MultiFactorAddedEvent: *policy.NewMultiFactorAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyMultiFactorAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicyMultiFactorAddedEventType),
 			mfaType),
 	}
 }
 
-func MultiFactorAddedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MultiFactorAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.MultiFactorAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -101,17 +114,21 @@ type LoginPolicyMultiFactorRemovedEvent struct {
 
 func NewLoginPolicyMultiFactorRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mfaType domain.MultiFactorType,
 ) *LoginPolicyMultiFactorRemovedEvent {
 
 	return &LoginPolicyMultiFactorRemovedEvent{
 		MultiFactorRemovedEvent: *policy.NewMultiFactorRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyMultiFactorRemovedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicyMultiFactorRemovedEventType),
 			mfaType),
 	}
 }
 
-func MultiFactorRemovedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MultiFactorRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := policy.MultiFactorRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

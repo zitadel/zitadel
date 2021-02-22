@@ -46,11 +46,15 @@ func (wm *IAMLoginPolicyWriteModel) Reduce() error {
 func (wm *IAMLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.LoginPolicyWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.LoginPolicyAddedEventType,
+			iam.LoginPolicyChangedEventType)
 }
 
 func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
@@ -77,7 +81,7 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewLoginPolicyChangedEvent(ctx, changes)
+	changedEvent, err := iam.NewLoginPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

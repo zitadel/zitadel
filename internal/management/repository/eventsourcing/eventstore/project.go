@@ -2,33 +2,40 @@ package eventstore
 
 import (
 	"context"
+	"encoding/json"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"strings"
 
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
-	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
+	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
+	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type ProjectRepo struct {
 	es_int.Eventstore
-	SearchLimit     uint64
-	ProjectEvents   *proj_event.ProjectEventstore
-	UserGrantEvents *usr_grant_event.UserGrantEventStore
-	UserEvents      *usr_event.UserEventstore
-	IAMEvents       *iam_event.IAMEventstore
-	View            *view.View
-	Roles           []string
-	IAMID           string
+	SearchLimit uint64
+	View        *view.View
+	Roles       []string
+	IAMID       string
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
@@ -40,7 +47,7 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 		project = new(model.ProjectView)
 	}
 
-	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
+	events, esErr := repo.getProjectEvents(ctx, id, project.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8yfKu", "Errors.Project.NotFound")
 	}
@@ -175,19 +182,19 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID strin
 }
 
 func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
-	changes, err := repo.ProjectEvents.ProjectChanges(ctx, id, lastSequence, limit, sortAscending)
+	changes, err := repo.getProjectChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
-			if user.Human != nil {
+			if user.HumanView != nil {
 				change.ModifierName = user.DisplayName
 			}
-			if user.Machine != nil {
-				change.ModifierName = user.Machine.Name
+			if user.MachineView != nil {
+				change.ModifierName = user.MachineView.Name
 			}
 		}
 	}
@@ -204,7 +211,7 @@ func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID s
 		app.ID = appID
 	}
 
-	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, projectID, app.Sequence)
+	events, esErr := repo.getProjectEvents(ctx, projectID, app.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Fshu8", "Errors.Application.NotFound")
 	}
@@ -249,27 +256,73 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 }
 
 func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
-	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, id, appId, lastSequence, limit, sortAscending)
+	changes, err := repo.getApplicationChanges(ctx, id, appId, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
-		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
-			if user.Human != nil {
+			if user.HumanView != nil {
 				change.ModifierName = user.DisplayName
 			}
-			if user.Machine != nil {
-				change.ModifierName = user.Machine.Name
+			if user.MachineView != nil {
+				change.ModifierName = user.MachineView.Name
 			}
 		}
 	}
 	return changes, nil
 }
 
-func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
-	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
+func (repo *ProjectRepo) SearchClientKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, sequenceErr := repo.View.GetLatestAuthNKeySequence()
+	logging.Log("EVENT-ADwgw").OnError(sequenceErr).Warn("could not read latest authn key sequence")
+	keys, count, err := repo.View.SearchAuthNKeys(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &key_model.AuthNKeySearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      key_view_model.AuthNKeysToModel(keys),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
+}
+
+func (repo *ProjectRepo) GetClientKey(ctx context.Context, projectID, applicationID, keyID string) (*key_model.AuthNKeyView, error) {
+	key, viewErr := repo.View.AuthNKeyByIDs(applicationID, keyID)
+	if viewErr != nil {
+		return nil, viewErr
+	}
+
+	events, esErr := repo.getProjectEvents(ctx, projectID, key.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-SFf2g", "Errors.User.KeyNotFound")
+	}
+
+	if esErr != nil {
+		logging.Log("EVENT-ADbf2").WithError(viewErr).Debug("error retrieving new events")
+		return key_view_model.AuthNKeyToModel(key), nil
+	}
+
+	viewKey := *key
+	for _, event := range events {
+		err := key.AppendEventIfMyClientKey(event)
+		if err != nil {
+			return key_view_model.AuthNKeyToModel(&viewKey), nil
+		}
+		if key.State != int32(proj_model.AppStateActive) {
+			return nil, caos_errs.ThrowNotFound(nil, "EVENT-Adfg3", "Errors.User.KeyNotFound")
+		}
+	}
+	return key_view_model.AuthNKeyToModel(key), nil
 }
 
 func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (*proj_model.ProjectGrantView, error) {
@@ -390,7 +443,7 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 }
 
 func (repo *ProjectRepo) GetProjectMemberRoles(ctx context.Context) ([]string, error) {
-	iam, err := repo.IAMEvents.IAMByID(ctx, repo.IAMID)
+	iam, err := repo.GetIAMByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -415,4 +468,159 @@ func (repo *ProjectRepo) GetProjectGrantMemberRoles() []string {
 		}
 	}
 	return roles
+}
+
+func (repo *ProjectRepo) userByID(ctx context.Context, id string) (*usr_model.UserView, error) {
+	user, viewErr := repo.View.UserByID(id)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		user = new(usr_es_model.UserView)
+	}
+	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4n8Fs", "Errors.User.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
+		return usr_es_model.UserToModel(user), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return usr_es_model.UserToModel(user), nil
+		}
+	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2m0Fs", "Errors.User.NotFound")
+	}
+	return usr_es_model.UserToModel(&userCopy), nil
+}
+
+func (r *ProjectRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return r.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *ProjectRepo) getProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
+	query := proj_view.ChangesQuery(id, lastSequence, limit, sortAscending)
+
+	events, err := repo.Eventstore.FilterEvents(context.Background(), query)
+	if err != nil {
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, caos_errs.ThrowInternal(err, "EVENT-328b1", "Errors.Internal")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-FpQqK", "Errors.Changes.NotFound")
+	}
+
+	changes := make([]*proj_model.ProjectChange, len(events))
+
+	for i, event := range events {
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
+		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
+		change := &proj_model.ProjectChange{
+			ChangeDate: creationDate,
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
+		}
+
+		if event.Data != nil {
+			var data interface{}
+			if strings.Contains(change.EventType, "application") {
+				data = new(proj_model.Application)
+			} else {
+				data = new(proj_model.Project)
+			}
+			err = json.Unmarshal(event.Data, data)
+			logging.Log("EVENT-NCkpN").OnError(err).Debug("unable to unmarshal data")
+			change.Data = data
+		}
+
+		changes[i] = change
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
+		}
+	}
+
+	return &proj_model.ProjectChanges{
+		Changes:      changes,
+		LastSequence: lastSequence,
+	}, nil
+}
+
+func (repo *ProjectRepo) getProjectEvents(ctx context.Context, id string, sequence uint64) ([]*models.Event, error) {
+	query, err := proj_view.ProjectByIDQuery(id, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *ProjectRepo) getApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
+	query := proj_view.ChangesQuery(projectID, lastSequence, limit, sortAscending)
+
+	events, err := repo.Eventstore.FilterEvents(ctx, query)
+	if err != nil {
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, caos_errs.ThrowInternal(err, "EVENT-sw6Ku", "Errors.Internal")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-9IHLP", "Errors.Changes.NotFound")
+	}
+
+	result := make([]*proj_model.ApplicationChange, 0)
+	for _, event := range events {
+		if !strings.Contains(event.Type.String(), "application") || event.Data == nil {
+			continue
+		}
+
+		app := new(proj_model.Application)
+		err := json.Unmarshal(event.Data, app)
+		logging.Log("EVENT-GIiKD").OnError(err).Debug("unable to unmarshal data")
+		if app.AppID != appID {
+			continue
+		}
+
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
+		logging.Log("EVENT-MJzeN").OnError(err).Debug("unable to parse timestamp")
+
+		result = append(result, &proj_model.ApplicationChange{
+			ChangeDate: creationDate,
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
+			Data:       app,
+		})
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
+		}
+	}
+
+	return &proj_model.ApplicationChanges{
+		Changes:      result,
+		LastSequence: lastSequence,
+	}, nil
+}
+
+func (u *ProjectRepo) GetIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &iam_es_model.IAM{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
+	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return iam_es_model.IAMToModel(iam), nil
 }

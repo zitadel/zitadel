@@ -2,16 +2,19 @@ package handler
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/user/repository/view"
+	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -21,14 +24,12 @@ const (
 
 type IAMMember struct {
 	handler
-	userEvents   *usr_event.UserEventstore
 	subscription *eventstore.Subscription
 }
 
-func newIAMMember(handler handler, userEvents *usr_event.UserEventstore) *IAMMember {
+func newIAMMember(handler handler) *IAMMember {
 	iamMember := &IAMMember{
-		handler:    handler,
-		userEvents: userEvents,
+		handler: handler,
 	}
 
 	iamMember.subscribe()
@@ -129,7 +130,7 @@ func (m *IAMMember) processUser(event *es_models.Event) (err error) {
 		if len(members) == 0 {
 			return m.view.ProcessedIAMMemberSequence(event)
 		}
-		user, err := m.userEvents.UserByID(context.Background(), event.AggregateID)
+		user, err := m.getUserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
@@ -145,7 +146,7 @@ func (m *IAMMember) processUser(event *es_models.Event) (err error) {
 }
 
 func (m *IAMMember) fillData(member *iam_model.IAMMemberView) (err error) {
-	user, err := m.userEvents.UserByID(context.Background(), member.UserID)
+	user, err := m.getUserByID(member.UserID)
 	if err != nil {
 		return err
 	}
@@ -153,16 +154,16 @@ func (m *IAMMember) fillData(member *iam_model.IAMMemberView) (err error) {
 	return nil
 }
 
-func (m *IAMMember) fillUserData(member *iam_model.IAMMemberView, user *usr_model.User) {
+func (m *IAMMember) fillUserData(member *iam_model.IAMMemberView, user *view_model.UserView) {
 	member.UserName = user.UserName
-	if user.Human != nil {
+	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.DisplayName = user.FirstName + " " + user.LastName
-		member.Email = user.EmailAddress
+		member.Email = user.Email
 	}
-	if user.Machine != nil {
-		member.DisplayName = user.Machine.Name
+	if user.MachineView != nil {
+		member.DisplayName = user.MachineView.Name
 	}
 }
 func (m *IAMMember) OnError(event *es_models.Event, err error) error {
@@ -172,4 +173,37 @@ func (m *IAMMember) OnError(event *es_models.Event, err error) error {
 
 func (m *IAMMember) OnSuccess() error {
 	return spooler.HandleSuccess(m.view.UpdateIAMMemberSpoolerRunTimestamp)
+}
+
+func (m *IAMMember) getUserByID(userID string) (*view_model.UserView, error) {
+	user, usrErr := m.view.UserByID(userID)
+	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+		return nil, usrErr
+	}
+	if user == nil {
+		user = &view_model.UserView{}
+	}
+	events, err := m.getUserEvents(userID, user.Sequence)
+	if err != nil {
+		return user, usrErr
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return user, nil
+		}
+	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-4n9fs", "Errors.User.NotFound")
+	}
+	return &userCopy, nil
+}
+
+func (m *IAMMember) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.es.FilterEvents(context.Background(), query)
 }

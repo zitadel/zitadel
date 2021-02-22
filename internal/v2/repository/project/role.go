@@ -4,30 +4,31 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 var (
-	uniqueRoleType      = "project_role"
+	UniqueRoleType      = "project_role"
 	roleEventTypePrefix = projectEventTypePrefix + "role."
 	RoleAddedType       = roleEventTypePrefix + "added"
 	RoleChangedType     = roleEventTypePrefix + "changed"
 	RoleRemovedType     = roleEventTypePrefix + "removed"
 )
 
-func NewAddProjectRoleUniqueConstraint(roleKey, projectID, resourceOwner string) *eventstore.EventUniqueConstraint {
+func NewAddProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueRoleType,
-		fmt.Sprintf("%s:%s:%s", roleKey, projectID, resourceOwner),
+		UniqueRoleType,
+		fmt.Sprintf("%s:%s", roleKey, projectID),
 		"Errors.Project.Role.AlreadyExists")
 }
 
-func NewRemoveProjectRoleUniqueConstraint(roleKey, projectID, resourceOwner string) *eventstore.EventUniqueConstraint {
+func NewRemoveProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueRoleType,
-		fmt.Sprintf("%s:%s:%s", roleKey, projectID, resourceOwner))
+		UniqueRoleType,
+		fmt.Sprintf("%s:%s", roleKey, projectID))
 }
 
 type RoleAddedEvent struct {
@@ -44,15 +45,22 @@ func (e *RoleAddedEvent) Data() interface{} {
 }
 
 func (e *RoleAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.projectID, e.ResourceOwner())}
+	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.projectID)}
 }
 
-func NewRoleAddedEvent(ctx context.Context, key, displayName, group, projectID, resourceOwner string) *RoleAddedEvent {
+func NewRoleAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	key,
+	displayName,
+	group,
+	projectID string,
+) *RoleAddedEvent {
 	return &RoleAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
+		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			RoleAddedType,
-			resourceOwner,
 		),
 		Key:         key,
 		DisplayName: displayName,
@@ -92,13 +100,16 @@ func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 
 func NewRoleChangedEvent(
 	ctx context.Context,
-	changes []RoleChanges) (*RoleChangedEvent, error) {
+	aggregate *eventstore.Aggregate,
+	changes []RoleChanges,
+) (*RoleChangedEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-eR9vx", "Errors.NoChangesFound")
 	}
 	changeEvent := &RoleChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			RoleChangedType,
 		),
 	}
@@ -144,7 +155,7 @@ type RoleRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Key       string `json:"key,omitempty"`
-	projectID string
+	projectID string `json:"-"`
 }
 
 func (e *RoleRemovedEvent) Data() interface{} {
@@ -152,15 +163,19 @@ func (e *RoleRemovedEvent) Data() interface{} {
 }
 
 func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.projectID, e.ResourceOwner())}
+	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.projectID)}
 }
 
-func NewRoleRemovedEvent(ctx context.Context, key, projectID, resourceOwner string) *RoleRemovedEvent {
+func NewRoleRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	key,
+	projectID string) *RoleRemovedEvent {
 	return &RoleRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPushWithResourceOwner(
+		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			RoleRemovedType,
-			resourceOwner,
 		),
 		Key:       key,
 		projectID: projectID,

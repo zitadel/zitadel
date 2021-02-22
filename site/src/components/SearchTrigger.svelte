@@ -1,6 +1,5 @@
 <script>
     import {onMount} from 'svelte';
-    import { _ } from 'svelte-i18n';
     let buttonname = '';
 
     onMount(() => {
@@ -58,7 +57,7 @@
 
 <button on:click class="search-trigger">
     <i class="las la-search"></i>
-    <span>{$_('search_button_holder')}</span>
+    <span>Search this site</span>
     <span class="fill-space"></span>
     <span class="strg">{buttonname || 'Ctrl'} F</span>
 </button>

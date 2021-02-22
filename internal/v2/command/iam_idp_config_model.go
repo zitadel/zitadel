@@ -28,7 +28,16 @@ func NewIAMIDPConfigWriteModel(configID string) *IAMIDPConfigWriteModel {
 func (wm *IAMIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.IDPConfigAddedEventType,
+			iam.IDPConfigChangedEventType,
+			iam.IDPConfigDeactivatedEventType,
+			iam.IDPConfigReactivatedEventType,
+			iam.IDPConfigRemovedEventType,
+			iam.IDPOIDCConfigAddedEventType,
+			iam.IDPOIDCConfigChangedEventType,
+		)
 }
 
 func (wm *IAMIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
@@ -84,13 +93,16 @@ func (wm *IAMIDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventRead
 
 func (wm *IAMIDPConfigWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	configID,
 	name string,
 	stylingType domain.IDPConfigStylingType,
 ) (*iam.IDPConfigChangedEvent, bool) {
 
 	changes := make([]idpconfig.IDPConfigChanges, 0)
+	oldName := ""
 	if wm.Name != name {
+		oldName = wm.Name
 		changes = append(changes, idpconfig.ChangeName(name))
 	}
 	if stylingType.Valid() && wm.StylingType != stylingType {
@@ -99,7 +111,7 @@ func (wm *IAMIDPConfigWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changeEvent, err := iam.NewIDPConfigChangedEvent(ctx, configID, changes)
+	changeEvent, err := iam.NewIDPConfigChangedEvent(ctx, aggregate, configID, oldName, changes)
 	if err != nil {
 		return nil, false
 	}

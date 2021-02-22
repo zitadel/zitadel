@@ -52,17 +52,6 @@ func (rm *UserReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).AggregateIDs(rm.AggregateID)
 }
 
-func UserAggregateFromReadModel(rm *UserReadModel) *user.Aggregate {
-	return &user.Aggregate{
-		Aggregate: *eventstore.NewAggregate(
-			rm.AggregateID,
-			user.AggregateType,
-			rm.ResourceOwner,
-			user.AggregateVersion,
-		),
-	}
-}
-
 func NewUserEventSearchQuery(userID, orgID string, sequence uint64) *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(userID).ResourceOwner(orgID).SequenceGreater(sequence)

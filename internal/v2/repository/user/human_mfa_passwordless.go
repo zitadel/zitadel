@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
@@ -23,6 +24,7 @@ type HumanPasswordlessAddedEvent struct {
 
 func NewHumanPasswordlessAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	webAuthNTokenID,
 	challenge string,
 ) *HumanPasswordlessAddedEvent {
@@ -30,6 +32,7 @@ func NewHumanPasswordlessAddedEvent(
 		HumanWebAuthNAddedEvent: *NewHumanWebAuthNAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanPasswordlessTokenAddedType,
 			),
 			webAuthNTokenID,
@@ -53,6 +56,7 @@ type HumanPasswordlessVerifiedEvent struct {
 
 func NewHumanPasswordlessVerifiedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	webAuthNTokenID,
 	webAuthNTokenName,
 	attestationType string,
@@ -65,6 +69,7 @@ func NewHumanPasswordlessVerifiedEvent(
 		HumanWebAuthNVerifiedEvent: *NewHumanWebAuthNVerifiedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanPasswordlessTokenVerifiedType,
 			),
 			webAuthNTokenID,
@@ -93,6 +98,7 @@ type HumanPasswordlessSignCountChangedEvent struct {
 
 func NewHumanPasswordlessSignCountChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	webAuthNTokenID string,
 	signCount uint32,
 ) *HumanPasswordlessSignCountChangedEvent {
@@ -100,6 +106,7 @@ func NewHumanPasswordlessSignCountChangedEvent(
 		HumanWebAuthNSignCountChangedEvent: *NewHumanWebAuthNSignCountChangedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanPasswordlessTokenSignCountChangedType,
 			),
 			webAuthNTokenID,
@@ -121,14 +128,22 @@ type HumanPasswordlessRemovedEvent struct {
 	HumanWebAuthNRemovedEvent
 }
 
+func PrepareHumanPasswordlessRemovedEvent(ctx context.Context, webAuthNTokenID string) func(*eventstore.Aggregate) eventstore.EventPusher {
+	return func(a *eventstore.Aggregate) eventstore.EventPusher {
+		return NewHumanPasswordlessRemovedEvent(ctx, a, webAuthNTokenID)
+	}
+}
+
 func NewHumanPasswordlessRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	webAuthNTokenID string,
 ) *HumanPasswordlessRemovedEvent {
 	return &HumanPasswordlessRemovedEvent{
 		HumanWebAuthNRemovedEvent: *NewHumanWebAuthNRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanPasswordlessTokenRemovedType,
 			),
 			webAuthNTokenID,
@@ -151,6 +166,7 @@ type HumanPasswordlessBeginLoginEvent struct {
 
 func NewHumanPasswordlessBeginLoginEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	challenge string,
 	info *AuthRequestInfo,
 ) *HumanPasswordlessBeginLoginEvent {
@@ -158,6 +174,7 @@ func NewHumanPasswordlessBeginLoginEvent(
 		HumanWebAuthNBeginLoginEvent: *NewHumanWebAuthNBeginLoginEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanPasswordlessTokenVerifiedType,
 			),
 			challenge,
@@ -179,11 +196,12 @@ type HumanPasswordlessCheckSucceededEvent struct {
 	HumanWebAuthNCheckSucceededEvent
 }
 
-func NewHumanPasswordlessCheckSucceededEvent(ctx context.Context) *HumanPasswordlessCheckSucceededEvent {
+func NewHumanPasswordlessCheckSucceededEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordlessCheckSucceededEvent {
 	return &HumanPasswordlessCheckSucceededEvent{
 		HumanWebAuthNCheckSucceededEvent: *NewHumanWebAuthNCheckSucceededEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanPasswordlessTokenCheckSucceededType,
 			),
 		),
@@ -203,11 +221,12 @@ type HumanPasswordlessCheckFailedEvent struct {
 	HumanWebAuthNCheckFailedEvent
 }
 
-func NewHumanPasswordlessCheckFailedEvent(ctx context.Context) *HumanPasswordlessCheckFailedEvent {
+func NewHumanPasswordlessCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordlessCheckFailedEvent {
 	return &HumanPasswordlessCheckFailedEvent{
 		HumanWebAuthNCheckFailedEvent: *NewHumanWebAuthNCheckFailedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanPasswordlessTokenCheckFailedType,
 			),
 		),

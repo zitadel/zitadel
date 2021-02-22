@@ -14,7 +14,7 @@ func (s *Server) GetOrgByID(ctx context.Context, orgID *admin.OrgID) (_ *admin.O
 	if err != nil {
 		return nil, err
 	}
-	return orgFromModel(org), nil
+	return orgViewFromModel(org), nil
 }
 
 func (s *Server) SearchOrgs(ctx context.Context, request *admin.OrgSearchRequest) (_ *admin.OrgSearchResponse, err error) {

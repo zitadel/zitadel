@@ -25,10 +25,6 @@ func NewUserGrantWriteModel(userGrantID string, resourceOwner string) *UserGrant
 	}
 }
 
-func (wm *UserGrantWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *UserGrantWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -63,15 +59,20 @@ func (wm *UserGrantWriteModel) Reduce() error {
 
 func (wm *UserGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, usergrant.AggregateType).
-		AggregateIDs(wm.AggregateID)
+		AggregateIDs(wm.AggregateID).
+		EventTypes(usergrant.UserGrantAddedType,
+			usergrant.UserGrantChangedType,
+			usergrant.UserGrantCascadeChangedType,
+			usergrant.UserGrantDeactivatedType,
+			usergrant.UserGrantReactivatedType,
+			usergrant.UserGrantRemovedType,
+			usergrant.UserGrantCascadeRemovedType)
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}
 	return query
 }
 
-func UserGrantAggregateFromWriteModel(wm *eventstore.WriteModel) *usergrant.Aggregate {
-	return &usergrant.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, usergrant.AggregateType, usergrant.AggregateVersion),
-	}
+func UserGrantAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModel(wm, usergrant.AggregateType, usergrant.AggregateVersion)
 }

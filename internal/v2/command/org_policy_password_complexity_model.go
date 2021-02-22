@@ -43,11 +43,15 @@ func (wm *OrgPasswordComplexityPolicyWriteModel) Reduce() error {
 func (wm *OrgPasswordComplexityPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.PasswordComplexityPolicyWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(org.PasswordComplexityPolicyAddedEventType,
+			org.PasswordComplexityPolicyChangedEventType,
+			org.PasswordComplexityPolicyRemovedEventType)
 }
 
 func (wm *OrgPasswordComplexityPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	minLength uint64,
 	hasLowercase,
 	hasUppercase,
@@ -74,7 +78,7 @@ func (wm *OrgPasswordComplexityPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewPasswordComplexityPolicyChangedEvent(ctx, changes)
+	changedEvent, err := org.NewPasswordComplexityPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
@@ -31,10 +32,11 @@ func (e *HumanAddressChangedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
-func NewHumanAddressChangedEvent(ctx context.Context) *HumanAddressChangedEvent {
+func NewHumanAddressChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanAddressChangedEvent {
 	return &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanAddressChangedType,
 		),
 	}

@@ -77,7 +77,7 @@
             </div>
         </div>
         <ng-template appHasRole [appHasRole]="['user.membership.read']">
-            <app-memberships [user]="user"></app-memberships>
+            <app-memberships [auth]="true" [user]="user"></app-memberships>
         </ng-template>
 
         <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.MYUSER" [id]="user.id">

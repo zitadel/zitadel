@@ -219,18 +219,21 @@ $custom-typography:
     box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
     background-color: #2d2e30;
     border-radius: 8px;
+    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
   }
 
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
     background-color: #2d2e30;
+    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
   }
 
   ::-webkit-scrollbar-thumb {
     background-color: #737c8870;
     border-radius: 8px;
     cursor: pointer;
+    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
   }
 
   .root-header {

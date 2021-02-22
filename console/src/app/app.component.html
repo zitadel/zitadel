@@ -1,19 +1,25 @@
 <ng-container *ngIf="(authService.user | async) || {} as user">
     <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
         <mat-toolbar class="root-header">
-            <button aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
+            <button *ngIf="authenticationService.authenticated" aria-label="Toggle sidenav" mat-icon-button
+                (click)="drawer.toggle()">
                 <i class="icon las la-bars"></i>
             </button>
-            <a *ngIf="(isHandset$ | async) == false" class="title" [routerLink]="['/']">
+            <a class="title" [routerLink]="['/']">
                 <img class="logo" alt="zitadel logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
-                    src="../assets/images/zitadel-logo-light.svg" />
+                    src="../assets/images/zitadel-logo-solo-light.svg" />
                 <ng-template #lighttheme>
-                    <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-dark.svg" />
+                    <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />
                 </ng-template>
             </a>
 
-            <button (click)="loadOrgs()" *ngIf="profile?.id && org" mat-button [matMenuTriggerFor]="menu"
-                (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
+            <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
+                stroke-linecap="round" stroke-linejoin="round" fill="none" shape-rendering="geometricPrecision">
+                <path d="M16.88 3.549L7.12 20.451"></path>
+            </svg>
+
+            <button class="org-button" (click)="loadOrgs()" *ngIf="profile?.id && org" mat-button
+                [matMenuTriggerFor]="menu" (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
                 <mat-icon>
                     arrow_drop_down</mat-icon>
             </button>
@@ -37,8 +43,8 @@
                     </button>
                 </div>
 
-                <button class="show-all" mat-menu-item
-                    [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button>
+                <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
+                    translate}}</button>
 
                 <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
                     <button mat-menu-item [routerLink]="[ '/org/create' ]">
@@ -49,23 +55,29 @@
             </mat-menu>
             <span class="fill-space"></span>
 
-            <a class="doc-link" href="https://docs.zitadel.ch" mat-stroked-button
-                target="_blank">{{'MENU.DOCUMENTATION' | translate}}</a>
+            <a class="doc-link" href="https://docs.zitadel.ch" mat-stroked-button target="_blank">{{'MENU.DOCUMENTATION'
+                | translate}}</a>
             <div (clickOutside)="closeAccountCard()" class="icon-container">
                 <app-avatar *ngIf="user && (user.displayName || (user.firstName && user.lastName))"
                     class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"
                     [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)" [size]="38">
                 </app-avatar>
-                <app-accounts-card @accounts class="a_card  mat-elevation-z5" *ngIf="showAccount"
+                <app-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount"
                     (close)="showAccount = false" [profile]="profile" [iamuser]="iamuser$ | async">
                 </app-accounts-card>
             </div>
         </mat-toolbar>
         <mat-drawer-container class="main-container">
             <mat-drawer #drawer class="sidenav" [mode]="(isHandset$ | async) ? 'over' : 'side'"
-                [opened]="!(isHandset$ | async)">
+                [opened]="!(isHandset$ | async) && authenticationService.authenticated">
                 <div class="side-column">
                     <div class="list">
+                        <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                            [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/']">
+                            <i class="icon las la-home"></i>
+                            <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
+                        </a>
+
                         <ng-container *ngIf="authenticationService.authenticationChanged | async">
                             <a @navitem matTooltip="{{'MENU.TOOLTIP.PERSONAL' | translate}}" class="nav-item"
                                 [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
@@ -163,6 +175,13 @@
                         </ng-container>
 
                         <span class="fill-space"></span>
+
+                        <div class="toc-line">
+                            <a class="toc" href="https://zitadel.ch/pdf/agb.pdf" alt="Terms and Conditions"
+                                target="_blank">{{'MENU.TOC'
+                                | translate}}</a>
+                            <span>&nbsp;&nbsp;&nbsp;</span>
+                        </div>
                     </div>
                     <span class="fill-space"></span>
                 </div>

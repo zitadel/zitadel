@@ -2,7 +2,11 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"strings"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -10,22 +14,15 @@ import (
 	"github.com/caos/logging"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type IAMRepository struct {
-	SearchLimit uint64
-	*iam_es.IAMEventstore
-	OrgEvents      *org_es.OrgEventstore
-	UserEvents     *usr_es.UserEventstore
+	Eventstore     eventstore.Eventstore
+	SearchLimit    uint64
 	View           *admin_view.View
 	SystemDefaults systemdefaults.SystemDefaults
 	Roles          []string
@@ -68,48 +65,6 @@ func (repo *IAMRepository) GetIAMMemberRoles() []string {
 		}
 	}
 	return roles
-}
-
-func (repo *IAMRepository) RemoveIDPConfig(ctx context.Context, idpConfigID string) error {
-
-	aggregates := make([]*es_models.Aggregate, 0)
-	idp := iam_model.NewIDPConfig(repo.SystemDefaults.IamID, idpConfigID)
-	_, agg, err := repo.IAMEventstore.PrepareRemoveIDPConfig(ctx, idp)
-	if err != nil {
-		return err
-	}
-	aggregates = append(aggregates, agg)
-
-	providers, err := repo.View.IDPProvidersByIdpConfigID(idpConfigID)
-	if err != nil {
-		return err
-	}
-	for _, p := range providers {
-		if p.AggregateID == repo.SystemDefaults.IamID {
-			continue
-		}
-		provider := &iam_model.IDPProvider{ObjectRoot: es_models.ObjectRoot{AggregateID: p.AggregateID}, IDPConfigID: p.IDPConfigID}
-		providerAgg := new(es_models.Aggregate)
-		_, providerAgg, err = repo.OrgEvents.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider, true)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, providerAgg)
-	}
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
-	if err != nil {
-		return err
-	}
-	for _, externalIDP := range externalIDPs {
-		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
-		idpAgg := make([]*es_models.Aggregate, 0)
-		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, idpAgg...)
-	}
-	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
 }
 
 func (repo *IAMRepository) IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
@@ -174,7 +129,7 @@ func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.LoginPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
 	}
@@ -213,31 +168,6 @@ func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, reques
 	return result, nil
 }
 
-func (repo *IAMRepository) RemoveIDPProviderFromLoginPolicy(ctx context.Context, provider *iam_model.IDPProvider) error {
-	aggregates := make([]*es_models.Aggregate, 0)
-	provider.AggregateID = repo.SystemDefaults.IamID
-	_, removeAgg, err := repo.IAMEventstore.PrepareRemoveIDPProviderFromLoginPolicy(ctx, provider)
-	if err != nil {
-		return err
-	}
-	aggregates = append(aggregates, removeAgg)
-
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(provider.IDPConfigID)
-	if err != nil {
-		return err
-	}
-	for _, externalIDP := range externalIDPs {
-		idpRemove := &usr_model.ExternalIDP{ObjectRoot: es_models.ObjectRoot{AggregateID: externalIDP.UserID}, IDPConfigID: externalIDP.IDPConfigID, UserID: externalIDP.ExternalUserID}
-		idpAgg := make([]*es_models.Aggregate, 0)
-		_, idpAgg, err = repo.UserEvents.PrepareRemoveExternalIDP(ctx, idpRemove, true)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, idpAgg...)
-	}
-	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, nil, aggregates...)
-}
-
 func (repo *IAMRepository) SearchDefaultSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error) {
 	policy, err := repo.GetDefaultLoginPolicy(ctx)
 	if err != nil {
@@ -268,7 +198,7 @@ func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordComplexityPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-1Mc0s", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
@@ -293,7 +223,7 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordAgePolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-vMyS3", "Errors.IAM.PasswordAgePolicy.NotFound")
 	}
@@ -318,7 +248,7 @@ func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordLockoutPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2M9oP", "Errors.IAM.PasswordLockoutPolicy.NotFound")
 	}
@@ -343,7 +273,7 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.OrgIAMPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-MkoL0", "Errors.IAM.OrgIAMPolicy.NotFound")
 	}
@@ -360,32 +290,12 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 	return iam_es_model.OrgIAMViewToModel(policy), nil
 }
 
-func (repo *IAMRepository) AddDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.AddOrgIAMPolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *iam_model.OrgIAMPolicy) (*iam_model.OrgIAMPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.ChangeOrgIAMPolicy(ctx, policy)
-}
-
 func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
 	return iam_es_model.LabelPolicyViewToModel(policy), err
-}
-
-func (repo *IAMRepository) AddDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.AddLabelPolicy(ctx, policy)
-}
-
-func (repo *IAMRepository) ChangeDefaultLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
-	policy.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.ChangeLabelPolicy(ctx, policy)
 }
 
 func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
@@ -434,12 +344,10 @@ func (repo *IAMRepository) GetDefaultMailText(ctx context.Context, textType stri
 	return iam_es_model.MailTextViewToModel(text), err
 }
 
-func (repo *IAMRepository) AddDefaultMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
-	text.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.AddMailText(ctx, text)
-}
-
-func (repo *IAMRepository) ChangeDefaultMailText(ctx context.Context, text *iam_model.MailText) (*iam_model.MailText, error) {
-	text.AggregateID = repo.SystemDefaults.IamID
-	return repo.IAMEventstore.ChangeMailText(ctx, text)
+func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Eventstore.FilterEvents(ctx, query)
 }

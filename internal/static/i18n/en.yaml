@@ -185,13 +185,19 @@ Errors:
     IDMissing: ID missing
     App:
       AlreadyExists: Application already exists
+      NotFound: Application not found
       Invalid: Application invalid
       NotExisting: Application doesn't exist
-      IsNotOIDC: Application is not type oidc
       NotActive:: Application is not active
       NotInactive: Application is not inactive
-    OIDCConfigInvalid: OIDC configuration is invalid
-    OIDCAuthMethodNoneSecret: OIDC Auth Method None does not require a secret
+      OIDCConfigInvalid: OIDC configuration is invalid
+      APIConfigInvalid: OIDC configuration is invalid
+      IsNotOIDC: Application is not type oidc
+      IsNotAPI: Application is not type API
+      OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
+      APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
+      AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
+      OIDCSecretInvalid: Client Secret is invalid
     RequiredFieldsMissing: Some required fields are missing
     Grant:
       AlreadyExists: Project grant already exists
@@ -202,7 +208,6 @@ Errors:
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
     UserIDMisisng: User ID missing
-    OIDCSecretInvalid: Client Secret is invalid
   IAM:
     Member:
       RolesNotChanged: Roles habe not been changed
@@ -286,6 +291,8 @@ Errors:
     NotInactive: User grant is not deactivated
     NoPermissionForProject: User has no permissions on this project
     RoleKeyNotFound: Role not found
+  Member:
+    AlreadyExists: Member already exists
   IDPConfig:
     AlreadyExists: IDP Configuration with this name already exists
   Changes:

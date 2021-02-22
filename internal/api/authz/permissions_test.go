@@ -12,15 +12,14 @@ func getTestCtx(userID, orgID string) context.Context {
 }
 
 type testVerifier struct {
-	grant *Grant
+	memberships []*Membership
 }
 
 func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, error) {
 	return "userID", "agentID", "de", "orgID", nil
 }
-
-func (v *testVerifier) ResolveGrants(ctx context.Context) (*Grant, error) {
-	return v.grant, nil
+func (v *testVerifier) SearchMyMemberships(ctx context.Context) ([]*Membership, error) {
+	return v.memberships, nil
 }
 
 func (v *testVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
@@ -65,8 +64,10 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "Empty Context",
 			args: args{
 				ctxData: CtxData{},
-				verifier: Start(&testVerifier{grant: &Grant{
-					Roles: []string{"ORG_OWNER"},
+				verifier: Start(&testVerifier{memberships: []*Membership{
+					{
+						Roles: []string{"ORG_OWNER"},
+					},
 				}}),
 				requiredPerm: "project.read",
 				authConfig: Config{
@@ -90,7 +91,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "No Grants",
 			args: args{
 				ctxData:      CtxData{},
-				verifier:     Start(&testVerifier{grant: &Grant{}}),
+				verifier:     Start(&testVerifier{memberships: []*Membership{}}),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -111,8 +112,13 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "Get Permissions",
 			args: args{
 				ctxData: CtxData{UserID: "userID", OrgID: "orgID"},
-				verifier: Start(&testVerifier{grant: &Grant{
-					Roles: []string{"IAM_OWNER"},
+				verifier: Start(&testVerifier{memberships: []*Membership{
+					{
+						AggregateID: "IAM",
+						ObjectID:    "IAM",
+						MemberType:  MemberTypeIam,
+						Roles:       []string{"IAM_OWNER"},
+					},
 				}}),
 				requiredPerm: "project.read",
 				authConfig: Config{
@@ -150,10 +156,10 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 	}
 }
 
-func Test_MapGrantsToPermissions(t *testing.T) {
+func Test_MapMembershipToPermissions(t *testing.T) {
 	type args struct {
 		requiredPerm string
-		grant        *Grant
+		membership   []*Membership
 		authConfig   Config
 	}
 	tests := []struct {
@@ -166,7 +172,14 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			name: "One Role existing perm",
 			args: args{
 				requiredPerm: "project.read",
-				grant:        &Grant{Roles: []string{"ORG_OWNER"}},
+				membership: []*Membership{
+					{
+						AggregateID: "1",
+						ObjectID:    "1",
+						MemberType:  MemberTypeOrganisation,
+						Roles:       []string{"ORG_OWNER"},
+					},
+				},
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
 						{
@@ -187,7 +200,14 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			name: "One Role not existing perm",
 			args: args{
 				requiredPerm: "project.write",
-				grant:        &Grant{Roles: []string{"ORG_OWNER"}},
+				membership: []*Membership{
+					{
+						AggregateID: "1",
+						ObjectID:    "1",
+						MemberType:  MemberTypeOrganisation,
+						Roles:       []string{"ORG_OWNER"},
+					},
+				},
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
 						{
@@ -208,7 +228,20 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			name: "Multiple Roles one existing",
 			args: args{
 				requiredPerm: "project.read",
-				grant:        &Grant{Roles: []string{"ORG_OWNER", "IAM_OWNER"}},
+				membership: []*Membership{
+					{
+						AggregateID: "1",
+						ObjectID:    "1",
+						MemberType:  MemberTypeOrganisation,
+						Roles:       []string{"ORG_OWNER"},
+					},
+					{
+						AggregateID: "IAM",
+						ObjectID:    "IAM",
+						MemberType:  MemberTypeIam,
+						Roles:       []string{"IAM_OWNER"},
+					},
+				},
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
 						{
@@ -229,7 +262,20 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			name: "Multiple Roles, global and specific",
 			args: args{
 				requiredPerm: "project.read",
-				grant:        &Grant{Roles: []string{"ORG_OWNER", "PROJECT_OWNER:1"}},
+				membership: []*Membership{
+					{
+						AggregateID: "2",
+						ObjectID:    "2",
+						MemberType:  MemberTypeOrganisation,
+						Roles:       []string{"ORG_OWNER"},
+					},
+					{
+						AggregateID: "1",
+						ObjectID:    "1",
+						MemberType:  MemberTypeProject,
+						Roles:       []string{"PROJECT_OWNER"},
+					},
+				},
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
 						{
@@ -249,7 +295,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			requestPerms, allPerms := mapGrantToPermissions(tt.args.requiredPerm, tt.args.grant, tt.args.authConfig)
+			requestPerms, allPerms := mapMembershipsToPermissions(tt.args.requiredPerm, tt.args.membership, tt.args.authConfig)
 			if !equalStringArray(requestPerms, tt.requestPerms) {
 				t.Errorf("got wrong requestPerms, expecting: %v, actual: %v ", tt.requestPerms, requestPerms)
 			}
@@ -260,10 +306,10 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 	}
 }
 
-func Test_MapRoleToPerm(t *testing.T) {
+func Test_MapMembershipToPerm(t *testing.T) {
 	type args struct {
 		requiredPerm string
-		actualRole   string
+		membership   *Membership
 		authConfig   Config
 		requestPerms []string
 		allPerms     []string
@@ -278,7 +324,12 @@ func Test_MapRoleToPerm(t *testing.T) {
 			name: "first perm without context id",
 			args: args{
 				requiredPerm: "project.read",
-				actualRole:   "ORG_OWNER",
+				membership: &Membership{
+					AggregateID: "Org",
+					ObjectID:    "Org",
+					MemberType:  MemberTypeOrganisation,
+					Roles:       []string{"ORG_OWNER"},
+				},
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
 						{
@@ -301,7 +352,12 @@ func Test_MapRoleToPerm(t *testing.T) {
 			name: "existing perm without context id",
 			args: args{
 				requiredPerm: "project.read",
-				actualRole:   "ORG_OWNER",
+				membership: &Membership{
+					AggregateID: "Org",
+					ObjectID:    "Org",
+					MemberType:  MemberTypeOrganisation,
+					Roles:       []string{"ORG_OWNER"},
+				},
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
 						{
@@ -324,7 +380,12 @@ func Test_MapRoleToPerm(t *testing.T) {
 			name: "first perm with context id",
 			args: args{
 				requiredPerm: "project.read",
-				actualRole:   "PROJECT_OWNER:1",
+				membership: &Membership{
+					AggregateID: "1",
+					ObjectID:    "1",
+					MemberType:  MemberTypeProject,
+					Roles:       []string{"PROJECT_OWNER"},
+				},
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
 						{
@@ -347,7 +408,12 @@ func Test_MapRoleToPerm(t *testing.T) {
 			name: "perm with context id, existing global",
 			args: args{
 				requiredPerm: "project.read",
-				actualRole:   "PROJECT_OWNER:1",
+				membership: &Membership{
+					AggregateID: "1",
+					ObjectID:    "1",
+					MemberType:  MemberTypeProject,
+					Roles:       []string{"PROJECT_OWNER"},
+				},
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
 						{
@@ -369,7 +435,7 @@ func Test_MapRoleToPerm(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			requestPerms, allPerms := mapRoleToPerm(tt.args.requiredPerm, tt.args.actualRole, tt.args.authConfig, tt.args.requestPerms, tt.args.allPerms)
+			requestPerms, allPerms := mapMembershipToPerm(tt.args.requiredPerm, tt.args.membership, tt.args.authConfig, tt.args.requestPerms, tt.args.allPerms)
 			if !equalStringArray(requestPerms, tt.requestPerms) {
 				t.Errorf("got wrong requestPerms, expecting: %v, actual: %v ", tt.requestPerms, requestPerms)
 			}

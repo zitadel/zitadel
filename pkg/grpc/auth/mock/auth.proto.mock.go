@@ -636,6 +636,26 @@ func (mr *MockAuthServiceClientMockRecorder) SearchMyUserGrant(arg0, arg1 interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMyUserGrant", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchMyUserGrant), varargs...)
 }
 
+// SearchMyUserMemberships mocks base method
+func (m *MockAuthServiceClient) SearchMyUserMemberships(arg0 context.Context, arg1 *auth.UserMembershipSearchRequest, arg2 ...grpc.CallOption) (*auth.UserMembershipSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SearchMyUserMemberships", varargs...)
+	ret0, _ := ret[0].(*auth.UserMembershipSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchMyUserMemberships indicates an expected call of SearchMyUserMemberships
+func (mr *MockAuthServiceClientMockRecorder) SearchMyUserMemberships(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMyUserMemberships", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchMyUserMemberships), varargs...)
+}
+
 // UpdateMyUserAddress mocks base method
 func (m *MockAuthServiceClient) UpdateMyUserAddress(arg0 context.Context, arg1 *auth.UpdateUserAddressRequest, arg2 ...grpc.CallOption) (*auth.UserAddress, error) {
 	m.ctrl.T.Helper()

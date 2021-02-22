@@ -2,19 +2,23 @@ package eventstore
 
 import (
 	"context"
+	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
+
 	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"time"
-
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 )
 
 type TokenRepo struct {
-	UserEvents *user_event.UserEventstore
+	Eventstore eventstore.Eventstore
 	View       *view.View
 }
 
@@ -40,7 +44,7 @@ func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*
 		token.UserID = userID
 	}
 
-	events, esErr := repo.UserEvents.UserEventsByID(ctx, userID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, token.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -62,11 +66,10 @@ func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*
 	return model.TokenViewToModel(token), nil
 }
 
-func AppendAudIfNotExisting(aud string, existingAud []string) []string {
-	for _, a := range existingAud {
-		if a == aud {
-			return existingAud
-		}
+func (r *TokenRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
 	}
-	return append(existingAud, aud)
+	return r.Eventstore.FilterEvents(ctx, query)
 }

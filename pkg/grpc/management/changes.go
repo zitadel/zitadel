@@ -1,6 +1,8 @@
 package management
 
-import "github.com/caos/zitadel/internal/api/grpc/server/middleware"
+import (
+	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
+)
 
 func (c *Changes) Localizers() []middleware.Localizer {
 	if c == nil {

@@ -45,12 +45,14 @@ func SetupStepMapper(event *repository.Event) (eventstore.EventReader, error) {
 
 func NewSetupStepDoneEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	step domain.Step,
 ) *SetupStepEvent {
 
 	return &SetupStepEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			SetupDoneEventType,
 		),
 		Step: step,
@@ -59,12 +61,14 @@ func NewSetupStepDoneEvent(
 
 func NewSetupStepStartedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	step domain.Step,
 ) *SetupStepEvent {
 
 	return &SetupStepEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			SetupStartedEventType,
 		),
 		Step: step,

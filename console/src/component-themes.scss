@@ -5,24 +5,29 @@
 @import './styles/link.scss';
 @import './styles/sidenav-list';
 @import 'src/app/modules/avatar/avatar.component';
+@import 'src/app/modules/app-radio/app-type-radio/app-type-radio.component';
+@import 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 @import 'src/app/modules/changes/changes.component';
 @import 'src/app/modules/info-section/info-section.component';
 @import 'src/app/modules/detail-layout/detail-layout.component';
-@import 'src/app/pages/projects/owned-projects/owned-project-detail/application-grid/application-grid.component';
+@import 'src/app/modules/app-card/app-card.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
 @import 'src/app/app.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
 @import 'src/app/modules/meta-layout/meta.scss';
+@import 'src/app/modules/onboarding/onboarding.component.scss';
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
+  @include app-type-radio-theme($theme);
+  @include app-auth-method-radio-theme($theme);
   @include card-theme($theme);
   @include table-theme($theme);
   @include detail-layout-theme($theme);
   @include sidenav-list-theme($theme);
-  @include application-grid-theme($theme);
+  @include app-card-theme($theme);
   @include membership-theme($theme);
   @include changes-theme($theme);
   @include theme-card($theme);
@@ -34,4 +39,5 @@
   @include link-theme($theme);
   @include meta-theme($theme);
   @include info-section-theme($theme);
+  @include onboarding-theme($theme);
 }

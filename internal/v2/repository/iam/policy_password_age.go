@@ -19,12 +19,16 @@ type PasswordAgePolicyAddedEvent struct {
 
 func NewPasswordAgePolicyAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	expireWarnDays,
 	maxAgeDays uint64,
 ) *PasswordAgePolicyAddedEvent {
 	return &PasswordAgePolicyAddedEvent{
 		PasswordAgePolicyAddedEvent: *policy.NewPasswordAgePolicyAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordAgePolicyAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				PasswordAgePolicyAddedEventType),
 			expireWarnDays,
 			maxAgeDays),
 	}
@@ -45,10 +49,14 @@ type PasswordAgePolicyChangedEvent struct {
 
 func NewPasswordAgePolicyChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	changes []policy.PasswordAgePolicyChanges,
 ) (*PasswordAgePolicyChangedEvent, error) {
 	changedEvent, err := policy.NewPasswordAgePolicyChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, PasswordAgePolicyChangedEventType),
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasswordAgePolicyChangedEventType),
 		changes,
 	)
 	if err != nil {

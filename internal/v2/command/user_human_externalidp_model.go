@@ -27,17 +27,13 @@ func NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID, resource
 	}
 }
 
-func (wm *HumanExternalIDPWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *HumanExternalIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanExternalIDPAddedEvent:
 			wm.IDPConfigID = e.IDPConfigID
 			wm.DisplayName = e.DisplayName
-			wm.ExternalUserID = e.UserID
+			wm.ExternalUserID = e.ExternalUserID
 			wm.State = domain.ExternalIDPStateActive
 		case *user.HumanExternalIDPRemovedEvent:
 			wm.State = domain.ExternalIDPStateRemoved
@@ -53,5 +49,9 @@ func (wm *HumanExternalIDPWriteModel) Reduce() error {
 func (wm *HumanExternalIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(user.HumanExternalIDPAddedType,
+			user.HumanExternalIDPRemovedType,
+			user.HumanExternalIDPCascadeRemovedType,
+			user.UserRemovedType)
 }

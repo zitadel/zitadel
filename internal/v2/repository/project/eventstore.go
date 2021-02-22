@@ -18,7 +18,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(RoleRemovedType, RoleRemovedEventMapper).
 		RegisterFilterEventMapper(GrantAddedType, GrantAddedEventMapper).
 		RegisterFilterEventMapper(GrantChangedType, GrantChangedEventMapper).
-		RegisterFilterEventMapper(GrantCascadeChangedType, GrantChangedEventMapper).
+		RegisterFilterEventMapper(GrantCascadeChangedType, GrantCascadeChangedEventMapper).
 		RegisterFilterEventMapper(GrantDeactivatedType, GrantDeactivateEventMapper).
 		RegisterFilterEventMapper(GrantReactivatedType, GrantReactivatedEventMapper).
 		RegisterFilterEventMapper(GrantRemovedType, GrantRemovedEventMapper).
@@ -26,7 +26,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(GrantMemberChangedType, GrantMemberChangedEventMapper).
 		RegisterFilterEventMapper(GrantMemberRemovedType, GrantMemberRemovedEventMapper).
 		RegisterFilterEventMapper(ApplicationAddedType, ApplicationAddedEventMapper).
-		RegisterFilterEventMapper(ApplicationChangedType, ApplicationAddedEventMapper).
+		RegisterFilterEventMapper(ApplicationChangedType, ApplicationChangedEventMapper).
 		RegisterFilterEventMapper(ApplicationRemovedType, ApplicationRemovedEventMapper).
 		RegisterFilterEventMapper(ApplicationDeactivatedType, ApplicationDeactivatedEventMapper).
 		RegisterFilterEventMapper(ApplicationReactivatedType, ApplicationReactivatedEventMapper).
@@ -34,5 +34,10 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(OIDCConfigChangedType, OIDCConfigChangedEventMapper).
 		RegisterFilterEventMapper(OIDCConfigSecretChangedType, OIDCConfigSecretChangedEventMapper).
 		RegisterFilterEventMapper(OIDCClientSecretCheckSucceededType, OIDCConfigSecretCheckSucceededEventMapper).
-		RegisterFilterEventMapper(OIDCClientSecretCheckFailedType, OIDCConfigSecretCheckFailedEventMapper)
+		RegisterFilterEventMapper(OIDCClientSecretCheckFailedType, OIDCConfigSecretCheckFailedEventMapper).
+		RegisterFilterEventMapper(APIConfigAddedType, APIConfigAddedEventMapper).
+		RegisterFilterEventMapper(APIConfigChangedType, APIConfigChangedEventMapper).
+		RegisterFilterEventMapper(APIConfigSecretChangedType, APIConfigSecretChangedEventMapper).
+		RegisterFilterEventMapper(ApplicationKeyAddedEventType, ApplicationKeyAddedEventMapper).
+		RegisterFilterEventMapper(ApplicationKeyRemovedEventType, ApplicationKeyRemovedEventMapper)
 }

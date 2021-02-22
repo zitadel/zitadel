@@ -15,7 +15,7 @@ SystemDefaults:
       IncludeLowerLetters: true
       IncludeUpperLetters: true
       IncludeDigits: true
-      IncludeSymbols: true
+      IncludeSymbols: false
     InitializeUserCode:
       Length: 6
       Expiry: '72h'
@@ -45,6 +45,7 @@ SystemDefaults:
       IncludeDigits: true
       IncludeSymbols: false
     MachineKeySize: 2048
+    ApplicationKeySize: 2048
   Multifactors:
     OTP:
       Issuer: 'ZITADEL'
@@ -130,3 +131,10 @@ SystemDefaults:
     OriginLogin: $ZITADEL_ACCOUNTS
     OriginConsole: $ZITADEL_CONSOLE
     DisplayName: ZITADEL
+  KeyConfig:
+    Size: 2048
+    PrivateKeyLifetime: 6h
+    PublicKeyLifetime: 30h
+    EncryptionConfig:
+      EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
+    SigningKeyRotation: 10s

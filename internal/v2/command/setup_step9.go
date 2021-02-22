@@ -2,11 +2,11 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/v2/domain"
-	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
 )
 
 type Step9 struct {
@@ -22,31 +22,31 @@ func (s *Step9) execute(ctx context.Context, commandSide *CommandSide) error {
 }
 
 func (r *CommandSide) SetupStep9(ctx context.Context, step *Step9) error {
-	fn := func(iam *IAMWriteModel) (*iam_repo.Aggregate, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
 		multiFactorModel := NewIAMMultiFactorWriteModel()
 		iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
 		if !step.Passwordless {
-			return iamAgg, nil
+			return []eventstore.EventPusher{}, nil
 		}
-		err := setPasswordlessAllowedInPolicy(ctx, r, iamAgg)
+		passwordlessEvent, err := setPasswordlessAllowedInPolicy(ctx, r, iamAgg)
 		if err != nil {
 			return nil, err
 		}
 		logging.Log("SETUP-AEG2t").Info("allowed passwordless in login policy")
-		err = r.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, domain.MultiFactorTypeU2FWithPIN)
+		multifactorEvent, err := r.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, domain.MultiFactorTypeU2FWithPIN)
 		if err != nil {
 			return nil, err
 		}
 		logging.Log("SETUP-ADfng").Info("added passwordless to MFA login policy")
-		return iamAgg, err
+		return []eventstore.EventPusher{passwordlessEvent, multifactorEvent}, nil
 	}
 	return r.setup(ctx, step, fn)
 }
 
-func setPasswordlessAllowedInPolicy(ctx context.Context, c *CommandSide, iamAgg *iam_repo.Aggregate) error {
+func setPasswordlessAllowedInPolicy(ctx context.Context, c *CommandSide, iamAgg *eventstore.Aggregate) (eventstore.EventPusher, error) {
 	policy, err := c.getDefaultLoginPolicy(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	policy.PasswordlessType = domain.PasswordlessTypeAllowed
 	return c.changeDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(), policy)

@@ -25,10 +25,6 @@ func NewProjectWriteModel(projectID string, resourceOwner string) *ProjectWriteM
 	}
 }
 
-func (wm *ProjectWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *ProjectWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -67,11 +63,17 @@ func (wm *ProjectWriteModel) Reduce() error {
 func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(project.ProjectAddedType,
+			project.ProjectChangedType,
+			project.ProjectDeactivatedType,
+			project.ProjectReactivatedType,
+			project.ProjectRemovedType)
 }
 
 func (wm *ProjectWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	name string,
 	projectRoleAssertion,
 	projectRoleCheck bool,
@@ -79,7 +81,9 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	changes := make([]project.ProjectChanges, 0)
 	var err error
 
+	oldName := ""
 	if wm.Name != name {
+		oldName = wm.Name
 		changes = append(changes, project.ChangeName(name))
 	}
 	if wm.ProjectRoleAssertion != projectRoleAssertion {
@@ -91,15 +95,13 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := project.NewProjectChangeEvent(ctx, changes)
+	changeEvent, err := project.NewProjectChangeEvent(ctx, aggregate, oldName, changes)
 	if err != nil {
 		return nil, false, err
 	}
 	return changeEvent, true, nil
 }
 
-func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *project.Aggregate {
-	return &project.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, project.AggregateType, project.AggregateVersion),
-	}
+func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModel(wm, project.AggregateType, project.AggregateVersion)
 }

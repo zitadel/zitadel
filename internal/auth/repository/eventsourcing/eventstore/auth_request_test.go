@@ -21,7 +21,6 @@ import (
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
-	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	grant_view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
@@ -198,7 +197,6 @@ func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*g
 
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	type fields struct {
-		UserEvents                 *user_event.UserEventstore
 		AuthRequests               *cache.AuthRequestCache
 		View                       *view.View
 		userSessionViewProvider    userSessionViewProvider
@@ -958,7 +956,6 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repo := &AuthRequestRepo{
-				UserEvents:                 tt.fields.UserEvents,
 				AuthRequests:               tt.fields.AuthRequests,
 				View:                       tt.fields.View,
 				UserSessionViewProvider:    tt.fields.userSessionViewProvider,

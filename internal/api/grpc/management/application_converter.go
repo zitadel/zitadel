@@ -2,18 +2,20 @@ package management
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/v2/domain"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
@@ -24,6 +26,28 @@ func appFromDomain(app domain.Application) *management.Application {
 		State: appStateFromDomain(app.GetState()),
 		Name:  app.GetApplicationName(),
 	}
+}
+func appFromModel(app *proj_model.Application) *management.Application {
+	changeDate, err := ptypes.TimestampProto(app.ChangeDate)
+	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
+
+	return &management.Application{
+		Id:         app.AppID,
+		State:      appStateFromModel(app.State),
+		ChangeDate: changeDate,
+		Name:       app.Name,
+		Sequence:   app.Sequence,
+		AppConfig:  appConfigFromModel(app),
+	}
+}
+
+func appConfigFromModel(app *proj_model.Application) management.AppConfig {
+	if app.Type == proj_model.AppTypeAPI {
+		return &management.Application_ApiConfig{
+			ApiConfig: apiConfigFromModel(app.APIConfig),
+		}
+	}
+	return nil
 }
 
 func oidcAppFromDomain(app *domain.OIDCApp) *management.Application {
@@ -37,9 +61,25 @@ func oidcAppFromDomain(app *domain.OIDCApp) *management.Application {
 	}
 }
 
+func apiAppFromDomain(app *domain.APIApp) *management.Application {
+	return &management.Application{
+		Id:         app.AppID,
+		State:      appStateFromDomain(app.State),
+		ChangeDate: timestamppb.New(app.ChangeDate),
+		Name:       app.AppName,
+		Sequence:   app.Sequence,
+		AppConfig:  apiAppConfigFromDomain(app),
+	}
+}
+
 func oidcAppConfigFromDomain(app *domain.OIDCApp) management.AppConfig {
 	return &management.Application_OidcConfig{
 		OidcConfig: oidcConfigFromDomain(app),
+	}
+}
+func apiAppConfigFromDomain(app *domain.APIApp) management.AppConfig {
+	return &management.Application_ApiConfig{
+		ApiConfig: apiConfigFromDomain(app),
 	}
 }
 
@@ -65,6 +105,22 @@ func oidcConfigFromDomain(config *domain.OIDCApp) *management.OIDCConfig {
 	}
 }
 
+func apiConfigFromDomain(config *domain.APIApp) *management.APIConfig {
+	return &management.APIConfig{
+		ClientId:       config.ClientID,
+		ClientSecret:   config.ClientSecretString,
+		AuthMethodType: apiAuthMethodTypeFromDomain(config.AuthMethodType),
+	}
+}
+
+func apiConfigFromModel(config *proj_model.APIConfig) *management.APIConfig {
+	return &management.APIConfig{
+		ClientId:       config.ClientID,
+		ClientSecret:   config.ClientSecretString,
+		AuthMethodType: apiAuthMethodTypeFromModel(config.AuthMethodType),
+	}
+}
+
 func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *management.OIDCConfig {
 	return &management.OIDCConfig{
 		RedirectUris:             app.OIDCRedirectUris,
@@ -74,11 +130,11 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *manage
 		ClientId:                 app.OIDCClientID,
 		AuthMethodType:           oidcAuthMethodTypeFromModel(app.OIDCAuthMethodType),
 		PostLogoutRedirectUris:   app.OIDCPostLogoutRedirectUris,
-		Version:                  oidcVersionFromModel(app.OIDCVersion),
+		Version:                  oidcVersionFromDomain(domain.OIDCVersion(app.OIDCVersion)),
 		NoneCompliant:            app.NoneCompliant,
 		ComplianceProblems:       complianceProblemsToLocalizedMessages(app.ComplianceProblems),
 		DevMode:                  app.DevMode,
-		AccessTokenType:          oidcTokenTypeFromModel(app.AccessTokenType),
+		AccessTokenType:          oidcTokenTypeFromDomain(domain.OIDCTokenType(app.AccessTokenType)),
 		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
 		IdTokenRoleAssertion:     app.IDTokenRoleAssertion,
 		IdTokenUserinfoAssertion: app.IDTokenUserinfoAssertion,
@@ -117,6 +173,16 @@ func oidcAppCreateToDomain(app *management.OIDCApplicationCreate) *domain.OIDCAp
 	}
 }
 
+func apiAppCreateToModel(app *management.APIApplicationCreate) *domain.APIApp {
+	return &domain.APIApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: app.ProjectId,
+		},
+		AppName:        app.Name,
+		AuthMethodType: apiAuthMethodTypeToDomain(app.AuthMethodType),
+	}
+}
+
 func appUpdateToDomain(app *management.ApplicationUpdate) domain.Application {
 	return &domain.ChangeApp{
 		AppID:   app.Id,
@@ -142,6 +208,46 @@ func oidcConfigUpdateToDomain(app *management.OIDCConfigUpdate) *domain.OIDCApp 
 		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
 		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
 		ClockSkew:                app.ClockSkew.AsDuration(),
+	}
+}
+
+func apiConfigUpdateToDomain(app *management.APIConfigUpdate) *domain.APIApp {
+	return &domain.APIApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: app.ProjectId,
+		},
+		AppID:          app.ApplicationId,
+		AuthMethodType: apiAuthMethodTypeToDomain(app.AuthMethodType),
+	}
+}
+
+func addClientKeyToDomain(key *management.AddClientKeyRequest) *domain.ApplicationKey {
+	expirationDate := time.Time{}
+	if key.ExpirationDate != nil {
+		expirationDate = key.ExpirationDate.AsTime()
+	}
+
+	return &domain.ApplicationKey{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: key.ProjectId,
+		},
+		ExpirationDate: expirationDate,
+		Type:           authNKeyTypeToDomain(key.Type),
+		ApplicationID:  key.ApplicationId,
+	}
+}
+
+func addClientKeyFromDomain(key *domain.ApplicationKey) *management.AddClientKeyResponse {
+	detail, err := key.Detail()
+	logging.Log("MANAG-adt42").OnError(err).Warn("unable to marshal key")
+
+	return &management.AddClientKeyResponse{
+		Id:             key.KeyID,
+		CreationDate:   timestamppb.New(key.CreationDate),
+		ExpirationDate: timestamppb.New(key.ExpirationDate),
+		Sequence:       key.Sequence,
+		KeyDetails:     detail,
+		Type:           authNKeyTypeFromDomain(key.Type),
 	}
 }
 
@@ -404,6 +510,8 @@ func oidcAuthMethodTypeToDomain(authType management.OIDCAuthMethodType) domain.O
 		return domain.OIDCAuthMethodTypePost
 	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
 		return domain.OIDCAuthMethodTypeNone
+	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT:
+		return domain.OIDCAuthMethodTypePrivateKeyJWT
 	default:
 		return domain.OIDCAuthMethodTypeBasic
 	}
@@ -417,8 +525,32 @@ func oidcAuthMethodTypeFromDomain(authType domain.OIDCAuthMethodType) management
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST
 	case domain.OIDCAuthMethodTypeNone:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
+	case domain.OIDCAuthMethodTypePrivateKeyJWT:
+		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT
 	default:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
+	}
+}
+
+func apiAuthMethodTypeToDomain(authType management.APIAuthMethodType) domain.APIAuthMethodType {
+	switch authType {
+	case management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC:
+		return domain.APIAuthMethodTypeBasic
+	case management.APIAuthMethodType_APIAUTHMETHODTYPE_PRIVATE_KEY_JWT:
+		return domain.APIAuthMethodTypePrivateKeyJWT
+	default:
+		return domain.APIAuthMethodTypeBasic
+	}
+}
+
+func apiAuthMethodTypeFromDomain(authType domain.APIAuthMethodType) management.APIAuthMethodType {
+	switch authType {
+	case domain.APIAuthMethodTypeBasic:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
+	case domain.APIAuthMethodTypePrivateKeyJWT:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_PRIVATE_KEY_JWT
+	default:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
 	}
 }
 
@@ -430,6 +562,8 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) managem
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST
 	case proj_model.OIDCAuthMethodTypeNone:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
+	case proj_model.OIDCAuthMethodTypePrivateKeyJWT:
+		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT
 	default:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
 	}
@@ -457,14 +591,14 @@ func oidcTokenTypeFromDomain(tokenType domain.OIDCTokenType) management.OIDCToke
 	}
 }
 
-func oidcTokenTypeFromModel(tokenType proj_model.OIDCTokenType) management.OIDCTokenType {
-	switch tokenType {
-	case proj_model.OIDCTokenTypeBearer:
-		return management.OIDCTokenType_OIDCTokenType_Bearer
-	case proj_model.OIDCTokenTypeJWT:
-		return management.OIDCTokenType_OIDCTokenType_JWT
+func apiAuthMethodTypeFromModel(authType proj_model.APIAuthMethodType) management.APIAuthMethodType {
+	switch authType {
+	case proj_model.APIAuthMethodTypeBasic:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
+	case proj_model.APIAuthMethodTypePrivateKeyJWT:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_PRIVATE_KEY_JWT
 	default:
-		return management.OIDCTokenType_OIDCTokenType_Bearer
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
 	}
 }
 
@@ -477,12 +611,21 @@ func oidcVersionFromDomain(version domain.OIDCVersion) management.OIDCVersion {
 	}
 }
 
-func oidcVersionFromModel(version proj_model.OIDCVersion) management.OIDCVersion {
-	switch version {
-	case proj_model.OIDCVersionV1:
-		return management.OIDCVersion_OIDCV1_0
+func authNKeyTypeToDomain(keyType management.AuthNKeyType) domain.AuthNKeyType {
+	switch keyType {
+	case management.AuthNKeyType_AUTHNKEY_JSON:
+		return domain.AuthNKeyTypeJSON
 	default:
-		return management.OIDCVersion_OIDCV1_0
+		return domain.AuthNKeyTypeNONE
+	}
+}
+
+func authNKeyTypeFromDomain(typ domain.AuthNKeyType) management.AuthNKeyType {
+	switch typ {
+	case domain.AuthNKeyTypeJSON:
+		return management.AuthNKeyType_AUTHNKEY_JSON
+	default:
+		return management.AuthNKeyType_AUTHNKEY_UNSPECIFIED
 	}
 }
 
@@ -514,4 +657,70 @@ func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*management
 	}
 
 	return result
+}
+
+func clientKeyViewsFromModel(keys ...*key_model.AuthNKeyView) []*management.ClientKeyView {
+	keyViews := make([]*management.ClientKeyView, len(keys))
+	for i, key := range keys {
+		keyViews[i] = clientKeyViewFromModel(key)
+	}
+	return keyViews
+}
+
+func clientKeyViewFromModel(key *key_model.AuthNKeyView) *management.ClientKeyView {
+	creationDate, err := ptypes.TimestampProto(key.CreationDate)
+	logging.Log("MANAG-DAs2t").OnError(err).Debug("unable to parse timestamp")
+
+	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
+	logging.Log("MANAG-BDgh4").OnError(err).Debug("unable to parse timestamp")
+
+	return &management.ClientKeyView{
+		Id:             key.ID,
+		CreationDate:   creationDate,
+		ExpirationDate: expirationDate,
+		Sequence:       key.Sequence,
+		Type:           authNKeyTypeFromModel(key.Type),
+	}
+}
+
+func authNKeyTypeFromModel(typ key_model.AuthNKeyType) management.AuthNKeyType {
+	switch typ {
+	case key_model.AuthNKeyTypeJSON:
+		return management.AuthNKeyType_AUTHNKEY_JSON
+	default:
+		return management.AuthNKeyType_AUTHNKEY_UNSPECIFIED
+	}
+}
+
+func clientKeySearchRequestToModel(req *management.ClientKeySearchRequest) *key_model.AuthNKeySearchRequest {
+	return &key_model.AuthNKeySearchRequest{
+		Offset: req.Offset,
+		Limit:  req.Limit,
+		Asc:    req.Asc,
+		Queries: []*key_model.AuthNKeySearchQuery{
+			{
+				Key:    key_model.AuthNKeyObjectType,
+				Method: model.SearchMethodEquals,
+				Value:  key_model.AuthNKeyObjectTypeApplication,
+			}, {
+				Key:    key_model.AuthNKeyObjectID,
+				Method: model.SearchMethodEquals,
+				Value:  req.ApplicationId,
+			},
+		},
+	}
+}
+
+func clientKeySearchResponseFromModel(req *key_model.AuthNKeySearchResponse) *management.ClientKeySearchResponse {
+	viewTimestamp, err := ptypes.TimestampProto(req.Timestamp)
+	logging.Log("MANAG-Sk9ds").OnError(err).Debug("unable to parse cretaion date")
+
+	return &management.ClientKeySearchResponse{
+		Offset:            req.Offset,
+		Limit:             req.Limit,
+		TotalResult:       req.TotalResult,
+		ProcessedSequence: req.Sequence,
+		ViewTimestamp:     viewTimestamp,
+		Result:            clientKeyViewsFromModel(req.Result...),
+	}
 }

@@ -31,6 +31,8 @@ func (wm *OrgMailTemplateWriteModel) AppendEvents(events ...eventstore.EventRead
 			wm.MailTemplateWriteModel.AppendEvents(&e.MailTemplateAddedEvent)
 		case *org.MailTemplateChangedEvent:
 			wm.MailTemplateWriteModel.AppendEvents(&e.MailTemplateChangedEvent)
+		case *org.MailTemplateRemovedEvent:
+			wm.MailTemplateWriteModel.AppendEvents(&e.MailTemplateRemovedEvent)
 		}
 	}
 }
@@ -41,7 +43,12 @@ func (wm *OrgMailTemplateWriteModel) Reduce() error {
 
 func (wm *OrgMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.MailTemplateWriteModel.AggregateID)
+		AggregateIDs(wm.MailTemplateWriteModel.AggregateID).
+		EventTypes(
+			org.MailTemplateAddedEventType,
+			org.MailTemplateChangedEventType,
+			org.MailTemplateRemovedEventType)
+
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}
@@ -50,6 +57,7 @@ func (wm *OrgMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *OrgMailTemplateWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	template []byte,
 ) (*org.MailTemplateChangedEvent, bool) {
 	changes := make([]policy.MailTemplateChanges, 0)
@@ -59,7 +67,7 @@ func (wm *OrgMailTemplateWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewMailTemplateChangedEvent(ctx, changes)
+	changedEvent, err := org.NewMailTemplateChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

@@ -83,13 +83,13 @@ func IAMToModel(iam *IAM) *model.IAM {
 	idps := IDPConfigsToModel(iam.IDPs)
 	mailTexts := MailTextsToModel(iam.DefaultMailTexts)
 	converted := &model.IAM{
-		ObjectRoot:   iam.ObjectRoot,
-		SetUpStarted: domain.Step(iam.SetUpStarted),
-		SetUpDone:    domain.Step(iam.SetUpDone),
-		GlobalOrgID:  iam.GlobalOrgID,
-		IAMProjectID: iam.IAMProjectID,
-		Members:      members,
-		IDPs:         idps,
+		ObjectRoot:       iam.ObjectRoot,
+		SetUpStarted:     domain.Step(iam.SetUpStarted),
+		SetUpDone:        domain.Step(iam.SetUpDone),
+		GlobalOrgID:      iam.GlobalOrgID,
+		IAMProjectID:     iam.IAMProjectID,
+		Members:          members,
+		IDPs:             idps,
 		DefaultMailTexts: mailTexts,
 	}
 	if iam.DefaultLoginPolicy != nil {

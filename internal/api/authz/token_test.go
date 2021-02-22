@@ -43,7 +43,7 @@ func Test_VerifyAccessToken(t *testing.T) {
 				ctx:   context.Background(),
 				token: "Bearer AUTH",
 				verifier: &TokenVerifier{
-					authZRepo: &testVerifier{grant: &Grant{}},
+					authZRepo: &testVerifier{memberships: []*Membership{}},
 					clients: func() sync.Map {
 						m := sync.Map{}
 						m.Store("service", &client{name: "name"})

@@ -14,6 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
+import { AppCardModule } from 'src/app/modules/app-card/app-card.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
@@ -43,6 +44,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
     imports: [
         CommonModule,
         FormsModule,
+        AppCardModule,
         OwnedProjectDetailRoutingModule,
         TranslateModule,
         ReactiveFormsModule,

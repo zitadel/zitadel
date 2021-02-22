@@ -7,8 +7,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/project/repository/view"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 )
 
@@ -61,7 +61,7 @@ func (a *Application) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
+	return view.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (a *Application) Reduce(event *models.Event) (err error) {

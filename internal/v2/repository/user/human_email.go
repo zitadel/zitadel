@@ -3,11 +3,12 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
-	"time"
 )
 
 const (
@@ -33,10 +34,11 @@ func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func NewHumanEmailChangedEvent(ctx context.Context) *HumanEmailChangedEvent {
+func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanEmailChangedType,
 		),
 	}
@@ -68,10 +70,11 @@ func (e *HumanEmailVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func NewHumanEmailVerifiedEvent(ctx context.Context) *HumanEmailVerifiedEvent {
+func NewHumanEmailVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailVerifiedEvent {
 	return &HumanEmailVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanEmailVerifiedType,
 		),
 	}
@@ -97,10 +100,11 @@ func (e *HumanEmailVerificationFailedEvent) UniqueConstraints() []*eventstore.Ev
 	return nil
 }
 
-func NewHumanEmailVerificationFailedEvent(ctx context.Context) *HumanEmailVerificationFailedEvent {
+func NewHumanEmailVerificationFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailVerificationFailedEvent {
 	return &HumanEmailVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanEmailVerificationFailedType,
 		),
 	}
@@ -129,11 +133,13 @@ func (e *HumanEmailCodeAddedEvent) UniqueConstraints() []*eventstore.EventUnique
 
 func NewHumanEmailCodeAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration) *HumanEmailCodeAddedEvent {
 	return &HumanEmailCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanEmailCodeAddedType,
 		),
 		Code:   code,
@@ -165,10 +171,11 @@ func (e *HumanEmailCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func NewHumanEmailCodeSentEvent(ctx context.Context) *HumanEmailCodeSentEvent {
+func NewHumanEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailCodeSentEvent {
 	return &HumanEmailCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanEmailCodeSentType,
 		),
 	}

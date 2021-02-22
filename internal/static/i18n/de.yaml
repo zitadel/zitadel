@@ -189,10 +189,15 @@ Errors:
       Invalid: Applikation ist ungültig
       NotExisting: Applikation exisitert nicht
       IsNotOIDC: Applikation ist nicht vom Typ OIDC
+      IsNotAPI: Applikation ist nicht vom Typ API
       NotActive: Applikation ist nicht aktiv
       NotInactive: Applikation ist nickt inaktiv
       OIDCConfigInvalid: OIDC Konfiguration ist ungültig
-    OIDCAuthMethodNoneSecret: OIDC Auth Method None benötigt kein Secret
+      APIConfigInvalid: API Konfiguration ist ungültig
+      OIDCAuthMethodNoSecret: Gewählte OIDC Auth Method benötigt kein Secret
+      APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
+      AuthMethodNoPrivateKeyJWT: Gewählte Auth Method benötigt keinen Key
+      OIDCSecretInvalid: Client Secret ist ungültig
     RequiredFieldsMissing: Benötigte Felder fehlen
     Grant:
       AlreadyExists: Projekt Grant existiert bereits
@@ -203,7 +208,6 @@ Errors:
       NotActive: Projekt Grant ist nicht aktiv
       NotInactive: Projekt Grant ist nicht inaktiv
     UserIDMisisng: User ID fehlt
-    OIDCSecretInvalid: Client Secret ist ungültig
   IAM:
     Member:
       RolesNotChanged: Rollen wurden nicht verändert
@@ -290,6 +294,8 @@ Errors:
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
     RoleKeyNotFound: Rolle konnte nicht gefunden werden
+  Member:
+    AlreadyExists: Member existiert bereits
   IDPConfig:
     AlreadyExists: IDP Konfiguration mit diesem Name existiert bereits
   Changes:

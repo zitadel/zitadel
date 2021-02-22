@@ -3,20 +3,20 @@ package repository
 import (
 	"context"
 
+	key_model "github.com/caos/zitadel/internal/key/model"
+
 	"github.com/caos/zitadel/internal/user/model"
 )
 
 type UserRepository interface {
 	myUserRepo
 
-	GetPasswordless(ctx context.Context, id string) ([]*model.WebAuthNToken, error)
-
 	UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error)
 
 	UserByID(ctx context.Context, userID string) (*model.UserView, error)
 	UserByLoginName(ctx context.Context, loginName string) (*model.UserView, error)
 
-	MachineKeyByID(ctx context.Context, keyID string) (*model.MachineKeyView, error)
+	MachineKeyByID(ctx context.Context, keyID string) (*key_model.AuthNKeyView, error)
 }
 
 type myUserRepo interface {
@@ -34,7 +34,9 @@ type myUserRepo interface {
 
 	MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error)
 
-	GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNToken, error)
+	GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNView, error)
 
 	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
+
+	SearchMyUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
 }

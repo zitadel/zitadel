@@ -17,8 +17,10 @@ func (r *CommandSide) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OI
 		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-67J9d", "Errors.Org.IDPConfig.AlreadyExists")
 	}
 
+	orgAgg := OrgAggregateFromWriteModel(&existingConfig.WriteModel)
 	changedEvent, hasChanged, err := existingConfig.NewChangedEvent(
 		ctx,
+		orgAgg,
 		config.IDPConfigID,
 		config.ClientID,
 		config.Issuer,
@@ -34,10 +36,11 @@ func (r *CommandSide) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OI
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
 	}
 
-	orgAgg := OrgAggregateFromWriteModel(&existingConfig.WriteModel)
-	orgAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingConfig, orgAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingConfig, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

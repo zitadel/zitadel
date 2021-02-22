@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
@@ -11,45 +12,45 @@ import (
 func (r *CommandSide) AddDefaultMailText(ctx context.Context, policy *domain.MailText) (*domain.MailText, error) {
 	addedPolicy := NewIAMMailTextWriteModel(policy.MailTextType, policy.Language)
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.MailTextWriteModel.WriteModel)
-	err := r.addDefaultMailText(ctx, nil, addedPolicy, policy)
+	event, err := r.addDefaultMailText(ctx, iamAgg, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
 
-	err = r.eventstore.PushAggregate(ctx, addedPolicy, iamAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, event)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToMailTextPolicy(&addedPolicy.MailTextWriteModel), nil
 }
 
-func (r *CommandSide) addDefaultMailText(ctx context.Context, iamAgg *iam_repo.Aggregate, addedPolicy *IAMMailTextWriteModel, mailText *domain.MailText) error {
+func (r *CommandSide) addDefaultMailText(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMMailTextWriteModel, mailText *domain.MailText) (eventstore.EventPusher, error) {
 	if !mailText.IsValid() {
-		return caos_errs.ThrowPreconditionFailed(nil, "IAM-3n8fs", "Errors.IAM.MailText.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-3n8fs", "Errors.IAM.MailText.Invalid")
 	}
 	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return caos_errs.ThrowAlreadyExists(nil, "IAM-9o0pM", "Errors.IAM.MailText.AlreadyExists")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-9o0pM", "Errors.IAM.MailText.AlreadyExists")
 	}
 
-	iamAgg.PushEvents(
-		iam_repo.NewMailTextAddedEvent(
-			ctx,
-			mailText.MailTextType,
-			mailText.Language,
-			mailText.Title,
-			mailText.PreHeader,
-			mailText.Subject,
-			mailText.Greeting,
-			mailText.Text,
-			mailText.ButtonText),
-	)
-
-	return nil
+	return iam_repo.NewMailTextAddedEvent(
+		ctx,
+		iamAgg,
+		mailText.MailTextType,
+		mailText.Language,
+		mailText.Title,
+		mailText.PreHeader,
+		mailText.Subject,
+		mailText.Greeting,
+		mailText.Text,
+		mailText.ButtonText), nil
 }
 
 func (r *CommandSide) ChangeDefaultMailText(ctx context.Context, mailText *domain.MailText) (*domain.MailText, error) {
@@ -65,8 +66,10 @@ func (r *CommandSide) ChangeDefaultMailText(ctx context.Context, mailText *domai
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-2N8fs", "Errors.IAM.MailText.NotFound")
 	}
 
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.MailTextWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
 		ctx,
+		iamAgg,
 		mailText.MailTextType,
 		mailText.Language,
 		mailText.Title,
@@ -79,14 +82,14 @@ func (r *CommandSide) ChangeDefaultMailText(ctx context.Context, mailText *domai
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-m9L0s", "Errors.IAM.MailText.NotChanged")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.MailTextWriteModel.WriteModel)
-	iamAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingPolicy, iamAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToMailTextPolicy(&existingPolicy.MailTextWriteModel), nil
 }
 

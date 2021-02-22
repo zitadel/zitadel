@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/project"
-	"github.com/caos/zitadel/internal/v2/repository/usergrant"
 	"reflect"
 )
 
@@ -30,17 +29,16 @@ func (r *CommandSide) AddProjectGrant(ctx context.Context, grant *domain.Project
 	}
 	addedGrant := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedGrant.WriteModel)
-
-	projectAgg.PushEvents(project.NewGrantAddedEvent(ctx, grant.GrantID, grant.GrantedOrgID, grant.AggregateID, grant.RoleKeys))
-
+	pushedEvents, err := r.eventstore.PushEvents(
+		ctx,
+		project.NewGrantAddedEvent(ctx, projectAgg, grant.GrantID, grant.GrantedOrgID, grant.AggregateID, grant.RoleKeys))
 	if err != nil {
 		return nil, err
 	}
-	err = r.eventstore.PushAggregate(ctx, addedGrant, projectAgg)
+	err = AppendAndReduce(addedGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-
 	return projectGrantWriteModelToProjectGrant(addedGrant), nil
 }
 
@@ -62,45 +60,48 @@ func (r *CommandSide) ChangeProjectGrant(ctx context.Context, grant *domain.Proj
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-0o0pL", "Errors.NoChangesFoundc")
 	}
 
-	projectAgg.PushEvents(project.NewGrantChangedEvent(ctx, grant.GrantID, grant.RoleKeys))
+	events := []eventstore.EventPusher{
+		project.NewGrantChangedEvent(ctx, projectAgg, grant.GrantID, grant.RoleKeys),
+	}
 
 	removedRoles := domain.GetRemovedRoles(existingGrant.RoleKeys, grant.RoleKeys)
 	if len(removedRoles) == 0 {
-		err = r.eventstore.PushAggregate(ctx, existingGrant, projectAgg)
+		pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+		if err != nil {
+			return nil, err
+		}
+		err = AppendAndReduce(existingGrant, pushedEvents...)
 		if err != nil {
 			return nil, err
 		}
 		return projectGrantWriteModelToProjectGrant(existingGrant), nil
 	}
 
-	aggregates := make([]eventstore.Aggregater, 0)
-	aggregates = append(aggregates, projectAgg)
 	for _, userGrantID := range cascadeUserGrantIDs {
-		grantAgg, _, err := r.removeRoleFromUserGrant(ctx, userGrantID, removedRoles, true)
+		event, err := r.removeRoleFromUserGrant(ctx, userGrantID, removedRoles, true)
 		if err != nil {
 			continue
 		}
-		aggregates = append(aggregates, grantAgg)
+		events = append(events, event)
 	}
-	resultEvents, err := r.eventstore.PushAggregates(ctx, aggregates...)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
-	existingGrant.AppendEvents(resultEvents...)
-	err = existingGrant.Reduce()
+	err = AppendAndReduce(existingGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
 	return projectGrantWriteModelToProjectGrant(existingGrant), nil
 }
 
-func (r *CommandSide) removeRoleFromProjectGrant(ctx context.Context, projectAgg *project.Aggregate, projectID, projectGrantID, roleKey string, cascade bool) (_ *ProjectGrantWriteModel, err error) {
+func (r *CommandSide) removeRoleFromProjectGrant(ctx context.Context, projectAgg *eventstore.Aggregate, projectID, projectGrantID, roleKey string, cascade bool) (_ eventstore.EventPusher, _ *ProjectGrantWriteModel, err error) {
 	existingProjectGrant, err := r.projectGrantWriteModelByID(ctx, projectID, projectGrantID, "")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if existingProjectGrant.State == domain.ProjectGrantStateUnspecified || existingProjectGrant.State == domain.ProjectGrantStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.Grant.NotFound")
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.Grant.NotFound")
 	}
 	keyExists := false
 	for i, key := range existingProjectGrant.RoleKeys {
@@ -113,21 +114,15 @@ func (r *CommandSide) removeRoleFromProjectGrant(ctx context.Context, projectAgg
 		}
 	}
 	if !keyExists {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5m8g9", "Errors.Project.Grant.RoleKeyNotFound")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5m8g9", "Errors.Project.Grant.RoleKeyNotFound")
 	}
 	changedProjectGrant := NewProjectGrantWriteModel(projectGrantID, projectID, existingProjectGrant.ResourceOwner)
 
-	if !cascade {
-		projectAgg.PushEvents(
-			project.NewGrantChangedEvent(ctx, projectGrantID, existingProjectGrant.RoleKeys),
-		)
-	} else {
-		projectAgg.PushEvents(
-			usergrant.NewUserGrantCascadeChangedEvent(ctx, existingProjectGrant.RoleKeys),
-		)
+	if cascade {
+		return project.NewGrantCascadeChangedEvent(ctx, projectAgg, projectGrantID, existingProjectGrant.RoleKeys), changedProjectGrant, nil
 	}
 
-	return changedProjectGrant, nil
+	return project.NewGrantChangedEvent(ctx, projectAgg, projectGrantID, existingProjectGrant.RoleKeys), changedProjectGrant, nil
 }
 
 func (r *CommandSide) DeactivateProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string) (err error) {
@@ -147,8 +142,8 @@ func (r *CommandSide) DeactivateProjectGrant(ctx context.Context, projectID, gra
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
 
-	projectAgg.PushEvents(project.NewGrantDeactivateEvent(ctx, grantID))
-	return r.eventstore.PushAggregate(ctx, existingGrant, projectAgg)
+	_, err = r.eventstore.PushEvents(ctx, project.NewGrantDeactivateEvent(ctx, projectAgg, grantID))
+	return err
 }
 
 func (r *CommandSide) ReactivateProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string) (err error) {
@@ -167,8 +162,8 @@ func (r *CommandSide) ReactivateProjectGrant(ctx context.Context, projectID, gra
 		return caos_errs.ThrowPreconditionFailed(nil, "PROJECT-47fu8", "Errors.Project.Grant.NotInactive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
-	projectAgg.PushEvents(project.NewGrantReactivatedEvent(ctx, grantID))
-	return r.eventstore.PushAggregate(ctx, existingGrant, projectAgg)
+	_, err = r.eventstore.PushEvents(ctx, project.NewGrantReactivatedEvent(ctx, projectAgg, grantID))
+	return err
 }
 
 func (r *CommandSide) RemoveProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string, cascadeUserGrantIDs ...string) (err error) {
@@ -183,20 +178,19 @@ func (r *CommandSide) RemoveProjectGrant(ctx context.Context, projectID, grantID
 	if err != nil {
 		return err
 	}
-	aggregates := make([]eventstore.Aggregater, 0)
+	events := make([]eventstore.EventPusher, 0)
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
-	projectAgg.PushEvents(project.NewGrantRemovedEvent(ctx, grantID, existingGrant.GrantedOrgID, projectID))
-	aggregates = append(aggregates, projectAgg)
+	events = append(events, project.NewGrantRemovedEvent(ctx, projectAgg, grantID, existingGrant.GrantedOrgID, projectID))
 
 	for _, userGrantID := range cascadeUserGrantIDs {
-		grantAgg, _, err := r.removeUserGrant(ctx, userGrantID, "", true)
+		event, err := r.removeUserGrant(ctx, userGrantID, "", true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
-		aggregates = append(aggregates, grantAgg)
+		events = append(events, event)
 	}
-	_, err = r.eventstore.PushAggregates(ctx, aggregates...)
+	_, err = r.eventstore.PushEvents(ctx, events...)
 	return err
 }
 

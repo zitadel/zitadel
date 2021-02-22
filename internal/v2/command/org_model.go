@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
 	"github.com/caos/zitadel/internal/v2/repository/org"
 )
 
@@ -21,19 +20,6 @@ func NewOrgWriteModel(orgID string) *OrgWriteModel {
 			AggregateID:   orgID,
 			ResourceOwner: orgID,
 		},
-	}
-}
-
-func (wm *OrgWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-	for _, event := range events {
-		switch e := event.(type) {
-		case *org.OrgAddedEvent,
-			*iam.LabelPolicyChangedEvent:
-			wm.WriteModel.AppendEvents(e)
-		case *org.DomainPrimarySetEvent:
-			wm.WriteModel.AppendEvents(e)
-		}
 	}
 }
 
@@ -55,11 +41,13 @@ func (wm *OrgWriteModel) Reduce() error {
 func (wm *OrgWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.OrgAddedEventType,
+			org.OrgChangedEventType,
+			org.OrgDomainPrimarySetEventType)
 }
 
-func OrgAggregateFromWriteModel(wm *eventstore.WriteModel) *org.Aggregate {
-	return &org.Aggregate{
-		Aggregate: *eventstore.AggregateFromWriteModel(wm, org.AggregateType, org.AggregateVersion),
-	}
+func OrgAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModel(wm, org.AggregateType, org.AggregateVersion)
 }

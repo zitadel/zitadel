@@ -34,7 +34,7 @@ func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) domai
 func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.OIDCApp {
 	return &domain.OIDCApp{
 		ObjectRoot:               writeModelToObjectRoot(writeModel.WriteModel),
-		AppID:                    writeModel.AggregateID,
+		AppID:                    writeModel.AppID,
 		AppName:                  writeModel.AppName,
 		State:                    writeModel.State,
 		ClientID:                 writeModel.ClientID,
@@ -55,6 +55,18 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 	}
 }
 
+func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIApp {
+	return &domain.APIApp{
+		ObjectRoot:     writeModelToObjectRoot(writeModel.WriteModel),
+		AppID:          writeModel.AppID,
+		AppName:        writeModel.AppName,
+		State:          writeModel.State,
+		ClientID:       writeModel.ClientID,
+		ClientSecret:   writeModel.ClientSecret,
+		AuthMethodType: writeModel.AuthMethodType,
+	}
+}
+
 func roleWriteModelToRole(writeModel *ProjectRoleWriteModel) *domain.ProjectRole {
 	return &domain.ProjectRole{
 		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
@@ -70,5 +82,17 @@ func memberWriteModelToProjectGrantMember(writeModel *ProjectGrantMemberWriteMod
 		Roles:      writeModel.Roles,
 		GrantID:    writeModel.GrantID,
 		UserID:     writeModel.UserID,
+	}
+}
+
+func applicationKeyWriteModelToKey(wm *ApplicationKeyWriteModel, privateKey []byte) *domain.ApplicationKey {
+	return &domain.ApplicationKey{
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
+		ApplicationID:  wm.AppID,
+		ClientID:       wm.ClientID,
+		KeyID:          wm.KeyID,
+		Type:           wm.KeyType,
+		ExpirationDate: wm.ExpirationDate,
+		PrivateKey:     privateKey,
 	}
 }

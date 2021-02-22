@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/zitadel/internal/api/http"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -11,6 +12,7 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	iam_repo "github.com/caos/zitadel/internal/v2/repository/iam"
+	keypair "github.com/caos/zitadel/internal/v2/repository/keypair"
 	"github.com/caos/zitadel/internal/v2/repository/org"
 	proj_repo "github.com/caos/zitadel/internal/v2/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/v2/repository/user"
@@ -32,13 +34,19 @@ type CommandSide struct {
 	passwordVerificationCode    crypto.Generator
 	machineKeyAlg               crypto.EncryptionAlgorithm
 	machineKeySize              int
+	applicationKeySize          int
 	applicationSecretGenerator  crypto.Generator
 	domainVerificationAlg       *crypto.AESCrypto
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
 	//TODO: remove global model, or move to domain
 	multifactors global_model.Multifactors
-	webauthn     *webauthn_helper.WebAuthN
+
+	webauthn           *webauthn_helper.WebAuthN
+	keySize            int
+	keyAlgorithm       crypto.EncryptionAlgorithm
+	privateKeyLifetime time.Duration
+	publicKeyLifetime  time.Duration
 }
 
 type Config struct {
@@ -48,15 +56,19 @@ type Config struct {
 
 func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	repo = &CommandSide{
-		eventstore:  config.Eventstore,
-		idGenerator: id.SonyFlakeGenerator,
-		iamDomain:   config.SystemDefaults.Domain,
+		eventstore:         config.Eventstore,
+		idGenerator:        id.SonyFlakeGenerator,
+		iamDomain:          config.SystemDefaults.Domain,
+		keySize:            config.SystemDefaults.KeyConfig.Size,
+		privateKeyLifetime: config.SystemDefaults.KeyConfig.PrivateKeyLifetime.Duration,
+		publicKeyLifetime:  config.SystemDefaults.KeyConfig.PublicKeyLifetime.Duration,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
 	usr_grant_repo.RegisterEventMappers(repo.eventstore)
 	proj_repo.RegisterEventMappers(repo.eventstore)
+	keypair.RegisterEventMappers(repo.eventstore)
 
 	//TODO: simplify!!!!
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)
@@ -74,6 +86,7 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	repo.userPasswordAlg = crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeyAlg = userEncryptionAlgorithm
 	repo.machineKeySize = int(config.SystemDefaults.SecretGenerators.MachineKeySize)
+	repo.applicationKeySize = int(config.SystemDefaults.SecretGenerators.ApplicationKeySize)
 
 	aesOTPCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.Multifactors.OTP.VerificationKey)
 	if err != nil {
@@ -99,6 +112,12 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 		return nil, err
 	}
 	repo.webauthn = web
+
+	keyAlgorithm, err := crypto.NewAESCrypto(config.SystemDefaults.KeyConfig.EncryptionConfig)
+	if err != nil {
+		return nil, err
+	}
+	repo.keyAlgorithm = keyAlgorithm
 	return repo, nil
 }
 
@@ -113,4 +132,12 @@ func (r *CommandSide) getIAMWriteModel(ctx context.Context) (_ *IAMWriteModel, e
 	}
 
 	return writeModel, nil
+}
+
+func AppendAndReduce(object interface {
+	AppendEvents(...eventstore.EventReader)
+	Reduce() error
+}, events ...eventstore.EventReader) error {
+	object.AppendEvents(events...)
+	return object.Reduce()
 }

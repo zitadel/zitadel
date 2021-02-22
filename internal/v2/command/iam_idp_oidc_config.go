@@ -17,8 +17,10 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *do
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-67J9d", "Errors.IAM.IDPConfig.AlreadyExists")
 	}
 
+	iamAgg := IAMAggregateFromWriteModel(&existingConfig.WriteModel)
 	changedEvent, hasChanged, err := existingConfig.NewChangedEvent(
 		ctx,
+		iamAgg,
 		config.IDPConfigID,
 		config.ClientID,
 		config.Issuer,
@@ -34,13 +36,13 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *do
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&existingConfig.WriteModel)
-	iamAgg.PushEvents(changedEvent)
-
-	err = r.eventstore.PushAggregate(ctx, existingConfig, iamAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(existingConfig, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToIDPOIDCConfig(&existingConfig.OIDCConfigWriteModel), nil
 }

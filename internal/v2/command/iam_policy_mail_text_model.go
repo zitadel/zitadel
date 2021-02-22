@@ -43,11 +43,15 @@ func (wm *IAMMailTextWriteModel) Reduce() error {
 func (wm *IAMMailTextWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
 		AggregateIDs(wm.MailTextWriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.MailTextAddedEventType,
+			iam.MailTextChangedEventType)
 }
 
 func (wm *IAMMailTextWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	mailTextType,
 	language,
 	title,
@@ -79,7 +83,7 @@ func (wm *IAMMailTextWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewMailTextChangedEvent(ctx, mailTextType, language, changes)
+	changedEvent, err := iam.NewMailTextChangedEvent(ctx, aggregate, mailTextType, language, changes)
 	if err != nil {
 		return nil, false
 	}

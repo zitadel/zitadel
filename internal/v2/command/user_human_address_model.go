@@ -29,10 +29,6 @@ func NewHumanAddressWriteModel(userID, resourceOwner string) *HumanAddressWriteM
 	}
 }
 
-func (wm *HumanAddressWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	wm.WriteModel.AppendEvents(events...)
-}
-
 func (wm *HumanAddressWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -76,11 +72,16 @@ func (wm *HumanAddressWriteModel) Reduce() error {
 func (wm *HumanAddressWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		ResourceOwner(wm.ResourceOwner)
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.HumanAddressChangedType,
+			user.UserRemovedType)
 }
 
 func (wm *HumanAddressWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	country,
 	locality,
 	postalCode,
@@ -88,7 +89,7 @@ func (wm *HumanAddressWriteModel) NewChangedEvent(
 	streetAddress string,
 ) (*user.HumanAddressChangedEvent, bool) {
 	hasChanged := false
-	changedEvent := user.NewHumanAddressChangedEvent(ctx)
+	changedEvent := user.NewHumanAddressChangedEvent(ctx, aggregate)
 	if wm.Country != country {
 		hasChanged = true
 		changedEvent.Country = &country

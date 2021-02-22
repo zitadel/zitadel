@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
-	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 )
 
 type Configs map[string]*Config
@@ -30,16 +29,13 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 	return h.es
 }
 
-type EventstoreRepos struct {
-	IAMEvents *iam_events.IAMEventstore
-}
-
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		newUserGrant(
-			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
-			repos.IAMEvents,
+			handler{view, bulkLimit, configs.cycleDuration("UserGrants"), errorCount, es},
 			systemDefaults.IamID),
+		newUserMembership(
+			handler{view, bulkLimit, configs.cycleDuration("UserMemberships"), errorCount, es}),
 		newApplication(
 			handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newOrg(

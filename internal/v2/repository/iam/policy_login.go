@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -19,6 +20,7 @@ type LoginPolicyAddedEvent struct {
 
 func NewLoginPolicyAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
@@ -27,7 +29,10 @@ func NewLoginPolicyAddedEvent(
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
 		LoginPolicyAddedEvent: *policy.NewLoginPolicyAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, LoginPolicyAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LoginPolicyAddedEventType),
 			allowUsernamePassword,
 			allowRegister,
 			allowExternalIDP,
@@ -51,10 +56,14 @@ type LoginPolicyChangedEvent struct {
 
 func NewLoginPolicyChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	changes []policy.LoginPolicyChanges,
 ) (*LoginPolicyChangedEvent, error) {
 	changedEvent, err := policy.NewLoginPolicyChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, LoginPolicyChangedEventType),
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			LoginPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {

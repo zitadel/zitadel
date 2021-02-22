@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
@@ -23,6 +24,7 @@ type HumanU2FAddedEvent struct {
 
 func NewHumanU2FAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	webAuthNTokenID,
 	challenge string,
 ) *HumanU2FAddedEvent {
@@ -30,6 +32,7 @@ func NewHumanU2FAddedEvent(
 		HumanWebAuthNAddedEvent: *NewHumanWebAuthNAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanU2FTokenAddedType,
 			),
 			webAuthNTokenID,
@@ -53,6 +56,7 @@ type HumanU2FVerifiedEvent struct {
 
 func NewHumanU2FVerifiedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	webAuthNTokenID,
 	webAuthNTokenName,
 	attestationType string,
@@ -65,6 +69,7 @@ func NewHumanU2FVerifiedEvent(
 		HumanWebAuthNVerifiedEvent: *NewHumanWebAuthNVerifiedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanU2FTokenVerifiedType,
 			),
 			webAuthNTokenID,
@@ -93,6 +98,7 @@ type HumanU2FSignCountChangedEvent struct {
 
 func NewHumanU2FSignCountChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	webAuthNTokenID string,
 	signCount uint32,
 ) *HumanU2FSignCountChangedEvent {
@@ -100,6 +106,7 @@ func NewHumanU2FSignCountChangedEvent(
 		HumanWebAuthNSignCountChangedEvent: *NewHumanWebAuthNSignCountChangedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanU2FTokenSignCountChangedType,
 			),
 			webAuthNTokenID,
@@ -121,14 +128,22 @@ type HumanU2FRemovedEvent struct {
 	HumanWebAuthNRemovedEvent
 }
 
+func PrepareHumanU2FRemovedEvent(ctx context.Context, webAuthNTokenID string) func(*eventstore.Aggregate) eventstore.EventPusher {
+	return func(a *eventstore.Aggregate) eventstore.EventPusher {
+		return NewHumanU2FRemovedEvent(ctx, a, webAuthNTokenID)
+	}
+}
+
 func NewHumanU2FRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	webAuthNTokenID string,
 ) *HumanU2FRemovedEvent {
 	return &HumanU2FRemovedEvent{
 		HumanWebAuthNRemovedEvent: *NewHumanWebAuthNRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanU2FTokenRemovedType,
 			),
 			webAuthNTokenID,
@@ -151,6 +166,7 @@ type HumanU2FBeginLoginEvent struct {
 
 func NewHumanU2FBeginLoginEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	challenge string,
 	info *AuthRequestInfo,
 ) *HumanU2FBeginLoginEvent {
@@ -158,6 +174,7 @@ func NewHumanU2FBeginLoginEvent(
 		HumanWebAuthNBeginLoginEvent: *NewHumanWebAuthNBeginLoginEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanU2FTokenVerifiedType,
 			),
 			challenge,
@@ -179,11 +196,12 @@ type HumanU2FCheckSucceededEvent struct {
 	HumanWebAuthNCheckSucceededEvent
 }
 
-func NewHumanU2FCheckSucceededEvent(ctx context.Context) *HumanU2FCheckSucceededEvent {
+func NewHumanU2FCheckSucceededEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanU2FCheckSucceededEvent {
 	return &HumanU2FCheckSucceededEvent{
 		HumanWebAuthNCheckSucceededEvent: *NewHumanWebAuthNCheckSucceededEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanU2FTokenCheckSucceededType,
 			),
 		),
@@ -203,11 +221,12 @@ type HumanU2FCheckFailedEvent struct {
 	HumanWebAuthNCheckFailedEvent
 }
 
-func NewHumanU2FCheckFailedEvent(ctx context.Context) *HumanU2FCheckFailedEvent {
+func NewHumanU2FCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanU2FCheckFailedEvent {
 	return &HumanU2FCheckFailedEvent{
 		HumanWebAuthNCheckFailedEvent: *NewHumanWebAuthNCheckFailedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				HumanU2FTokenCheckFailedType,
 			),
 		),

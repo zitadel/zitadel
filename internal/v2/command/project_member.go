@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v2"
 	"reflect"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -14,12 +15,16 @@ import (
 func (r *CommandSide) AddProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
 	addedMember := NewProjectMemberWriteModel(member.AggregateID, member.UserID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
-	err := r.addProjectMember(ctx, projectAgg, addedMember, member)
+	event, err := r.addProjectMember(ctx, projectAgg, addedMember, member)
 	if err != nil {
 		return nil, err
 	}
 
-	err = r.eventstore.PushAggregate(ctx, addedMember, projectAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, event)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(addedMember, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -27,28 +32,26 @@ func (r *CommandSide) AddProjectMember(ctx context.Context, member *domain.Membe
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
-func (r *CommandSide) addProjectMember(ctx context.Context, projectAgg *project.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) error {
+func (r *CommandSide) addProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
-		return caos_errs.ThrowPreconditionFailed(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
 	}
 
 	err := r.checkUserExists(ctx, addedMember.UserID, "")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = r.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if addedMember.State == domain.MemberStateActive {
-		return errors.ThrowAlreadyExists(nil, "PROJECT-PtXi1", "Errors.Project.Member.AlreadyExists")
+		return nil, errors.ThrowAlreadyExists(nil, "PROJECT-PtXi1", "Errors.Project.Member.AlreadyExists")
 	}
 
-	projectAgg.PushEvents(project.NewProjectMemberAddedEvent(ctx, member.UserID, member.Roles...))
-
-	return nil
+	return project.NewProjectMemberAddedEvent(ctx, projectAgg, member.UserID, member.Roles...), nil
 }
 
 //ChangeProjectMember updates an existing member
@@ -68,15 +71,13 @@ func (r *CommandSide) ChangeProjectMember(ctx context.Context, member *domain.Me
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.RolesNotChanged")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	projectAgg.PushEvents(project.NewProjectMemberChangedEvent(ctx, member.UserID, member.Roles...))
-
-	events, err := r.eventstore.PushAggregates(ctx, projectAgg)
+	pushedEvents, err := r.eventstore.PushEvents(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
 
-	existingMember.AppendEvents(events...)
-	if err = existingMember.Reduce(); err != nil {
+	err = AppendAndReduce(existingMember, pushedEvents...)
+	if err != nil {
 		return nil, err
 	}
 
@@ -93,9 +94,8 @@ func (r *CommandSide) RemoveProjectMember(ctx context.Context, projectID, userID
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	projectAgg.PushEvents(project.NewProjectMemberRemovedEvent(ctx, userID))
-
-	return r.eventstore.PushAggregate(ctx, m, projectAgg)
+	_, err = r.eventstore.PushEvents(ctx, project.NewProjectMemberRemovedEvent(ctx, projectAgg, userID))
+	return err
 }
 
 func (r *CommandSide) projectMemberWriteModelByID(ctx context.Context, projectID, userID, resourceOwner string) (member *ProjectMemberWriteModel, err error) {

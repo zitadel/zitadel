@@ -20,12 +20,16 @@ type LabelPolicyAddedEvent struct {
 
 func NewLabelPolicyAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	primaryColor,
 	secondaryColor string,
 ) *LabelPolicyAddedEvent {
 	return &LabelPolicyAddedEvent{
 		LabelPolicyAddedEvent: *policy.NewLabelPolicyAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, LabelPolicyAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LabelPolicyAddedEventType),
 			primaryColor,
 			secondaryColor),
 	}
@@ -46,10 +50,14 @@ type LabelPolicyChangedEvent struct {
 
 func NewLabelPolicyChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	changes []policy.LabelPolicyChanges,
 ) (*LabelPolicyChangedEvent, error) {
 	changedEvent, err := policy.NewLabelPolicyChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, LabelPolicyChangedEventType),
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			LabelPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {
@@ -73,10 +81,14 @@ type LabelPolicyRemovedEvent struct {
 
 func NewLabelPolicyRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 ) *LabelPolicyRemovedEvent {
 	return &LabelPolicyRemovedEvent{
 		LabelPolicyRemovedEvent: *policy.NewLabelPolicyRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, LabelPolicyRemovedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LabelPolicyRemovedEventType),
 		),
 	}
 }

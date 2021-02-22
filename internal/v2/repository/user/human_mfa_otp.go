@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
@@ -32,11 +33,15 @@ func (e *HumanOTPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 	return nil
 }
 
-func NewHumanOTPAddedEvent(ctx context.Context,
-	secret *crypto.CryptoValue) *HumanOTPAddedEvent {
+func NewHumanOTPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	secret *crypto.CryptoValue,
+) *HumanOTPAddedEvent {
 	return &HumanOTPAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanMFAOTPAddedType,
 		),
 		Secret: secret,
@@ -67,10 +72,15 @@ func (e *HumanOTPVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
-func NewHumanOTPVerifiedEvent(ctx context.Context, userAgentID string) *HumanOTPVerifiedEvent {
+func NewHumanOTPVerifiedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	userAgentID string,
+) *HumanOTPVerifiedEvent {
 	return &HumanOTPVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanMFAOTPVerifiedType,
 		),
 		UserAgentID: userAgentID,
@@ -95,10 +105,14 @@ func (e *HumanOTPRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 	return nil
 }
 
-func NewHumanOTPRemovedEvent(ctx context.Context) *HumanOTPRemovedEvent {
+func NewHumanOTPRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *HumanOTPRemovedEvent {
 	return &HumanOTPRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanMFAOTPRemovedType,
 		),
 	}
@@ -123,10 +137,15 @@ func (e *HumanOTPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUni
 	return nil
 }
 
-func NewHumanOTPCheckSucceededEvent(ctx context.Context, info *AuthRequestInfo) *HumanOTPCheckSucceededEvent {
+func NewHumanOTPCheckSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanOTPCheckSucceededEvent {
 	return &HumanOTPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanMFAOTPCheckSucceededType,
 		),
 		AuthRequestInfo: info,
@@ -157,10 +176,15 @@ func (e *HumanOTPCheckFailedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
-func NewHumanOTPCheckFailedEvent(ctx context.Context, info *AuthRequestInfo) *HumanOTPCheckFailedEvent {
+func NewHumanOTPCheckFailedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanOTPCheckFailedEvent {
 	return &HumanOTPCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanMFAOTPCheckFailedType,
 		),
 		AuthRequestInfo: info,

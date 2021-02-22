@@ -3,13 +3,14 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 const (
-	uniqueExternalIDPType    = "external_idps"
+	UniqueExternalIDPType    = "external_idps"
 	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
 	externalLoginEventPrefix = humanEventPrefix + "externallogin."
 
@@ -22,23 +23,23 @@ const (
 
 func NewAddExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueExternalIDPType,
+		UniqueExternalIDPType,
 		idpConfigID+externalUserID,
 		"Errors.User.ExternalIDP.AlreadyExists")
 }
 
 func NewRemoveExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueExternalIDPType,
+		UniqueExternalIDPType,
 		idpConfigID+externalUserID)
 }
 
 type HumanExternalIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPConfigID string `json:"idpConfigId,omitempty"`
-	UserID      string `json:"userId,omitempty"`
-	DisplayName string `json:"displayName,omitempty"`
+	IDPConfigID    string `json:"idpConfigId,omitempty"`
+	ExternalUserID string `json:"userId,omitempty"`
+	DisplayName    string `json:"displayName,omitempty"`
 }
 
 func (e *HumanExternalIDPAddedEvent) Data() interface{} {
@@ -46,18 +47,25 @@ func (e *HumanExternalIDPAddedEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
+	return []*eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
-func NewHumanExternalIDPAddedEvent(ctx context.Context, idpConfigID, displayName, externalUserID string) *HumanExternalIDPAddedEvent {
+func NewHumanExternalIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID,
+	displayName,
+	externalUserID string,
+) *HumanExternalIDPAddedEvent {
 	return &HumanExternalIDPAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanExternalIDPAddedType,
 		),
-		IDPConfigID: idpConfigID,
-		DisplayName: displayName,
-		UserID:      externalUserID,
+		IDPConfigID:    idpConfigID,
+		DisplayName:    displayName,
+		ExternalUserID: externalUserID,
 	}
 }
 
@@ -77,8 +85,8 @@ func HumanExternalIDPAddedEventMapper(event *repository.Event) (eventstore.Event
 type HumanExternalIDPRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPConfigID string `json:"idpConfigId"`
-	UserID      string `json:"userId,omitempty"`
+	IDPConfigID    string `json:"idpConfigId"`
+	ExternalUserID string `json:"userId,omitempty"`
 }
 
 func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
@@ -86,17 +94,23 @@ func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
-func NewHumanExternalIDPRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPRemovedEvent {
+func NewHumanExternalIDPRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID,
+	externalUserID string,
+) *HumanExternalIDPRemovedEvent {
 	return &HumanExternalIDPRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanExternalIDPRemovedType,
 		),
-		IDPConfigID: idpConfigID,
-		UserID:      externalUserID,
+		IDPConfigID:    idpConfigID,
+		ExternalUserID: externalUserID,
 	}
 }
 
@@ -116,8 +130,8 @@ func HumanExternalIDPRemovedEventMapper(event *repository.Event) (eventstore.Eve
 type HumanExternalIDPCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPConfigID string `json:"idpConfigId"`
-	UserID      string `json:"userId,omitempty"`
+	IDPConfigID    string `json:"idpConfigId"`
+	ExternalUserID string `json:"userId,omitempty"`
 }
 
 func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
@@ -125,17 +139,23 @@ func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.UserID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
-func NewHumanExternalIDPCascadeRemovedEvent(ctx context.Context, idpConfigID, externalUserID string) *HumanExternalIDPCascadeRemovedEvent {
+func NewHumanExternalIDPCascadeRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID,
+	externalUserID string,
+) *HumanExternalIDPCascadeRemovedEvent {
 	return &HumanExternalIDPCascadeRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanExternalIDPCascadeRemovedType,
 		),
-		IDPConfigID: idpConfigID,
-		UserID:      externalUserID,
+		IDPConfigID:    idpConfigID,
+		ExternalUserID: externalUserID,
 	}
 }
 
@@ -165,10 +185,14 @@ func (e *HumanExternalIDPCheckSucceededEvent) UniqueConstraints() []*eventstore.
 	return nil
 }
 
-func NewHumanExternalIDPCheckSucceededEvent(ctx context.Context, info *AuthRequestInfo) *HumanExternalIDPCheckSucceededEvent {
+func NewHumanExternalIDPCheckSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo) *HumanExternalIDPCheckSucceededEvent {
 	return &HumanExternalIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			HumanExternalLoginCheckSucceededType,
 		),
 		AuthRequestInfo: info,

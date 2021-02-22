@@ -27,10 +27,15 @@ func (e *ProjectSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 	return nil
 }
 
-func NewIAMProjectSetEvent(ctx context.Context, projectID string) *ProjectSetEvent {
+func NewIAMProjectSetEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	projectID string,
+) *ProjectSetEvent {
 	return &ProjectSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			ProjectSetEventType,
 		),
 		ProjectID: projectID,

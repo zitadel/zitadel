@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 )
 
 var (
-	uniqueGrantType         = "project_Grant"
+	UniqueGrantType         = "project_grant"
 	grantEventTypePrefix    = projectEventTypePrefix + "grant."
 	GrantAddedType          = grantEventTypePrefix + "added"
 	GrantChangedType        = grantEventTypePrefix + "changed"
@@ -22,14 +23,14 @@ var (
 
 func NewAddProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueRoleType,
+		UniqueRoleType,
 		fmt.Sprintf("%s:%s", grantedOrgID, projectID),
 		"Errors.Project.Grant.AlreadyExists")
 }
 
 func NewRemoveProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		uniqueRoleType,
+		UniqueRoleType,
 		fmt.Sprintf("%s:%s", grantedOrgID, projectID))
 }
 
@@ -50,10 +51,18 @@ func (e *GrantAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 	return []*eventstore.EventUniqueConstraint{NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.projectID)}
 }
 
-func NewGrantAddedEvent(ctx context.Context, grantID, grantedOrgID, projectID string, roleKeys []string) *GrantAddedEvent {
+func NewGrantAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	grantID,
+	grantedOrgID,
+	projectID string,
+	roleKeys []string,
+) *GrantAddedEvent {
 	return &GrantAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GrantAddedType,
 		),
 		GrantID:      grantID,
@@ -91,10 +100,16 @@ func (e *GrantChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstra
 	return nil
 }
 
-func NewGrantChangedEvent(ctx context.Context, grantID string, roleKeys []string) *GrantChangedEvent {
+func NewGrantChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	grantID string,
+	roleKeys []string,
+) *GrantChangedEvent {
 	return &GrantChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GrantChangedType,
 		),
 		GrantID:  grantID,
@@ -130,10 +145,16 @@ func (e *GrantCascadeChangedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
-func NewGrantCascadeChangedEvent(ctx context.Context, grantID string, roleKeys []string) *GrantCascadeChangedEvent {
+func NewGrantCascadeChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	grantID string,
+	roleKeys []string,
+) *GrantCascadeChangedEvent {
 	return &GrantCascadeChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GrantCascadeChangedType,
 		),
 		GrantID:  grantID,
@@ -168,10 +189,15 @@ func (e *GrantDeactivateEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 	return nil
 }
 
-func NewGrantDeactivateEvent(ctx context.Context, grantID string) *GrantDeactivateEvent {
+func NewGrantDeactivateEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	grantID string,
+) *GrantDeactivateEvent {
 	return &GrantDeactivateEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GrantDeactivatedType,
 		),
 		GrantID: grantID,
@@ -205,10 +231,15 @@ func (e *GrantReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
-func NewGrantReactivatedEvent(ctx context.Context, grantID string) *GrantReactivatedEvent {
+func NewGrantReactivatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	grantID string,
+) *GrantReactivatedEvent {
 	return &GrantReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GrantReactivatedType,
 		),
 		GrantID: grantID,
@@ -244,10 +275,17 @@ func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstra
 	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.projectID)}
 }
 
-func NewGrantRemovedEvent(ctx context.Context, grantID, grantedOrgID, projectID string) *GrantRemovedEvent {
+func NewGrantRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	grantID,
+	grantedOrgID,
+	projectID string,
+) *GrantRemovedEvent {
 	return &GrantRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
+			aggregate,
 			GrantRemovedType,
 		),
 		GrantID:      grantID,

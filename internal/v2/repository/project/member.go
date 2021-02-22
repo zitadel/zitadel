@@ -2,6 +2,7 @@ package project
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/eventstore/v2/repository"
 	"github.com/caos/zitadel/internal/v2/repository/member"
@@ -19,6 +20,7 @@ type MemberAddedEvent struct {
 
 func NewProjectMemberAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	userID string,
 	roles ...string,
 ) *MemberAddedEvent {
@@ -26,6 +28,7 @@ func NewProjectMemberAddedEvent(
 		MemberAddedEvent: *member.NewMemberAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				MemberAddedType,
 			),
 			userID,
@@ -49,6 +52,7 @@ type MemberChangedEvent struct {
 
 func NewProjectMemberChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	userID string,
 	roles ...string,
 ) *MemberChangedEvent {
@@ -57,6 +61,7 @@ func NewProjectMemberChangedEvent(
 		MemberChangedEvent: *member.NewMemberChangedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				MemberChangedType,
 			),
 			userID,
@@ -80,6 +85,7 @@ type MemberRemovedEvent struct {
 
 func NewProjectMemberRemovedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	userID string,
 ) *MemberRemovedEvent {
 
@@ -87,6 +93,7 @@ func NewProjectMemberRemovedEvent(
 		MemberRemovedEvent: *member.NewRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
+				aggregate,
 				MemberRemovedType,
 			),
 			userID,

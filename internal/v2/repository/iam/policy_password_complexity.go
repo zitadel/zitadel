@@ -19,6 +19,7 @@ type PasswordComplexityPolicyAddedEvent struct {
 
 func NewPasswordComplexityPolicyAddedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	minLength uint64,
 	hasLowercase,
 	hasUppercase,
@@ -27,7 +28,10 @@ func NewPasswordComplexityPolicyAddedEvent(
 ) *PasswordComplexityPolicyAddedEvent {
 	return &PasswordComplexityPolicyAddedEvent{
 		PasswordComplexityPolicyAddedEvent: *policy.NewPasswordComplexityPolicyAddedEvent(
-			eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyAddedEventType),
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				PasswordComplexityPolicyAddedEventType),
 			minLength,
 			hasLowercase,
 			hasUppercase,
@@ -51,10 +55,14 @@ type PasswordComplexityPolicyChangedEvent struct {
 
 func NewPasswordComplexityPolicyChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	changes []policy.PasswordComplexityPolicyChanges,
 ) (*PasswordComplexityPolicyChangedEvent, error) {
 	changedEvent, err := policy.NewPasswordComplexityPolicyChangedEvent(
-		eventstore.NewBaseEventForPush(ctx, PasswordComplexityPolicyChangedEventType),
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasswordComplexityPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {
