@@ -10,12 +10,16 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/query"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 const (
@@ -173,7 +177,7 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 	}
 	policy := org.OrgIamPolicy
 	if policy == nil {
-		policy, err = u.iamEvents.GetOrgIAMPolicy(context.Background(), u.iamID)
+		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
 		if err != nil {
 			return err
 		}
@@ -205,7 +209,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	}
 	policy := org.OrgIamPolicy
 	if policy == nil {
-		policy, err = u.iamEvents.GetOrgIAMPolicy(context.Background(), u.iamID)
+		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
 		if err != nil {
 			return err
 		}
@@ -227,7 +231,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	}
 	policy := org.OrgIamPolicy
 	if policy == nil {
-		policy, err = u.iamEvents.GetOrgIAMPolicy(context.Background(), u.iamID)
+		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
 		if err != nil {
 			return err
 		}
@@ -274,4 +278,32 @@ func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, er
 	}
 
 	return org_es_model.OrgToModel(esOrg), nil
+}
+
+func (u *User) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &model.IAM{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, iam.AppendEvents, query)
+	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return model.IAMToModel(iam), nil
+}
+
+func (u *User) getDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicy, error) {
+	existingIAM, err := u.getIAMByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if existingIAM.DefaultOrgIAMPolicy == nil {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3m9fs", "Errors.IAM.OrgIAMPolicy.NotExisting")
+	}
+	return existingIAM.DefaultOrgIAMPolicy, nil
 }

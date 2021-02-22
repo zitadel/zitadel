@@ -72,14 +72,3 @@ func (es *IAMEventstore) GetIDPConfig(ctx context.Context, aggregateID, idpConfi
 	}
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-Scj8s", "Errors.IAM.IdpNotExisting")
 }
-
-func (es *IAMEventstore) GetOrgIAMPolicy(ctx context.Context, iamID string) (*iam_model.OrgIAMPolicy, error) {
-	existingIAM, err := es.IAMByID(ctx, iamID)
-	if err != nil {
-		return nil, err
-	}
-	if existingIAM.DefaultOrgIAMPolicy == nil {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2Fj8s", "Errors.IAM.OrgIAMPolicy.NotExisting")
-	}
-	return existingIAM.DefaultOrgIAMPolicy, nil
-}
