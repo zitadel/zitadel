@@ -628,7 +628,7 @@ service ManagementService {
     // returns a project my organisation got granted from another organisation
     rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
         option (google.api.http) = {
-            get: "/grantedprojects/{project_id}/grants/{id}"
+            get: "/grantedprojects/{project_id}/grants/{grant_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -732,7 +732,7 @@ service ManagementService {
 
     rpc AddProjectRole(AddProjectRoleRequest) returns (AddProjectRoleResponse) {
         option (google.api.http) = {
-            post: "/projects/{id}/roles"
+            post: "/projects/{project_id}/roles"
             body: "*"
         };
 
@@ -745,7 +745,7 @@ service ManagementService {
   // add a list of project roles in one request
     rpc BulkAddProjectRoles(BulkAddProjectRolesRequest) returns (BulkAddProjectRolesResponse) {
         option (google.api.http) = {
-            post: "/projects/{id}/roles/_bulk"
+            post: "/projects/{project_id}/roles/_bulk"
             body: "*"
         };
 
@@ -757,7 +757,7 @@ service ManagementService {
 
     rpc UpdateProjectRole(UpdateProjectRoleRequest) returns (UpdateProjectRoleResponse) {
         option (google.api.http) = {
-            put: "/projects/{id}/roles/{role_key}"
+            put: "/projects/{project_id}/roles/{role_key}"
             body: "*"
         };
 
@@ -770,7 +770,7 @@ service ManagementService {
     // RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
     rpc RemoveProjectRole(RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
         option (google.api.http) = {
-            delete: "/projects/{id}/roles/{role_key}"
+            delete: "/projects/{project_id}/roles/{role_key}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -803,7 +803,7 @@ service ManagementService {
 
     rpc AddProjectMember(AddProjectMemberRequest) returns (AddProjectMemberResponse) {
         option (google.api.http) = {
-            post: "/projects/{id}/members"
+            post: "/projects/{project_id}/members"
             body: "*"
         };
 
@@ -815,7 +815,7 @@ service ManagementService {
 
     rpc UpdateProjectMember(UpdateProjectMemberRequest) returns (UpdateProjectMemberResponse) {
         option (google.api.http) = {
-            put: "/projects/{id}/members/{user_id}"
+            put: "/projects/{project_id}/members/{user_id}"
             body: "*"
         };
 
@@ -827,7 +827,7 @@ service ManagementService {
 
     rpc RemoveProjectMember(RemoveProjectMemberRequest) returns (RemoveProjectMemberResponse) {
         option (google.api.http) = {
-            delete: "/projects/{id}/members/{user_id}"
+            delete: "/projects/{project_id}/members/{user_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -838,7 +838,7 @@ service ManagementService {
 
     rpc GetAppByID(GetAppByIDRequest) returns (GetAppByIDResponse) {
         option (google.api.http) = {
-            get: "/projects/{project_id}/apps/{id}"
+            get: "/projects/{project_id}/apps/{app_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -885,7 +885,7 @@ service ManagementService {
 
     rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{id}"
+            put: "/projects/{project_id}/apps/{app_id}"
             body: "*"
         };
 
@@ -921,7 +921,7 @@ service ManagementService {
 
     rpc DeactivateApp(DeactivateAppRequest) returns (DeactivateAppResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{id}/_deactivate"
+            put: "/projects/{project_id}/apps/{app_id}/_deactivate"
             body: "*"
         };
 
@@ -933,7 +933,7 @@ service ManagementService {
 
     rpc ReactivateApp(ReactivateAppRequest) returns (ReactivateAppResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{id}/_reactivate"
+            put: "/projects/{project_id}/apps/{app_id}/_reactivate"
             body: "*"
         };
 
@@ -945,7 +945,7 @@ service ManagementService {
 
     rpc RemoveApp(RemoveAppRequest) returns (RemoveAppResponse) {
         option (google.api.http) = {
-            delete: "/projects/{project_id}/apps/{id}"
+            delete: "/projects/{project_id}/apps/{app_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -956,7 +956,7 @@ service ManagementService {
 
     rpc RegenerateOIDCClientSecret(RegenerateOIDCClientSecretRequest) returns (RegenerateOIDCClientSecretResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{id}/oidcconfig/_changeclientsecret"
+            put: "/projects/{project_id}/apps/{app_id}/oidcconfig/_changeclientsecret"
             body: "*"
         };
 
@@ -968,7 +968,7 @@ service ManagementService {
 
     rpc RegenerateAPIClientSecret(RegenerateAPIClientSecretRequest) returns (RegenerateAPIClientSecretResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{id}/apiconfig/_changeclientsecret"
+            put: "/projects/{project_id}/apps/{app_id}/apiconfig/_changeclientsecret"
             body: "*"
         };
 

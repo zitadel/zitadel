@@ -507,7 +507,7 @@ service AdminService {
         };
     }
 
-    rpc UpdateIAMMember(UpdateIAMMemberRequest) returns (UpdateIAMMemberRequest) {
+    rpc UpdateIAMMember(UpdateIAMMemberRequest) returns (UpdateIAMMemberResponse) {
         option (google.api.http) = {
             put: "/members/{user_id}"
             body: "*"

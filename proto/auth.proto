@@ -344,7 +344,7 @@ service AuthService {
 
     rpc RemoveMyPasswordless(RemoveMyPasswordlessRequest) returns (RemoveMyPasswordlessResponse) {
         option (google.api.http) = {
-            delete: "/users/me/passwordless/{id}"
+            delete: "/users/me/passwordless/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
