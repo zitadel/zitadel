@@ -185,9 +185,9 @@ Errors:
     IDMissing: ID missing
     App:
       AlreadyExists: Application already exists
+      NotFound: Application not found
       Invalid: Application invalid
       NotExisting: Application doesn't exist
-      IsNotOIDC: Application is not type oidc
       NotActive:: Application is not active
       NotInactive: Application is not inactive
       OIDCConfigInvalid: OIDC configuration is invalid
@@ -197,6 +197,7 @@ Errors:
       OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
       APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
       AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
+      OIDCSecretInvalid: Client Secret is invalid
     RequiredFieldsMissing: Some required fields are missing
     Grant:
       AlreadyExists: Project grant already exists
@@ -207,7 +208,6 @@ Errors:
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
     UserIDMisisng: User ID missing
-    OIDCSecretInvalid: Client Secret is invalid
   IAM:
     Member:
       RolesNotChanged: Roles habe not been changed

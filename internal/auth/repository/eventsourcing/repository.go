@@ -158,6 +158,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			SigningKeyRotation: systemDefaults.KeyConfig.SigningKeyRotation.Duration,
 		},
 		eventstore.ApplicationRepo{
+			Commands:      command,
 			View:          view,
 			ProjectEvents: project,
 		},

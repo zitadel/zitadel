@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"strings"
-	"time"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -18,10 +17,8 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/id"
-	key_model "github.com/caos/zitadel/internal/key/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -56,7 +53,7 @@ func StartProject(conf ProjectConfig, systemDefaults sd.SystemDefaults) (*Projec
 		passwordAlg:   passwordAlg,
 		pwGenerator:   pwGenerator,
 		idGenerator:   id.SonyFlakeGenerator,
-		ClientKeySize: int(systemDefaults.SecretGenerators.ClientKeySize),
+		ClientKeySize: int(systemDefaults.SecretGenerators.ApplicationKeySize),
 	}, nil
 }
 
@@ -147,63 +144,19 @@ func ChangesQuery(projectID string, latestSequence, limit uint64, sortAscending 
 	return query
 }
 
-func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
-	if app == nil || !app.IsValid(true) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9eidw", "Errors.Project.App.Invalid")
+func (es *ProjectEventstore) ApplicationByIDs(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {
+	if projectID == "" || appID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld93d", "Errors.Project.IDMissing")
 	}
-	existingProject, err := es.ProjectByID(ctx, app.AggregateID)
-	if err != nil {
-		return nil, err
-	}
-	app.AppID, err = es.idGenerator.Next()
+	project, err := es.ProjectByID(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}
 
-	var stringPw string
-	if app.OIDCConfig != nil {
-		app.OIDCConfig.AppID = app.AppID
-		err := app.OIDCConfig.GenerateNewClientID(es.idGenerator, existingProject)
-		if err != nil {
-			return nil, err
-		}
-		stringPw, err = app.OIDCConfig.GenerateClientSecretIfNeeded(es.pwGenerator)
-		if err != nil {
-			return nil, err
-		}
+	if _, a := project.GetApp(appID); a != nil {
+		return a, nil
 	}
-	if app.APIConfig != nil {
-		app.APIConfig.AppID = app.AppID
-		err := app.APIConfig.GenerateNewClientID(es.idGenerator, existingProject)
-		if err != nil {
-			return nil, err
-		}
-		stringPw, err = app.APIConfig.GenerateClientSecretIfNeeded(es.pwGenerator)
-		if err != nil {
-			return nil, err
-		}
-	}
-	repoProject := model.ProjectFromModel(existingProject)
-	repoApp := model.AppFromModel(app)
-
-	addAggregate := ApplicationAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
-	if err != nil {
-		return nil, err
-	}
-	es.projectCache.cacheProject(repoProject)
-	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
-		converted := model.AppToModel(a)
-		if converted.OIDCConfig != nil {
-			converted.OIDCConfig.ClientSecretString = stringPw
-			converted.OIDCConfig.FillCompliance()
-		}
-		if converted.APIConfig != nil {
-			converted.APIConfig.ClientSecretString = stringPw
-		}
-		return converted, nil
-	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-GvPct", "Errors.Internal")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-8ei2s", "Errors.Project.App.NotFound")
 }
 
 func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
@@ -250,233 +203,4 @@ func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, projectID s
 		Changes:      result,
 		LastSequence: lastSequence,
 	}, nil
-}
-
-func (es *ProjectEventstore) ChangeAPIConfig(ctx context.Context, config *proj_model.APIConfig) (*proj_model.APIConfig, error) {
-	if config == nil || !config.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-SDg54", "Errors.Project.APIConfigInvalid")
-	}
-	existingProject, err := es.ProjectByID(ctx, config.AggregateID)
-	if err != nil {
-		return nil, err
-	}
-	var app *proj_model.Application
-	if _, app = existingProject.GetApp(config.AppID); app == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Rgu63", "Errors.Project.AppNotExisting")
-	}
-	if app.Type != proj_model.AppTypeAPI {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-RHj63", "Errors.Project.AppIsNotAPI")
-	}
-	repoProject := model.ProjectFromModel(existingProject)
-	repoConfig := model.APIConfigFromModel(config)
-
-	projectAggregate := APIConfigChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoConfig)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
-	if err != nil {
-		return nil, err
-	}
-	es.projectCache.cacheProject(repoProject)
-	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
-		return model.APIConfigToModel(a.APIConfig), nil
-	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-aebn5", "Errors.Internal")
-}
-
-func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
-	if appID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7ue34", "Errors.Project.App.OIDCConfigInvalid")
-	}
-	existingProject, err := es.ProjectByID(ctx, projectID)
-	if err != nil {
-		return nil, err
-	}
-	var app *proj_model.Application
-	if _, app = existingProject.GetApp(appID); app == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9odi4", "Errors.Project.App.NotExisting")
-	}
-	if app.Type != proj_model.AppTypeOIDC {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dile4", "Errors.Project.App.IsNotOIDC")
-	}
-	if app.OIDCConfig.AuthMethodType == proj_model.OIDCAuthMethodTypeNone || app.OIDCConfig.AuthMethodType == proj_model.OIDCAuthMethodTypePrivateKeyJWT {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-GDrg2", "Errors.Project.OIDCAuthMethodNoSecret")
-	}
-	repoProject := model.ProjectFromModel(existingProject)
-
-	stringPw, err := app.OIDCConfig.GenerateNewClientSecret(es.pwGenerator)
-	if err != nil {
-		return nil, err
-	}
-
-	projectAggregate := OIDCConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, app.OIDCConfig.ClientSecret)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
-	if err != nil {
-		return nil, err
-	}
-	es.projectCache.cacheProject(repoProject)
-
-	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
-		config := model.OIDCConfigToModel(a.OIDCConfig)
-		config.ClientSecretString = stringPw
-		return config, nil
-	}
-
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-dk87s", "Errors.Internal")
-}
-
-func (es *ProjectEventstore) ChangeAPIConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.APIConfig, error) {
-	if appID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdfb3", "Errors.Project.APIConfigInvalid")
-	}
-	existingProject, err := es.ProjectByID(ctx, projectID)
-	if err != nil {
-		return nil, err
-	}
-	var app *proj_model.Application
-	if _, app = existingProject.GetApp(appID); app == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ADbg3", "Errors.Project.AppNotExisting")
-	}
-	if app.Type != proj_model.AppTypeAPI {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Ntwqw", "Errors.Project.AppIsNotAPI")
-	}
-	if app.APIConfig.AuthMethodType != proj_model.APIAuthMethodTypeBasic {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-HW4tw", "Errors.Project.APIAuthMethodNoSecret")
-	}
-	repoProject := model.ProjectFromModel(existingProject)
-
-	stringPw, err := app.APIConfig.GenerateNewClientSecret(es.pwGenerator)
-	if err != nil {
-		return nil, err
-	}
-
-	projectAggregate := APIConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, app.APIConfig.ClientSecret)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
-	if err != nil {
-		return nil, err
-	}
-	es.projectCache.cacheProject(repoProject)
-
-	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
-		config := model.APIConfigToModel(a.APIConfig)
-		config.ClientSecretString = stringPw
-		return config, nil
-	}
-
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-HBfju", "Errors.Internal")
-}
-
-func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, projectID, appID string, secret string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	if appID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-H3RT2", "Errors.Project.RequiredFieldsMissing")
-	}
-	existingProject, err := es.ProjectByID(ctx, projectID)
-	if err != nil {
-		return err
-	}
-	var app *proj_model.Application
-	if _, app = existingProject.GetApp(appID); app == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-D6hba", "Errors.Project.AppNoExisting")
-	}
-	if app.Type != proj_model.AppTypeOIDC {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-huywq", "Errors.Project.App.IsNotOIDC")
-	}
-
-	ctx, spanHash := tracing.NewSpan(ctx)
-	err = crypto.CompareHash(app.OIDCConfig.ClientSecret, []byte(secret), es.passwordAlg)
-	spanHash.EndWithError(err)
-	if err == nil {
-		err = es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckSucceededAggregate)
-		logging.Log("EVENT-AE1vf").OnError(err).Warn("could not push event OIDCClientSecretCheckSucceeded")
-		return nil
-	}
-	err = es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckFailedAggregate)
-	logging.Log("EVENT-GD1gh").OnError(err).Warn("could not push event OIDCClientSecretCheckFailed")
-	return caos_errs.ThrowInvalidArgument(nil, "EVENT-wg24q", "Errors.Project.OIDCSecretInvalid")
-}
-
-func (es *ProjectEventstore) setOIDCClientSecretCheckResult(ctx context.Context, project *proj_model.Project, appID string, check func(*es_models.AggregateCreator, *model.Project, string) es_sdk.AggregateFunc) error {
-	repoProject := model.ProjectFromModel(project)
-	agg := check(es.AggregateCreator(), repoProject, appID)
-	err := es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, agg)
-	if err != nil {
-		return err
-	}
-	es.projectCache.cacheProject(repoProject)
-	return nil
-}
-
-func (es *ProjectEventstore) AddClientKey(ctx context.Context, key *proj_model.ClientKey) (*proj_model.ClientKey, error) {
-	existingProject, err := es.ProjectByID(ctx, key.AggregateID)
-	if err != nil {
-		return nil, err
-	}
-	var app *proj_model.Application
-	if _, app = existingProject.GetApp(key.ApplicationID); app == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dbf32", "Errors.Project.AppNoExisting")
-	}
-	if (app.OIDCConfig == nil || app.OIDCConfig != nil && app.OIDCConfig.AuthMethodType != proj_model.OIDCAuthMethodTypePrivateKeyJWT) &&
-		(app.APIConfig == nil || app.APIConfig != nil && app.APIConfig.AuthMethodType != proj_model.APIAuthMethodTypePrivateKeyJWT) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dff54", "Errors.Project.AuthMethodNoPrivateKeyJWT")
-	}
-	if app.OIDCConfig != nil {
-		key.ClientID = app.OIDCConfig.ClientID
-	}
-	if app.APIConfig != nil {
-		key.ClientID = app.APIConfig.ClientID
-	}
-	key.KeyID, err = es.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	if key.ExpirationDate.IsZero() {
-		key.ExpirationDate, err = key_model.DefaultExpiration()
-		if err != nil {
-			logging.Log("EVENT-Adgf2").WithError(err).Warn("unable to set default date")
-			return nil, errors.ThrowInternal(err, "EVENT-j68fg", "Errors.Internal")
-		}
-	}
-	if key.ExpirationDate.Before(time.Now()) {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-C6YV5", "Errors.MachineKey.ExpireBeforeNow")
-	}
-
-	repoProject := model.ProjectFromModel(existingProject)
-	repoKey := model.ClientKeyFromModel(key)
-	err = repoKey.GenerateClientKeyPair(es.ClientKeySize)
-	if err != nil {
-		return nil, err
-	}
-	agg := OIDCApplicationKeyAddedAggregate(es.AggregateCreator(), repoProject, repoKey)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, agg)
-	if err != nil {
-		return nil, err
-	}
-	es.projectCache.cacheProject(repoProject)
-
-	return model.ClientKeyToModel(repoKey), nil
-}
-
-func (es *ProjectEventstore) RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID string) error {
-	existingProject, err := es.ProjectByID(ctx, projectID)
-	if err != nil {
-		return err
-	}
-	var app *proj_model.Application
-	if _, app = existingProject.GetApp(applicationID); app == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-ADfzz", "Errors.Project.AppNotExisting")
-	}
-	if app.Type != proj_model.AppTypeOIDC {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-ADffh", "Errors.Project.AppIsNotOIDC")
-	}
-	if _, key := app.GetKey(keyID); key == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-D2Sff", "Errors.Project.AppKeyNotExisting")
-	}
-	repoProject := model.ProjectFromModel(existingProject)
-	agg := OIDCApplicationKeyRemovedAggregate(es.AggregateCreator(), repoProject, keyID)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, agg)
-	if err != nil {
-		return err
-	}
-	es.projectCache.cacheProject(repoProject)
-	return nil
 }

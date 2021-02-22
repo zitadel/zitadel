@@ -24,9 +24,6 @@ type ProjectRepository interface {
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ProjectChanges, error)
 
 	ApplicationByID(ctx context.Context, projectID, appID string) (*model.ApplicationView, error)
-	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)
-	ChangeAPIConfig(ctx context.Context, config *model.APIConfig) (*model.APIConfig, error)
-	ChangeAPIConfigSecret(ctx context.Context, projectID, appID string) (*model.APIConfig, error)
 	SearchApplications(ctx context.Context, request *model.ApplicationSearchRequest) (*model.ApplicationSearchResponse, error)
 	ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ApplicationChanges, error)
 	SearchClientKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error)
