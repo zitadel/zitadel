@@ -8,9 +8,11 @@ import (
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/v2/command"
 )
 
 type ApplicationRepo struct {
+	Commands      *command.CommandSide
 	View          *view.View
 	ProjectEvents *proj_event.ProjectEventstore
 }
@@ -31,5 +33,5 @@ func (a *ApplicationRepo) AuthorizeOIDCApplication(ctx context.Context, clientID
 	if err != nil {
 		return err
 	}
-	return a.ProjectEvents.VerifyOIDCClientSecret(ctx, app.ProjectID, app.ID, secret)
+	return a.Commands.VerifyOIDCClientSecret(ctx, app.ProjectID, app.ID, secret)
 }
