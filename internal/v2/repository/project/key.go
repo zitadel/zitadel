@@ -39,8 +39,8 @@ func (e *ApplicationKeyAddedEvent) UniqueConstraints() []*eventstore.EventUnique
 func NewApplicationKeyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	appID string,
-	clientID string,
+	appID,
+	clientID,
 	keyID string,
 	keyType domain.AuthNKeyType,
 	expirationDate time.Time,
