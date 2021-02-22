@@ -399,7 +399,7 @@ service AdminService {
     //TODO: discuss DisableMultiFactorToDefaultLoginPolicy
     rpc RemoveMultiFactorFromDefaultLoginPolicy(RemoveMultiFactorFromDefaultLoginPolicyRequest) returns (RemoveMultiFactorFromDefaultLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/policies/login/multifactors/{multi_factor}"
+            delete: "/policies/login/multifactors/{type}"
         };
 
         option (zitadel.v1.auth_option) = {
