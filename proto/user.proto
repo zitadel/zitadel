@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package zitadel.user.v1;
-
 import "zitadel/object.proto";
 import "google/protobuf/timestamp.proto";
+
+package zitadel.user.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/user";
 

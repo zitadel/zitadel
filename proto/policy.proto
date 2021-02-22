@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "zitadel/object.proto";
+
 package zitadel.policy.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
