@@ -82,6 +82,7 @@ RUN build/zitadel/generate-grpc.sh
 FROM scratch as go-copy
 COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/grpc ./pkg/grpc
 COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go ./internal/protoc/protoc-gen-authoption/authoption/options.pb.go
 
 # ## Go test
 # FROM go-base as go-test
