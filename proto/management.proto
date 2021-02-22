@@ -2298,7 +2298,7 @@ message CreateCustomLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    zitadel.user.v1.PasswordlessType passwordless_type = 5;
+    zitadel.user.v1.MFAType passwordless_type = 5;
 }
 
 message CreateCustomLoginPolicyResponse {
@@ -2310,7 +2310,7 @@ message UpdateCustomLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    zitadel.user.v1.PasswordlessType passwordless_type = 5;
+    zitadel.user.v1.MFAType passwordless_type = 5;
 }
 
 message UpdateCustomLoginPolicyResponse {
