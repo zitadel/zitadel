@@ -188,7 +188,11 @@ func (i *IDPProvider) getOrgByID(ctx context.Context, orgID string) (*org_model.
 		return nil, err
 	}
 
-	var esOrg *org_es_model.Org
+	esOrg := &org_es_model.Org{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: orgID,
+		},
+	}
 	err = es_sdk.Filter(ctx, i.Eventstore().FilterEvents, esOrg.AppendEvents, query)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err

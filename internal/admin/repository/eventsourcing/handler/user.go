@@ -262,7 +262,11 @@ func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, er
 		return nil, err
 	}
 
-	var esOrg *org_es_model.Org
+	esOrg := &org_es_model.Org{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: orgID,
+		},
+	}
 	err = es_sdk.Filter(ctx, u.eventstore.FilterEvents, esOrg.AppendEvents, query)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
