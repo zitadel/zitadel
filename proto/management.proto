@@ -1149,7 +1149,7 @@ service ManagementService {
         };
     }
     
-    rpc GetUserGrantByID(GetUserGrantByIDRequest) returns (GetUserGrantByIDRequestResponse) {
+    rpc GetUserGrantByID(GetUserGrantByIDRequest) returns (GetUserGrantByIDResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/grants/{grant_id}"
         };
@@ -2510,7 +2510,7 @@ message GetProjectGrantByIDResponse {
 
 message ListProjectGrantsRequest {
     string project_id = 1;
-    zitdel.v1.Search meta_data = 2;
+    zitadel.v1.Search meta_data = 2;
     repeated zitadel.project.v1.ProjectGrantQuery queries = 3;
 }
 
@@ -2565,10 +2565,24 @@ message RemoveProjectGrantResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
 
-message ListProjectGrantMemberRolesRequest {}
+message ListProjectGrantMemberRolesRequest {
+    //TODO: shall we create an object per member type? ProjectMember, ...
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.member.v1.Member result = 2;
+}
 
 message ListProjectGrantMemberRolesResponse {
-    repeated string result = 1;
+    repeated string result = 2;
+}
+
+message ListProjectGrantMembersRequest {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.project.v1.ProjectGrantMemberQuery queries = 2;
+}
+
+message ListProjectGrantMembersResponse {
+    zitadel.v1.Search meta_data = 1;
+    repeated zitadel.project.v1.ProjectGrantMemberQuery queries = 2;
 }
 
 message AddProjectGrantMemberRequest {
@@ -2636,7 +2650,26 @@ message UpdateUserGrantRequest {
     string user_id = 1;
     string grant_id = 2;
 }
+
 message UpdateUserGrantResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message DeactivateUserGrantRequest {
+    string user_id = 1;
+    string grant_id = 2;
+}
+
+message DeactivateUserGrantResponse {
+    zitadel.v1.MetaData meta_data = 1;
+}
+
+message ReactivateUserGrantRequest {
+    string user_id = 1;
+    string grant_id = 2;
+}
+
+message ReactivateUserGrantResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
 

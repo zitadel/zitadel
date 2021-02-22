@@ -117,12 +117,44 @@ message UserGrantProjectNameQuery {
     zitadel.v1.TextQueryMethod method = 2;
 }
 
-//TODO: needed?
+//TODO: needed as you can search first and last name?
 message UserGrantDisplayNameQuery {
     string first_name = 1;
     zitadel.v1.TextQueryMethod method = 2;
 }
 
+message ProjectGrantMemberQuery {
+    oneof query {
+        ProjectGrantMemberFirstNameQuery first_name = 1;
+        ProjectGrantMemberLastNameQuery last_name = 2;
+        ProjectGrantMemberEmailQuery email = 3;
+        ProjectGrantMemberUserIDQuery user_id = 4;
+        ProjectGrantMemberUserNameQuery user_name = 5;
+    }
+}
+
+message ProjectGrantMemberFirstNameQuery {
+    string first_name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
+}
+
+message ProjectGrantMemberLastNameQuery {
+    string last_name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
+}
+//TODO: email or login name
+message ProjectGrantMemberEmailQuery {
+    string email = 1;
+    zitadel.v1.TextQueryMethod method = 2;
+}
+message ProjectGrantMemberUserIDQuery {
+    string user_id = 1;
+}
+//TODO: needed?
+message ProjectGrantMemberUserNameQuery {
+    string user_name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
+}
 
 enum ProjectState {
     PROJECT_STATE_UNSPECIFIED = 0;
