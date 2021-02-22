@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	key_model "github.com/caos/zitadel/internal/key/model"
 
 	"github.com/caos/logging"
@@ -13,15 +12,11 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/sdk"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -36,47 +31,6 @@ type UserRepo struct {
 
 func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.UserEvents.Health(ctx)
-}
-
-func (repo *UserRepo) registerUser(ctx context.Context, registerUser *model.User, externalIDP *model.ExternalIDP, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
-	policyResourceOwner := authz.GetCtxData(ctx).OrgID
-	if resourceOwner != "" {
-		policyResourceOwner = resourceOwner
-	}
-	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(policyResourceOwner)
-	if errors.IsNotFound(err) {
-		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return nil, err
-	}
-	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
-	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(policyResourceOwner)
-	if errors.IsNotFound(err) {
-		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return nil, err
-	}
-	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, externalIDP, pwPolicyView, orgPolicyView, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	if orgMember != nil {
-		orgMember.UserID = user.AggregateID
-		_, memberAggregate, err := repo.OrgEvents.PrepareAddOrgMember(ctx, orgMember, policyResourceOwner)
-		if err != nil {
-			return nil, err
-		}
-		aggregates = append(aggregates, memberAggregate)
-	}
-
-	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, user.AppendEvents, aggregates...)
-	if err != nil {
-		return nil, err
-	}
-	return usr_model.UserToModel(user), nil
 }
 
 func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {
@@ -245,13 +199,6 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 		}
 	}
 	return changes, nil
-}
-
-func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
-	if obj.AggregateID != authz.GetCtxData(ctx).UserID {
-		return errors.ThrowPermissionDenied(nil, "EVENT-kFi9w", "object does not belong to user")
-	}
-	return nil
 }
 
 func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*key_model.AuthNKeyView, error) {

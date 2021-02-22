@@ -8,15 +8,13 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	global_model "github.com/caos/zitadel/internal/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type UserGrantRepo struct {
-	SearchLimit     uint64
-	UserGrantEvents *grant_event.UserGrantEventStore
-	View            *view.View
+	SearchLimit uint64
+	View        *view.View
 }
 
 func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*grant_model.UserGrantView, error) {
