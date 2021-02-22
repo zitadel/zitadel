@@ -2576,7 +2576,7 @@ message ListProjectGrantMembersRequest {
     string project_id = 1;
     string grant_id = 2;
     zitadel.v1.ListQuery meta_data = 3;
-    repeated zitadel.project.v1.ProjectGrantMemberQuery queries = 4;
+    repeated zitadel.member.v1.SearchQuery queries = 4;
 }
 
 message ListProjectGrantMembersResponse {
