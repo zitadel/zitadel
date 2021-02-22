@@ -2083,7 +2083,7 @@ message SetPrimaryOrgDomainResponse {
 message ListOrgMemberRolesRequest {}
 
 message ListOrgMemberRolesResponse {
-    repeated string roles = 1;
+    repeated string result = 1;
 }
 
 message ListOrgMembersRequest {
@@ -2208,7 +2208,7 @@ message ListProjectMemberRolesRequest {}
 
 message ListProjectMemberRolesResponse {
     zitadel.v1.Search meta_data = 1;
-    repeated string roles = 2;
+    repeated string result = 2;
 }
 
 message AddProjectRoleRequest {
@@ -2572,6 +2572,7 @@ message ListProjectGrantMemberRolesRequest {
 }
 
 message ListProjectGrantMemberRolesResponse {
+    zitadel.v1.Search meta_data = 1;
     repeated string result = 2;
 }
 
@@ -2582,7 +2583,7 @@ message ListProjectGrantMembersRequest {
 
 message ListProjectGrantMembersResponse {
     zitadel.v1.Search meta_data = 1;
-    repeated zitadel.project.v1.ProjectGrantMemberQuery queries = 2;
+    repeated zitadel.member.v1.Member result = 2;
 }
 
 message AddProjectGrantMemberRequest {

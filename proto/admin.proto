@@ -1011,6 +1011,7 @@ message ListIAMMembersResponse {
 message ListViewsRequest {}
 
 message ListViewsResponse {
+    //TODO: search
     repeated View views = 1;
 }
 
@@ -1024,6 +1025,7 @@ message ClearViewResponse {}
 message ListFailedEventsRequest {}
 
 message ListFailedEventsResponse {
+    //TODO: search
     repeated FailedEvent result = 1;
 }
 
