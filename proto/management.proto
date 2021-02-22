@@ -1316,7 +1316,7 @@ service ManagementService {
 
     rpc RemoveIDPFromLoginPolicy(RemoveIDPFromLoginPolicyRequest) returns (RemoveIDPFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/policies/login/idpproviders/{idp_config_id}"
+            delete: "/orgs/me/policies/login/idpproviders/{idp_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2778,7 +2778,7 @@ message AddSecondFactorToLoginPolicyResponse {
 }
 
 message RemoveSecondFactorFromLoginPolicyRequest {
-    zitadel.policy.v1.SecondFactor second_factor = 1;
+    zitadel.policy.v1.SecondFactorType second_factor = 1;
 }
 
 message RemoveSecondFactorFromLoginPolicyResponse {
@@ -2801,7 +2801,7 @@ message AddMultiFactorToLoginPolicyResponse {
 }
 
 message RemoveMultiFactorFromLoginPolicyRequest {
-    zitadel.user.v1.MultiFactor multi_factor = 1;
+    zitadel.user.v1.MultiFactorType multi_factor = 1;
 }
 
 message RemoveMultiFactorFromLoginPolicyResponse {

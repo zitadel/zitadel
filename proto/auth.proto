@@ -4,6 +4,8 @@ import "zitadel/user.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/policy.proto";
+import "zitadel/idp.proto";
+import "validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
