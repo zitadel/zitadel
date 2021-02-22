@@ -71,7 +71,7 @@ message IDPQuery {
 }
 
 message UserIDQuery {
-    string user_id = 1;
+    string id = 1;
 }
 
 enum IDPFieldName {

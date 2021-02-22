@@ -216,13 +216,13 @@ message Membership {
 
 message MembershipQuery {
     oneof query {
-        MembershipOrganisationQuery org = 1;
+        MembershipOrgQuery org = 1;
         MembershipProjectQuery project = 2;
         MembershipProjectGrantQuery project_grant = 3;
     }
 }
 
-message MembershipOrganisationQuery {
+message MembershipOrgQuery {
     string org_id = 1;
 }
 

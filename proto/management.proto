@@ -1577,7 +1577,7 @@ service ManagementService {
 
     rpc DeactivateOrgIDP(DeactivateOrgIDPRequest) returns (DeactivateOrgIDPResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/idps/{id}/_deactivate"
+            put: "/orgs/me/idps/{idp_id}/_deactivate"
             body: "*"
         };
 
@@ -1588,7 +1588,7 @@ service ManagementService {
 
     rpc ReactivateOrgIDP(ReactivateOrgIDPRequest) returns (ReactivateOrgIDPResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/idps/{id}/_reactivate"
+            put: "/orgs/me/idps/{idp_id}/_reactivate"
             body: "*"
         };
 
@@ -1599,7 +1599,7 @@ service ManagementService {
 
     rpc RemoveOrgIDP(RemoveOrgIDPRequest) returns (RemoveOrgIDPResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/idps/{id}"
+            delete: "/orgs/me/idps/{idp_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1609,7 +1609,7 @@ service ManagementService {
 
     rpc UpdateOrgIDP(UpdateOrgIDPRequest) returns (UpdateOrgIDPResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/idps/{id}"
+            put: "/orgs/me/idps/{idp_id}"
             body: "*"
         };
 
@@ -1937,7 +1937,7 @@ message AddMachineKeyRequest {
 }
   
 message AddMachineKeyResponse {
-    string id = 1;
+    string key_id = 1;
     bytes key_details = 2;
     zitadel.v1.ObjectDetails details = 3;
 }
@@ -1963,7 +1963,8 @@ message ListUserIDPsResponse {
 
 message RemoveUserIDPRequest {
     string user_id = 1;
-    string linked_user_id = 2;
+    string idp_id = 2;
+    string linked_user_id = 3;
 }
 
 message RemoveUserIDPResponse {
@@ -2117,7 +2118,7 @@ message RemoveOrgMemberResponse {
 }
 
 message GetProjectByIDRequest {
-    string project_id = 1;
+    string id = 1;
 }
 
 message GetProjectByIDResponse {
@@ -2160,12 +2161,12 @@ message AddProjectRequest {
 }
 
 message AddProjectResponse {
-    string project_id = 1;
+    string id = 1;
     zitadel.v1.ObjectDetails details = 2;
 }
 
 message UpdateProjectRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string id = 1 [(validate.rules).string = {min_len: 1}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool project_role_assertion = 3;
     bool project_role_check = 4;
@@ -2176,7 +2177,7 @@ message UpdateProjectResponse {
 }
 
 message DeactivateProjectRequest {
-    string project_id = 1;
+    string id = 1;
 }
 
 message DeactivateProjectResponse {
@@ -2184,7 +2185,7 @@ message DeactivateProjectResponse {
 }
 
 message ReactivateProjectRequest {
-    string project_id = 1;
+    string id = 1;
 }
 
 message ReactivateProjectResponse {
@@ -2192,7 +2193,7 @@ message ReactivateProjectResponse {
 }
 
 message RemoveProjectRequest {
-    string project_id = 1;
+    string id = 1;
 }
 
 message RemoveProjectResponse {
@@ -2480,8 +2481,8 @@ message AddAPIClientKeyRequest {
 }
 
 message AddAPIClientKeyResponse {
-    zitadel.v1.ObjectDetails details = 1;
-    string id = 2;
+    string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
     bytes key_details = 3;
 }
 
@@ -2635,7 +2636,7 @@ message ListUserGrantResponse {
 
 message AddUserGrantRequest {
     string user_id = 1;
-    string grant_id = 2;
+    string project_id = 2;
 }
 
 message AddUserGrantResponse {
@@ -2962,7 +2963,7 @@ message AddOrgOIDCIDPResponse {
 }
 
 message DeactivateOrgIDPRequest {
-    string id = 1;
+    string idp_id = 1;
 }
 
 message DeactivateOrgIDPResponse {
@@ -2970,7 +2971,7 @@ message DeactivateOrgIDPResponse {
 }
 
 message ReactivateOrgIDPRequest {
-    string id = 1;
+    string idp_id = 1;
 }
 
 message ReactivateOrgIDPResponse {
@@ -2978,23 +2979,19 @@ message ReactivateOrgIDPResponse {
 }
 
 message RemoveOrgIDPRequest {
-    string id = 1;
+    string idp_id = 1;
 }
 
 message RemoveOrgIDPResponse {}
 
 message UpdateOrgIDPRequest {
-    string id = 1;
+    string idp_id = 1;
     string name = 2;
     zitadel.idp.v1.IDPStylingType styling_type = 3;
 }
 
 message UpdateOrgIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
-    string id = 2;
-    zitadel.idp.v1.IDPState state = 3;
-    string name = 4;
-    zitadel.idp.v1.IDPStylingType styling_type = 5;
 }
 
 message UpdateOrgIDPOIDCConfigRequest {

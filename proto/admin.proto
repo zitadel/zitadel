@@ -737,8 +737,7 @@ message UpdateIDPRequest {
 }
 
 message UpdateIDPResponse {
-    string id = 1;
-    zitadel.v1.ObjectDetails details = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateIDPOIDCConfigRequest {
@@ -750,8 +749,7 @@ message UpdateIDPOIDCConfigRequest {
 }
 
 message UpdateIDPOIDCConfigResponse {
-    string idp_id = 1;
-    zitadel.v1.ObjectDetails details = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetDefaultOrgIAMPolicyRequest {}
