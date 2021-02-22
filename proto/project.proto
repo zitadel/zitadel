@@ -8,15 +8,15 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/project";
 
 message Project {
     string id = 1;
-    string name = 2;
-    ProjectState state = 3;
-    zitadel.v1.MetaData meta_data = 4;
+    zitadel.v1.ObjectDetails details = 2;
+    string name = 3;
+    ProjectState state = 4;
 }
 
 //TODO: would it make sense to return
 // message GrantedProject {
 //     string grant_id = 1;
-//     zitadel.v1.MetaData meta_data = 2;
+//     zitadel.v1.ObjectDetails details = 2;
 //     zitadel.org.v1.Org org = 3;
 //     Project project = 4;
 // }
@@ -33,13 +33,13 @@ message GrantedProject {
     string project_owner_id = 8;
     string project_owner_name = 9;
 
-    zitadel.v1.MetaData meta_data = 10;
+    zitadel.v1.ObjectDetails details = 10;
 }
 
 message UserGrant {
     string user_id = 1;
     string grant_id = 2;
-    zitadel.v1.MetaData meta_data = 3;
+    // zitadel.v1.ObjectDetails details = 3;
 }
 
 message UserGrantQuery {
@@ -178,8 +178,9 @@ message ProjectNameQuery {
 //TODO: seperate file
 message Role {
     string key = 1;
-    string display_name = 2;
-    string group = 3;
+    zitadel.v1.ObjectDetails details = 2;
+    string display_name = 3;
+    string group = 4;
 }
 
 //TODO: seperate file

@@ -7,56 +7,39 @@ package zitadel.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/object";
 
-message MetaData {
+message ObjectDetails {
     //sequence represents the order of events. It's always upcounting
     //
     // on read: the sequence of the last event reduced by the projection
     //
     // on manipulation: the timestamp of the event(s) added by the manipulation
-    uint64 sequence = 1 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
+    uint64 sequence = 1;
     //creation_date is the timestamp where the first operation on the object was made
     //
     // on read: the timestamp of the first event of the object
     //
     // on create: the timestamp of the event(s) added by the manipulation
-    google.protobuf.Timestamp creation_date = 2 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
+    google.protobuf.Timestamp creation_date = 2;
     //change_date is the timestamp when the object was changed
     //
     // on read: the timestamp of the last event reduced by the projection
     //
     // on manipulation: the
-    google.protobuf.Timestamp change_date = 3 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
+    google.protobuf.Timestamp change_date = 3;
     //resource_owner is the organisation an object belongs to
-    string resource_owner = 4 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
+    string resource_owner = 4;
 }
 
-message Search {
-    uint64 offset = 1 [
-        (google.api.field_behavior) = OPTIONAL
-    ];
-    uint32 limit = 2 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    bool asc = 3 [
-        (google.api.field_behavior) = OPTIONAL
-    ];
-    uint64 total_result = 4 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
-    uint64 processed_sequence = 5 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
-    google.protobuf.Timestamp view_timestamp = 6 [
-        (google.api.field_behavior) = OUTPUT_ONLY
-    ];
+message ListQuery {
+    uint64 offset = 1;
+    uint32 limit = 2;
+    bool asc = 3;
+}
+
+message ListDetails {
+    uint64 total_result = 1;
+    uint64 processed_sequence = 2;
+    google.protobuf.Timestamp view_timestamp = 3;
 }
 
 enum TextQueryMethod {//TODO: validate

@@ -6,21 +6,21 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
 
 message IDP {
     string id = 1;
-    IDPState state = 2;
-    string name = 3;
-    IDPStylingType styling_type = 4;
+    zitadel.v1.ObjectDetails details = 2;
+    IDPState state = 3;
+    string name = 4;
+    IDPStylingType styling_type = 5;
     oneof config {
-        OIDCConfig oidc_config = 5;
+        OIDCConfig oidc_config = 6;
     }
 }
 
-//TODO: discuss
 message IDPUserLink {
     string user_id = 1;
     string idp_id = 2;
     string idp_name = 3;
-    string linked_user_id = 4;
-    string linked_user_name = 5;
+    string provided_user_id = 4;
+    string provided_user_name = 5;
     IDPType idp_type = 6;
 }
 
@@ -29,6 +29,8 @@ message IDPLoginPolicyLink {
     string idp_name = 2;
     IDPType idp_type = 3;
 }
+
+//TODO: discuss links? which data are needeD?
 
 enum IDPState {
     IDP_STATE_UNSPECIFIED = 0;
@@ -42,9 +44,9 @@ enum IDPStylingType {
 }
 
 enum IDPType {
-    IDPTYPE_UNSPECIFIED = 0;
-    IDPTYPE_OIDC = 1;
-    IDPTYPE_SAML = 2;
+    IDP_TYPE_UNSPECIFIED = 0;
+    IDP_TYPE_OIDC = 1;
+    IDP_TYPE_SAML = 2;
 }
 
 message OIDCConfig {
@@ -52,7 +54,7 @@ message OIDCConfig {
     string client_secret = 2;
     string issuer = 3;
     repeated string scopes = 4;
-    OIDCMappingField idp_display_name_mapping = 5;
+    OIDCMappingField display_name_mapping = 5;
     OIDCMappingField username_mapping = 6;
 }
 

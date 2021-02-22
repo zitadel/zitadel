@@ -8,7 +8,7 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/member";
 
 message Member {
     string user_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
     repeated string roles = 3;
     string preferred_login_name = 4;
     string email = 5;

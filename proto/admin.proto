@@ -108,9 +108,20 @@ service AdminService {
         };
     }
 
-    rpc CreateIDP(CreateIDPRequest) returns (CreateIDPResponse) {
+    rpc AddIDP(AddIDPRequest) returns (AddIDPResponse) {
         option (google.api.http) = {
             post: "/idps"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
+        option (google.api.http) = {
+            put: "/idps/{id}"
             body: "*"
         };
 
@@ -144,17 +155,6 @@ service AdminService {
     rpc RemoveIDP(RemoveIDPRequest) returns (RemoveIDPResponse) {
         option (google.api.http) = {
             delete: "/idps/{id}"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.idp.write"
-        };
-    }
-
-    rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
-        option (google.api.http) = {
-            put: "/idps/{id}"
-            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -204,7 +204,7 @@ service AdminService {
         };
     }
 
-    rpc CreateCustomOrgIAMPolicy(CreateCustomOrgIAMPolicyRequest) returns (CreateCustomOrgIAMPolicyResponse) {
+    rpc AddCustomOrgIAMPolicy(AddCustomOrgIAMPolicyRequest) returns (AddCustomOrgIAMPolicyResponse) {
         option (google.api.http) = {
             post: "/orgs/{org_id}/policies/orgiam"
             body: "*"
@@ -235,13 +235,6 @@ service AdminService {
             permission: "iam.policy.delete"
         };
     }
-
-
-
-
-
-
-
 
     rpc GetDefaultLabelPolicy(GetDefaultLabelPolicyRequest) returns (GetDefaultLabelPolicyResponse) {
         option (google.api.http) = {
@@ -305,7 +298,6 @@ service AdminService {
             permission: "iam.policy.write"
         };
     }
-
 
     rpc ListDefaultLoginPolicyIDPs(ListDefaultLoginPolicyIDPsRequest) returns (ListDefaultLoginPolicyIDPsResponse) {
         option (google.api.http) = {
@@ -376,7 +368,7 @@ service AdminService {
 
     rpc ListDefaultLoginPolicyMultiFactors(ListDefaultLoginPolicyMultiFactorsRequest) returns (ListDefaultLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
-            get: "/policies/login/multifactors/_search" //TODO: shouldnt it be post?
+            get: "/policies/login/mfas/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -387,7 +379,7 @@ service AdminService {
     //TODO: discuss EnableMultiFactorToDefaultLoginPolicy
     rpc AddMultiFactorToDefaultLoginPolicy(AddMultiFactorToDefaultLoginPolicyRequest) returns (AddMultiFactorToDefaultLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/policies/login/multifactors"
+            post: "/policies/login/mfas"
             body: "*"
         };
 
@@ -399,7 +391,7 @@ service AdminService {
     //TODO: discuss DisableMultiFactorToDefaultLoginPolicy
     rpc RemoveMultiFactorFromDefaultLoginPolicy(RemoveMultiFactorFromDefaultLoginPolicyRequest) returns (RemoveMultiFactorFromDefaultLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/policies/login/multifactors/{type}"
+            delete: "/policies/login/mfas/{type}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -591,35 +583,79 @@ message IsOrgUniqueResponse {
 }
 
 message GetOrgByIDRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string.min_len = 1];
 }
 
 message GetOrgByIDResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.org.v1.Org org = 2;
+    zitadel.org.v1.Org org = 1;
 }
 
 message ListOrgsRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     zitadel.org.v1.OrgFieldName sorting_column = 2;
     repeated zitadel.org.v1.OrgQuery queries = 3;
 }
 
 message ListOrgsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     zitadel.org.v1.OrgFieldName sorting_column = 2;
     repeated zitadel.org.v1.Org result = 3;
 }
 
 message SetUpOrgRequest {
-    zitadel.org.v1.Org org = 1;
-    zitadel.user.v1.User user = 2;
+    message Org {
+        string name = 1 [(validate.rules).string.min_len = 1];
+    }
+    message Human {
+        message Profile {
+            string first_name = 1;
+            string last_name = 2;
+            string nick_name = 3;
+            string display_name = 4;
+            string preferred_language = 5;
+            zitadel.user.v1.Gender gender = 6;
+        }
+        message Email {
+            string email = 1;
+            bool is_email_verified = 2;
+        }
+        message Phone {
+            //TODO: use https://github.com/google/libphonenumber/blob/master/resources/phonenumber.proto
+            string phone = 1;
+            bool is_phone_verified = 2;
+        }
+        message Address {
+            string country = 1;
+            string locality = 2;
+            string postal_code = 3;
+            string region = 4;
+            string street_address = 5;
+        }
+    
+        string user_name = 1;
+        
+        Profile profile = 2;
+        Email email = 3;
+        Phone phone = 4;
+        Address address = 5;
+    }
+    message Machine {
+        string user_name = 1;
+
+        string name = 2;
+        string description = 3;
+    }
+    Org org = 1;
+    oneof user {
+        Human human = 1;
+        Machine machine = 2;
+    }
 }
 
 message SetUpOrgResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.org.v1.Org org = 2;
-    zitadel.user.v1.User user = 3;
+    zitadel.v1.ObjectDetails details = 1;
+    string org_id = 2;
+    string user_id = 3;
 }
 
 message GetIDPByIDRequest {
@@ -627,27 +663,26 @@ message GetIDPByIDRequest {
 }
 
 message GetIDPByIDResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.idp.v1.IDP idp = 2;
+    zitadel.idp.v1.IDP idp = 1;
 }
 
 message ListIDPsRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDPQuery queries = 3;
 }
 
 message ListIDPsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDP result = 3;
 }
 
-message CreateIDPRequest {
+message AddIDPRequest {
     message OIDCConfig {
         string issuer = 1;
         repeated string scopes = 2;
-        zitadel.idp.v1.OIDCMappingField idp_display_name_mapping = 3;
+        zitadel.idp.v1.OIDCMappingField display_name_mapping = 3;
         zitadel.idp.v1.OIDCMappingField username_mapping = 4;
     }
 
@@ -658,14 +693,14 @@ message CreateIDPRequest {
     }
 }
 
-message CreateIDPResponse {
+message AddIDPResponse {
     message OIDCConfig {
         string client_id = 1;
         string client_secret = 2;
     }
 
     string id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
     oneof config {
         OIDCConfig oidc_config = 3;
     }
@@ -676,7 +711,7 @@ message DeactivateIDPRequest {
 }
 
 message DeactivateIDPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ReactivateIDPRequest {
@@ -684,7 +719,7 @@ message ReactivateIDPRequest {
 }
 
 message ReactivateIDPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveIDPRequest {
@@ -692,7 +727,7 @@ message RemoveIDPRequest {
 }
 
 message RemoveIDPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateIDPRequest {
@@ -703,27 +738,26 @@ message UpdateIDPRequest {
 
 message UpdateIDPResponse {
     string id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message UpdateIDPOIDCConfigRequest {
     string idp_id = 1;
     string issuer = 2;
     repeated string scopes = 3;
-    zitadel.idp.v1.OIDCMappingField idp_display_name_mapping = 4;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 4;
     zitadel.idp.v1.OIDCMappingField username_mapping = 5;
 }
 
 message UpdateIDPOIDCConfigResponse {
     string idp_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message GetDefaultOrgIAMPolicyRequest {}
 
 message GetDefaultOrgIAMPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.OrgIAMPolicy policy = 2;
+    zitadel.policy.v1.OrgIAMPolicy policy = 1;
 }
 
 message UpdateDefaultOrgIAMPolicyRequest {
@@ -731,7 +765,7 @@ message UpdateDefaultOrgIAMPolicyRequest {
 }
 
 message UpdateDefaultOrgIAMPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetOrgIAMPolicyRequest {
@@ -739,17 +773,17 @@ message GetOrgIAMPolicyRequest {
 }
 
 message GetOrgIAMPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.OrgIAMPolicy policy = 2;
+    zitadel.policy.v1.OrgIAMPolicy policy = 1;
+    bool is_default = 2;
 }
 
-message CreateCustomOrgIAMPolicyRequest {
+message AddCustomOrgIAMPolicyRequest {
     string org_id = 1;
     bool user_login_must_be_domain = 2;
 }
 
-message CreateCustomOrgIAMPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message AddCustomOrgIAMPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateCustomOrgIAMPolicyRequest {
@@ -758,7 +792,7 @@ message UpdateCustomOrgIAMPolicyRequest {
 }
 
 message UpdateCustomOrgIAMPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ResetOrgIAMPolicyToDefaultRequest {
@@ -766,14 +800,13 @@ message ResetOrgIAMPolicyToDefaultRequest {
 }
 
 message ResetOrgIAMPolicyToDefaultResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetDefaultLabelPolicyRequest {}
 
 message GetDefaultLabelPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.LabelPolicy policy = 2;
+    zitadel.policy.v1.LabelPolicy policy = 1;
 }
 
 message UpdateDefaultLabelPolicyRequest {
@@ -782,14 +815,13 @@ message UpdateDefaultLabelPolicyRequest {
 }
 
 message UpdateDefaultLabelPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetDefaultMailTemplatePolicyRequest {}
 
 message GetDefaultMailTemplatePolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.MailTemplatePolicy policy = 2;
+    zitadel.policy.v1.MailTemplatePolicy policy = 1;
 }
 
 message UpdateDefaultMailTemplatePolicyRequest {
@@ -804,14 +836,13 @@ message UpdateDefaultMailTemplatePolicyRequest {
 }
 
 message UpdateDefaultMailTemplatePolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetDefaultLoginPolicyRequest {}
 
 message GetDefaultLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.LoginPolicy policy = 2;
+    zitadel.policy.v1.LoginPolicy policy = 1;
 }
 
 message UpdateDefaultLoginPolicyRequest {
@@ -823,17 +854,16 @@ message UpdateDefaultLoginPolicyRequest {
 }
 
 message UpdateDefaultLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    //TODO: do policies have an id?
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListDefaultLoginPolicyIDPsRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
 }
 
 message ListDefaultLoginPolicyIDPsResponse {
-    zitadel.v1.Search meta_data = 1;
-    repeated zitadel.idp.v1.IDPUserLink result = 2;
+    zitadel.v1.ListDetails meta_data = 1;
+    repeated zitadel.idp.v1.IDPLoginPolicyLink result = 2;
 }
 
 message AddIDPToDefaultLoginPolicyRequest {
@@ -841,7 +871,7 @@ message AddIDPToDefaultLoginPolicyRequest {
 }
 
 message AddIDPToDefaultLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveIDPFromDefaultLoginPolicyRequest {
@@ -849,74 +879,59 @@ message RemoveIDPFromDefaultLoginPolicyRequest {
 }
 
 message RemoveIDPFromDefaultLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListDefaultLoginPolicySecondFactorsRequest {}
 
 message ListDefaultLoginPolicySecondFactorsResponse {
-    zitadel.v1.Search meta_data = 1;
-    repeated zitadel.user.v1.SecondFactor result = 2;
+    zitadel.v1.ListDetails meta_data = 1;
+    repeated zitadel.policy.v1.SecondFactor result = 2;
 }
 
 message AddSecondFactorToDefaultLoginPolicyRequest {
-    zitadel.user.v1.SecondFactorType type = 1;
+    zitadel.policy.v1.SecondFactorType type = 1;
 }
 
 message AddSecondFactorToDefaultLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveSecondFactorFromDefaultLoginPolicyRequest {
-    zitadel.user.v1.SecondFactorType type = 1;
+    zitadel.policy.v1.SecondFactorType type = 1;
 }
 
 message RemoveSecondFactorFromDefaultLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListDefaultLoginPolicyMultiFactorsRequest {}
 
 message ListDefaultLoginPolicyMultiFactorsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.user.v1.MultiFactor result = 2;
 }
 
 message AddMultiFactorToDefaultLoginPolicyRequest {
-    zitadel.user.v1.MFAType type = 1;
+    zitadel.user.v1.MultiFactorType type = 1;
 }
 
 message AddMultiFactorToDefaultLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveMultiFactorFromDefaultLoginPolicyRequest {
-    zitadel.user.v1.MFAType type = 1;
+    zitadel.user.v1.MultiFactorType type = 1;
 }
 
 message RemoveMultiFactorFromDefaultLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 message GetDefaultPasswordComplexityPolicyRequest {}
 
 message GetDefaultPasswordComplexityPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordComplexityPolicy policy = 2;
+    zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
 }
 
 message UpdateDefaultPasswordComplexityPolicyRequest {
@@ -928,39 +943,37 @@ message UpdateDefaultPasswordComplexityPolicyRequest {
 }
 
 message UpdateDefaultPasswordComplexityPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetDefaultPasswordAgePolicyRequest {}
 
 message GetDefaultPasswordAgePolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordAgePolicy policy = 2;
+    zitadel.policy.v1.PasswordAgePolicy policy = 1;
 }
 
 message UpdateDefaultPasswordAgePolicyRequest {
-    uint64 max_age_days = 1;
-    uint64 expire_warn_days = 2;
+    uint32 max_age_days = 1;
+    uint32 expire_warn_days = 2;
 }
 
 message UpdateDefaultPasswordAgePolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetDefaultPasswordLockoutPolicyRequest {}
 
 message GetDefaultPasswordLockoutPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordLockoutPolicy policy = 2;
+    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
 }
 
 message UpdateDefaultPasswordLockoutPolicyRequest {
-    uint64 max_attempts = 1;
+    uint32 max_attempts = 1;
     bool show_lockout_failure = 2;
 }
 
 message UpdateDefaultPasswordLockoutPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message AddIAMMemberRequest {
@@ -969,7 +982,7 @@ message AddIAMMemberRequest {
 }
 
 message AddIAMMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateIAMMemberRequest {
@@ -978,7 +991,7 @@ message UpdateIAMMemberRequest {
 }
 
 message UpdateIAMMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveIAMMemberRequest {
@@ -986,24 +999,24 @@ message RemoveIAMMemberRequest {
 }
 
 message RemoveIAMMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListIAMMemberRolesRequest {}
 
 message ListIAMMemberRolesResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated string roles = 2;
 }
 
 message ListIAMMembersRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     zitadel.member.v1.MemberFieldName sorting_column = 2;
     zitadel.member.v1.SearchQuery query = 3;
 }
 
 message ListIAMMembersResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     zitadel.member.v1.MemberFieldName sorting_column = 2;
     repeated zitadel.member.v1.Member result = 3;
 }
@@ -1012,7 +1025,7 @@ message ListViewsRequest {}
 
 message ListViewsResponse {
     //TODO: search
-    repeated View views = 1;
+    repeated View result = 1;
 }
 
 message ClearViewRequest {

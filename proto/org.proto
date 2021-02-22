@@ -8,8 +8,9 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/org";
 
 message Org {
     string id = 1;
-    OrgState state = 2;
-    string name = 3;
+    zitadel.v1.ObjectDetails details = 2;
+    OrgState state = 3;
+    string name = 4;
 }
 
 enum OrgState {
@@ -19,10 +20,12 @@ enum OrgState {
 }
 
 message Domain {
-    string domain = 1;
-    bool is_verified = 2;
-    bool is_primary = 3;
-    DomainValidationType validation_type = 4;
+    string org_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    string domain_name = 3;
+    bool is_verified = 4;
+    bool is_primary = 5;
+    DomainValidationType validation_type = 6;
 }
 
 enum DomainValidationType {
@@ -49,42 +52,13 @@ enum OrgFieldName {
 
 message DomainSearchQuery {
     oneof query {
-        DomainQuery domain = 1;
+        DomainNameQuery domain_name = 1;
     }
 }
 
-message DomainQuery {
-    string domain = 1;
+message DomainNameQuery {
+    string name = 1;
     zitadel.v1.TextQueryMethod method = 2;
-}
-
-//TODO: replace with member.searchquery
-message MemberSearchQuery {
-    oneof query {
-        MemberFirstNameQuery first_name = 1;
-        MemberLastNameQuery last_name = 2;
-        MemberLoginNameQuery login_name = 3;
-        MemberUserIDQuery user_id = 4;
-    }
-}
-
-message MemberFirstNameQuery {
-    string first_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-message MemberLastNameQuery {
-    string last_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-message MemberLoginNameQuery {
-    string login_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-message MemberUserIDQuery {
-    string user_id = 1;
 }
 
 enum OrgDomainValidationType {

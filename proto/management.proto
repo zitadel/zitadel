@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "zitadel/application.proto";
+import "zitadel/app.proto";
 import "zitadel/idp.proto";
 import "zitadel/user.proto";
 import "zitadel/object.proto";
@@ -123,9 +123,20 @@ service ManagementService {
         };
     }
 
-    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
-            post: "/users"
+            post: "/users/human"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
+        option (google.api.http) = {
+            post: "/users/machine"
             body: "*"
         };
 
@@ -242,7 +253,7 @@ service ManagementService {
 
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/_resendinitialisation" //TODO: verb?
+            post: "/users/{user_id}/_resendinitialization" 
             body: "*"
         };
 
@@ -251,7 +262,6 @@ service ManagementService {
         };
     }
 
-    //TODO: previously ResendEmailVerificationMail
     rpc ResendHumanEmailVerification(ResendEmailVerificationRequest) returns (ResendEmailVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/email/_resendverification"
@@ -340,7 +350,7 @@ service ManagementService {
 
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
-            put: "/users/{id}/machine"
+            put: "/users/{user_id}/machine"
             body: "*"
         };
 
@@ -424,11 +434,6 @@ service ManagementService {
         };
     }
 
-
-
-
-
-
     rpc GetMyOrg(GetMyOrgRequest) returns (GetMyOrgResponse) {
         option (google.api.http) = {
             get: "/orgs/me"
@@ -449,7 +454,7 @@ service ManagementService {
         };
     }
 
-    rpc CreateOrg(CreateOrgRequest) returns (CreateOrgResponse) {
+    rpc AddOrg(AddOrgRequest) returns (AddOrgResponse) {
         option (google.api.http) = {
             post: "/orgs"
             body: "*"
@@ -588,7 +593,7 @@ service ManagementService {
         };
     }
 
-    rpc ChangeOrgMember(ChangeOrgMemberRequest) returns (ChangeOrgMemberResponse) {
+    rpc UpdateOrgMember(UpdateOrgMemberRequest) returns (UpdateOrgMemberResponse) {
         option (google.api.http) = {
             put: "/orgs/me/members/{user_id}"
             body: "*"
@@ -620,6 +625,18 @@ service ManagementService {
         };
     }
 
+    // returns a project my organisation got granted from another organisation
+    rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
+        option (google.api.http) = {
+            get: "/grantedprojects/{project_id}/grants/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.read"
+            check_field_name: "Id"
+        };
+    }
+
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
         option (google.api.http) = {
             post: "/projects/_search"
@@ -643,19 +660,7 @@ service ManagementService {
         };
     }
 
-    // returns a project my organisation got granted from another organisation
-    rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
-        option (google.api.http) = {
-            get: "/grantedprojects/{project_id}/grants/{id}"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "project.read"
-            check_field_name: "Id"
-        };
-    }
-
-    rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {
+    rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
         option (google.api.http) = {
             post: "/projects"
             body: "*"
@@ -713,13 +718,15 @@ service ManagementService {
         };
     }
 
-    rpc ListProjectMemberRoles(ListProjectMemberRolesRequest) returns (ListProjectMemberRolesResponse) {
+    rpc ListProjectRoles(ListProjectRolesRequest) returns (ListProjectRolesResponse) {
         option (google.api.http) = {
-            get: "/projects/members/roles"
+            post: "/projects/{project_id}/roles/_search"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "project.member.read"
+            permission: "project.role.read"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -750,7 +757,7 @@ service ManagementService {
 
     rpc UpdateProjectRole(UpdateProjectRoleRequest) returns (UpdateProjectRoleResponse) {
         option (google.api.http) = {
-            put: "/projects/{id}/roles/{key}"
+            put: "/projects/{id}/roles/{role_key}"
             body: "*"
         };
 
@@ -763,7 +770,7 @@ service ManagementService {
     // RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
     rpc RemoveProjectRole(RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
         option (google.api.http) = {
-            delete: "/projects/{id}/roles/{key}"
+            delete: "/projects/{id}/roles/{role_key}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -772,15 +779,13 @@ service ManagementService {
         };
     }
 
-    rpc ListProjectRoles(ListProjectRolesRequest) returns (ListProjectRolesResponse) {
+    rpc ListProjectMemberRoles(ListProjectMemberRolesRequest) returns (ListProjectMemberRolesResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/roles/_search"
-            body: "*"
+            get: "/projects/members/roles"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "project.role.read"
-            check_field_name: "ProjectId"
+            permission: "project.member.read"
         };
     }
 
@@ -831,9 +836,9 @@ service ManagementService {
         };
     }
 
-    rpc GetApplicationByID(GetApplicationByIDRequest) returns (GetApplicationByIDResponse) {
+    rpc GetAppByID(GetAppByIDRequest) returns (GetAppByIDResponse) {
         option (google.api.http) = {
-            get: "/projects/{project_id}/applications/{id}"
+            get: "/projects/{project_id}/apps/{id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -842,9 +847,9 @@ service ManagementService {
         };
     }
 
-    rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
+    rpc ListApps(ListAppsRequest) returns (ListAppsResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/applications/_search"
+            post: "/projects/{project_id}/apps/_search"
             body: "*"
         };
 
@@ -854,9 +859,9 @@ service ManagementService {
         };
     }
 
-    rpc CreateOIDCApplication(CreateOIDCApplicationRequest) returns (CreateOIDCApplicationResponse) {
+    rpc AddOIDCApp(AddOIDCAppRequest) returns (AddOIDCAppResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/applications/oidc"
+            post: "/projects/{project_id}/apps/oidc"
             body: "*"
         };
 
@@ -866,9 +871,9 @@ service ManagementService {
         };
     }
 
-    rpc CreateAPIApplication(CreateAPIApplicationRequest) returns (CreateAPIApplicationResponse) {
+    rpc AddAPIApp(AddAPIAppRequest) returns (AddAPIAppResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/applications/api"
+            post: "/projects/{project_id}/apps/api"
             body: "*"
         };
 
@@ -878,9 +883,9 @@ service ManagementService {
         };
     }
 
-    rpc UpdateApplication(UpdateApplicationRequest) returns (UpdateApplicationResponse) {
+    rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{id}"
+            put: "/projects/{project_id}/apps/{id}"
             body: "*"
         };
 
@@ -890,9 +895,9 @@ service ManagementService {
         };
     }
 
-    rpc UpdateOIDCApplicationConfig(UpdateOIDCApplicationConfigRequest) returns (UpdateOIDCApplicationConfigResponse) {
+    rpc UpdateOIDCAppConfig(UpdateOIDCAppConfigRequest) returns (UpdateOIDCAppConfigResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{application_id}/oidcconfig"
+            put: "/projects/{project_id}/apps/{app_id}/oidcconfig"
             body: "*"
         };
 
@@ -902,9 +907,9 @@ service ManagementService {
         };
     }
 
-    rpc UpdateAPIApplicationConfig(UpdateAPIApplicationConfigRequest) returns (UpdateAPIApplicationConfigResponse) {
+    rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{application_id}/apiconfig"
+            put: "/projects/{project_id}/apps/{app_id}/apiconfig"
             body: "*"
         };
 
@@ -914,9 +919,9 @@ service ManagementService {
         };
     }
 
-    rpc DeactivateApplication(DeactivateApplicationRequest) returns (DeactivateApplicationResponse) {
+    rpc DeactivateApp(DeactivateAppRequest) returns (DeactivateAppResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{id}/_deactivate"
+            put: "/projects/{project_id}/apps/{id}/_deactivate"
             body: "*"
         };
 
@@ -926,9 +931,9 @@ service ManagementService {
         };
     }
 
-    rpc ReactivateApplication(ReactivateApplicationRequest) returns (ReactivateApplicationResponse) {
+    rpc ReactivateApp(ReactivateAppRequest) returns (ReactivateAppResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{id}/_reactivate"
+            put: "/projects/{project_id}/apps/{id}/_reactivate"
             body: "*"
         };
 
@@ -938,9 +943,9 @@ service ManagementService {
         };
     }
 
-    rpc RemoveApplication(RemoveApplicationRequest) returns (RemoveApplicationResponse) {
+    rpc RemoveApp(RemoveAppRequest) returns (RemoveAppResponse) {
         option (google.api.http) = {
-            delete: "/projects/{project_id}/applications/{id}"
+            delete: "/projects/{project_id}/apps/{id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -951,7 +956,7 @@ service ManagementService {
 
     rpc RegenerateOIDCClientSecret(RegenerateOIDCClientSecretRequest) returns (RegenerateOIDCClientSecretResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{id}/oidcconfig/_changeclientsecret"
+            put: "/projects/{project_id}/apps/{id}/oidcconfig/_changeclientsecret"
             body: "*"
         };
 
@@ -963,7 +968,7 @@ service ManagementService {
 
     rpc RegenerateAPIClientSecret(RegenerateAPIClientSecretRequest) returns (RegenerateAPIClientSecretResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/applications/{id}/apiconfig/_changeclientsecret"
+            put: "/projects/{project_id}/apps/{id}/apiconfig/_changeclientsecret"
             body: "*"
         };
 
@@ -975,7 +980,7 @@ service ManagementService {
 
     rpc GetAPIClientKey(GetAPIClientKeyRequest) returns (GetAPIClientKeyResponse) {
         option (google.api.http) = {
-            get: "/projects/{project_id}/applications/{application_id}/keys/{key_id}"
+            get: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -986,7 +991,7 @@ service ManagementService {
 
     rpc ListAPIClientKeys(ListAPIClientKeysRequest) returns (ListAPIClientKeysResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/applications/{application_id}/keys/_search"
+            post: "/projects/{project_id}/apps/{app_id}/keys/_search"
             body: "*"
         };
 
@@ -998,7 +1003,7 @@ service ManagementService {
 
     rpc AddAPIClientKey(AddAPIClientKeyRequest) returns (AddAPIClientKeyResponse){
         option (google.api.http) = {
-            post: "/projects/{project_id}/applications/{application_id}/keys"
+            post: "/projects/{project_id}/apps/{app_id}/keys"
             body: "*"
         };
 
@@ -1010,7 +1015,7 @@ service ManagementService {
 
     rpc RemoveAPIClientKey(RemoveAPIClientKeyRequest) returns (RemoveAPIClientKeyResponse) {
         option (google.api.http) = {
-            delete: "/projects/{project_id}/applications/{application_id}/keys/{key_id}"
+            delete: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1041,7 +1046,7 @@ service ManagementService {
         };
     }
 
-    rpc CreateProjectGrant(CreateProjectGrantRequest) returns (CreateProjectGrantResponse) {
+    rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants"
             body: "*"
@@ -1236,11 +1241,6 @@ service ManagementService {
         };
     }
 
-
-
-
-
-
     rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
         option (google.api.http) = {
             get: "/orgs/me/policies/login"
@@ -1261,7 +1261,7 @@ service ManagementService {
         };
     }
 
-    rpc CreateCustomLoginPolicy(CreateCustomLoginPolicyRequest) returns (CreateCustomLoginPolicyResponse) {
+    rpc AddCustomLoginPolicy(AddCustomLoginPolicyRequest) returns (AddCustomLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/orgs/me/policies/login"
             body: "*"
@@ -1358,7 +1358,7 @@ service ManagementService {
 
     rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/policies/login/multifactors/_search"
+            get: "/orgs/me/policies/login/mfas/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1366,10 +1366,9 @@ service ManagementService {
         };
     }
 
-    //TODO: mfa or multi factor?
     rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/policies/login/multifactors"
+            post: "/orgs/me/policies/login/mfas"
             body: "*"
         };
 
@@ -1380,7 +1379,7 @@ service ManagementService {
 
     rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/policies/login/multifactors/{multi_factor}"
+            delete: "/orgs/me/policies/login/mfas/{multi_factor}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1408,7 +1407,7 @@ service ManagementService {
         };
     }
     
-    rpc CreateCustomPasswordComplexityPolicy(CreateCustomPasswordComplexityPolicyRequest) returns (CreateCustomPasswordComplexityPolicyResponse) {
+    rpc AddCustomPasswordComplexityPolicy(AddCustomPasswordComplexityPolicyRequest) returns (AddCustomPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             post: "/orgs/me/policies/complexity"
             body: "*"
@@ -1460,7 +1459,7 @@ service ManagementService {
         };
     }
     
-    rpc CreateCustomPasswordAgePolicy(CreateCustomPasswordAgePolicyRequest) returns (CreateCustomPasswordAgePolicyResponse) {
+    rpc AddCustomPasswordAgePolicy(AddCustomPasswordAgePolicyRequest) returns (AddCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
             post: "/orgs/me/policies/age"
             body: "*"
@@ -1512,7 +1511,7 @@ service ManagementService {
         };
     }
     
-    rpc CreateCustomPasswordLockoutPolicy(CreateCustomPasswordLockoutPolicyRequest) returns (CreateCustomPasswordLockoutPolicyResponse) {
+    rpc AddCustomPasswordLockoutPolicy(AddCustomPasswordLockoutPolicyRequest) returns (AddCustomPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             post: "/orgs/me/policies/lockout"
             body: "*"
@@ -1544,7 +1543,6 @@ service ManagementService {
         };
     }
 
-//TODO: ...OrgIDP... or is comment enough?
     rpc GetOrgIDPByID(GetOrgIDPByIDRequest) returns (GetOrgIDPByIDResponse) {
         option (google.api.http) = {
             get: "/orgs/me/idps/{id}"
@@ -1566,7 +1564,7 @@ service ManagementService {
         };
     }
 
-    rpc CreateOrgIDP(CreateOrgIDPRequest) returns (CreateOrgIDPResponse) {
+    rpc AddOrgOIDCIDP(AddOrgOIDCIDPRequest) returns (AddOrgOIDCIDPResponse) {
         option (google.api.http) = {
             post: "/orgs/me/idps"
             body: "*"
@@ -1637,9 +1635,7 @@ message HealthzRequest {}
 message HealthzResponse {}
 
 message GetUserByIDRequest {
-    string id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string id = 1;
 }
 
 message GetUserByIDResponse {
@@ -1647,9 +1643,7 @@ message GetUserByIDResponse {
 }
 
 message GetUserByLoginNameGlobalRequest{
-    string login_name = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string login_name = 1;
 }
 
 message GetUserByLoginNameGlobalResponse {
@@ -1657,26 +1651,23 @@ message GetUserByLoginNameGlobalResponse {
 }
 
 message ListUsersRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     zitadel.user.v1.UserFieldName sorting_column = 2;
-    zitadel.user.v1.SearchQuery query = 3;
+    repeated zitadel.user.v1.SearchQuery queries = 3;
 }
 
 message ListUsersResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     zitadel.user.v1.UserFieldName sorting_column = 2;
     repeated zitadel.user.v1.User result = 3;
 }
 
 message IsUserUniqueRequest {
     string user_name = 1 [
-        (validate.rules).string.pattern = "^[^[:space:]]{1,200}$",
-        (google.api.field_behavior) = REQUIRED
+        (validate.rules).string.pattern = "^[^[:space:]]{1,200}$"
     ];
-    //TODO: email still needed or should it be login_names?
-    string email = 2  [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (google.api.field_behavior) = REQUIRED
+    string login_name = 2  [
+        (validate.rules).string = {min_len: 1, max_len: 200}
     ];
 }
 
@@ -1684,212 +1675,221 @@ message IsUserUniqueResponse {
     bool is_unique = 1;
 }
 
-message CreateUserRequest {
-    string user_name = 1;
-    oneof type {
-        zitadel.user.v1.Human human = 2;
-        zitadel.user.v1.Machine machine = 3;
+message AddHumanUserRequest {
+    message Profile {
+        string first_name = 1;
+        string last_name = 2;
+        string nick_name = 3;
+        string display_name = 4;
+        string preferred_language = 5;
+        zitadel.user.v1.Gender gender = 6;
     }
+    message Email {
+        string email = 1;
+        bool is_email_verified = 2;
+    }
+    message Phone {
+        //TODO: use https://github.com/google/libphonenumber/blob/master/resources/phonenumber.proto
+        string phone = 1;
+        bool is_phone_verified = 2;
+    }
+    message Address {
+        string country = 1;
+        string locality = 2;
+        string postal_code = 3;
+        string region = 4;
+        string street_address = 5;
+    }
+
+    string user_name = 1;
+
+    Profile profile = 2;
+    Email email = 3;
+    Phone phone = 4;
+    Address address = 5;
+}
+message AddHumanUserResponse {
+    string user_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
-message CreateUserResponse {
-    string id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+message AddMachineUserRequest {
+    string user_name = 1;
+
+    string name = 2;
+    string description = 3;
+}
+
+message AddMachineUserResponse {
+    string user_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message DeactivateUserRequest {
-    string id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string id = 1;
 }
 
 message DeactivateUserResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ReactivateUserRequest {
-    string id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string id = 1;
 }
 
 message ReactivateUserResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message LockUserRequest {
-    string id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string id = 1;
 }
 
 message LockUserResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UnlockUserRequest {
-    string id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string id = 1;
 }
 
 message UnlockUserResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveUserRequest {
-    string id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string id = 1;
 }
 
 message RemoveUserResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateUserNameRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    string user_name = 2 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
+    string user_name = 2;
 }
 
 message UpdateUserNameResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetHumanProfileRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
 }
 
 message GetHumanProfileResponse {
-    string user_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 1;
+    zitadel.user.v1.Profile profile = 2;
 }
 
 message UpdateHumanProfileRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    zitadel.user.v1.Profile profile = 2 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
+
+    string first_name = 2;
+    string last_name = 3;
+    string nick_name = 4;
+    string display_name = 5;
+    string preferred_language = 6;
+    zitadel.user.v1.Gender gender = 7;
 }
 
 message UpdateHumanProfileResponse {
-    string user_id = 1;
-    zitadel.v1.MetaData meta_data = 3;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetHumanEmailRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
 }
 
 message GetHumanEmailResponse {
-    string user_id = 1;
-    zitadel.user.v1.Email email = 3;
+    zitadel.v1.ObjectDetails details = 1;
+    zitadel.user.v1.Email email = 2;
 }
 
 message UpdateHumanEmailRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    zitadel.user.v1.Email email = 2 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
+
+    string email = 2;
+    bool is_email_verified = 3;
 }
 
 message UpdateHumanEmailResponse {
-    string user_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ResendHumanInitializationRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
 }
 
 message ResendHumanInitializationResponse {}
 
 message ResendEmailVerificationRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
 }
 
-message ResendEmailVerificationResponse {}
+message ResendEmailVerificationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message GetHumanPhoneRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
 }
 
 message GetHumanPhoneResponse {
-    string user_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 1;
+    zitadel.user.v1.Phone phone = 2;
 }
 
 message UpdateHumanPhoneRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    zitadel.user.v1.Phone phone = 2 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
+
+
+    string phone = 2;
+    bool is_phone_verified = 3;
 }
 
 message UpdateHumanPhoneResponse {
-    string user_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveHumanPhoneRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
 }
 
-message RemoveHumanPhoneResponse {}
+message RemoveHumanPhoneResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message ResendHumanPhoneVerificationRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
 }
 
-message ResendHumanPhoneVerificationResponse {}
+message ResendHumanPhoneVerificationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message GetHumanAddressRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
 }
 
 message GetHumanAddressResponse {
-    string user_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 1;
+    zitadel.user.v1.Address address = 2;
 }
 
 message UpdateHumanAddressRequest {
-    string user_id = 1 [
-        (google.api.field_behavior) = REQUIRED
-    ];
-    zitadel.user.v1.Address address = 2 [
-        (google.api.field_behavior) = REQUIRED
-    ];
+    string user_id = 1;
+
+    string country = 2;
+    string locality = 3;
+    string postal_code = 4;
+    string region = 5;
+    string street_address = 6;
 }
 
 message UpdateHumanAddressResponse {
-    string user_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message SetInitialPasswordRequest {
@@ -1898,18 +1898,17 @@ message SetInitialPasswordRequest {
 }
 
 message SetInitialPasswordResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateMachineRequest {
     string user_id = 1;
-    //TODO: discuss with or without description?
     string description = 2 [(validate.rules).string.max_len = 500];
     string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UpdateMachineResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetMachineKeyByIDsRequest {
@@ -1918,17 +1917,16 @@ message GetMachineKeyByIDsRequest {
 }
 
 message GetMachineKeyByIDsResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.user.v1.MachineKey key = 2;
+    zitadel.user.v1.MachineKey key = 1;
 }
 
 message ListMachineKeysRequest {
     string user_id = 1;
-    zitadel.v1.Search meta_data = 2;
+    zitadel.v1.ListQuery meta_data = 2;
 }
 
 message ListMachineKeysResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.user.v1.MachineKey result = 2;
 }
 
@@ -1941,7 +1939,7 @@ message AddMachineKeyRequest {
 message AddMachineKeyResponse {
     string id = 1;
     bytes key_details = 2;
-    zitadel.v1.MetaData meta_data = 3;
+    zitadel.v1.ObjectDetails details = 3;
 }
 
 message RemoveMachineKeyRequest {
@@ -1950,16 +1948,16 @@ message RemoveMachineKeyRequest {
 }
 
 message RemoveMachineKeyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListUserIDPsRequest {
     string user_id = 1;
-    zitadel.v1.Search meta_data = 2;
+    zitadel.v1.ListQuery meta_data = 2;
 }
 
 message ListUserIDPsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.idp.v1.IDPUserLink result = 2;
 }
 
@@ -1969,25 +1967,24 @@ message RemoveUserIDPRequest {
 }
 
 message RemoveUserIDPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListUserMembershipsRequest {
     string user_id = 1;
-    zitadel.v1.Search meta_data = 2;
+    zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.user.v1.MembershipQuery queries = 3;
 }
 
 message ListUserMembershipsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.user.v1.Membership result = 2;
 }
 
 message GetMyOrgRequest {}
 
 message GetMyOrgResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.org.v1.Org org = 2;
+    zitadel.org.v1.Org org = 1;
 }
 
 message GetOrgByDomainGlobalRequest {
@@ -1995,45 +1992,43 @@ message GetOrgByDomainGlobalRequest {
 }
 
 message GetOrgByDomainGlobalResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.org.v1.Org org = 2;
+    zitadel.org.v1.Org org = 1;
 }
 
-message CreateOrgRequest {
+message AddOrgRequest {
     string name = 1;
 }
 
-message CreateOrgResponse {
+message AddOrgResponse {
     string id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message DeactivateOrgRequest {}
 
 message DeactivateOrgResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ReactivateOrgRequest {}
 
 message ReactivateOrgResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetOrgIAMPolicyRequest {}
 
 message GetOrgIAMPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.OrgIAMPolicy policy = 2;
+    zitadel.policy.v1.OrgIAMPolicy policy = 1;
 }
 
 message ListOrgDomainsRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     repeated zitadel.org.v1.DomainSearchQuery queries = 2;
 }
 
 message ListOrgDomainsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.org.v1.Domain result = 2;
 }
 
@@ -2042,7 +2037,7 @@ message AddOrgDomainRequest {
 }
 
 message AddOrgDomainResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveOrgDomainRequest {
@@ -2050,7 +2045,7 @@ message RemoveOrgDomainRequest {
 }
 
 message RemoveOrgDomainResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GenerateOrgDomainValidationRequest {
@@ -2059,7 +2054,7 @@ message GenerateOrgDomainValidationRequest {
 }
 
 message GenerateOrgDomainValidationResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
     string token = 2;
     string url = 3;
 }
@@ -2069,7 +2064,7 @@ message ValidateOrgDomainRequest {
 }
 
 message ValidateOrgDomainResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message SetPrimaryOrgDomainRequest {
@@ -2077,7 +2072,7 @@ message SetPrimaryOrgDomainRequest {
 }
 
 message SetPrimaryOrgDomainResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListOrgMemberRolesRequest {}
@@ -2087,12 +2082,12 @@ message ListOrgMemberRolesResponse {
 }
 
 message ListOrgMembersRequest {
-    zitadel.v1.Search meta_data = 1;
-    repeated zitadel.org.v1.MemberSearchQuery queries = 2;
+    zitadel.v1.ListQuery meta_data = 1;
+    repeated zitadel.member.v1.SearchQuery queries = 2;
 }
 
 message ListOrgMembersResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.member.v1.Member result = 2;
 }
 
@@ -2101,16 +2096,16 @@ message AddOrgMemberRequest {
     repeated string roles = 2;
 }
 message AddOrgMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message ChangeOrgMemberRequest {
+message UpdateOrgMemberRequest {
     string user_id = 1;
     repeated string roles = 2;
 }
 
-message ChangeOrgMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message UpdateOrgMemberResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveOrgMemberRequest {
@@ -2118,7 +2113,7 @@ message RemoveOrgMemberRequest {
 }
 
 message RemoveOrgMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetProjectByIDRequest {
@@ -2130,22 +2125,22 @@ message GetProjectByIDResponse {
 }
 
 message ListProjectsRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
 message ListProjectsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.project.v1.Project result = 2;
 }
 
 message ListGrantedProjectsRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
 message ListGrantedProjectsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.project.v1.GrantedProject result = 2;
 }
 
@@ -2158,15 +2153,15 @@ message GetGrantedProjectByIDResponse {
     zitadel.project.v1.GrantedProject granted_project = 1;
 }
 
-message CreateProjectRequest {
+message AddProjectRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool project_role_assertion = 2;
     bool project_role_check = 3;
 }
 
-message CreateProjectResponse {
+message AddProjectResponse {
     string project_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message UpdateProjectRequest {
@@ -2177,7 +2172,7 @@ message UpdateProjectRequest {
 }
 
 message UpdateProjectResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message DeactivateProjectRequest {
@@ -2185,7 +2180,7 @@ message DeactivateProjectRequest {
 }
 
 message DeactivateProjectResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ReactivateProjectRequest {
@@ -2193,7 +2188,7 @@ message ReactivateProjectRequest {
 }
 
 message ReactivateProjectResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveProjectRequest {
@@ -2201,25 +2196,25 @@ message RemoveProjectRequest {
 }
 
 message RemoveProjectResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListProjectMemberRolesRequest {}
 
 message ListProjectMemberRolesResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated string result = 2;
 }
 
 message AddProjectRoleRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string key = 2 [(validate.rules).string = {min_len: 1}];
+    string role_key = 2 [(validate.rules).string = {min_len: 1}];
     string display_name = 3;
     string group = 4;
 }
 
 message AddProjectRoleResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message BulkAddProjectRolesRequest {
@@ -2234,47 +2229,48 @@ message BulkAddProjectRolesRequest {
 }
 
 message BulkAddProjectRolesResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateProjectRoleRequest {
     string project_id = 1;
-    string key = 2 [(validate.rules).string = {min_len: 1}];
+    string role_key = 2 [(validate.rules).string = {min_len: 1}];
     string display_name = 3;
     string group = 4;
 }
 
 message UpdateProjectRoleResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveProjectRoleRequest {
     string project_id = 1;
-    string key = 2;
+    string role_key = 2;
 }
+
 message RemoveProjectRoleResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListProjectRolesRequest {
     string project_id = 1;
-    zitadel.v1.Search meta_data = 2;
+    zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.project.v1.RoleQuery queries = 3;
 }
 
 message ListProjectRolesResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.project.v1.Role result = 2;
 }
 
 message ListProjectMembersRequest {
     string project_id = 1;
-    zitadel.v1.Search meta_data = 2;
+    zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.member.v1.SearchQuery queries = 3;
 }
 
 message ListProjectMembersResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.member.v1.Member result = 2;
 }
 
@@ -2285,7 +2281,7 @@ message AddProjectMemberRequest {
 }
 
 message AddProjectMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateProjectMemberRequest {
@@ -2295,7 +2291,7 @@ message UpdateProjectMemberRequest {
 }
 
 message UpdateProjectMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveProjectMemberRequest {
@@ -2304,36 +2300,36 @@ message RemoveProjectMemberRequest {
 }
 
 message RemoveProjectMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetApplicationByIDRequest {
+message GetAppByIDRequest {
     string project_id = 1;
     string app_id = 2;
 }
 
-message GetApplicationByIDResponse {
+message GetAppByIDResponse {
     zitadel.app.v1.App app = 1;
 }
 
-message ListApplicationsRequest {
+message ListAppsRequest {
     string project_id = 1;
-    zitadel.v1.Search meta_data = 2;
+    zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.app.v1.AppQuery queries = 3;
 }
 
-message ListApplicationsResponse {
-    zitadel.v1.Search meta_data = 1;
+message ListAppsResponse {
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.app.v1.App result = 2;
 }
 
-message CreateOIDCApplicationRequest {
+message AddOIDCAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string redirect_uris = 3;
     repeated zitadel.app.v1.OIDCResponseType response_types = 4;
     repeated zitadel.app.v1.OIDCGrantType grant_types = 5;
-    zitadel.app.v1.OIDCApplicationType application_type = 6;
+    zitadel.app.v1.OIDCAppType app_type = 6;
     zitadel.app.v1.OIDCAuthMethodType auth_method_type = 7;
     repeated string post_logout_redirect_uris = 8;
     zitadel.app.v1.OIDCVersion version = 9;
@@ -2345,46 +2341,46 @@ message CreateOIDCApplicationRequest {
     google.protobuf.Duration clock_skew = 15 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
-message CreateOIDCApplicationResponse {
+message AddOIDCAppResponse {
     string app_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
     string client_id = 3;
     string client_secret = 4;
     bool none_compliant = 5;
     repeated zitadel.v1.LocalizedMessage compliance_problems = 6;
 }
 
-message CreateAPIApplicationRequest {
+message AddAPIAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.app.v1.APIAuthMethodType auth_method_type = 3;
 }
 
-message CreateAPIApplicationResponse {
+message AddAPIAppResponse {
     string app_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
     string client_id = 3;
     string client_secret = 4;
 }
 
-message UpdateApplicationRequest {
+message UpdateAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
     string app_id = 2 [(validate.rules).string = {min_len: 1}];
     string name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message UpdateApplicationResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message UpdateAppResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message UpdateOIDCApplicationConfigRequest {
+message UpdateOIDCAppConfigRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string application_id = 2 [(validate.rules).string = {min_len: 1}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1}];
     
     repeated string redirect_uris = 3;
     repeated zitadel.app.v1.OIDCResponseType response_types = 4;
     repeated zitadel.app.v1.OIDCGrantType grant_types = 5;
-    zitadel.app.v1.OIDCApplicationType application_type = 6;
+    zitadel.app.v1.OIDCAppType app_type = 6;
     zitadel.app.v1.OIDCAuthMethodType auth_method_type = 7;
     repeated string post_logout_redirect_uris = 8;
     bool dev_mode = 9;
@@ -2395,45 +2391,45 @@ message UpdateOIDCApplicationConfigRequest {
     google.protobuf.Duration clock_skew = 14 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
-message UpdateOIDCApplicationConfigResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message UpdateOIDCAppConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message UpdateAPIApplicationConfigRequest {
+message UpdateAPIAppConfigRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
     string app_id = 2 [(validate.rules).string = {min_len: 1}];
     zitadel.app.v1.APIAuthMethodType auth_method_type = 7;
 }
 
-message UpdateAPIApplicationConfigResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message UpdateAPIAppConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message DeactivateApplicationRequest {
+message DeactivateAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
     string app_id = 2 [(validate.rules).string = {min_len: 1}];
 }
 
-message DeactivateApplicationResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message DeactivateAppResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message ReactivateApplicationRequest {
+message ReactivateAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
     string app_id = 2 [(validate.rules).string = {min_len: 1}];
 }
 
-message ReactivateApplicationResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message ReactivateAppResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveApplicationRequest {
+message RemoveAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
     string app_id = 2 [(validate.rules).string = {min_len: 1}];
 }
 
-message RemoveApplicationResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message RemoveAppResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RegenerateOIDCClientSecretRequest {
@@ -2443,7 +2439,7 @@ message RegenerateOIDCClientSecretRequest {
 
 message RegenerateOIDCClientSecretResponse {
     string client_secret = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message RegenerateAPIClientSecretRequest {
@@ -2453,7 +2449,7 @@ message RegenerateAPIClientSecretRequest {
 
 message RegenerateAPIClientSecretResponse {
     string client_secret = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message GetAPIClientKeyRequest {
@@ -2467,12 +2463,12 @@ message GetAPIClientKeyResponse {
 }
 
 message ListAPIClientKeysRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     string app_id = 2;
     string project_id = 3;
 }
 message ListAPIClientKeysResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.app.v1.APIClientKey result = 2;
 }
 
@@ -2484,7 +2480,7 @@ message AddAPIClientKeyRequest {
 }
 
 message AddAPIClientKeyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
     string id = 2;
     bytes key_details = 3;
 }
@@ -2496,7 +2492,7 @@ message RemoveAPIClientKeyRequest {
 }
 
 message RemoveAPIClientKeyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetProjectGrantByIDRequest {
@@ -2510,24 +2506,24 @@ message GetProjectGrantByIDResponse {
 
 message ListProjectGrantsRequest {
     string project_id = 1;
-    zitadel.v1.Search meta_data = 2;
+    zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.project.v1.ProjectGrantQuery queries = 3;
 }
 
 message ListProjectGrantsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.project.v1.GrantedProject result = 2;
 }
 
-message CreateProjectGrantRequest {
+message AddProjectGrantRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
     string granted_org_id = 2 [(validate.rules).string = {min_len: 1}];
     repeated string role_keys = 3;
 }
 
-message CreateProjectGrantResponse {
+message AddProjectGrantResponse {
     string grant_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message UpdateProjectGrantRequest {
@@ -2537,7 +2533,7 @@ message UpdateProjectGrantRequest {
 }
 
 message UpdateProjectGrantResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message DeactivateProjectGrantRequest {
@@ -2546,7 +2542,7 @@ message DeactivateProjectGrantRequest {
 }
 
 message DeactivateProjectGrantResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ReactivateProjectGrantRequest {
@@ -2554,7 +2550,7 @@ message ReactivateProjectGrantRequest {
     string grant_id = 2 [(validate.rules).string = {min_len: 1}];
 }
 message ReactivateProjectGrantResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveProjectGrantRequest {
@@ -2562,27 +2558,27 @@ message RemoveProjectGrantRequest {
     string grant_id = 2 [(validate.rules).string = {min_len: 1}];
 }
 message RemoveProjectGrantResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListProjectGrantMemberRolesRequest {
     //TODO: shall we create an object per member type? ProjectMember, ...
-    zitadel.v1.Search meta_data = 1;
-    repeated zitadel.member.v1.Member result = 2;
+    zitadel.v1.ListQuery meta_data = 1;
+    repeated string result = 2;
 }
 
 message ListProjectGrantMemberRolesResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated string result = 2;
 }
 
 message ListProjectGrantMembersRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     repeated zitadel.project.v1.ProjectGrantMemberQuery queries = 2;
 }
 
 message ListProjectGrantMembersResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.member.v1.Member result = 2;
 }
 
@@ -2594,7 +2590,7 @@ message AddProjectGrantMemberRequest {
 }
 
 message AddProjectGrantMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateProjectGrantMemberRequest {
@@ -2605,7 +2601,7 @@ message UpdateProjectGrantMemberRequest {
 }
 
 message UpdateProjectGrantMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveProjectGrantMemberRequest {
@@ -2615,7 +2611,7 @@ message RemoveProjectGrantMemberRequest {
 }
 
 message RemoveProjectGrantMemberResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetUserGrantByIDRequest {
@@ -2628,12 +2624,12 @@ message GetUserGrantByIDResponse {
 }
 
 message ListUserGrantRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     repeated zitadel.project.v1.UserGrantQuery queries = 2;
 }
 
 message ListUserGrantResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.project.v1.UserGrant result = 2;
 }
 
@@ -2644,7 +2640,7 @@ message AddUserGrantRequest {
 
 message AddUserGrantResponse {
     string user_grant_id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message UpdateUserGrantRequest {
@@ -2653,7 +2649,7 @@ message UpdateUserGrantRequest {
 }
 
 message UpdateUserGrantResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message DeactivateUserGrantRequest {
@@ -2662,7 +2658,7 @@ message DeactivateUserGrantRequest {
 }
 
 message DeactivateUserGrantResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ReactivateUserGrantRequest {
@@ -2671,7 +2667,7 @@ message ReactivateUserGrantRequest {
 }
 
 message ReactivateUserGrantResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveUserGrantRequest {
@@ -2680,7 +2676,7 @@ message RemoveUserGrantRequest {
 }
 
 message RemoveUserGrantResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message BulkRemoveUserGrantRequest {
@@ -2690,44 +2686,36 @@ message BulkRemoveUserGrantRequest {
 
 message BulkRemoveUserGrantResponse {
     message RemovedUserGrant {
-        zitadel.v1.MetaData meta_data = 1;
+        zitadel.v1.ObjectDetails details = 1;
         string grant_id = 2;
     }
 
     repeated RemovedUserGrant result = 1;
 }
 
-
-
-
-
-
-
 message GetLoginPolicyRequest {}
 
 message GetLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.LoginPolicy policy = 2;
-    bool is_default = 3;
+    zitadel.policy.v1.LoginPolicy policy = 1;
+    bool is_default = 2;
 }
 
 message GetDefaultLoginPolicyRequest {}
 
 message GetDefaultLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.LoginPolicy policy = 2;
+    zitadel.policy.v1.LoginPolicy policy = 1;
 }
 
-message CreateCustomLoginPolicyRequest {
+message AddCustomLoginPolicyRequest {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    zitadel.user.v1.MFAType passwordless_type = 5;
+    zitadel.user.v1.MultiFactorType passwordless_type = 5;
 }
 
-message CreateCustomLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message AddCustomLoginPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateCustomLoginPolicyRequest {
@@ -2735,35 +2723,34 @@ message UpdateCustomLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    zitadel.user.v1.MFAType passwordless_type = 5;
+    zitadel.user.v1.MultiFactorType passwordless_type = 5;
 }
 
 message UpdateCustomLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ResetLoginPolicyToDefaultRequest {}
 
 message ResetLoginPolicyToDefaultResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListLoginPolicyIDPsRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
 }
 
 message ListLoginPolicyIDPsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.idp.v1.IDPLoginPolicyLink result = 2;
 }
 
 message AddIDPToLoginPolicyRequest {
     string idp_id = 1;
-    //TODO: do we need IdpProviderType?
 }
+
 message AddIDPToLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    //TODO: do we need IdpProviderType?
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveIDPFromLoginPolicyRequest {
@@ -2771,13 +2758,13 @@ message RemoveIDPFromLoginPolicyRequest {
 }
 
 message RemoveIDPFromLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListLoginPolicySecondFactorsRequest {}
 
 message ListLoginPolicySecondFactorsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.user.v1.SecondFactor result = 2;
 }
 
@@ -2785,7 +2772,7 @@ message AddSecondFactorToLoginPolicyRequest {
     zitadel.user.v1.SecondFactor second_factor = 1;
 }
 message AddSecondFactorToLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveSecondFactorFromLoginPolicyRequest {
@@ -2793,21 +2780,22 @@ message RemoveSecondFactorFromLoginPolicyRequest {
 }
 
 message RemoveSecondFactorFromLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListLoginPolicyMultiFactorsRequest {}
 
 message ListLoginPolicyMultiFactorsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.user.v1.MultiFactor result = 2;
 }
 
 message AddMultiFactorToLoginPolicyRequest {
     zitadel.user.v1.MultiFactor multi_factor = 1;
 }
+
 message AddMultiFactorToLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveMultiFactorFromLoginPolicyRequest {
@@ -2815,25 +2803,23 @@ message RemoveMultiFactorFromLoginPolicyRequest {
 }
 
 message RemoveMultiFactorFromLoginPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetPasswordComplexityPolicyRequest {}
 
 message GetPasswordComplexityPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordComplexityPolicy policy = 2;
-    bool is_default = 3;
+    zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
+    bool is_default = 2;
 }
 
 message GetDefaultPasswordComplexityPolicyRequest {}
 
 message GetDefaultPasswordComplexityPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordComplexityPolicy policy = 2;
+    zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
 }
 
-message CreateCustomPasswordComplexityPolicyRequest {
+message AddCustomPasswordComplexityPolicyRequest {
     uint64 min_length = 1;
     bool has_uppercase = 2;
     bool has_lowercase = 3;
@@ -2841,8 +2827,8 @@ message CreateCustomPasswordComplexityPolicyRequest {
     bool has_symbol = 5;
 }
 
-message CreateCustomPasswordComplexityPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message AddCustomPasswordComplexityPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateCustomPasswordComplexityPolicyRequest {
@@ -2854,37 +2840,35 @@ message UpdateCustomPasswordComplexityPolicyRequest {
 }
 
 message UpdateCustomPasswordComplexityPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ResetPasswordComplexityPolicyToDefaultRequest {}
 
 message ResetPasswordComplexityPolicyToDefaultResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetPasswordAgePolicyRequest {}
 
 message GetPasswordAgePolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordAgePolicy policy = 2;
-    bool is_default = 3;
+    zitadel.policy.v1.PasswordAgePolicy policy = 1;
+    bool is_default = 2;
 }
 
 message GetDefaultPasswordAgePolicyRequest {}
 
 message GetDefaultPasswordAgePolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordAgePolicy policy = 2;
+    zitadel.policy.v1.PasswordAgePolicy policy = 1;
 }
 
-message CreateCustomPasswordAgePolicyRequest {
+message AddCustomPasswordAgePolicyRequest {
     uint64 max_age_days = 1;
     uint64 expire_warn_days = 2;
 }
 
-message CreateCustomPasswordAgePolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message AddCustomPasswordAgePolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateCustomPasswordAgePolicyRequest {
@@ -2893,37 +2877,35 @@ message UpdateCustomPasswordAgePolicyRequest {
 }
 
 message UpdateCustomPasswordAgePolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ResetPasswordAgePolicyToDefaultRequest {}
 
 message ResetPasswordAgePolicyToDefaultResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetPasswordLockoutPolicyRequest {}
 
 message GetPasswordLockoutPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordLockoutPolicy policy = 2;
-    bool is_default = 3;
+    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
+    bool is_default = 2;
 }
 
 message GetDefaultPasswordLockoutPolicyRequest {}
 
 message GetDefaultPasswordLockoutPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordLockoutPolicy policy = 2;
+    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
 }
 
-message CreateCustomPasswordLockoutPolicyRequest {
+message AddCustomPasswordLockoutPolicyRequest {
     uint64 max_attempts = 1;
     bool show_lockout_failure = 2;
 }
 
-message CreateCustomPasswordLockoutPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message AddCustomPasswordLockoutPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateCustomPasswordLockoutPolicyRequest {
@@ -2932,13 +2914,13 @@ message UpdateCustomPasswordLockoutPolicyRequest {
 }
 
 message UpdateCustomPasswordLockoutPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ResetPasswordLockoutPolicyToDefaultRequest {}
 
 message ResetPasswordLockoutPolicyToDefaultResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetOrgIDPByIDRequest {
@@ -2946,29 +2928,37 @@ message GetOrgIDPByIDRequest {
 }
 
 message GetOrgIDPByIDResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.idp.v1.IDP idp = 2;
+    zitadel.idp.v1.IDP idp = 1;
 }
 
 message ListOrgIDPsRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDPQuery queries = 3;
 }
 
 message ListOrgIDPsResponse {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListDetails meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDP result = 3;
 }
 
-message CreateOrgIDPRequest {
-    zitadel.idp.v1.IDP idp = 1;
+message AddOrgOIDCIDPRequest {
+    string id = 1;
+    string name = 2;
+    IDPStylingType styling_type = 4;
+
+    string client_id = 4;
+    string client_secret = 5;
+    string issuer = 6;
+    repeated string scopes = 7;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 8;
+    zitadel.idp.v1.OIDCMappingField username_mapping = 9;
 }
 
-message CreateOrgIDPResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.idp.v1.IDP idp = 2;
+message AddOrgOIDCIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string idp_id = 2;
 }
 
 message DeactivateOrgIDPRequest {
@@ -2976,7 +2966,7 @@ message DeactivateOrgIDPRequest {
 }
 
 message DeactivateOrgIDPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ReactivateOrgIDPRequest {
@@ -2984,7 +2974,7 @@ message ReactivateOrgIDPRequest {
 }
 
 message ReactivateOrgIDPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveOrgIDPRequest {
@@ -3000,7 +2990,7 @@ message UpdateOrgIDPRequest {
 }
 
 message UpdateOrgIDPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
     string id = 2;
     zitadel.idp.v1.IDPState state = 3;
     string name = 4;
@@ -3009,10 +2999,15 @@ message UpdateOrgIDPResponse {
 
 message UpdateOrgIDPOIDCConfigRequest {
     string idp_id = 1;
-    zitadel.idp.v1.OIDCConfig config = 2;
+
+    string client_id = 1;
+    string client_secret = 2;
+    string issuer = 3;
+    repeated string scopes = 4;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 5;
+    zitadel.idp.v1.OIDCMappingField username_mapping = 6;
 }
 
 message UpdateOrgIDPOIDCConfigResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.idp.v1.OIDCConfig config = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }

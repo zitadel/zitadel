@@ -10,15 +10,19 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/app";
 
 message App {
     string id = 1;
-    AppState state = 2;
-    string name = 5;
-    oneof app_config {
-        OIDCConfig oidc_config = 8;
+    zitadel.v1.ObjectDetails details = 2;
+    AppState state = 3;
+    string name = 4;
+    oneof config {
+        OIDCConfig oidc_config = 5;
+        APIConfig api_config = 6;
     }
 }
 
 enum AppState {
     APP_STATE_UNSPECIFIED = 0;
+    APP_STATE_ACTIVE = 1;
+    APP_STATE_INACTIVE = 2;
 }
 
 message AppQuery {
@@ -36,7 +40,7 @@ message OIDCConfig {
     repeated string redirect_uris = 1;
     repeated OIDCResponseType response_types = 2;
     repeated OIDCGrantType grant_types = 3;
-    OIDCApplicationType application_type = 4;
+    OIDCAppType application_type = 4;
     string client_id = 5;
     string client_secret = 6;
     OIDCAuthMethodType auth_method_type = 7;
@@ -60,7 +64,7 @@ enum OIDCGrantType{
     OIDC_GRANT_TYPE_UNSPECIFIED = 0;
 }
 
-enum OIDCApplicationType {
+enum OIDCAppType {
     OIDC_APPLICATION_TYPE_UNSPECIFIED = 0;
 }
 
@@ -88,11 +92,12 @@ message APIConfig {
 
 message APIClientKey {
     string id = 1;
-    AuthNKeyType type = 2;
-    zitadel.v1.MetaData meta_data = 3;
+    zitadel.v1.ObjectDetails details = 2;
+    AuthNKeyType type = 3;
 }
 
+//TODO: where to place that user.machine and api-client can use the same?
 enum AuthNKeyType {
     AUTHNKEY_UNSPECIFIED = 0;
     AUTHNKEY_JSON = 1;
-  }
+}

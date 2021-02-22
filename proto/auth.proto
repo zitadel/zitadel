@@ -240,7 +240,7 @@ service AuthService {
         };
     }
 
-    rpc ListMyMFAs(ListMyMFAsRequest) returns (ListMyMFAsResponse) {
+    rpc ListMyMultiFactors(ListMyMultiFactorsRequest) returns (ListMyMultiFactorsResponse) {
         option (google.api.http) = {
             get: "/users/me/mfas"
         };
@@ -250,7 +250,7 @@ service AuthService {
         };
     }
 
-    rpc AddMyMFAOTP(AddMyMFAOTPRequest) returns (AddMyMFAOTPResponse) {
+    rpc AddMyMultiFactorOTP(AddMyMultiFactorOTPRequest) returns (AddMyMultiFactorOTPResponse) {
         option (google.api.http) = {
             post: "/users/me/mfas/otp"
             body: "*"
@@ -260,7 +260,7 @@ service AuthService {
         };
     }
 
-    rpc VerifyMyMFAOTP(VerifyMyMFAOTPRequest) returns (VerifyMyMFAOTPResponse) {
+    rpc VerifyMyMultiFactorOTP(VerifyMyMultiFactorOTPRequest) returns (VerifyMyMultiFactorOTPResponse) {
         option (google.api.http) = {
             put: "/users/me/mfas/otp/_verify"
             body: "*"
@@ -271,7 +271,7 @@ service AuthService {
         };
     }
 
-    rpc RemoveMyMFAOTP(RemoveMyMFAOTPRequest) returns (RemoveMyMFAOTPResponse) {
+    rpc RemoveMyMultiFactorOTP(RemoveMyMultiFactorOTPRequest) returns (RemoveMyMultiFactorOTPResponse) {
         option (google.api.http) = {
             delete: "/users/me/mfas/otp"
         };
@@ -281,7 +281,7 @@ service AuthService {
         };
     }
 
-    rpc AddMyMFAU2F(AddMyMFAU2FRequest) returns (AddMyMFAU2FResponse) {
+    rpc AddMyMultiFactorU2F(AddMyMultiFactorU2FRequest) returns (AddMyMultiFactorU2FResponse) {
         option (google.api.http) = {
             post: "/users/me/mfas/u2f"
             body: "*"
@@ -291,7 +291,7 @@ service AuthService {
         };
     }
 
-    rpc VerifyMyMFAU2F(VerifyMyMFAU2FRequest) returns (VerifyMyMFAU2FResponse) {
+    rpc VerifyMyMultiFactorU2F(VerifyMyMultiFactorU2FRequest) returns (VerifyMyMultiFactorU2FResponse) {
         option (google.api.http) = {
             put: "/users/me/mfas/u2f/_verify"
             body: "*"
@@ -302,7 +302,7 @@ service AuthService {
         };
     }
 
-    rpc RemoveMyMFAU2F(RemoveMyMFAU2FRequest) returns (RemoveMyMFAU2FResponse) {
+    rpc RemoveMyMultiFactorU2F(RemoveMyMultiFactorU2FRequest) returns (RemoveMyMultiFactorU2FResponse) {
         option (google.api.http) = {
             delete: "/users/me/mfas/u2f/{token_id}"
         };
@@ -362,9 +362,8 @@ message HealthzResponse {}
 message GetMyUserRequest {}
 
 message GetMyUserResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.user.v1.User user = 2;
-    google.protobuf.Timestamp last_login = 3;
+    zitadel.user.v1.User user = 1;
+    google.protobuf.Timestamp last_login = 2;
 }
 
 message UpdateMyUserNameRequest {
@@ -372,82 +371,86 @@ message UpdateMyUserNameRequest {
 }
 
 message UpdateMyUserNameResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    string user_name = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetMyPasswordComplexityPolicyRequest {}
 
 message GetMyPasswordComplexityPolicyResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.policy.v1.PasswordComplexityPolicy policy = 2;
+    zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
 }
 
 message UpdateMyPasswordRequest {
-    //TODO: current_password?
-    string password = 1;
+    string old_password = 1 [(validate.rules).string = {min_len: 1, max_len: 72}];
+    string new_password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
 }
 
 message UpdateMyPasswordResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetMyProfileRequest {}
 
 message GetMyProfileResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
     zitadel.user.v1.Profile profile = 2;
 }
 
 message UpdateMyProfileRequest {
-    zitadel.user.v1.Profile profile = 1;
+    string first_name = 1;
+    string last_name = 2;
+    string nick_name = 3;
+    string display_name = 4;
+    string preferred_language = 5;
+    zitadel.user.v1.Gender gender = 6;
 }
 
 message UpdateMyProfileResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.user.v1.Profile profile = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetMyEmailRequest {}
 
 message GetMyEmailResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
     zitadel.user.v1.Email email = 2;
 }
 
 message SetMyEmailRequest {
-    zitadel.user.v1.Email email = 1;
+    string email = 1;
 }
 
 message SetMyEmailResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.user.v1.Email email = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message VerifyMyEmailRequest {
     string code = 1;
 }
 
-message VerifyMyEmailResponse {}
+message VerifyMyEmailResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message ResendMyEmailVerificationRequest {}
 
-message ResendMyEmailVerificationResponse {}
+message ResendMyEmailVerificationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message GetMyPhoneRequest {}
 
 message GetMyPhoneResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
     zitadel.user.v1.Phone phone = 2;
 }
 
 message SetMyPhoneRequest {
-    zitadel.user.v1.Email email = 1;
+    string phone = 1;
 }
 
 message SetMyPhoneResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.user.v1.Email email = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message VerifyMyPhoneRequest {
@@ -458,35 +461,43 @@ message VerifyMyPhoneResponse {}
 
 message ResendMyPhoneVerificationRequest {}
 
-message ResendMyPhoneVerificationResponse {}
+message ResendMyPhoneVerificationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message RemoveMyPhoneRequest {}
-message RemoveMyPhoneResponse {}
+
+message RemoveMyPhoneResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message GetMyAddressRequest {}
 
 message GetMyAddressResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
     zitadel.user.v1.Address address = 2;
 }
 
 message UpdateMyAddressRequest {
-    zitadel.user.v1.Address address = 1;
+    string country = 1;
+    string locality = 2;
+    string postal_code = 3;
+    string region = 4;
+    string street_address = 5;
 }
 
 message UpdateMyAddressResponse {
-    zitadel.v1.MetaData meta_data = 1;
-    zitadel.user.v1.Address address = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListMyLinkedIDPsRequest {
-    zitadel.v1.Search meta_data = 1;
+    zitadel.v1.ListQuery meta_data = 1;
     //TODO: maybe search for idp name and linked login name?
 }
 
 message ListMyLinkedIDPsResponse {
-    zitadel.v1.Search meta_data = 1;
-    //TODO: result
+    zitadel.v1.ListDetails meta_data = 1;
+    repeated zitadel.idp.v1.IDPUserLink result = 2;
 }
 
 message RemoveMyLinkedIDPRequest {
@@ -495,58 +506,58 @@ message RemoveMyLinkedIDPRequest {
 }
 
 message RemoveMyLinkedIDPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListMyMFAsRequest {}
+message ListMyMultiFactorsRequest {}
 
-message ListMyMFAsResponse {
+message ListMyMultiFactorsResponse {
     repeated zitadel.user.v1.MultiFactor result = 1;
 }
 
-message AddMyMFAOTPRequest {}
+message AddMyMultiFactorOTPRequest {}
 
-message AddMyMFAOTPResponse {
+message AddMyMultiFactorOTPResponse {
     string url = 1;
     string secret = 2;
-    zitadel.v1.MetaData meta_data = 3;
+    zitadel.v1.ObjectDetails details = 3;
 }
 
-message VerifyMyMFAOTPRequest {
+message VerifyMyMultiFactorOTPRequest {
     string code = 1;
 }
 
-message VerifyMyMFAOTPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message VerifyMyMultiFactorOTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveMyMFAOTPRequest {}
+message RemoveMyMultiFactorOTPRequest {}
 
-message RemoveMyMFAOTPResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message RemoveMyMultiFactorOTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message AddMyMFAU2FRequest {}
+message AddMyMultiFactorU2FRequest {}
 
-message AddMyMFAU2FResponse {
+message AddMyMultiFactorU2FResponse {
     zitadel.user.v1.WebAuthNKey key = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
-message VerifyMyMFAU2FRequest {
+message VerifyMyMultiFactorU2FRequest {
     zitadel.user.v1.WebAuthNVerification verification = 1;
 }
 
-message VerifyMyMFAU2FResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message VerifyMyMultiFactorU2FResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveMyMFAU2FRequest {
+message RemoveMyMultiFactorU2FRequest {
     string token_id = 1;
 }
 
-message RemoveMyMFAU2FResponse {
-    zitadel.v1.MetaData meta_data = 1;
+message RemoveMyMultiFactorU2FResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 
@@ -560,7 +571,7 @@ message AddMyPasswordlessRequest {}
 
 message AddMyPasswordlessResponse {
     zitadel.user.v1.WebAuthNKey key = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message VerifyMyPasswordlessRequest {
@@ -568,7 +579,7 @@ message VerifyMyPasswordlessRequest {
 }
 
 message VerifyMyPasswordlessResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveMyPasswordlessRequest {
@@ -576,5 +587,5 @@ message RemoveMyPasswordlessRequest {
 }
 
 message RemoveMyPasswordlessResponse {
-    zitadel.v1.MetaData meta_data = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }

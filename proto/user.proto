@@ -9,7 +9,7 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/user";
 
 message User {
     string id = 1;
-    zitadel.v1.MetaData meta_data = 2;
+    zitadel.v1.ObjectDetails details = 2;
     UserState state = 3;
     string user_name = 4;
     repeated string login_names = 5;
@@ -149,27 +149,27 @@ enum UserFieldName {
 }
 
 message MultiFactor {
-    MFAState state = 1;
+    MultiFactorState state = 1;
     oneof type {
-        MFAOTP otp = 2;
-        MFAU2F u2f = 3;
+        MultiFactorOTP otp = 2;
+        MultiFactorU2F u2f = 3;
     }
 }
 
-enum MFAState {
-    MFA_STATE_UNSPECIFIED = 0;
-    MFA_STATE_NOT_READY = 1;
-    MFA_STATE_READY = 2;
-    MFA_STATE_REMOVED = 3;
+enum MultiFactorState {
+    MultiFactor_STATE_UNSPECIFIED = 0;
+    MultiFactor_STATE_NOT_READY = 1;
+    MultiFactor_STATE_READY = 2;
+    MultiFactor_STATE_REMOVED = 3;
 }
 
-enum MFAType {
-    MFA_TYPE_UNSPECIFIED = 0;
+enum MultiFactorType {
+    MultiFactor_TYPE_UNSPECIFIED = 0;
 }
 
-message MFAOTP {}
+message MultiFactorOTP {}
 
-message MFAU2F {
+message MultiFactorU2F {
     string id = 1;
     string name = 2;
 }
@@ -177,7 +177,7 @@ message MFAU2F {
 message Passwordless {
     string id = 1;
     string name = 2;
-    MFAState state = 3;
+    MultiFactorState state = 3;
 }
 
 message WebAuthNKey {
@@ -190,21 +190,11 @@ message WebAuthNVerification {
     string token_name = 2;
 }
 
-//TODO: analog multi factor?
-message SecondFactor {
-    SecondFactorType type = 1;
-}
-
-enum SecondFactorType {
-    SECOND_FACTOR_TYPE_UNSPECIFIED = 0;
-    SECOND_FACTOR_TYPE_OTP = 1;
-    SECOND_FACTOR_TYPE_U2F = 2;
-}
-
 message MachineKey {
     string id = 1;
-    MachineKeyType type = 2;
-    google.protobuf.Timestamp expiration_date = 3;
+    zitadel.v1.ObjectDetails details = 2;
+    MachineKeyType type = 3;
+    google.protobuf.Timestamp expiration_date = 4;
 }
 
 enum MachineKeyType {
@@ -214,12 +204,13 @@ enum MachineKeyType {
 
 message Membership {
     string user_id = 1;
-    repeated string roles = 2;
-    string display_name = 3;
+    zitadel.v1.ObjectDetails details = 2; //TODO: needed?
+    repeated string roles = 3;
+    string display_name = 4;
     oneof type {
-        string org_id = 4;
-        string project_id = 5;
-        string project_grant_id = 6;
+        string org_id = 5;
+        string project_id = 6;
+        string project_grant_id = 7;
     }
 }
 
