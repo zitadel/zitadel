@@ -178,7 +178,7 @@ service ManagementService {
         };
     }
 
-    rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
         option (google.api.http) = {
             delete: "/users/{id}"
         };
@@ -1135,7 +1135,7 @@ service ManagementService {
         };
     }
 
-    rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResult) {
+    rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
             get: "/orgs/me/policies/login/multifactors/_search"
         };
@@ -1516,13 +1516,13 @@ message UnlockUserResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
 
-message DeleteUserRequest {
+message RemoveUserRequest {
     string id = 1 [
         (google.api.field_behavior) = REQUIRED
     ];
 }
 
-message DeleteUserResponse {
+message RemoveUserResponse {
     zitadel.v1.MetaData meta_data = 1;
 }
 
@@ -1739,7 +1739,7 @@ message ListUserIDPsRequest {
 
 message ListUserIDPsResponse {
     zitadel.v1.Search meta_data = 1;
-    repeated zitadel.idp.v1.IDPLink result = 2;
+    repeated zitadel.idp.v1.IDPUserLink result = 2;
 }
 
 message RemoveUserIDPRequest {
@@ -2298,7 +2298,7 @@ message CreateCustomLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    PasswordlessType passwordless_type = 5;
+    zitadel.user.v1.PasswordlessType passwordless_type = 5;
 }
 
 message CreateCustomLoginPolicyResponse {
@@ -2310,7 +2310,7 @@ message UpdateCustomLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    PasswordlessType passwordless_type = 5;
+    zitadel.user.v1.PasswordlessType passwordless_type = 5;
 }
 
 message UpdateCustomLoginPolicyResponse {
