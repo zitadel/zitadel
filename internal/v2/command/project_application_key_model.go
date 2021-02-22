@@ -35,26 +35,6 @@ func NewApplicationKeyWriteModel(projectID, appID, keyID, resourceOwner string) 
 func (wm *ApplicationKeyWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *project.ApplicationAddedEvent:
-			if e.AppID != wm.AppID {
-				continue
-			}
-			wm.WriteModel.AppendEvents(e)
-		case *project.ApplicationChangedEvent:
-			if e.AppID != wm.AppID {
-				continue
-			}
-			wm.WriteModel.AppendEvents(e)
-		case *project.ApplicationDeactivatedEvent:
-			if e.AppID != wm.AppID {
-				continue
-			}
-			wm.WriteModel.AppendEvents(e)
-		case *project.ApplicationReactivatedEvent:
-			if e.AppID != wm.AppID {
-				continue
-			}
-			wm.WriteModel.AppendEvents(e)
 		case *project.ApplicationRemovedEvent:
 			if e.AppID != wm.AppID {
 				continue
@@ -70,22 +50,12 @@ func (wm *ApplicationKeyWriteModel) AppendEvents(events ...eventstore.EventReade
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *project.OIDCConfigSecretChangedEvent:
-			if e.AppID != wm.AppID {
-				continue
-			}
-			wm.WriteModel.AppendEvents(e)
 		case *project.APIConfigAddedEvent:
 			if e.AppID != wm.AppID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *project.APIConfigChangedEvent:
-			if e.AppID != wm.AppID {
-				continue
-			}
-			wm.WriteModel.AppendEvents(e)
-		case *project.APIConfigSecretChangedEvent:
 			if e.AppID != wm.AppID {
 				continue
 			}
