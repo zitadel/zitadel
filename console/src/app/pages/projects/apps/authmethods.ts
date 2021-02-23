@@ -162,6 +162,7 @@ export function getPartialConfigFromAuthMethod(authMethod: string): {
 
 export function getAuthMethodFromPartialConfig(config: Partial<OIDCConfig.AsObject> | OIDCConfig.AsObject): string {
     const toCheck = [config.responseTypesList, config.grantTypesList, config.authMethodType];
+    console.log(toCheck);
     const code = JSON.stringify(
         [
             [OIDCResponseType.OIDCRESPONSETYPE_CODE],

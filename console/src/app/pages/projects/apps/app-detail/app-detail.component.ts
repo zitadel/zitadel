@@ -270,19 +270,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public authMethodFromPartialConfig(config: OIDCConfig.AsObject): string {
+        // console.log(config);
         const key = getAuthMethodFromPartialConfig(config);
+        console.log(key);
         return key;
     }
 
     public setPartialConfigFromAuthMethod(authMethod: string): void {
+        console.log(authMethod);
         const partialConfig = getPartialConfigFromAuthMethod(authMethod);
-
-        if (partialConfig && this.app.oidcConfig) {
-            this.app.oidcConfig.responseTypesList = (partialConfig as Partial<OIDCConfig.AsObject>).responseTypesList ?? [];
-            this.app.oidcConfig.grantTypesList = (partialConfig as Partial<OIDCConfig.AsObject>).grantTypesList ?? [];
-            this.app.oidcConfig.authMethodType = (partialConfig as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+        console.log(partialConfig);
+        if (partialConfig && partialConfig.oidc && this.app.oidcConfig) {
+            this.app.oidcConfig.responseTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).responseTypesList ?? [];
+            this.app.oidcConfig.grantTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).grantTypesList ?? [];
+            this.app.oidcConfig.authMethodType = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
             this.appForm.patchValue(this.app.oidcConfig);
-        } else if (this.app.apiConfig) {
+        } else if (partialConfig && partialConfig.api && this.app.apiConfig) {
             this.app.apiConfig.authMethodType = (partialConfig as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
             this.appForm.patchValue(this.app.apiConfig);
         }
