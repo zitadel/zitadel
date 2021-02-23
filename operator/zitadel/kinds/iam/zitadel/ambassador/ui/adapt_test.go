@@ -30,11 +30,11 @@ func SetReturnResourceVersion(
 			},
 		},
 	}
-	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).Return(ret, nil)
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).MinTimes(1).MaxTimes(1).Return(ret, nil)
 }
 
 func SetCheckCRD(k8sClient *kubernetesmock.MockClientInt) {
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 }
 
 func SetMappingsEmpty(
@@ -68,7 +68,7 @@ func SetMappingsEmpty(
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, accountsLabels.Name(), "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, accountsLabels.Name(), accounts).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, accountsLabels.Name(), accounts).MinTimes(1).MaxTimes(1)
 
 	console := &unstructured.Unstructured{
 		Object: map[string]interface{}{
@@ -88,7 +88,7 @@ func SetMappingsEmpty(
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, consoleLabels.Name(), "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, consoleLabels.Name(), console).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, consoleLabels.Name(), console).MinTimes(1).MaxTimes(1)
 }
 
 func TestUi_Adapt(t *testing.T) {
@@ -171,7 +171,7 @@ func TestUi_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AccountsName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AccountsName, accounts).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AccountsName, accounts).MinTimes(1).MaxTimes(1)
 
 	consoleName := labels.MustForName(componentLabels, ConsoleName)
 	console := &unstructured.Unstructured{
@@ -192,7 +192,7 @@ func TestUi_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ConsoleName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ConsoleName, console).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ConsoleName, console).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, uiURL, dns)
 	assert.NoError(t, err)
