@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 func TestAppendUserPasswordChangedEvent(t *testing.T) {

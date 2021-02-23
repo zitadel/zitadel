@@ -2,12 +2,12 @@ package management
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )

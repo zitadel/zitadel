@@ -2,21 +2,21 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -32,7 +32,7 @@ const (
 
 type UserMembership struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newUserMembership(

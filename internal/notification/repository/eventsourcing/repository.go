@@ -1,13 +1,13 @@
 package eventsourcing
 
 import (
-	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"net/http"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
-	es_int "github.com/caos/zitadel/internal/eventstore"
-	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/spooler"
 	noti_view "github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
@@ -16,7 +16,7 @@ import (
 
 type Config struct {
 	DefaultLanguage language.Tag
-	Eventstore      es_int.Config
+	Eventstore      v1.Config
 	View            types.SQL
 	Spooler         spooler.SpoolerConfig
 	Domain          string
@@ -27,7 +27,7 @@ type EsRepository struct {
 }
 
 func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.CommandSide) (*EsRepository, error) {
-	es, err := es_int.Start(conf.Eventstore)
+	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
 	}

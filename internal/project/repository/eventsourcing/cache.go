@@ -4,7 +4,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/cache"
 	"github.com/caos/zitadel/internal/cache/config"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 

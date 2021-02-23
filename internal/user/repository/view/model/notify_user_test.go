@@ -3,7 +3,7 @@ package model
 import (
 	"testing"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 

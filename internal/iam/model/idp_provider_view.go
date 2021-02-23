@@ -1,8 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"time"
 )
 

@@ -2,10 +2,10 @@ package eventsourcing
 
 import (
 	"github.com/caos/zitadel/internal/cache/config"
-	es_int "github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 )
 
 type IAMConfig struct {
-	es_int.Eventstore
+	v1.Eventstore
 	Cache *config.CacheConfig
 }

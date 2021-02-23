@@ -2,7 +2,7 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/query"
+	"github.com/caos/zitadel/internal/query"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )

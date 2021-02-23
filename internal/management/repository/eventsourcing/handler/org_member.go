@@ -3,14 +3,13 @@ package handler
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/user/repository/view"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -24,7 +23,7 @@ const (
 
 type OrgMember struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newOrgMember(
@@ -64,7 +63,7 @@ func (p *OrgMember) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (m *OrgMember) EventQuery() (*models.SearchQuery, error) {
+func (m *OrgMember) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := m.view.GetLatestOrgMemberSequence()
 	if err != nil {
 		return nil, err
@@ -74,7 +73,7 @@ func (m *OrgMember) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *OrgMember) Reduce(event *models.Event) (err error) {
+func (m *OrgMember) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate:
 		err = m.processOrgMember(event)
@@ -84,7 +83,7 @@ func (m *OrgMember) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
+func (m *OrgMember) processOrgMember(event *es_models.Event) (err error) {
 	member := new(org_model.OrgMemberView)
 	switch event.Type {
 	case model.OrgMemberAdded:
@@ -118,7 +117,7 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 	return m.view.PutOrgMember(member, event)
 }
 
-func (m *OrgMember) processUser(event *models.Event) (err error) {
+func (m *OrgMember) processUser(event *es_models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
 		usr_es_model.UserEmailChanged,
@@ -168,7 +167,7 @@ func (m *OrgMember) fillUserData(member *org_model.OrgMemberView, user *usr_view
 		member.DisplayName = user.MachineView.Name
 	}
 }
-func (m *OrgMember) OnError(event *models.Event, err error) error {
+func (m *OrgMember) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgmember handler")
 	return spooler.HandleError(event, err, m.view.GetLatestOrgMemberFailedEvent, m.view.ProcessedOrgMemberFailedEvent, m.view.ProcessedOrgMemberSequence, m.errorCountUntilSkip)
 }
@@ -201,7 +200,7 @@ func (u *OrgMember) getUserByID(userID string) (*usr_view_model.UserView, error)
 	return &userCopy, nil
 }
 
-func (u *OrgMember) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+func (u *OrgMember) getUserEvents(userID string, sequence uint64) ([]*es_models.Event, error) {
 	query, err := view.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err

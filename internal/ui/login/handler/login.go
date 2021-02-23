@@ -2,8 +2,8 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/query"
 	"net"
 	"net/http"
 

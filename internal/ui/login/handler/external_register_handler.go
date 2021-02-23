@@ -8,9 +8,9 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {

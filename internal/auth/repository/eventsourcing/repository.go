@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
@@ -9,21 +10,20 @@ import (
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
-	es_int "github.com/caos/zitadel/internal/eventstore"
-	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
 	key_model "github.com/caos/zitadel/internal/key/model"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
+	"github.com/caos/zitadel/internal/query"
 )
 
 type Config struct {
 	SearchLimit uint64
 	Domain      string
-	Eventstore  es_int.Config
+	Eventstore  v1.Config
 	AuthRequest cache.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
@@ -31,7 +31,7 @@ type Config struct {
 
 type EsRepository struct {
 	spooler    *es_spol.Spooler
-	Eventstore es_int.Eventstore
+	Eventstore v1.Eventstore
 	eventstore.UserRepo
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
@@ -44,7 +44,7 @@ type EsRepository struct {
 }
 
 func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.CommandSide, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
-	es, err := es_int.Start(conf.Eventstore)
+	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
 	}
@@ -111,10 +111,12 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IAMID:                      systemDefaults.IamID,
 		},
 		eventstore.TokenRepo{
-			View:       view,
+			View: view,
 		},
 		eventstore.KeyRepository{
 			View:                     view,
+			Commands:                 command,
+			Eventstore:               esV2,
 			SigningKeyRotationCheck:  systemDefaults.KeyConfig.SigningKeyRotationCheck.Duration,
 			SigningKeyGracefulPeriod: systemDefaults.KeyConfig.SigningKeyGracefulPeriod.Duration,
 			KeyAlgorithm:             keyAlgorithm,

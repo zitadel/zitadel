@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/query"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
 
 	"github.com/caos/logging"
 
@@ -22,7 +23,6 @@ import (
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	es_int "github.com/caos/zitadel/internal/eventstore"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/setup"
@@ -53,7 +53,7 @@ type Config struct {
 type setupConfig struct {
 	Log logging.Config
 
-	Eventstore     es_int.Config
+	Eventstore     v1.Config
 	SystemDefaults sd.SystemDefaults
 	SetUp          setup.IAMSetUp
 }
@@ -98,7 +98,7 @@ func startZitadel(configPaths []string) {
 
 	ctx := context.Background()
 	//TODO: new eventstore config for command sie
-	es, err := es_int.Start(conf.Admin.Eventstore)
+	es, err := v1.Start(conf.Admin.Eventstore)
 	if err != nil {
 		return
 	}
@@ -179,7 +179,7 @@ func startSetup(configPaths []string, localDevMode bool) {
 
 	ctx := context.Background()
 
-	es, err := es_int.Start(conf.Eventstore)
+	es, err := v1.Start(conf.Eventstore)
 	logging.Log("MAIN-Ddt3").OnError(err).Fatal("cannot start eventstore")
 
 	commands, err := command.StartCommandSide(&command.Config{

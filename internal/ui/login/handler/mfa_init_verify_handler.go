@@ -2,7 +2,7 @@ package handler
 
 import (
 	"bytes"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	"net/http"
 
 	svg "github.com/ajstarks/svgo"

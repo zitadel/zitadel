@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 func TestAppendAddMailTextEvent(t *testing.T) {

@@ -2,11 +2,10 @@ package handler
 
 import (
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 )
@@ -17,7 +16,7 @@ const (
 
 type OrgDomain struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newOrgDomain(handler handler) *OrgDomain {
@@ -55,7 +54,7 @@ func (p *OrgDomain) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
+func (d *OrgDomain) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := d.view.GetLatestOrgDomainSequence()
 	if err != nil {
 		return nil, err
@@ -65,7 +64,7 @@ func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (d *OrgDomain) Reduce(event *models.Event) (err error) {
+func (d *OrgDomain) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate:
 		err = d.processOrgDomain(event)
@@ -73,7 +72,7 @@ func (d *OrgDomain) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
+func (d *OrgDomain) processOrgDomain(event *es_models.Event) (err error) {
 	domain := new(org_model.OrgDomainView)
 	switch event.Type {
 	case model.OrgDomainAdded:
@@ -125,7 +124,7 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 	return d.view.PutOrgDomain(domain, event)
 }
 
-func (d *OrgDomain) OnError(event *models.Event, err error) error {
+func (d *OrgDomain) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-us4sj", "id", event.AggregateID).WithError(err).Warn("something went wrong in orgdomain handler")
 	return spooler.HandleError(event, err, d.view.GetLatestOrgDomainFailedEvent, d.view.ProcessedOrgDomainFailedEvent, d.view.ProcessedOrgDomainSequence, d.errorCountUntilSkip)
 }

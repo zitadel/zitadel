@@ -2,10 +2,10 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 
 	"github.com/caos/logging"
@@ -18,7 +18,7 @@ import (
 )
 
 type TokenRepo struct {
-	Eventstore eventstore.Eventstore
+	Eventstore v1.Eventstore
 	View       *view.View
 }
 
