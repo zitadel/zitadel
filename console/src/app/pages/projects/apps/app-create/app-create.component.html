@@ -231,16 +231,17 @@
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
-
-                    <cnsl-form-field appearance="outline" class="formfield">
-                        <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
-                        <mat-select formControlName="authMethodType">
-                            <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type.type">
-                                {{ 'APP.OIDC.AUTHMETHOD.'+type.type | translate }}
-                            </mat-option>
-                        </mat-select>
-                    </cnsl-form-field>
                 </ng-container>
+
+                <cnsl-form-field appearance="outline" class="formfield">
+                    <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
+                    <mat-select formControlName="authMethodType">
+                        <mat-option *ngFor="let type of authMethodTypes" [value]="type.type">
+                            <span *ngIf="type.oidc">{{ 'APP.OIDC.AUTHMETHOD.'+type.type | translate }}</span>
+                            <span *ngIf="type.api">{{ 'APP.API.AUTHMETHOD.'+type.type | translate }}</span>
+                        </mat-option>
+                    </mat-select>
+                </cnsl-form-field>
             </div>
 
             <div class="content" *ngIf="formappType?.value?.createType == AppCreateType.OIDC">

@@ -71,13 +71,15 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     public authMethods: RadioItemAuthType[] = [
         PKCE_METHOD,
         CODE_METHOD,
+        PK_JWT_METHOD,
         POST_METHOD,
     ];
 
-    public oidcAuthMethodType: { type: OIDCAuthMethodType, checked: boolean, disabled: boolean; }[] = [
-        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, checked: false, disabled: false },
-        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE, checked: false, disabled: false },
-        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST, checked: false, disabled: false },
+    // set to oidc first
+    public authMethodTypes: { type: OIDCAuthMethodType | APIAuthMethodType, checked: boolean, disabled: boolean; api?: boolean; oidc?: boolean; }[] = [
+        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, checked: false, disabled: false, oidc: true },
+        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE, checked: false, disabled: false, oidc: true },
+        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST, checked: false, disabled: false, oidc: true },
     ];
 
     // stepper
@@ -105,7 +107,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
     public requestRedirectValuesSubject$: Subject<void> = new Subject();
-
 
     constructor(
         private router: Router,
@@ -159,9 +160,11 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
                             break;
                         case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
+                            PK_JWT_METHOD.recommended = false;
                             this.authMethods = [
                                 PKCE_METHOD,
                                 CODE_METHOD,
+                                PK_JWT_METHOD,
                                 POST_METHOD,
                             ];
 
@@ -177,6 +180,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                             break;
                     }
                 } else if (isAPI) {
+                    PK_JWT_METHOD.recommended = true;
                     this.authMethods = [
                         PK_JWT_METHOD,
                         BASIC_AUTH_METHOD,
@@ -218,9 +222,13 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             debounceTime(150)).subscribe(() => {
                 console.log('change');
                 this.oidcApp.name = this.formname?.value;
+                this.apiApp.name = this.formname?.value;
+
                 this.oidcApp.responseTypesList = this.formresponseTypesList?.value;
                 this.oidcApp.grantTypesList = this.formgrantTypesList?.value;
+
                 this.oidcApp.authMethodType = this.formauthMethodType?.value;
+                this.apiApp.authMethodType = this.formauthMethodType?.value;
 
                 const oidcAppType = (this.formappType?.value as RadioItemAppType).oidcApplicationType;
                 if (oidcAppType !== undefined) {
@@ -237,17 +245,30 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         const isOIDC = (this.formappType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
         const isAPI = (this.formappType?.value as RadioItemAppType).createType == AppCreateType.API;
         if (isOIDC) {
-            const authMethodControl = new FormControl('', [Validators.required]);
+            // const authMethodControl = new FormControl('', [Validators.required]);
             const grantTypesControl = new FormControl('', [Validators.required]);
             const responseTypesControl = new FormControl('', [Validators.required]);
 
-            this.form.addControl('authMethodType', authMethodControl);
+            // this.form.addControl('authMethodType', authMethodControl);
             this.form.addControl('grantTypesList', grantTypesControl);
             this.form.addControl('responseTypesList', responseTypesControl);
+
+            this.authMethodTypes = [
+                { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, checked: false, disabled: false, oidc: true },
+                { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE, checked: false, disabled: false, oidc: true },
+                { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST, checked: false, disabled: false, oidc: true },
+            ];
+            this.authMethod?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC);
         } else if (isAPI) {
-            this.form.removeControl('authMethodType');
+            // this.form.removeControl('authMethodType');
             this.form.removeControl('grantTypesList');
             this.form.removeControl('responseTypesList');
+
+            this.authMethodTypes = [
+                { type: APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT, checked: false, disabled: false, api: true },
+                { type: APIAuthMethodType.APIAUTHMETHODTYPE_BASIC, checked: false, disabled: false, api: true },
+            ];
+            this.authMethod?.setValue(APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT);
         }
         this.form.updateValueAndValidity();
     }
@@ -269,8 +290,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     }
 
     public createApp(): void {
-        const isOIDC = (this.appType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
-        const isAPI = (this.appType?.value as RadioItemAppType).createType == AppCreateType.API;
+        const isOIDC = (this.formappType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
+        const isAPI = (this.formappType?.value as RadioItemAppType).createType == AppCreateType.API;
 
         if (isOIDC) {
             this.requestRedirectValuesSubject$.next();
@@ -299,6 +320,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 .then((data: Application) => {
                     this.loading = false;
                     const response = data.toObject();
+                    console.log(response);
                     if (response.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
                         this.showSavedDialog(response);
                     } else {

@@ -6,7 +6,9 @@
             </a>
             <div class="title-col">
                 <h1>{{app?.name}}</h1>
-                <span>{{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.applicationType | translate}}</span>
+                <span *ngIf="app?.oidcConfig">{{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.applicationType |
+                    translate}}</span>
+                <span *ngIf="app?.apiConfig">API</span>
             </div>
             <ng-container *ngIf="isZitadel === false">
                 <ng-template appHasRole [appHasRole]="['project.app.write:'+projectId, 'project.app.write']">
@@ -54,13 +56,7 @@
             </div>
         </form>
 
-        <!-- <cnsl-info-section class="docs-line" *ngIf="docs?.discoveryEndpoint">
-            <p><strong>Discovery Endpoint:</strong> {{docs.discoveryEndpoint}}</p>
-            <p><strong>Issuer:</strong> {{docs.issuer}}</p>
-        </cnsl-info-section> -->
-
         <div class="environment-wrapper">
-
             <div class="environment" *ngIf="app?.oidcConfig?.clientId">
                 <span class="key">{{'APP.OIDC.INFO.CLIENTID' | translate}}</span>
                 <div class="environment-row">
@@ -100,7 +96,7 @@
             </cnsl-info-section>
         </div>
 
-        <div class="content">
+        <div class="content" *ngIf="app?.oidcConfig">
             <h3 class="full-width section-title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}</h3>
 
             <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
