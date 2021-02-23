@@ -60,9 +60,3 @@ message DomainNameQuery {
     string name = 1;
     zitadel.v1.TextQueryMethod method = 2;
 }
-
-enum OrgDomainValidationType {
-    ORG_DOMAIN_VALIDATION_TYPE_UNSPECIFIED = 0;
-    ORG_DOMAIN_VALIDATION_TYPE_HTTP = 1;
-    ORG_DOMAIN_VALIDATION_TYPE_DNS = 2;
-}

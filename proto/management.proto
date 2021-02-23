@@ -2266,7 +2266,7 @@ message RemoveOrgDomainResponse {
 
 message GenerateOrgDomainValidationRequest {
     string domain = 1;
-    zitadel.org.v1.OrgDomainValidationType type = 2;
+    zitadel.org.v1.DomainValidationType type = 2;
 }
 
 message GenerateOrgDomainValidationResponse {
