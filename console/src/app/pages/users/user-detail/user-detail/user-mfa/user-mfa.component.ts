@@ -47,7 +47,6 @@ export class UserMfaComponent implements OnInit, OnDestroy {
 
     public getMFAs(): void {
         this.mgmtUserService.getUserMfas(this.user.id).then(mfas => {
-            console.log(mfas.toObject().mfasList);
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
         }).catch(error => {
@@ -56,7 +55,6 @@ export class UserMfaComponent implements OnInit, OnDestroy {
     }
 
     public deleteMFA(type: MfaType, id?: string): void {
-        console.log(type, id);
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -82,7 +80,6 @@ export class UserMfaComponent implements OnInit, OnDestroy {
                         this.toast.showError(error);
                     });
                 } else if (type === MfaType.MFATYPE_U2F && id) {
-                    console.log(this.user.id, id);
                     this.mgmtUserService.RemoveMfaU2F(this.user.id, id).then(() => {
                         this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 

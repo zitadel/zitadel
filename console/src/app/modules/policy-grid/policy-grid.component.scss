@@ -21,6 +21,7 @@ h2 {
     min-height: 250px;
     padding: 1rem;
     height: 100%;
+    box-sizing: border-box;
 
     @media only screen and (max-width: 450px) {
       flex-basis: 100%;
@@ -30,7 +31,7 @@ h2 {
       height: 60px;
       width: 60px;
       border-radius: 50%;
-      background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #5469d4);
+      background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #7b8ada);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -62,6 +63,13 @@ h2 {
     .desc {
       font-size: 14px;
       color: var(--grey);
+    }
+
+    .icons {
+        margin-bottom: 1rem;
+        .icon {
+            margin-right: .5rem;
+        }
     }
 
     .fill-space {

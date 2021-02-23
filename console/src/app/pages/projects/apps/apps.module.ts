@@ -32,7 +32,8 @@ import { AppSecretDialogComponent } from './app-secret-dialog/app-secret-dialog.
 import { AppsRoutingModule } from './apps-routing.module';
 import { A11yModule } from '@angular/cdk/a11y';
 import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
-
+import { LinksModule } from 'src/app/modules/links/links.module';
+import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.module';
 @NgModule({
     declarations: [
         AppCreateComponent,
@@ -43,6 +44,8 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     imports: [
         CommonModule,
         A11yModule,
+        RedirectPipeModule,
+        LinksModule,
         AppRadioModule,
         AppsRoutingModule,
         FormsModule,

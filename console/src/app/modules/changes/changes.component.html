@@ -6,12 +6,45 @@
 </div>
 
 <div class="scroll-container" appScrollable (scrollPosition)="scrollHandler($event)">
-    <li class="item change-item-back" *ngFor="let event of data | async">
-        <span class="seq">
-            {{event.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
-        </span>
-        <span class="editor">{{event.editor}}</span>
-        <span class="desc">{{event?.eventType?.localizedMessage }}</span>
+    <li class="item change-item-back" *ngFor="let hist of data | async; index as histindex">
+        <span *ngIf="hist.values[0].dates[0]" class="date">{{
+            hist.values[0]?.dates[0]| timestampToDate | localizedDate: 'dd. MMMM YYYY' }}</span>
+        <div class="item" *ngFor="let dayelement of hist.values; index as i">
+            <div class="row">
+                <app-avatar matTooltip="{{ dayelement.editorName }}" *ngIf="dayelement.editorName; else spacer"
+                    class="avatar" [name]="dayelement.editorName" [size]="32">
+                </app-avatar>
+                <ng-template #spacer>
+                    <div class="spacer"></div>
+                </ng-template>
+                <div class="actions">
+                    <div class="action" *ngFor="let action of dayelement.eventTypes; index as j">
+                        <button disabled mat-icon-button aria-label="Restore history"
+                            matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}">
+                            <mat-icon class="icon">schedule</mat-icon>
+                        </button>
+
+                        <span>
+                            <span>{{ action.localizedMessage }}</span>
+                            <span class="block">{{
+                                dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm'
+                                }}</span>
+                        </span>
+                        <!-- <span *ngIf="histindex === 0 && i === 0 && j === 0">
+                            <span>current file</span>
+                            <span class="block">{{
+                                dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm'
+                                }}</span>
+                        </span> -->
+
+                        <!-- <button mat-icon-button disabled>
+                            <mat-icon class="icon red" color="warn">error_outline
+                            </mat-icon>
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </li>
     <div class="sp-wrapper">
         <mat-spinner *ngIf="loading | async" diameter="25"></mat-spinner>

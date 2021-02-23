@@ -85,4 +85,22 @@
     width: 65px;
     max-width: 65px;
   }
+
+  .state {
+    border-radius: 50vw;
+    padding: 2px .5rem;
+    letter-spacing: .05em;
+    font-size: 13px;
+    background-color: if($is-dark-theme, #4f566b, #e4e7e4);
+
+    &.active {
+        background-color: if($is-dark-theme, #4f566b, #cbf4c9);
+        color: if($is-dark-theme, #cbf4c9, #0e6245);
+    }
+
+    &.inactive {
+      color: if($is-dark-theme, #ffc1c1, #620e0e);
+      background-color: if($is-dark-theme, #4f566b, #ffc1c1);
+    }
+  }
 }

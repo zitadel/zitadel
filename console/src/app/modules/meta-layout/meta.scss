@@ -2,6 +2,8 @@
 @import '~@angular/material/theming';
 
 @mixin meta-theme($theme) {
+    $is-dark-theme: map-get($theme, is-dark);
+
   .meta-details {
     margin-bottom: 1rem;
     border-bottom: 1px solid #81868a40;
@@ -24,24 +26,6 @@
 
       .second {
         font-size: 13px;
-      }
-
-      .state {
-        border-radius: 50vw;
-        padding: 2px .5rem;
-        letter-spacing: .05em;
-        font-size: 13px;
-        background-color: #8795a120;
-
-        &.active {
-          background-color: #85d996;
-          color: black;
-        }
-
-        &.inactive {
-          background-color: #ff8981;
-          color: black;
-        }
       }
     }
   }

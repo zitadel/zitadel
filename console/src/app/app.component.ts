@@ -143,6 +143,31 @@ export class AppComponent implements OnDestroy {
             'mdi_pin',
             this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin.svg'),
         );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_format-letter-case-lower',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/format-letter-case-lower.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_format-letter-case-upper',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/format-letter-case-upper.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_counter',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/counter.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_symbol',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/symbol.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_numeric',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/numeric.svg'),
+        );
         this.getProjectCount();
 
         this.orgSub = this.authService.activeOrgChanged.subscribe(org => {

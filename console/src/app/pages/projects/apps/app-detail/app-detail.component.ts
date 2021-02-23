@@ -1,18 +1,22 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { CnslLinks } from 'src/app/modules/links/links.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
+    APIAuthMethodType,
+    APIConfig,
     Application,
     AppState,
     OIDCApplicationType,
@@ -96,6 +100,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public OIDCTokenType: any = OIDCTokenType;
 
     public ChangeType: any = ChangeType;
+
+    public requestRedirectValuesSubject$: Subject<void> = new Subject();
+    public copiedKey: any = '';
+    public environmentMap: { [key: string]: string; } = {};
+    public nextLinks: Array<CnslLinks> = [];
+
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
@@ -106,7 +116,19 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private mgmtService: ManagementService,
         private authService: GrpcAuthService,
         private router: Router,
+        private http: HttpClient,
     ) {
+        this.http.get('./assets/environment.json')
+            .toPromise().then((env: any) => {
+
+                this.environmentMap = {
+                    issuer: env.issuer,
+                    adminServiceUrl: env.adminServiceUrl,
+                    mgmtServiceUrl: env.mgmtServiceUrl,
+                    authServiceUrl: env.adminServiceUrl,
+                };
+            });
+
         this.appNameForm = this.fb.group({
             state: [{ value: '', disabled: true }, []],
             name: [{ value: '', disabled: true }, [Validators.required]],
@@ -138,8 +160,30 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.subscription?.unsubscribe();
     }
 
+    private initLinks(): void {
+        this.nextLinks = [
+            {
+                i18nTitle: 'APP.PAGES.NEXTSTEPS.0.TITLE',
+                i18nDesc: 'APP.PAGES.NEXTSTEPS.0.DESC',
+                routerLink: ['/projects', this.projectId],
+            },
+            {
+                i18nTitle: 'APP.PAGES.NEXTSTEPS.1.TITLE',
+                i18nDesc: 'APP.PAGES.NEXTSTEPS.1.DESC',
+                routerLink: ['/users', 'create'],
+            }, {
+                i18nTitle: 'APP.PAGES.NEXTSTEPS.2.TITLE',
+                i18nDesc: 'APP.PAGES.NEXTSTEPS.2.DESC',
+                href: 'https://docs.zitadel.ch'
+            },
+        ];
+    }
+
     private async getData({ projectid, id }: Params): Promise<void> {
         this.projectId = projectid;
+
+        this.initLinks();
+
         this.mgmtService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
@@ -233,10 +277,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         const partialConfig = getPartialConfigFromAuthMethod(authMethod);
 
         if (partialConfig && this.app.oidcConfig) {
-            this.app.oidcConfig.responseTypesList = partialConfig.responseTypesList ?? [];
-            this.app.oidcConfig.grantTypesList = partialConfig.grantTypesList ?? [];
-            this.app.oidcConfig.authMethodType = partialConfig.authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+            this.app.oidcConfig.responseTypesList = (partialConfig as Partial<OIDCConfig.AsObject>).responseTypesList ?? [];
+            this.app.oidcConfig.grantTypesList = (partialConfig as Partial<OIDCConfig.AsObject>).grantTypesList ?? [];
+            this.app.oidcConfig.authMethodType = (partialConfig as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
             this.appForm.patchValue(this.app.oidcConfig);
+        } else if (this.app.apiConfig) {
+            this.app.apiConfig.authMethodType = (partialConfig as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
+            this.appForm.patchValue(this.app.apiConfig);
         }
     }
 
@@ -297,6 +344,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
 
     public saveOIDCApp(): void {
+        this.requestRedirectValuesSubject$.next();
         if (this.appNameForm.valid) {
             this.app.name = this.name?.value;
         }

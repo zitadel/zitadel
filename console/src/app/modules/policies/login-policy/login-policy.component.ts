@@ -9,6 +9,7 @@ import {
     DefaultLoginPolicyRequest,
     DefaultLoginPolicyView,
     IdpProviderView as AdminIdpProviderView,
+    IdpStylingType,
     IdpView as AdminIdpView,
     PasswordlessType as AdminPasswordlessType,
 } from 'src/app/proto/generated/admin_pb';
@@ -24,6 +25,8 @@ import {
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { CnslLinks } from '../../links/links.component';
+import { IAM_COMPLEXITY_LINK, IAM_LABEL_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK, ORG_COMPLEXITY_LINK, ORG_IAM_POLICY_LINK } from '../../policy-grid/policy-links';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
@@ -46,6 +49,9 @@ export class LoginPolicyComponent implements OnDestroy {
 
     public loading: boolean = false;
     public disabled: boolean = true;
+
+    public IdpStylingType: any = IdpStylingType;
+    public nextLinks: CnslLinks[] = [];
     constructor(
         private route: ActivatedRoute,
         private toast: ToastService,
@@ -59,11 +65,20 @@ export class LoginPolicyComponent implements OnDestroy {
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
                     this.passwordlessTypes = [MgmtPasswordlessType.PASSWORDLESSTYPE_ALLOWED,
                     MgmtPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
+                    this.nextLinks = [
+                        ORG_COMPLEXITY_LINK,
+                        ORG_IAM_POLICY_LINK,
+                    ];
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
                     this.passwordlessTypes = [AdminPasswordlessType.PASSWORDLESSTYPE_ALLOWED,
                     AdminPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
+                    this.nextLinks = [
+                        IAM_COMPLEXITY_LINK,
+                        IAM_POLICY_LINK,
+                        IAM_LABEL_LINK,
+                    ];
                     break;
             }
 

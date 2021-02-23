@@ -9,6 +9,8 @@ import {
     AddMachineKeyResponse,
     AddOrgDomainRequest,
     AddOrgMemberRequest,
+    APIApplicationCreate,
+    APIAuthMethodType,
     Application,
     ApplicationID,
     ApplicationSearchQuery,
@@ -974,6 +976,7 @@ export class ManagementService {
         req.setId(id);
         req.setSecId(secId);
         req.setLimit(limit);
+        req.setAsc(false);
         req.setSequenceOffset(offset);
         return this.grpcService.mgmt.applicationChanges(req);
     }
@@ -982,6 +985,7 @@ export class ManagementService {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
+        req.setAsc(false);
         req.setSequenceOffset(offset);
         return this.grpcService.mgmt.orgChanges(req);
     }
@@ -990,6 +994,7 @@ export class ManagementService {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
+        req.setAsc(false);
         req.setSequenceOffset(offset);
         return this.grpcService.mgmt.projectChanges(req);
     }
@@ -998,6 +1003,7 @@ export class ManagementService {
         const req = new ChangeRequest();
         req.setId(id);
         req.setLimit(limit);
+        req.setAsc(false);
         req.setSequenceOffset(sequenceoffset);
         return this.grpcService.mgmt.userChanges(req);
     }
@@ -1349,6 +1355,15 @@ export class ManagementService {
         req.setPostLogoutRedirectUrisList(app.postLogoutRedirectUrisList);
 
         return this.grpcService.mgmt.createOIDCApplication(req);
+    }
+
+    public CreateAPIApplication(app: APIApplicationCreate.AsObject): Promise<Application> {
+        const req = new APIApplicationCreate();
+        req.setProjectId(app.projectId);
+        req.setName(app.name);
+        req.setAuthMethodType(app.authMethodType);
+
+        return this.grpcService.mgmt.createAPIApplication(req);
     }
 
     public UpdateApplication(projectId: string, appId: string, name: string): Promise<Application> {

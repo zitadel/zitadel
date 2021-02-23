@@ -20,6 +20,7 @@ import { MfaTableComponent } from './mfa-table.component';
 import { DialogAddTypeComponent } from './dialog-add-type/dialog-add-type.component';
 import { InputModule } from '../input/input.module';
 import { MatSelectModule } from '@angular/material/select';
+import { MatRippleModule } from '@angular/material/core';
 
 @NgModule({
     declarations: [MfaTableComponent, DialogAddTypeComponent],
@@ -36,6 +37,7 @@ import { MatSelectModule } from '@angular/material/select';
         TimestampToDatePipeModule,
         HasRoleModule,
         MatProgressSpinnerModule,
+        MatRippleModule,
     ],
     exports: [
         MfaTableComponent,

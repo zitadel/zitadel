@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { OIDCAuthMethodType, OIDCGrantType, OIDCResponseType } from 'src/app/proto/generated/management_pb';
+import { APIAuthMethodType, OIDCAuthMethodType, OIDCGrantType, OIDCResponseType } from 'src/app/proto/generated/management_pb';
 
 export interface RadioItemAuthType {
     key: string;
@@ -11,6 +11,7 @@ export interface RadioItemAuthType {
     responseType?: OIDCResponseType;
     grantType?: OIDCGrantType;
     authMethod?: OIDCAuthMethodType;
+    apiAuthMethod?: | APIAuthMethodType;
     recommended?: boolean;
     notRecommended?: boolean;
 }

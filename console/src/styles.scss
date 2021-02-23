@@ -276,9 +276,9 @@ h2 {
 
 .max-width-container {
   max-width: 1350px;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
   padding-top: 2rem;
-  padding-left: 4rem;
+  padding-left: 2rem;
 
   @media only screen and (min-width: 1024px) {
     max-width: 1120px;
@@ -297,11 +297,11 @@ h2 {
 .enlarged-container {
   padding: 0 1.5rem;
   padding-top: 2rem;
-  padding-left: 4rem;
+  padding-left: 2rem;
 
   @media only screen and (max-width: 500px) {
-    padding-left: .5rem;
-    padding-right: .5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 

@@ -18,16 +18,20 @@
             <span class="fill-space"></span>
             <div class="app-specs">
                 <div class="row" *ngIf="method && method.responseType != undefined">
-                    <span>{{'APP.OIDC.RESPONSE' | translate}}</span>
-                    <span>{{('APP.OIDC.RESPONSE'+method.responseType.toString()) | translate}}</span>
+                    <span>{{'APP.OIDC.RESPONSETYPE' | translate}}</span>
+                    <span>{{('APP.OIDC.RESPONSE.'+method.responseType.toString()) | translate}}</span>
                 </div>
                 <div class="row" *ngIf="method.grantType != undefined">
                     <span>{{'APP.GRANT' | translate}}</span>
-                    <span>{{('APP.OIDC.GRANT'+method.grantType.toString()) | translate}}</span>
+                    <span>{{('APP.OIDC.GRANT.'+method.grantType.toString()) | translate}}</span>
                 </div>
                 <div class="row" *ngIf="method.authMethod != undefined">
-                    <span>{{'APP.OIDC.AUTHMETHOD' | translate}}</span>
-                    <span>{{('APP.OIDC.AUTHMETHOD'+method.authMethod.toString()) | translate}}</span>
+                    <span>{{'APP.AUTHMETHOD' | translate}}</span>
+                    <span>{{('APP.OIDC.AUTHMETHOD.'+method.authMethod.toString()) | translate}}</span>
+                </div>
+                <div class="row" *ngIf="method.apiAuthMethod != undefined">
+                    <span>{{'APP.AUTHMETHOD' | translate}}</span>
+                    <span>{{('APP.API.AUTHMETHOD.'+method.apiAuthMethod.toString()) | translate}}</span>
                 </div>
             </div>
         </label>
