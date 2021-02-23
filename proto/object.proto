@@ -52,12 +52,3 @@ enum TextQueryMethod {//TODO: validate
     TEXT_QUERY_METHOD_ENDS_WITH = 7;
     TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE = 8;
 }
-
-enum ListQueryMethod {
-    LISTQUERYMETHOD_UNSPECIFIED = 0;
-    //TODO: better alternatives?
-    // the list must contain at least ONE of the items
-    LISTQUERYMETHOD_CONTAINS_ONE = 1;
-    // the list must contain ALL items
-    LISTQUERYMETHOD_CONTAINS_ALL = 2;
-}

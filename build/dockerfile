@@ -1,22 +1,23 @@
+ARG GO_VERSION=1.15.8
+ARG NODE_VERSION=15.8.0
+ARG ENV=prod
+
 #######################
 ## This step sets up the folder structure,
 ## initalices go mods,
 ## downloads the protofiles, 
 ## protoc and protoc-gen-grpc-web for later use
 #######################
-ARG GO_VERSION=1.15.8
-ARG NODE_VERSION=15.8.0
-
-FROM golang:${GO_VERSION} AS base
-
-RUN apt-get update && apt-get install -y unzip
-
+FROM alpine AS base
 ARG PROTOC_VERSION=3.14.0
 ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-x86_64.zip
 ARG GRPC_WEB_VERSION=1.2.1
 ARG GRPC_WEB=protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64
 
+
+RUN apk add tar curl
 WORKDIR /proto
+
 #protoc
 RUN curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/$PROTOC_ZIP \
     && unzip -o $PROTOC_ZIP -d /usr/local bin/protoc \
@@ -39,12 +40,14 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1
 #zitadel protos
 COPY /proto/ include/zitadel/.
 
+
 #######################
 ## With this step we prepare all node_modules, this helps caching the build
 ## Speed up this step by mounting your local node_modules directory
 #######################
 FROM node:${NODE_VERSION} as npm-base
 WORKDIR /console
+
 COPY console/package.json console/package-lock.json ./
 RUN npm install
 
@@ -54,59 +57,116 @@ COPY --from=base /usr/local/bin /usr/local/bin/.
 COPY build/console build/console/
 RUN build/console/generate-grpc.sh
 
+
+#######################
+## copy for local dev
+#######################
 FROM scratch as npm-copy
 COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
 
+
+#######################
+## anular dev build
+#######################
+FROM npm-base as dev-angular-build
+RUN npm install -g @angular/cli
+
+
+#######################
+## anular prod build
+#######################
 FROM npm-base as prod-angular-build
 RUN npm run prodbuild
 
+
 #######################
 ## Go dependencies
+## Speed up this step by mounting your local go mod pkg directory
 #######################
 FROM golang:${GO_VERSION} as go-dep
 RUN mkdir -p src/github.com/caos/zitadel
 COPY . src/github.com/caos/zitadel/
 WORKDIR /go/src/github.com/caos/zitadel/
+
 RUN go mod download
 RUN ./tools/install.sh
 
 #######################
 ## Go base build
-## Speed up this step by mounting your local go mod pkg directory
 #######################
 FROM go-dep as go-base
 COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
 RUN build/zitadel/generate-grpc.sh
 
+
+#######################
+## copy for local dev
+#######################
 FROM scratch as go-copy
 COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/grpc ./pkg/grpc
 COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
 COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go ./internal/protoc/protoc-gen-authoption/authoption/options.pb.go
 
-# ## Go test
-# FROM go-base as go-test
-# RUN go test -race -v -coverprofile=profile.cov ./...
 
-# ## Go test
-# FROM scratch as go-codecov
-# COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
+#######################
+## Go test
+#######################
+FROM go-base as go-test
+COPY . .
 
+# Migrations for cockroach-secure
+RUN go install github.com/rakyll/statik
+RUN ./build/operator/prebuild.sh ./migrations
+
+RUN go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
+
+
+#######################
+## Go test results
+#######################
+FROM scratch as go-codecov
+COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
+
+
+#######################
 ## Go prod build
-FROM go-base as prod-go-build
+#######################
+FROM go-test as prod-go-build
 COPY --from=prod-angular-build console/dist/console console/dist/console/
-RUN ./build/console/generate-static.sh \
+RUN go get github.com/rakyll/statik \
+    && ./build/console/generate-static.sh \
     && ./build/login/generate-static.sh \
     && ./build/notification/generate-static.sh \
     && ./build/zitadel/generate-static.sh
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-amd64 cmd/zitadel/main.go
 
-# `skaffold debug` sets SKAFFOLD_GO_GCFLAGS to disable compiler optimizations
-ARG SKAFFOLD_GO_GCFLAGS
-RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /app cmd/zitadel/main.go
 
-FROM golang:${GO_VERSION}
-# Define GOTRACEBACK to mark this container as using the Go language runtime
-# for `skaffold debug` (https://skaffold.dev/docs/workflows/debug/).
-ENV GOTRACEBACK=single
-CMD ["./app"]
-COPY --from=prod-go-build /app . 
+#######################
+## Go dev build
+#######################
+FROM go-base as dev-go-build
+RUN go get github.com/go-delve/delve/cmd/dlv
+
+
+#######################
+## Final Production Image
+#######################
+FROM alpine:latest as artifact
+RUN adduser -D zitadel
+COPY cmd/zitadel/*.yaml /app/
+COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-amd64 /app/zitadel
+RUN chmod a+x /app/zitadel
+RUN ls -la /
+
+
+#######################
+## Scratch Image
+#######################
+FROM  scratch as final
+COPY --from=artifact /etc/passwd /etc/passwd
+COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
+COPY --from=artifact /app /
+USER zitadel
+HEALTHCHECK NONE
+ENTRYPOINT ["/zitadel"]

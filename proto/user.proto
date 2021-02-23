@@ -164,7 +164,9 @@ enum MultiFactorState {
 }
 
 enum MultiFactorType {
-    MultiFactor_TYPE_UNSPECIFIED = 0;
+    MULTI_FACTOR_TYPE_UNSPECIFIED = 0;
+    MULTI_FACTOR_TYPE_OTP = 1;
+    MULTI_FACTOR_TYPE_U2F = 2;
 }
 
 message MultiFactorOTP {}

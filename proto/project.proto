@@ -125,10 +125,14 @@ message UserGrantDisplayNameQuery {
 
 enum ProjectState {
     PROJECT_STATE_UNSPECIFIED = 0;
+    PROJECT_STATE_ACTIVE = 1;
+    PROJECT_STATE_INACTIVE = 2;
 }
 
 enum ProjectGrantState {
     PROJECT_GRANT_STATE_UNSPECIFIED = 0;
+    PROJECT_GRANT_STATE_ACTIVE = 1;
+    PROJECT_GRANT_STATE_INACTIVE = 2;
 }
 
 message ProjectQuery {

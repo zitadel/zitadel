@@ -15,6 +15,6 @@ message Key {
 }
 
 enum KeyType {
-    AUTHNKEY_UNSPECIFIED = 0;
-    AUTHNKEY_JSON = 1;
+    KEY_TYPE_UNSPECIFIED = 0;
+    KEY_TYPE_JSON = 1;
 }
