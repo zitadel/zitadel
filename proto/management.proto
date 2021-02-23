@@ -10,6 +10,8 @@ import "zitadel/member.proto";
 import "zitadel/project.proto";
 import "zitadel/policy.proto";
 import "zitadel/message.proto";
+import "zitadel/change.proto";
+import "zitadel/auth_n.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -64,6 +66,23 @@ service ManagementService {
         };
     }
 
+    rpc GetOIDCInformation(GetOIDCInformationRequest) returns (GetOIDCInformationResponse) {
+        option (google.api.http) = {
+            get: "/zitadel/docs"
+        };
+    }
+
+    // GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)
+    rpc GetIAM(GetIAMRequest) returns (GetIAMResponse) {
+        option (google.api.http) = {
+            get: "/iam"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -105,6 +124,16 @@ service ManagementService {
         option (google.api.http) = {
             post: "/users/_search"
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    rpc ListUserChanges(ListUserChangesRequest) returns (ListUserChangesResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/changes"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -347,12 +376,23 @@ service ManagementService {
         };
     }
 
+    rpc SendHumanResetPasswordNotification(SendHumanResetPasswordNotificationRequest) returns (SendHumanResetPasswordNotificationResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/password/_reset"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
     rpc ListUserMultiFactors(ListUserMultiFactorsRequest) returns (ListUserMultiFactorsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/mfas"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -362,7 +402,7 @@ service ManagementService {
             delete: "/users/{user_id}/mfas/otp"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -372,7 +412,7 @@ service ManagementService {
             delete: "/users/{user_id}/mfas/u2f"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -382,7 +422,7 @@ service ManagementService {
             get: "/users/{user_id}/passwordless"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -392,34 +432,10 @@ service ManagementService {
             delete: "/users/{user_id}/passwordless"
         };
 
-        option (caos.zitadel.utils.v1.auth_option) = {
+        option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
@@ -524,6 +540,16 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.global.read"
+        };
+    }
+
+    rpc ListOrgChanges(ListOrgChangesRequest) returns (ListOrgChangesResponse) {
+        option (google.api.http) = {
+            get: "/orgs/{org_id}/changes"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "org.read"
         };
     }
 
@@ -733,6 +759,16 @@ service ManagementService {
         };
     }
 
+    rpc ListProjectChanges(ListProjectChangesRequest) returns (ListProjectChangesResponse) {
+        option (google.api.http) = {
+            get: "/projects/{project_id}/changes"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "project.read"
+        };
+    }
+
     rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
         option (google.api.http) = {
             post: "/projects"
@@ -929,6 +965,16 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.app.read"
             check_field_name: "ProjectId"
+        };
+    }
+
+    rpc ListAppChanges(ListAppChangesRequest) returns (ListAppChangesResponse) {
+        option (google.api.http) = {
+            get: "/projects/{project_id}/apps/{app_id}/changes"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "app.read"
         };
     }
 
@@ -1707,6 +1753,28 @@ message HealthzRequest {}
 
 message HealthzResponse {}
 
+message GetOIDCInformationRequest {}
+
+message GetOIDCInformationResponse {
+    string issuer = 1;
+    string discovery_endpoint = 2;  
+}
+
+message GetIAMRequest {
+    enum SetupStep {
+        SETUP_STEP_UNDEFINED = 0;
+        SETUP_STEP_1 = 1;
+        SETUP_STEP_2 = 2;
+    }
+
+    string global_org_id = 1;
+    string iam_project_id = 2;
+    SetupStep set_up_done = 3;
+    SetupStep set_up_started = 4;
+}
+
+message GetIAMResponse {}
+
 message GetUserByIDRequest {
     string id = 1;
 }
@@ -1733,6 +1801,16 @@ message ListUsersResponse {
     zitadel.v1.ListDetails meta_data = 1;
     zitadel.user.v1.UserFieldName sorting_column = 2;
     repeated zitadel.user.v1.User result = 3;
+}
+
+message ListUserChangesRequest {
+    zitadel.v1.ListQuery query = 1;
+    string user_id = 2;
+}
+
+message ListUserChangesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.change.v1.Change result = 2;
 }
 
 message IsUserUniqueRequest {
@@ -1974,6 +2052,19 @@ message SetHumanInitialPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message SendHumanResetPasswordNotificationRequest {
+    enum Type {
+        TYPE_EMAIL = 0;
+        TYPE_SMS = 1;
+    }
+    string user_id = 1;
+    Type type = 2;
+}
+
+message SendHumanResetPasswordNotificationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message ListUserMultiFactorsRequest {
     string user_id = 1;
 }
@@ -2031,7 +2122,7 @@ message GetMachineKeyByIDsRequest {
 }
 
 message GetMachineKeyByIDsResponse {
-    zitadel.user.v1.MachineKey key = 1;
+    zitadel.authn.v1.Key key = 1;
 }
 
 message ListMachineKeysRequest {
@@ -2041,12 +2132,12 @@ message ListMachineKeysRequest {
 
 message ListMachineKeysResponse {
     zitadel.v1.ListDetails meta_data = 1;
-    repeated zitadel.user.v1.MachineKey result = 2;
+    repeated zitadel.authn.v1.Key result = 2;
 }
 
 message AddMachineKeyRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
-    zitadel.user.v1.MachineKeyType type = 2 [(validate.rules).enum = {not_in: [0]}];
+    zitadel.authn.v1.KeyType type = 2 [(validate.rules).enum = {not_in: [0]}];
     google.protobuf.Timestamp expiration_date = 3;
 }
   
@@ -2104,6 +2195,16 @@ message GetMyOrgResponse {
 
 message GetOrgByDomainGlobalRequest {
     string domain = 1;
+}
+
+message ListOrgChangesRequest {
+    zitadel.v1.ListQuery query = 1;
+    string org_id = 2;
+}
+
+message ListOrgChangesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.change.v1.Change result = 2;
 }
 
 message GetOrgByDomainGlobalResponse {
@@ -2239,6 +2340,15 @@ message GetProjectByIDResponse {
     zitadel.project.v1.Project project = 1;
 }
 
+message GetGrantedProjectByIDRequest {
+    string project_id = 1;
+    string grant_id = 2;
+}
+
+message GetGrantedProjectByIDResponse {
+    zitadel.project.v1.GrantedProject granted_project = 1;
+}
+
 message ListProjectsRequest {
     zitadel.v1.ListQuery meta_data = 1;
     repeated zitadel.project.v1.ProjectQuery queries = 2;
@@ -2259,13 +2369,14 @@ message ListGrantedProjectsResponse {
     repeated zitadel.project.v1.GrantedProject result = 2;
 }
 
-message GetGrantedProjectByIDRequest {
-    string project_id = 1;
-    string grant_id = 2;
+message ListProjectChangesRequest {
+    zitadel.v1.ListQuery query = 1;
+    string project_id = 2;
 }
 
-message GetGrantedProjectByIDResponse {
-    zitadel.project.v1.GrantedProject granted_project = 1;
+message ListProjectChangesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.change.v1.Change result = 2;
 }
 
 message AddProjectRequest {
@@ -2437,6 +2548,17 @@ message ListAppsResponse {
     zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.app.v1.App result = 2;
 }
+   
+message ListAppChangesRequest {
+    zitadel.v1.ListQuery query = 1;
+    string project_id = 2;
+    string app_id = 3;
+}
+
+message ListAppChangesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.change.v1.Change result = 2;
+}
 
 message AddOIDCAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1}];
@@ -2574,7 +2696,7 @@ message GetAPIClientKeyRequest {
 }
 
 message GetAPIClientKeyResponse {
-    zitadel.app.v1.APIClientKey key = 1;
+    zitadel.authn.v1.Key key = 1;
 }
 
 message ListAPIClientKeysRequest {
@@ -2584,13 +2706,13 @@ message ListAPIClientKeysRequest {
 }
 message ListAPIClientKeysResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.app.v1.APIClientKey result = 2;
+    repeated zitadel.authn.v1.Key result = 2;
 }
 
 message AddAPIClientKeyRequest {
     string project_id = 1 [(validate.rules).string.min_len = 1];
     string app_id = 2 [(validate.rules).string.min_len = 1];
-    zitadel.app.v1.AuthNKeyType type = 3 [(validate.rules).enum = {not_in: [0]}];
+    zitadel.authn.v1.KeyType type = 3 [(validate.rules).enum = {not_in: [0]}];
     google.protobuf.Timestamp expiration_date = 4;
 }
 

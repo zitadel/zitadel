@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
-import "google/api/field_behavior.proto";
 
 package zitadel.v1;
 

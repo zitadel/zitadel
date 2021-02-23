@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 import "zitadel/user.proto";
+import "zitadel/org.proto";
+import "zitadel/change.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/policy.proto";
@@ -40,10 +42,29 @@ service AuthService {
         };
     }
     
-    //User
     rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
         option (google.api.http) = {
             get: "/users/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
+        option (google.api.http) = {
+            get: "/users/me/changes"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
+        option (google.api.http) = {
+            get: "/users/me/sessions"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -353,6 +374,47 @@ service AuthService {
             permission: "authenticated"
         };
     }
+
+    rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
+        option (google.api.http) = {
+            post: "/usergrants/me/_search"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyProjectOrgs(ListMyProjectOrgsRequest) returns (ListMyProjectOrgsResponse) {
+        option (google.api.http) = {
+            post: "/global/projectorgs/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
+        option (google.api.http) = {
+            get: "/permissions/zitadel/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyProjectPermissions(ListMyProjectPermissionsRequest) returns (ListMyProjectPermissionsResponse) {
+        option (google.api.http) = {
+            get: "/permissions/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
 }
 
 message HealthzRequest {}
@@ -366,6 +428,21 @@ message GetMyUserRequest {}
 message GetMyUserResponse {
     zitadel.user.v1.User user = 1;
     google.protobuf.Timestamp last_login = 2;
+}
+
+message ListMyUserChangesRequest {
+    zitadel.v1.ListQuery query = 1;
+}
+
+message ListMyUserChangesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.change.v1.Change result = 2;
+}
+
+message ListMyUserSessionsRequest {}
+
+message ListMyUserSessionsResponse {
+    repeated zitadel.user.v1.Session result = 1;
 }
 
 message UpdateMyUserNameRequest {
@@ -589,4 +666,36 @@ message RemoveMyPasswordlessRequest {
 
 message RemoveMyPasswordlessResponse {
     zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListMyUserGrantsRequest {
+    zitadel.v1.ListQuery query = 1;
+    //TODO: simplify i would use project.usergrant
+}
+
+message ListMyUserGrantsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.user.v1.UserGrant result = 2;
+}
+
+message ListMyProjectOrgsRequest {
+    zitadel.v1.ListQuery query = 1;
+    repeated zitadel.org.v1.OrgQuery queries = 2;
+}
+
+message ListMyProjectOrgsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.org.v1.Org result = 2;
+}
+
+message ListMyZitadelPermissionsRequest {}
+
+message ListMyZitadelPermissionsResponse {
+    repeated string result = 1;
+}
+
+message ListMyProjectPermissionsRequest {}
+
+message ListMyProjectPermissionsResponse {
+    repeated string result = 1;
 }

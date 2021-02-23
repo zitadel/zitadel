@@ -1,6 +1,0 @@
-syntax = "proto3";
-
-package zitadel.iam.v1;
-
-option go_package ="github.com/caos/zitadel/pkg/grpc/iam";
-

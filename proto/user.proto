@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
-import "google/protobuf/timestamp.proto";
 
 package zitadel.user.v1;
 
@@ -191,18 +190,6 @@ message WebAuthNToken {
     string name = 3;
 }
 
-message MachineKey {
-    string id = 1;
-    zitadel.v1.ObjectDetails details = 2;
-    MachineKeyType type = 3;
-    google.protobuf.Timestamp expiration_date = 4;
-}
-
-enum MachineKeyType {
-    MACHINE_KEY_UNSPECIFIED = 0;
-    MACHINE_KEY_JSON = 1;
-}
-
 message Membership {
     string user_id = 1;
     zitadel.v1.ObjectDetails details = 2; //TODO: needed?
@@ -233,4 +220,45 @@ message MembershipProjectQuery {
 
 message MembershipProjectGrantQuery {
     string project_grant_id = 1;
+}
+
+message Session {
+    string session_id = 1;
+    string agent_id = 2;
+    SessionState auth_state = 3;
+    string user_id = 4;
+    string user_name = 5;
+    string login_name = 7;
+    string display_name = 8;
+    zitadel.v1.ObjectDetails details = 9;
+}
+
+enum SessionState {
+    SESSION_STATE_UNSPECIFIED = 0;
+    SESSION_STATE_ACTIVE = 1;
+    SESSION_STATE_TERMINATED = 2;
+}
+
+message UserGrant {
+    string org_id = 1;
+    string project_id = 2;
+    string user_id = 3;
+    repeated string roles = 4;
+    string org_name = 5;
+    string grant_id = 6;
+}
+
+message UserGrantQuery {
+    oneof query {
+        UserGrantProjectIDQuery project_id = 1;
+        UserGrantOrgIDQuery org_id = 2;
+    }
+}
+
+message UserGrantProjectIDQuery {
+    string project_id = 1;
+}
+
+message UserGrantOrgIDQuery {
+    string org_id = 1;
 }

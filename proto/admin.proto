@@ -108,9 +108,9 @@ service AdminService {
         };
     }
 
-    rpc AddIDP(AddIDPRequest) returns (AddIDPResponse) {
+    rpc AddOIDCIDP(AddOIDCIDPRequest) returns (AddOIDCIDPResponse) {
         option (google.api.http) = {
-            post: "/idps"
+            post: "/idps/oidc"
             body: "*"
         };
 
@@ -678,32 +678,22 @@ message ListIDPsResponse {
     repeated zitadel.idp.v1.IDP result = 3;
 }
 
-message AddIDPRequest {
-    message OIDCConfig {
-        string issuer = 1;
-        repeated string scopes = 2;
-        zitadel.idp.v1.OIDCMappingField display_name_mapping = 3;
-        zitadel.idp.v1.OIDCMappingField username_mapping = 4;
-    }
+message AddOIDCIDPRequest {
+    string id = 1;
+    string name = 2;
+    zitadel.idp.v1.IDPStylingType styling_type = 3;
 
-    string name = 1;
-    zitadel.idp.v1.IDPStylingType styling_type = 2;
-    oneof config {
-        OIDCConfig oidc_config = 3;
-    }
+    string client_id = 4;
+    string client_secret = 5;
+    string issuer = 6;
+    repeated string scopes = 7;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 8;
+    zitadel.idp.v1.OIDCMappingField username_mapping = 9;
 }
 
-message AddIDPResponse {
-    message OIDCConfig {
-        string client_id = 1;
-        string client_secret = 2;
-    }
-
-    string id = 1;
-    zitadel.v1.ObjectDetails details = 2;
-    oneof config {
-        OIDCConfig oidc_config = 3;
-    }
+message AddOIDCIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string idp_id = 2;
 }
 
 message DeactivateIDPRequest {
