@@ -31,7 +31,7 @@ func SetReturnResourceVersion(
 			},
 		},
 	}
-	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).Return(ret, nil)
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).MinTimes(1).MaxTimes(1).Return(ret, nil)
 }
 
 func TestGrpc_Adapt(t *testing.T) {
@@ -53,7 +53,7 @@ func TestGrpc_Adapt(t *testing.T) {
 
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	group := "getambassador.io"
 	version := "v2"
@@ -90,7 +90,7 @@ func TestGrpc_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminMName, adminM).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminMName, adminM).MinTimes(1).MaxTimes(1)
 
 	authMName := labels.MustForName(componentLabels, AuthMName)
 	authM := &unstructured.Unstructured{
@@ -115,7 +115,7 @@ func TestGrpc_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthMName, authM).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthMName, authM).MinTimes(1).MaxTimes(1)
 
 	mgmtMName := labels.MustForName(componentLabels, MgmtMName)
 	mgmtM := &unstructured.Unstructured{
@@ -140,7 +140,7 @@ func TestGrpc_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtMName, mgmtM).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtMName, mgmtM).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)
@@ -169,7 +169,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	group := "getambassador.io"
 	version := "v2"
@@ -207,7 +207,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminMName, adminM).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminMName, adminM).MinTimes(1).MaxTimes(1)
 
 	authMName := labels.MustForName(componentLabels, AuthMName)
 	authM := &unstructured.Unstructured{
@@ -232,7 +232,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthMName, authM).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthMName, authM).MinTimes(1).MaxTimes(1)
 
 	mgmtMName := labels.MustForName(componentLabels, MgmtMName)
 	mgmtM := &unstructured.Unstructured{
@@ -257,7 +257,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtMName, mgmtM).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtMName, mgmtM).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)
