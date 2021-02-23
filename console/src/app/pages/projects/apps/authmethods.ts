@@ -45,8 +45,8 @@ export const PK_JWT_METHOD: RadioItemAuthType = {
     prefix: 'JWT',
     background: 'rgb(89, 93, 128)',
     responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
-    grantType: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
-    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+    grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+    authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT,
     apiAuthMethod: APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT,
     // recommended: true,
 };
@@ -60,6 +60,7 @@ export const BASIC_AUTH_METHOD: RadioItemAuthType = {
     responseType: OIDCResponseType.OIDCRESPONSETYPE_CODE,
     grantType: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
     authMethod: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+    apiAuthMethod: APIAuthMethodType.APIAUTHMETHODTYPE_BASIC,
 };
 
 export const IMPLICIT_METHOD: RadioItemAuthType = {
@@ -122,6 +123,11 @@ export function getPartialConfigFromAuthMethod(authMethod: string): {
             return config;
         case PK_JWT_METHOD.key:
             config = {
+                oidc: {
+                    responseTypesList: [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+                    grantTypesList: [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+                    authMethodType: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT,
+                },
                 api: {
                     authMethodType: APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT,
                 }
@@ -180,13 +186,13 @@ export function getAuthMethodFromPartialConfig(config: Partial<OIDCConfig.AsObje
         ]
     );
 
-    // const pk_jwt = JSON.stringify(
-    //     [
-    //         [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-    //         [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-    //         OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
-    //     ]
-    // );
+    const pk_jwt = JSON.stringify(
+        [
+            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT,
+        ]
+    );
 
     const implicit = JSON.stringify(
         [
@@ -200,7 +206,7 @@ export function getAuthMethodFromPartialConfig(config: Partial<OIDCConfig.AsObje
         case code: return CODE_METHOD.key;
         case pkce: return PKCE_METHOD.key;
         case post: return POST_METHOD.key;
-        // case pk_jwt: return PK_JWT_METHOD.key;
+        case pk_jwt: return PK_JWT_METHOD.key;
         case implicit: return IMPLICIT_METHOD.key;
         default:
             return CUSTOM_METHOD.key;

@@ -20,6 +20,8 @@ import { MachineKeysComponent } from './machine-keys.component';
 import { ShowKeyDialogModule } from './show-key-dialog/show-key-dialog.module';
 import { AddKeyDialogModule } from './add-key-dialog/add-key-dialog.module';
 import { RouterModule } from '@angular/router';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 
 @NgModule({
@@ -41,6 +43,8 @@ import { RouterModule } from '@angular/router';
         MatCheckboxModule,
         MatTooltipModule,
         HasRolePipeModule,
+        TimestampToDatePipeModule,
+        LocalizedDatePipeModule,
         TranslateModule,
         RefreshTableModule,
         InputModule,

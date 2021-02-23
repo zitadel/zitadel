@@ -256,6 +256,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.authMethods = [
                     PKCE_METHOD,
                     CODE_METHOD,
+                    PK_JWT_METHOD,
                     POST_METHOD,
                 ];
                 break;

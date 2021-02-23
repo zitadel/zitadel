@@ -1044,7 +1044,8 @@
             "AUTHMETHOD": {
                 "0":"Basic",
                 "1":"Post",
-                "2":"None"
+                "2":"None",
+                "3":"Private Key JWT"
             },
             "TOKENTYPE":"Auth Token Type",
             "TOKENTYPE0": "Bearer Token",

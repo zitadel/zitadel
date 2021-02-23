@@ -25,6 +25,7 @@ export class AppAuthMethodRadioComponent {
     @Input() current: string = '';
     @Input() selected: string = '';
     @Input() authMethods!: RadioItemAuthType[];
+    @Input() isOIDC: boolean = false;
     @Output() selectedMethod: EventEmitter<string> = new EventEmitter();
 
     public emitChange(): void {

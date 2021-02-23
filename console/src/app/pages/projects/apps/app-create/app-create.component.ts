@@ -127,21 +127,18 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
         this.initForm();
 
-
         this.firstFormGroup = this.fb.group({
             name: ['', [Validators.required]],
             appType: [WEB_TYPE, [Validators.required]],
         });
 
         this.firstFormGroup.valueChanges.subscribe(value => {
+            console.log('asdf');
             if (this.firstFormGroup.valid) {
                 this.oidcApp.name = this.name?.value;
                 this.apiApp.name = this.name?.value;
 
-                const isOIDC = (this.appType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
-                const isAPI = (this.appType?.value as RadioItemAppType).createType == AppCreateType.API;
-
-                if (isOIDC) {
+                if (this.isStepperOIDC) {
                     const oidcAppType = (this.appType?.value as RadioItemAppType).oidcApplicationType;
                     if (oidcAppType !== undefined) {
                         this.oidcApp.applicationType = oidcAppType;
@@ -160,7 +157,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
                             break;
                         case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
-                            PK_JWT_METHOD.recommended = false;
+                            // PK_JWT_METHOD.recommended = false;
                             this.authMethods = [
                                 PKCE_METHOD,
                                 CODE_METHOD,
@@ -179,8 +176,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                             this.authMethod?.setValue(PKCE_METHOD.key);
                             break;
                     }
-                } else if (isAPI) {
-                    PK_JWT_METHOD.recommended = true;
+                } else if (this.isStepperAPI) {
+                    // PK_JWT_METHOD.recommended = true;
                     this.authMethods = [
                         PK_JWT_METHOD,
                         BASIC_AUTH_METHOD,
@@ -197,11 +194,12 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.secondFormGroup.valueChanges.subscribe(form => {
             const partialConfig = getPartialConfigFromAuthMethod(form.authMethod);
             console.log(partialConfig);
-            if (partialConfig) {
+
+            if (this.isStepperOIDC && partialConfig && partialConfig.oidc) {
                 this.oidcApp.responseTypesList = partialConfig.oidc?.responseTypesList ?? [];
                 this.oidcApp.grantTypesList = partialConfig.oidc?.grantTypesList ?? [];
                 this.oidcApp.authMethodType = partialConfig.oidc?.authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-
+            } else if (this.isStepperAPI && partialConfig && partialConfig.api) {
                 this.apiApp.authMethodType = partialConfig.api?.authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
             }
         });
@@ -237,19 +235,15 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             });
 
         this.formappType?.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(() => {
-            this.setFormValidators();
+            this.setDevFormValidators();
         });
     }
 
-    public setFormValidators(): void {
-        const isOIDC = (this.formappType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
-        const isAPI = (this.formappType?.value as RadioItemAppType).createType == AppCreateType.API;
-        if (isOIDC) {
-            // const authMethodControl = new FormControl('', [Validators.required]);
+    public setDevFormValidators(): void {
+        if (this.isDevOIDC) {
             const grantTypesControl = new FormControl('', [Validators.required]);
             const responseTypesControl = new FormControl('', [Validators.required]);
 
-            // this.form.addControl('authMethodType', authMethodControl);
             this.form.addControl('grantTypesList', grantTypesControl);
             this.form.addControl('responseTypesList', responseTypesControl);
 
@@ -259,8 +253,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST, checked: false, disabled: false, oidc: true },
             ];
             this.authMethod?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC);
-        } else if (isAPI) {
-            // this.form.removeControl('authMethodType');
+        } else if (this.isDevAPI) {
             this.form.removeControl('grantTypesList');
             this.form.removeControl('responseTypesList');
 
@@ -290,10 +283,10 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     }
 
     public createApp(): void {
-        const isOIDC = (this.formappType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
-        const isAPI = (this.formappType?.value as RadioItemAppType).createType == AppCreateType.API;
+        const appOIDCCheck = this.devmode ? this.isDevOIDC : this.isStepperOIDC;
+        const appAPICheck = this.devmode ? this.isDevAPI : this.isStepperAPI;
 
-        if (isOIDC) {
+        if (appOIDCCheck) {
             this.requestRedirectValuesSubject$.next();
 
             this.loading = true;
@@ -312,7 +305,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.loading = false;
                     this.toast.showError(error);
                 });
-        } else if (isAPI) {
+        } else if (appAPICheck) {
             console.log(this.apiApp);
             this.loading = true;
             this.mgmtService
@@ -383,6 +376,22 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     // }
     get formauthMethodType(): AbstractControl | null {
         return this.form.get('authMethodType');
+    }
+
+    get isDevOIDC(): boolean {
+        return (this.formappType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
+    }
+
+    get isStepperOIDC(): boolean {
+        return (this.appType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
+    }
+
+    get isDevAPI(): boolean {
+        return (this.formappType?.value as RadioItemAppType).createType == AppCreateType.API;
+    }
+
+    get isStepperAPI(): boolean {
+        return (this.appType?.value as RadioItemAppType).createType == AppCreateType.API;
     }
 };
 

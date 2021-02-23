@@ -47,6 +47,7 @@
                 <ng-template matStepLabel>{{'APP.AUTHMETHODSECTION' | translate}}</ng-template>
 
                 <app-auth-method-radio [authMethods]="authMethods" [selected]="authMethod?.value"
+                    [isOIDC]="appType?.value?.createType == AppCreateType.OIDC"
                     (selectedMethod)="authMethod?.setValue($event)">
                 </app-auth-method-radio>
 
@@ -224,8 +225,7 @@
 
                     <cnsl-form-field appearance="outline" class="formfield">
                         <cnsl-label>{{ 'APP.OIDC.RESPONSETYPE' | translate }}</cnsl-label>
-                        <mat-select formControlName="responseTypesList" multiple
-                            (selectionChange)="setFormValidators()">
+                        <mat-select formControlName="responseTypesList" multiple>
                             <mat-option *ngFor="let type of oidcResponseTypes" [value]="type.type">
                                 {{ 'APP.OIDC.RESPONSE.'+type.type | translate }}
                             </mat-option>

@@ -31,7 +31,7 @@ export class MachineKeysComponent implements OnInit {
 
     @Output() public changedSelection: EventEmitter<Array<MachineKeyView.AsObject>> = new EventEmitter();
 
-    constructor(public translate: TranslateService, private userService: ManagementService, private dialog: MatDialog,
+    constructor(public translate: TranslateService, private mgmtService: ManagementService, private dialog: MatDialog,
         private toast: ToastService) {
         this.selection.changed.subscribe(() => {
             this.changedSelection.emit(this.selection.selected);
@@ -62,7 +62,7 @@ export class MachineKeysComponent implements OnInit {
 
     public deleteSelectedKeys(): void {
         const mappedDeletions = this.selection.selected.map(value => {
-            return this.userService.DeleteMachineKey(value.id, this.userId);
+            return this.mgmtService.DeleteMachineKey(value.id, this.userId);
         });
         Promise.all(mappedDeletions).then(() => {
             this.selection.clear();
@@ -97,7 +97,7 @@ export class MachineKeysComponent implements OnInit {
                 }
 
                 if (type) {
-                    return this.userService.AddMachineKey(this.userId, type, date).then((response) => {
+                    return this.mgmtService.AddMachineKey(this.userId, type, date).then((response) => {
                         if (response) {
                             setTimeout(() => {
                                 this.refreshPage();
@@ -121,7 +121,7 @@ export class MachineKeysComponent implements OnInit {
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
 
-        this.userService.SearchMachineKeys(this.userId, limit, offset).then(resp => {
+        this.mgmtService.SearchMachineKeys(this.userId, limit, offset).then(resp => {
             this.keyResult = resp.toObject();
             this.dataSource.data = this.keyResult.resultList;
             this.loadingSubject.next(false);
