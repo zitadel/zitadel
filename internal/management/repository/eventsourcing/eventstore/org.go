@@ -3,13 +3,13 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/golang/protobuf/ptypes"
 	"strings"
 

@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 
 	"golang.org/x/text/language"

@@ -2,10 +2,10 @@ package login
 
 import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/ui/login/handler"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
 )
 
 type Config struct {

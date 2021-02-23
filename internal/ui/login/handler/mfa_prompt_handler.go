@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	"net/http"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"

@@ -2,7 +2,7 @@ package handler
 
 import (
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	"net/http"
 )
 

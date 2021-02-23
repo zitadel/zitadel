@@ -5,9 +5,9 @@ import (
 	"flag"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/query"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
 
 	"github.com/caos/logging"
 

@@ -3,12 +3,12 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"strings"
 
 	"github.com/caos/logging"

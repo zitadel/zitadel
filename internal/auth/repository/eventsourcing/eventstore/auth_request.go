@@ -2,8 +2,8 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 
 	"github.com/caos/logging"

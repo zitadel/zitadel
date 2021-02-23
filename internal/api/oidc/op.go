@@ -10,12 +10,12 @@ import (
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth/repository"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
 )
 
 type OPHandlerConfig struct {

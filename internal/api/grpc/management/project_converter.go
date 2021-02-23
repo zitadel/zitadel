@@ -2,7 +2,7 @@ package management
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/logging"

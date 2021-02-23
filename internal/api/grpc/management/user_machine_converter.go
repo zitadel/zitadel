@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"

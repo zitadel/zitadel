@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 
-	"github.com/caos/zitadel/internal/v2/query"
+	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"

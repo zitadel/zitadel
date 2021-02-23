@@ -1,9 +1,9 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/v2/domain"
-	"github.com/caos/zitadel/internal/v2/repository/iam"
+	"github.com/caos/zitadel/internal/repository/iam"
 )
 
 type IAM struct {
@@ -18,7 +18,7 @@ type IAM struct {
 	// TODO: how to implement queries?
 }
 
-func (rm *IAM) AppendEvents(events ...eventstore.eventstore) {
+func (rm *IAM) AppendEvents(events ...eventstore.EventReader) {
 	rm.ReadModel.AppendEvents(events...)
 }
 

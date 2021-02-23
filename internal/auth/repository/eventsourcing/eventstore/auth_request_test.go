@@ -3,7 +3,7 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	"testing"
 	"time"
 

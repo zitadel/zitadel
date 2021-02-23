@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
@@ -10,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/logging"

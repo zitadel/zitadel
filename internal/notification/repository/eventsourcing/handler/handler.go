@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/v2/command"
 	"net/http"
 	"time"
 

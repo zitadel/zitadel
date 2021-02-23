@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/query"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/admin/repository"

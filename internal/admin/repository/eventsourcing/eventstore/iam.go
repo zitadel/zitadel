@@ -2,11 +2,11 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"strings"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"

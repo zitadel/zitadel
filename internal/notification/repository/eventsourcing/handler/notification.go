@@ -3,11 +3,11 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"github.com/caos/zitadel/internal/v2/command"
 	"golang.org/x/text/language"
 	"net/http"
 	"time"

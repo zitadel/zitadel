@@ -5,10 +5,10 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 const (

@@ -2,7 +2,7 @@ package eventsourcing
 
 import (
 	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/v2/query"
+	"github.com/caos/zitadel/internal/query"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"

@@ -1,8 +1,8 @@
 package admin
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
