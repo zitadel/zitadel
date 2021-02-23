@@ -99,6 +99,7 @@
     },
     "ACTIONS": {
         "SAVE": "Speichern",
+        "SAVENOW":"Speichern",
         "NEW": "Neu",
         "ADD":"Hinzufügen",
         "CREATE": "Erstellen",
@@ -1123,7 +1124,8 @@
             "DEACTIVATED":"Anwendung deaktiviert.",
             "OIDCUPDATED":"OIDC-Konfiguration geändert.",
             "OIDCCLIENTSECRETREGENERATED":"OIDC-Client Secret generiert.",
-            "DELETED":"App gelöscht."
+            "DELETED":"App gelöscht.",
+            "CONFIGCHANGED":"Konfiguration geändert."
         }
     },
     "GENDERS": {

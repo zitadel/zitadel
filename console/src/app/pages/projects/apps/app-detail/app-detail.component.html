@@ -135,7 +135,12 @@
             (selectedMethod)="setPartialConfigFromAuthMethod($event)">
         </app-auth-method-radio>
 
-        <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
+        <app-card *ngIf="currentAuthMethod == 'PK_JWT' && projectId && app?.id" [expanded]="false"
+            title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}" description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
+            <app-client-keys [projectId]="projectId" [appId]="app.id"></app-client-keys>
+        </app-card>
+
+        <form *ngIf="oidcForm && app?.oidcConfig" [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
             <app-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
                 <div card-actions
                     *ngIf="app?.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
@@ -230,7 +235,7 @@
             </app-card>
 
             <div class="btn-container">
-                <button class="submit-button" type="submit" color="primary" [disabled]="appForm.invalid || !canWrite"
+                <button class="submit-button" type="submit" color="primary" [disabled]="oidcForm.invalid || !canWrite"
                     mat-raised-button>
                     {{ 'ACTIONS.SAVE' | translate }}
                 </button>

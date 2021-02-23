@@ -99,6 +99,7 @@
     },
     "ACTIONS": {
         "SAVE": "Save",
+        "SAVENOW":"Save now",
         "NEW": "New",
         "ADD":"Add",
         "CREATE": "Create",
@@ -1124,7 +1125,8 @@
             "DEACTIVATED":"Application deactivated.",
             "OIDCUPDATED":"OIDC configuration updated.",
             "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated.",
-            "DELETED":"App deleted."
+            "DELETED":"App deleted.",
+            "CONFIGCHANGED":"Configuration changed."
         }
     },
     "GENDERS": {

@@ -160,56 +160,68 @@ export function getPartialConfigFromAuthMethod(authMethod: string): {
     }
 }
 
-export function getAuthMethodFromPartialConfig(config: Partial<OIDCConfig.AsObject> | OIDCConfig.AsObject): string {
-    const toCheck = [config.responseTypesList, config.grantTypesList, config.authMethodType];
-    console.log(toCheck);
-    const code = JSON.stringify(
-        [
-            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
-        ]
-    );
+export function getAuthMethodFromPartialConfig(config: { oidc?: Partial<OIDCConfig.AsObject>, api?: Partial<APIConfig.AsObject>; }): string {
+    if (config?.oidc) {
+        const toCheck = [config.oidc.responseTypesList, config.oidc.grantTypesList, config.oidc.authMethodType];
 
-    const pkce = JSON.stringify(
-        [
-            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-        ]
-    );
+        console.log(toCheck);
+        const code = JSON.stringify(
+            [
+                [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+                [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+                OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+            ]
+        );
 
-    const post = JSON.stringify(
-        [
-            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
-        ]
-    );
+        const pkce = JSON.stringify(
+            [
+                [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+                [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+                OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+            ]
+        );
 
-    const pk_jwt = JSON.stringify(
-        [
-            [OIDCResponseType.OIDCRESPONSETYPE_CODE],
-            [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
-            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT,
-        ]
-    );
+        const post = JSON.stringify(
+            [
+                [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+                [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+                OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+            ]
+        );
 
-    const implicit = JSON.stringify(
-        [
-            [OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN],
-            [OIDCGrantType.OIDCGRANTTYPE_IMPLICIT],
-            OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-        ]
-    );
+        const pk_jwt = JSON.stringify(
+            [
+                [OIDCResponseType.OIDCRESPONSETYPE_CODE],
+                [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE],
+                OIDCAuthMethodType.OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT,
+            ]
+        );
 
-    switch (JSON.stringify(toCheck)) {
-        case code: return CODE_METHOD.key;
-        case pkce: return PKCE_METHOD.key;
-        case post: return POST_METHOD.key;
-        case pk_jwt: return PK_JWT_METHOD.key;
-        case implicit: return IMPLICIT_METHOD.key;
-        default:
-            return CUSTOM_METHOD.key;
+        const implicit = JSON.stringify(
+            [
+                [OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN],
+                [OIDCGrantType.OIDCGRANTTYPE_IMPLICIT],
+                OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+            ]
+        );
+
+        switch (JSON.stringify(toCheck)) {
+            case code: return CODE_METHOD.key;
+            case pkce: return PKCE_METHOD.key;
+            case post: return POST_METHOD.key;
+            case pk_jwt: return PK_JWT_METHOD.key;
+            case implicit: return IMPLICIT_METHOD.key;
+            default:
+                return CUSTOM_METHOD.key;
+        }
+    } else if (config.api) {
+        switch (config.api.authMethodType) {
+            case APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT: return PK_JWT_METHOD.key;
+            case APIAuthMethodType.APIAUTHMETHODTYPE_BASIC: return BASIC_AUTH_METHOD.key;
+            default:
+                return CUSTOM_METHOD.key;
+        }
+    } else {
+        return CUSTOM_METHOD.key;
     }
 }

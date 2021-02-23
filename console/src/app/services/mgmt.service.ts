@@ -5,12 +5,16 @@ import { BehaviorSubject } from 'rxjs';
 
 import { MultiFactorsResult } from '../proto/generated/admin_pb';
 import {
+    AddClientKeyRequest,
+    AddClientKeyResponse,
     AddMachineKeyRequest,
     AddMachineKeyResponse,
     AddOrgDomainRequest,
     AddOrgMemberRequest,
     APIApplicationCreate,
     APIAuthMethodType,
+    APIConfig,
+    APIConfigUpdate,
     Application,
     ApplicationID,
     ApplicationSearchQuery,
@@ -18,9 +22,13 @@ import {
     ApplicationSearchResponse,
     ApplicationUpdate,
     ApplicationView,
+    AuthNKeyType,
     ChangeOrgMemberRequest,
     ChangeRequest,
     Changes,
+    ClientKeyIDRequest,
+    ClientKeySearchRequest,
+    ClientKeySearchResponse,
     CreateHumanRequest,
     CreateMachineRequest,
     CreateUserRequest,
@@ -367,6 +375,23 @@ export class ManagementService {
         return this.grpcService.mgmt.addMachineKey(req);
     }
 
+    public addClientKey(
+        projectId: string,
+        appId: string,
+        type: AuthNKeyType,
+        date?: Timestamp,
+    ): Promise<AddClientKeyResponse> {
+        const req = new AddClientKeyRequest();
+        req.setType(type);
+        req.setProjectId(projectId);
+        req.setApplicationId(appId);
+        if (date) {
+            req.setExpirationDate(date);
+        }
+        return this.grpcService.mgmt.addClientKey(req);
+    }
+
+
     public DeleteMachineKey(
         keyId: string,
         userId: string,
@@ -376,6 +401,20 @@ export class ManagementService {
         req.setUserId(userId);
 
         return this.grpcService.mgmt.deleteMachineKey(req);
+    }
+
+    public DeleteClientKey(
+        keyId: string,
+        projectId: string,
+        appId: string,
+    ): Promise<Empty> {
+        const req = new ClientKeyIDRequest();
+        req.setKeyId(keyId);
+        req.setProjectId(projectId);
+        req.setApplicationId(appId);
+        console.log(keyId, projectId, appId);
+
+        return this.grpcService.mgmt.deleteClientKey(req);
     }
 
     public SearchMachineKeys(
@@ -392,6 +431,24 @@ export class ManagementService {
             req.setAsc(asc);
         }
         return this.grpcService.mgmt.searchMachineKeys(req);
+    }
+
+    public SearchClientKeys(
+        projectId: string,
+        appId: string,
+        limit: number,
+        offset: number,
+        asc?: boolean,
+    ): Promise<ClientKeySearchResponse> {
+        const req = new ClientKeySearchRequest();
+        req.setProjectId(projectId);
+        req.setApplicationId(appId);
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (asc) {
+            req.setAsc(asc);
+        }
+        return this.grpcService.mgmt.searchClientKeys(req);
     }
 
     public RemoveExternalIDP(
@@ -1376,6 +1433,10 @@ export class ManagementService {
 
     public UpdateOIDCAppConfig(req: OIDCConfigUpdate): Promise<OIDCConfig> {
         return this.grpcService.mgmt.updateApplicationOIDCConfig(req);
+    }
+
+    public UpdateAPIAppConfig(req: APIConfigUpdate): Promise<APIConfig> {
+        return this.grpcService.mgmt.updateApplicationAPIConfig(req);
     }
 
     public RemoveApplication(projectId: string, appId: string): Promise<Empty> {

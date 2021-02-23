@@ -34,6 +34,7 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
 import { LinksModule } from 'src/app/modules/links/links.module';
 import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.module';
+import { ClientKeysModule } from 'src/app/modules/client-keys/client-keys.module';
 @NgModule({
     declarations: [
         AppCreateComponent,
@@ -54,6 +55,7 @@ import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.mo
         HasRoleModule,
         MatMenuModule,
         MatChipsModule,
+        ClientKeysModule,
         MatIconModule,
         MatSelectModule,
         MatButtonToggleModule,

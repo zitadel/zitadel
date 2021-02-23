@@ -1,13 +1,14 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
     [timestamp]="keyResult?.viewTimestamp" [selection]="selection">
     <div actions>
-        <button color="warn" [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false"
+        <button color="warn"
+            [disabled]="([('project.app.write:' + projectId), 'project.app.write'] | hasRole | async) == false"
             (click)="deleteSelectedKeys()" matTooltip="{{'ACTIONS.DELETE' | translate}}" class="icon-button"
             mat-icon-button *ngIf="selection.hasValue()">
             <i class="las la-trash"></i>
         </button>
-        <a [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false" color="primary"
-            mat-raised-button (click)="openAddKey()">
+        <a [disabled]="([('project.app.write:' + projectId), 'project.app.write'] | hasRole | async) == false"
+            color="primary" mat-raised-button (click)="openAddKey()">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </div>
@@ -54,7 +55,8 @@
 
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
+            <tr class="highlight" mat-row *matRowDef="let key; columns: displayedColumns;"
+                (click)="selection.toggle(key);">
             </tr>
 
         </table>

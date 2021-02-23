@@ -16,7 +16,7 @@ import { CardModule } from '../card/card.module';
 import { InputModule } from '../input/input.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 
-import { MachineKeysComponent } from './machine-keys.component';
+import { ClientKeysComponent } from './client-keys.component';
 import { ShowKeyDialogModule } from '../show-key-dialog/show-key-dialog.module';
 import { AddKeyDialogModule } from 'src/app/modules/add-key-dialog/add-key-dialog.module';
 import { RouterModule } from '@angular/router';
@@ -26,7 +26,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 
 @NgModule({
     declarations: [
-        MachineKeysComponent,
+        ClientKeysComponent,
     ],
     imports: [
         CommonModule,
@@ -52,7 +52,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
         AddKeyDialogModule,
     ],
     exports: [
-        MachineKeysComponent,
+        ClientKeysComponent,
     ],
 })
-export class MachineKeysModule { }
+export class ClientKeysModule { }

@@ -5,6 +5,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
@@ -17,6 +18,7 @@ import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.com
 import {
     APIAuthMethodType,
     APIConfig,
+    APIConfigUpdate,
     Application,
     AppState,
     OIDCApplicationType,
@@ -87,7 +89,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public AppState: any = AppState;
     public appNameForm!: FormGroup;
-    public appForm!: FormGroup;
+    public oidcForm!: FormGroup;
+    public apiForm!: FormGroup;
 
     public redirectUrisList: string[] = [];
     public postLogoutRedirectUrisList: string[] = [];
@@ -117,6 +120,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private authService: GrpcAuthService,
         private router: Router,
         private http: HttpClient,
+        private snackbar: MatSnackBar,
     ) {
         this.http.get('./assets/environment.json')
             .toPromise().then((env: any) => {
@@ -133,7 +137,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             state: [{ value: '', disabled: true }, []],
             name: [{ value: '', disabled: true }, [Validators.required]],
         });
-        this.appForm = this.fb.group({
+
+        this.oidcForm = this.fb.group({
             devMode: [{ value: false, disabled: true }, []],
             clientId: [{ value: '', disabled: true }],
             responseTypesList: [{ value: [], disabled: true }],
@@ -145,6 +150,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             idTokenRoleAssertion: [{ value: false, disabled: true }],
             idTokenUserinfoAssertion: [{ value: false, disabled: true }],
             clockSkewSeconds: [{ value: 0, disabled: true }],
+        });
+
+        this.apiForm = this.fb.group({
+            authMethodType: [{ value: '', disabled: true }],
         });
     }
 
@@ -195,7 +204,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
                 this.getAuthMethodOptions();
                 if (this.app.oidcConfig) {
-                    this.initialAuthMethod = this.authMethodFromPartialConfig(this.app.oidcConfig);
+                    this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
+                    this.currentAuthMethod = this.initialAuthMethod;
+                    if (this.initialAuthMethod === CUSTOM_METHOD.key) {
+                        if (!this.authMethods.includes(CUSTOM_METHOD)) {
+                            this.authMethods.push(CUSTOM_METHOD);
+                        }
+                    } else {
+                        this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
+                    }
+                } else if (this.app.apiConfig) {
+                    this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
                     this.currentAuthMethod = this.initialAuthMethod;
                     if (this.initialAuthMethod === CUSTOM_METHOD.key) {
                         if (!this.authMethods.includes(CUSTOM_METHOD)) {
@@ -208,7 +227,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
                 if (allowed) {
                     this.appNameForm.enable();
-                    this.appForm.enable();
+                    this.oidcForm.enable();
                 }
 
                 if (this.app.oidcConfig?.redirectUrisList) {
@@ -219,14 +238,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 }
                 if (this.app.oidcConfig?.clockSkew) {
                     const inSecs = this.app.oidcConfig?.clockSkew.seconds + this.app.oidcConfig?.clockSkew.nanos / 100000;
-                    this.appForm.controls['clockSkewSeconds'].setValue(inSecs);
+                    this.oidcForm.controls['clockSkewSeconds'].setValue(inSecs);
                 }
                 if (this.app.oidcConfig) {
-                    this.appForm.patchValue(this.app.oidcConfig);
+                    this.oidcForm.patchValue(this.app.oidcConfig);
                 }
 
-                this.appForm.valueChanges.subscribe(oidcConfig => {
-                    this.initialAuthMethod = this.authMethodFromPartialConfig(oidcConfig);
+                this.oidcForm.valueChanges.subscribe((oidcConfig) => {
+                    this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: oidcConfig });
                     if (this.initialAuthMethod === CUSTOM_METHOD.key) {
                         if (!this.authMethods.includes(CUSTOM_METHOD)) {
                             this.authMethods.push(CUSTOM_METHOD);
@@ -234,6 +253,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                     } else {
                         this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
                     }
+
+                    this.showSaveSnack();
                 });
             }).catch(error => {
                 console.error(error);
@@ -242,6 +263,20 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             });
         });
         this.docs = (await this.mgmtService.GetZitadelDocs()).toObject();
+    }
+
+    private async showSaveSnack(): Promise<void> {
+        const message = await this.translate.get('APP.TOAST.CONFIGCHANGED').toPromise();
+        const action = await this.translate.get('ACTIONS.SAVENOW').toPromise();
+
+        const snackRef = this.snackbar.open(message, action, { duration: 5000 });
+        snackRef.onAction().subscribe(() => {
+            if (this.app.oidcConfig) {
+                this.saveOIDCApp();
+            } else if (this.app.apiConfig) {
+                this.saveAPIApp();
+            }
+        });
     }
 
     private getAuthMethodOptions(): void {
@@ -269,8 +304,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         }
     }
 
-    public authMethodFromPartialConfig(config: OIDCConfig.AsObject): string {
-        // console.log(config);
+    public authMethodFromPartialConfig(config: { oidc?: OIDCConfig.AsObject, api?: APIConfig.AsObject; }): string {
         const key = getAuthMethodFromPartialConfig(config);
         console.log(key);
         return key;
@@ -284,10 +318,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.app.oidcConfig.responseTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).responseTypesList ?? [];
             this.app.oidcConfig.grantTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).grantTypesList ?? [];
             this.app.oidcConfig.authMethodType = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-            this.appForm.patchValue(this.app.oidcConfig);
+            console.log(this.app.oidcConfig);
+            this.oidcForm.patchValue(this.app.oidcConfig);
         } else if (partialConfig && partialConfig.api && this.app.apiConfig) {
             this.app.apiConfig.authMethodType = (partialConfig as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
-            this.appForm.patchValue(this.app.apiConfig);
+            this.apiForm.patchValue(this.app.apiConfig);
         }
     }
 
@@ -353,7 +388,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.app.name = this.name?.value;
         }
 
-        if (this.appForm.valid) {
+        if (this.oidcForm.valid) {
             if (this.app.oidcConfig) {
                 this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
                 this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
@@ -392,7 +427,34 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                     .UpdateOIDCAppConfig(req)
                     .then(() => {
                         if (this.app.oidcConfig) {
-                            this.currentAuthMethod = this.authMethodFromPartialConfig(this.app.oidcConfig);
+                            const config = { oidc: this.app.oidcConfig };
+                            this.currentAuthMethod = this.authMethodFromPartialConfig(config);
+                        }
+                        this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+                    })
+                    .catch(error => {
+                        this.toast.showError(error);
+                    });
+            }
+        }
+    }
+
+    public saveAPIApp(): void {
+        if (this.apiForm.valid) {
+            if (this.app.apiConfig) {
+                this.app.apiConfig.authMethodType = this.authMethodType?.value;
+
+                const req = new APIConfigUpdate();
+                req.setProjectId(this.projectId);
+                req.setApplicationId(this.app.id);
+                req.setAuthMethodType(this.app.apiConfig.authMethodType);
+
+                this.mgmtService
+                    .UpdateAPIAppConfig(req)
+                    .then(() => {
+                        if (this.app.oidcConfig) {
+                            const config = { oidc: this.app.oidcConfig };
+                            this.currentAuthMethod = this.authMethodFromPartialConfig(config);
                         }
                         this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
                     })
@@ -428,46 +490,46 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public get clientId(): AbstractControl | null {
-        return this.appForm.get('clientId');
+        return this.oidcForm.get('clientId');
     }
 
     public get responseTypesList(): AbstractControl | null {
-        return this.appForm.get('responseTypesList');
+        return this.oidcForm.get('responseTypesList');
     }
 
     public get grantTypesList(): AbstractControl | null {
-        return this.appForm.get('grantTypesList');
+        return this.oidcForm.get('grantTypesList');
     }
 
     public get applicationType(): AbstractControl | null {
-        return this.appForm.get('applicationType');
+        return this.oidcForm.get('applicationType');
     }
 
     public get authMethodType(): AbstractControl | null {
-        return this.appForm.get('authMethodType');
+        return this.oidcForm.get('authMethodType');
     }
 
     public get devMode(): AbstractControl | null {
-        return this.appForm.get('devMode');
+        return this.oidcForm.get('devMode');
     }
 
     public get accessTokenType(): AbstractControl | null {
-        return this.appForm.get('accessTokenType');
+        return this.oidcForm.get('accessTokenType');
     }
 
     public get idTokenRoleAssertion(): AbstractControl | null {
-        return this.appForm.get('idTokenRoleAssertion');
+        return this.oidcForm.get('idTokenRoleAssertion');
     }
 
     public get accessTokenRoleAssertion(): AbstractControl | null {
-        return this.appForm.get('accessTokenRoleAssertion');
+        return this.oidcForm.get('accessTokenRoleAssertion');
     }
 
     public get idTokenUserinfoAssertion(): AbstractControl | null {
-        return this.appForm.get('idTokenUserinfoAssertion');
+        return this.oidcForm.get('idTokenUserinfoAssertion');
     }
 
     public get clockSkewSeconds(): AbstractControl | null {
-        return this.appForm.get('clockSkewSeconds');
+        return this.oidcForm.get('clockSkewSeconds');
     }
 }
