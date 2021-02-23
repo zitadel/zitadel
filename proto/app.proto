@@ -89,15 +89,3 @@ message APIConfig {
     string client_secret = 2;
     APIAuthMethodType auth_method_type = 3;
 }
-
-message APIClientKey {
-    string id = 1;
-    zitadel.v1.ObjectDetails details = 2;
-    AuthNKeyType type = 3;
-}
-
-//TODO: where to place that user.machine and api-client can use the same?
-enum AuthNKeyType {
-    AUTHNKEY_UNSPECIFIED = 0;
-    AUTHNKEY_JSON = 1;
-}

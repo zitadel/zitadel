@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "google/protobuf/timestamp.proto";
+
+package zitadel.authn.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/authn";
+
+message Key {
+    string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    KeyType type = 3;
+    google.protobuf.Timestamp expiration_date = 4;
+}
+
+enum KeyType {
+    AUTHNKEY_UNSPECIFIED = 0;
+    AUTHNKEY_JSON = 1;
+}

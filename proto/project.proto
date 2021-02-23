@@ -39,7 +39,7 @@ message GrantedProject {
 message UserGrant {
     string user_id = 1;
     string grant_id = 2;
-    // zitadel.v1.ObjectDetails details = 3;
+    zitadel.v1.ObjectDetails details = 3;
 }
 
 message UserGrantQuery {
