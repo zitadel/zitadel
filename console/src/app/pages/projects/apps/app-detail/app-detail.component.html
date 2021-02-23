@@ -130,9 +130,9 @@
             </cnsl-redirect-uris>
         </div>
 
-        <app-auth-method-radio *ngIf="authMethods && initialAuthMethod && app?.oidcConfig" [authMethods]="authMethods"
-            [selected]="initialAuthMethod" [current]="currentAuthMethod" [isOIDC]="app?.oidcConfig !== undefined"
-            (selectedMethod)="setPartialConfigFromAuthMethod($event)">
+        <app-auth-method-radio *ngIf="authMethods && initialAuthMethod && (app?.oidcConfig || app?.apiConfig)"
+            [authMethods]="authMethods" [selected]="initialAuthMethod" [current]="currentAuthMethod"
+            [isOIDC]="app?.oidcConfig !== undefined" (selectedMethod)="setPartialConfigFromAuthMethod($event)">
         </app-auth-method-radio>
 
         <app-card *ngIf="currentAuthMethod == 'PK_JWT' && projectId && app?.id" [expanded]="false"

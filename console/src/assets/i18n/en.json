@@ -1124,9 +1124,10 @@
             "REACTIVATED":"Application reactivated.",
             "DEACTIVATED":"Application deactivated.",
             "OIDCUPDATED":"OIDC configuration updated.",
+            "UPDATED":"App updated.",
             "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated.",
             "DELETED":"App deleted.",
-            "CONFIGCHANGED":"Configuration changed."
+            "CONFIGCHANGED":"Changes detected!"
         }
     },
     "GENDERS": {

@@ -25,9 +25,7 @@
         max-height: 50vh;
         overflow-y: scroll;
         border-bottom: 1px solid #ffffff20;
-        margin-bottom: 0.5rem;	
-        // display: flex;
-        // flex-direction: column;
+        margin-bottom: 0.5rem;
 
         .date {
             font-weight: 500;
@@ -37,10 +35,10 @@
         }
 
         .item {
-            // display: flex;
             display: block;
             padding: 10px 0;
             font-size: 0.8rem;
+
             .row {
                 display: flex;
                 flex-direction: row;
@@ -74,6 +72,11 @@
                             flex: 1;
                             font-weight: 500;
                             font-size: 0.8rem;
+                            overflow-x: hidden;
+                        }
+                        
+                        .msg {
+                            text-overflow: ellipsis;
                         }
 
                         .block {

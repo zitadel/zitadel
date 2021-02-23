@@ -35,7 +35,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
-import { CODE_METHOD, getAuthMethodFromPartialConfig, getPartialConfigFromAuthMethod, IMPLICIT_METHOD, PKCE_METHOD, PK_JWT_METHOD, POST_METHOD, CUSTOM_METHOD } from '../authmethods';
+import { CODE_METHOD, getAuthMethodFromPartialConfig, getPartialConfigFromAuthMethod, IMPLICIT_METHOD, PKCE_METHOD, PK_JWT_METHOD, POST_METHOD, CUSTOM_METHOD, BASIC_AUTH_METHOD } from '../authmethods';
 
 @Component({
     selector: 'app-app-detail',
@@ -52,11 +52,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public addOnBlur: boolean = true;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
-    public authMethods: RadioItemAuthType[] = [
-        PKCE_METHOD,
-        CODE_METHOD,
-        POST_METHOD,
-    ];
+    public authMethods: RadioItemAuthType[] = [];
     private subscription?: Subscription;
     public projectId: string = '';
     public app!: Application.AsObject;
@@ -202,8 +198,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app = app.toObject();
                 this.appNameForm.patchValue(this.app);
 
-                this.getAuthMethodOptions();
                 if (this.app.oidcConfig) {
+                    this.getAuthMethodOptions('OIDC');
+
                     this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
                     this.currentAuthMethod = this.initialAuthMethod;
                     if (this.initialAuthMethod === CUSTOM_METHOD.key) {
@@ -214,6 +211,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                         this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
                     }
                 } else if (this.app.apiConfig) {
+                    this.getAuthMethodOptions('API');
+
                     this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
                     this.currentAuthMethod = this.initialAuthMethod;
                     if (this.initialAuthMethod === CUSTOM_METHOD.key) {
@@ -228,6 +227,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 if (allowed) {
                     this.appNameForm.enable();
                     this.oidcForm.enable();
+                    this.apiForm.enable();
                 }
 
                 if (this.app.oidcConfig?.redirectUrisList) {
@@ -256,6 +256,19 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
                     this.showSaveSnack();
                 });
+
+                this.apiForm.valueChanges.subscribe((apiConfig) => {
+                    this.initialAuthMethod = this.authMethodFromPartialConfig({ api: apiConfig });
+                    if (this.initialAuthMethod === CUSTOM_METHOD.key) {
+                        if (!this.authMethods.includes(CUSTOM_METHOD)) {
+                            this.authMethods.push(CUSTOM_METHOD);
+                        }
+                    } else {
+                        this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
+                    }
+
+                    this.showSaveSnack();
+                });
             }).catch(error => {
                 console.error(error);
                 this.toast.showError(error);
@@ -269,7 +282,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         const message = await this.translate.get('APP.TOAST.CONFIGCHANGED').toPromise();
         const action = await this.translate.get('ACTIONS.SAVENOW').toPromise();
 
-        const snackRef = this.snackbar.open(message, action, { duration: 5000 });
+        const snackRef = this.snackbar.open(message, action, { duration: 5000, verticalPosition: 'top' });
         snackRef.onAction().subscribe(() => {
             if (this.app.oidcConfig) {
                 this.saveOIDCApp();
@@ -279,50 +292,54 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         });
     }
 
-    private getAuthMethodOptions(): void {
-        switch (this.app.oidcConfig?.applicationType) {
-            case OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE:
-                this.authMethods = [
-                    PKCE_METHOD,
-                    CUSTOM_METHOD,
-                ];
-                break;
-            case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
-                this.authMethods = [
-                    PKCE_METHOD,
-                    CODE_METHOD,
-                    PK_JWT_METHOD,
-                    POST_METHOD,
-                ];
-                break;
-            case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
-                this.authMethods = [
-                    PKCE_METHOD,
-                    IMPLICIT_METHOD,
-                ];
-                break;
+    private getAuthMethodOptions(type: string): void {
+        if (type == 'OIDC') {
+            switch (this.app.oidcConfig?.applicationType) {
+                case OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE:
+                    this.authMethods = [
+                        PKCE_METHOD,
+                        CUSTOM_METHOD,
+                    ];
+                    break;
+                case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
+                    this.authMethods = [
+                        PKCE_METHOD,
+                        CODE_METHOD,
+                        PK_JWT_METHOD,
+                        POST_METHOD,
+                    ];
+                    break;
+                case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
+                    this.authMethods = [
+                        PKCE_METHOD,
+                        IMPLICIT_METHOD,
+                    ];
+                    break;
+            }
+        }
+        if (type == 'API') {
+            this.authMethods = [
+                PK_JWT_METHOD,
+                BASIC_AUTH_METHOD,
+            ];
         }
     }
 
     public authMethodFromPartialConfig(config: { oidc?: OIDCConfig.AsObject, api?: APIConfig.AsObject; }): string {
         const key = getAuthMethodFromPartialConfig(config);
-        console.log(key);
         return key;
     }
 
     public setPartialConfigFromAuthMethod(authMethod: string): void {
-        console.log(authMethod);
         const partialConfig = getPartialConfigFromAuthMethod(authMethod);
-        console.log(partialConfig);
         if (partialConfig && partialConfig.oidc && this.app.oidcConfig) {
             this.app.oidcConfig.responseTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).responseTypesList ?? [];
             this.app.oidcConfig.grantTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).grantTypesList ?? [];
             this.app.oidcConfig.authMethodType = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
-            console.log(this.app.oidcConfig);
             this.oidcForm.patchValue(this.app.oidcConfig);
         } else if (partialConfig && partialConfig.api && this.app.apiConfig) {
-            this.app.apiConfig.authMethodType = (partialConfig as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
-            this.apiForm.patchValue(this.app.apiConfig);
+            this.app.apiConfig.authMethodType = (partialConfig.api as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
+            this.apiAuthMethodType?.setValue(this.app.apiConfig.authMethodType);
         }
     }
 
@@ -372,7 +389,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.mgmtService
                 .UpdateApplication(this.projectId, this.app.id, this.name?.value)
                 .then(() => {
-                    this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+                    this.toast.showInfo('APP.TOAST.UPDATED', true);
                     this.editState = false;
                 })
                 .catch(error => {
@@ -440,28 +457,26 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public saveAPIApp(): void {
-        if (this.apiForm.valid) {
-            if (this.app.apiConfig) {
-                this.app.apiConfig.authMethodType = this.authMethodType?.value;
+        if (this.apiForm.valid && this.app.apiConfig) {
+            this.app.apiConfig.authMethodType = this.apiAuthMethodType?.value;
 
-                const req = new APIConfigUpdate();
-                req.setProjectId(this.projectId);
-                req.setApplicationId(this.app.id);
-                req.setAuthMethodType(this.app.apiConfig.authMethodType);
+            const req = new APIConfigUpdate();
+            req.setProjectId(this.projectId);
+            req.setApplicationId(this.app.id);
+            req.setAuthMethodType(this.app.apiConfig.authMethodType);
 
-                this.mgmtService
-                    .UpdateAPIAppConfig(req)
-                    .then(() => {
-                        if (this.app.oidcConfig) {
-                            const config = { oidc: this.app.oidcConfig };
-                            this.currentAuthMethod = this.authMethodFromPartialConfig(config);
-                        }
-                        this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
-                    })
-                    .catch(error => {
-                        this.toast.showError(error);
-                    });
-            }
+            this.mgmtService
+                .UpdateAPIAppConfig(req)
+                .then(() => {
+                    if (this.app.apiConfig) {
+                        const config = { api: this.app.apiConfig };
+                        this.currentAuthMethod = this.authMethodFromPartialConfig(config);
+                    }
+                    this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+                })
+                .catch(error => {
+                    this.toast.showError(error);
+                });
         }
     }
 
@@ -507,6 +522,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public get authMethodType(): AbstractControl | null {
         return this.oidcForm.get('authMethodType');
+    }
+
+    public get apiAuthMethodType(): AbstractControl | null {
+        return this.apiForm.get('authMethodType');
     }
 
     public get devMode(): AbstractControl | null {
