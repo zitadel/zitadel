@@ -64,6 +64,23 @@ service ManagementService {
         };
     }
 
+    rpc GetOIDCInformation(GetOIDCInformationRequest) returns (GetOIDCInformationResponse) {
+        option (google.api.http) = {
+            get: "/zitadel/docs"
+        };
+    }
+
+    // GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)
+    rpc GetIAM(GetIAMRequest) returns (GetIAMResponse) {
+        option (google.api.http) = {
+            get: "/iam"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -343,6 +360,17 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    rpc SendHumanResetPasswordNotification(SendHumanResetPasswordNotificationRequest) returns (SendHumanResetPasswordNotificationResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/password/_reset"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -1707,6 +1735,28 @@ message HealthzRequest {}
 
 message HealthzResponse {}
 
+message GetOIDCInformationRequest {}
+
+message GetOIDCInformationResponse {
+    string issuer = 1;
+    string discovery_endpoint = 2;  
+}
+
+message GetIAMRequest {
+    enum SetupStep {
+        SETUP_STEP_UNDEFINED = 0;
+        SETUP_STEP_1 = 1;
+        SETUP_STEP_2 = 2;
+    }
+
+    string global_org_id = 1;
+    string iam_project_id = 2;
+    SetupStep set_up_done = 3;
+    SetupStep set_up_started = 4;
+}
+
+message GetIAMResponse {}
+
 message GetUserByIDRequest {
     string id = 1;
 }
@@ -1972,6 +2022,19 @@ message SetHumanInitialPasswordRequest {
 
 message SetHumanInitialPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
+}
+
+message SendHumanResetPasswordNotificationRequest {
+    enum Type {
+        TYPE_EMAIL = 0;
+        TYPE_SMS = 1;
+    }
+    string user_id = 1;
+    Type type = 2;
+}
+
+message SendHumanResetPasswordNotificationResponse {
+    zitadel.user.v1.ObjectDetails details = 1;
 }
 
 message ListUserMultiFactorsRequest {
