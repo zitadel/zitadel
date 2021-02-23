@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
+	key_model "github.com/caos/zitadel/internal/key/model"
 )
 
 type Configs map[string]*Config
@@ -29,7 +30,7 @@ func (h *handler) Eventstore() eventstore.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, systemDefaults sd.SystemDefaults, keyChan chan<- *key_model.KeyView) []query.Handler {
 	return []query.Handler{
 		newUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
@@ -41,7 +42,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newToken(
 			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
 		newKey(
-			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es}),
+			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es},
+			keyChan),
 		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),

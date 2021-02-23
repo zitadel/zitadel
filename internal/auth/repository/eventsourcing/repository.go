@@ -15,6 +15,7 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/id"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/v2/command"
 	"github.com/caos/zitadel/internal/v2/query"
 )
@@ -75,7 +76,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
+	keyChan := make(chan *key_model.KeyView)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, keyChan)
+	locker := spooler.NewLocker(sqlClient)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,
@@ -108,12 +111,15 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IAMID:                      systemDefaults.IamID,
 		},
 		eventstore.TokenRepo{
-			Eventstore: es,
 			View:       view,
 		},
 		eventstore.KeyRepository{
-			View:               view,
-			SigningKeyRotation: systemDefaults.KeyConfig.SigningKeyRotation.Duration,
+			View:                     view,
+			SigningKeyRotationCheck:  systemDefaults.KeyConfig.SigningKeyRotationCheck.Duration,
+			SigningKeyGracefulPeriod: systemDefaults.KeyConfig.SigningKeyGracefulPeriod.Duration,
+			KeyAlgorithm:             keyAlgorithm,
+			Locker:                   locker,
+			KeyChan:                  keyChan,
 		},
 		eventstore.ApplicationRepo{
 			Commands: command,

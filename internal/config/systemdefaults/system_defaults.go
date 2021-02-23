@@ -101,9 +101,10 @@ type WebAuthN struct {
 }
 
 type KeyConfig struct {
-	Size               int
-	PrivateKeyLifetime types.Duration
-	PublicKeyLifetime  types.Duration
-	EncryptionConfig   *crypto.KeyConfig
-	SigningKeyRotation types.Duration
+	Size                     int
+	PrivateKeyLifetime       types.Duration
+	PublicKeyLifetime        types.Duration
+	EncryptionConfig         *crypto.KeyConfig
+	SigningKeyRotationCheck  types.Duration
+	SigningKeyGracefulPeriod types.Duration
 }
