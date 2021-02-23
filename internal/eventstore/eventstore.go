@@ -47,7 +47,14 @@ func (es *Eventstore) PushEvents(ctx context.Context, pushEvents ...EventPusher)
 	if err != nil {
 		return nil, err
 	}
-	return es.mapEvents(events)
+
+	eventReaders, err := es.mapEvents(events)
+	if err != nil {
+		return nil, err
+	}
+
+	go notify(eventReaders)
+	return eventReaders, nil
 }
 
 func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {

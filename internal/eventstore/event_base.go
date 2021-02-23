@@ -54,6 +54,11 @@ func (e *BaseEvent) Aggregate() Aggregate {
 	return e.aggregate
 }
 
+//Data returns the payload of the event. It represent the changed fields by the event
+func (e *BaseEvent) Data() []byte {
+	return e.Data()
+}
+
 //BaseEventFromRepo maps a stored event to a BaseEvent
 func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 	return &BaseEvent{
