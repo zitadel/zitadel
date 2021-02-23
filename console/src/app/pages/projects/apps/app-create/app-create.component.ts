@@ -133,7 +133,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         });
 
         this.firstFormGroup.valueChanges.subscribe(value => {
-            console.log('asdf');
             if (this.firstFormGroup.valid) {
                 this.oidcApp.name = this.name?.value;
                 this.apiApp.name = this.name?.value;
@@ -193,7 +192,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         });
         this.secondFormGroup.valueChanges.subscribe(form => {
             const partialConfig = getPartialConfigFromAuthMethod(form.authMethod);
-            console.log(partialConfig);
 
             if (this.isStepperOIDC && partialConfig && partialConfig.oidc) {
                 this.oidcApp.responseTypesList = partialConfig.oidc?.responseTypesList ?? [];
@@ -218,7 +216,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.form.valueChanges.pipe(
             takeUntil(this.destroyed$),
             debounceTime(150)).subscribe(() => {
-                console.log('change');
                 this.oidcApp.name = this.formname?.value;
                 this.apiApp.name = this.formname?.value;
 
@@ -306,15 +303,13 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                     this.toast.showError(error);
                 });
         } else if (appAPICheck) {
-            console.log(this.apiApp);
             this.loading = true;
             this.mgmtService
                 .CreateAPIApplication(this.apiApp)
                 .then((data: Application) => {
                     this.loading = false;
                     const response = data.toObject();
-                    console.log(response);
-                    if (response.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
+                    if (response.apiConfig?.authMethodType == APIAuthMethodType.APIAUTHMETHODTYPE_BASIC) {
                         this.showSavedDialog(response);
                     } else {
                         this.router.navigate(['projects', this.projectId, 'apps', response.id]);
@@ -328,12 +323,21 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     }
 
     public showSavedDialog(app: Application.AsObject): void {
-        if (app.oidcConfig !== undefined) {
+        if (app.oidcConfig?.clientSecret !== undefined) {
             const dialogRef = this.dialog.open(AppSecretDialogComponent, {
                 data: app.oidcConfig,
             });
 
-            dialogRef.afterClosed().subscribe(result => {
+            dialogRef.afterClosed().subscribe(() => {
+                this.router.navigate(['projects', this.projectId, 'apps', app.id]);
+            });
+        }
+        else if (app.apiConfig?.clientSecret !== undefined) {
+            const dialogRef = this.dialog.open(AppSecretDialogComponent, {
+                data: app.apiConfig,
+            });
+
+            dialogRef.afterClosed().subscribe(() => {
                 this.router.navigate(['projects', this.projectId, 'apps', app.id]);
             });
         } else {

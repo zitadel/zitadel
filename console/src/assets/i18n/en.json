@@ -1081,6 +1081,7 @@
             }
         },
         "API": {
+            "REGENERATESECRET": "Regenerate Client Secret",
             "SELECTION":{
                 "TITLE":"API",
                 "DESCRIPTION":"APIs in general"
@@ -1125,7 +1126,7 @@
             "DEACTIVATED":"Application deactivated.",
             "OIDCUPDATED":"OIDC configuration updated.",
             "UPDATED":"App updated.",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated.",
+            "CLIENTSECRETREGENERATED":"client secret generated.",
             "DELETED":"App deleted.",
             "CONFIGCHANGED":"Changes detected!"
         }

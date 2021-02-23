@@ -140,11 +140,16 @@
             <app-client-keys [projectId]="projectId" [appId]="app.id"></app-client-keys>
         </app-card>
 
+        <div *ngIf="currentAuthMethod == 'BASIC'">
+            <button [disabled]="!canWrite" mat-stroked-button
+                (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' | translate}}</button>
+        </div>
+
+
         <form *ngIf="oidcForm && app?.oidcConfig" [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
             <app-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
-                <div card-actions
-                    *ngIf="app?.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
-                    <button [disabled]="!canWrite" mat-stroked-button
+                <div card-actions *ngIf="currentAuthMethod == 'CODE' || currentAuthMethod == 'POST'">
+                    <button type="button" [disabled]="!canWrite" mat-stroked-button
                         (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
                 </div>
 

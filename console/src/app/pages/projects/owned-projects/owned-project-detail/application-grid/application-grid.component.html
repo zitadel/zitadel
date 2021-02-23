@@ -26,9 +26,9 @@
         </cnsl-app-card>
         <span class="name">{{app.name}}</span>
         <span *ngIf="app.oidcConfig?.applicationType !== undefined && app.oidcConfig?.applicationType !== null"
-            class="type">{{'APP.OIDC.APPTYPE.'+app.oidcConfig?.applicationType
-            |
-            translate}}</span>
+            class="type">
+            {{'APP.OIDC.APPTYPE.'+app.oidcConfig?.applicationType | translate}}</span>
+        <span *ngIf="app.apiConfig !== undefined" class="type"> API</span>
 
     </div>
 

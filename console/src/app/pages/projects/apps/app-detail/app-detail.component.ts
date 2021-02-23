@@ -21,6 +21,7 @@ import {
     APIConfigUpdate,
     Application,
     AppState,
+    ClientSecret,
     OIDCApplicationType,
     OIDCAuthMethodType,
     OIDCConfig,
@@ -96,6 +97,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public OIDCApplicationType: any = OIDCApplicationType;
     public OIDCAuthMethodType: any = OIDCAuthMethodType;
+    public APIAuthMethodType: any = APIAuthMethodType;
     public OIDCTokenType: any = OIDCTokenType;
 
     public ChangeType: any = ChangeType;
@@ -481,11 +483,27 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public regenerateOIDCClientSecret(): void {
-        this.mgmtService.RegenerateOIDCClientSecret(this.app.id, this.projectId).then((data: OIDCConfig) => {
-            this.toast.showInfo('APP.TOAST.OIDCCLIENTSECRETREGENERATED', true);
+        this.mgmtService.RegenerateOIDCClientSecret(this.app.id, this.projectId).then((data: ClientSecret) => {
+            this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
             this.dialog.open(AppSecretDialogComponent, {
                 data: {
-                    clientId: data.toObject().clientId,
+                    // clientId: data.toObject() as ClientSecret.AsObject.clientId,
+                    clientSecret: data.toObject().clientSecret,
+                },
+                width: '400px',
+            });
+
+        }).catch(error => {
+            this.toast.showError(error);
+        });
+    }
+
+    public regenerateAPIClientSecret(): void {
+        this.mgmtService.RegenerateAPIClientSecret(this.app.id, this.projectId).then((data: ClientSecret) => {
+            this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
+            this.dialog.open(AppSecretDialogComponent, {
+                data: {
+                    // clientId: data.toObject().clientId ?? '',
                     clientSecret: data.toObject().clientSecret,
                 },
                 width: '400px',

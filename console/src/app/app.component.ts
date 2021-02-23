@@ -168,6 +168,12 @@ export class AppComponent implements OnDestroy {
             'mdi_numeric',
             this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/numeric.svg'),
         );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_api',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/api.svg'),
+        );
+
         this.getProjectCount();
 
         this.orgSub = this.authService.activeOrgChanged.subscribe(org => {

@@ -29,6 +29,7 @@ import {
     ClientKeyIDRequest,
     ClientKeySearchRequest,
     ClientKeySearchResponse,
+    ClientSecret,
     CreateHumanRequest,
     CreateMachineRequest,
     CreateUserRequest,
@@ -1271,11 +1272,18 @@ export class ManagementService {
         return this.grpcService.mgmt.deactivateApplication(req);
     }
 
-    public RegenerateOIDCClientSecret(id: string, projectId: string): Promise<any> {
+    public RegenerateOIDCClientSecret(id: string, projectId: string): Promise<ClientSecret> {
         const req = new ApplicationID();
         req.setId(id);
         req.setProjectId(projectId);
         return this.grpcService.mgmt.regenerateOIDCClientSecret(req);
+    }
+
+    public RegenerateAPIClientSecret(id: string, projectId: string): Promise<ClientSecret> {
+        const req = new ApplicationID();
+        req.setId(id);
+        req.setProjectId(projectId);
+        return this.grpcService.mgmt.regenerateAPIClientSecret(req);
     }
 
     public SearchProjectRoles(

@@ -213,7 +213,6 @@ export function getAuthMethodFromPartialConfig(config: { oidc?: Partial<OIDCConf
                 return CUSTOM_METHOD.key;
         }
     } else if (config.api && config.api.authMethodType !== undefined) {
-        console.log(config.api);
         switch (config.api.authMethodType.toString()) {
             case APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT.toString(): return PK_JWT_METHOD.key;
             case APIAuthMethodType.APIAUTHMETHODTYPE_BASIC.toString(): return BASIC_AUTH_METHOD.key;
