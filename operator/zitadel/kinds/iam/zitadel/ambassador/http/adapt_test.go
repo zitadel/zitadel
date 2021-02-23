@@ -30,7 +30,7 @@ func SetReturnResourceVersion(
 			},
 		},
 	}
-	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).Return(ret, nil)
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).MinTimes(1).MaxTimes(1).Return(ret, nil)
 }
 
 func TestHttp_Adapt(t *testing.T) {
@@ -49,7 +49,7 @@ func TestHttp_Adapt(t *testing.T) {
 	}
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	group := "getambassador.io"
 	version := "v2"
@@ -87,7 +87,7 @@ func TestHttp_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, EndsessionName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, EndsessionName, endsession).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, EndsessionName, endsession).MinTimes(1).MaxTimes(1)
 
 	issuerName := labels.MustForName(componentLabels, IssuerName)
 	issuer := &unstructured.Unstructured{
@@ -111,7 +111,7 @@ func TestHttp_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerName, issuer).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerName, issuer).MinTimes(1).MaxTimes(1)
 
 	authorizeName := labels.MustForName(componentLabels, AuthorizeName)
 	authorize := &unstructured.Unstructured{
@@ -135,7 +135,7 @@ func TestHttp_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthorizeName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthorizeName, authorize).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthorizeName, authorize).MinTimes(1).MaxTimes(1)
 
 	oauthName := labels.MustForName(componentLabels, OauthName)
 	oauth := &unstructured.Unstructured{
@@ -159,7 +159,7 @@ func TestHttp_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, OauthName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OauthName, oauth).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OauthName, oauth).MinTimes(1).MaxTimes(1)
 
 	mgmtName := labels.MustForName(componentLabels, MgmtName)
 	mgmt := &unstructured.Unstructured{
@@ -183,7 +183,7 @@ func TestHttp_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtName, mgmt).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtName, mgmt).MinTimes(1).MaxTimes(1)
 
 	adminRName := labels.MustForName(componentLabels, AdminRName)
 	adminR := &unstructured.Unstructured{
@@ -207,7 +207,7 @@ func TestHttp_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminRName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminRName, adminR).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminRName, adminR).MinTimes(1).MaxTimes(1)
 
 	authRName := labels.MustForName(componentLabels, AuthRName)
 	authR := &unstructured.Unstructured{
@@ -231,7 +231,7 @@ func TestHttp_Adapt(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthRName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)
@@ -257,7 +257,7 @@ func TestHttp_Adapt2(t *testing.T) {
 	}
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	group := "getambassador.io"
 	version := "v2"
@@ -296,7 +296,7 @@ func TestHttp_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, EndsessionName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, EndsessionName, endsession).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, EndsessionName, endsession).MinTimes(1).MaxTimes(1)
 
 	issuerName := labels.MustForName(componentLabels, IssuerName)
 	issuer := &unstructured.Unstructured{
@@ -320,7 +320,7 @@ func TestHttp_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerName, issuer).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerName, issuer).MinTimes(1).MaxTimes(1)
 
 	authorizeName := labels.MustForName(componentLabels, AuthorizeName)
 	authorize := &unstructured.Unstructured{
@@ -344,7 +344,7 @@ func TestHttp_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthorizeName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthorizeName, authorize).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthorizeName, authorize).MinTimes(1).MaxTimes(1)
 
 	oauthName := labels.MustForName(componentLabels, OauthName)
 	oauth := &unstructured.Unstructured{
@@ -368,7 +368,7 @@ func TestHttp_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, OauthName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OauthName, oauth).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OauthName, oauth).MinTimes(1).MaxTimes(1)
 
 	mgmtName := labels.MustForName(componentLabels, MgmtName)
 	mgmt := &unstructured.Unstructured{
@@ -392,7 +392,7 @@ func TestHttp_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, MgmtName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtName, mgmt).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, MgmtName, mgmt).MinTimes(1).MaxTimes(1)
 
 	adminRName := labels.MustForName(componentLabels, AdminRName)
 	adminR := &unstructured.Unstructured{
@@ -416,7 +416,7 @@ func TestHttp_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AdminRName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminRName, adminR).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AdminRName, adminR).MinTimes(1).MaxTimes(1)
 
 	authRName := labels.MustForName(componentLabels, AuthRName)
 	authR := &unstructured.Unstructured{
@@ -440,7 +440,7 @@ func TestHttp_Adapt2(t *testing.T) {
 		},
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthRName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)
