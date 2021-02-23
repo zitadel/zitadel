@@ -336,7 +336,7 @@ service ManagementService {
     }
 
     // A Manager is only allowed to set an initial password, on the next login the user has to change his password
-    rpc SetInitialPassword(SetInitialPasswordRequest) returns (SetInitialPasswordResponse) {
+    rpc SetHumanInitialPassword(SetHumanInitialPasswordRequest) returns (SetHumanInitialPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_initialize"
             body: "*"
@@ -346,6 +346,80 @@ service ManagementService {
             permission: "user.write"
         };
     }
+
+    rpc ListUserMultiFactors(ListUserMultiFactorsRequest) returns (ListUserMultiFactorsResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/mfas"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    rpc RemoveHumanMultiFactorOTP(RemoveHumanMultiFactorOTPRequest) returns (RemoveHumanMultiFactorOTPResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/mfas/otp"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    rpc RemoveHumanMultiFactorU2F(RemoveHumanMultiFactorU2FRequest) returns (RemoveHumanMultiFactorU2FResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/mfas/u2f"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/passwordless"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/passwordless"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
@@ -1891,12 +1965,53 @@ message UpdateHumanAddressResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message SetInitialPasswordRequest {
+message SetHumanInitialPasswordRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
     string password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
 }
 
-message SetInitialPasswordResponse {
+message SetHumanInitialPasswordResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListUserMultiFactorsRequest {
+    string user_id = 1;
+}
+
+message ListUserMultiFactorsResponse {
+    repeated zitadel.user.v1.MultiFactor result = 1;
+}
+
+message RemoveHumanMultiFactorOTPRequest {
+    string user_id = 1;
+}
+
+message RemoveHumanMultiFactorOTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveHumanMultiFactorU2FRequest {
+    string user_id = 1;
+}
+
+message RemoveHumanMultiFactorU2FResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListHumanPasswordlessRequest {
+    string user_id = 1;
+}
+
+message ListHumanPasswordlessResponse {
+    repeated zitadel.user.v1.WebAuthNToken result = 1;
+}
+
+message RemoveHumanPasswordlessRequest {
+    string user_id = 1;
+    string token_id = 2;
+}
+
+message RemoveHumanPasswordlessResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -2767,11 +2882,11 @@ message ListLoginPolicySecondFactorsRequest {}
 
 message ListLoginPolicySecondFactorsResponse {
     zitadel.v1.ListDetails meta_data = 1;
-    repeated zitadel.policy.v1.SecondFactor result = 2;
+    repeated zitadel.policy.v1.SecondFactorType result = 2;
 }
 
 message AddSecondFactorToLoginPolicyRequest {
-    zitadel.policy.v1.SecondFactor second_factor = 1;
+    zitadel.policy.v1.SecondFactorType second_factor = 1;
 }
 message AddSecondFactorToLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
@@ -2789,11 +2904,11 @@ message ListLoginPolicyMultiFactorsRequest {}
 
 message ListLoginPolicyMultiFactorsResponse {
     zitadel.v1.ListDetails meta_data = 1;
-    repeated zitadel.user.v1.MultiFactor result = 2;
+    repeated zitadel.policy.v1.MultiFactorType result = 2;
 }
 
 message AddMultiFactorToLoginPolicyRequest {
-    zitadel.user.v1.MultiFactor multi_factor = 1;
+    zitadel.policy.v1.MultiFactorType multi_factor = 1;
 }
 
 message AddMultiFactorToLoginPolicyResponse {
@@ -2801,7 +2916,7 @@ message AddMultiFactorToLoginPolicyResponse {
 }
 
 message RemoveMultiFactorFromLoginPolicyRequest {
-    zitadel.user.v1.MultiFactorType multi_factor = 1;
+    zitadel.policy.v1.MultiFactorType multi_factor = 1;
 }
 
 message RemoveMultiFactorFromLoginPolicyResponse {
