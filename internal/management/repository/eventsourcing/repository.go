@@ -1,12 +1,12 @@
 package eventsourcing
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/v2/query"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
-	es_int "github.com/caos/zitadel/internal/eventstore"
-	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
@@ -15,7 +15,7 @@ import (
 type Config struct {
 	SearchLimit uint64
 	Domain      string
-	Eventstore  es_int.Config
+	Eventstore  v1.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
 }
@@ -32,7 +32,7 @@ type EsRepository struct {
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
 
-	es, err := es_int.Start(conf.Eventstore)
+	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"

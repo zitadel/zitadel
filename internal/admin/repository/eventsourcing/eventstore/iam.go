@@ -2,8 +2,8 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/v2/domain"
@@ -21,7 +21,7 @@ import (
 )
 
 type IAMRepository struct {
-	Eventstore     eventstore.Eventstore
+	Eventstore     v1.Eventstore
 	SearchLimit    uint64
 	View           *admin_view.View
 	SystemDefaults systemdefaults.SystemDefaults

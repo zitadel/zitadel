@@ -7,13 +7,13 @@ import (
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
-	es_int "github.com/caos/zitadel/internal/eventstore"
-	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 )
 
 type Config struct {
 	SearchLimit uint64
-	Eventstore  es_int.Config
+	Eventstore  v1.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
 	Domain      string
@@ -27,7 +27,7 @@ type EsRepository struct {
 }
 
 func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
-	es, err := es_int.Start(conf.Eventstore)
+	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
 	}

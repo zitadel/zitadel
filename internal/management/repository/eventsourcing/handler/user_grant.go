@@ -2,23 +2,22 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/logging"
 	"k8s.io/apimachinery/pkg/api/errors"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -34,7 +33,7 @@ const (
 
 type UserGrant struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newUserGrant(
@@ -256,7 +255,7 @@ func (u *UserGrant) getUserByID(userID string) (*usr_view_model.UserView, error)
 	return &userCopy, nil
 }
 
-func (u *UserGrant) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+func (u *UserGrant) getUserEvents(userID string, sequence uint64) ([]*es_models.Event, error) {
 	query, err := view.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err
@@ -272,7 +271,7 @@ func (u *UserGrant) getOrgByID(ctx context.Context, orgID string) (*org_model.Or
 	}
 
 	esOrg := &org_es_model.Org{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: orgID,
 		},
 	}
@@ -293,7 +292,7 @@ func (u *UserGrant) getProjectByID(ctx context.Context, projID string) (*proj_mo
 		return nil, err
 	}
 	esProject := &proj_es_model.Project{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: projID,
 		},
 	}

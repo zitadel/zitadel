@@ -3,8 +3,8 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -35,7 +35,7 @@ const (
 
 type OrgRepository struct {
 	SearchLimit    uint64
-	Eventstore     eventstore.Eventstore
+	Eventstore     v1.Eventstore
 	View           *mgmt_view.View
 	Roles          []string
 	SystemDefaults systemdefaults.SystemDefaults

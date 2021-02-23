@@ -1,10 +1,10 @@
 package command
 
 import (
+	"github.com/caos/zitadel/internal/eventstore"
 	"strings"
 
 	caos_errors "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )

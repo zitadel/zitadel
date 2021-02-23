@@ -2,9 +2,8 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v2"
-
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/v2/domain"

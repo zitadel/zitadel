@@ -1,6 +1,6 @@
 package domain
 
-import "github.com/caos/zitadel/internal/eventstore/models"
+import "github.com/caos/zitadel/internal/eventstore/v1/models"
 
 type Machine struct {
 	models.ObjectRoot

@@ -5,12 +5,11 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
@@ -30,7 +29,7 @@ const (
 type ExternalIDP struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
-	subscription   *eventstore.Subscription
+	subscription   *v1.Subscription
 }
 
 func newExternalIDP(
@@ -60,8 +59,8 @@ func (i *ExternalIDP) ViewModel() string {
 	return externalIDPTable
 }
 
-func (i *ExternalIDP) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
+func (i *ExternalIDP) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
 }
 
 func (i *ExternalIDP) CurrentSequence() (uint64, error) {
@@ -72,7 +71,7 @@ func (i *ExternalIDP) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *ExternalIDP) EventQuery() (*models.SearchQuery, error) {
+func (i *ExternalIDP) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := i.view.GetLatestExternalIDPSequence()
 	if err != nil {
 		return nil, err
@@ -82,7 +81,7 @@ func (i *ExternalIDP) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (i *ExternalIDP) Reduce(event *models.Event) (err error) {
+func (i *ExternalIDP) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.UserAggregate:
 		err = i.processUser(event)
@@ -92,7 +91,7 @@ func (i *ExternalIDP) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (i *ExternalIDP) processUser(event *models.Event) (err error) {
+func (i *ExternalIDP) processUser(event *es_models.Event) (err error) {
 	externalIDP := new(usr_view_model.ExternalIDPView)
 	switch event.Type {
 	case model.HumanExternalIDPAdded:
@@ -118,7 +117,7 @@ func (i *ExternalIDP) processUser(event *models.Event) (err error) {
 	return i.view.PutExternalIDP(externalIDP, event)
 }
 
-func (i *ExternalIDP) processIdpConfig(event *models.Event) (err error) {
+func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 	switch event.Type {
 	case iam_es_model.IDPConfigChanged, org_es_model.IDPConfigChanged:
 		configView := new(iam_view_model.IDPConfigView)
@@ -165,7 +164,7 @@ func (i *ExternalIDP) fillConfigData(externalIDP *usr_view_model.ExternalIDPView
 	externalIDP.IDPName = config.Name
 }
 
-func (i *ExternalIDP) OnError(event *models.Event, err error) error {
+func (i *ExternalIDP) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-4Rsu8", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
 	return spooler.HandleError(event, err, i.view.GetLatestExternalIDPFailedEvent, i.view.ProcessedExternalIDPFailedEvent, i.view.ProcessedExternalIDPSequence, i.errorCountUntilSkip)
 }
@@ -192,7 +191,7 @@ func (i *ExternalIDP) getOrgByID(ctx context.Context, orgID string) (*org_model.
 	}
 
 	esOrg := &org_es_model.Org{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: orgID,
 		},
 	}

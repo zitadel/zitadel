@@ -3,7 +3,7 @@ package domain
 import (
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errors "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"strings"
 	"time"
 )

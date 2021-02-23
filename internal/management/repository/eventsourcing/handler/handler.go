@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 )
 
@@ -22,14 +22,14 @@ type handler struct {
 	cycleDuration       time.Duration
 	errorCountUntilSkip uint64
 
-	es eventstore.Eventstore
+	es v1.Eventstore
 }
 
-func (h *handler) Eventstore() eventstore.Eventstore {
+func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, defaults systemdefaults.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		newProject(
 			handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount, es}),

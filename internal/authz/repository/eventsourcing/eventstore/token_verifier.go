@@ -2,7 +2,8 @@ package eventstore
 
 import (
 	"context"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
@@ -11,8 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 
 	"github.com/caos/logging"
@@ -28,7 +28,7 @@ import (
 type TokenVerifierRepo struct {
 	TokenVerificationKey [32]byte
 	IAMID                string
-	Eventstore           eventstore.Eventstore
+	Eventstore           v1.Eventstore
 	View                 *view.View
 }
 

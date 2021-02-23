@@ -1,14 +1,14 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/key/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
@@ -21,7 +21,7 @@ const (
 
 type Key struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 	keyChan      chan<- *model.KeyView
 }
 

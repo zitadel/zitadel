@@ -1,14 +1,14 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	key_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	user_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -20,7 +20,7 @@ const (
 
 type AuthNKeys struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newAuthNKeys(handler handler) *AuthNKeys {

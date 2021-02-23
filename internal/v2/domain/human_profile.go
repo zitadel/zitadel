@@ -1,7 +1,7 @@
 package domain
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"golang.org/x/text/language"
 )
 

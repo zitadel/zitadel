@@ -2,10 +2,10 @@ package policy
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v2"
-	"github.com/caos/zitadel/internal/eventstore/v2/repository"
+	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
 const (

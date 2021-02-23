@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/user"
 )

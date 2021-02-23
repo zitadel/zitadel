@@ -1,7 +1,7 @@
 package project
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {

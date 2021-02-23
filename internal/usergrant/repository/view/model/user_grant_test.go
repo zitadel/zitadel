@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/usergrant/model"
 	es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	"github.com/lib/pq"

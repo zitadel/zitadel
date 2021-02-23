@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/v2/domain"
 	keypair "github.com/caos/zitadel/internal/v2/repository/keypair"
 	"github.com/caos/zitadel/internal/v2/repository/project"

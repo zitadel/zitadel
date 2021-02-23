@@ -1,7 +1,7 @@
 package query
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/v2/repository/member"
 )
 

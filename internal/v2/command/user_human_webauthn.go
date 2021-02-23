@@ -2,9 +2,9 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/v2/domain"
 	usr_repo "github.com/caos/zitadel/internal/v2/repository/user"

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 type ApplicationKey struct {

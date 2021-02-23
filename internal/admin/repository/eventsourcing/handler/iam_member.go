@@ -3,15 +3,14 @@ package handler
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -24,7 +23,7 @@ const (
 
 type IAMMember struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newIAMMember(handler handler) *IAMMember {
@@ -199,7 +198,7 @@ func (m *IAMMember) getUserByID(userID string) (*view_model.UserView, error) {
 	return &userCopy, nil
 }
 
-func (m *IAMMember) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+func (m *IAMMember) getUserEvents(userID string, sequence uint64) ([]*es_models.Event, error) {
 	query, err := view.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err

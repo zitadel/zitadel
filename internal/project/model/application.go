@@ -3,7 +3,7 @@ package model
 import (
 	"github.com/golang/protobuf/ptypes/timestamp"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 type Application struct {

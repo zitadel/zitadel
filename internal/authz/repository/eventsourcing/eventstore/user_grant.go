@@ -2,9 +2,9 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
@@ -25,7 +25,7 @@ type UserGrantRepo struct {
 	IamID        string
 	IamProjectID string
 	Auth         authz.Config
-	Eventstore   eventstore.Eventstore
+	Eventstore   v1.Eventstore
 }
 
 func (repo *UserGrantRepo) Health() error {

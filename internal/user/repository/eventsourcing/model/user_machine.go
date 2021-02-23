@@ -6,8 +6,7 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 type Machine struct {
@@ -17,7 +16,7 @@ type Machine struct {
 	Description string `json:"description,omitempty"`
 }
 
-func (sa *Machine) AppendEvents(events ...*models.Event) error {
+func (sa *Machine) AppendEvents(events ...*es_models.Event) error {
 	for _, event := range events {
 		if err := sa.AppendEvent(event); err != nil {
 			return err
@@ -26,7 +25,7 @@ func (sa *Machine) AppendEvents(events ...*models.Event) error {
 	return nil
 }
 
-func (sa *Machine) AppendEvent(event *models.Event) (err error) {
+func (sa *Machine) AppendEvent(event *es_models.Event) (err error) {
 	switch event.Type {
 	case MachineAdded, MachineChanged:
 		err = sa.setData(event)
@@ -35,7 +34,7 @@ func (sa *Machine) AppendEvent(event *models.Event) (err error) {
 	return err
 }
 
-func (sa *Machine) setData(event *models.Event) error {
+func (sa *Machine) setData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, sa); err != nil {
 		logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(err, "MODEL-GwjY9", "could not unmarshal event")

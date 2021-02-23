@@ -4,13 +4,12 @@ import (
 	"encoding/json"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
 type PasswordComplexityPolicy struct {
-	models.ObjectRoot
+	es_models.ObjectRoot
 
 	State        int32  `json:"-"`
 	MinLength    uint64 `json:"minLength"`

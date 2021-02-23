@@ -1,9 +1,9 @@
 package command
 
 import (
+	"github.com/caos/zitadel/internal/eventstore"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore/v2"
 	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/internal/v2/repository/project"
 )

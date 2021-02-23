@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v2"
+	"github.com/caos/zitadel/internal/eventstore"
 	"reflect"
 
 	"github.com/caos/zitadel/internal/errors"
