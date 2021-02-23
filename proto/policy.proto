@@ -43,20 +43,14 @@ message LoginPolicy {
     PasswordlessType passwordless_type = 6;
 }
 
-message SecondFactor {
-    message OTP {}
-    message U2F {}
-
-    oneof type {
-        OTP otp = 1;
-        U2F u2f = 2;
-    }
-}
-
 enum SecondFactorType {
     SECOND_FACTOR_TYPE_UNSPECIFIED = 0;
     SECOND_FACTOR_TYPE_OTP = 1;
     SECOND_FACTOR_TYPE_U2F = 2;
+}
+
+enum MultiFactorType {
+    MULTI_FACTOR_TYPE_UNSPECIFIED = 0;
 }
 
 enum PasswordlessType {

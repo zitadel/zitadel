@@ -154,6 +154,7 @@ message MultiFactor {
         MultiFactorOTP otp = 2;
         MultiFactorU2F u2f = 3;
     }
+    //TODO: should it contain objectdetails?
 }
 
 enum MultiFactorState {
@@ -174,12 +175,6 @@ message MultiFactorU2F {
     string name = 2;
 }
 
-message Passwordless {
-    string id = 1;
-    string name = 2;
-    MultiFactorState state = 3;
-}
-
 message WebAuthNKey {
     string id = 1;
     bytes public_key = 2;
@@ -188,6 +183,12 @@ message WebAuthNKey {
 message WebAuthNVerification {
     bytes public_key_credential = 1;
     string token_name = 2;
+}
+
+message WebAuthNToken {
+    string id = 1;
+    MultiFactorState state = 2;
+    string name = 3;
 }
 
 message MachineKey {

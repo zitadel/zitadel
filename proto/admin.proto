@@ -884,7 +884,7 @@ message ListDefaultLoginPolicySecondFactorsRequest {}
 
 message ListDefaultLoginPolicySecondFactorsResponse {
     zitadel.v1.ListDetails meta_data = 1;
-    repeated zitadel.policy.v1.SecondFactor result = 2;
+    repeated zitadel.policy.v1.SecondFactorType result = 2;
 }
 
 message AddSecondFactorToDefaultLoginPolicyRequest {
@@ -907,11 +907,11 @@ message ListDefaultLoginPolicyMultiFactorsRequest {}
 
 message ListDefaultLoginPolicyMultiFactorsResponse {
     zitadel.v1.ListDetails meta_data = 1;
-    repeated zitadel.user.v1.MultiFactor result = 2;
+    repeated zitadel.policy.v1.MultiFactorType result = 2;
 }
 
 message AddMultiFactorToDefaultLoginPolicyRequest {
-    zitadel.user.v1.MultiFactorType type = 1;
+    zitadel.policy.v1.MultiFactorType type = 1;
 }
 
 message AddMultiFactorToDefaultLoginPolicyResponse {
@@ -919,7 +919,7 @@ message AddMultiFactorToDefaultLoginPolicyResponse {
 }
 
 message RemoveMultiFactorFromDefaultLoginPolicyRequest {
-    zitadel.user.v1.MultiFactorType type = 1;
+    zitadel.policy.v1.MultiFactorType type = 1;
 }
 
 message RemoveMultiFactorFromDefaultLoginPolicyResponse {

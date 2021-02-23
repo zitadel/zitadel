@@ -517,6 +517,13 @@ message ListMyMultiFactorsResponse {
     repeated zitadel.user.v1.MultiFactor result = 1;
 }
 
+message AddMyMultiFactorU2FRequest {}
+
+message AddMyMultiFactorU2FResponse {
+    zitadel.user.v1.WebAuthNKey key = 1;
+    zitadel.v1.ObjectDetails details = 2;
+}
+
 message AddMyMultiFactorOTPRequest {}
 
 message AddMyMultiFactorOTPResponse {
@@ -533,24 +540,17 @@ message VerifyMyMultiFactorOTPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveMyMultiFactorOTPRequest {}
-
-message RemoveMyMultiFactorOTPResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message AddMyMultiFactorU2FRequest {}
-
-message AddMyMultiFactorU2FResponse {
-    zitadel.user.v1.WebAuthNKey key = 1;
-    zitadel.v1.ObjectDetails details = 2;
-}
-
 message VerifyMyMultiFactorU2FRequest {
     zitadel.user.v1.WebAuthNVerification verification = 1;
 }
 
 message VerifyMyMultiFactorU2FResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveMyMultiFactorOTPRequest {}
+
+message RemoveMyMultiFactorOTPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -562,11 +562,10 @@ message RemoveMyMultiFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-
 message ListMyPasswordlessRequest {}
 
 message ListMyPasswordlessResponse {
-    repeated zitadel.user.v1.Passwordless result = 1; 
+    repeated zitadel.user.v1.WebAuthNToken result = 1; 
 }
 
 message AddMyPasswordlessRequest {}
