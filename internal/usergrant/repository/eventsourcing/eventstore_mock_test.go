@@ -41,7 +41,7 @@ func GetMockUserGrantByIDOK(ctrl *gomock.Controller) *UserGrantEventStore {
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserGrantAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -57,14 +57,14 @@ func GetMockUserGrantByIDRemoved(ctrl *gomock.Controller) *UserGrantEventStore {
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserGrantRemoved},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
 func GetMockUserGrantByIDNoEvents(ctrl *gomock.Controller) *UserGrantEventStore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -79,9 +79,9 @@ func GetMockManipulateUserGrant(ctrl *gomock.Controller) *UserGrantEventStore {
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserGrantAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -97,17 +97,17 @@ func GetMockManipulateUserGrantInactive(ctrl *gomock.Controller) *UserGrantEvent
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserGrantDeactivated},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
 func GetMockManipulateUserGrantNoEvents(ctrl *gomock.Controller) *UserGrantEventStore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }

@@ -42,7 +42,7 @@ func newTestEventstore(t *testing.T) *testOrgEventstore {
 }
 
 func (es *testOrgEventstore) expectFilterEvents(events []*es_models.Event, err error) *testOrgEventstore {
-	es.mockEventstore.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, err)
+	es.mockEventstore.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, err).AnyTimes()
 	return es
 }
 
@@ -56,20 +56,20 @@ func (es *testOrgEventstore) expectPushEvents(startSequence uint64, err error) *
 				}
 			}
 			return err
-		})
+		}).AnyTimes()
 	return es
 }
 
 func (es *testOrgEventstore) expectAggregateCreator() *testOrgEventstore {
-	es.mockEventstore.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("test"))
+	es.mockEventstore.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("test")).AnyTimes()
 	return es
 }
 
 func (es *testOrgEventstore) expectGenerateVerification(r rune) *testOrgEventstore {
 	generator, _ := es.verificationGenerator.(*crypto.MockGenerator)
-	generator.EXPECT().Length().Return(uint(2))
-	generator.EXPECT().Runes().Return([]rune("aa"))
-	generator.EXPECT().Alg().Return(es.verificationAlgorithm)
+	generator.EXPECT().Length().Return(uint(2)).AnyTimes()
+	generator.EXPECT().Runes().Return([]rune("aa")).AnyTimes()
+	generator.EXPECT().Alg().Return(es.verificationAlgorithm).AnyTimes()
 	return es
 }
 
@@ -83,20 +83,20 @@ func (es *testOrgEventstore) expectEncrypt() *testOrgEventstore {
 				KeyID:      "id",
 				Crypted:    value,
 			}, nil
-		})
-	algorithm.EXPECT().Algorithm().Return("enc")
-	algorithm.EXPECT().EncryptionKeyID().Return("id")
+		}).AnyTimes()
+	algorithm.EXPECT().Algorithm().Return("enc").AnyTimes()
+	algorithm.EXPECT().EncryptionKeyID().Return("id").AnyTimes()
 	return es
 }
 
 func (es *testOrgEventstore) expectDecrypt() *testOrgEventstore {
 	algorithm, _ := es.verificationAlgorithm.(*crypto.MockEncryptionAlgorithm)
-	algorithm.EXPECT().Algorithm().AnyTimes().Return("enc")
-	algorithm.EXPECT().DecryptionKeyIDs().Return([]string{"id"})
+	algorithm.EXPECT().Algorithm().Return("enc").AnyTimes()
+	algorithm.EXPECT().DecryptionKeyIDs().Return([]string{"id"}).AnyTimes()
 	algorithm.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(value []byte, id string) (string, error) {
 			return string(value), nil
-		})
+		}).AnyTimes()
 	return es
 }
 
