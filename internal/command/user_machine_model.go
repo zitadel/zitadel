@@ -27,7 +27,6 @@ func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
 	}
 }
 
-//TODO: Compute OTPState? initial/active
 func (wm *MachineWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {

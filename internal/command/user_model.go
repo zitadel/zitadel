@@ -25,7 +25,6 @@ func NewUserWriteModel(userID, resourceOwner string) *UserWriteModel {
 	}
 }
 
-//TODO: Compute OTPState? initial/active
 func (wm *UserWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
