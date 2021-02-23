@@ -108,7 +108,7 @@ func TestSetUpStarted(t *testing.T) {
 		{
 			name: "setup already started",
 			args: args{
-				es:    GetMockManipulateIAM(ctrl),
+				es:    GetMockManipulateIAM(gomock.NewController(t)),
 				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
 				step:  iam_model.Step1,
@@ -120,7 +120,7 @@ func TestSetUpStarted(t *testing.T) {
 		{
 			name: "setup iam no id",
 			args: args{
-				es:   GetMockManipulateIAM(ctrl),
+				es:   GetMockManipulateIAM(gomock.NewController(t)),
 				ctx:  authz.NewMockContext("orgID", "userID"),
 				step: iam_model.Step1,
 			},

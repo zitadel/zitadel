@@ -48,14 +48,14 @@ func GetMockIAMByIDOK(ctrl *gomock.Controller) *IAMEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.GlobalOrgSet, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
 func GetMockIamByIDNoEvents(ctrl *gomock.Controller) *IAMEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -64,9 +64,9 @@ func GetMockManipulateIAM(ctrl *gomock.Controller) *IAMEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -75,9 +75,9 @@ func GetMockManipulateIAMWithCrypto(ctrl *gomock.Controller) *IAMEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMSetupStarted},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstoreWithCrypto(ctrl, mockEs)
 }
 
@@ -88,9 +88,9 @@ func GetMockManipulateIAMWithMember(ctrl *gomock.Controller) *IAMEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.IAMMemberAdded, Data: memberData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -103,9 +103,9 @@ func GetMockManipulateIAMWithOIDCIdp(ctrl *gomock.Controller) *IAMEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.OIDCIDPConfigAdded, Data: oidcData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -118,9 +118,9 @@ func GetMockManipulateIAMWithLoginPolicy(ctrl *gomock.Controller) *IAMEventstore
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIDPProviderAdded, Data: idpProviderData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -137,9 +137,9 @@ func GetMockManipulateIAMWithLoginPolicyWithMFAs(ctrl *gomock.Controller) *IAMEv
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyMultiFactorAdded, Data: multiFactor},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -150,9 +150,9 @@ func GetMockManipulateIAMWithPasswodComplexityPolicy(ctrl *gomock.Controller) *I
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordComplexityPolicyAdded, Data: policyData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -163,9 +163,9 @@ func GetMockManipulateIAMWithPasswordAgePolicy(ctrl *gomock.Controller) *IAMEven
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordAgePolicyAdded, Data: policyData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -176,9 +176,9 @@ func GetMockManipulateIAMWithPasswordLockoutPolicy(ctrl *gomock.Controller) *IAM
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordLockoutPolicyAdded, Data: policyData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -189,18 +189,18 @@ func GetMockManipulateIAMWithOrgIAMPolicy(ctrl *gomock.Controller) *IAMEventstor
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgIAMPolicyAdded, Data: policyData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
 func GetMockManipulateIAMNotExisting(ctrl *gomock.Controller) *IAMEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -211,9 +211,9 @@ func GetMockManipulateIAMWithLabelPolicy(ctrl *gomock.Controller) *IAMEventstore
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LabelPolicyAdded, Data: policyData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -224,9 +224,9 @@ func GetMockManipulateIAMWithMailTemplate(ctrl *gomock.Controller) *IAMEventstor
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTemplateAdded, Data: mailTemplate},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -237,8 +237,8 @@ func GetMockManipulateIAMWithMailText(ctrl *gomock.Controller) *IAMEventstore {
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTextAdded, Data: mailText},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }

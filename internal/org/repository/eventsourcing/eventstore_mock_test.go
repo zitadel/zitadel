@@ -45,16 +45,16 @@ func GetMockChangesOrgOK(ctrl *gomock.Controller) *OrgEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, AggregateType: repo_model.OrgAggregate, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
 func GetMockChangesOrgNoEvents(ctrl *gomock.Controller) *OrgEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -67,9 +67,9 @@ func GetMockChangesOrgWithCrypto(ctrl *gomock.Controller) *OrgEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.OrgAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstoreWithCrypto(ctrl, mockEs)
 }
 
@@ -83,9 +83,9 @@ func GetMockChangesOrgWithOIDCIdp(ctrl *gomock.Controller) *OrgEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.OIDCIDPConfigAdded, Data: oidcData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -99,9 +99,9 @@ func GetMockChangesOrgWithLoginPolicy(ctrl *gomock.Controller) *OrgEventstore {
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyIDPProviderAdded, Data: idpData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -119,9 +119,9 @@ func GetMockChangesOrgWithLoginPolicyWithMFA(ctrl *gomock.Controller) *OrgEvents
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.LoginPolicyMultiFactorAdded, Data: multiFactor},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -139,9 +139,9 @@ func GetMockChangesOrgWithPasswordComplexityPolicy(ctrl *gomock.Controller) *Org
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordComplexityPolicyAdded, Data: passwordComplexityPolicy},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -156,9 +156,9 @@ func GetMockChangesOrgWithPasswordLockoutPolicy(ctrl *gomock.Controller) *OrgEve
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordLockoutPolicyAdded, Data: passwordLockoutPolicy},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -173,9 +173,9 @@ func GetMockChangesOrgWithPasswordAgePolicy(ctrl *gomock.Controller) *OrgEventst
 		{AggregateID: "AggregateID", Sequence: 1, Type: model.PasswordAgePolicyAdded, Data: passwordAgePolicy},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -187,9 +187,9 @@ func GetMockChangesOrgWithLabelPolicy(ctrl *gomock.Controller) *OrgEventstore {
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.LabelPolicyAdded, Data: labelPolicy},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -201,9 +201,9 @@ func GetMockChangesOrgWithMailTemplate(ctrl *gomock.Controller) *OrgEventstore {
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTemplateAdded, Data: mailTemplate},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
@@ -215,8 +215,8 @@ func GetMockChangesOrgWithMailText(ctrl *gomock.Controller) *OrgEventstore {
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MailTextAdded, Data: mailText},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil).AnyTimes()
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST")).AnyTimes()
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return GetMockedEventstore(ctrl, mockEs)
 }

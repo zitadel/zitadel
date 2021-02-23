@@ -11,12 +11,12 @@ func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("enc")
 	mCrypto.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
 	mCrypto.EXPECT().DecryptionKeyIDs().AnyTimes().Return([]string{"id"})
-	mCrypto.EXPECT().Encrypt(gomock.Any()).DoAndReturn(
+	mCrypto.EXPECT().Encrypt(gomock.Any()).AnyTimes().DoAndReturn(
 		func(code []byte) ([]byte, error) {
 			return code, nil
 		},
 	)
-	mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
+	mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(code []byte, keyID string) (string, error) {
 			if keyID != "id" {
 				return "", errors.ThrowInternal(nil, "id", "invalid key id")
@@ -30,12 +30,12 @@ func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
 func CreateMockHashAlg(ctrl *gomock.Controller) HashAlgorithm {
 	mCrypto := NewMockHashAlgorithm(ctrl)
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("hash")
-	mCrypto.EXPECT().Hash(gomock.Any()).DoAndReturn(
+	mCrypto.EXPECT().Hash(gomock.Any()).AnyTimes().DoAndReturn(
 		func(code []byte) ([]byte, error) {
 			return code, nil
 		},
 	)
-	mCrypto.EXPECT().CompareHash(gomock.Any(), gomock.Any()).DoAndReturn(
+	mCrypto.EXPECT().CompareHash(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(hashed, comparer []byte) error {
 			if string(hashed) != string(comparer) {
 				return errors.ThrowInternal(nil, "id", "invalid")
