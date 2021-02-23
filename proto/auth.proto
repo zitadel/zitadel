@@ -40,13 +40,22 @@ service AuthService {
         };
     }
     
-    //User
     rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
         option (google.api.http) = {
             get: "/users/me"
         };
 
         option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
+        option (google.api.http) = {
+            get: "/users/me/sessions"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "authenticated"
         };
     }
@@ -366,6 +375,12 @@ message GetMyUserRequest {}
 message GetMyUserResponse {
     zitadel.user.v1.User user = 1;
     google.protobuf.Timestamp last_login = 2;
+}
+
+message ListMyUserSessionsRequest {}
+
+message ListMyUserSessionsResponse {
+    repeated zitadel.user.v1.Session result = 1;
 }
 
 message UpdateMyUserNameRequest {

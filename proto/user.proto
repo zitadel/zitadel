@@ -234,3 +234,20 @@ message MembershipProjectQuery {
 message MembershipProjectGrantQuery {
     string project_grant_id = 1;
 }
+
+message Session {
+    string session_id = 1;
+    string agent_id = 2;
+    SessionState auth_state = 3;
+    string user_id = 4;
+    string user_name = 5;
+    string login_name = 7;
+    string display_name = 8;
+    zitadel.v1.ObjectDetails details = 9;
+}
+
+enum SessionState {
+    SESSION_STATE_UNSPECIFIED = 0;
+    SESSION_STATE_ACTIVE = 1;
+    SESSION_STATE_TERMINATED = 2;
+  }
