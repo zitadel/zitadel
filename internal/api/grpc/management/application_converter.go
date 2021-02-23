@@ -101,6 +101,13 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *manage
 	}
 }
 
+func apiConfigFromApplicationViewModel(app *proj_model.ApplicationView) *management.APIConfig {
+	return &management.APIConfig{
+		ClientId:       app.OIDCClientID,
+		AuthMethodType: apiAuthMethodTypeFromModel(proj_model.APIAuthMethodType(app.OIDCAuthMethodType)),
+	}
+}
+
 func complianceProblemsToLocalizedMessages(problems []string) []*message.LocalizedMessage {
 	converted := make([]*message.LocalizedMessage, len(problems))
 	for i, p := range problems {
@@ -263,6 +270,10 @@ func applicationViewFromModel(application *proj_model.ApplicationView) *manageme
 	if application.IsOIDC {
 		converted.AppConfig = &management.ApplicationView_OidcConfig{
 			OidcConfig: oidcConfigFromApplicationViewModel(application),
+		}
+	} else {
+		converted.AppConfig = &management.ApplicationView_ApiConfig{
+			ApiConfig: apiConfigFromApplicationViewModel(application),
 		}
 	}
 	return converted
