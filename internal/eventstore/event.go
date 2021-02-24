@@ -36,11 +36,6 @@ type EventReader interface {
 
 	Sequence() uint64
 	CreationDate() time.Time
-	//Data returns the payload of the event. It represent the changed fields by the event
-	// valid types are:
-	// * nil (no payload),
-	// * json byte array
-	// * struct which can be marshalled to json
-	// * pointer to struct which can be marshalled to json
-	Data() []byte
+	//DataAsBytes returns the payload of the event. It represent the changed fields by the event
+	DataAsBytes() []byte
 }

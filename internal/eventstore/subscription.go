@@ -84,11 +84,11 @@ func mapEventToV1Event(event EventReader) *models.Event {
 		Sequence:      event.Sequence(),
 		CreationDate:  event.CreationDate(),
 		Type:          models.EventType(event.Type()),
-		AggregateType: models.AggregateType((event.Aggregate().Typ)),
+		AggregateType: models.AggregateType(event.Aggregate().Typ),
 		AggregateID:   event.Aggregate().ID,
 		ResourceOwner: event.Aggregate().ResourceOwner,
 		EditorService: event.EditorService(),
 		EditorUser:    event.EditorUser(),
-		Data:          event.Data(),
+		Data:          event.DataAsBytes(),
 	}
 }

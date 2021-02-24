@@ -22,6 +22,7 @@ type BaseEvent struct {
 	User string `json:"-"`
 	//Service is the service which created the event
 	Service string `json:"-"`
+	Data    []byte `json:"-"`
 }
 
 // EditorService implements EventPusher
@@ -55,8 +56,8 @@ func (e *BaseEvent) Aggregate() Aggregate {
 }
 
 //Data returns the payload of the event. It represent the changed fields by the event
-func (e *BaseEvent) Data() []byte {
-	return e.Data()
+func (e *BaseEvent) DataAsBytes() []byte {
+	return e.Data
 }
 
 //BaseEventFromRepo maps a stored event to a BaseEvent
@@ -73,6 +74,7 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 		sequence:     event.Sequence,
 		Service:      event.EditorService,
 		User:         event.EditorUser,
+		Data:         event.Data,
 	}
 }
 

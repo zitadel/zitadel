@@ -127,7 +127,6 @@ func (o *Org) AppendEvents(events ...*es_models.Event) error {
 func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 	switch event.Type {
 	case OrgAdded:
-		*o = Org{}
 		err = o.setData(event)
 		if err != nil {
 			return err
