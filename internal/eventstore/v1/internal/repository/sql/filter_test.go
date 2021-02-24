@@ -10,6 +10,11 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
+type mockEvents struct {
+	events []*es_models.Event
+	t      *testing.T
+}
+
 func TestSQL_Filter(t *testing.T) {
 	type fields struct {
 		client *dbMock
