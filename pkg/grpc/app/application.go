@@ -1,16 +1,16 @@
-package management
+package app
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 )
 
-func (a *ApplicationView) Localizers() []middleware.Localizer {
+func (a *App) Localizers() []middleware.Localizer {
 	if a == nil {
 		return nil
 	}
 
-	switch configType := a.AppConfig.(type) {
-	case *ApplicationView_OidcConfig:
+	switch configType := a.Config.(type) {
+	case *App_OidcConfig:
 		if !configType.OidcConfig.NoneCompliant {
 			return nil
 		}
