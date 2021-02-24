@@ -3,13 +3,13 @@ package auth
 import (
 	"github.com/caos/zitadel/internal/v2/command"
 	"github.com/caos/zitadel/internal/v2/query"
-	"github.com/caos/zitadel/pkg/grpc/auth"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/pkg/grpc/auth"
 )
 
 var _ auth.AuthServiceServer = (*Server)(nil)
@@ -19,7 +19,6 @@ const (
 )
 
 type Server struct {
-	auth.UnimplementedAuthServiceServer
 	command *command.CommandSide
 	query   *query.QuerySide
 	repo    repository.Repository
