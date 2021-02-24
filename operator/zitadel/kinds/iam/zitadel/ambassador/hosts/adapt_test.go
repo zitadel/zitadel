@@ -1,15 +1,17 @@
 package hosts
 
 import (
+	"github.com/caos/orbos/mntr"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/stretchr/testify/assert"
+	macherrs "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"testing"
 
-	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/labels/mocklabels"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	apixv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
@@ -22,10 +24,15 @@ func SetReturnResourceVersion(
 	namespace,
 	name string,
 	resourceVersion string,
+	labels map[string]string,
 ) {
 	ret := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"metadata": map[string]interface{}{
+				"annotations": map[string]string{
+					"aes_res_changed": "true",
+				},
+				"labels":          labels,
 				"resourceVersion": resourceVersion,
 			},
 		},
@@ -67,7 +74,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"name":      issuerHostName.Name(),
 				"namespace": namespace,
 				"labels":    labels.MustK8sMap(issuerHostName),
-				"annotations": map[string]interface{}{
+				"annotations": map[string]string{
 					"aes_res_changed": "true",
 				},
 			},
@@ -90,7 +97,11 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			},
 		}}
 
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerHostName, "")
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, IssuerHostName).Return(nil, macherrs.NewNotFound(schema.GroupResource{
+		Group:    "",
+		Resource: "",
+	}, IssuerHostName))
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerHostName, "", labels.MustK8sMap(issuerHostName))
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerHostName, issuerHost).MinTimes(1).MaxTimes(1)
 
 	consoleHostName := labels.MustForName(componentLabels, ConsoleHostName)
@@ -102,7 +113,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"name":      consoleHostName.Name(),
 				"namespace": namespace,
 				"labels":    labels.MustK8sMap(consoleHostName),
-				"annotations": map[string]interface{}{
+				"annotations": map[string]string{
 					"aes_res_changed": "true",
 				},
 			},
@@ -125,7 +136,11 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			},
 		}}
 
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ConsoleHostName, "")
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, ConsoleHostName).Return(nil, macherrs.NewNotFound(schema.GroupResource{
+		Group:    "",
+		Resource: "",
+	}, ConsoleHostName))
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ConsoleHostName, "", labels.MustK8sMap(consoleHostName))
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ConsoleHostName, consoleHost).MinTimes(1).MaxTimes(1)
 
 	apiHostName := labels.MustForName(componentLabels, ApiHostName)
@@ -137,7 +152,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"name":      apiHostName.Name(),
 				"namespace": namespace,
 				"labels":    labels.MustK8sMap(apiHostName),
-				"annotations": map[string]interface{}{
+				"annotations": map[string]string{
 					"aes_res_changed": "true",
 				},
 			},
@@ -160,7 +175,11 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			},
 		}}
 
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ApiHostName, "")
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, ApiHostName).Return(nil, macherrs.NewNotFound(schema.GroupResource{
+		Group:    "",
+		Resource: "",
+	}, ApiHostName))
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ApiHostName, "", labels.MustK8sMap(apiHostName))
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ApiHostName, apiHost).MinTimes(1).MaxTimes(1)
 
 	accountsHostName := labels.MustForName(componentLabels, AccountsHostName)
@@ -172,7 +191,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"name":      accountsHostName.Name(),
 				"namespace": namespace,
 				"labels":    labels.MustK8sMap(accountsHostName),
-				"annotations": map[string]interface{}{
+				"annotations": map[string]string{
 					"aes_res_changed": "true",
 				},
 			},
@@ -195,7 +214,11 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			},
 		}}
 
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AccountsHostName, "")
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, AccountsHostName).Return(nil, macherrs.NewNotFound(schema.GroupResource{
+		Group:    "",
+		Resource: "",
+	}, AccountsHostName))
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AccountsHostName, "", labels.MustK8sMap(accountsHostName))
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AccountsHostName, accountsHost).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, dns)
@@ -239,7 +262,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"name":      issuerHostName.Name(),
 				"namespace": namespace,
 				"labels":    labels.MustK8sMap(issuerHostName),
-				"annotations": map[string]interface{}{
+				"annotations": map[string]string{
 					"aes_res_changed": "true",
 				},
 			},
@@ -262,7 +285,11 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			},
 		}}
 
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerHostName, "")
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, IssuerHostName).Return(nil, macherrs.NewNotFound(schema.GroupResource{
+		Group:    "",
+		Resource: "",
+	}, IssuerHostName))
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerHostName, "", labels.MustK8sMap(issuerHostName))
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerHostName, issuerHost).MinTimes(1).MaxTimes(1)
 
 	consoleHostName := labels.MustForName(componentLabels, ConsoleHostName)
@@ -274,7 +301,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"name":      consoleHostName.Name(),
 				"namespace": namespace,
 				"labels":    labels.MustK8sMap(consoleHostName),
-				"annotations": map[string]interface{}{
+				"annotations": map[string]string{
 					"aes_res_changed": "true",
 				},
 			},
@@ -297,7 +324,11 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			},
 		}}
 
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ConsoleHostName, "")
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, ConsoleHostName).Return(nil, macherrs.NewNotFound(schema.GroupResource{
+		Group:    "",
+		Resource: "",
+	}, ConsoleHostName))
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ConsoleHostName, "", labels.MustK8sMap(consoleHostName))
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ConsoleHostName, consoleHost).MinTimes(1).MaxTimes(1)
 
 	apiHostName := labels.MustForName(componentLabels, ApiHostName)
@@ -309,7 +340,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"name":      apiHostName.Name(),
 				"namespace": namespace,
 				"labels":    labels.MustK8sMap(apiHostName),
-				"annotations": map[string]interface{}{
+				"annotations": map[string]string{
 					"aes_res_changed": "true",
 				},
 			},
@@ -332,7 +363,11 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			},
 		}}
 
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ApiHostName, "")
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, ApiHostName).Return(nil, macherrs.NewNotFound(schema.GroupResource{
+		Group:    "",
+		Resource: "",
+	}, ApiHostName))
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ApiHostName, "", labels.MustK8sMap(apiHostName))
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ApiHostName, apiHost).MinTimes(1).MaxTimes(1)
 
 	accountsHostName := labels.MustForName(componentLabels, AccountsHostName)
@@ -344,7 +379,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"name":      accountsHostName.Name(),
 				"namespace": namespace,
 				"labels":    labels.MustK8sMap(accountsHostName),
-				"annotations": map[string]interface{}{
+				"annotations": map[string]string{
 					"aes_res_changed": "true",
 				},
 			},
@@ -367,7 +402,11 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			},
 		}}
 
-	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AccountsHostName, "")
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, AccountsHostName).Return(nil, macherrs.NewNotFound(schema.GroupResource{
+		Group:    "",
+		Resource: "",
+	}, AccountsHostName))
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AccountsHostName, "", labels.MustK8sMap(accountsHostName))
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AccountsHostName, accountsHost).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, dns)
