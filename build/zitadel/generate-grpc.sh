@@ -38,7 +38,7 @@ protoc \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/admin.proto
 mv ${ZITADEL_PATH}/pkg/grpc/admin/zitadel/* ${ZITADEL_PATH}/pkg/grpc/admin
-rm ${ZITADEL_PATH}/pkg/grpc/admin/zitadel
+rm -r ${ZITADEL_PATH}/pkg/grpc/admin/zitadel
 
 protoc \
   -I=/proto/include \
@@ -54,7 +54,7 @@ protoc \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/management.proto
 mv ${ZITADEL_PATH}/pkg/grpc/management/zitadel/* ${ZITADEL_PATH}/pkg/grpc/management
-rm ${ZITADEL_PATH}/pkg/grpc/management/zitadel
+rm -r ${ZITADEL_PATH}/pkg/grpc/management/zitadel
 
 protoc \
   -I=/proto/include \
@@ -68,6 +68,6 @@ protoc \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/auth.proto
 mv ${ZITADEL_PATH}/pkg/grpc/auth/zitadel/* ${ZITADEL_PATH}/pkg/grpc/auth
-rm ${ZITADEL_PATH}/pkg/grpc/auth/zitadel
+rm -r ${ZITADEL_PATH}/pkg/grpc/auth/zitadel
 
 echo "done generating grpc"

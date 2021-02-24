@@ -5,16 +5,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"google.golang.org/grpc"
-
 	"github.com/caos/logging"
-
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	client_middleware "github.com/caos/zitadel/internal/api/grpc/client/middleware"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -23,11 +21,11 @@ const (
 )
 
 var (
-	DefaultJSONMarshaler = &runtime.JSONPb{OrigName: false, EmitDefaults: false}
+	DefaultJSONMarshaler = &runtime.JSONPb{}
 
 	DefaultServeMuxOptions = func(customHeaders ...string) []runtime.ServeMuxOption {
 		return []runtime.ServeMuxOption{
-			runtime.WithMarshalerOption(DefaultJSONMarshaler.ContentType(), DefaultJSONMarshaler),
+			runtime.WithMarshalerOption(DefaultJSONMarshaler.ContentType(nil), DefaultJSONMarshaler),
 			runtime.WithMarshalerOption(mimeWildcard, DefaultJSONMarshaler),
 			runtime.WithMarshalerOption(runtime.MIMEWildcard, DefaultJSONMarshaler),
 			runtime.WithIncomingHeaderMatcher(DefaultHeaderMatcher(customHeaders...)),
