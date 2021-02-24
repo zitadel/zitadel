@@ -1,14 +1,15 @@
 package admin
 
 import (
+	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/v2/query"
+	"google.golang.org/grpc"
+
 	"github.com/caos/zitadel/internal/admin/repository"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
 	"github.com/caos/zitadel/pkg/grpc/admin"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -18,7 +19,6 @@ const (
 var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
-	admin.UnimplementedAdminServiceServer
 	command       *command.CommandSide
 	query         *query.QuerySide
 	org           repository.OrgRepository
