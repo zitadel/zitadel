@@ -605,6 +605,7 @@ message ListOrgsResponse {
 message SetUpOrgRequest {
     message Org {
         string name = 1 [(validate.rules).string.min_len = 1];
+        string domain = 2;
     }
     message Human {
         message Profile {
