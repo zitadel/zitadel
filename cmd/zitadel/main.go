@@ -42,6 +42,7 @@ type Config struct {
 
 	EventstoreBase types.SQLBase
 	Commands       command.Config
+	Queries        query.Config
 
 	AuthZ authz.Config
 	Auth  auth_es.Config
@@ -109,7 +110,7 @@ func startZitadel(configPaths []string) {
 	if err != nil {
 		return
 	}
-	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
+	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
 	if err != nil {
 		return
 	}

@@ -32,8 +32,8 @@ Commands:
       Cert: $CR_EVENTSTORE_CERT
       Key: $CR_EVENTSTORE_KEY
 
-Query:
-  Eventsttore:
+Queries:
+  Eventstore:
     User: 'queries'
     Password: $CR_QUERIES_PASSWORD
       SSL:
