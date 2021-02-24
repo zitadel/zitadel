@@ -10,7 +10,7 @@ import (
 type IAMRepository struct {
 	IAMID string
 
-	IAMV2QuerySide *query.QuerySide
+	IAMV2QuerySide *query.Queries
 }
 
 func (repo *IAMRepository) GetIAM(ctx context.Context) (*model.IAM, error) {

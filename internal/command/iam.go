@@ -9,17 +9,17 @@ import (
 )
 
 //TODO: private
-func (r *CommandSide) GetIAM(ctx context.Context) (*domain.IAM, error) {
+func (c *Commands) GetIAM(ctx context.Context) (*domain.IAM, error) {
 	iamWriteModel := NewIAMWriteModel()
-	err := r.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
 		return nil, err
 	}
 	return writeModelToIAM(iamWriteModel), nil
 }
 
-func (r *CommandSide) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, orgID string) (eventstore.EventPusher, error) {
-	err := r.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
+func (c *Commands) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, orgID string) (eventstore.EventPusher, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -29,8 +29,8 @@ func (r *CommandSide) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggre
 	return iam.NewGlobalOrgSetEventEvent(ctx, iamAgg, orgID), nil
 }
 
-func (r *CommandSide) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, projectID string) (eventstore.EventPusher, error) {
-	err := r.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
+func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, projectID string) (eventstore.EventPusher, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
 		return nil, err
 	}

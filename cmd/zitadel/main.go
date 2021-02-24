@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 
@@ -39,6 +40,9 @@ type Config struct {
 	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
 
+	EventstoreBase types.SQLBase
+	Commands       command.Config
+
 	AuthZ authz.Config
 	Auth  auth_es.Config
 	Admin admin_es.Config
@@ -53,7 +57,7 @@ type Config struct {
 type setupConfig struct {
 	Log logging.Config
 
-	Eventstore     v1.Config
+	Eventstore     types.SQL
 	SystemDefaults sd.SystemDefaults
 	SetUp          setup.IAMSetUp
 }
@@ -97,40 +101,42 @@ func startZitadel(configPaths []string) {
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
-	//TODO: new eventstore config for command sie
-	es, err := v1.Start(conf.Admin.Eventstore)
+	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
 	if err != nil {
 		return
 	}
-	esV2 := es.V2()
-	command, err := command.StartCommandSide(&command.Config{Eventstore: esV2, SystemDefaults: conf.SystemDefaults})
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults)
 	if err != nil {
 		return
 	}
-	query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: conf.SystemDefaults})
+	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
 	if err != nil {
 		return
 	}
-	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults)
+	queries, err := query.StartQueries(esQueries, conf.SystemDefaults)
+	if err != nil {
+		return
+	}
+	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
-		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, command, authZRepo)
+		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo)
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
-	startAPI(ctx, conf, authZRepo, authRepo, command, query)
-	startUI(ctx, conf, authRepo, command, query)
+	startAPI(ctx, conf, authZRepo, authRepo, commands, queries)
+	startUI(ctx, conf, authRepo, commands, queries)
 
 	if *notificationEnabled {
-		notification.Start(ctx, conf.Notification, conf.SystemDefaults, command)
+		notification.Start(ctx, conf.Notification, conf.SystemDefaults, commands)
 	}
 
 	<-ctx.Done()
 	logging.Log("MAIN-s8d2h").Info("stopping zitadel")
 }
 
-func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, command *command.CommandSide, query *query.QuerySide) {
+func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries) {
 	uis := ui.Create(conf.UI)
 	if *loginEnabled {
 		login, prefix := login.Start(conf.UI.Login, command, query, authRepo, conf.SystemDefaults, *localDevMode)
@@ -144,7 +150,7 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, 
 	uis.Start(ctx)
 }
 
-func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.CommandSide, query *query.QuerySide) {
+func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries) {
 	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
@@ -158,7 +164,7 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo))
 	}
 	if *managementEnabled {
-		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles)
+		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query)
 		logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
 		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
 	}
@@ -179,13 +185,10 @@ func startSetup(configPaths []string, localDevMode bool) {
 
 	ctx := context.Background()
 
-	es, err := v1.Start(conf.Eventstore)
+	es, err := eventstore.Start(conf.Eventstore)
 	logging.Log("MAIN-Ddt3").OnError(err).Fatal("cannot start eventstore")
 
-	commands, err := command.StartCommandSide(&command.Config{
-		Eventstore:     es.V2(),
-		SystemDefaults: conf.SystemDefaults,
-	})
+	commands, err := command.StartCommands(es, conf.SystemDefaults)
 	logging.Log("MAIN-dsjrr").OnError(err).Fatal("cannot start command side")
 
 	err = setup.Execute(ctx, conf.SetUp, conf.SystemDefaults.IamID, commands)

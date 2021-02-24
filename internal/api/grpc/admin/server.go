@@ -19,8 +19,8 @@ const (
 var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
-	command       *command.CommandSide
-	query         *query.QuerySide
+	command       *command.Commands
+	query         *query.Queries
 	org           repository.OrgRepository
 	iam           repository.IAMRepository
 	administrator repository.AdministratorRepository
@@ -31,7 +31,7 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.CommandSide, query *query.QuerySide, repo repository.Repository) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository) *Server {
 	return &Server{
 		command:       command,
 		query:         query,

@@ -13,23 +13,23 @@ const (
 	oidcUser = "OIDC"
 )
 
-func (r *CommandSide) GenerateSigningKeyPair(ctx context.Context, algorithm string) error {
+func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string) error {
 	ctx = setOIDCCtx(ctx)
-	privateCrypto, publicCrypto, err := crypto.GenerateEncryptedKeyPair(r.keySize, r.keyAlgorithm)
+	privateCrypto, publicCrypto, err := crypto.GenerateEncryptedKeyPair(c.keySize, c.keyAlgorithm)
 	if err != nil {
 		return err
 	}
-	keyID, err := r.idGenerator.Next()
+	keyID, err := c.idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	privateKeyExp := time.Now().UTC().Add(r.privateKeyLifetime)
-	publicKeyExp := time.Now().UTC().Add(r.publicKeyLifetime)
+	privateKeyExp := time.Now().UTC().Add(c.privateKeyLifetime)
+	publicKeyExp := time.Now().UTC().Add(c.publicKeyLifetime)
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, keypair.NewAddedEvent(
+	_, err = c.eventstore.PushEvents(ctx, keypair.NewAddedEvent(
 		ctx,
 		keyAgg,
 		domain.KeyUsageSigning,

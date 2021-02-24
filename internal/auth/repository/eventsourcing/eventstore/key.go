@@ -20,7 +20,7 @@ import (
 )
 
 type KeyRepository struct {
-	Commands                 *command.CommandSide
+	Commands                 *command.Commands
 	Eventstore               *eventstore.Eventstore
 	View                     *view.View
 	SigningKeyRotationCheck  time.Duration

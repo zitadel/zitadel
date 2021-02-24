@@ -9,18 +9,14 @@ Eventstore:
     SQL:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'adminapi'
+      User: 'eventstore'
       Database: 'eventstore'
-      Password: $CR_ADMINAPI_PASSWORD
+      Password: $CR_EVENTSTORE_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_ADMINAPI_CERT
-        Key: $CR_ADMINAPI_KEY
-  Cache:
-    Type: 'fastcache'
-    Config:
-      MaxCacheSizeInByte: 10485760 #10mb
+        Cert: $CR_EVENTSTORE_CERT
+        Key: $CR_EVENTSTORE_KEY
 
 SetUp:
   Step1:

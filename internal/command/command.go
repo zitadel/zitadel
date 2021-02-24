@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"time"
 
@@ -20,7 +21,7 @@ import (
 	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 )
 
-type CommandSide struct {
+type Commands struct {
 	eventstore  *eventstore.Eventstore
 	idGenerator id.Generator
 	iamDomain   string
@@ -50,18 +51,17 @@ type CommandSide struct {
 }
 
 type Config struct {
-	Eventstore     *eventstore.Eventstore
-	SystemDefaults sd.SystemDefaults
+	Eventstore types.SQLUser
 }
 
-func StartCommandSide(config *Config) (repo *CommandSide, err error) {
-	repo = &CommandSide{
-		eventstore:         config.Eventstore,
+func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults) (repo *Commands, err error) {
+	repo = &Commands{
+		eventstore:         eventstore,
 		idGenerator:        id.SonyFlakeGenerator,
-		iamDomain:          config.SystemDefaults.Domain,
-		keySize:            config.SystemDefaults.KeyConfig.Size,
-		privateKeyLifetime: config.SystemDefaults.KeyConfig.PrivateKeyLifetime.Duration,
-		publicKeyLifetime:  config.SystemDefaults.KeyConfig.PublicKeyLifetime.Duration,
+		iamDomain:          defaults.Domain,
+		keySize:            defaults.KeyConfig.Size,
+		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
+		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
@@ -71,49 +71,49 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	keypair.RegisterEventMappers(repo.eventstore)
 
 	//TODO: simplify!!!!
-	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)
+	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
 	if err != nil {
 		return nil, err
 	}
-	userEncryptionAlgorithm, err := crypto.NewAESCrypto(config.SystemDefaults.UserVerificationKey)
+	userEncryptionAlgorithm, err := crypto.NewAESCrypto(defaults.UserVerificationKey)
 	if err != nil {
 		return nil, err
 	}
-	repo.initializeUserCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.InitializeUserCode, userEncryptionAlgorithm)
-	repo.emailVerificationCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.EmailVerificationCode, userEncryptionAlgorithm)
-	repo.phoneVerificationCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.PhoneVerificationCode, userEncryptionAlgorithm)
-	repo.passwordVerificationCode = crypto.NewEncryptionGenerator(config.SystemDefaults.SecretGenerators.PasswordVerificationCode, userEncryptionAlgorithm)
-	repo.userPasswordAlg = crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
+	repo.initializeUserCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.InitializeUserCode, userEncryptionAlgorithm)
+	repo.emailVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.EmailVerificationCode, userEncryptionAlgorithm)
+	repo.phoneVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PhoneVerificationCode, userEncryptionAlgorithm)
+	repo.passwordVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PasswordVerificationCode, userEncryptionAlgorithm)
+	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeyAlg = userEncryptionAlgorithm
-	repo.machineKeySize = int(config.SystemDefaults.SecretGenerators.MachineKeySize)
-	repo.applicationKeySize = int(config.SystemDefaults.SecretGenerators.ApplicationKeySize)
+	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
+	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
 
-	aesOTPCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.Multifactors.OTP.VerificationKey)
+	aesOTPCrypto, err := crypto.NewAESCrypto(defaults.Multifactors.OTP.VerificationKey)
 	if err != nil {
 		return nil, err
 	}
 	repo.multifactors = global_model.Multifactors{
 		OTP: global_model.OTP{
 			CryptoMFA: aesOTPCrypto,
-			Issuer:    config.SystemDefaults.Multifactors.OTP.Issuer,
+			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},
 	}
-	passwordAlg := crypto.NewBCrypt(config.SystemDefaults.SecretGenerators.PasswordSaltCost)
-	repo.applicationSecretGenerator = crypto.NewHashGenerator(config.SystemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
+	passwordAlg := crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
+	repo.applicationSecretGenerator = crypto.NewHashGenerator(defaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
 
-	repo.domainVerificationAlg, err = crypto.NewAESCrypto(config.SystemDefaults.DomainVerification.VerificationKey)
+	repo.domainVerificationAlg, err = crypto.NewAESCrypto(defaults.DomainVerification.VerificationKey)
 	if err != nil {
 		return nil, err
 	}
-	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(config.SystemDefaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
+	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = http.ValidateDomain
-	web, err := webauthn_helper.StartServer(config.SystemDefaults.WebAuthN)
+	web, err := webauthn_helper.StartServer(defaults.WebAuthN)
 	if err != nil {
 		return nil, err
 	}
 	repo.webauthn = web
 
-	keyAlgorithm, err := crypto.NewAESCrypto(config.SystemDefaults.KeyConfig.EncryptionConfig)
+	keyAlgorithm, err := crypto.NewAESCrypto(defaults.KeyConfig.EncryptionConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -121,12 +121,12 @@ func StartCommandSide(config *Config) (repo *CommandSide, err error) {
 	return repo, nil
 }
 
-func (r *CommandSide) getIAMWriteModel(ctx context.Context) (_ *IAMWriteModel, err error) {
+func (c *Commands) getIAMWriteModel(ctx context.Context) (_ *IAMWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewIAMWriteModel()
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

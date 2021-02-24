@@ -43,7 +43,7 @@ type EsRepository struct {
 	eventstore.IAMRepository
 }
 
-func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.CommandSide, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
+func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -67,11 +67,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 	}
 
 	authReq, err := cache.Start(conf.AuthRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +140,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,
-			IAMV2QuerySide: iamV2Query,
+			IAMV2QuerySide: queries,
 		},
 	}, nil
 }

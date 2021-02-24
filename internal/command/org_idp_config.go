@@ -12,18 +12,18 @@ import (
 	org_repo "github.com/caos/zitadel/internal/repository/org"
 )
 
-func (r *CommandSide) AddIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
+func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
 	if config.OIDCConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
 	}
 
-	idpConfigID, err := r.idGenerator.Next()
+	idpConfigID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, config.AggregateID)
 
-	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), r.idpConfigSecretCrypto)
+	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (r *CommandSide) AddIDPConfig(ctx context.Context, config *domain.IDPConfig
 			config.OIDCConfig.UsernameMapping,
 			config.OIDCConfig.Scopes...),
 	}
-	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,8 +60,8 @@ func (r *CommandSide) AddIDPConfig(ctx context.Context, config *domain.IDPConfig
 	return writeModelToIDPConfig(&addedConfig.IDPConfigWriteModel), nil
 }
 
-func (r *CommandSide) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
-	existingIDP, err := r.orgIDPConfigWriteModelByID(ctx, config.IDPConfigID, config.AggregateID)
+func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
+	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, config.IDPConfigID, config.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (r *CommandSide) ChangeIDPConfig(ctx context.Context, config *domain.IDPCon
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
 	}
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -91,8 +91,8 @@ func (r *CommandSide) ChangeIDPConfig(ctx context.Context, config *domain.IDPCon
 	return writeModelToIDPConfig(&existingIDP.IDPConfigWriteModel), nil
 }
 
-func (r *CommandSide) DeactivateIDPConfig(ctx context.Context, idpID, orgID string) error {
-	existingIDP, err := r.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
+func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string) error {
+	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
 	if err != nil {
 		return err
 	}
@@ -100,12 +100,12 @@ func (r *CommandSide) DeactivateIDPConfig(ctx context.Context, idpID, orgID stri
 		return caos_errs.ThrowPreconditionFailed(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
+	_, err = c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
 	return err
 }
 
-func (r *CommandSide) ReactivateIDPConfig(ctx context.Context, idpID, orgID string) error {
-	existingIDP, err := r.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
+func (c *Commands) ReactivateIDPConfig(ctx context.Context, idpID, orgID string) error {
+	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
 	if err != nil {
 		return err
 	}
@@ -113,12 +113,12 @@ func (r *CommandSide) ReactivateIDPConfig(ctx context.Context, idpID, orgID stri
 		return caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
+	_, err = c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
 	return err
 }
 
-func (r *CommandSide) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.ExternalIDP) error {
-	existingIDP, err := r.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
+func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.ExternalIDP) error {
+	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
 	if err != nil {
 		return err
 	}
@@ -136,19 +136,19 @@ func (r *CommandSide) RemoveIDPConfig(ctx context.Context, idpID, orgID string, 
 	}
 
 	if cascadeRemoveProvider {
-		removeIDPEvents := r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true, cascadeExternalIDPs...)
+		removeIDPEvents := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true, cascadeExternalIDPs...)
 		events = append(events, removeIDPEvents...)
 	}
-	_, err = r.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
-func (r *CommandSide) orgIDPConfigWriteModelByID(ctx context.Context, idpID, orgID string) (policy *OrgIDPConfigWriteModel, err error) {
+func (c *Commands) orgIDPConfigWriteModelByID(ctx context.Context, idpID, orgID string) (policy *OrgIDPConfigWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewOrgIDPConfigWriteModel(idpID, orgID)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

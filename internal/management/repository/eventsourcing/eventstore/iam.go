@@ -8,7 +8,7 @@ import (
 )
 
 type IAMRepository struct {
-	IAMV2Query *query.QuerySide
+	IAMV2Query *query.Queries
 }
 
 func (repo *IAMRepository) IAMByID(ctx context.Context, id string) (*iam_model.IAM, error) {

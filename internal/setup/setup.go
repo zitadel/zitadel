@@ -16,7 +16,7 @@ const (
 	SetupUser    = "SETUP"
 )
 
-func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *command.CommandSide) error {
+func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *command.Commands) error {
 	logging.Log("SETUP-JAK2q").Info("starting setup")
 
 	iam, err := commands.GetIAM(ctx)

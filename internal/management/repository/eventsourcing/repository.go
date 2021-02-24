@@ -30,13 +30,12 @@ type EsRepository struct {
 	view *mgmt_view.View
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, queries *query.Queries) (*EsRepository, error) {
 
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
 	}
-	esV2 := es.V2()
 
 	sqlClient, err := conf.View.Start()
 	if err != nil {
@@ -47,10 +46,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		return nil, err
 	}
 
-	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
-	if err != nil {
-		return nil, err
-	}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
 
 	return &EsRepository{
@@ -60,7 +55,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view},
 		IAMRepository: eventstore.IAMRepository{
-			IAMV2Query: iamV2Query,
+			IAMV2Query: queries,
 		},
 		view: view,
 	}, nil

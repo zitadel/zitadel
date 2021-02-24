@@ -12,15 +12,15 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+func (c *Commands) AddIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	addedMember := NewIAMMemberWriteModel(member.UserID)
 	iamAgg := IAMAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
-	event, err := r.addIAMMember(ctx, iamAgg, addedMember, member)
+	event, err := c.addIAMMember(ctx, iamAgg, addedMember, member)
 	if err != nil {
 		return nil, err
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -31,14 +31,14 @@ func (r *CommandSide) AddIAMMember(ctx context.Context, member *domain.Member) (
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
-func (r *CommandSide) addIAMMember(ctx context.Context, iamAgg *eventstore.Aggregate, addedMember *IAMMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
+func (c *Commands) addIAMMember(ctx context.Context, iamAgg *eventstore.Aggregate, addedMember *IAMMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-GR34U", "Errors.IAM.MemberInvalid")
 	}
 
-	err := r.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}
@@ -50,14 +50,14 @@ func (r *CommandSide) addIAMMember(ctx context.Context, iamAgg *eventstore.Aggre
 }
 
 //ChangeIAMMember updates an existing member
-func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+func (c *Commands) ChangeIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	//TODO: check if roles valid
 
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.MemberInvalid")
 	}
 
-	existingMember, err := r.iamMemberWriteModelByID(ctx, member.UserID)
+	existingMember, err := c.iamMemberWriteModelByID(ctx, member.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *domain.Member
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.Member.RolesNotChanged")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	pushedEvents, err := r.eventstore.PushEvents(ctx, iam_repo.NewMemberChangedEvent(ctx, iamAgg, member.UserID, member.Roles...))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewMemberChangedEvent(ctx, iamAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +78,8 @@ func (r *CommandSide) ChangeIAMMember(ctx context.Context, member *domain.Member
 	return memberWriteModelToMember(&existingMember.MemberWriteModel), nil
 }
 
-func (r *CommandSide) RemoveIAMMember(ctx context.Context, userID string) error {
-	m, err := r.iamMemberWriteModelByID(ctx, userID)
+func (c *Commands) RemoveIAMMember(ctx context.Context, userID string) error {
+	m, err := c.iamMemberWriteModelByID(ctx, userID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
@@ -88,16 +88,16 @@ func (r *CommandSide) RemoveIAMMember(ctx context.Context, userID string) error 
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, iam_repo.NewMemberRemovedEvent(ctx, iamAgg, userID))
+	_, err = c.eventstore.PushEvents(ctx, iam_repo.NewMemberRemovedEvent(ctx, iamAgg, userID))
 	return err
 }
 
-func (r *CommandSide) iamMemberWriteModelByID(ctx context.Context, userID string) (member *IAMMemberWriteModel, err error) {
+func (c *Commands) iamMemberWriteModelByID(ctx context.Context, userID string) (member *IAMMemberWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewIAMMemberWriteModel(userID)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

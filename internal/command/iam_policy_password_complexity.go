@@ -9,9 +9,9 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) getDefaultPasswordComplexityPolicy(ctx context.Context) (*domain.PasswordComplexityPolicy, error) {
+func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context) (*domain.PasswordComplexityPolicy, error) {
 	policyWriteModel := NewIAMPasswordComplexityPolicyWriteModel()
-	err := r.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -20,15 +20,15 @@ func (r *CommandSide) getDefaultPasswordComplexityPolicy(ctx context.Context) (*
 	return policy, nil
 }
 
-func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+func (c *Commands) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
 	addedPolicy := NewIAMPasswordComplexityPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
-	events, err := r.addDefaultPasswordComplexityPolicy(ctx, iamAgg, addedPolicy, policy)
+	events, err := c.addDefaultPasswordComplexityPolicy(ctx, iamAgg, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, events)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events)
 	if err != nil {
 		return nil, err
 	}
@@ -39,12 +39,12 @@ func (r *CommandSide) AddDefaultPasswordComplexityPolicy(ctx context.Context, po
 	return writeModelToPasswordComplexityPolicy(&addedPolicy.PasswordComplexityPolicyWriteModel), nil
 }
 
-func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMPasswordComplexityPolicyWriteModel, policy *domain.PasswordComplexityPolicy) (eventstore.EventPusher, error) {
+func (c *Commands) addDefaultPasswordComplexityPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMPasswordComplexityPolicyWriteModel, policy *domain.PasswordComplexityPolicy) (eventstore.EventPusher, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
 
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -55,12 +55,12 @@ func (r *CommandSide) addDefaultPasswordComplexityPolicy(ctx context.Context, ia
 	return iam_repo.NewPasswordComplexityPolicyAddedEvent(ctx, iamAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol), nil
 }
 
-func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+func (c *Commands) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
 
-	existingPolicy, err := r.defaultPasswordComplexityPolicyWriteModelByID(ctx)
+	existingPolicy, err := c.defaultPasswordComplexityPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context,
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -84,12 +84,12 @@ func (r *CommandSide) ChangeDefaultPasswordComplexityPolicy(ctx context.Context,
 	return writeModelToPasswordComplexityPolicy(&existingPolicy.PasswordComplexityPolicyWriteModel), nil
 }
 
-func (r *CommandSide) defaultPasswordComplexityPolicyWriteModelByID(ctx context.Context) (policy *IAMPasswordComplexityPolicyWriteModel, err error) {
+func (c *Commands) defaultPasswordComplexityPolicyWriteModelByID(ctx context.Context) (policy *IAMPasswordComplexityPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewIAMPasswordComplexityPolicyWriteModel()
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

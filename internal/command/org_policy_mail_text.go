@@ -8,12 +8,12 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (r *CommandSide) AddMailText(ctx context.Context, resourceOwner string, mailText *domain.MailText) (*domain.MailText, error) {
+func (c *Commands) AddMailText(ctx context.Context, resourceOwner string, mailText *domain.MailText) (*domain.MailText, error) {
 	if !mailText.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4778u", "Errors.Org.MailText.Invalid")
 	}
 	addedPolicy := NewOrgMailTextWriteModel(resourceOwner, mailText.MailTextType, mailText.Language)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func (r *CommandSide) AddMailText(ctx context.Context, resourceOwner string, mai
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.MailTextWriteModel.WriteModel)
-	pushedEvents, err := r.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.PushEvents(
 		ctx,
 		org.NewMailTextAddedEvent(
 			ctx,
@@ -46,12 +46,12 @@ func (r *CommandSide) AddMailText(ctx context.Context, resourceOwner string, mai
 	return writeModelToMailText(&addedPolicy.MailTextWriteModel), nil
 }
 
-func (r *CommandSide) ChangeMailText(ctx context.Context, resourceOwner string, mailText *domain.MailText) (*domain.MailText, error) {
+func (c *Commands) ChangeMailText(ctx context.Context, resourceOwner string, mailText *domain.MailText) (*domain.MailText, error) {
 	if !mailText.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-3m9fs", "Errors.Org.MailText.Invalid")
 	}
 	existingPolicy := NewOrgMailTextWriteModel(resourceOwner, mailText.MailTextType, mailText.Language)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (r *CommandSide) ChangeMailText(ctx context.Context, resourceOwner string, 
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-2n9fs", "Errors.Org.MailText.NotChanged")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -87,9 +87,9 @@ func (r *CommandSide) ChangeMailText(ctx context.Context, resourceOwner string, 
 	return writeModelToMailText(&existingPolicy.MailTextWriteModel), nil
 }
 
-func (r *CommandSide) RemoveMailText(ctx context.Context, resourceOwner, mailTextType, language string) error {
+func (c *Commands) RemoveMailText(ctx context.Context, resourceOwner, mailTextType, language string) error {
 	existingPolicy := NewOrgMailTextWriteModel(resourceOwner, mailTextType, language)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return err
 	}
@@ -97,6 +97,6 @@ func (r *CommandSide) RemoveMailText(ctx context.Context, resourceOwner, mailTex
 		return caos_errs.ThrowNotFound(nil, "Org-3b8Jf", "Errors.Org.MailText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, org.NewMailTextRemovedEvent(ctx, orgAgg, mailTextType, language))
+	_, err = c.eventstore.PushEvents(ctx, org.NewMailTextRemovedEvent(ctx, orgAgg, mailTextType, language))
 	return err
 }

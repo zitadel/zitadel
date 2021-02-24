@@ -2,12 +2,12 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/spooler"
 	authz_view "github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
@@ -18,11 +18,9 @@ import (
 )
 
 type Config struct {
-	Domain      string
-	Eventstore  v1.Config
-	AuthRequest cache.Config
-	View        types.SQL
-	Spooler     spooler.SpoolerConfig
+	Eventstore v1.Config
+	View       types.SQL
+	Spooler    spooler.SpoolerConfig
 }
 
 type EsRepository struct {
@@ -32,12 +30,11 @@ type EsRepository struct {
 	eventstore.TokenVerifierRepo
 }
 
-func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, queries *query.Queries) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
 	}
-	esV2 := es.V2()
 
 	sqlClient, err := conf.View.Start()
 	if err != nil {
@@ -46,11 +43,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 
 	idGenerator := id.SonyFlakeGenerator
 	view, err := authz_view.StartView(sqlClient, idGenerator)
-	if err != nil {
-		return nil, err
-	}
-
-	iamV2, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +59,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*
 		},
 		eventstore.IamRepo{
 			IAMID:      systemDefaults.IamID,
-			IAMV2Query: iamV2,
+			IAMV2Query: queries,
 		},
 		eventstore.TokenVerifierRepo{
 			//TODO: Add Token Verification Key

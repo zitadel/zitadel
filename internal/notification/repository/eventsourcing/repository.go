@@ -26,7 +26,7 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 }
 
-func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.CommandSide) (*EsRepository, error) {
+func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.Commands) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err

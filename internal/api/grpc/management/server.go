@@ -20,8 +20,8 @@ const (
 var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
-	command        *command.CommandSide
-	query          *query.QuerySide
+	command        *command.Commands
+	query          *query.Queries
 	project        repository.ProjectRepository
 	org            repository.OrgRepository
 	user           repository.UserRepository
@@ -35,7 +35,7 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.CommandSide, query *query.QuerySide, repo repository.Repository, sd systemdefaults.SystemDefaults) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, sd systemdefaults.SystemDefaults) *Server {
 	return &Server{
 		command:        command,
 		query:          query,

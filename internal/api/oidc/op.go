@@ -49,15 +49,15 @@ type Endpoint struct {
 
 type OPStorage struct {
 	repo                       repository.Repository
-	command                    *command.CommandSide
-	query                      *query.QuerySide
+	command                    *command.Commands
+	query                      *query.Queries
 	defaultLoginURL            string
 	defaultAccessTokenLifetime time.Duration
 	defaultIdTokenLifetime     time.Duration
 	signingKeyAlgorithm        string
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.CommandSide, query *query.QuerySide, repo repository.Repository, localDevMode bool) op.OpenIDProvider {
+func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, localDevMode bool) op.OpenIDProvider {
 	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
 	config.OPConfig.CodeMethodS256 = true
@@ -84,7 +84,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	return provider
 }
 
-func newStorage(config StorageConfig, command *command.CommandSide, query *query.QuerySide, repo repository.Repository) *OPStorage {
+func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository) *OPStorage {
 	return &OPStorage{
 		repo:                       repo,
 		command:                    command,

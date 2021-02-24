@@ -8,20 +8,20 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-func (r *CommandSide) AddApplicationKey(ctx context.Context, key *domain.ApplicationKey, resourceOwner string) (_ *domain.ApplicationKey, err error) {
-	application, err := r.getApplicationWriteModel(ctx, key.AggregateID, key.ApplicationID, resourceOwner)
+func (c *Commands) AddApplicationKey(ctx context.Context, key *domain.ApplicationKey, resourceOwner string) (_ *domain.ApplicationKey, err error) {
+	application, err := c.getApplicationWriteModel(ctx, key.AggregateID, key.ApplicationID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if !application.State.Exists() {
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-sak25", "Errors.Application.NotFound")
 	}
-	key.KeyID, err = r.idGenerator.Next()
+	key.KeyID, err = c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 	keyWriteModel := NewApplicationKeyWriteModel(key.AggregateID, key.ApplicationID, key.KeyID, resourceOwner)
-	err = r.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +34,13 @@ func (r *CommandSide) AddApplicationKey(ctx context.Context, key *domain.Applica
 		return nil, err
 	}
 
-	err = domain.SetNewAuthNKeyPair(key, r.applicationKeySize)
+	err = domain.SetNewAuthNKeyPair(key, c.applicationKeySize)
 	if err != nil {
 		return nil, err
 	}
 	key.ClientID = keyWriteModel.ClientID
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.PushEvents(ctx,
 		project.NewApplicationKeyAddedEvent(
 			ctx,
 			ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel),
@@ -62,9 +62,9 @@ func (r *CommandSide) AddApplicationKey(ctx context.Context, key *domain.Applica
 	return result, nil
 }
 
-func (r *CommandSide) RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID, resourceOwner string) error {
+func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID, resourceOwner string) error {
 	keyWriteModel := NewApplicationKeyWriteModel(projectID, applicationID, keyID, resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
 	if err != nil {
 		return err
 	}
@@ -72,6 +72,6 @@ func (r *CommandSide) RemoveApplicationKey(ctx context.Context, projectID, appli
 		return errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.Application.Key.NotFound")
 	}
 
-	_, err = r.eventstore.PushEvents(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
+	_, err = c.eventstore.PushEvents(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
 	return err
 }
