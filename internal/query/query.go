@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 
@@ -19,6 +20,10 @@ type Queries struct {
 	eventstore   *eventstore.Eventstore
 	idGenerator  id.Generator
 	secretCrypto crypto.Crypto
+}
+
+type Config struct {
+	Eventstore types.SQLUser
 }
 
 func StartQueries(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults) (repo *Queries, err error) {

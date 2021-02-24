@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/caos/zitadel/internal/eventstore"
 	"testing"
 	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/repository/sql"
 )
@@ -30,7 +30,7 @@ func NewUserAggregate(id string) *eventstore.Aggregate {
 // ------------------------------------------------------------
 
 type UserAddedEvent struct {
-	eventstore.eventstore `json:"-"`
+	eventstore.BaseEvent `json:"-"`
 
 	FirstName string `json:"firstName"`
 }

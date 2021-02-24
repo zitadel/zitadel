@@ -63,6 +63,13 @@ func getAllUsers(desired *DesiredV0) map[string]string {
 	}
 	users[esUser] = esPassword
 
+	queryUser := "queries"
+	queryPassword := queryUser
+	if passwords != nil && passwords.Queries != nil {
+		queryPassword = passwords.Queries.Value
+	}
+	users[queryUser] = queryPassword
+
 	return users
 }
 

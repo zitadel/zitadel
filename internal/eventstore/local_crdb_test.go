@@ -95,6 +95,7 @@ func setPasswordNULL() error {
 		"authpassword",
 		"notificationpassword",
 		"authzpassword",
+		"queriespassword",
 	}
 	for _, name := range passwordNames {
 		if err := os.Setenv(name, "NULL"); err != nil {

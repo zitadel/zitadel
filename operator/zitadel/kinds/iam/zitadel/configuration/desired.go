@@ -34,6 +34,7 @@ type Passwords struct {
 	Adminapi     *secret.Secret `yaml:"adminapi"`
 	Notification *secret.Secret `yaml:"notification"`
 	Eventstore   *secret.Secret `yaml:"eventstore"`
+	Queries      *secret.Secret `yaml:"queries"`
 }
 
 type Secrets struct {
