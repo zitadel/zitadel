@@ -34,7 +34,7 @@ Commands:
 
 Query:
   Eventsttore:
-    User: 'Queries'
+    User: 'queries'
     Password: $CR_QUERIES_PASSWORD
       SSL:
         Cert: $CR_QUERIES_CERT
