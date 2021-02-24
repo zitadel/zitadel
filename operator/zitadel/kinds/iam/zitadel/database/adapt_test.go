@@ -77,8 +77,8 @@ func TestDatabase_AdaptFailConnection(t *testing.T) {
 	monitor := mntr.Monitor{}
 	queried := map[string]interface{}{}
 
-	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).Return("", "", errors.New("fail"))
-	dbClient.EXPECT().ListUsers(monitor, k8sClient).Return([]string{"test"}, nil)
+	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).MinTimes(1).MaxTimes(1).Return("", "", errors.New("fail"))
+	dbClient.EXPECT().ListUsers(monitor, k8sClient).MinTimes(1).MaxTimes(1).Return([]string{"test"}, nil)
 
 	_, err := GetDatabaseInQueried(queried)
 	assert.Error(t, err)

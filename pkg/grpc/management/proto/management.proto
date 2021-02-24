@@ -2853,6 +2853,7 @@ message ApplicationView {
   string name = 5;
   oneof app_config {
     OIDCConfig oidc_config = 8;
+    APIConfig api_config = 10;
   }
 
   uint64 sequence = 9;
