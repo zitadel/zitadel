@@ -37,11 +37,17 @@ enum DomainValidationType {
 message OrgQuery {
     oneof query {
         OrgNameQuery name = 1;
+        OrgDomainQuery domain = 2;
     }
 }
 
 message OrgNameQuery {
     string name = 1;
+    zitadel.v1.TextQueryMethod method = 2;
+}
+
+message OrgDomainQuery {
+    string domain = 1;
     zitadel.v1.TextQueryMethod method = 2;
 }
 
