@@ -37,18 +37,16 @@ func (es *eventstore) Subscribe(aggregates ...models.AggregateType) *Subscriptio
 	return sub
 }
 
-func notify(aggregates []*models.Aggregate) {
+func Notify(events []*models.Event) {
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
-	for _, aggregate := range aggregates {
-		subs, ok := subscriptions[aggregate.Type()]
+	for _, event := range events {
+		subs, ok := subscriptions[event.AggregateType]
 		if !ok {
 			continue
 		}
 		for _, sub := range subs {
-			for _, event := range aggregate.Events {
-				sub.Events <- event
-			}
+			sub.Events <- event
 		}
 	}
 }

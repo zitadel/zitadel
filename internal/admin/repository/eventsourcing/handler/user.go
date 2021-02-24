@@ -30,7 +30,6 @@ const (
 
 type User struct {
 	handler
-	eventstore     v1.Eventstore
 	systemDefaults systemdefaults.SystemDefaults
 	subscription   *v1.Subscription
 }
@@ -266,7 +265,7 @@ func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, er
 			AggregateID: orgID,
 		},
 	}
-	err = es_sdk.Filter(ctx, u.eventstore.FilterEvents, esOrg.AppendEvents, query)
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
@@ -287,7 +286,7 @@ func (u *User) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
 			AggregateID: domain.IAMID,
 		},
 	}
-	err = es_sdk.Filter(ctx, u.eventstore.FilterEvents, iam.AppendEvents, query)
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, iam.AppendEvents, query)
 	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
 		return nil, err
 	}

@@ -38,8 +38,10 @@ func newIAMMember(handler handler) *IAMMember {
 
 func (m *IAMMember) subscribe() {
 	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
+
 	go func() {
 		for event := range m.subscription.Events {
+
 			query.ReduceEvent(m, event)
 		}
 	}()
