@@ -28,12 +28,6 @@ mkdir -p ${OPENAPI_PATH}
 
 protoc \
   -I=/proto/include \
-  --go_out $GOPATH/src \
-  --go-grpc_out $GOPATH/src \
-  ${PROTO_PATH}/message.proto
-
-protoc \
-  -I=/proto/include \
   --go_out ${GOPATH}/src \
   --go-grpc_out ${GOPATH}/src \
   --grpc-gateway_out ${GOPATH}/src \
@@ -55,7 +49,7 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --authoption_out ${GOPATH}/src \
+  --authoption_out ${GRPC_PATH}/management \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/management.proto
 mv ${ZITADEL_PATH}/pkg/grpc/management/zitadel/* ${ZITADEL_PATH}/pkg/grpc/management
