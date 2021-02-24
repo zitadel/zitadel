@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) BulkAddedHumanExternalIDP(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.ExternalIDP) (err error) {
+func (c *Commands) BulkAddedHumanExternalIDP(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.ExternalIDP) (err error) {
 	if len(externalIDPs) == 0 {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
 	}
@@ -20,17 +20,17 @@ func (r *CommandSide) BulkAddedHumanExternalIDP(ctx context.Context, userID, res
 		externalIDPWriteModel := NewHumanExternalIDPWriteModel(userID, externalIDP.IDPConfigID, externalIDP.ExternalUserID, resourceOwner)
 		userAgg := UserAggregateFromWriteModel(&externalIDPWriteModel.WriteModel)
 
-		events[i], err = r.addHumanExternalIDP(ctx, userAgg, externalIDP)
+		events[i], err = c.addHumanExternalIDP(ctx, userAgg, externalIDP)
 		if err != nil {
 			return err
 		}
 	}
 
-	_, err = r.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
-func (r *CommandSide) addHumanExternalIDP(ctx context.Context, aggregate *eventstore.Aggregate, externalIDP *domain.ExternalIDP) (eventstore.EventPusher, error) {
+func (c *Commands) addHumanExternalIDP(ctx context.Context, aggregate *eventstore.Aggregate, externalIDP *domain.ExternalIDP) (eventstore.EventPusher, error) {
 	if !externalIDP.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid")
 	}
@@ -38,21 +38,21 @@ func (r *CommandSide) addHumanExternalIDP(ctx context.Context, aggregate *events
 	return user.NewHumanExternalIDPAddedEvent(ctx, aggregate, externalIDP.IDPConfigID, externalIDP.DisplayName, externalIDP.ExternalUserID), nil
 }
 
-func (r *CommandSide) RemoveHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP) error {
-	event, err := r.removeHumanExternalIDP(ctx, externalIDP, false)
+func (c *Commands) RemoveHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP) error {
+	event, err := c.removeHumanExternalIDP(ctx, externalIDP, false)
 	if err != nil {
 		return err
 	}
-	_, err = r.eventstore.PushEvents(ctx, event)
+	_, err = c.eventstore.PushEvents(ctx, event)
 	return err
 }
 
-func (r *CommandSide) removeHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP, cascade bool) (eventstore.EventPusher, error) {
+func (c *Commands) removeHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP, cascade bool) (eventstore.EventPusher, error) {
 	if externalIDP.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.IDMissing")
 	}
 
-	existingExternalIDP, err := r.externalIDPWriteModelByID(ctx, externalIDP.AggregateID, externalIDP.IDPConfigID, externalIDP.ExternalUserID, externalIDP.ResourceOwner)
+	existingExternalIDP, err := c.externalIDPWriteModelByID(ctx, externalIDP.AggregateID, externalIDP.IDPConfigID, externalIDP.ExternalUserID, externalIDP.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -66,12 +66,12 @@ func (r *CommandSide) removeHumanExternalIDP(ctx context.Context, externalIDP *d
 	return user.NewHumanExternalIDPRemovedEvent(ctx, userAgg, externalIDP.IDPConfigID, externalIDP.ExternalUserID), nil
 }
 
-func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, userID string, authRequest *domain.AuthRequest) (err error) {
+func (c *Commands) HumanExternalLoginChecked(ctx context.Context, orgID, userID string, authRequest *domain.AuthRequest) (err error) {
 	if userID == "" {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5n8sM", "Errors.IDMissing")
 	}
 
-	existingHuman, err := r.getHumanWriteModelByID(ctx, userID, orgID)
+	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
@@ -80,16 +80,16 @@ func (r *CommandSide) HumanExternalLoginChecked(ctx context.Context, orgID, user
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, user.NewHumanExternalIDPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	_, err = c.eventstore.PushEvents(ctx, user.NewHumanExternalIDPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	return err
 }
 
-func (r *CommandSide) externalIDPWriteModelByID(ctx context.Context, userID, idpConfigID, externalUserID, resourceOwner string) (writeModel *HumanExternalIDPWriteModel, err error) {
+func (c *Commands) externalIDPWriteModelByID(ctx context.Context, userID, idpConfigID, externalUserID, resourceOwner string) (writeModel *HumanExternalIDPWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID, resourceOwner)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

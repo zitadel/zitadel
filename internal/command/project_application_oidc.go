@@ -13,19 +13,19 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) AddOIDCApplication(ctx context.Context, application *domain.OIDCApp, resourceOwner string) (_ *domain.OIDCApp, err error) {
-	project, err := r.getProjectByID(ctx, application.AggregateID, resourceOwner)
+func (c *Commands) AddOIDCApplication(ctx context.Context, application *domain.OIDCApp, resourceOwner string) (_ *domain.OIDCApp, err error) {
+	project, err := c.getProjectByID(ctx, application.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	addedApplication := NewOIDCApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
-	events, stringPw, err := r.addOIDCApplication(ctx, projectAgg, project, application, resourceOwner)
+	events, stringPw, err := c.addOIDCApplication(ctx, projectAgg, project, application, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	addedApplication.AppID = application.AppID
-	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -39,11 +39,11 @@ func (r *CommandSide) AddOIDCApplication(ctx context.Context, application *domai
 	return result, nil
 }
 
-func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, oidcApp *domain.OIDCApp, resourceOwner string) (events []eventstore.EventPusher, stringPW string, err error) {
+func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, oidcApp *domain.OIDCApp, resourceOwner string) (events []eventstore.EventPusher, stringPW string, err error) {
 	if !oidcApp.IsValid() {
 		return nil, "", caos_errs.ThrowPreconditionFailed(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
-	oidcApp.AppID, err = r.idGenerator.Next()
+	oidcApp.AppID, err = c.idGenerator.Next()
 	if err != nil {
 		return nil, "", err
 	}
@@ -53,11 +53,11 @@ func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *events
 	}
 
 	var stringPw string
-	err = domain.SetNewClientID(oidcApp, r.idGenerator, proj)
+	err = domain.SetNewClientID(oidcApp, c.idGenerator, proj)
 	if err != nil {
 		return nil, "", err
 	}
-	stringPw, err = domain.SetNewClientSecretIfNeeded(oidcApp, r.applicationSecretGenerator)
+	stringPw, err = domain.SetNewClientSecretIfNeeded(oidcApp, c.applicationSecretGenerator)
 	if err != nil {
 		return nil, "", err
 	}
@@ -83,12 +83,12 @@ func (r *CommandSide) addOIDCApplication(ctx context.Context, projectAgg *events
 	return events, stringPw, nil
 }
 
-func (r *CommandSide) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
+func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
 	if !oidc.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m900", "Errors.Project.App.OIDCConfigInvalid")
 	}
 
-	existingOIDC, err := r.getOIDCAppWriteModel(ctx, oidc.AggregateID, oidc.AppID, resourceOwner)
+	existingOIDC, err := c.getOIDCAppWriteModel(ctx, oidc.AggregateID, oidc.AppID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (r *CommandSide) ChangeOIDCApplication(ctx context.Context, oidc *domain.OI
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -134,26 +134,26 @@ func (r *CommandSide) ChangeOIDCApplication(ctx context.Context, oidc *domain.OI
 	return result, nil
 }
 
-func (r *CommandSide) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.OIDCApp, error) {
+func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.OIDCApp, error) {
 	if projectID == "" || appID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-99i83", "Errors.IDMissing")
 	}
 
-	existingOIDC, err := r.getOIDCAppWriteModel(ctx, projectID, appID, resourceOwner)
+	existingOIDC, err := c.getOIDCAppWriteModel(ctx, projectID, appID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingOIDC.State == domain.AppStateUnspecified || existingOIDC.State == domain.AppStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2g66f", "Errors.Project.App.NotExisting")
 	}
-	cryptoSecret, stringPW, err := domain.NewClientSecret(r.applicationSecretGenerator)
+	cryptoSecret, stringPW, err := domain.NewClientSecret(c.applicationSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, project.NewOIDCConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewOIDCConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +167,8 @@ func (r *CommandSide) ChangeOIDCApplicationSecret(ctx context.Context, projectID
 	return result, err
 }
 
-func (r *CommandSide) VerifyOIDCClientSecret(ctx context.Context, projectID, appID, secret string) error {
-	app, err := r.getOIDCAppWriteModel(ctx, projectID, appID, "")
+func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID, secret string) error {
+	app, err := c.getOIDCAppWriteModel(ctx, projectID, appID, "")
 	if err != nil {
 		return err
 	}
@@ -181,20 +181,20 @@ func (r *CommandSide) VerifyOIDCClientSecret(ctx context.Context, projectID, app
 
 	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-	err = crypto.CompareHash(app.ClientSecret, []byte(secret), r.userPasswordAlg)
+	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.userPasswordAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
-		_, err = r.eventstore.PushEvents(ctx, project.NewOIDCConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
+		_, err = c.eventstore.PushEvents(ctx, project.NewOIDCConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
 		return err
 	}
-	_, err = r.eventstore.PushEvents(ctx, project.NewOIDCConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
+	_, err = c.eventstore.PushEvents(ctx, project.NewOIDCConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
 	logging.Log("COMMAND-ADfhz").OnError(err).Error("could not push event OIDCClientSecretCheckFailed")
 	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Bz542", "Errors.Project.App.OIDCSecretInvalid")
 }
 
-func (r *CommandSide) getOIDCAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*OIDCApplicationWriteModel, error) {
+func (c *Commands) getOIDCAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*OIDCApplicationWriteModel, error) {
 	appWriteModel := NewOIDCApplicationWriteModelWithAppID(projectID, appID, resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, appWriteModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err
 	}

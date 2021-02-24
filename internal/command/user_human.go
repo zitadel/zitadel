@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func (r *CommandSide) getHuman(ctx context.Context, userID, resourceowner string) (*domain.Human, error) {
-	human, err := r.getHumanWriteModelByID(ctx, userID, resourceowner)
+func (c *Commands) getHuman(ctx context.Context, userID, resourceowner string) (*domain.Human, error) {
+	human, err := c.getHumanWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}
@@ -21,12 +21,12 @@ func (r *CommandSide) getHuman(ctx context.Context, userID, resourceowner string
 	return writeModelToHuman(human), nil
 }
 
-func (r *CommandSide) AddHuman(ctx context.Context, orgID string, human *domain.Human) (*domain.Human, error) {
-	events, addedHuman, err := r.addHuman(ctx, orgID, human)
+func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Human) (*domain.Human, error) {
+	events, addedHuman, err := c.addHuman(ctx, orgID, human)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -39,15 +39,15 @@ func (r *CommandSide) AddHuman(ctx context.Context, orgID string, human *domain.
 	return writeModelToHuman(addedHuman), nil
 }
 
-func (r *CommandSide) addHuman(ctx context.Context, orgID string, human *domain.Human) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
-	return r.createHuman(ctx, orgID, human, nil, false)
+	return c.createHuman(ctx, orgID, human, nil, false)
 }
 
-func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
-	userEvents, registeredHuman, err := r.registerHuman(ctx, orgID, human, externalIDP)
+func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
+	userEvents, registeredHuman, err := c.registerHuman(ctx, orgID, human, externalIDP)
 	if err != nil {
 		return nil, err
 	}
@@ -62,14 +62,14 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *do
 			UserID: human.AggregateID,
 			Roles:  orgMemberRoles,
 		}
-		memberEvent, err := r.addOrgMember(ctx, orgAgg, orgMemberWriteModel, orgMember)
+		memberEvent, err := c.addOrgMember(ctx, orgAgg, orgMemberWriteModel, orgMember)
 		if err != nil {
 			return nil, err
 		}
 		userEvents = append(userEvents, memberEvent)
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, userEvents...)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, userEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -81,24 +81,24 @@ func (r *CommandSide) RegisterHuman(ctx context.Context, orgID string, human *do
 	return writeModelToHuman(registeredHuman), nil
 }
 
-func (r *CommandSide) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-9dk45", "Errors.User.Invalid")
 	}
-	return r.createHuman(ctx, orgID, human, externalIDP, true)
+	return c.createHuman(ctx, orgID, human, externalIDP, true)
 }
 
-func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister bool) ([]eventstore.EventPusher, *HumanWriteModel, error) {
-	userID, err := r.idGenerator.Next()
+func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister bool) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+	userID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
 	human.AggregateID = userID
-	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, orgID)
+	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
 	}
-	pwPolicy, err := r.getOrgPasswordComplexityPolicy(ctx, orgID)
+	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -106,7 +106,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 		return nil, nil, err
 	}
 	human.SetNamesAsDisplayname()
-	if err := human.HashPasswordIfExisting(pwPolicy, r.userPasswordAlg, true); err != nil {
+	if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, true); err != nil {
 		return nil, nil, err
 	}
 	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
@@ -121,7 +121,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	}
 
 	if externalIDP != nil {
-		event, err := r.addHumanExternalIDP(ctx, userAgg, externalIDP)
+		event, err := c.addHumanExternalIDP(ctx, userAgg, externalIDP)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -129,7 +129,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	}
 
 	if human.IsInitialState() {
-		initCode, err := domain.NewInitUserCode(r.initializeUserCode)
+		initCode, err := domain.NewInitUserCode(c.initializeUserCode)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -141,7 +141,7 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	}
 
 	if human.Phone != nil && human.PhoneNumber != "" && !human.IsPhoneVerified {
-		phoneCode, err := domain.NewPhoneCode(r.phoneVerificationCode)
+		phoneCode, err := domain.NewPhoneCode(c.phoneVerificationCode)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -153,12 +153,12 @@ func (r *CommandSide) createHuman(ctx context.Context, orgID string, human *doma
 	return events, addedHuman, nil
 }
 
-func (r *CommandSide) HumanSkipMFAInit(ctx context.Context, userID, resourceowner string) (err error) {
+func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner string) (err error) {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2xpX9", "Errors.User.UserIDMissing")
 	}
 
-	existingHuman, err := r.getHumanWriteModelByID(ctx, userID, resourceowner)
+	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return err
 	}
@@ -166,7 +166,7 @@ func (r *CommandSide) HumanSkipMFAInit(ctx context.Context, userID, resourceowne
 		return caos_errs.ThrowNotFound(nil, "COMMAND-m9cV8", "Errors.User.NotFound")
 	}
 
-	_, err = r.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.PushEvents(ctx,
 		user.NewHumanMFAInitSkippedEvent(ctx, UserAggregateFromWriteModel(&existingHuman.WriteModel)))
 	return err
 }
@@ -234,13 +234,13 @@ func createRegisterHumanEvent(ctx context.Context, aggregate *eventstore.Aggrega
 	return addEvent
 }
 
-func (r *CommandSide) HumansSignOut(ctx context.Context, agentID string, userIDs []string) error {
+func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []string) error {
 	if agentID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
 	events := make([]eventstore.EventPusher, len(userIDs))
 	for i, userID := range userIDs {
-		existingUser, err := r.getHumanWriteModelByID(ctx, userID, "")
+		existingUser, err := c.getHumanWriteModelByID(ctx, userID, "")
 		if err != nil {
 			return err
 		}
@@ -253,13 +253,13 @@ func (r *CommandSide) HumansSignOut(ctx context.Context, agentID string, userIDs
 			agentID)
 	}
 
-	_, err := r.eventstore.PushEvents(ctx, events...)
+	_, err := c.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
-func (r *CommandSide) getHumanWriteModelByID(ctx context.Context, userID, resourceowner string) (*HumanWriteModel, error) {
+func (c *Commands) getHumanWriteModelByID(ctx context.Context, userID, resourceowner string) (*HumanWriteModel, error) {
 	humanWriteModel := NewHumanWriteModel(userID, resourceowner)
-	err := r.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
 	if err != nil {
 		return nil, err
 	}

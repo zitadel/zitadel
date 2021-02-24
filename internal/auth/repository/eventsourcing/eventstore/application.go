@@ -11,7 +11,7 @@ import (
 )
 
 type ApplicationRepo struct {
-	Commands *command.CommandSide
+	Commands *command.Commands
 	View     *view.View
 }
 

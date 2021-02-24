@@ -12,6 +12,6 @@ type Config struct {
 	Handler handler.Config
 }
 
-func Start(config Config, command *command.CommandSide, query *query.QuerySide, authRepo *eventsourcing.EsRepository, systemdefaults systemdefaults.SystemDefaults, localDevMode bool) (*handler.Login, string) {
+func Start(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, systemdefaults systemdefaults.SystemDefaults, localDevMode bool) (*handler.Login, string) {
 	return handler.CreateLogin(config.Handler, command, query, authRepo, systemdefaults, localDevMode)
 }

@@ -8,12 +8,12 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) ChangeHumanProfile(ctx context.Context, profile *domain.Profile) (*domain.Profile, error) {
+func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profile) (*domain.Profile, error) {
 	if !profile.IsValid() && profile.AggregateID != "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8io0d", "Errors.User.Profile.Invalid")
 	}
 
-	existingProfile, err := r.profileWriteModelByID(ctx, profile.AggregateID, profile.ResourceOwner)
+	existingProfile, err := c.profileWriteModelByID(ctx, profile.AggregateID, profile.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (r *CommandSide) ChangeHumanProfile(ctx context.Context, profile *domain.Pr
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
 	}
 
-	events, err := r.eventstore.PushEvents(ctx, changedEvent)
+	events, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -37,12 +37,12 @@ func (r *CommandSide) ChangeHumanProfile(ctx context.Context, profile *domain.Pr
 	return writeModelToProfile(existingProfile), nil
 }
 
-func (r *CommandSide) profileWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanProfileWriteModel, err error) {
+func (c *Commands) profileWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanProfileWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanProfileWriteModel(userID, resourceOwner)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

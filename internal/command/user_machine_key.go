@@ -9,17 +9,17 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) AddUserMachineKey(ctx context.Context, machineKey *domain.MachineKey, resourceOwner string) (*domain.MachineKey, error) {
-	err := r.checkUserExists(ctx, machineKey.AggregateID, resourceOwner)
+func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *domain.MachineKey, resourceOwner string) (*domain.MachineKey, error) {
+	err := c.checkUserExists(ctx, machineKey.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	keyID, err := r.idGenerator.Next()
+	keyID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 	keyWriteModel := NewMachineKeyWriteModel(machineKey.AggregateID, keyID, resourceOwner)
-	err = r.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -28,11 +28,11 @@ func (r *CommandSide) AddUserMachineKey(ctx context.Context, machineKey *domain.
 		return nil, err
 	}
 
-	if err = domain.SetNewAuthNKeyPair(machineKey, r.machineKeySize); err != nil {
+	if err = domain.SetNewAuthNKeyPair(machineKey, c.machineKeySize); err != nil {
 		return nil, err
 	}
 
-	events, err := r.eventstore.PushEvents(ctx,
+	events, err := c.eventstore.PushEvents(ctx,
 		user.NewMachineKeyAddedEvent(
 			ctx,
 			UserAggregateFromWriteModel(&keyWriteModel.WriteModel),
@@ -53,8 +53,8 @@ func (r *CommandSide) AddUserMachineKey(ctx context.Context, machineKey *domain.
 	return key, nil
 }
 
-func (r *CommandSide) RemoveUserMachineKey(ctx context.Context, userID, keyID, resourceOwner string) error {
-	keyWriteModel, err := r.machineKeyWriteModelByID(ctx, userID, keyID, resourceOwner)
+func (c *Commands) RemoveUserMachineKey(ctx context.Context, userID, keyID, resourceOwner string) error {
+	keyWriteModel, err := c.machineKeyWriteModelByID(ctx, userID, keyID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -62,12 +62,12 @@ func (r *CommandSide) RemoveUserMachineKey(ctx context.Context, userID, keyID, r
 		return errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.User.Machine.Key.NotFound")
 	}
 
-	_, err = r.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.PushEvents(ctx,
 		user.NewMachineKeyRemovedEvent(ctx, UserAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
 	return err
 }
 
-func (r *CommandSide) machineKeyWriteModelByID(ctx context.Context, userID, keyID, resourceOwner string) (writeModel *MachineKeyWriteModel, err error) {
+func (c *Commands) machineKeyWriteModelByID(ctx context.Context, userID, keyID, resourceOwner string) (writeModel *MachineKeyWriteModel, err error) {
 	if userID == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-4n8vs", "Errors.User.UserIDMissing")
 	}
@@ -75,7 +75,7 @@ func (r *CommandSide) machineKeyWriteModelByID(ctx context.Context, userID, keyI
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewMachineKeyWriteModel(userID, keyID, resourceOwner)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

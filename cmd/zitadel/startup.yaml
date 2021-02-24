@@ -16,8 +16,31 @@ Metrics:
   Config:
     MeterName: 'github.com/caos/zitadel'
 
+EventstoreBase:
+  Host: $ZITADEL_EVENTSTORE_HOST
+  Port: $ZITADEL_EVENTSTORE_PORT
+  Database: 'eventstore'
+  SSL:
+    Mode: $CR_SSL_MODE
+    RootCert: $CR_ROOT_CERT
+
+Commands:
+  Eventstore:
+    User: 'eventstore'
+    Password: $CR_EVENTSTORE_PASSWORD
+    SSL:
+      Cert: $CR_EVENTSTORE_CERT
+      Key: $CR_EVENTSTORE_KEY
+
+Query:
+  Eventsttore:
+    User: 'queries'
+    Password: $CR_QUERIES_PASSWORD
+      SSL:
+        Cert: $CR_QUERIES_CERT
+        Key: $CR_QUERIES_KEY
+
 AuthZ:
-  Domain: $ZITADEL_DEFAULT_DOMAIN
   Repository:
     Eventstore:
       ServiceName: 'AuthZ'

@@ -15,7 +15,7 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func Start(ctx context.Context, config Config, systemDefaults sd.SystemDefaults, command *command.CommandSide) {
+func Start(ctx context.Context, config Config, systemDefaults sd.SystemDefaults, command *command.Commands) {
 	statikFS, err := fs.NewWithNamespace("notification")
 	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start listener")
 

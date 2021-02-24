@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 
@@ -13,35 +14,30 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-type QuerySide struct {
+type Queries struct {
 	iamID        string
 	eventstore   *eventstore.Eventstore
 	idGenerator  id.Generator
 	secretCrypto crypto.Crypto
 }
 
-type Config struct {
-	Eventstore     *eventstore.Eventstore
-	SystemDefaults sd.SystemDefaults
-}
-
-func StartQuerySide(config *Config) (repo *QuerySide, err error) {
-	repo = &QuerySide{
-		iamID:       config.SystemDefaults.IamID,
-		eventstore:  config.Eventstore,
+func StartQueries(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults) (repo *Queries, err error) {
+	repo = &Queries{
+		iamID:       defaults.IamID,
+		eventstore:  eventstore,
 		idGenerator: id.SonyFlakeGenerator,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
 
-	repo.secretCrypto, err = crypto.NewAESCrypto(config.SystemDefaults.IDPConfigVerificationKey)
+	repo.secretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
 	if err != nil {
 		return nil, err
 	}
 	return repo, nil
 }
 
-func (r *QuerySide) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, err error) {
+func (r *Queries) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, err error) {
 	readModel, err := r.iamByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -50,7 +46,7 @@ func (r *QuerySide) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, e
 	return readModelToIAM(readModel), nil
 }
 
-func (r *QuerySide) iamByID(ctx context.Context, id string) (_ *ReadModel, err error) {
+func (r *Queries) iamByID(ctx context.Context, id string) (_ *ReadModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

@@ -8,12 +8,12 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (r *CommandSide) AddMailTemplate(ctx context.Context, resourceOwner string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
+func (c *Commands) AddMailTemplate(ctx context.Context, resourceOwner string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3m9fs", "Errors.Org.MailTemplate.Invalid")
 	}
 	addedPolicy := NewOrgMailTemplateWriteModel(resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func (r *CommandSide) AddMailTemplate(ctx context.Context, resourceOwner string,
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.MailTemplateWriteModel.WriteModel)
-	pushedEvents, err := r.eventstore.PushEvents(ctx, org.NewMailTemplateAddedEvent(ctx, orgAgg, policy.Template))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewMailTemplateAddedEvent(ctx, orgAgg, policy.Template))
 	if err != nil {
 		return nil, err
 	}
@@ -33,12 +33,12 @@ func (r *CommandSide) AddMailTemplate(ctx context.Context, resourceOwner string,
 	return writeModelToMailTemplate(&addedPolicy.MailTemplateWriteModel), nil
 }
 
-func (r *CommandSide) ChangeMailTemplate(ctx context.Context, resourceOwner string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
+func (c *Commands) ChangeMailTemplate(ctx context.Context, resourceOwner string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-9f9ds", "Errors.Org.MailTemplate.Invalid")
 	}
 	existingPolicy := NewOrgMailTemplateWriteModel(resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (r *CommandSide) ChangeMailTemplate(ctx context.Context, resourceOwner stri
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.MailTemplate.NotChanged")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -63,9 +63,9 @@ func (r *CommandSide) ChangeMailTemplate(ctx context.Context, resourceOwner stri
 	return writeModelToMailTemplate(&existingPolicy.MailTemplateWriteModel), nil
 }
 
-func (r *CommandSide) RemoveMailTemplate(ctx context.Context, orgID string) error {
+func (c *Commands) RemoveMailTemplate(ctx context.Context, orgID string) error {
 	existingPolicy := NewOrgMailTemplateWriteModel(orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return err
 	}
@@ -74,6 +74,6 @@ func (r *CommandSide) RemoveMailTemplate(ctx context.Context, orgID string) erro
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 
-	_, err = r.eventstore.PushEvents(ctx, org.NewMailTemplateRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.PushEvents(ctx, org.NewMailTemplateRemovedEvent(ctx, orgAgg))
 	return err
 }

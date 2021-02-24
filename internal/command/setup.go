@@ -14,15 +14,15 @@ import (
 
 type Step interface {
 	Step() domain.Step
-	execute(context.Context, *CommandSide) error
+	execute(context.Context, *Commands) error
 }
 
 const (
 	SetupUser = "SETUP"
 )
 
-func (r *CommandSide) ExecuteSetupSteps(ctx context.Context, steps []Step) error {
-	iam, err := r.GetIAM(ctx)
+func (c *Commands) ExecuteSetupSteps(ctx context.Context, steps []Step) error {
+	iam, err := c.GetIAM(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
@@ -38,12 +38,12 @@ func (r *CommandSide) ExecuteSetupSteps(ctx context.Context, steps []Step) error
 	ctx = setSetUpContextData(ctx)
 
 	for _, step := range steps {
-		iam, err = r.StartSetup(ctx, step.Step())
+		iam, err = c.StartSetup(ctx, step.Step())
 		if err != nil {
 			return err
 		}
 
-		err = step.execute(ctx, r)
+		err = step.execute(ctx, c)
 		if err != nil {
 			return err
 		}
@@ -55,8 +55,8 @@ func setSetUpContextData(ctx context.Context) context.Context {
 	return authz.SetCtxData(ctx, authz.CtxData{UserID: SetupUser})
 }
 
-func (r *CommandSide) StartSetup(ctx context.Context, step domain.Step) (*domain.IAM, error) {
-	iamWriteModel, err := r.getIAMWriteModel(ctx)
+func (c *Commands) StartSetup(ctx context.Context, step domain.Step) (*domain.IAM, error) {
+	iamWriteModel, err := c.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (r *CommandSide) StartSetup(ctx context.Context, step domain.Step) (*domain
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "setup error")
 	}
 	aggregate := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
-	pushedEvents, err := r.eventstore.PushEvents(ctx, iam_repo.NewSetupStepStartedEvent(ctx, aggregate, step))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewSetupStepStartedEvent(ctx, aggregate, step))
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Grgh1", "Setup start failed")
 	}
@@ -76,8 +76,8 @@ func (r *CommandSide) StartSetup(ctx context.Context, step domain.Step) (*domain
 	return writeModelToIAM(iamWriteModel), nil
 }
 
-func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider func(*IAMWriteModel) ([]eventstore.EventPusher, error)) error {
-	iam, err := r.getIAMWriteModel(ctx)
+func (c *Commands) setup(ctx context.Context, step Step, iamAggregateProvider func(*IAMWriteModel) ([]eventstore.EventPusher, error)) error {
+	iam, err := c.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
@@ -91,7 +91,7 @@ func (r *CommandSide) setup(ctx context.Context, step Step, iamAggregateProvider
 	iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 	events = append(events, iam_repo.NewSetupStepDoneEvent(ctx, iamAgg, step.Step()))
 
-	_, err = r.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailedf(nil, "EVENT-dbG31", "Setup %v failed", step.Step())
 	}

@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
@@ -14,6 +13,8 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
+	es2 "github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
 	key_model "github.com/caos/zitadel/internal/key/model"
@@ -43,12 +44,11 @@ type EsRepository struct {
 	eventstore.IAMRepository
 }
 
-func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.CommandSide, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
+func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, authZRepo *authz_repo.EsRepository, esV2 *es2.Eventstore) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
 	}
-	esV2 := es.V2()
 
 	sqlClient, err := conf.View.Start()
 	if err != nil {
@@ -67,11 +67,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 	}
 
 	authReq, err := cache.Start(conf.AuthRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +140,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,
-			IAMV2QuerySide: iamV2Query,
+			IAMV2QuerySide: queries,
 		},
 	}, nil
 }

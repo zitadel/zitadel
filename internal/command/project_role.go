@@ -9,19 +9,19 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-func (r *CommandSide) AddProjectRole(ctx context.Context, projectRole *domain.ProjectRole, resourceOwner string) (_ *domain.ProjectRole, err error) {
-	err = r.checkProjectExists(ctx, projectRole.AggregateID, resourceOwner)
+func (c *Commands) AddProjectRole(ctx context.Context, projectRole *domain.ProjectRole, resourceOwner string) (_ *domain.ProjectRole, err error) {
+	err = c.checkProjectExists(ctx, projectRole.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 
 	roleWriteModel := NewProjectRoleWriteModelWithKey(projectRole.Key, projectRole.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
-	events, err := r.addProjectRoles(ctx, projectAgg, projectRole.AggregateID, projectRole)
+	events, err := c.addProjectRoles(ctx, projectAgg, projectRole.AggregateID, projectRole)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -32,24 +32,24 @@ func (r *CommandSide) AddProjectRole(ctx context.Context, projectRole *domain.Pr
 	return roleWriteModelToRole(roleWriteModel), nil
 }
 
-func (r *CommandSide) BulkAddProjectRole(ctx context.Context, projectID, resourceOwner string, projectRoles []*domain.ProjectRole) (err error) {
-	err = r.checkProjectExists(ctx, projectID, resourceOwner)
+func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOwner string, projectRoles []*domain.ProjectRole) (err error) {
+	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
 		return err
 	}
 
 	roleWriteModel := NewProjectRoleWriteModel(projectID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
-	events, err := r.addProjectRoles(ctx, projectAgg, projectID, projectRoles...)
+	events, err := c.addProjectRoles(ctx, projectAgg, projectID, projectRoles...)
 	if err != nil {
 		return err
 	}
 
-	_, err = r.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
-func (r *CommandSide) addProjectRoles(ctx context.Context, projectAgg *eventstore.Aggregate, projectID string, projectRoles ...*domain.ProjectRole) ([]eventstore.EventPusher, error) {
+func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.Aggregate, projectID string, projectRoles ...*domain.ProjectRole) ([]eventstore.EventPusher, error) {
 	var events []eventstore.EventPusher
 	for _, projectRole := range projectRoles {
 		if !projectRole.IsValid() {
@@ -68,16 +68,16 @@ func (r *CommandSide) addProjectRoles(ctx context.Context, projectAgg *eventstor
 	return events, nil
 }
 
-func (r *CommandSide) ChangeProjectRole(ctx context.Context, projectRole *domain.ProjectRole, resourceOwner string) (_ *domain.ProjectRole, err error) {
+func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.ProjectRole, resourceOwner string) (_ *domain.ProjectRole, err error) {
 	if !projectRole.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
 	}
-	err = r.checkProjectExists(ctx, projectRole.AggregateID, resourceOwner)
+	err = c.checkProjectExists(ctx, projectRole.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 
-	existingRole, err := r.getProjectRoleWriteModelByID(ctx, projectRole.Key, projectRole.AggregateID, resourceOwner)
+	existingRole, err := c.getProjectRoleWriteModelByID(ctx, projectRole.Key, projectRole.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (r *CommandSide) ChangeProjectRole(ctx context.Context, projectRole *domain
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0cs", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changeEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +106,11 @@ func (r *CommandSide) ChangeProjectRole(ctx context.Context, projectRole *domain
 	return roleWriteModelToRole(existingRole), nil
 }
 
-func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, resourceOwner string, cascadingProjectGrantIds []string, cascadeUserGrantIDs ...string) (err error) {
+func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resourceOwner string, cascadingProjectGrantIds []string, cascadeUserGrantIDs ...string) (err error) {
 	if projectID == "" || key == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
 	}
-	existingRole, err := r.getProjectRoleWriteModelByID(ctx, key, projectID, resourceOwner)
+	existingRole, err := c.getProjectRoleWriteModelByID(ctx, key, projectID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -123,7 +123,7 @@ func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, res
 	}
 
 	for _, projectGrantID := range cascadingProjectGrantIds {
-		event, _, err := r.removeRoleFromProjectGrant(ctx, projectAgg, projectID, projectGrantID, key, true)
+		event, _, err := c.removeRoleFromProjectGrant(ctx, projectAgg, projectID, projectGrantID, key, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-6n77g", "projectgrantid", projectGrantID).WithError(err).Warn("could not cascade remove role from project grant")
 			continue
@@ -132,7 +132,7 @@ func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, res
 	}
 
 	for _, grantID := range cascadeUserGrantIDs {
-		event, err := r.removeRoleFromUserGrant(ctx, grantID, []string{key}, true)
+		event, err := c.removeRoleFromUserGrant(ctx, grantID, []string{key}, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-mK0of", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
@@ -140,13 +140,13 @@ func (r *CommandSide) RemoveProjectRole(ctx context.Context, projectID, key, res
 		events = append(events, event)
 	}
 
-	_, err = r.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
-func (r *CommandSide) getProjectRoleWriteModelByID(ctx context.Context, key, projectID, resourceOwner string) (*ProjectRoleWriteModel, error) {
+func (c *Commands) getProjectRoleWriteModelByID(ctx context.Context, key, projectID, resourceOwner string) (*ProjectRoleWriteModel, error) {
 	projectRoleWriteModel := NewProjectRoleWriteModelWithKey(key, projectID, resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, projectRoleWriteModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, projectRoleWriteModel)
 	if err != nil {
 		return nil, err
 	}

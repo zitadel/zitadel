@@ -7,12 +7,12 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-func (r *CommandSide) ChangeApplication(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (domain.Application, error) {
+func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (domain.Application, error) {
 	if appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
 	}
 
-	existingApp, err := r.getApplicationWriteModel(ctx, projectID, appChange.GetAppID(), resourceOwner)
+	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appChange.GetAppID(), resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (r *CommandSide) ChangeApplication(ctx context.Context, projectID string, a
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	pushedEvents, err := r.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.PushEvents(
 		ctx,
 		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName(), projectID))
 	if err != nil {
@@ -36,12 +36,12 @@ func (r *CommandSide) ChangeApplication(ctx context.Context, projectID string, a
 	return applicationWriteModelToApplication(existingApp), nil
 }
 
-func (r *CommandSide) DeactivateApplication(ctx context.Context, projectID, appID, resourceOwner string) error {
+func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, resourceOwner string) error {
 	if projectID == "" || appID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-88fi0", "Errors.IDMissing")
 	}
 
-	existingApp, err := r.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
+	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -52,16 +52,16 @@ func (r *CommandSide) DeactivateApplication(ctx context.Context, projectID, appI
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dsh35", "Errors.Project.App.NotActive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, project.NewApplicationDeactivatedEvent(ctx, projectAgg, appID))
+	_, err = c.eventstore.PushEvents(ctx, project.NewApplicationDeactivatedEvent(ctx, projectAgg, appID))
 	return err
 }
 
-func (r *CommandSide) ReactivateApplication(ctx context.Context, projectID, appID, resourceOwner string) error {
+func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, resourceOwner string) error {
 	if projectID == "" || appID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-983dF", "Errors.IDMissing")
 	}
 
-	existingApp, err := r.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
+	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -73,16 +73,16 @@ func (r *CommandSide) ReactivateApplication(ctx context.Context, projectID, appI
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
-	_, err = r.eventstore.PushEvents(ctx, project.NewApplicationReactivatedEvent(ctx, projectAgg, appID))
+	_, err = c.eventstore.PushEvents(ctx, project.NewApplicationReactivatedEvent(ctx, projectAgg, appID))
 	return err
 }
 
-func (r *CommandSide) RemoveApplication(ctx context.Context, projectID, appID, resourceOwner string) error {
+func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, resourceOwner string) error {
 	if projectID == "" || appID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1b7Jf", "Errors.IDMissing")
 	}
 
-	existingApp, err := r.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
+	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -91,13 +91,13 @@ func (r *CommandSide) RemoveApplication(ctx context.Context, projectID, appID, r
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
-	_, err = r.eventstore.PushEvents(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, projectID))
+	_, err = c.eventstore.PushEvents(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, projectID))
 	return err
 }
 
-func (r *CommandSide) getApplicationWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*ApplicationWriteModel, error) {
+func (c *Commands) getApplicationWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*ApplicationWriteModel, error) {
 	appWriteModel := NewApplicationWriteModelWithAppIDC(projectID, appID, resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, appWriteModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err
 	}

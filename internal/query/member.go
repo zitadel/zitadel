@@ -5,7 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *QuerySide) IAMMemberByID(ctx context.Context, iamID, userID string) (member *IAMMemberReadModel, err error) {
+func (r *Queries) IAMMemberByID(ctx context.Context, iamID, userID string) (member *IAMMemberReadModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

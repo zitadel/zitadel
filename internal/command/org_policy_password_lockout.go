@@ -7,9 +7,9 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (r *CommandSide) AddPasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+func (c *Commands) AddPasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
 	addedPolicy := NewOrgPasswordLockoutPolicyWriteModel(resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +18,7 @@ func (r *CommandSide) AddPasswordLockoutPolicy(ctx context.Context, resourceOwne
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := r.eventstore.PushEvents(ctx, org.NewPasswordLockoutPolicyAddedEvent(ctx, orgAgg, policy.MaxAttempts, policy.ShowLockOutFailures))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewPasswordLockoutPolicyAddedEvent(ctx, orgAgg, policy.MaxAttempts, policy.ShowLockOutFailures))
 	if err != nil {
 		return nil, err
 	}
@@ -29,9 +29,9 @@ func (r *CommandSide) AddPasswordLockoutPolicy(ctx context.Context, resourceOwne
 	return writeModelToPasswordLockoutPolicy(&addedPolicy.PasswordLockoutPolicyWriteModel), nil
 }
 
-func (r *CommandSide) ChangePasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+func (c *Commands) ChangePasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
 	existingPolicy := NewOrgPasswordLockoutPolicyWriteModel(resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (r *CommandSide) ChangePasswordLockoutPolicy(ctx context.Context, resourceO
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-4M9vs", "Errors.Org.PasswordLockoutPolicy.NotChanged")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -56,9 +56,9 @@ func (r *CommandSide) ChangePasswordLockoutPolicy(ctx context.Context, resourceO
 	return writeModelToPasswordLockoutPolicy(&existingPolicy.PasswordLockoutPolicyWriteModel), nil
 }
 
-func (r *CommandSide) RemovePasswordLockoutPolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemovePasswordLockoutPolicy(ctx context.Context, orgID string) error {
 	existingPolicy := NewOrgPasswordLockoutPolicyWriteModel(orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return err
 	}
@@ -67,6 +67,6 @@ func (r *CommandSide) RemovePasswordLockoutPolicy(ctx context.Context, orgID str
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 
-	_, err = r.eventstore.PushEvents(ctx, org.NewPasswordLockoutPolicyRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.PushEvents(ctx, org.NewPasswordLockoutPolicyRemovedEvent(ctx, orgAgg))
 	return err
 }
