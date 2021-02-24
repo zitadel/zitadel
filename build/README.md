@@ -12,15 +12,15 @@
 This command generates the grpc stub for angular into the folder console/src/app/proto/generated for local development
 
 ```Bash
-DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:local --target npm-copy -o console/src/app/proto/generated
+DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:local --target npm-copy -o .
 ```
 
 ### Go
 
-With this command you can generate the stub for golang into the correct dir pkg/
+With this command you can generate the stub for golang into the zitadel dir 
 
 ```Bash
-DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:local --target go-copy -o pkg
+DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:local --target go-copy -o .
 ```
 
 ## Run
