@@ -53,11 +53,10 @@ enum IDPType {
 
 message OIDCConfig {
     string client_id = 1;
-    string client_secret = 2;
-    string issuer = 3;
+    string issuer = 2;
     repeated string scopes = 4;
-    OIDCMappingField display_name_mapping = 5;
-    OIDCMappingField username_mapping = 6;
+    OIDCMappingField display_name_mapping = 4;
+    OIDCMappingField username_mapping = 5;
 }
 
 enum OIDCMappingField {
