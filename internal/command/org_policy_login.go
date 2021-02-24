@@ -9,9 +9,9 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (r *CommandSide) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
 	addedPolicy := NewOrgLoginPolicyWriteModel(resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (r *CommandSide) AddLoginPolicy(ctx context.Context, resourceOwner string, 
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := r.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.PushEvents(
 		ctx,
 		org.NewLoginPolicyAddedEvent(
 			ctx,
@@ -40,9 +40,9 @@ func (r *CommandSide) AddLoginPolicy(ctx context.Context, resourceOwner string, 
 	return writeModelToLoginPolicy(&addedPolicy.LoginPolicyWriteModel), nil
 }
 
-func (r *CommandSide) ChangeLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
 	existingPolicy := NewOrgLoginPolicyWriteModel(resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (r *CommandSide) ChangeLoginPolicy(ctx context.Context, resourceOwner strin
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -66,9 +66,9 @@ func (r *CommandSide) ChangeLoginPolicy(ctx context.Context, resourceOwner strin
 	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
 }
 
-func (r *CommandSide) RemoveLoginPolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) error {
 	existingPolicy := NewOrgLoginPolicyWriteModel(orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return err
 	}
@@ -76,13 +76,13 @@ func (r *CommandSide) RemoveLoginPolicy(ctx context.Context, orgID string) error
 		return caos_errs.ThrowNotFound(nil, "Org-GHB37", "Errors.Org.LoginPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.PushEvents(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
 	return err
 }
 
-func (r *CommandSide) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
+func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
-	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (r *CommandSide) AddIDPProviderToLoginPolicy(ctx context.Context, resourceO
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.WriteModel)
-	pushedEvents, err := r.eventstore.PushEvents(ctx, org.NewIdentityProviderAddedEvent(ctx, orgAgg, idpProvider.IDPConfigID, idpProvider.Type))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewIdentityProviderAddedEvent(ctx, orgAgg, idpProvider.IDPConfigID, idpProvider.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +102,9 @@ func (r *CommandSide) AddIDPProviderToLoginPolicy(ctx context.Context, resourceO
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (r *CommandSide) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) error {
+func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) error {
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
-	err := r.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return err
 	}
@@ -113,13 +113,13 @@ func (r *CommandSide) RemoveIDPProviderFromLoginPolicy(ctx context.Context, reso
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
-	events := r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false, cascadeExternalIDPs...)
+	events := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false, cascadeExternalIDPs...)
 
-	_, err = r.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
-func (r *CommandSide) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.ExternalIDP) []eventstore.EventPusher {
+func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.ExternalIDP) []eventstore.EventPusher {
 	var events []eventstore.EventPusher
 	if cascade {
 		events = append(events, org.NewIdentityProviderCascadeRemovedEvent(ctx, orgAgg, idpConfigID))
@@ -128,7 +128,7 @@ func (r *CommandSide) removeIDPProviderFromLoginPolicy(ctx context.Context, orgA
 	}
 
 	for _, idp := range cascadeExternalIDPs {
-		event, err := r.removeHumanExternalIDP(ctx, idp, true)
+		event, err := c.removeHumanExternalIDP(ctx, idp, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-n8RRf", "userid", idp.AggregateID, "idpconfigid", idp.IDPConfigID).WithError(err).Warn("could not cascade remove external idp")
 			continue
@@ -138,9 +138,9 @@ func (r *CommandSide) removeIDPProviderFromLoginPolicy(ctx context.Context, orgA
 	return events
 }
 
-func (r *CommandSide) AddSecondFactorToLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) (domain.SecondFactorType, error) {
+func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) (domain.SecondFactorType, error) {
 	secondFactorModel := NewOrgSecondFactorWriteModel(orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return domain.SecondFactorTypeUnspecified, err
 	}
@@ -151,16 +151,16 @@ func (r *CommandSide) AddSecondFactorToLoginPolicy(ctx context.Context, secondFa
 
 	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 
-	if _, err = r.eventstore.PushEvents(ctx, org.NewLoginPolicySecondFactorAddedEvent(ctx, orgAgg, secondFactor)); err != nil {
+	if _, err = c.eventstore.PushEvents(ctx, org.NewLoginPolicySecondFactorAddedEvent(ctx, orgAgg, secondFactor)); err != nil {
 		return domain.SecondFactorTypeUnspecified, err
 	}
 
 	return secondFactorModel.MFAType, nil
 }
 
-func (r *CommandSide) RemoveSecondFactorFromLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) error {
+func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) error {
 	secondFactorModel := NewOrgSecondFactorWriteModel(orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return err
 	}
@@ -169,13 +169,13 @@ func (r *CommandSide) RemoveSecondFactorFromLoginPolicy(ctx context.Context, sec
 	}
 	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 
-	_, err = r.eventstore.PushEvents(ctx, org.NewLoginPolicySecondFactorRemovedEvent(ctx, orgAgg, secondFactor))
+	_, err = c.eventstore.PushEvents(ctx, org.NewLoginPolicySecondFactorRemovedEvent(ctx, orgAgg, secondFactor))
 	return err
 }
 
-func (r *CommandSide) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) (domain.MultiFactorType, error) {
+func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) (domain.MultiFactorType, error) {
 	multiFactorModel := NewOrgMultiFactorWriteModel(orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, err
 	}
@@ -185,16 +185,16 @@ func (r *CommandSide) AddMultiFactorToLoginPolicy(ctx context.Context, multiFact
 
 	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.WriteModel)
 
-	if _, err = r.eventstore.PushEvents(ctx, org.NewLoginPolicyMultiFactorAddedEvent(ctx, orgAgg, multiFactor)); err != nil {
+	if _, err = c.eventstore.PushEvents(ctx, org.NewLoginPolicyMultiFactorAddedEvent(ctx, orgAgg, multiFactor)); err != nil {
 		return domain.MultiFactorTypeUnspecified, err
 	}
 
 	return multiFactorModel.MFAType, nil
 }
 
-func (r *CommandSide) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) error {
+func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) error {
 	multiFactorModel := NewOrgMultiFactorWriteModel(orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return err
 	}
@@ -203,6 +203,6 @@ func (r *CommandSide) RemoveMultiFactorFromLoginPolicy(ctx context.Context, mult
 	}
 	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
 
-	_, err = r.eventstore.PushEvents(ctx, org.NewLoginPolicyMultiFactorRemovedEvent(ctx, orgAgg, multiFactor))
+	_, err = c.eventstore.PushEvents(ctx, org.NewLoginPolicyMultiFactorRemovedEvent(ctx, orgAgg, multiFactor))
 	return err
 }

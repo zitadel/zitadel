@@ -15,12 +15,12 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (cs *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userName string) error {
+func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName string) error {
 	if orgID == "" || userID == "" || userName == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.IDMissing")
 	}
 
-	existingUser, err := cs.userWriteModelByID(ctx, userID, orgID)
+	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (cs *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userNa
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
 	}
 
-	orgIAMPolicy, err := cs.getOrgIAMPolicy(ctx, orgID)
+	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
 		return err
 	}
@@ -43,18 +43,18 @@ func (cs *CommandSide) ChangeUsername(ctx context.Context, orgID, userID, userNa
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
-	_, err = cs.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.PushEvents(ctx,
 		user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, orgIAMPolicy.UserLoginMustBeDomain))
 
 	return err
 }
 
-func (r *CommandSide) DeactivateUser(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0gDf", "Errors.User.UserIDMissing")
 	}
 
-	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
+	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -65,17 +65,17 @@ func (r *CommandSide) DeactivateUser(ctx context.Context, userID, resourceOwner 
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
 	}
 
-	_, err = r.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.PushEvents(ctx,
 		user.NewUserDeactivatedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	return err
 }
 
-func (r *CommandSide) ReactivateUser(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9ds", "Errors.User.UserIDMissing")
 	}
 
-	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
+	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -86,17 +86,17 @@ func (r *CommandSide) ReactivateUser(ctx context.Context, userID, resourceOwner 
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive")
 	}
 
-	_, err = r.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.PushEvents(ctx,
 		user.NewUserReactivatedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	return err
 }
 
-func (r *CommandSide) LockUser(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
 	}
 
-	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
+	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -107,17 +107,17 @@ func (r *CommandSide) LockUser(ctx context.Context, userID, resourceOwner string
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
 	}
 
-	_, err = r.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.PushEvents(ctx,
 		user.NewUserLockedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	return err
 }
 
-func (r *CommandSide) UnlockUser(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M0dse", "Errors.User.UserIDMissing")
 	}
 
-	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
+	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -128,17 +128,17 @@ func (r *CommandSide) UnlockUser(ctx context.Context, userID, resourceOwner stri
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked")
 	}
 
-	_, err = r.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.PushEvents(ctx,
 		user.NewUserUnlockedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	return err
 }
 
-func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingGrantIDs ...string) error {
+func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingGrantIDs ...string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
 
-	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
+	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 	}
 
-	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
+	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -155,7 +155,7 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
 
 	for _, grantID := range cascadingGrantIDs {
-		removeEvent, err := r.removeUserGrant(ctx, grantID, "", true)
+		removeEvent, err := c.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-5m9oL", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
@@ -163,16 +163,16 @@ func (r *CommandSide) RemoveUser(ctx context.Context, userID, resourceOwner stri
 		events = append(events, removeEvent)
 	}
 
-	_, err = r.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
-func (r *CommandSide) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
+func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
 	if orgID == "" || userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-55n8M", "Errors.IDMissing")
 	}
 
-	existingUser, err := r.userWriteModelByID(ctx, userID, orgID)
+	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -183,18 +183,18 @@ func (r *CommandSide) AddUserToken(ctx context.Context, orgID, agentID, clientID
 	audience = domain.AddAudScopeToAudience(audience, scopes)
 
 	preferredLanguage := ""
-	existingHuman, err := r.getHumanWriteModelByID(ctx, userID, orgID)
+	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
 	if existingHuman != nil {
 		preferredLanguage = existingHuman.PreferredLanguage.String()
 	}
 	expiration := time.Now().UTC().Add(lifetime)
-	tokenID, err := r.idGenerator.Next()
+	tokenID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.PushEvents(ctx,
 		user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, audience, scopes, expiration))
 	if err != nil {
 		return nil, err
@@ -214,8 +214,8 @@ func (r *CommandSide) AddUserToken(ctx context.Context, orgID, agentID, clientID
 	}, nil
 }
 
-func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (events []eventstore.EventPusher, _ *UserWriteModel, err error) {
-	existingUser, err := r.userWriteModelByID(ctx, userID, "")
+func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events []eventstore.EventPusher, _ *UserWriteModel, err error) {
+	existingUser, err := c.userWriteModelByID(ctx, userID, "")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -225,12 +225,12 @@ func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (eve
 	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
 	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)
 
-	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
+	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	id, err := r.idGenerator.Next()
+	id, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -238,14 +238,14 @@ func (r *CommandSide) userDomainClaimed(ctx context.Context, userID string) (eve
 		user.NewDomainClaimedEvent(
 			ctx,
 			userAgg,
-			fmt.Sprintf("%s@temporary.%s", id, r.iamDomain),
+			fmt.Sprintf("%s@temporary.%s", id, c.iamDomain),
 			existingUser.UserName,
 			orgIAMPolicy.UserLoginMustBeDomain),
 	}, changedUserGrant, nil
 }
 
-func (r *CommandSide) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {
-	existingUser, err := r.userWriteModelByID(ctx, userID, orgID)
+func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {
+	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
@@ -253,13 +253,13 @@ func (r *CommandSide) UserDomainClaimedSent(ctx context.Context, orgID, userID s
 		return caos_errs.ThrowNotFound(nil, "COMMAND-5m9gK", "Errors.User.NotFound")
 	}
 
-	_, err = r.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.PushEvents(ctx,
 		user.NewDomainClaimedSentEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	return err
 }
 
-func (r *CommandSide) checkUserExists(ctx context.Context, userID, resourceOwner string) error {
-	existingUser, err := r.userWriteModelByID(ctx, userID, resourceOwner)
+func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) error {
+	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -269,12 +269,12 @@ func (r *CommandSide) checkUserExists(ctx context.Context, userID, resourceOwner
 	return nil
 }
 
-func (r *CommandSide) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {
+func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewUserWriteModel(userID, resourceOwner)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

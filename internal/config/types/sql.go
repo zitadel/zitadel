@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -21,11 +22,32 @@ type SQL struct {
 	SSL      *ssl
 }
 
+type SQLBase struct {
+	Host     string
+	Port     string
+	Database string
+	SSL      sslBase
+}
+
+type SQLUser struct {
+	User     string
+	Password string
+	SSL      sslUser
+}
+
 type ssl struct {
+	sslBase
+	sslUser
+}
+
+type sslBase struct {
 	// type of connection security
 	Mode string
 	// RootCert Path to the CA certificate
 	RootCert string
+}
+
+type sslUser struct {
 	// Cert Path to the client certificate
 	Cert string
 	// Key Path to the client private key
@@ -71,7 +93,7 @@ func (s *SQL) Start() (*sql.DB, error) {
 
 func (s *SQL) checkSSL() {
 	if s.SSL == nil || s.SSL.Mode == sslDisabledMode || s.SSL.Mode == "" {
-		s.SSL = &ssl{Mode: sslDisabledMode}
+		s.SSL = &ssl{sslBase: sslBase{Mode: sslDisabledMode}}
 		return
 	}
 	if s.SSL.Cert == "" || s.SSL.Key == "" || s.SSL.RootCert == "" {
@@ -81,4 +103,24 @@ func (s *SQL) checkSSL() {
 			"rootCert set", s.SSL.RootCert != "",
 		).Fatal("fields for secure connection missing")
 	}
+}
+
+func (u SQLUser) Start(base SQLBase) (*sql.DB, error) {
+	return (&SQL{
+		Host:     base.Host,
+		Port:     base.Port,
+		User:     u.User,
+		Password: u.Password,
+		Database: base.Database,
+		SSL: &ssl{
+			sslBase: sslBase{
+				Mode:     base.SSL.Mode,
+				RootCert: base.SSL.RootCert,
+			},
+			sslUser: sslUser{
+				Cert: u.SSL.Cert,
+				Key:  u.SSL.Key,
+			},
+		},
+	}).Start()
 }

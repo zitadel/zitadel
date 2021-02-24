@@ -19,8 +19,8 @@ const (
 )
 
 type Server struct {
-	command *command.CommandSide
-	query   *query.QuerySide
+	command *command.Commands
+	query   *query.Queries
 	repo    repository.Repository
 }
 
@@ -28,7 +28,7 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.CommandSide, query *query.QuerySide, authRepo repository.Repository) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, authRepo repository.Repository) *Server {
 	return &Server{
 		command: command,
 		query:   query,

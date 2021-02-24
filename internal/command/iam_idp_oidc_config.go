@@ -6,9 +6,9 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
-func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
+func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
 	existingConfig := NewIAMIDPOIDCConfigWriteModel(config.IDPConfigID)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingConfig)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *do
 		config.ClientID,
 		config.Issuer,
 		config.ClientSecretString,
-		r.idpConfigSecretCrypto,
+		c.idpConfigSecretCrypto,
 		config.IDPDisplayNameMapping,
 		config.UsernameMapping,
 		config.Scopes...)
@@ -36,7 +36,7 @@ func (r *CommandSide) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *do
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

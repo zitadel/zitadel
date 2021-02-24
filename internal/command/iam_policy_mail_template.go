@@ -9,15 +9,15 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) AddDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
+func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
 	addedPolicy := NewIAMMailTemplateWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.MailTemplateWriteModel.WriteModel)
-	event, err := r.addDefaultMailTemplate(ctx, iamAgg, addedPolicy, policy)
+	event, err := c.addDefaultMailTemplate(ctx, iamAgg, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -28,11 +28,11 @@ func (r *CommandSide) AddDefaultMailTemplate(ctx context.Context, policy *domain
 	return writeModelToMailTemplatePolicy(&addedPolicy.MailTemplateWriteModel), nil
 }
 
-func (r *CommandSide) addDefaultMailTemplate(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMMailTemplateWriteModel, policy *domain.MailTemplate) (eventstore.EventPusher, error) {
+func (c *Commands) addDefaultMailTemplate(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMMailTemplateWriteModel, policy *domain.MailTemplate) (eventstore.EventPusher, error) {
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-fm9sd", "Errors.IAM.MailTemplate.Invalid")
 	}
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -43,11 +43,11 @@ func (r *CommandSide) addDefaultMailTemplate(ctx context.Context, iamAgg *events
 	return iam_repo.NewMailTemplateAddedEvent(ctx, iamAgg, policy.Template), nil
 }
 
-func (r *CommandSide) ChangeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
+func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4m9ds", "Errors.IAM.MailTemplate.Invalid")
 	}
-	existingPolicy, err := r.defaultMailTemplateWriteModelByID(ctx)
+	existingPolicy, err := c.defaultMailTemplateWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (r *CommandSide) ChangeDefaultMailTemplate(ctx context.Context, policy *dom
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-3nfsG", "Errors.IAM.MailTemplate.NotChanged")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -73,12 +73,12 @@ func (r *CommandSide) ChangeDefaultMailTemplate(ctx context.Context, policy *dom
 	return writeModelToMailTemplatePolicy(&existingPolicy.MailTemplateWriteModel), nil
 }
 
-func (r *CommandSide) defaultMailTemplateWriteModelByID(ctx context.Context) (policy *IAMMailTemplateWriteModel, err error) {
+func (c *Commands) defaultMailTemplateWriteModelByID(ctx context.Context) (policy *IAMMailTemplateWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewIAMMailTemplateWriteModel()
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

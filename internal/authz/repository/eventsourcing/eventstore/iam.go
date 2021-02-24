@@ -10,7 +10,7 @@ import (
 type IamRepo struct {
 	IAMID string
 
-	IAMV2Query *query.QuerySide
+	IAMV2Query *query.Queries
 }
 
 func (repo *IamRepo) Health(ctx context.Context) error {

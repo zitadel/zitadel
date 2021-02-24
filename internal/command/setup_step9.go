@@ -16,33 +16,33 @@ func (s *Step9) Step() domain.Step {
 	return domain.Step9
 }
 
-func (s *Step9) execute(ctx context.Context, commandSide *CommandSide) error {
+func (s *Step9) execute(ctx context.Context, commandSide *Commands) error {
 	return commandSide.SetupStep9(ctx, s)
 }
 
-func (r *CommandSide) SetupStep9(ctx context.Context, step *Step9) error {
+func (c *Commands) SetupStep9(ctx context.Context, step *Step9) error {
 	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
 		multiFactorModel := NewIAMMultiFactorWriteModel()
 		iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
 		if !step.Passwordless {
 			return []eventstore.EventPusher{}, nil
 		}
-		passwordlessEvent, err := setPasswordlessAllowedInPolicy(ctx, r, iamAgg)
+		passwordlessEvent, err := setPasswordlessAllowedInPolicy(ctx, c, iamAgg)
 		if err != nil {
 			return nil, err
 		}
 		logging.Log("SETUP-AEG2t").Info("allowed passwordless in login policy")
-		multifactorEvent, err := r.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, domain.MultiFactorTypeU2FWithPIN)
+		multifactorEvent, err := c.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, domain.MultiFactorTypeU2FWithPIN)
 		if err != nil {
 			return nil, err
 		}
 		logging.Log("SETUP-ADfng").Info("added passwordless to MFA login policy")
 		return []eventstore.EventPusher{passwordlessEvent, multifactorEvent}, nil
 	}
-	return r.setup(ctx, step, fn)
+	return c.setup(ctx, step, fn)
 }
 
-func setPasswordlessAllowedInPolicy(ctx context.Context, c *CommandSide, iamAgg *eventstore.Aggregate) (eventstore.EventPusher, error) {
+func setPasswordlessAllowedInPolicy(ctx context.Context, c *Commands, iamAgg *eventstore.Aggregate) (eventstore.EventPusher, error) {
 	policy, err := c.getDefaultLoginPolicy(ctx)
 	if err != nil {
 		return nil, err

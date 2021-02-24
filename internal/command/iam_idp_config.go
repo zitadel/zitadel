@@ -12,18 +12,18 @@ import (
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
 )
 
-func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
+func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
 	if config.OIDCConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "IAM-eUpQU", "Errors.idp.config.notset")
 	}
 
-	idpConfigID, err := r.idGenerator.Next()
+	idpConfigID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 	addedConfig := NewIAMIDPConfigWriteModel(idpConfigID)
 
-	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), r.idpConfigSecretCrypto)
+	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *domain.ID
 		),
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func (r *CommandSide) AddDefaultIDPConfig(ctx context.Context, config *domain.ID
 	return writeModelToIDPConfig(&addedConfig.IDPConfigWriteModel), nil
 }
 
-func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
-	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, config.IDPConfigID)
+func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
+	existingIDP, err := c.iamIDPConfigWriteModelByID(ctx, config.IDPConfigID)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -87,8 +87,8 @@ func (r *CommandSide) ChangeDefaultIDPConfig(ctx context.Context, config *domain
 	return writeModelToIDPConfig(&existingIDP.IDPConfigWriteModel), nil
 }
 
-func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, idpID string) error {
-	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, idpID)
+func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string) error {
+	existingIDP, err := c.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return err
 	}
@@ -96,12 +96,12 @@ func (r *CommandSide) DeactivateDefaultIDPConfig(ctx context.Context, idpID stri
 		return caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotActive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, iam_repo.NewIDPConfigDeactivatedEvent(ctx, iamAgg, idpID))
+	_, err = c.eventstore.PushEvents(ctx, iam_repo.NewIDPConfigDeactivatedEvent(ctx, iamAgg, idpID))
 	return err
 }
 
-func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) error {
-	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, idpID)
+func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) error {
+	existingIDP, err := c.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return err
 	}
@@ -109,12 +109,12 @@ func (r *CommandSide) ReactivateDefaultIDPConfig(ctx context.Context, idpID stri
 		return caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, iam_repo.NewIDPConfigReactivatedEvent(ctx, iamAgg, idpID))
+	_, err = c.eventstore.PushEvents(ctx, iam_repo.NewIDPConfigReactivatedEvent(ctx, iamAgg, idpID))
 	return err
 }
 
-func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.ExternalIDP) error {
-	existingIDP, err := r.iamIDPConfigWriteModelByID(ctx, idpID)
+func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.ExternalIDP) error {
+	existingIDP, err := c.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return err
 	}
@@ -129,24 +129,24 @@ func (r *CommandSide) RemoveDefaultIDPConfig(ctx context.Context, idpID string, 
 
 	for _, idpProvider := range idpProviders {
 		if idpProvider.AggregateID == domain.IAMID {
-			userEvents := r.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, true, externalIDPs...)
+			userEvents := c.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, true, externalIDPs...)
 			events = append(events, userEvents...)
 		}
 		orgAgg := OrgAggregateFromWriteModel(&NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpID).WriteModel)
-		orgEvents := r.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true)
+		orgEvents := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true)
 		events = append(events, orgEvents...)
 	}
 
-	_, err = r.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
-func (r *CommandSide) iamIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *IAMIDPConfigWriteModel, err error) {
+func (c *Commands) iamIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *IAMIDPConfigWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewIAMIDPConfigWriteModel(idpID)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

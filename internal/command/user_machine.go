@@ -9,18 +9,18 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) AddMachine(ctx context.Context, orgID string, machine *domain.Machine) (*domain.Machine, error) {
+func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain.Machine) (*domain.Machine, error) {
 	if !machine.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 	}
 
-	userID, err := r.idGenerator.Next()
+	userID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 	machine.AggregateID = userID
 
-	orgIAMPolicy, err := r.getOrgIAMPolicy(ctx, orgID)
+	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID string, machine *dom
 
 	addedMachine := NewMachineWriteModel(machine.AggregateID, orgID)
 	userAgg := UserAggregateFromWriteModel(&addedMachine.WriteModel)
-	events, err := r.eventstore.PushEvents(ctx, user.NewMachineAddedEvent(
+	events, err := c.eventstore.PushEvents(ctx, user.NewMachineAddedEvent(
 		ctx,
 		userAgg,
 		machine.Username,
@@ -49,8 +49,8 @@ func (r *CommandSide) AddMachine(ctx context.Context, orgID string, machine *dom
 	return writeModelToMachine(addedMachine), nil
 }
 
-func (r *CommandSide) ChangeMachine(ctx context.Context, machine *domain.Machine) (*domain.Machine, error) {
-	existingMachine, err := r.machineWriteModelByID(ctx, machine.AggregateID, machine.ResourceOwner)
+func (c *Commands) ChangeMachine(ctx context.Context, machine *domain.Machine) (*domain.Machine, error) {
+	existingMachine, err := c.machineWriteModelByID(ctx, machine.AggregateID, machine.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (r *CommandSide) ChangeMachine(ctx context.Context, machine *domain.Machine
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.NotChanged")
 	}
 
-	events, err := r.eventstore.PushEvents(ctx, changedEvent)
+	events, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (r *CommandSide) ChangeMachine(ctx context.Context, machine *domain.Machine
 }
 
 //TODO: adlerhurst we should check userID on the same level, in user.go userID is checked in public funcs
-func (r *CommandSide) machineWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *MachineWriteModel, err error) {
+func (c *Commands) machineWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *MachineWriteModel, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Plof", "Errors.User.UserIDMissing")
 	}
@@ -84,7 +84,7 @@ func (r *CommandSide) machineWriteModelByID(ctx context.Context, userID, resourc
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewMachineWriteModel(userID, resourceOwner)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

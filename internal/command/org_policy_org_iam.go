@@ -9,14 +9,14 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) AddOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+func (c *Commands) AddOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
 	addedPolicy := NewORGOrgIAMPolicyWriteModel(resourceOwner)
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	event, err := r.addOrgIAMPolicy(ctx, orgAgg, addedPolicy, policy)
+	event, err := c.addOrgIAMPolicy(ctx, orgAgg, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := r.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -27,8 +27,8 @@ func (r *CommandSide) AddOrgIAMPolicy(ctx context.Context, resourceOwner string,
 	return orgWriteModelToOrgIAMPolicy(addedPolicy), nil
 }
 
-func (r *CommandSide) addOrgIAMPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, addedPolicy *ORGOrgIAMPolicyWriteModel, policy *domain.OrgIAMPolicy) (eventstore.EventPusher, error) {
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+func (c *Commands) addOrgIAMPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, addedPolicy *ORGOrgIAMPolicyWriteModel, policy *domain.OrgIAMPolicy) (eventstore.EventPusher, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +38,8 @@ func (r *CommandSide) addOrgIAMPolicy(ctx context.Context, orgAgg *eventstore.Ag
 	return org.NewOrgIAMPolicyAddedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain), nil
 }
 
-func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
-	existingPolicy, err := r.orgIAMPolicyWriteModelByID(ctx, resourceOwner)
+func (c *Commands) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+	existingPolicy, err := c.orgIAMPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner stri
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +64,8 @@ func (r *CommandSide) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner stri
 	return orgWriteModelToOrgIAMPolicy(existingPolicy), nil
 }
 
-func (r *CommandSide) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
-	existingPolicy, err := r.orgIAMPolicyWriteModelByID(ctx, orgID)
+func (c *Commands) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
+	existingPolicy, err := c.orgIAMPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return err
 	}
@@ -74,27 +74,27 @@ func (r *CommandSide) RemoveOrgIAMPolicy(ctx context.Context, orgID string) erro
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, org.NewOrgIAMPolicyRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.PushEvents(ctx, org.NewOrgIAMPolicyRemovedEvent(ctx, orgAgg))
 	return err
 }
 
-func (r *CommandSide) getOrgIAMPolicy(ctx context.Context, orgID string) (*domain.OrgIAMPolicy, error) {
-	policy, err := r.orgIAMPolicyWriteModelByID(ctx, orgID)
+func (c *Commands) getOrgIAMPolicy(ctx context.Context, orgID string) (*domain.OrgIAMPolicy, error) {
+	policy, err := c.orgIAMPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
 	if policy.State == domain.PolicyStateActive {
 		return orgWriteModelToOrgIAMPolicy(policy), nil
 	}
-	return r.getDefaultOrgIAMPolicy(ctx)
+	return c.getDefaultOrgIAMPolicy(ctx)
 }
 
-func (r *CommandSide) orgIAMPolicyWriteModelByID(ctx context.Context, orgID string) (policy *ORGOrgIAMPolicyWriteModel, err error) {
+func (c *Commands) orgIAMPolicyWriteModelByID(ctx context.Context, orgID string) (policy *ORGOrgIAMPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewORGOrgIAMPolicyWriteModel(orgID)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

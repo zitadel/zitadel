@@ -17,14 +17,14 @@ func (s *Step6) Step() domain.Step {
 	return domain.Step6
 }
 
-func (s *Step6) execute(ctx context.Context, commandSide *CommandSide) error {
+func (s *Step6) execute(ctx context.Context, commandSide *Commands) error {
 	return commandSide.SetupStep6(ctx, s)
 }
 
-func (r *CommandSide) SetupStep6(ctx context.Context, step *Step6) error {
+func (c *Commands) SetupStep6(ctx context.Context, step *Step6) error {
 	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		event, err := r.addDefaultLabelPolicy(ctx, iamAgg, NewIAMLabelPolicyWriteModel(), &domain.LabelPolicy{
+		event, err := c.addDefaultLabelPolicy(ctx, iamAgg, NewIAMLabelPolicyWriteModel(), &domain.LabelPolicy{
 			PrimaryColor:   step.DefaultLabelPolicy.PrimaryColor,
 			SecondaryColor: step.DefaultLabelPolicy.SecondaryColor,
 		})
@@ -34,5 +34,5 @@ func (r *CommandSide) SetupStep6(ctx context.Context, step *Step6) error {
 		logging.Log("SETUP-ADgd2").Info("default label policy set up")
 		return []eventstore.EventPusher{event}, nil
 	}
-	return r.setup(ctx, step, fn)
+	return c.setup(ctx, step, fn)
 }

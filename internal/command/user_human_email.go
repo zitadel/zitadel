@@ -11,12 +11,12 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*domain.Email, error) {
+func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*domain.Email, error) {
 	if !email.IsValid() || email.AggregateID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
 	}
 
-	existingEmail, err := r.emailWriteModel(ctx, email.AggregateID, email.ResourceOwner)
+	existingEmail, err := c.emailWriteModel(ctx, email.AggregateID, email.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -34,14 +34,14 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 	if email.IsEmailVerified {
 		events = append(events, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 	} else {
-		emailCode, err := domain.NewEmailCode(r.emailVerificationCode)
+		emailCode, err := domain.NewEmailCode(c.emailVerificationCode)
 		if err != nil {
 			return nil, err
 		}
 		events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry))
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (r *CommandSide) ChangeHumanEmail(ctx context.Context, email *domain.Email)
 	return writeModelToEmail(existingEmail), nil
 }
 
-func (r *CommandSide) VerifyHumanEmail(ctx context.Context, userID, code, resourceowner string) error {
+func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceowner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
@@ -60,7 +60,7 @@ func (r *CommandSide) VerifyHumanEmail(ctx context.Context, userID, code, resour
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-çm0ds", "Errors.User.Code.Empty")
 	}
 
-	existingCode, err := r.emailWriteModel(ctx, userID, resourceowner)
+	existingCode, err := c.emailWriteModel(ctx, userID, resourceowner)
 	if err != nil {
 		return err
 	}
@@ -69,23 +69,23 @@ func (r *CommandSide) VerifyHumanEmail(ctx context.Context, userID, code, resour
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, r.emailVerificationCode)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.emailVerificationCode)
 	if err == nil {
-		_, err = r.eventstore.PushEvents(ctx, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
+		_, err = c.eventstore.PushEvents(ctx, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 		return err
 	}
 
-	_, err = r.eventstore.PushEvents(ctx, user.NewHumanEmailVerificationFailedEvent(ctx, userAgg))
+	_, err = c.eventstore.PushEvents(ctx, user.NewHumanEmailVerificationFailedEvent(ctx, userAgg))
 	logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
 	return caos_errs.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
 }
 
-func (r *CommandSide) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 
-	existingEmail, err := r.emailWriteModel(ctx, userID, resourceOwner)
+	existingEmail, err := c.emailWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -99,16 +99,16 @@ func (r *CommandSide) CreateHumanEmailVerificationCode(ctx context.Context, user
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.User.Email.AlreadyVerified")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
-	emailCode, err := domain.NewEmailCode(r.emailVerificationCode)
+	emailCode, err := domain.NewEmailCode(c.emailVerificationCode)
 	if err != nil {
 		return err
 	}
-	_, err = r.eventstore.PushEvents(ctx, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry))
+	_, err = c.eventstore.PushEvents(ctx, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry))
 	return err
 }
 
-func (r *CommandSide) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
-	existingEmail, err := r.emailWriteModel(ctx, userID, orgID)
+func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	existingEmail, err := c.emailWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
@@ -116,16 +116,16 @@ func (r *CommandSide) HumanEmailVerificationCodeSent(ctx context.Context, orgID,
 		return caos_errs.ThrowNotFound(nil, "COMMAND-6n8uH", "Errors.User.Email.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, user.NewHumanEmailCodeSentEvent(ctx, userAgg))
+	_, err = c.eventstore.PushEvents(ctx, user.NewHumanEmailCodeSentEvent(ctx, userAgg))
 	return err
 }
 
-func (r *CommandSide) emailWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanEmailWriteModel, err error) {
+func (c *Commands) emailWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanEmailWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanEmailWriteModel(userID, resourceOwner)
-	err = r.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

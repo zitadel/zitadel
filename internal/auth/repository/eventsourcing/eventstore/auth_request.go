@@ -30,7 +30,7 @@ import (
 )
 
 type AuthRequestRepo struct {
-	Command      *command.CommandSide
+	Command      *command.Commands
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 

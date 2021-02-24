@@ -8,19 +8,19 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-func (r *CommandSide) AddAPIApplication(ctx context.Context, application *domain.APIApp, resourceOwner string) (_ *domain.APIApp, err error) {
-	project, err := r.getProjectByID(ctx, application.AggregateID, resourceOwner)
+func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.APIApp, resourceOwner string) (_ *domain.APIApp, err error) {
+	project, err := c.getProjectByID(ctx, application.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	addedApplication := NewAPIApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
-	events, stringPw, err := r.addAPIApplication(ctx, projectAgg, project, application, resourceOwner)
+	events, stringPw, err := c.addAPIApplication(ctx, projectAgg, project, application, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	addedApplication.AppID = application.AppID
-	pushedEvents, err := r.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -33,11 +33,11 @@ func (r *CommandSide) AddAPIApplication(ctx context.Context, application *domain
 	return result, nil
 }
 
-func (r *CommandSide) addAPIApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, apiAppApp *domain.APIApp, resourceOwner string) (events []eventstore.EventPusher, stringPW string, err error) {
+func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, apiAppApp *domain.APIApp, resourceOwner string) (events []eventstore.EventPusher, stringPW string, err error) {
 	if !apiAppApp.IsValid() {
 		return nil, "", caos_errs.ThrowPreconditionFailed(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
-	apiAppApp.AppID, err = r.idGenerator.Next()
+	apiAppApp.AppID, err = c.idGenerator.Next()
 	if err != nil {
 		return nil, "", err
 	}
@@ -47,11 +47,11 @@ func (r *CommandSide) addAPIApplication(ctx context.Context, projectAgg *eventst
 	}
 
 	var stringPw string
-	err = domain.SetNewClientID(apiAppApp, r.idGenerator, proj)
+	err = domain.SetNewClientID(apiAppApp, c.idGenerator, proj)
 	if err != nil {
 		return nil, "", err
 	}
-	stringPw, err = domain.SetNewClientSecretIfNeeded(apiAppApp, r.applicationSecretGenerator)
+	stringPw, err = domain.SetNewClientSecretIfNeeded(apiAppApp, c.applicationSecretGenerator)
 	if err != nil {
 		return nil, "", err
 	}
@@ -65,12 +65,12 @@ func (r *CommandSide) addAPIApplication(ctx context.Context, projectAgg *eventst
 	return events, stringPw, nil
 }
 
-func (r *CommandSide) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
+func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
 	if !apiApp.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m900", "Errors.Project.App.APIConfigInvalid")
 	}
 
-	existingAPI, err := r.getAPIAppWriteModel(ctx, apiApp.AggregateID, apiApp.AppID, resourceOwner)
+	existingAPI, err := c.getAPIAppWriteModel(ctx, apiApp.AggregateID, apiApp.AppID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (r *CommandSide) ChangeAPIApplication(ctx context.Context, apiApp *domain.A
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -103,26 +103,26 @@ func (r *CommandSide) ChangeAPIApplication(ctx context.Context, apiApp *domain.A
 	return result, nil
 }
 
-func (r *CommandSide) ChangeAPIApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.APIApp, error) {
+func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.APIApp, error) {
 	if projectID == "" || appID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-99i83", "Errors.IDMissing")
 	}
 
-	existingAPI, err := r.getAPIAppWriteModel(ctx, projectID, appID, resourceOwner)
+	existingAPI, err := c.getAPIAppWriteModel(ctx, projectID, appID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingAPI.State == domain.AppStateUnspecified || existingAPI.State == domain.AppStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2g66f", "Errors.Project.App.NotExisting")
 	}
-	cryptoSecret, stringPW, err := domain.NewClientSecret(r.applicationSecretGenerator)
+	cryptoSecret, stringPW, err := domain.NewClientSecret(c.applicationSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingAPI.WriteModel)
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, project.NewAPIConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewAPIConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
 	if err != nil {
 		return nil, err
 	}
@@ -135,9 +135,9 @@ func (r *CommandSide) ChangeAPIApplicationSecret(ctx context.Context, projectID,
 	result.ClientSecretString = stringPW
 	return result, err
 }
-func (r *CommandSide) getAPIAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*APIApplicationWriteModel, error) {
+func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*APIApplicationWriteModel, error) {
 	appWriteModel := NewAPIApplicationWriteModelWithAppID(projectID, appID, resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, appWriteModel)
+	err := c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err
 	}

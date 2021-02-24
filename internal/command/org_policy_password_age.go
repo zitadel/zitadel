@@ -8,9 +8,9 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (r *CommandSide) AddPasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+func (c *Commands) AddPasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
 	addedPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func (r *CommandSide) AddPasswordAgePolicy(ctx context.Context, resourceOwner st
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := r.eventstore.PushEvents(ctx, org.NewPasswordAgePolicyAddedEvent(ctx, orgAgg, policy.ExpireWarnDays, policy.MaxAgeDays))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewPasswordAgePolicyAddedEvent(ctx, orgAgg, policy.ExpireWarnDays, policy.MaxAgeDays))
 	if err != nil {
 		return nil, err
 	}
@@ -30,9 +30,9 @@ func (r *CommandSide) AddPasswordAgePolicy(ctx context.Context, resourceOwner st
 	return writeModelToPasswordAgePolicy(&addedPolicy.PasswordAgePolicyWriteModel), nil
 }
 
-func (r *CommandSide) ChangePasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
 	existingPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (r *CommandSide) ChangePasswordAgePolicy(ctx context.Context, resourceOwner
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-dsgjR", "Errors.ORg.LabelPolicy.NotChanged")
 	}
 
-	pushedEvents, err := r.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -57,9 +57,9 @@ func (r *CommandSide) ChangePasswordAgePolicy(ctx context.Context, resourceOwner
 	return writeModelToPasswordAgePolicy(&existingPolicy.PasswordAgePolicyWriteModel), nil
 }
 
-func (r *CommandSide) RemovePasswordAgePolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemovePasswordAgePolicy(ctx context.Context, orgID string) error {
 	existingPolicy := NewOrgPasswordAgePolicyWriteModel(orgID)
-	err := r.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return err
 	}
@@ -67,6 +67,6 @@ func (r *CommandSide) RemovePasswordAgePolicy(ctx context.Context, orgID string)
 		return caos_errs.ThrowNotFound(nil, "ORG-Dgs1g", "Errors.Org.PasswordAgePolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	_, err = r.eventstore.PushEvents(ctx, org.NewPasswordAgePolicyRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.PushEvents(ctx, org.NewPasswordAgePolicyRemovedEvent(ctx, orgAgg))
 	return err
 }

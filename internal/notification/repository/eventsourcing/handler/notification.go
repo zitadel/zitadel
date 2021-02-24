@@ -46,7 +46,7 @@ const (
 
 type Notification struct {
 	handler
-	command        *command.CommandSide
+	command        *command.Commands
 	systemDefaults sd.SystemDefaults
 	AesCrypto      crypto.EncryptionAlgorithm
 	i18n           *i18n.Translator
@@ -56,7 +56,7 @@ type Notification struct {
 
 func newNotification(
 	handler handler,
-	command *command.CommandSide,
+	command *command.Commands,
 	defaults sd.SystemDefaults,
 	aesCrypto crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,

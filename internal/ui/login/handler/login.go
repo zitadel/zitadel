@@ -29,8 +29,8 @@ type Login struct {
 	router              http.Handler
 	renderer            *Renderer
 	parser              *form.Parser
-	command             *command.CommandSide
-	query               *query.QuerySide
+	command             *command.Commands
+	query               *query.Queries
 	authRepo            auth_repository.Repository
 	baseURL             string
 	zitadelURL          string
@@ -60,7 +60,7 @@ const (
 	handlerPrefix = "/login"
 )
 
-func CreateLogin(config Config, command *command.CommandSide, query *query.QuerySide, authRepo *eventsourcing.EsRepository, systemDefaults systemdefaults.SystemDefaults, localDevMode bool) (*Login, string) {
+func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, systemDefaults systemdefaults.SystemDefaults, localDevMode bool) (*Login, string) {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
