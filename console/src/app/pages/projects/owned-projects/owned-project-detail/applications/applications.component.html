@@ -34,7 +34,11 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'APP.TYPE' | translate }} </th>
                 <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id ]" mat-cell
                     *matCellDef="let app">
-                    {{'APP.APPTYPE.'+app?.oidcConfig?.applicationType | translate}} </td>
+                    <span *ngIf="app?.oidcConfig?.applicationType !== undefined && app?.oidcConfig?.applicationType !== null">
+                    {{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.applicationType | translate}}
+                </span>
+                <span *ngIf="app.apiConfig">API</span>
+            </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

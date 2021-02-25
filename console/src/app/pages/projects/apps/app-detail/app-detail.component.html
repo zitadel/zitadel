@@ -70,7 +70,8 @@
                     </button>
                 </div>
             </div>
-            <div class="environment" *ngFor="let environmentV of (environmentMap | keyvalue)">
+            <ng-container  *ngFor="let environmentV of (environmentMap | keyvalue)">
+            <div *ngIf="environmentV.value" class="environment">
                 <span class="key">{{environmentV.key}}</span>
                 <div class="environment-row">
                     <span>{{environmentV.value}}</span>
@@ -83,6 +84,7 @@
                     </button>
                 </div>
             </div>
+        </ng-container>
         </div>
 
         <div class="compliance"
