@@ -6,7 +6,9 @@
             </a>
             <div class="title-col">
                 <h1>{{app?.name}}</h1>
-                <span>{{'APP.OIDC.APPTYPE'+app?.oidcConfig?.applicationType | translate}}</span>
+                <span *ngIf="app?.oidcConfig">{{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.applicationType |
+                    translate}}</span>
+                <span *ngIf="app?.apiConfig">API</span>
             </div>
             <ng-container *ngIf="isZitadel === false">
                 <ng-template appHasRole [appHasRole]="['project.app.write:'+projectId, 'project.app.write']">
@@ -54,10 +56,34 @@
             </div>
         </form>
 
-        <!-- <cnsl-info-section class="docs-line" *ngIf="docs?.discoveryEndpoint">
-            <p><strong>Discovery Endpoint:</strong> {{docs.discoveryEndpoint}}</p>
-            <p><strong>Issuer:</strong> {{docs.issuer}}</p>
-        </cnsl-info-section> -->
+        <div class="environment-wrapper">
+            <div class="environment" *ngIf="app?.oidcConfig?.clientId">
+                <span class="key">{{'APP.OIDC.INFO.CLIENTID' | translate}}</span>
+                <div class="environment-row">
+                    <span>{{this.app.oidcConfig?.clientId}}</span>
+                    <button color="primary" [disabled]="copiedKey == this.app.oidcConfig?.clientId"
+                        [matTooltip]="(copiedKey != this.app.oidcConfig?.clientId ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                        appCopyToClipboard [valueToCopy]="this.app.oidcConfig?.clientId"
+                        (copiedValue)="copiedKey = 'clientId'" mat-icon-button>
+                        <i *ngIf="copiedKey != 'clientId'" class="las la-clipboard"></i>
+                        <i *ngIf="copiedKey == 'clientId'" class="las la-clipboard-check"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="environment" *ngFor="let environmentV of (environmentMap | keyvalue)">
+                <span class="key">{{environmentV.key}}</span>
+                <div class="environment-row">
+                    <span>{{environmentV.value}}</span>
+                    <button color="primary" [disabled]="copiedKey == environmentV.value"
+                        [matTooltip]="(copiedKey != environmentV.value ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                        appCopyToClipboard [valueToCopy]="environmentV.value"
+                        (copiedValue)="copiedKey = environmentV.key" mat-icon-button>
+                        <i *ngIf="copiedKey != environmentV.key" class="las la-clipboard"></i>
+                        <i *ngIf="copiedKey == environmentV.key" class="las la-clipboard-check"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div class="compliance"
             *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
@@ -70,7 +96,7 @@
             </cnsl-info-section>
         </div>
 
-        <div class="content">
+        <div class="content" *ngIf="app?.oidcConfig">
             <h3 class="full-width section-title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}</h3>
 
             <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
@@ -83,33 +109,47 @@
                 <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
             </cnsl-info-section>
 
-            <p class="step-description"
+            <cnsl-info-section class="step-description"
                 *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
-                {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
+                {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}
+            </cnsl-info-section>
 
             <div style="margin: .5rem" class="divider"></div>
-
-            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode?.value"
+            <cnsl-redirect-uris *ngIf="applicationType?.value !== undefined" class="redirect-section"
+                [canWrite]="canWrite" [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
                 (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
-                title="{{ 'APP.OIDC.REDIRECT' | translate }}">
+                title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+                [isNative]="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
             </cnsl-redirect-uris>
 
-            <cnsl-redirect-uris class="redirect-section" [canWrite]="canWrite" [devMode]="devMode?.value"
-                (changedUris)="postLogoutRedirectUrisList = $event" [urisList]="postLogoutRedirectUrisList"
-                title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}">
+            <cnsl-redirect-uris *ngIf="applicationType?.value !== undefined" class="redirect-section"
+                [canWrite]="canWrite" [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $event"
+                [urisList]="postLogoutRedirectUrisList" [getValues]="requestRedirectValuesSubject$"
+                title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+                [isNative]="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
             </cnsl-redirect-uris>
         </div>
 
-        <app-auth-method-radio *ngIf="authMethods && initialAuthMethod && app?.oidcConfig" [authMethods]="authMethods"
-            [selected]="initialAuthMethod" [current]="currentAuthMethod"
-            (selectedMethod)="setPartialConfigFromAuthMethod($event)">
+        <app-auth-method-radio *ngIf="authMethods && initialAuthMethod && (app?.oidcConfig || app?.apiConfig)"
+            [authMethods]="authMethods" [selected]="initialAuthMethod" [current]="currentAuthMethod"
+            [isOIDC]="app?.oidcConfig !== undefined" (selectedMethod)="setPartialConfigFromAuthMethod($event)">
         </app-auth-method-radio>
 
-        <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
+        <app-card *ngIf="currentAuthMethod == 'PK_JWT' && projectId && app?.id" [expanded]="false"
+            title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}" description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
+            <app-client-keys [projectId]="projectId" [appId]="app.id"></app-client-keys>
+        </app-card>
+
+        <div *ngIf="currentAuthMethod == 'BASIC'">
+            <button [disabled]="!canWrite" mat-stroked-button
+                (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' | translate}}</button>
+        </div>
+
+
+        <form *ngIf="oidcForm && app?.oidcConfig" [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
             <app-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
-                <div card-actions
-                    *ngIf="app?.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE">
-                    <button [disabled]="!canWrite" mat-stroked-button
+                <div card-actions *ngIf="currentAuthMethod == 'CODE' || currentAuthMethod == 'POST'">
+                    <button type="button" [disabled]="!canWrite" mat-stroked-button
                         (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
                 </div>
 
@@ -120,37 +160,37 @@
                     </cnsl-form-field>
 
                     <cnsl-form-field class="formfield" appearance="outline">
-                        <cnsl-label>{{ 'APP.OIDC.RESPONSE' | translate }}</cnsl-label>
+                        <cnsl-label>{{ 'APP.OIDC.RESPONSETYPE' | translate }}</cnsl-label>
                         <mat-select formControlName="responseTypesList" multiple>
                             <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
-                                {{ 'APP.OIDC.RESPONSE'+type | translate }}
+                                {{ 'APP.OIDC.RESPONSE.'+type | translate }}
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
 
                     <cnsl-form-field class="formfield" appearance="outline">
-                        <cnsl-label>{{ 'APP.OIDC.GRANT' | translate }}</cnsl-label>
+                        <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
                         <mat-select formControlName="grantTypesList" multiple>
                             <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
-                                {{ 'APP.OIDC.GRANT'+grant | translate }}
+                                {{ 'APP.OIDC.GRANT.'+grant | translate }}
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
 
                     <cnsl-form-field appearance="outline" class="formfield">
-                        <cnsl-label>{{ 'APP.OIDC.APPTYPE' | translate }}</cnsl-label>
+                        <cnsl-label>{{ 'APP.APPTYPE' | translate }}</cnsl-label>
                         <mat-select formControlName="applicationType">
                             <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
-                                {{ 'APP.OIDC.APPTYPE'+type | translate }}
+                                {{ 'APP.OIDC.APPTYPE.'+type | translate }}
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
 
                     <cnsl-form-field appearance="outline" class="formfield">
-                        <cnsl-label>{{ 'APP.OIDC.AUTHMETHOD' | translate }}</cnsl-label>
+                        <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
                         <mat-select formControlName="authMethodType">
                             <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type">
-                                {{ 'APP.OIDC.AUTHMETHOD'+type | translate }}
+                                {{ 'APP.OIDC.AUTHMETHOD.'+type | translate }}
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
@@ -200,39 +240,14 @@
             </app-card>
 
             <div class="btn-container">
-                <button class="submit-button" type="submit" color="primary" [disabled]="appForm.invalid || !canWrite"
+                <button class="submit-button" type="submit" color="primary" [disabled]="oidcForm.invalid || !canWrite"
                     mat-raised-button>
                     {{ 'ACTIONS.SAVE' | translate }}
                 </button>
             </div>
         </form>
 
-        <div class="next-steps">
-            <h5>{{'APP.PAGES.NEXTSTEPS.TITLE' | translate}}</h5>
-            <div class="row">
-                <div class="step">
-                    <h6>{{ 'APP.PAGES.NEXTSTEPS.0.TITLE' | translate }}</h6>
-                    <p>{{'APP.PAGES.NEXTSTEPS.0.DESC' | translate}}</p>
-                    <span class="fill-space"></span>
-                    <a [routerLink]="['/projects', this.projectId]" color="primary" mat-mini-fab><i
-                            class="las la-angle-right"></i></a>
-                </div>
-                <div class="step">
-                    <h6>{{ 'APP.PAGES.NEXTSTEPS.1.TITLE' | translate }}</h6>
-                    <p>{{'APP.PAGES.NEXTSTEPS.1.DESC' | translate}}</p>
-                    <span class="fill-space"></span>
-                    <a [routerLink]="['/users', 'create']" color="primary" mat-mini-fab><i
-                            class="las la-angle-right"></i></a>
-                </div>
-                <div class="step">
-                    <h6>{{ 'APP.PAGES.NEXTSTEPS.2.TITLE' | translate }}</h6>
-                    <p>{{'APP.PAGES.NEXTSTEPS.2.DESC' | translate}}</p>
-                    <span class="fill-space"></span>
-                    <a href="https://docs.zitadel.ch" color="primary" mat-mini-fab><i
-                            class="las la-angle-right"></i></a>
-                </div>
-            </div>
-        </div>
+        <cnsl-links [links]="nextLinks"></cnsl-links>
     </div>
 
 

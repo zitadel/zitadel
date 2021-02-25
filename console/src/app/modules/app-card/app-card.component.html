@@ -1,5 +1,5 @@
 <div class="cnsl-app-card" [ngClass]="{'web': type == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
 'useragent': type == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
- 'native': type == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE}">
+ 'native': type == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE, 'api': isApiApp}">
     <ng-content></ng-content>
 </div>

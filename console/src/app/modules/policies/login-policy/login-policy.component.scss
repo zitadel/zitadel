@@ -15,18 +15,17 @@
       margin: .3rem 0;
     }
 
-    p {
-      margin-top: .5rem;
-      font-size: 14px;
-      color: var(--grey);
+    .info {
+        margin-bottom: 1rem;
+        display: block;
     }
   }
 }
 
 .save-button {
-  margin-top: 3rem;
+  margin-bottom: 3rem;
+  float: right;
   display: block;
-  padding: .5rem 4rem;
 }
 
 .idp-table-card {
@@ -45,6 +44,33 @@
 .idps {
   display: flex;
   margin: 0 -.5rem;
+
+  .idp {
+    background-color: #506e6e;
+    color: white;
+
+    .line {
+        display: flex;
+        align-items: center;
+
+        img {
+            height: 30px;
+            width: 30px;
+            margin-right: 1rem;
+            border-radius: .5rem;
+            object-fit: contain;
+        }
+
+        div {
+            flex: 1;
+            display: block;
+
+            * {
+                display: block;
+            }
+        }
+    }
+  }
 
   .idp,
   .new-idp {
@@ -68,15 +94,18 @@
       padding: 2px;
     }
 
-    .meta {
+    .meta-info {
       font-size: 12px;
-      color: var(--grey);
+      color: #fafafa;
     }
 
     .rm {
+      color: #f44336;
       position: absolute;
-      top: 0;
-      left: 0;
+      display: none;
+      top: -2px;
+      transition: all .2s ease;
+      left: -2px;
       transform: translateX(-50%) translateY(-50%);
       cursor: pointer;
 
@@ -86,11 +115,13 @@
     }
 
     &:not(.disabled) {
-      &:hover {
-        background-color: #ffffff10;
-      }
+        &:hover {
+            .rm {
+                display: block;
+            }
+        }
     }
-
+    
     img {
       height: 100%;
       width: 100%;
@@ -102,6 +133,6 @@
 .divider {
   width: 100%;
   height: 1px;
-  background-color: var(--grey);
+  background-color: rgba(var(--grey), .5);
   margin: 1rem 0;
 }

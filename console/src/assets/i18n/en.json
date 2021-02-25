@@ -99,6 +99,7 @@
     },
     "ACTIONS": {
         "SAVE": "Save",
+        "SAVENOW":"Save now",
         "NEW": "New",
         "ADD":"Add",
         "CREATE": "Create",
@@ -589,7 +590,7 @@
         },
         "LOGIN_POLICY": {
             "TITLE":"Login Policy",
-            "DESCRIPTION":"Define how Users can be authenticated",
+            "DESCRIPTION":"Define how Users can be authenticated and configure Identity Providers",
             "DESCRIPTIONCREATEADMIN":"Users can choose from the available identity providers below.",
             "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
             "SAVED":"Saved successfully!"
@@ -833,6 +834,9 @@
             "DELETED":"Deleted Project."
         }
     },
+    "NEXTSTEPS": {
+        "TITLE":"Next Steps"
+    },
     "IDP":{
         "LIST": {
             "TITLE":"Identity Providers",
@@ -859,7 +863,7 @@
             "1":"active",
             "2":"inactive"
         },
-        "MAPPINTFIELD": {
+        "MAPPINGFIELD": {
           "1": "Preferred Username",
           "2": "Email"
         },
@@ -986,8 +990,14 @@
         },
         "NAME": "Name",
         "TYPE":"Application Type",
+        "AUTHMETHOD":"Authentication Method",
+        "AUTHMETHODSECTION":"Authentication Method",
         "GRANT":"Grant Types",
         "OIDC": {
+            "INFO": {
+                "ISSUER":"Issuer",
+                "CLIENTID":"Client Id"
+            },
             "CURRENT":"Current Config",
             "TOKENSECTIONTITLE":"AuthToken Options",
             "REDIRECTSECTIONTITLE":"Redirect Settings",
@@ -1012,26 +1022,32 @@
             "REDIRECT": "Redirect URIs",
             "REDIRECTSECTION": "Redirect URIs",
             "POSTLOGOUTREDIRECT":"Post Logout URIs",
-            "RESPONSE": "Response Types",
             "RESPONSESECTION": "Response Types",
-            "GRANT": "Grant Types",
             "GRANTSECTION":"Grant Types",
             "GRANTTITLE":"Select your grant types. Note: Implicit is only available for browser-based applications.",
-            "APPTYPE": "Application Types",
-            "RESPONSE0": "Code",
-            "RESPONSE1": "ID Token",
-            "RESPONSE2": "Token-ID Token",
-            "GRANT0": "Authorization Code",
-            "GRANT1": "Implicit",
-            "GRANT2": "Refresh Token",
-            "APPTYPE0": "Web",
-            "APPTYPE1": "User Agent",
-            "APPTYPE2": "Native",
-            "AUTHMETHOD":"Authentication Method",
-            "AUTHMETHODSECTION":"Authentication Method",
-            "AUTHMETHOD0":"Basic",
-            "AUTHMETHOD1":"Post",
-            "AUTHMETHOD2":"None",
+            "APPTYPE": {
+                "0": "Web",
+                "1": "User Agent",
+                "2": "Native"
+            },
+            "RESPONSETYPE": "Response Types",
+            "RESPONSE": {
+                "0": "Code",
+                "1": "ID Token",
+                "2": "Token-ID Token"
+            },
+            "GRANTTYPE": "Grant Types",
+            "GRANT": {
+                "0": "Authorization Code",
+                "1": "Implicit",
+                "2": "Refresh Token"
+            },
+            "AUTHMETHOD": {
+                "0":"Basic",
+                "1":"Post",
+                "2":"None",
+                "3":"Private Key JWT"
+            },
             "TOKENTYPE":"Auth Token Type",
             "TOKENTYPE0": "Bearer Token",
             "TOKENTYPE1": "JWT",
@@ -1054,48 +1070,65 @@
                         "DESCRIPTION":"Regular Web applications like .net, PHP, Node.js, Java, etc."
                     },
                     "NATIVE": {
-                        "TITLE":"NATIVE",
+                        "TITLE":"Native",
                         "DESCRIPTION":"Mobile Apps, Desktop, Smart Devices, etc."
                     },
                     "USERAGENT": {
                         "TITLE":"User Agent",
                         "DESCRIPTION":"Single Page Applications (SPA) and in general all JS frameworks executed in browsers"
                     }
-                },
-                "AUTHMETHOD": {
-                    "CODE": {
-                        "TITLE":"Code",
-                        "DESCRIPTION":"Exchange the authorization code for the tokens"
-                    },
-                    "PKCE": {
-                        "TITLE":"PKCE",
-                        "DESCRIPTION":"Use a random hash instead of a static client secret for more security"
-                    },
-                    "POST": {
-                        "TITLE":"POST",
-                        "DESCRIPTION":"Send client_id and client_secret as part of the form"
-                    },
-                    "PK_JWT": {
-                        "TITLE":"Private Key JWT",
-                        "DESCRIPTION":"Use a private key to authorize your application"
-                    },
-                    "IMPLICIT": {
-                        "TITLE":"Implicit",
-                        "DESCRIPTION":"Get the tokens directly from the authorization endpoint"
-                    },
-                    "CUSTOM": {
-                        "TITLE":"Custom",
-                        "DESCRIPTION":"Your setting doesn't correspond to any other option."
-                    }
                 }
+            }
+        },
+        "API": {
+            "REGENERATESECRET": "Regenerate Client Secret",
+            "SELECTION":{
+                "TITLE":"API",
+                "DESCRIPTION":"APIs in general"
+            },
+            "AUTHMETHOD": {
+                "0":"Basic",
+                "1":"Private Key JWT"
+            }
+        },
+        "AUTHMETHODS": {
+            "CODE": {
+                "TITLE":"Code",
+                "DESCRIPTION":"Exchange the authorization code for the tokens"
+            },
+            "PKCE": {
+                "TITLE":"PKCE",
+                "DESCRIPTION":"Use a random hash instead of a static client secret for more security"
+            },
+            "POST": {
+                "TITLE":"POST",
+                "DESCRIPTION":"Send client_id and client_secret as part of the form"
+            },
+            "PK_JWT": {
+                "TITLE":"Private Key JWT",
+                "DESCRIPTION":"Use a private key to authorize your application"
+            },
+            "BASIC": {
+                "TITLE":"Basic",
+                "DESCRIPTION":"Authentication with Username and Passwort"
+            },
+            "IMPLICIT": {
+                "TITLE":"Implicit",
+                "DESCRIPTION":"Get the tokens directly from the authorization endpoint"
+            },
+            "CUSTOM": {
+                "TITLE":"Custom",
+                "DESCRIPTION":"Your setting doesn't correspond to any other option."
             }
         },
         "TOAST": {
             "REACTIVATED":"Application reactivated.",
             "DEACTIVATED":"Application deactivated.",
             "OIDCUPDATED":"OIDC configuration updated.",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC client secret generated.",
-            "DELETED":"App deleted."
+            "UPDATED":"App updated.",
+            "CLIENTSECRETREGENERATED":"client secret generated.",
+            "DELETED":"App deleted.",
+            "CONFIGCHANGED":"Changes detected!"
         }
     },
     "GENDERS": {

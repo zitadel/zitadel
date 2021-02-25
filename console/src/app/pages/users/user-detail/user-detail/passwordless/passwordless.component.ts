@@ -51,7 +51,6 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
 
     public getPasswordless(): void {
         this.service.GetPasswordless(this.user.id).then(passwordless => {
-            console.log(passwordless.toObject().tokensList);
             this.dataSource = new MatTableDataSource(passwordless.toObject().tokensList);
             this.dataSource.sort = this.sort;
         }).catch(error => {
