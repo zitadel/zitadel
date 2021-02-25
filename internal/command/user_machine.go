@@ -24,7 +24,6 @@ func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain
 	if err != nil {
 		return nil, err
 	}
-	//TODO: adlerhurst are no machines allowed in global org? or what if I create an org which allowes all suffixes?
 	if !orgIAMPolicy.UserLoginMustBeDomain {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6M0ds", "Errors.User.Invalid")
 	}

@@ -29,8 +29,6 @@ type WebAuthNLogin struct {
 	Challenge               string
 	AllowedCredentialIDs    [][]byte
 	UserVerification        UserVerificationRequirement
-	//TODO: Add Auth Request
-	//*model.AuthRequest
 }
 
 type UserVerificationRequirement int32

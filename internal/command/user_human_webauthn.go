@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -305,10 +306,23 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 
 	userAgg, token, signCount, err := c.finishWebAuthNLogin(ctx, userID, resourceOwner, credentialData, webAuthNLogin, u2fTokens, isLoginUI)
 	if err != nil {
+		_, pushErr := c.eventstore.PushEvents(ctx,
+			usr_repo.NewHumanU2FCheckFailedEvent(
+				ctx,
+				userAgg,
+				authRequestDomainToAuthRequestInfo(authRequest),
+			),
+		)
+		logging.Log("EVENT-33M9f").OnError(pushErr).WithField("userID", userID).Warn("could not push failed passwordless check event")
 		return err
 	}
 
 	_, err = c.eventstore.PushEvents(ctx,
+		usr_repo.NewHumanU2FCheckSucceededEvent(
+			ctx,
+			userAgg,
+			authRequestDomainToAuthRequestInfo(authRequest),
+		),
 		usr_repo.NewHumanU2FSignCountChangedEvent(
 			ctx,
 			userAgg,
@@ -333,10 +347,23 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 
 	userAgg, token, signCount, err := c.finishWebAuthNLogin(ctx, userID, resourceOwner, credentialData, webAuthNLogin, passwordlessTokens, isLoginUI)
 	if err != nil {
+		_, pushErr := c.eventstore.PushEvents(ctx,
+			usr_repo.NewHumanPasswordlessCheckFailedEvent(
+				ctx,
+				userAgg,
+				authRequestDomainToAuthRequestInfo(authRequest),
+			),
+		)
+		logging.Log("EVENT-33M9f").OnError(pushErr).WithField("userID", userID).Warn("could not push failed passwordless check event")
 		return err
 	}
 
 	_, err = c.eventstore.PushEvents(ctx,
+		usr_repo.NewHumanU2FCheckSucceededEvent(
+			ctx,
+			userAgg,
+			authRequestDomainToAuthRequestInfo(authRequest),
+		),
 		usr_repo.NewHumanPasswordlessSignCountChangedEvent(
 			ctx,
 			userAgg,
