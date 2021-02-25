@@ -84,8 +84,8 @@ func IDPViewToConfigPb(config *domain.IDPConfigView) *idp_pb.IDP_OidcConfig {
 func OIDCConfigToPb(config *domain.OIDCIDPConfig) *idp_pb.IDP_OidcConfig {
 	return &idp_pb.IDP_OidcConfig{
 		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.ClientID,
-			ClientSecret:       config.ClientSecretString,
+			ClientId: config.ClientID,
+			// ClientSecret:       config.ClientSecretString,
 			Issuer:             config.Issuer,
 			Scopes:             config.Scopes,
 			DisplayNameMapping: MappingFieldToPb(config.IDPDisplayNameMapping),
