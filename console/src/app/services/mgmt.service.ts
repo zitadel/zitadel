@@ -98,12 +98,72 @@ import {
     ReactivateOrgRequest,
     AddProjectGrantRequest,
     AddProjectGrantResponse,
+    ListOrgMemberRolesResponse,
+    ListOrgMemberRolesRequest,
+    GetOrgIAMPolicyRequest,
+    GetOrgIAMPolicyResponse,
+    GetPasswordAgePolicyResponse,
+    GetPasswordAgePolicyRequest,
+    AddCustomPasswordAgePolicyRequest,
+    AddCustomPasswordAgePolicyResponse,
+    ResetPasswordAgePolicyToDefaultRequest,
+    ResetPasswordAgePolicyToDefaultResponse,
+    UpdateCustomPasswordAgePolicyRequest,
+    UpdateCustomPasswordAgePolicyResponse,
+    GetPasswordComplexityPolicyResponse,
+    GetPasswordComplexityPolicyRequest,
+    AddCustomPasswordComplexityPolicyRequest,
+    AddCustomPasswordComplexityPolicyResponse,
+    ResetPasswordComplexityPolicyToDefaultResponse,
+    ResetPasswordComplexityPolicyToDefaultRequest,
+    UpdateCustomPasswordComplexityPolicyResponse,
+    UpdateCustomPasswordComplexityPolicyRequest,
+    GetPasswordLockoutPolicyResponse,
+    GetPasswordLockoutPolicyRequest,
+    AddCustomPasswordLockoutPolicyRequest,
+    AddCustomPasswordLockoutPolicyResponse,
+    ResetPasswordLockoutPolicyToDefaultRequest,
+    ResetPasswordLockoutPolicyToDefaultResponse,
+    UpdateCustomPasswordLockoutPolicyResponse,
+    UpdateCustomPasswordLockoutPolicyRequest,
+    GetUserByIDRequest,
+    GetUserByIDResponse,
+    RemoveUserRequest,
+    RemoveUserResponse,
+    ListProjectMembersRequest,
+    ListProjectMembersResponse,
+    ListUserMembershipsRequest,
+    ListUserMembershipsResponse,
+    GetHumanProfileResponse,
+    GetHumanProfileRequest,
+    ListUserMultiFactorsResponse,
+    ListUserMultiFactorsRequest,
+    RemoveHumanMultiFactorOTPResponse,
+    RemoveHumanMultiFactorOTPRequest,
+    RemoveHumanMultiFactorU2FRequest,
+    RemoveHumanMultiFactorU2FResponse,
+    UpdateHumanProfileRequest,
+    UpdateHumanProfileResponse,
+    GetHumanEmailResponse,
+    GetHumanEmailRequest,
+    UpdateHumanEmailResponse,
+    UpdateHumanEmailRequest,
+    GetHumanPhoneResponse,
+    GetHumanPhoneRequest,
+    UpdateHumanPhoneResponse,
+    UpdateHumanPhoneRequest,
+    RemoveHumanPhoneRequest,
+    DeactivateUserRequest,
+    DeactivateUserResponse
 } from '../proto/generated/zitadel/management_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
 import { Metadata } from 'grpc';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
+import { PasswordComplexityPolicy } from '../proto/generated/management_pb';
+import { Member, SearchQuery } from '../proto/generated/zitadel/member_pb';
+import { Gender, MembershipQuery } from '../proto/generated/zitadel/user_pb';
 
 export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
 
@@ -499,122 +559,121 @@ export class ManagementService {
         return this.grpcService.mgmt.addProjectGrant(req);
     }
 
-    public GetOrgMemberRoles(): Promise<OrgMemberRoles> {
-        const req = new Empty();
-        return this.grpcService.mgmt.getOrgMemberRoles(req);
+    public listOrgMemberRoles(): Promise<ListOrgMemberRolesResponse> {
+        const req = new ListOrgMemberRolesRequest();
+        return this.grpcService.mgmt.listOrgMemberRoles(req);
     }
 
     // Policy
 
-    public GetMyOrgIamPolicy(): Promise<OrgIamPolicyView> {
-        const req = new Empty();
-        return this.grpcService.mgmt.getMyOrgIamPolicy(req);
+    public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse> {
+        const req = new GetOrgIAMPolicyRequest();
+        return this.grpcService.mgmt.getOrgIAMPolicy(req);
     }
 
-    public GetPasswordAgePolicy(): Promise<PasswordAgePolicyView> {
-        const req = new Empty();
-
+    public GetPasswordAgePolicy(): Promise<GetPasswordAgePolicyResponse> {
+        const req = new GetPasswordAgePolicyRequest();
         return this.grpcService.mgmt.getPasswordAgePolicy(req);
     }
 
-    public CreatePasswordAgePolicy(
+    public addCustomPasswordAgePolicy(
         maxAgeDays: number,
         expireWarnDays: number,
-    ): Promise<PasswordAgePolicy> {
-        const req = new PasswordAgePolicyRequest();
+    ): Promise<AddCustomPasswordAgePolicyResponse> {
+        const req = new AddCustomPasswordAgePolicyRequest();
         req.setMaxAgeDays(maxAgeDays);
         req.setExpireWarnDays(expireWarnDays);
 
-        return this.grpcService.mgmt.createPasswordAgePolicy(req);
+        return this.grpcService.mgmt.addCustomPasswordAgePolicy(req);
     }
 
-    public RemovePasswordAgePolicy(): Promise<Empty> {
-        const req = new Empty();
-        return this.grpcService.mgmt.removePasswordAgePolicy(req);
+    public resetPasswordAgePolicyToDefault(): Promise<ResetPasswordAgePolicyToDefaultResponse> {
+        const req = new ResetPasswordAgePolicyToDefaultRequest();
+        return this.grpcService.mgmt.resetPasswordAgePolicyToDefault(req);
     }
 
-    public UpdatePasswordAgePolicy(
+    public updateCustomPasswordAgePolicy(
         maxAgeDays: number,
         expireWarnDays: number,
-    ): Promise<PasswordAgePolicy> {
-        const req = new PasswordAgePolicyRequest();
+    ): Promise<UpdateCustomPasswordAgePolicyResponse> {
+        const req = new UpdateCustomPasswordAgePolicyRequest();
         req.setMaxAgeDays(maxAgeDays);
         req.setExpireWarnDays(expireWarnDays);
-        return this.grpcService.mgmt.updatePasswordAgePolicy(req);
+        return this.grpcService.mgmt.updateCustomPasswordAgePolicy(req);
     }
 
-    public GetPasswordComplexityPolicy(): Promise<PasswordComplexityPolicyView> {
-        const req = new Empty();
+    public GetPasswordComplexityPolicy(): Promise<GetPasswordComplexityPolicyResponse> {
+        const req = new GetPasswordComplexityPolicyRequest();
         return this.grpcService.mgmt.getPasswordComplexityPolicy(req);
     }
 
-    public CreatePasswordComplexityPolicy(
+    public addCustomPasswordComplexityPolicy(
         hasLowerCase: boolean,
         hasUpperCase: boolean,
         hasNumber: boolean,
         hasSymbol: boolean,
         minLength: number,
-    ): Promise<PasswordComplexityPolicy> {
-        const req = new PasswordComplexityPolicyRequest();
+    ): Promise<AddCustomPasswordComplexityPolicyResponse> {
+        const req = new AddCustomPasswordComplexityPolicyRequest();
         req.setHasLowercase(hasLowerCase);
         req.setHasUppercase(hasUpperCase);
         req.setHasNumber(hasNumber);
         req.setHasSymbol(hasSymbol);
         req.setMinLength(minLength);
-        return this.grpcService.mgmt.createPasswordComplexityPolicy(req);
+        return this.grpcService.mgmt.addCustomPasswordComplexityPolicy(req);
     }
 
-    public removePasswordComplexityPolicy(): Promise<Empty> {
-        const req = new Empty();
-        return this.grpcService.mgmt.removePasswordComplexityPolicy(req);
+    public resetPasswordComplexityPolicyToDefault(): Promise<ResetPasswordComplexityPolicyToDefaultResponse> {
+        const req = new ResetPasswordComplexityPolicyToDefaultRequest();
+        return this.grpcService.mgmt.resetPasswordComplexityPolicyToDefault(req);
     }
 
-    public UpdatePasswordComplexityPolicy(
+    public updateCustomPasswordComplexityPolicy(
         hasLowerCase: boolean,
         hasUpperCase: boolean,
         hasNumber: boolean,
         hasSymbol: boolean,
         minLength: number,
-    ): Promise<PasswordComplexityPolicy> {
-        const req = new PasswordComplexityPolicy();
+    ): Promise<UpdateCustomPasswordComplexityPolicyResponse> {
+        const req = new UpdateCustomPasswordComplexityPolicyRequest();
         req.setHasLowercase(hasLowerCase);
         req.setHasUppercase(hasUpperCase);
         req.setHasNumber(hasNumber);
         req.setHasSymbol(hasSymbol);
         req.setMinLength(minLength);
-        return this.grpcService.mgmt.updatePasswordComplexityPolicy(req);
+        return this.grpcService.mgmt.updateCustomPasswordComplexityPolicy(req);
     }
 
-    public GetPasswordLockoutPolicy(): Promise<PasswordLockoutPolicy> {
-        const req = new Empty();
+    public getPasswordLockoutPolicy(): Promise<GetPasswordLockoutPolicyResponse> {
+        const req = new GetPasswordLockoutPolicyRequest();
 
         return this.grpcService.mgmt.getPasswordLockoutPolicy(req);
     }
 
-    public CreatePasswordLockoutPolicy(
+    public addCustomPasswordLockoutPolicy(
         maxAttempts: number,
         showLockoutFailures: boolean,
-    ): Promise<PasswordLockoutPolicy> {
-        const req = new PasswordLockoutPolicyRequest();
+    ): Promise<AddCustomPasswordLockoutPolicyResponse> {
+        const req = new AddCustomPasswordLockoutPolicyRequest();
         req.setMaxAttempts(maxAttempts);
         req.setShowLockoutFailure(showLockoutFailures);
 
-        return this.grpcService.mgmt.createPasswordLockoutPolicy(req);
+        return this.grpcService.mgmt.addCustomPasswordLockoutPolicy(req);
     }
 
-    public RemovePasswordLockoutPolicy(): Promise<Empty> {
-        const req = new Empty();
-        return this.grpcService.mgmt.removePasswordLockoutPolicy(req);
+    public resetPasswordLockoutPolicyToDefault(): Promise<ResetPasswordLockoutPolicyToDefaultResponse> {
+        const req = new ResetPasswordLockoutPolicyToDefaultRequest();
+        return this.grpcService.mgmt.resetPasswordLockoutPolicyToDefault(req);
     }
 
-    public UpdatePasswordLockoutPolicy(
+    public updateCustomPasswordLockoutPolicy(
         maxAttempts: number,
         showLockoutFailures: boolean,
-    ): Promise<PasswordLockoutPolicy> {
-        const req = new PasswordLockoutPolicy();
+    ): Promise<UpdateCustomPasswordLockoutPolicyResponse> {
+        const req = new UpdateCustomPasswordLockoutPolicyRequest();
         req.setMaxAttempts(maxAttempts);
         req.setShowLockoutFailure(showLockoutFailures);
-        return this.grpcService.mgmt.updatePasswordLockoutPolicy(req);
+        return this.grpcService.mgmt.updateCustomPasswordLockoutPolicy(req);
     }
 
     public getLocalizedComplexityPolicyPatternErrorString(policy: PasswordComplexityPolicy.AsObject): string {
@@ -629,81 +688,95 @@ export class ManagementService {
         }
     }
 
-    public GetUserByID(id: string): Promise<UserView> {
-        const req = new UserID();
+    public getUserByID(id: string): Promise<GetUserByIDResponse> {
+        const req = new GetUserByIDRequest();
         req.setId(id);
         return this.grpcService.mgmt.getUserByID(req);
     }
 
-    public DeleteUser(id: string): Promise<Empty> {
-        const req = new UserID();
+    public removeUser(id: string): Promise<RemoveUserResponse> {
+        const req = new RemoveUserRequest();
         req.setId(id);
-        return this.grpcService.mgmt.deleteUser(req);
+        return this.grpcService.mgmt.removeUser(req);
     }
 
-    public SearchProjectMembers(
+    public listProjectMembers(
         projectId: string,
         limit: number,
         offset: number,
-        queryList?: ProjectMemberSearchQuery[],
-    ): Promise<ProjectMemberSearchResponse> {
-        const req = new ProjectMemberSearchRequest();
+        queryList?: SearchQuery[],
+    ): Promise<ListProjectMembersResponse> {
+        const req = new ListProjectMembersRequest();
+        const query = new ListQuery();
+        req.setMetaData(query);
         req.setProjectId(projectId);
-        req.setLimit(limit);
-        req.setOffset(offset);
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.searchProjectMembers(req);
+        req.setMetaData(query);
+        return this.grpcService.mgmt.listProjectMembers(req);
     }
 
-    public SearchUserMemberships(userId: string,
-        limit: number, offset: number, queryList?: UserMembershipSearchQuery[]): Promise<UserMembershipSearchResponse> {
-        const req = new UserMembershipSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
+    public listUserMemberships(userId: string,
+        limit: number, offset: number,
+        queryList?: MembershipQuery[],
+    ): Promise<ListUserMembershipsResponse> {
+        const req = new ListUserMembershipsRequest();
         req.setUserId(userId);
+        const metadata = new ListQuery();
+        if (limit) {
+            metadata.setLimit(limit);
+        }
+        if (offset) {
+            metadata.setOffset(offset);
+        }
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.searchUserMemberships(req);
+        req.setMetaData(metadata);
+        return this.grpcService.mgmt.listUserMemberships(req);
     }
 
-    public GetUserProfile(id: string): Promise<UserProfile> {
-        const req = new UserID();
-        req.setId(id);
-        return this.grpcService.mgmt.getUserProfile(req);
+    public GetUserProfile(userId: string): Promise<GetHumanProfileResponse> {
+        const req = new GetHumanProfileRequest();
+        req.setUserId(userId);
+        return this.grpcService.mgmt.getHumanProfile(req);
     }
 
-    public getUserMfas(id: string): Promise<UserMultiFactors> {
-        const req = new UserID();
-        req.setId(id);
-        return this.grpcService.mgmt.getUserMfas(req);
+    public listUserMultiFactors(userId: string): Promise<ListUserMultiFactorsResponse> {
+        const req = new ListUserMultiFactorsRequest();
+        req.setUserId(userId);
+        return this.grpcService.mgmt.listUserMultiFactors(req);
     }
 
-    public removeMfaOTP(id: string): Promise<Empty> {
-        const req = new UserID();
-        req.setId(id);
-        return this.grpcService.mgmt.removeMfaOTP(req);
+    public removeHumanMultiFactorOTP(userId: string): Promise<RemoveHumanMultiFactorOTPResponse> {
+        const req = new RemoveHumanMultiFactorOTPRequest();
+        req.setUserId(userId);
+        return this.grpcService.mgmt.removeHumanMultiFactorOTP(req);
     }
 
-    public RemoveMfaU2F(userid: string, id: string): Promise<Empty> {
-        const req = new WebAuthNTokenID();
-        req.setId(id);
-        req.setUserId(userid);
-        return this.grpcService.mgmt.removeMfaU2F(req);
+    public removeHumanMultiFactorU2F(userId: string, id: string): Promise<RemoveHumanMultiFactorU2FResponse> {
+        const req = new RemoveHumanMultiFactorU2FRequest();
+        req.setUserId(userId);
+        return this.grpcService.mgmt.removeHumanMultiFactorU2F(req);
     }
 
-    public SaveUserProfile(
-        id: string,
+    public updateHumanProfile(
+        userId: string,
         firstName?: string,
         lastName?: string,
         nickName?: string,
         preferredLanguage?: string,
         gender?: Gender,
-    ): Promise<UserProfile> {
-        const req = new UpdateUserProfileRequest();
-        req.setId(id);
+    ): Promise<UpdateHumanProfileResponse> {
+        const req = new UpdateHumanProfileRequest();
+        req.setUserId(userId);
         if (firstName) {
             req.setFirstName(firstName);
         }
@@ -719,43 +792,43 @@ export class ManagementService {
         if (preferredLanguage) {
             req.setPreferredLanguage(preferredLanguage);
         }
-        return this.grpcService.mgmt.updateUserProfile(req);
+        return this.grpcService.mgmt.updateHumanProfile(req);
     }
 
-    public GetUserEmail(id: string): Promise<UserEmail> {
-        const req = new UserID();
-        req.setId(id);
-        return this.grpcService.mgmt.getUserEmail(req);
+    public getHumanEmail(id: string): Promise<GetHumanEmailResponse> {
+        const req = new GetHumanEmailRequest();
+        req.setUserId(id);
+        return this.grpcService.mgmt.getHumanEmail(req);
     }
 
-    public SaveUserEmail(id: string, email: string): Promise<UserEmail> {
-        const req = new UpdateUserEmailRequest();
-        req.setId(id);
+    public updateHumanEmail(userId: string, email: string): Promise<UpdateHumanEmailResponse> {
+        const req = new UpdateHumanEmailRequest();
+        req.setUserId(userId);
         req.setEmail(email);
-        return this.grpcService.mgmt.changeUserEmail(req);
+        return this.grpcService.mgmt.updateHumanEmail(req);
     }
 
-    public GetUserPhone(id: string): Promise<UserPhone> {
-        const req = new UserID();
-        req.setId(id);
-        return this.grpcService.mgmt.getUserPhone(req);
+    public getHumanPhone(userId: string): Promise<GetHumanPhoneResponse> {
+        const req = new GetHumanPhoneRequest();
+        req.setUserId(userId);
+        return this.grpcService.mgmt.getHumanPhone(req);
     }
 
-    public SaveUserPhone(id: string, phone: string): Promise<UserPhone> {
-        const req = new UpdateUserPhoneRequest();
-        req.setId(id);
+    public updateHumanPhone(userId: string, phone: string): Promise<UpdateHumanPhoneResponse> {
+        const req = new UpdateHumanPhoneRequest();
+        req.setUserId(userId);
         req.setPhone(phone);
-        return this.grpcService.mgmt.changeUserPhone(req);
+        return this.grpcService.mgmt.updateHumanPhone(req);
     }
 
-    public RemoveUserPhone(id: string): Promise<Empty> {
-        const req = new UserID();
-        req.setId(id);
-        return this.grpcService.mgmt.removeUserPhone(req);
+    public removeHumanPhone(userId: string): Promise<Empty> {
+        const req = new RemoveHumanPhoneRequest();
+        req.setUserId(userId);
+        return this.grpcService.mgmt.removeHumanPhone(req);
     }
 
-    public DeactivateUser(id: string): Promise<UserResponse> {
-        const req = new UserID();
+    public deactivateUser(id: string): Promise<DeactivateUserResponse> {
+        const req = new DeactivateUserRequest();
         req.setId(id);
         return this.grpcService.mgmt.deactivateUser(req);
     }

@@ -4,14 +4,20 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import {
     AddCustomOrgIAMPolicyRequest,
     AddCustomOrgIAMPolicyResponse,
+    AddIAMMemberRequest,
+    AddIAMMemberResponse,
     AddIDPToDefaultLoginPolicyRequest,
     AddIDPToDefaultLoginPolicyResponse,
     AddMultiFactorToDefaultLoginPolicyRequest,
     AddMultiFactorToDefaultLoginPolicyResponse,
+    AddOIDCIDPRequest,
+    AddOIDCIDPResponse,
     AddSecondFactorToDefaultLoginPolicyRequest,
     AddSecondFactorToDefaultLoginPolicyResponse,
     ClearViewRequest,
     ClearViewResponse,
+    DeactivateIDPRequest,
+    DeactivateIDPResponse,
     GetDefaultLabelPolicyRequest,
     GetDefaultLabelPolicyResponse,
     GetDefaultLoginPolicyRequest,
@@ -36,14 +42,22 @@ import {
     ListFailedEventsResponse,
     ListIAMMemberRolesRequest,
     ListIAMMemberRolesResponse,
+    ListIAMMembersRequest,
+    ListIAMMembersResponse,
     ListIDPsRequest,
     ListIDPsResponse,
     ListViewsRequest,
     ListViewsResponse,
+    ReactivateIDPRequest,
+    ReactivateIDPResponse,
     RemoveFailedEventRequest,
     RemoveFailedEventResponse,
+    RemoveIAMMemberRequest,
+    RemoveIAMMemberResponse,
     RemoveIDPFromDefaultLoginPolicyRequest,
     RemoveIDPFromDefaultLoginPolicyResponse,
+    RemoveIDPRequest,
+    RemoveIDPResponse,
     RemoveMultiFactorFromDefaultLoginPolicyRequest,
     RemoveMultiFactorFromDefaultLoginPolicyResponse,
     RemoveSecondFactorFromDefaultLoginPolicyRequest,
@@ -64,8 +78,15 @@ import {
     UpdateDefaultPasswordComplexityPolicyResponse,
     UpdateDefaultPasswordLockoutPolicyRequest,
     UpdateDefaultPasswordLockoutPolicyResponse,
+    UpdateIAMMemberRequest,
+    UpdateIAMMemberResponse,
+    UpdateIDPOIDCConfigRequest,
+    UpdateIDPOIDCConfigResponse,
+    UpdateIDPRequest,
+    UpdateIDPResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { IDPQuery } from '../proto/generated/zitadel/idp_pb';
+import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
 
@@ -326,90 +347,96 @@ export class AdminService {
         return this.grpcService.admin.getIDPByID(req);
     }
 
-    public UpdateIdp(
-        req: IdpUpdate,
-    ): Promise<Idp> {
-        return this.grpcService.admin.updateIdpConfig(req);
+    public updateIDP(
+        req: UpdateIDPRequest,
+    ): Promise<UpdateIDPResponse> {
+        return this.grpcService.admin.updateIDP(req);
     }
 
-    public CreateOidcIdp(
-        req: OidcIdpConfigCreate,
-    ): Promise<Idp> {
-        return this.grpcService.admin.createOidcIdp(req);
+    public addOIDCIDP(
+        req: AddOIDCIDPRequest,
+    ): Promise<AddOIDCIDPResponse> {
+        return this.grpcService.admin.addOIDCIDP(req);
     }
 
-    public UpdateOidcIdpConfig(
-        req: OidcIdpConfigUpdate,
-    ): Promise<OidcIdpConfig> {
-        return this.grpcService.admin.updateOidcIdpConfig(req);
+    public updateIDPOIDCConfig(
+        req: UpdateIDPOIDCConfigRequest,
+    ): Promise<UpdateIDPOIDCConfigResponse> {
+        return this.grpcService.admin.updateIDPOIDCConfig(req);
     }
 
-    public RemoveIdpConfig(
+    public removeIDP(
         id: string,
-    ): Promise<Empty> {
-        const req = new IdpID;
+    ): Promise<RemoveIDPResponse> {
+        const req = new RemoveIDPRequest;
         req.setId(id);
-        return this.grpcService.admin.removeIdpConfig(req);
+        return this.grpcService.admin.removeIDP(req);
     }
 
-    public DeactivateIdpConfig(
+    public deactivateIDP(
         id: string,
-    ): Promise<Empty> {
-        const req = new IdpID;
+    ): Promise<DeactivateIDPResponse> {
+        const req = new DeactivateIDPRequest;
         req.setId(id);
-        return this.grpcService.admin.deactivateIdpConfig(req);
+        return this.grpcService.admin.deactivateIDP(req);
     }
 
-    public ReactivateIdpConfig(
+    public reactivateIDP(
         id: string,
-    ): Promise<Empty> {
-        const req = new IdpID;
+    ): Promise<ReactivateIDPResponse> {
+        const req = new ReactivateIDPRequest;
         req.setId(id);
-        return this.grpcService.admin.reactivateIdpConfig(req);
+        return this.grpcService.admin.reactivateIDP(req);
     }
 
-    public SearchIamMembers(
+    public listIAMMembers(
         limit: number,
         offset: number,
-        queryList?: IamMemberSearchQuery[],
-    ): Promise<IamMemberSearchResponse> {
-        const req = new IamMemberSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
-        if (queryList) {
-            req.setQueriesList(queryList);
+        query?: SearchQuery,
+    ): Promise<ListIAMMembersResponse> {
+        const req = new ListIAMMembersRequest();
+        const metadata = new ListQuery();
+        if (limit) {
+            metadata.setLimit(limit);
         }
-        return this.grpcService.admin.searchIamMembers(req);
+        if (offset) {
+            metadata.setOffset(offset);
+        }
+        if (query) {
+            req.setQuery(query);
+        }
+        req.setMetaData(metadata);
+
+        return this.grpcService.admin.listIAMMembers(req);
     }
 
-    public RemoveIamMember(
+    public removeIAMMember(
         userId: string,
-    ): Promise<Empty> {
-        const req = new RemoveIamMemberRequest();
+    ): Promise<RemoveIAMMemberResponse> {
+        const req = new RemoveIAMMemberRequest();
         req.setUserId(userId);
-
-        return this.grpcService.admin.removeIamMember(req);
+        return this.grpcService.admin.removeIAMMember(req);
     }
 
-    public AddIamMember(
+    public addIAMMember(
         userId: string,
         rolesList: string[],
-    ): Promise<IamMember> {
-        const req = new AddIamMemberRequest();
+    ): Promise<AddIAMMemberResponse> {
+        const req = new AddIAMMemberRequest();
         req.setUserId(userId);
         req.setRolesList(rolesList);
 
-        return this.grpcService.admin.addIamMember(req);
+        return this.grpcService.admin.addIAMMember(req);
     }
 
-    public ChangeIamMember(
+    public updateIAMMember(
         userId: string,
         rolesList: string[],
-    ): Promise<IamMember> {
-        const req = new ChangeIamMemberRequest();
+    ): Promise<UpdateIAMMemberResponse> {
+        const req = new UpdateIAMMemberRequest();
         req.setUserId(userId);
         req.setRolesList(rolesList);
 
-        return this.grpcService.admin.changeIamMember(req);
+        return this.grpcService.admin.updateIAMMember(req);
     }
 }
