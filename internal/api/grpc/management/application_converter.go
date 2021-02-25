@@ -2,6 +2,7 @@ package management
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -10,6 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
@@ -40,6 +42,11 @@ func appConfigFromModel(app *proj_model.Application) management.AppConfig {
 			OidcConfig: oidcConfigFromModel(app.OIDCConfig),
 		}
 	}
+	if app.Type == proj_model.AppTypeAPI {
+		return &management.Application_ApiConfig{
+			ApiConfig: apiConfigFromModel(app.APIConfig),
+		}
+	}
 	return nil
 }
 
@@ -65,6 +72,14 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *management.OIDCConfig {
 	}
 }
 
+func apiConfigFromModel(config *proj_model.APIConfig) *management.APIConfig {
+	return &management.APIConfig{
+		ClientId:       config.ClientID,
+		ClientSecret:   config.ClientSecretString,
+		AuthMethodType: apiAuthMethodTypeFromModel(config.AuthMethodType),
+	}
+}
+
 func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *management.OIDCConfig {
 	return &management.OIDCConfig{
 		RedirectUris:             app.OIDCRedirectUris,
@@ -83,6 +98,13 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *manage
 		IdTokenRoleAssertion:     app.IDTokenRoleAssertion,
 		IdTokenUserinfoAssertion: app.IDTokenUserinfoAssertion,
 		ClockSkew:                durationpb.New(app.ClockSkew),
+	}
+}
+
+func apiConfigFromApplicationViewModel(app *proj_model.ApplicationView) *management.APIConfig {
+	return &management.APIConfig{
+		ClientId:       app.OIDCClientID,
+		AuthMethodType: apiAuthMethodTypeFromModel(proj_model.APIAuthMethodType(app.OIDCAuthMethodType)),
 	}
 }
 
@@ -120,6 +142,19 @@ func oidcAppCreateToModel(app *management.OIDCApplicationCreate) *proj_model.App
 	}
 }
 
+func apiAppCreateToModel(app *management.APIApplicationCreate) *proj_model.Application {
+	return &proj_model.Application{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: app.ProjectId,
+		},
+		Name: app.Name,
+		Type: proj_model.AppTypeAPI,
+		APIConfig: &proj_model.APIConfig{
+			AuthMethodType: apiAuthMethodTypeToModel(app.AuthMethodType),
+		},
+	}
+}
+
 func appUpdateToModel(app *management.ApplicationUpdate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
@@ -148,6 +183,16 @@ func oidcConfigUpdateToModel(app *management.OIDCConfigUpdate) *proj_model.OIDCC
 		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
 		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
 		ClockSkew:                app.ClockSkew.AsDuration(),
+	}
+}
+
+func apiConfigUpdateToModel(app *management.APIConfigUpdate) *proj_model.APIConfig {
+	return &proj_model.APIConfig{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: app.ProjectId,
+		},
+		AppID:          app.ApplicationId,
+		AuthMethodType: apiAuthMethodTypeToModel(app.AuthMethodType),
 	}
 }
 
@@ -225,6 +270,10 @@ func applicationViewFromModel(application *proj_model.ApplicationView) *manageme
 	if application.IsOIDC {
 		converted.AppConfig = &management.ApplicationView_OidcConfig{
 			OidcConfig: oidcConfigFromApplicationViewModel(application),
+		}
+	} else {
+		converted.AppConfig = &management.ApplicationView_ApiConfig{
+			ApiConfig: apiConfigFromApplicationViewModel(application),
 		}
 	}
 	return converted
@@ -354,8 +403,21 @@ func oidcAuthMethodTypeToModel(authType management.OIDCAuthMethodType) proj_mode
 		return proj_model.OIDCAuthMethodTypePost
 	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
 		return proj_model.OIDCAuthMethodTypeNone
+	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT:
+		return proj_model.OIDCAuthMethodTypePrivateKeyJWT
 	default:
 		return proj_model.OIDCAuthMethodTypeBasic
+	}
+}
+
+func apiAuthMethodTypeToModel(authType management.APIAuthMethodType) proj_model.APIAuthMethodType {
+	switch authType {
+	case management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC:
+		return proj_model.APIAuthMethodTypeBasic
+	case management.APIAuthMethodType_APIAUTHMETHODTYPE_PRIVATE_KEY_JWT:
+		return proj_model.APIAuthMethodTypePrivateKeyJWT
+	default:
+		return proj_model.APIAuthMethodTypeBasic
 	}
 }
 
@@ -367,8 +429,21 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) managem
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST
 	case proj_model.OIDCAuthMethodTypeNone:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
+	case proj_model.OIDCAuthMethodTypePrivateKeyJWT:
+		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT
 	default:
 		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
+	}
+}
+
+func apiAuthMethodTypeFromModel(authType proj_model.APIAuthMethodType) management.APIAuthMethodType {
+	switch authType {
+	case proj_model.APIAuthMethodTypeBasic:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
+	case proj_model.APIAuthMethodTypePrivateKeyJWT:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_PRIVATE_KEY_JWT
+	default:
+		return management.APIAuthMethodType_APIAUTHMETHODTYPE_BASIC
 	}
 }
 
@@ -431,4 +506,127 @@ func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*management
 	}
 
 	return result
+}
+
+func clientKeyViewsFromModel(keys ...*key_model.AuthNKeyView) []*management.ClientKeyView {
+	keyViews := make([]*management.ClientKeyView, len(keys))
+	for i, key := range keys {
+		keyViews[i] = clientKeyViewFromModel(key)
+	}
+	return keyViews
+}
+
+func clientKeyViewFromModel(key *key_model.AuthNKeyView) *management.ClientKeyView {
+	creationDate, err := ptypes.TimestampProto(key.CreationDate)
+	logging.Log("MANAG-DAs2t").OnError(err).Debug("unable to parse timestamp")
+
+	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
+	logging.Log("MANAG-BDgh4").OnError(err).Debug("unable to parse timestamp")
+
+	return &management.ClientKeyView{
+		Id:             key.ID,
+		CreationDate:   creationDate,
+		ExpirationDate: expirationDate,
+		Sequence:       key.Sequence,
+		Type:           authNKeyTypeFromModel(key.Type),
+	}
+}
+
+func addClientKeyToModel(key *management.AddClientKeyRequest) *proj_model.ClientKey {
+	expirationDate := time.Time{}
+	if key.ExpirationDate != nil {
+		var err error
+		expirationDate, err = ptypes.Timestamp(key.ExpirationDate)
+		logging.Log("MANAG-Dgt42").OnError(err).Debug("unable to parse expiration date")
+	}
+
+	return &proj_model.ClientKey{
+		ExpirationDate: expirationDate,
+		Type:           authNKeyTypeToModel(key.Type),
+		ApplicationID:  key.ApplicationId,
+		ObjectRoot:     models.ObjectRoot{AggregateID: key.ProjectId},
+	}
+}
+
+func addClientKeyFromModel(key *proj_model.ClientKey) *management.AddClientKeyResponse {
+	creationDate, err := ptypes.TimestampProto(key.CreationDate)
+	logging.Log("MANAG-FBzz4").OnError(err).Debug("unable to parse cretaion date")
+
+	expirationDate, err := ptypes.TimestampProto(key.ExpirationDate)
+	logging.Log("MANAG-sag21").OnError(err).Debug("unable to parse cretaion date")
+
+	detail, err := json.Marshal(struct {
+		Type     string `json:"type"`
+		KeyID    string `json:"keyId"`
+		Key      string `json:"key"`
+		AppID    string `json:"appId"`
+		ClientID string `json:"clientID"`
+	}{
+		Type:     "application",
+		KeyID:    key.KeyID,
+		Key:      string(key.PrivateKey),
+		AppID:    key.ApplicationID,
+		ClientID: key.ClientID,
+	})
+	logging.Log("MANAG-adt42").OnError(err).Warn("unable to marshall key")
+
+	return &management.AddClientKeyResponse{
+		Id:             key.KeyID,
+		CreationDate:   creationDate,
+		ExpirationDate: expirationDate,
+		Sequence:       key.Sequence,
+		KeyDetails:     detail,
+		Type:           authNKeyTypeFromModel(key.Type),
+	}
+}
+
+func authNKeyTypeToModel(typ management.AuthNKeyType) key_model.AuthNKeyType {
+	switch typ {
+	case management.AuthNKeyType_AUTHNKEY_JSON:
+		return key_model.AuthNKeyTypeJSON
+	default:
+		return key_model.AuthNKeyTypeNONE
+	}
+}
+
+func authNKeyTypeFromModel(typ key_model.AuthNKeyType) management.AuthNKeyType {
+	switch typ {
+	case key_model.AuthNKeyTypeJSON:
+		return management.AuthNKeyType_AUTHNKEY_JSON
+	default:
+		return management.AuthNKeyType_AUTHNKEY_UNSPECIFIED
+	}
+}
+
+func clientKeySearchRequestToModel(req *management.ClientKeySearchRequest) *key_model.AuthNKeySearchRequest {
+	return &key_model.AuthNKeySearchRequest{
+		Offset: req.Offset,
+		Limit:  req.Limit,
+		Asc:    req.Asc,
+		Queries: []*key_model.AuthNKeySearchQuery{
+			{
+				Key:    key_model.AuthNKeyObjectType,
+				Method: model.SearchMethodEquals,
+				Value:  key_model.AuthNKeyObjectTypeApplication,
+			}, {
+				Key:    key_model.AuthNKeyObjectID,
+				Method: model.SearchMethodEquals,
+				Value:  req.ApplicationId,
+			},
+		},
+	}
+}
+
+func clientKeySearchResponseFromModel(req *key_model.AuthNKeySearchResponse) *management.ClientKeySearchResponse {
+	viewTimestamp, err := ptypes.TimestampProto(req.Timestamp)
+	logging.Log("MANAG-Sk9ds").OnError(err).Debug("unable to parse cretaion date")
+
+	return &management.ClientKeySearchResponse{
+		Offset:            req.Offset,
+		Limit:             req.Limit,
+		TotalResult:       req.TotalResult,
+		ProcessedSequence: req.Sequence,
+		ViewTimestamp:     viewTimestamp,
+		Result:            clientKeyViewsFromModel(req.Result...),
+	}
 }

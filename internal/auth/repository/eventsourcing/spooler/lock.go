@@ -15,6 +15,10 @@ type locker struct {
 	dbClient *sql.DB
 }
 
+func NewLocker(client *sql.DB) *locker {
+	return &locker{dbClient: client}
+}
+
 func (l *locker) Renew(lockerID, viewModel string, waitTime time.Duration) error {
 	return es_locker.Renew(l.dbClient, lockTable, lockerID, viewModel, waitTime)
 }

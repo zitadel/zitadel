@@ -1,0 +1,55 @@
+@import '~@angular/material/theming';
+
+@mixin app-card-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $primary-dark: mat-color($primary, A900);
+  $accent: map-get($theme, accent);
+  $is-dark-theme: map-get($theme, is-dark);
+  $accent-color: mat-color($primary, 500);
+  /* stylelint-enable */
+
+  .cnsl-app-card {
+        padding: 1rem;
+        box-sizing: border-box;
+        cursor: pointer;
+        animation: all .2s;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        height: 80px;
+        width: 80px;
+        margin: 1rem;
+        text-transform: uppercase;
+        border-radius: .5rem;
+        font-weight: 800;
+        background-color: $primary-dark;
+        transition: background-color box-shadow .3s ease-in;
+
+        &.web {
+            background-color: rgb(80, 110, 110);
+            color: white;
+            border: none;
+        }
+
+        &.native {
+            background-color: #595d80;
+            color: white;
+            border: none;
+        }
+
+        &.useragent {
+            background-color: #6a506e;
+            color: white;
+            border: none;
+        }
+
+        &.api {
+            background-color: #333;
+            color: white;
+            border: none;
+        }
+    }
+}

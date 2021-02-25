@@ -1,8 +1,9 @@
 package model
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/golang/protobuf/ptypes/timestamp"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 type Application struct {
@@ -13,6 +14,7 @@ type Application struct {
 	Name       string
 	Type       AppType
 	OIDCConfig *OIDCConfig
+	APIConfig  *APIConfig
 }
 type ApplicationChanges struct {
 	Changes      []*ApplicationChange
@@ -42,6 +44,7 @@ const (
 	AppTypeUnspecified AppType = iota
 	AppTypeOIDC
 	AppTypeSAML
+	AppTypeAPI
 )
 
 func NewApplication(projectID, appID string) *Application {
@@ -58,5 +61,20 @@ func (a *Application) IsValid(includeConfig bool) bool {
 	if a.Type == AppTypeOIDC && !a.OIDCConfig.IsValid() {
 		return false
 	}
+	if a.Type == AppTypeAPI && !a.APIConfig.IsValid() {
+		return false
+	}
 	return true
+}
+
+func (a *Application) GetKey(keyID string) (int, *ClientKey) {
+	if a.OIDCConfig == nil {
+		return -1, nil
+	}
+	for i, k := range a.OIDCConfig.ClientKeys {
+		if k.KeyID == keyID {
+			return i, k
+		}
+	}
+	return -1, nil
 }

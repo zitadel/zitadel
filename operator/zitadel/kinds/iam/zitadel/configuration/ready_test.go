@@ -2,11 +2,12 @@ package configuration
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestConfiguration_Ready1(t *testing.T) {
@@ -19,11 +20,11 @@ func TestConfiguration_Ready1(t *testing.T) {
 	cmName := "testCM"
 	consoleCMName := "testConsole"
 
-	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).Times(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
 
 	readyFunc := GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName)
 	assert.NotNil(t, readyFunc)
@@ -40,11 +41,11 @@ func TestConfiguration_Ready2(t *testing.T) {
 	cmName := "testCM2"
 	consoleCMName := "testConsole2"
 
-	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).Times(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
 
 	readyFunc := GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName)
 	assert.NotNil(t, readyFunc)
@@ -61,11 +62,11 @@ func TestConfiguration_ReadyFail1(t *testing.T) {
 	cmName := "testCM"
 	consoleCMName := "testConsole"
 
-	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).Times(1).Return(errors.New("fail"))
-	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).Times(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).MinTimes(1).MaxTimes(1).Return(errors.New("fail"))
+	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
 
 	readyFunc := GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName)
 	assert.NotNil(t, readyFunc)
@@ -82,11 +83,11 @@ func TestConfiguration_ReadyFail2(t *testing.T) {
 	cmName := "testCM"
 	consoleCMName := "testConsole"
 
-	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).Times(1).Return(errors.New("fail"))
-	client.EXPECT().WaitForSecret(namespace, secretName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).Times(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).MinTimes(1).MaxTimes(1).Return(errors.New("fail"))
+	client.EXPECT().WaitForSecret(namespace, secretName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
 
 	readyFunc := GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName)
 	assert.NotNil(t, readyFunc)
@@ -103,11 +104,11 @@ func TestConfiguration_ReadyFail3(t *testing.T) {
 	cmName := "testCM"
 	consoleCMName := "testConsole"
 
-	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretName, timeout).Times(1).Return(errors.New("fail"))
-	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).Times(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretName, timeout).MinTimes(1).MaxTimes(1).Return(errors.New("fail"))
+	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
 
 	readyFunc := GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName)
 	assert.NotNil(t, readyFunc)
@@ -124,11 +125,11 @@ func TestConfiguration_ReadyFail4(t *testing.T) {
 	cmName := "testCM"
 	consoleCMName := "testConsole"
 
-	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).Times(1).Return(errors.New("fail"))
-	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).Times(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).MinTimes(1).MaxTimes(1).Return(errors.New("fail"))
+	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
 
 	readyFunc := GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName)
 	assert.NotNil(t, readyFunc)
@@ -145,11 +146,11 @@ func TestConfiguration_ReadyFail5(t *testing.T) {
 	cmName := "testCM"
 	consoleCMName := "testConsole"
 
-	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).Times(1).Return(nil)
-	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).Times(1).Return(errors.New("fail"))
+	client.EXPECT().WaitForConfigMap(namespace, cmName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForConfigMap(namespace, consoleCMName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretVarsName, timeout).MinTimes(1).MaxTimes(1).Return(nil)
+	client.EXPECT().WaitForSecret(namespace, secretPasswordName, timeout).MinTimes(1).MaxTimes(1).Return(errors.New("fail"))
 
 	readyFunc := GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName)
 	assert.NotNil(t, readyFunc)

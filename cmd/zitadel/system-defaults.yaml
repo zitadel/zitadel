@@ -1,5 +1,5 @@
 SystemDefaults:
-  DefaultLanguage: 'de'
+  DefaultLanguage: 'en'
   Domain: $ZITADEL_DEFAULT_DOMAIN
   ZitadelDocs:
     Issuer: $ZITADEL_ISSUER
@@ -45,6 +45,7 @@ SystemDefaults:
       IncludeDigits: true
       IncludeSymbols: false
     MachineKeySize: 2048
+    ClientKeySize: 2048
   Multifactors:
     OTP:
       Issuer: 'ZITADEL'

@@ -18,6 +18,7 @@ coverage.txt
 #Debug
 __debug_bin
 debug
+sandbox.go
 
 # IDE
 .idea

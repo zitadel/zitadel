@@ -6,6 +6,8 @@ function disableSubmit(checks, button) {
     }
     addRequiredEventListener(inputs, checks, form, button);
     disableDoubleSubmit(form, button);
+
+    toggleButton(checks, form, inputs, button);
 }
 
 function addRequiredEventListener(inputs, checks, form, button) {

@@ -24,6 +24,8 @@
         font-size: 16px;
         text-transform: uppercase;
         letter-spacing: .05em;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
 
       .fill-space {
@@ -50,6 +52,6 @@
 
   @media only screen and (max-width: 500px) {
     margin: .5rem 0;
-    padding: .5rem;
+    padding: 1rem;
   }
 }

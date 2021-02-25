@@ -1,8 +1,6 @@
 package configuration
 
-import (
-	"github.com/caos/orbos/pkg/secret"
-)
+import "github.com/caos/orbos/pkg/secret"
 
 type Configuration struct {
 	Tracing       *Tracing       `yaml:"tracing,omitempty"`

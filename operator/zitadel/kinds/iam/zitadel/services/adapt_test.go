@@ -123,13 +123,11 @@ func TestServices_AdaptEnsure1(t *testing.T) {
 	namespace := "test"
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc"
-	var grpcPort uint16 = 1
 	httpPortName := "http"
 	httpServiceName := "http"
-	var httpPort uint16 = 2
 	uiPortName := "ui"
 	uiServiceName := "ui"
-	var uiPort uint16 = 3
+	var grpcPort, httpPort, uiPort uint16 = 1, 2, 3
 
 	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
 
@@ -174,13 +172,11 @@ func TestServices_AdaptEnsure2(t *testing.T) {
 	namespace := "test0"
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc1"
-	var grpcPort uint16 = 11
 	httpPortName := "http"
 	httpServiceName := "http2"
-	var httpPort uint16 = 22
 	uiPortName := "ui"
 	uiServiceName := "ui3"
-	var uiPort uint16 = 33
+	var grpcPort, httpPort, uiPort uint16 = 11, 22, 33
 
 	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
 
@@ -225,13 +221,11 @@ func TestServices_AdaptEnsure3(t *testing.T) {
 	namespace := "test00"
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc11"
-	var grpcPort uint16 = 111
 	httpPortName := "http"
 	httpServiceName := "http22"
-	var httpPort uint16 = 222
 	uiPortName := "ui"
 	uiServiceName := "ui33"
-	var uiPort uint16 = 333
+	var grpcPort, httpPort, uiPort uint16 = 111, 222, 333
 
 	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
 
@@ -276,13 +270,11 @@ func TestServices_AdaptDestroy1(t *testing.T) {
 	namespace := "test"
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc"
-	var grpcPort uint16 = 1
 	httpPortName := "http"
 	httpServiceName := "http"
-	var httpPort uint16 = 2
 	uiPortName := "ui"
 	uiServiceName := "ui"
-	var uiPort uint16 = 3
+	var grpcPort, httpPort, uiPort uint16 = 1, 2, 3
 
 	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
 
@@ -325,13 +317,11 @@ func TestServices_AdaptDestroy2(t *testing.T) {
 	namespace := "test0"
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc1"
-	var grpcPort uint16 = 11
 	httpPortName := "http"
 	httpServiceName := "http2"
-	var httpPort uint16 = 22
 	uiPortName := "ui"
 	uiServiceName := "ui3"
-	var uiPort uint16 = 33
+	var grpcPort, httpPort, uiPort uint16 = 11, 22, 33
 
 	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
 
@@ -374,13 +364,11 @@ func TestServices_AdaptDestroy3(t *testing.T) {
 	namespace := "test00"
 	grpcPortName := "grpc"
 	grpcServiceName := "grpc11"
-	var grpcPort uint16 = 111
 	httpPortName := "http"
 	httpServiceName := "http22"
-	var httpPort uint16 = 222
 	uiPortName := "ui"
 	uiServiceName := "ui33"
-	var uiPort uint16 = 333
+	var grpcPort, httpPort, uiPort uint16 = 111, 222, 333
 
 	componentLabels, podSelectorLabels, nameLabels := serviceLabels(grpcServiceName, httpServiceName, uiServiceName)
 

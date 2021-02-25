@@ -3,11 +3,12 @@ package clean
 import (
 	"time"
 
+	"github.com/caos/zitadel/operator"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/job"
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator"
 	corev1 "k8s.io/api/core/v1"
 )
 

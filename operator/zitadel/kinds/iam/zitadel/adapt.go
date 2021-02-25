@@ -215,6 +215,9 @@ func AdaptFunc(
 			uiPort,
 			desiredKind.Spec.Configuration.Ingress,
 		)
+		if err != nil {
+			return nil, nil, allSecrets, err
+		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
 		queriers := make([]operator.QueryFunc, 0)

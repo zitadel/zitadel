@@ -75,7 +75,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es},
 			repos.OrgEvents,
 			repos.ProjectEvents),
-		newMachineKeys(
+		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),

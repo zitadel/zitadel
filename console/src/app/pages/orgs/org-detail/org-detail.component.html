@@ -40,13 +40,15 @@
                 <span *ngIf="org?.id" class="second">{{ org.id }}</span>
             </div>
             <div class="meta-row">
-                <span class="first">{{'ORG.PAGES.PRIMARYDOMAIN'  | translate}}</span>
+                <span class="first">{{'ORG.PAGES.PRIMARYDOMAIN' | translate}}</span>
                 <span class="second"><span style="display: block;">{{primaryDomain}}</span></span>
             </div>
             <div class="meta-row">
-                <span class="first">{{'ORG.PAGES.STATE'  | translate}}</span>
-                <span *ngIf="org && org.state !== undefined"
-                    class="second">{{'ORG.STATE.'+org.state | translate}}</span>
+                <span class="first">{{'ORG.PAGES.STATE' | translate}}</span>
+                <span *ngIf="org && org.state !== undefined" class="state"
+                    [ngClass]="{'active': org.state === OrgState.ORGSTATE_ACTIVE, 'inactive': org.state === OrgState.ORGSTATE_INACTIVE}">{{'ORG.STATE.'+org.state
+                    |
+                    translate}}</span>
             </div>
         </div>
 

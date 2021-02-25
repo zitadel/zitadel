@@ -1,5 +1,29 @@
 {
     "APP_NAME": "ZITADEL",
+    "ONBOARDING": {
+        "HEADER":"Erste Schritte",
+        "TITLE":"Lernen Sie unsere ZITADEL Console kennen.",
+        "LOGINDESC":"Melden Sie sich an um Zugriff auf Funktionen von Zitadel zu erhalten",
+        "LOGIN":"Anmelden",
+        "DESCRIPTION":"Führen Sie die folgenden Schritte aus und passen Sie ZITADEL optimal an Ihre Bedürfnisse an.",
+        "STEPS_TITLE":"Führen Sie die folgenden Schritte in gewünschter Reihenfolge aus:",
+        "STEPS": {
+            "1": {
+                "TITLE":"Projekt erstellen",
+                "DESC":"Erstellen Sie Ihr erstes Projekt und legen Sie Zugangsberechtigungen eventueller Mitarbeiter fest."
+            },
+            "2": {
+                "TITLE":"Applikation erstellen",
+                "DESC":"Erstellen Sie eine Applikation innerhalb Ihres Projektes und legen Sie dessen Eigenschaften fest."
+            },
+            "3": {
+                "TITLE":"Sicherheit verbessern",
+                "DESC":"Erweitern Sie die Zugangsrichtlinien und erhöhen Sie dadurch die Sicherheit ihrer Benutzer."
+            }
+        },
+        "START":"Start",
+        "DOCS":"Docs"
+    },
     "HOME": {
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
@@ -32,9 +56,15 @@
         "WELCOME":"Willkommen",
         "WELCOMESENTENCE":"Hier findest Du die empfohlenen Aktionen basierend auf Deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass Du möglicherweise Deine Organisation in der Kopfzeile wechseln musst.",
         "DISCLAIMER":"Du kannst nur die Einstellungen Deiner aktuellen Organisation, die in der Kopfzeile angegeben ist, sehen. ZITADEL behandelt Deine Daten vertraulich und sicher.",
-        "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit"
+        "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit",
+        "QUICKSTARTS": {
+            "LABEL":"Erste Schritte",
+            "TITLE":"Quickstarts",
+            "DESCRIPTION":"Mit ZITADEL schnell durchstarten."
+        }
     },
     "MENU": {
+        "DASHBOARD":"Übersicht",
         "PERSONAL_INFO": "Persönliche Informationen",
         "DOCUMENTATION":"Dokumentation",
         "IAMPOLICIES":"IAM",
@@ -54,6 +84,7 @@
         "SHOWORGS":"Alle Organisationen anzeigen",
         "GRANTSECTION":"Berechtigungssektion",
         "GRANTS":"Berechtigungen",
+        "TOC":"Datenschutz und AGB",
         "TOOLTIP": {
             "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
             "IAMPOLICIES":"Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",
@@ -68,6 +99,7 @@
     },
     "ACTIONS": {
         "SAVE": "Speichern",
+        "SAVENOW":"Speichern",
         "NEW": "Neu",
         "ADD":"Hinzufügen",
         "CREATE": "Erstellen",
@@ -802,6 +834,9 @@
             "DELETED":"Projekt gelöscht."
         }
     },
+    "NEXTSTEPS": {
+        "TITLE":"Nächste Schritte"
+    },
     "IDP":{
         "LIST": {
             "TITLE":"Identitäts Provider",
@@ -930,12 +965,39 @@
                     "1": "Aktiv",
                     "2": "Inaktiv"
                 }
+            },
+            "DIALOG": {
+                "DELETE": {
+                    "TITLE": "App löschen",
+                    "DESCRIPTION":"Wollen Sie diese App wirklich löschen?"
+                }
+            },
+            "NEXTSTEPS": {
+                "0": {
+                    "TITLE":"Rollen festlegen",
+                    "DESC":"Erfassen Sie Rollen für ihr Projekt"
+                },
+                "1": {
+                    "TITLE":"Benutzer hinzufügen",
+                    "DESC":"Fügen Sie Nutzer ihrer Organisation hinzu"
+                },
+                "2": {
+                    "TITLE":"Hilfe & Support",
+                    "DESC":"Lesen Sie unsere Dokumentation zum Erstellen von Applikation oder kontaktieren Sie unseren Support"
+                }
             }
         },
         "NAME": "Name",
         "TYPE":"Anwendungstyp",
+        "AUTHMETHOD":"Authentifizierungsmethode",
+        "AUTHMETHODSECTION":"Authentifizierungsmethode",
         "GRANT":"Berechtigungstypen",
         "OIDC": {
+            "INFO": {
+                "ISSUER":"Issuer",
+                "CLIENTID":"Client Id"
+            },
+            "CURRENT":"Aktuelle Konfiguration",
             "TOKENSECTIONTITLE":"AuthToken Optionen",
             "REDIRECTSECTIONTITLE":"Weiterleitungseinstellungen",
             "PROSWITCH":"Konfigurator überspringen",
@@ -959,26 +1021,32 @@
             "REDIRECT": "Weiterleitungs-URIs",
             "REDIRECTSECTION": "Weiterleitungs-URIs",
             "POSTLOGOUTREDIRECT":"URIs für Post-Log-out",
-            "RESPONSE": "Antworttypen",
             "RESPONSESECTION": "Antworttypen",
-            "GRANT": "Berechtigungstypen",
             "GRANTSECTION":"Berechtigungstypen",
             "GRANTTITLE":"Wähle Deine Berechtigungstypen aus. Hinweis: \"Implizit\" ist nur für browser-basierte Anwendungen verfügbar.",
-            "APPTYPE": "Anwendungstypen",
-            "RESPONSE0": "Code",
-            "RESPONSE1": "ID-Token",
-            "RESPONSE2": "Token-ID-Token",
-            "GRANT0": "Authorisation Code",
-            "GRANT1": "Implicit",
-            "GRANT2": "Refresh Token",
-            "APPTYPE0": "Web",
-            "APPTYPE1": "User Agent",
-            "APPTYPE2": "Native",
-            "AUTHMETHOD":"Authentifizierungsmethode",
-            "AUTHMETHODSECTION":"Authentifizierungsmethode",
-            "AUTHMETHOD0":"Basic",
-            "AUTHMETHOD1":"Post",
-            "AUTHMETHOD2":"None",
+            "APPTYPE": {
+                "0": "Web",
+                "1": "User Agent",
+                "2": "Native"
+            },
+            "RESPONSETYPE": "Antworttypen",
+            "RESPONSE": {
+                "0": "Code",
+                "1": "ID-Token",
+                "2": "Token-ID-Token"
+            },
+            "GRANTTYPE": "Berechtigungstypen",
+            "GRANT": {
+                "0": "Authorisation Code",
+                "1": "Implicit",
+                "2": "Refresh Token"
+            },
+            "AUTHMETHOD": {
+                "0":"Basic",
+                "1":"Post",
+                "2":"None",
+                "3":"Private Key JWT"
+            },
             "TOKENTYPE":"Auth Token Typ",
             "TOKENTYPE0": "Bearer Token",
             "TOKENTYPE1": "JWT",
@@ -991,13 +1059,75 @@
             "IDTOKENROLEASSERTION_DESCRIPTION":"Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
             "IDTOKENUSERINFOASSERTION":"User Info im ID Token",
             "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
-            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen."
+            "CLOCKSKEW":"ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen.",
+            "RECOMMENDED":"Empfohlen",
+            "NOTRECOMMENDED":"nicht empfohlen",
+            "SELECTION":{
+                "APPTYPE": {
+                    "WEB": {
+                        "TITLE":"Web",
+                        "DESCRIPTION":"Standard Web applications wie .net, PHP, Node.js, Java, etc."
+                    },
+                    "NATIVE": {
+                        "TITLE":"Native",
+                        "DESCRIPTION":"Mobile Apps, Desktop, Smart Devices, etc."
+                    },
+                    "USERAGENT": {
+                        "TITLE":"User Agent",
+                        "DESCRIPTION":"Single Page Applications (SPA) und grundsätzlich alle im Browser aufgeführten JS Frameworks"
+                    }
+                }
+            }
+        },
+        "API": {
+            "REGENERATESECRET": "Client Secret neu generieren",
+            "SELECTION":{
+                "TITLE":"API",
+                "DESCRIPTION":"APIs im Allgemeinen"
+            },
+            "AUTHMETHOD": {
+                "0":"Basic",
+                "1":"Private Key JWT"
+            }
+        },
+        "AUTHMETHODS": {
+            "CODE": {
+                "TITLE":"Code",
+                "DESCRIPTION":"Tausche den Authorization Code gegen Tokens ein"
+            },
+            "PKCE": {
+                "TITLE":"PKCE",
+                "DESCRIPTION":"Nutze einen Zufalls Hash Wert anstelle des Client Secret für mehr Sicherheit"
+            },
+            "POST": {
+                "TITLE":"POST",
+                "DESCRIPTION":"Sende client_id und client_secret im (HTML) Formular"
+            },
+            "PK_JWT": {
+                "TITLE":"Private Key JWT",
+                "DESCRIPTION":"Nutze einen Private Key um deine Application zu authentifizieren"
+            },
+            "BASIC": {
+                "TITLE":"Basic",
+                "DESCRIPTION":"Authentifizierung mittels Nutzername und Passwort"
+            },
+            "IMPLICIT": {
+                "TITLE":"Implicit",
+                "DESCRIPTION":"Erhalte die Token direkt vom authorize Endpoint"
+            },
+            "CUSTOM": {
+                "TITLE":"Custom",
+                "DESCRIPTION":"Deine Konfiguration entspricht keiner anderen Option."
+            }
         },
         "TOAST": {
             "REACTIVATED":"Anwendung reaktiviert.",
             "DEACTIVATED":"Anwendung deaktiviert.",
             "OIDCUPDATED":"OIDC-Konfiguration geändert.",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC-Client Secret generiert."
+            "UPDATED":"App geändert.",
+            "CLIENTSECRETREGENERATED":"Client Secret generiert.",
+            "DELETED":"App gelöscht.",
+            "CONFIGCHANGED":"Konfigurationsänderung entdeckt."
         }
     },
     "GENDERS": {

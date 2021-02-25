@@ -778,6 +778,7 @@ service ManagementService {
 
     option (caos.zitadel.utils.v1.auth_option) = {
       permission: "project.read"
+      check_field_name: "Id"
     };
   }
 
@@ -945,6 +946,18 @@ service ManagementService {
     };
   }
 
+  rpc CreateAPIApplication(APIApplicationCreate) returns (Application) {
+    option (google.api.http) = {
+      post: "/projects/{project_id}/applications/api"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
   rpc UpdateApplication(ApplicationUpdate) returns (Application) {
     option (google.api.http) = {
       put: "/projects/{project_id}/applications/{id}"
@@ -1012,6 +1025,76 @@ service ManagementService {
 
     option (caos.zitadel.utils.v1.auth_option) = {
       permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc UpdateApplicationAPIConfig(APIConfigUpdate) returns (APIConfig) {
+    option (google.api.http) = {
+      put: "/projects/{project_id}/applications/{application_id}/apiconfig"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc RegenerateAPIClientSecret(ApplicationID) returns (ClientSecret) {
+    option (google.api.http) = {
+      put: "/projects/{project_id}/applications/{id}/apiconfig/_changeclientsecret"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc AddClientKey(AddClientKeyRequest) returns (AddClientKeyResponse){
+    option (google.api.http) = {
+      post: "/projects/{project_id}/applications/{application_id}/keys"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc DeleteClientKey(ClientKeyIDRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/projects/{project_id}/applications/{application_id}/keys/{key_id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc SearchClientKeys(ClientKeySearchRequest) returns (ClientKeySearchResponse) {
+    option (google.api.http) = {
+      post: "/projects/{project_id}/applications/{application_id}/keys/_search"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.read"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  rpc GetClientKey(ClientKeyIDRequest) returns (ClientKeyView) {
+    option (google.api.http) = {
+      get: "/projects/{project_id}/applications/{application_id}/keys/{key_id}"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "project.app.read"
       check_field_name: "ProjectId"
     };
   }
@@ -1409,7 +1492,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.read"
+      permission: "policy.read"
     };
   }
 
@@ -1420,7 +1503,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.write"
+      permission: "policy.write"
     };
   }
 
@@ -1430,7 +1513,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.write"
+      permission: "policy.write"
     };
   }
 
@@ -1440,7 +1523,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.read"
+      permission: "policy.read"
     };
   }
 
@@ -1451,7 +1534,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.write"
+      permission: "policy.write"
     };
   }
 
@@ -1461,7 +1544,7 @@ service ManagementService {
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "iam.policy.write"
+      permission: "policy.write"
     };
   }
 
@@ -1673,7 +1756,7 @@ service ManagementService {
     };
   }
 
- 
+
   rpc GetMailTexts(google.protobuf.Empty) returns (MailTextsView) {
     option (google.api.http) = {
       get: "/orgs/me/policies/mailtexts"
@@ -1725,7 +1808,7 @@ service ManagementService {
       permission: "policy.delete"
     };
   }
- 
+
 }
 
 message ZitadelDocs {
@@ -2639,6 +2722,7 @@ message Application {
   string name = 5;
   oneof app_config {
     OIDCConfig oidc_config = 8;
+    APIConfig api_config = 10;
   }
   uint64 sequence = 9;
 }
@@ -2687,6 +2771,18 @@ message OIDCApplicationCreate {
   google.protobuf.Duration clock_skew = 15 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
+message APIApplicationCreate {
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  APIAuthMethodType auth_method_type = 3;
+}
+
+message APIConfig {
+  string client_id = 1;
+  string client_secret = 2;
+  APIAuthMethodType auth_method_type = 3;
+}
+
 enum OIDCVersion {
   OIDCV1_0 = 0;
 }
@@ -2713,6 +2809,12 @@ message OIDCConfigUpdate {
   google.protobuf.Duration clock_skew = 14 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
 }
 
+message APIConfigUpdate {
+  string project_id = 1 [(validate.rules).string = {min_len: 1}];
+  string application_id = 2 [(validate.rules).string = {min_len: 1}];
+  APIAuthMethodType auth_method_type = 7;
+}
+
 enum OIDCResponseType {
   OIDCRESPONSETYPE_CODE = 0;
   OIDCRESPONSETYPE_ID_TOKEN = 1;
@@ -2735,6 +2837,12 @@ enum OIDCAuthMethodType {
   OIDCAUTHMETHODTYPE_BASIC = 0;
   OIDCAUTHMETHODTYPE_POST = 1;
   OIDCAUTHMETHODTYPE_NONE = 2;
+  OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT = 3;
+}
+
+enum APIAuthMethodType {
+  APIAUTHMETHODTYPE_BASIC = 0;
+  APIAUTHMETHODTYPE_PRIVATE_KEY_JWT = 1;
 }
 
 message ClientSecret {
@@ -2749,6 +2857,7 @@ message ApplicationView {
   string name = 5;
   oneof app_config {
     OIDCConfig oidc_config = 8;
+    APIConfig api_config = 10;
   }
 
   uint64 sequence = 9;
@@ -2779,6 +2888,60 @@ message ApplicationSearchQuery {
 enum ApplicationSearchKey {
   APPLICATIONSERACHKEY_UNSPECIFIED = 0;
   APPLICATIONSEARCHKEY_APP_NAME = 1;
+}
+
+message AddClientKeyRequest {
+  string project_id = 1 [(validate.rules).string.min_len = 1];
+  string application_id = 2 [(validate.rules).string.min_len = 1];
+  AuthNKeyType type = 3 [(validate.rules).enum = {not_in: [0]}];
+  google.protobuf.Timestamp expiration_date = 4;
+}
+
+message AddClientKeyResponse {
+  string id = 1;
+  google.protobuf.Timestamp creation_date = 2;
+  uint64 sequence = 3;
+
+  AuthNKeyType type = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+  bytes key_details = 6;
+}
+
+message ClientKeyIDRequest {
+  string project_id = 1 [(validate.rules).string.min_len = 1];
+  string application_id = 2 [(validate.rules).string.min_len = 1];
+  string key_id = 3 [(validate.rules).string.min_len = 1];
+}
+
+message ClientKeyView {
+  string id = 1;
+  AuthNKeyType type = 2;
+  uint64 sequence = 3;
+
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+}
+
+enum AuthNKeyType {
+  AUTHNKEY_UNSPECIFIED = 0;
+  AUTHNKEY_JSON = 1;
+}
+
+message ClientKeySearchRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  bool asc = 3;
+  string project_id = 4 [(validate.rules).string.min_len = 1];
+  string application_id = 5 [(validate.rules).string.min_len = 1];
+}
+
+message ClientKeySearchResponse {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated ClientKeyView result = 4;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message ProjectGrant {
@@ -3432,65 +3595,65 @@ message PasswordLockoutPolicyView {
   google.protobuf.Timestamp change_date = 6;
 }
 message MailTemplate {
-    bytes template = 1;
-    google.protobuf.Timestamp creation_date = 2;
-    google.protobuf.Timestamp change_date = 3;
+  bytes template = 1;
+  google.protobuf.Timestamp creation_date = 2;
+  google.protobuf.Timestamp change_date = 3;
 }
 
 message MailTemplateUpdate {
-    bytes template = 1;
+  bytes template = 1;
 }
 
 message MailTemplateView {
   bool default = 1;
-    bytes template = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
+  bytes template = 2;
+  google.protobuf.Timestamp creation_date = 3;
+  google.protobuf.Timestamp change_date = 4;
 }
 
 message MailText {
-	string mail_text_type = 1;
-	string language = 2;
-	string title = 3;
-	string pre_header = 4;
-	string subject = 5;
-	string greeting = 6;
-	string text = 7;
-	string button_text = 8;
-    google.protobuf.Timestamp creation_date = 9;
-    google.protobuf.Timestamp change_date = 10;
+  string mail_text_type = 1;
+  string language = 2;
+  string title = 3;
+  string pre_header = 4;
+  string subject = 5;
+  string greeting = 6;
+  string text = 7;
+  string button_text = 8;
+  google.protobuf.Timestamp creation_date = 9;
+  google.protobuf.Timestamp change_date = 10;
 }
 
-message MailTextUpdate {   
-	string mail_text_type = 1;
-	string language = 2;
-	string title = 3;
-	string pre_header = 4;
-	string subject = 5;
-	string greeting = 6;
-	string text = 7;
-	string button_text = 8;
+message MailTextUpdate {
+  string mail_text_type = 1;
+  string language = 2;
+  string title = 3;
+  string pre_header = 4;
+  string subject = 5;
+  string greeting = 6;
+  string text = 7;
+  string button_text = 8;
 }
 
-message MailTextRemove {   
-	string mail_text_type = 1;
-	string language = 2;
+message MailTextRemove {
+  string mail_text_type = 1;
+  string language = 2;
 }
 
 message MailTextsView{
-    repeated MailTextView texts = 1;
+  repeated MailTextView texts = 1;
 }
 
 message MailTextView {
   bool default = 1;
-	string mail_text_type = 2;
-	string language = 3;
-	string title = 4;
-	string pre_header = 5;
-	string subject = 6;
-	string greeting = 7;
-	string text = 8;
-	string button_text = 9;
-    google.protobuf.Timestamp creation_date = 10;
-    google.protobuf.Timestamp change_date = 11;
+  string mail_text_type = 2;
+  string language = 3;
+  string title = 4;
+  string pre_header = 5;
+  string subject = 6;
+  string greeting = 7;
+  string text = 8;
+  string button_text = 9;
+  google.protobuf.Timestamp creation_date = 10;
+  google.protobuf.Timestamp change_date = 11;
 }

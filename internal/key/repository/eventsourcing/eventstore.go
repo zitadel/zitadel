@@ -25,11 +25,12 @@ type KeyEventstore struct {
 }
 
 type KeyConfig struct {
-	Size               int
-	PrivateKeyLifetime types.Duration
-	PublicKeyLifetime  types.Duration
-	EncryptionConfig   *crypto.KeyConfig
-	SigningKeyRotation types.Duration
+	Size                     int
+	PrivateKeyLifetime       types.Duration
+	PublicKeyLifetime        types.Duration
+	EncryptionConfig         *crypto.KeyConfig
+	SigningKeyRotationCheck  types.Duration
+	SigningKeyGracefulPeriod types.Duration
 }
 
 func StartKey(eventstore es_int.Eventstore, config KeyConfig, keyAlgorithm crypto.EncryptionAlgorithm, generator id.Generator) (*KeyEventstore, error) {
@@ -82,4 +83,8 @@ func (es *KeyEventstore) CreateKeyPair(ctx context.Context, pair *key_model.KeyP
 		return nil, err
 	}
 	return model.KeyPairToModel(repoKey), nil
+}
+
+func (es *KeyEventstore) LatestKeyEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
+	return es.FilterEvents(ctx, KeyPairQuery(sequence))
 }

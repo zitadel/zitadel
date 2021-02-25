@@ -4,8 +4,7 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/pkg/errors"
-	"github.com/rakyll/statik/fs"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -19,6 +18,7 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
+	"github.com/rakyll/statik/fs"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -203,7 +203,7 @@ func getMigrationFiles(monitor mntr.Monitor, root string) []migration {
 
 	statikFS, err := fs.New()
 	if err != nil {
-		monitor.Error(errors.Wrap(err, "failed to load migration files"))
+		monitor.Error(fmt.Errorf("failed to load migration files: %w", err))
 		return migrations
 	}
 	err = fs.Walk(statikFS, root, func(path string, info os.FileInfo, err error) error {

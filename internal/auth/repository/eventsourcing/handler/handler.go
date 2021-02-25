@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 
@@ -41,7 +42,7 @@ type EventstoreRepos struct {
 	IamEvents     *iam_events.IAMEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults, keyChan chan<- *key_model.KeyView) []query.Handler {
 	return []query.Handler{
 		newUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
@@ -59,7 +60,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es},
 			repos.ProjectEvents),
 		newKey(
-			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es}),
+			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es},
+			keyChan),
 		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es},
 			repos.ProjectEvents),
 		newOrg(
@@ -71,7 +73,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			repos.OrgEvents,
 			repos.IamEvents,
 			systemDefaults.IamID),
-		newMachineKeys(
+		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
 		newLoginPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),

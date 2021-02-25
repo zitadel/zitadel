@@ -3,23 +3,26 @@ package eventstore
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/caos/logging"
+
 	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"time"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 )
 
 type TokenRepo struct {
-	UserEvents *user_event.UserEventstore
-	View       *view.View
+	UserEvents    *user_event.UserEventstore
+	ProjectEvents *proj_event.ProjectEventstore
+	View          *view.View
 }
 
 func (repo *TokenRepo) CreateToken(ctx context.Context, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*usr_model.Token, error) {

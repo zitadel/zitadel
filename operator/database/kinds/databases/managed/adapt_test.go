@@ -1,9 +1,10 @@
 package managed
 
 import (
-	"gopkg.in/yaml.v3"
 	"testing"
 	"time"
+
+	"gopkg.in/yaml.v3"
 
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
@@ -106,31 +107,32 @@ func TestManaged_Adapt1(t *testing.T) {
 	}
 
 	k8sClient.EXPECT().ApplyService(gomock.Any()).Times(3)
-	k8sClient.EXPECT().ApplyServiceAccount(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplyRole(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplyClusterRole(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplyRoleBinding(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplyClusterRoleBinding(gomock.Any()).Times(1)
+
+	k8sClient.EXPECT().ApplyServiceAccount(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplyRole(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplyClusterRole(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplyRoleBinding(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplyClusterRoleBinding(gomock.Any()).MinTimes(1).MaxTimes(1)
 	//statefulset
-	k8sClient.EXPECT().ApplyStatefulSet(gomock.Any(), gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyStatefulSet(gomock.Any(), gomock.Any()).MinTimes(1).MaxTimes(1)
 	//running for setup
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, false, time.Duration(60))
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, false, time.Duration(60)).MinTimes(1).MaxTimes(1)
 	//not ready for setup
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(1))
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(1)).MinTimes(1).MaxTimes(1)
 	//ready after setup
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(60))
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(60)).MinTimes(1).MaxTimes(1)
 	//client
-	k8sClient.EXPECT().ListSecrets(namespace, nodeLabels).Times(1).Return(secretList, nil)
-	dbCurrent.EXPECT().GetCertificate().Times(1).Return(nil)
-	dbCurrent.EXPECT().GetCertificateKey().Times(1).Return(nil)
-	k8sClient.EXPECT().ApplySecret(gomock.Any()).Times(1)
+	k8sClient.EXPECT().ListSecrets(namespace, nodeLabels).MinTimes(1).MaxTimes(1).Return(secretList, nil)
+	dbCurrent.EXPECT().GetCertificate().MinTimes(1).MaxTimes(1).Return(nil)
+	dbCurrent.EXPECT().GetCertificateKey().MinTimes(1).MaxTimes(1).Return(nil)
+	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 	//node
-	k8sClient.EXPECT().ListSecrets(namespace, nodeLabels).Times(1).Return(secretList, nil)
-	dbCurrent.EXPECT().GetCertificate().Times(1).Return(nil)
-	dbCurrent.EXPECT().GetCertificateKey().Times(1).Return(nil)
-	dbCurrent.EXPECT().SetCertificate(gomock.Any()).Times(1)
-	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplySecret(gomock.Any()).Times(1)
+	k8sClient.EXPECT().ListSecrets(namespace, nodeLabels).MinTimes(1).MaxTimes(1).Return(secretList, nil)
+	dbCurrent.EXPECT().GetCertificate().MinTimes(1).MaxTimes(1).Return(nil)
+	dbCurrent.EXPECT().GetCertificateKey().MinTimes(1).MaxTimes(1).Return(nil)
+	dbCurrent.EXPECT().SetCertificate(gomock.Any()).MinTimes(1).MaxTimes(1)
+	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 
 	query, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
@@ -218,31 +220,31 @@ func TestManaged_Adapt2(t *testing.T) {
 	}
 
 	k8sClient.EXPECT().ApplyService(gomock.Any()).Times(3)
-	k8sClient.EXPECT().ApplyServiceAccount(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplyRole(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplyClusterRole(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplyRoleBinding(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplyClusterRoleBinding(gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyServiceAccount(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplyRole(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplyClusterRole(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplyRoleBinding(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplyClusterRoleBinding(gomock.Any()).MinTimes(1).MaxTimes(1)
 	//statefulset
-	k8sClient.EXPECT().ApplyStatefulSet(gomock.Any(), gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyStatefulSet(gomock.Any(), gomock.Any()).MinTimes(1).MaxTimes(1)
 	//running for setup
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, false, time.Duration(60))
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, false, time.Duration(60)).MinTimes(1).MaxTimes(1)
 	//not ready for setup
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(1))
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(1)).MinTimes(1).MaxTimes(1)
 	//ready after setup
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(60))
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(60)).MinTimes(1).MaxTimes(1)
 	//client
-	k8sClient.EXPECT().ListSecrets(namespace, nodeLabels).Times(1).Return(secretList, nil)
-	dbCurrent.EXPECT().GetCertificate().Times(1).Return(nil)
-	dbCurrent.EXPECT().GetCertificateKey().Times(1).Return(nil)
-	k8sClient.EXPECT().ApplySecret(gomock.Any()).Times(1)
+	k8sClient.EXPECT().ListSecrets(namespace, nodeLabels).MinTimes(1).MaxTimes(1).Return(secretList, nil)
+	dbCurrent.EXPECT().GetCertificate().MinTimes(1).MaxTimes(1).Return(nil)
+	dbCurrent.EXPECT().GetCertificateKey().MinTimes(1).MaxTimes(1).Return(nil)
+	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 	//node
-	k8sClient.EXPECT().ListSecrets(namespace, nodeLabels).Times(1).Return(secretList, nil)
-	dbCurrent.EXPECT().GetCertificate().Times(1).Return(nil)
-	dbCurrent.EXPECT().GetCertificateKey().Times(1).Return(nil)
-	dbCurrent.EXPECT().SetCertificate(gomock.Any()).Times(1)
-	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).Times(1)
-	k8sClient.EXPECT().ApplySecret(gomock.Any()).Times(1)
+	k8sClient.EXPECT().ListSecrets(namespace, nodeLabels).MinTimes(1).MaxTimes(1).Return(secretList, nil)
+	dbCurrent.EXPECT().GetCertificate().MinTimes(1).MaxTimes(1).Return(nil)
+	dbCurrent.EXPECT().GetCertificateKey().MinTimes(1).MaxTimes(1).Return(nil)
+	dbCurrent.EXPECT().SetCertificate(gomock.Any()).MinTimes(1).MaxTimes(1)
+	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).MinTimes(1).MaxTimes(1)
+	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 
 	query, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
