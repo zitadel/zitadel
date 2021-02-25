@@ -26,8 +26,6 @@ func SetReturnResourceVersion(
 	ret := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"metadata": map[string]interface{}{
-				"labels":          map[string]interface{}{},
-				"annotations":     map[string]interface{}{},
 				"resourceVersion": resourceVersion,
 			},
 		},
@@ -73,10 +71,9 @@ func TestHttp_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(endSessionName),
-				"name":        endSessionName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(endSessionName),
+				"name":      endSessionName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -98,10 +95,9 @@ func TestHttp_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(issuerName),
-				"name":        issuerName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(issuerName),
+				"name":      issuerName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -123,10 +119,9 @@ func TestHttp_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(authorizeName),
-				"name":        authorizeName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(authorizeName),
+				"name":      authorizeName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -148,10 +143,9 @@ func TestHttp_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(oauthName),
-				"name":        oauthName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(oauthName),
+				"name":      oauthName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -173,10 +167,9 @@ func TestHttp_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(mgmtName),
-				"name":        mgmtName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(mgmtName),
+				"name":      mgmtName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -198,10 +191,9 @@ func TestHttp_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(adminRName),
-				"name":        adminRName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(adminRName),
+				"name":      adminRName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -223,10 +215,9 @@ func TestHttp_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(authRName),
-				"name":        authRName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(authRName),
+				"name":      authRName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -289,10 +280,9 @@ func TestHttp_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(endsessionName),
-				"name":        endsessionName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(endsessionName),
+				"name":      endsessionName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -314,10 +304,9 @@ func TestHttp_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(issuerName),
-				"name":        issuerName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(issuerName),
+				"name":      issuerName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -339,10 +328,9 @@ func TestHttp_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(authorizeName),
-				"name":        authorizeName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(authorizeName),
+				"name":      authorizeName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -364,10 +352,9 @@ func TestHttp_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(oauthName),
-				"name":        oauthName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(oauthName),
+				"name":      oauthName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -389,10 +376,9 @@ func TestHttp_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(mgmtName),
-				"name":        mgmtName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(mgmtName),
+				"name":      mgmtName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -414,10 +400,9 @@ func TestHttp_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(adminRName),
-				"name":        adminRName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(adminRName),
+				"name":      adminRName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -439,10 +424,9 @@ func TestHttp_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(authRName),
-				"name":        authRName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(authRName),
+				"name":      authRName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,

@@ -27,8 +27,6 @@ func SetReturnResourceVersion(
 	ret := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"metadata": map[string]interface{}{
-				"labels":          map[string]interface{}{},
-				"annotations":     map[string]interface{}{},
 				"resourceVersion": resourceVersion,
 			},
 		},
@@ -75,10 +73,9 @@ func TestGrpc_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(adminMName),
-				"name":        adminMName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(adminMName),
+				"name":      adminMName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -101,10 +98,9 @@ func TestGrpc_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(authMName),
-				"name":        authMName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(authMName),
+				"name":      authMName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -127,10 +123,9 @@ func TestGrpc_Adapt(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(mgmtMName),
-				"name":        mgmtMName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(mgmtMName),
+				"name":      mgmtMName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -195,10 +190,9 @@ func TestGrpc_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(adminMName),
-				"name":        adminMName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(adminMName),
+				"name":      adminMName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -221,10 +215,9 @@ func TestGrpc_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(authMName),
-				"name":        authMName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(authMName),
+				"name":      authMName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -247,10 +240,9 @@ func TestGrpc_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(mgmtMName),
-				"name":        mgmtMName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(mgmtMName),
+				"name":      mgmtMName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,

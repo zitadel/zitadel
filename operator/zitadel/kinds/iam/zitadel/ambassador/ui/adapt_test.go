@@ -26,8 +26,6 @@ func SetReturnResourceVersion(
 	ret := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"metadata": map[string]interface{}{
-				"labels":          map[string]interface{}{},
-				"annotations":     map[string]interface{}{},
 				"resourceVersion": resourceVersion,
 			},
 		},
@@ -55,10 +53,9 @@ func SetMappingsEmpty(
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(accountsLabels),
-				"name":        accountsLabels.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(accountsLabels),
+				"name":      accountsLabels.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -78,10 +75,9 @@ func SetMappingsEmpty(
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(consoleLabels),
-				"name":        consoleLabels.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(consoleLabels),
+				"name":      consoleLabels.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"host":    ".",
@@ -160,10 +156,9 @@ func TestUi_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(accountsName),
-				"name":        accountsName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(accountsName),
+				"name":      accountsName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
@@ -184,10 +179,9 @@ func TestUi_Adapt2(t *testing.T) {
 			"apiVersion": group + "/" + version,
 			"kind":       kind,
 			"metadata": map[string]interface{}{
-				"labels":      labels.MustK8sMap(consoleName),
-				"name":        consoleName.Name(),
-				"namespace":   namespace,
-				"annotations": map[string]string{},
+				"labels":    labels.MustK8sMap(consoleName),
+				"name":      consoleName.Name(),
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
 				"host":    "console.domain",
