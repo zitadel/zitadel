@@ -37,7 +37,7 @@ export class OrgListComponent implements AfterViewInit {
     ) {
         this.loadOrgs(10, 0);
 
-        this.authService.GetActiveOrg().then(org => this.activeOrg = org);
+        this.authService.getActiveOrg().then(org => this.activeOrg = org);
     }
 
     public ngAfterViewInit(): void {
@@ -54,7 +54,7 @@ export class OrgListComponent implements AfterViewInit {
             query.setValue(filter);
         }
 
-        from(this.authService.SearchMyProjectOrgs(limit, offset, query ? [query] : undefined)).pipe(
+        from(this.authService.listMyProjectOrgs(limit, offset, query ? [query] : undefined)).pipe(
             map(resp => {
                 return resp.toObject().resultList;
             }),

@@ -4,9 +4,9 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthConfig } from 'angular-oauth2-oidc';
 
-import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
-import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
-import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
+import { AdminServicePromiseClient } from '../proto/generated/zitadel/admin_grpc_web_pb';
+import { AuthServicePromiseClient } from '../proto/generated/zitadel/auth_grpc_web_pb';
+import { ManagementServicePromiseClient } from '../proto/generated/zitadel/management_grpc_web_pb';
 import { AuthenticationService } from './authentication.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
