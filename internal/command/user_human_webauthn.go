@@ -165,7 +165,7 @@ func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowne
 		usr_repo.NewHumanU2FVerifiedEvent(
 			ctx,
 			userAgg,
-			verifyWebAuthN.WebauthNTokenID, //TODO: webAuthN andverifyWebAuthN same TokenID?
+			verifyWebAuthN.WebauthNTokenID,
 			webAuthN.WebAuthNTokenName,
 			webAuthN.AttestationType,
 			webAuthN.KeyID,
@@ -191,7 +191,7 @@ func (c *Commands) HumanHumanPasswordlessSetup(ctx context.Context, userID, reso
 		usr_repo.NewHumanPasswordlessVerifiedEvent(
 			ctx,
 			userAgg,
-			verifyWebAuthN.WebauthNTokenID, //TODO: webAuthN andverifyWebAuthN same TokenID?
+			verifyWebAuthN.WebauthNTokenID,
 			webAuthN.WebAuthNTokenName,
 			webAuthN.AttestationType,
 			webAuthN.KeyID,

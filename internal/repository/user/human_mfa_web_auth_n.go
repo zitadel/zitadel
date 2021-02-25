@@ -213,9 +213,7 @@ func HumanWebAuthNBeginLoginEventMapper(event *repository.Event) (eventstore.Eve
 
 type HumanWebAuthNCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
-
-	//TODO: Handle Auth Req??
-	//*AuthRequest
+	*AuthRequestInfo
 }
 
 func (e *HumanWebAuthNCheckSucceededEvent) Data() interface{} {
@@ -226,9 +224,12 @@ func (e *HumanWebAuthNCheckSucceededEvent) UniqueConstraints() []*eventstore.Eve
 	return nil
 }
 
-func NewHumanWebAuthNCheckSucceededEvent(base *eventstore.BaseEvent) *HumanWebAuthNCheckSucceededEvent {
+func NewHumanWebAuthNCheckSucceededEvent(
+	base *eventstore.BaseEvent,
+	info *AuthRequestInfo) *HumanWebAuthNCheckSucceededEvent {
 	return &HumanWebAuthNCheckSucceededEvent{
-		BaseEvent: *base,
+		BaseEvent:       *base,
+		AuthRequestInfo: info,
 	}
 }
 
@@ -245,9 +246,7 @@ func HumanWebAuthNCheckSucceededEventMapper(event *repository.Event) (eventstore
 
 type HumanWebAuthNCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-
-	//TODO: Handle Auth Req??
-	//*AuthRequest
+	*AuthRequestInfo
 }
 
 func (e *HumanWebAuthNCheckFailedEvent) Data() interface{} {
@@ -258,9 +257,12 @@ func (e *HumanWebAuthNCheckFailedEvent) UniqueConstraints() []*eventstore.EventU
 	return nil
 }
 
-func NewHumanWebAuthNCheckFailedEvent(base *eventstore.BaseEvent) *HumanWebAuthNCheckFailedEvent {
+func NewHumanWebAuthNCheckFailedEvent(
+	base *eventstore.BaseEvent,
+	info *AuthRequestInfo) *HumanWebAuthNCheckFailedEvent {
 	return &HumanWebAuthNCheckFailedEvent{
-		BaseEvent: *base,
+		BaseEvent:       *base,
+		AuthRequestInfo: info,
 	}
 }
 

@@ -80,7 +80,7 @@ func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
 	return users, err
 }
 
-func UserIDsByDomain(db *gorm.DB, table, domain string) ([]string, error) {
+func UserIDsByDomain(db *gorm.DB, table, orgDomain string) ([]string, error) {
 	type id struct {
 		Id string
 	}
@@ -88,7 +88,7 @@ func UserIDsByDomain(db *gorm.DB, table, domain string) ([]string, error) {
 	orgIDQuery := &usr_model.UserSearchQuery{
 		Key:    usr_model.UserSearchKeyUserName,
 		Method: domain.SearchMethodEndsWithIgnoreCase,
-		Value:  "%" + domain,
+		Value:  "%" + orgDomain,
 	}
 	query := repository.PrepareSearchQuery(table, model.UserSearchRequest{
 		Queries: []*usr_model.UserSearchQuery{orgIDQuery},

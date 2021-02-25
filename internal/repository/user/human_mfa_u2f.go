@@ -196,7 +196,10 @@ type HumanU2FCheckSucceededEvent struct {
 	HumanWebAuthNCheckSucceededEvent
 }
 
-func NewHumanU2FCheckSucceededEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanU2FCheckSucceededEvent {
+func NewHumanU2FCheckSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo) *HumanU2FCheckSucceededEvent {
 	return &HumanU2FCheckSucceededEvent{
 		HumanWebAuthNCheckSucceededEvent: *NewHumanWebAuthNCheckSucceededEvent(
 			eventstore.NewBaseEventForPush(
@@ -204,6 +207,7 @@ func NewHumanU2FCheckSucceededEvent(ctx context.Context, aggregate *eventstore.A
 				aggregate,
 				HumanU2FTokenCheckSucceededType,
 			),
+			info,
 		),
 	}
 }
@@ -221,7 +225,10 @@ type HumanU2FCheckFailedEvent struct {
 	HumanWebAuthNCheckFailedEvent
 }
 
-func NewHumanU2FCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanU2FCheckFailedEvent {
+func NewHumanU2FCheckFailedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo) *HumanU2FCheckFailedEvent {
 	return &HumanU2FCheckFailedEvent{
 		HumanWebAuthNCheckFailedEvent: *NewHumanWebAuthNCheckFailedEvent(
 			eventstore.NewBaseEventForPush(
@@ -229,6 +236,7 @@ func NewHumanU2FCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggr
 				aggregate,
 				HumanU2FTokenCheckFailedType,
 			),
+			info,
 		),
 	}
 }
