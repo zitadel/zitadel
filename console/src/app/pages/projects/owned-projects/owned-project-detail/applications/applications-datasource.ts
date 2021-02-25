@@ -30,7 +30,6 @@ export class ProjectApplicationsDataSource extends DataSource<Application.AsObje
             map(resp => {
                 const response = resp.toObject();
                 this.totalResult = response.totalResult;
-                console.log(response.resultList);
                 if (response.viewTimestamp) {
                     this.viewTimestamp = response.viewTimestamp;
                 }
