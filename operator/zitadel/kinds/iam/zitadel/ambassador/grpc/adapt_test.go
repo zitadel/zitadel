@@ -27,8 +27,8 @@ func SetReturnResourceVersion(
 	ret := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"metadata": map[string]interface{}{
-				"labels":          map[string]string{},
-				"annotations":     map[string]string{},
+				"labels":          map[string]interface{}{},
+				"annotations":     map[string]interface{}{},
 				"resourceVersion": resourceVersion,
 			},
 		},

@@ -29,7 +29,7 @@ func SetReturnResourceVersion(
 	ret := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"metadata": map[string]interface{}{
-				"annotations": map[string]string{
+				"annotations": map[string]interface{}{
 					"aes_res_changed": "true",
 				},
 				"labels":          labels,
