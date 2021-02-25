@@ -2,7 +2,8 @@ package idp
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/iam/model"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/v2/domain"
 	idp_pb "github.com/caos/zitadel/pkg/grpc/idp"
 )
@@ -17,6 +18,26 @@ func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
 		Details:     object.ToDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, "idp.ResourceOwner"), //TODO: resource owner in view
 	}
 	return mapped
+}
+
+func IDPsToUserLinkPb(resp *model.ExternalIDPSearchResponse) []*idp_pb.IDPUserLink {
+	links := make([]*idp_pb.IDPUserLink, len(resp.Result))
+	for i, link := range resp.Result {
+		links[i] = ExternalIDPViewToUserLinkPb(link)
+	}
+	return links
+}
+
+func ExternalIDPViewToUserLinkPb(link *model.ExternalIDPView) *idp_pb.IDPUserLink {
+	return &idp_pb.IDPUserLink{
+		UserId:           link.UserID,
+		IdpId:            link.IDPConfigID,
+		IdpName:          link.IDPName,
+		ProvidedUserId:   link.ExternalUserID,
+		ProvidedUserName: link.UserDisplayName,
+		//TODO: as soon as saml is implemented we need to switch here
+		IdpType: idp_pb.IDPType_IDP_TYPE_OIDC,
+	}
 }
 
 func IDPStateToPb(state domain.IDPConfigState) idp_pb.IDPState {
@@ -39,9 +60,9 @@ func IDPStylingTypeToDomain(stylingType idp_pb.IDPStylingType) domain.IDPConfigS
 	}
 }
 
-func ModelIDPStylingTypeToPb(stylingType model.IDPStylingType) idp_pb.IDPStylingType {
+func ModelIDPStylingTypeToPb(stylingType iam_model.IDPStylingType) idp_pb.IDPStylingType {
 	switch stylingType {
-	case model.IDPStylingTypeGoogle:
+	case iam_model.IDPStylingTypeGoogle:
 		return idp_pb.IDPStylingType_STYLING_TYPE_GOOGLE
 	default:
 		return idp_pb.IDPStylingType_STYLING_TYPE_UNSPECIFIED
@@ -57,7 +78,7 @@ func IDPStylingTypeToPb(stylingType domain.IDPConfigStylingType) idp_pb.IDPStyli
 	}
 }
 
-func ModelIDPViewToConfigPb(config *model.IDPConfigView) *idp_pb.IDP_OidcConfig {
+func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) *idp_pb.IDP_OidcConfig {
 	return &idp_pb.IDP_OidcConfig{
 		OidcConfig: &idp_pb.OIDCConfig{
 			ClientId:           config.OIDCClientID,
@@ -94,11 +115,11 @@ func OIDCConfigToPb(config *domain.OIDCIDPConfig) *idp_pb.IDP_OidcConfig {
 	}
 }
 
-func ModelMappingFieldToPb(mappingField model.OIDCMappingField) idp_pb.OIDCMappingField {
+func ModelMappingFieldToPb(mappingField iam_model.OIDCMappingField) idp_pb.OIDCMappingField {
 	switch mappingField {
-	case model.OIDCMappingFieldEmail:
+	case iam_model.OIDCMappingFieldEmail:
 		return idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL
-	case model.OIDCMappingFieldPreferredLoginName:
+	case iam_model.OIDCMappingFieldPreferredLoginName:
 		return idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME
 	default:
 		return idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_UNSPECIFIED
