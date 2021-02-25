@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func orgListRequestToModel(req *admin.ListOrgsRequest) (*model.OrgSearchRequest, error) {
+func listOrgRequestToModel(req *admin.ListOrgsRequest) (*model.OrgSearchRequest, error) {
 	queries, err := org_grpc.OrgQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -20,13 +20,13 @@ func orgListRequestToModel(req *admin.ListOrgsRequest) (*model.OrgSearchRequest,
 	}, nil
 }
 
-func setUpOrgOrgToModel(req *admin.SetUpOrgRequest_Org) *domain.Org {
+func setUpOrgOrgToDomain(req *admin.SetUpOrgRequest_Org) *domain.Org {
 	org := &domain.Org{
 		Name:    req.Name,
 		Domains: []*domain.OrgDomain{},
 	}
 	if req.Domain != "" {
-		org.Domains = append(org.Domains, req.Domain)
+		org.Domains = append(org.Domains, &domain.OrgDomain{Domain: req.Domain})
 	}
 	return org
 }

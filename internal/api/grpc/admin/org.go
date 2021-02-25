@@ -3,10 +3,9 @@ package admin
 import (
 	"context"
 
+	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
-	"github.com/caos/zitadel/internal/errors"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
-	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {
@@ -23,7 +22,7 @@ func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest
 }
 
 func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*admin_pb.ListOrgsResponse, error) {
-	query, err := orgListRequestToModel(req)
+	query, err := listOrgRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
@@ -35,10 +34,20 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*admin_pb.SetUpOrgResponse, error) {
-	human, _ := userCreateRequestToDomain(orgSetUp.User)
-	if human == nil {
-		return &empty.Empty{}, errors.ThrowPreconditionFailed(nil, "ADMIN-4nd9f", "Errors.User.NotHuman")
+	human := setUpOrgHumanToDomain(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
+	org := setUpOrgOrgToDomain(req.Org)
+
+	err := s.command.SetUpOrg(ctx, org, human)
+	if err != nil {
+		return nil, err
 	}
-	err = s.command.SetUpOrg(ctx, orgCreateRequestToDomain(orgSetUp.Org), human)
-	return &admin_pb.SetUpOrgResponse{}, nil
+	return &admin_pb.SetUpOrgResponse{}, nil //TODO: return obejct details
+}
+
+func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest) (*admin_pb.GetIDPByIDResponse, error) {
+	idp, err := s.query.DefaultIDPConfigByID(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetIDPByIDResponse{Idp: idp_grpc.IDPViewToPb(idp)}, nil
 }
