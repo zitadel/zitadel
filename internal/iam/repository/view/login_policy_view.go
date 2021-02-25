@@ -1,10 +1,10 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 )
@@ -12,7 +12,7 @@ import (
 func GetDefaultLoginPolicies(db *gorm.DB, table string) ([]*model.LoginPolicyView, error) {
 	loginPolicies := make([]*model.LoginPolicyView, 0)
 	queries := []*iam_model.LoginPolicySearchQuery{
-		{Key: iam_model.LoginPolicySearchKeyDefault, Value: true, Method: global_model.SearchMethodEquals},
+		{Key: iam_model.LoginPolicySearchKeyDefault, Value: true, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.LoginPolicySearchRequest{Queries: queries})
 	_, err := query(db, &loginPolicies)
@@ -24,7 +24,7 @@ func GetDefaultLoginPolicies(db *gorm.DB, table string) ([]*model.LoginPolicyVie
 
 func GetLoginPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.LoginPolicyView, error) {
 	policy := new(model.LoginPolicyView)
-	aggregateIDQuery := &model.LoginPolicySearchQuery{Key: iam_model.LoginPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	aggregateIDQuery := &model.LoginPolicySearchQuery{Key: iam_model.LoginPolicySearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {

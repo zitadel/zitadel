@@ -1,25 +1,25 @@
 package auth
 
 import (
-	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 )
 
-func searchMethodToModel(method auth.SearchMethod) model.SearchMethod {
+func searchMethodToModel(method auth.SearchMethod) domain.SearchMethod {
 	switch method {
 	case auth.SearchMethod_SEARCHMETHOD_EQUALS:
-		return model.SearchMethodEquals
+		return domain.SearchMethodEquals
 	case auth.SearchMethod_SEARCHMETHOD_CONTAINS:
-		return model.SearchMethodContains
+		return domain.SearchMethodContains
 	case auth.SearchMethod_SEARCHMETHOD_STARTS_WITH:
-		return model.SearchMethodStartsWith
+		return domain.SearchMethodStartsWith
 	case auth.SearchMethod_SEARCHMETHOD_EQUALS_IGNORE_CASE:
-		return model.SearchMethodEqualsIgnoreCase
+		return domain.SearchMethodEqualsIgnoreCase
 	case auth.SearchMethod_SEARCHMETHOD_CONTAINS_IGNORE_CASE:
-		return model.SearchMethodContainsIgnoreCase
+		return domain.SearchMethodContainsIgnoreCase
 	case auth.SearchMethod_SEARCHMETHOD_STARTS_WITH_IGNORE_CASE:
-		return model.SearchMethodStartsWithIgnoreCase
+		return domain.SearchMethodStartsWithIgnoreCase
 	default:
-		return model.SearchMethodEquals
+		return domain.SearchMethodEquals
 	}
 }

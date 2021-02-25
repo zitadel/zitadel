@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type OrgDomainView struct {
@@ -36,7 +35,7 @@ const (
 
 type OrgDomainSearchQuery struct {
 	Key    OrgDomainSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

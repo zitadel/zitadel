@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 )
 
@@ -45,7 +45,7 @@ const (
 
 type NotifyUserSearchQuery struct {
 	Key    NotifyUserSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  string
 }
 

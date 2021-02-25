@@ -3,7 +3,6 @@ package model
 import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/model"
 	"time"
 )
 
@@ -41,7 +40,7 @@ const (
 
 type LoginPolicySearchQuery struct {
 	Key    LoginPolicySearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

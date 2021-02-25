@@ -7,7 +7,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 )
 
@@ -68,20 +67,20 @@ func iamMemberSearchKeyToModel(key admin.IamMemberSearchKey) iam_model.IAMMember
 	}
 }
 
-func searchMethodToModel(key admin.SearchMethod) model.SearchMethod {
+func searchMethodToModel(key admin.SearchMethod) domain.SearchMethod {
 	switch key {
 	case admin.SearchMethod_SEARCHMETHOD_CONTAINS:
-		return model.SearchMethodContains
+		return domain.SearchMethodContains
 	case admin.SearchMethod_SEARCHMETHOD_CONTAINS_IGNORE_CASE:
-		return model.SearchMethodContainsIgnoreCase
+		return domain.SearchMethodContainsIgnoreCase
 	case admin.SearchMethod_SEARCHMETHOD_EQUALS:
-		return model.SearchMethodEquals
+		return domain.SearchMethodEquals
 	case admin.SearchMethod_SEARCHMETHOD_EQUALS_IGNORE_CASE:
-		return model.SearchMethodEqualsIgnoreCase
+		return domain.SearchMethodEqualsIgnoreCase
 	case admin.SearchMethod_SEARCHMETHOD_STARTS_WITH:
-		return model.SearchMethodStartsWith
+		return domain.SearchMethodStartsWith
 	case admin.SearchMethod_SEARCHMETHOD_STARTS_WITH_IGNORE_CASE:
-		return model.SearchMethodStartsWithIgnoreCase
+		return domain.SearchMethodStartsWithIgnoreCase
 	default:
 		return -1
 	}

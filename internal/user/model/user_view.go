@@ -10,7 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/model"
 )
 
 type UserView struct {
@@ -95,7 +94,7 @@ const (
 
 type UserSearchQuery struct {
 	Key    UserSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -136,7 +135,7 @@ func (r *UserSearchRequest) EnsureLimit(limit uint64) {
 }
 
 func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &UserSearchQuery{Key: UserSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
+	r.Queries = append(r.Queries, &UserSearchQuery{Key: UserSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: orgID})
 }
 
 func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.LoginPolicy) []domain.MFAType {

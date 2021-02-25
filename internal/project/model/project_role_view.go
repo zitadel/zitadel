@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type ProjectRoleView struct {
@@ -39,7 +38,7 @@ const (
 
 type ProjectRoleSearchQuery struct {
 	Key    ProjectRoleSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -53,10 +52,10 @@ type ProjectRoleSearchResponse struct {
 }
 
 func (r *ProjectRoleSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: ProjectRoleSearchKeyOrgID, Method: model.SearchMethodEquals, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: ProjectRoleSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: orgID})
 }
 func (r *ProjectRoleSearchRequest) AppendProjectQuery(projectID string) {
-	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: ProjectRoleSearchKeyProjectID, Method: model.SearchMethodEquals, Value: projectID})
+	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: ProjectRoleSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: projectID})
 }
 
 func (r *ProjectRoleSearchRequest) EnsureLimit(limit uint64) {

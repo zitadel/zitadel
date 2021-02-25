@@ -9,7 +9,6 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -72,20 +71,20 @@ func orgMemberSearchKeyToModel(key management.OrgMemberSearchKey) org_model.OrgM
 	}
 }
 
-func orgMemberSearchMethodToModel(key management.SearchMethod) model.SearchMethod {
+func orgMemberSearchMethodToModel(key management.SearchMethod) domain.SearchMethod {
 	switch key {
 	case management.SearchMethod_SEARCHMETHOD_CONTAINS:
-		return model.SearchMethodContains
+		return domain.SearchMethodContains
 	case management.SearchMethod_SEARCHMETHOD_CONTAINS_IGNORE_CASE:
-		return model.SearchMethodContainsIgnoreCase
+		return domain.SearchMethodContainsIgnoreCase
 	case management.SearchMethod_SEARCHMETHOD_EQUALS:
-		return model.SearchMethodEquals
+		return domain.SearchMethodEquals
 	case management.SearchMethod_SEARCHMETHOD_EQUALS_IGNORE_CASE:
-		return model.SearchMethodEqualsIgnoreCase
+		return domain.SearchMethodEqualsIgnoreCase
 	case management.SearchMethod_SEARCHMETHOD_STARTS_WITH:
-		return model.SearchMethodStartsWith
+		return domain.SearchMethodStartsWith
 	case management.SearchMethod_SEARCHMETHOD_STARTS_WITH_IGNORE_CASE:
-		return model.SearchMethodStartsWithIgnoreCase
+		return domain.SearchMethodStartsWithIgnoreCase
 	default:
 		return -1
 	}

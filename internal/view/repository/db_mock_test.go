@@ -3,13 +3,12 @@ package repository
 import (
 	"database/sql/driver"
 	"fmt"
+	"github.com/caos/zitadel/internal/domain"
 	"strconv"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 var (
@@ -73,7 +72,7 @@ func (req TestSearchRequest) GetQueries() []SearchQuery {
 
 type TestSearchQuery struct {
 	key    TestSearchKey
-	method model.SearchMethod
+	method domain.SearchMethod
 	value  string
 }
 
@@ -81,7 +80,7 @@ func (req TestSearchQuery) GetKey() ColumnKey {
 	return req.key
 }
 
-func (req TestSearchQuery) GetMethod() model.SearchMethod {
+func (req TestSearchQuery) GetMethod() domain.SearchMethod {
 	return req.method
 }
 

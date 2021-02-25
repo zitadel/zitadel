@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type ProjectMemberView struct {
@@ -42,7 +41,7 @@ const (
 
 type ProjectMemberSearchQuery struct {
 	Key    ProjectMemberSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -61,5 +60,5 @@ func (r *ProjectMemberSearchRequest) EnsureLimit(limit uint64) {
 	}
 }
 func (r *ProjectMemberSearchRequest) AppendProjectQuery(projectID string) {
-	r.Queries = append(r.Queries, &ProjectMemberSearchQuery{Key: ProjectMemberSearchKeyProjectID, Method: model.SearchMethodEquals, Value: projectID})
+	r.Queries = append(r.Queries, &ProjectMemberSearchQuery{Key: ProjectMemberSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: projectID})
 }

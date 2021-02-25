@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 )
 
 type SecondFactorsSearchRequest struct {
@@ -17,7 +17,7 @@ type MultiFactorsSearchRequest struct {
 
 type MFASearchQuery struct {
 	Key    MFASearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -39,9 +39,9 @@ type MultiFactorsSearchResponse struct {
 }
 
 func (r *SecondFactorsSearchRequest) AppendAggregateIDQuery(aggregateID string) {
-	r.Queries = append(r.Queries, &MFASearchQuery{Key: MFASearchKeyAggregateID, Method: model.SearchMethodEquals, Value: aggregateID})
+	r.Queries = append(r.Queries, &MFASearchQuery{Key: MFASearchKeyAggregateID, Method: domain.SearchMethodEquals, Value: aggregateID})
 }
 
 func (r *MultiFactorsSearchRequest) AppendAggregateIDQuery(aggregateID string) {
-	r.Queries = append(r.Queries, &MFASearchQuery{Key: MFASearchKeyAggregateID, Method: model.SearchMethodEquals, Value: aggregateID})
+	r.Queries = append(r.Queries, &MFASearchQuery{Key: MFASearchKeyAggregateID, Method: domain.SearchMethodEquals, Value: aggregateID})
 }

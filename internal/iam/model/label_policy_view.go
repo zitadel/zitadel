@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type LabelPolicyView struct {
@@ -34,7 +33,7 @@ const (
 
 type LabelPolicySearchQuery struct {
 	Key    LabelPolicySearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

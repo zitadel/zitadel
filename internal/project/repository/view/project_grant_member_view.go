@@ -1,8 +1,8 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -12,8 +12,8 @@ import (
 func ProjectGrantMemberByIDs(db *gorm.DB, table, grantID, userID string) (*model.ProjectGrantMemberView, error) {
 	grant := new(model.ProjectGrantMemberView)
 
-	grantIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyGrantID, Value: grantID, Method: global_model.SearchMethodEquals}
-	userIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
+	grantIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyGrantID, Value: grantID, Method: domain.SearchMethodEquals}
+	userIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, grantIDQuery, userIDQuery)
 	err := query(db, grant)
 	if caos_errs.IsNotFound(err) {
@@ -25,7 +25,7 @@ func ProjectGrantMemberByIDs(db *gorm.DB, table, grantID, userID string) (*model
 func ProjectGrantMembersByProjectID(db *gorm.DB, table, projectID string) ([]*model.ProjectGrantMemberView, error) {
 	members := make([]*model.ProjectGrantMemberView, 0)
 	queries := []*proj_model.ProjectGrantMemberSearchQuery{
-		{Key: proj_model.ProjectGrantMemberSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectGrantMemberSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectGrantMemberSearchRequest{Queries: queries})
 	_, err := query(db, &members)
@@ -48,7 +48,7 @@ func SearchProjectGrantMembers(db *gorm.DB, table string, req *proj_model.Projec
 func ProjectGrantMembersByUserID(db *gorm.DB, table, userID string) ([]*model.ProjectGrantMemberView, error) {
 	members := make([]*model.ProjectGrantMemberView, 0)
 	queries := []*proj_model.ProjectGrantMemberSearchQuery{
-		{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectGrantMemberSearchRequest{Queries: queries})
 	_, err := query(db, &members)

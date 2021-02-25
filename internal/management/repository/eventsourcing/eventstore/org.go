@@ -21,7 +21,6 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
@@ -74,7 +73,7 @@ func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.Or
 
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
+	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
 	sequence, sequenceErr := repo.View.GetLatestOrgDomainSequence()
 	logging.Log("EVENT-SLowp").OnError(sequenceErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest org domain sequence")
 	domains, count, err := repo.View.SearchOrgDomains(request)
@@ -124,7 +123,7 @@ func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID stri
 
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID}
+	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID}
 	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence()
 	logging.Log("EVENT-Smu3d").OnError(sequenceErr).Warn("could not read latest org member sequence")
 	members, count, err := repo.View.SearchOrgMembers(request)

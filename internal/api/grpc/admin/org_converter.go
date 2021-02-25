@@ -9,7 +9,6 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/admin"
@@ -164,14 +163,14 @@ func orgQueryKeyToModel(key admin.OrgSearchKey) org_model.OrgSearchKey {
 	}
 }
 
-func orgQueryMethodToModel(method admin.OrgSearchMethod) model.SearchMethod {
+func orgQueryMethodToModel(method admin.OrgSearchMethod) domain.SearchMethod {
 	switch method {
 	case admin.OrgSearchMethod_ORGSEARCHMETHOD_CONTAINS:
-		return model.SearchMethodContains
+		return domain.SearchMethodContains
 	case admin.OrgSearchMethod_ORGSEARCHMETHOD_EQUALS:
-		return model.SearchMethodEquals
+		return domain.SearchMethodEquals
 	case admin.OrgSearchMethod_ORGSEARCHMETHOD_STARTS_WITH:
-		return model.SearchMethodStartsWith
+		return domain.SearchMethodStartsWith
 	default:
 		return 0
 	}

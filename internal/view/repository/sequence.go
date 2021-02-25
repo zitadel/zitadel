@@ -1,13 +1,13 @@
 package repository
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	int_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/model"
 )
 
@@ -60,8 +60,8 @@ func (q *sequenceSearchQuery) GetKey() ColumnKey {
 	return q.key
 }
 
-func (q *sequenceSearchQuery) GetMethod() int_model.SearchMethod {
-	return int_model.SearchMethodEquals
+func (q *sequenceSearchQuery) GetMethod() domain.SearchMethod {
+	return domain.SearchMethodEquals
 }
 
 func (q *sequenceSearchQuery) GetValue() interface{} {

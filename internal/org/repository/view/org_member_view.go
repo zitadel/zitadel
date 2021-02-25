@@ -1,8 +1,8 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -12,8 +12,8 @@ import (
 func OrgMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.OrgMemberView, error) {
 	member := new(model.OrgMemberView)
 
-	orgIDQuery := &model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Value: orgID, Method: global_model.SearchMethodEquals}
-	userIDQuery := &model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
+	orgIDQuery := &model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Value: orgID, Method: domain.SearchMethodEquals}
+	userIDQuery := &model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyUserID, Value: userID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, orgIDQuery, userIDQuery)
 	err := query(db, member)
 	if caos_errs.IsNotFound(err) {
@@ -37,7 +37,7 @@ func OrgMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.OrgM
 		{
 			Key:    org_model.OrgMemberSearchKeyUserID,
 			Value:  userID,
-			Method: global_model.SearchMethodEquals,
+			Method: domain.SearchMethodEquals,
 		},
 	}
 	query := repository.PrepareSearchQuery(table, model.OrgMemberSearchRequest{Queries: queries})

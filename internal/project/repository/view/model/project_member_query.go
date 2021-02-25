@@ -1,7 +1,7 @@
 package model
 
 import (
-	global_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
@@ -41,7 +41,7 @@ func (req ProjectMemberSearchQuery) GetKey() repository.ColumnKey {
 	return ProjectMemberSearchKey(req.Key)
 }
 
-func (req ProjectMemberSearchQuery) GetMethod() global_model.SearchMethod {
+func (req ProjectMemberSearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 

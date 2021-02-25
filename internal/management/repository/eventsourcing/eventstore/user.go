@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
@@ -16,7 +17,6 @@ import (
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -342,10 +342,10 @@ func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_mo
 		return nil
 	}
 	if !iamPerm {
-		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: global_model.SearchMethodNotEquals, Value: usr_model.MemberTypeIam})
+		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: domain.SearchMethodNotEquals, Value: usr_model.MemberTypeIam})
 	}
 	if !orgPerm {
-		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: global_model.SearchMethodNotEquals, Value: usr_model.MemberTypeOrganisation})
+		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: domain.SearchMethodNotEquals, Value: usr_model.MemberTypeOrganisation})
 	}
 
 	ids := authz.GetExplicitPermissionCtxIDs(permissions, projectMemberReadPerm)
@@ -372,6 +372,6 @@ func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_mo
 			return result
 		}
 	}
-	request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyObjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+	request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyObjectID, Method: domain.SearchMethodIsOneOf, Value: ids})
 	return nil
 }

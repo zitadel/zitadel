@@ -1,10 +1,10 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 	"strings"
@@ -16,7 +16,7 @@ func GetMailTexts(db *gorm.DB, table string, aggregateID string) ([]*model.MailT
 		{
 			Key:    iam_model.MailTextSearchKeyAggregateID,
 			Value:  aggregateID,
-			Method: global_model.SearchMethodEquals,
+			Method: domain.SearchMethodEquals,
 		},
 	}
 	query := repository.PrepareSearchQuery(table, model.MailTextSearchRequest{Queries: queries})
@@ -29,9 +29,9 @@ func GetMailTexts(db *gorm.DB, table string, aggregateID string) ([]*model.MailT
 
 func GetMailTextByIDs(db *gorm.DB, table, aggregateID string, textType string, language string) (*model.MailTextView, error) {
 	mailText := new(model.MailTextView)
-	aggregateIDQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	textTypeQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyMailTextType, Value: textType, Method: global_model.SearchMethodEquals}
-	languageQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyLanguage, Value: strings.ToUpper(language), Method: global_model.SearchMethodEquals}
+	aggregateIDQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
+	textTypeQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyMailTextType, Value: textType, Method: domain.SearchMethodEquals}
+	languageQuery := &model.MailTextSearchQuery{Key: iam_model.MailTextSearchKeyLanguage, Value: strings.ToUpper(language), Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery, textTypeQuery, languageQuery)
 	err := query(db, mailText)
 	if caos_errs.IsNotFound(err) {

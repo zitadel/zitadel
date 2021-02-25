@@ -1,8 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/model"
 	"time"
 )
 
@@ -37,7 +37,7 @@ const (
 
 type PasswordComplexityPolicySearchQuery struct {
 	Key    PasswordComplexityPolicySearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

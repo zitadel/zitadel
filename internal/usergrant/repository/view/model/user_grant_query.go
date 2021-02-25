@@ -1,7 +1,7 @@
 package model
 
 import (
-	global_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
@@ -41,7 +41,7 @@ func (req UserGrantSearchQuery) GetKey() repository.ColumnKey {
 	return UserGrantSearchKey(req.Key)
 }
 
-func (req UserGrantSearchQuery) GetMethod() global_model.SearchMethod {
+func (req UserGrantSearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 

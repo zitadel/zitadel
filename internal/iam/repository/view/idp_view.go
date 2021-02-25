@@ -1,17 +1,17 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 )
 
 func IDPByID(db *gorm.DB, table, idpID string) (*model.IDPConfigView, error) {
 	idp := new(model.IDPConfigView)
-	idpIDQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyIdpConfigID, Value: idpID, Method: global_model.SearchMethodEquals}
+	idpIDQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyIdpConfigID, Value: idpID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, idpIDQuery)
 	err := query(db, idp)
 	if caos_errs.IsNotFound(err) {
@@ -26,7 +26,7 @@ func GetIDPConfigsByAggregateID(db *gorm.DB, table string, aggregateID string) (
 		{
 			Key:    iam_model.IDPConfigSearchKeyAggregateID,
 			Value:  aggregateID,
-			Method: global_model.SearchMethodEquals,
+			Method: domain.SearchMethodEquals,
 		},
 	}
 	query := repository.PrepareSearchQuery(table, model.IDPConfigSearchRequest{Queries: queries})
