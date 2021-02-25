@@ -44,10 +44,11 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.Pro
 
 //ChangeProjectGrantMember updates an existing member
 func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *domain.ProjectGrantMember, resourceOwner string) (*domain.ProjectGrantMember, error) {
-	//TODO: check if roles valid
-
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-109fs", "Errors.Project.Member.Invalid")
+	}
+	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectGrantRolePrefix, c.zitadelRoles)) > 0 {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-m0sDf", "Errors.Project.Member.Invalid")
 	}
 
 	existingMember, err := c.projectGrantMemberWriteModelByID(ctx, member.AggregateID, member.UserID, member.GrantID)

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -22,9 +23,10 @@ import (
 )
 
 type Commands struct {
-	eventstore  *eventstore.Eventstore
-	idGenerator id.Generator
-	iamDomain   string
+	eventstore   *eventstore.Eventstore
+	idGenerator  id.Generator
+	iamDomain    string
+	zitadelRoles []authz.RoleMapping
 
 	idpConfigSecretCrypto crypto.Crypto
 
@@ -53,11 +55,12 @@ type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults) (repo *Commands, err error) {
+func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         eventstore,
 		idGenerator:        id.SonyFlakeGenerator,
 		iamDomain:          defaults.Domain,
+		zitadelRoles:       authZConfig.RolePermissionMappings,
 		keySize:            defaults.KeyConfig.Size,
 		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
 		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,

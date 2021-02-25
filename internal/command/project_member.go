@@ -33,10 +33,11 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, 
 }
 
 func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
-	//TODO: check if roles valid
-
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
+	}
+	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectRolePrefix, c.zitadelRoles)) > 0 {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-3m9ds", "Errors.Project.Member.Invalid")
 	}
 
 	err := c.checkUserExists(ctx, addedMember.UserID, "")
@@ -56,10 +57,11 @@ func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.
 
 //ChangeProjectMember updates an existing member
 func (c *Commands) ChangeProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
-	//TODO: check if roles valid
-
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.Invalid")
+	}
+	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectRolePrefix, c.zitadelRoles)) > 0 {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-3m9d", "Errors.Project.Member.Invalid")
 	}
 
 	existingMember, err := c.projectMemberWriteModelByID(ctx, member.AggregateID, member.UserID, resourceOwner)
