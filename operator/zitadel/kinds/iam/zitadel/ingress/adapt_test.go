@@ -9,12 +9,18 @@ import (
 	"github.com/caos/orbos/pkg/labels/mocklabels"
 )
 
-func TestAdaptFunc(t *testing.T) {
+func TestAdaptFuncCover(t *testing.T) {
+	checkErr := func(err error) {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
 	cover := func(controller string) {
-		AdaptFunc(mntr.Monitor{}, mocklabels.Api, "", "", 0, "", 0, "", 0, &configuration.Ingress{
+		_, _, err := AdaptFunc(mntr.Monitor{}, mocklabels.Api, "", "", 0, "", 0, "", 0, &configuration.Ingress{
 			Subdomains: &configuration.Subdomains{},
 			Controller: controller,
 		})
+		checkErr(err)
 	}
 	cover("NGINX")
 	cover("Ambassador")

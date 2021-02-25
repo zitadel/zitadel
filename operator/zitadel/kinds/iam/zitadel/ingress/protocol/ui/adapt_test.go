@@ -1,5 +1,32 @@
 package ui
 
+import (
+	"testing"
+
+	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/labels/mocklabels"
+	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/core"
+)
+
+func TestAdaptFuncCover(t *testing.T) {
+	mockpathadapter := func(arguments core.PathArguments) (queryFunc operator.QueryFunc, destroyFunc operator.DestroyFunc, err error) {
+		return nil, nil, nil
+	}
+
+	AdaptFunc(
+		mntr.Monitor{},
+		mocklabels.Component,
+		"",
+		"",
+		0,
+		nil,
+		"",
+		mockpathadapter,
+		mockpathadapter,
+	)
+}
+
 /*
 import (
 	"fmt"

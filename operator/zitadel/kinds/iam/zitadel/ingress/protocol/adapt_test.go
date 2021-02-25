@@ -1,5 +1,41 @@
 package protocol
 
+import (
+	"testing"
+
+	"github.com/caos/zitadel/operator"
+
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/core"
+
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+
+	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/labels/mocklabels"
+)
+
+func TestAdaptFuncCover(t *testing.T) {
+	AdaptFunc(
+		mntr.Monitor{},
+		mocklabels.Component,
+		"",
+		"",
+		0,
+		"",
+		0,
+		"string",
+		0,
+		&configuration.Ingress{
+			Subdomains: &configuration.Subdomains{},
+		},
+		map[string]interface{}{},
+		func(virtualHost string) core.PathAdapter {
+			return func(arguments core.PathArguments) (queryFunc operator.QueryFunc, destroyFunc operator.DestroyFunc, err error) {
+				return nil, nil, nil
+			}
+		},
+	)
+}
+
 /*
 import (
 	"testing"
