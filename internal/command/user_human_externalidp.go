@@ -30,13 +30,18 @@ func (c *Commands) BulkAddedHumanExternalIDP(ctx context.Context, userID, resour
 	return err
 }
 
-func (c *Commands) addHumanExternalIDP(ctx context.Context, aggregate *eventstore.Aggregate, externalIDP *domain.ExternalIDP) (eventstore.EventPusher, error) {
+func (c *Commands) addHumanExternalIDP(ctx context.Context, humanAgg *eventstore.Aggregate, externalIDP *domain.ExternalIDP) (eventstore.EventPusher, error) {
 	if !externalIDP.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid")
 	}
-	//TODO: check if idpconfig exists
-
-	return user.NewHumanExternalIDPAddedEvent(ctx, aggregate, externalIDP.IDPConfigID, externalIDP.DisplayName, externalIDP.ExternalUserID), nil
+	_, err := c.getOrgIDPConfigByID(ctx, externalIDP.IDPConfigID, humanAgg.ResourceOwner)
+	if caos_errs.IsNotFound(err) {
+		_, err = c.getIAMIDPConfigByID(ctx, externalIDP.IDPConfigID)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return user.NewHumanExternalIDPAddedEvent(ctx, humanAgg, externalIDP.IDPConfigID, externalIDP.DisplayName, externalIDP.ExternalUserID), nil
 }
 
 func (c *Commands) RemoveHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP) error {

@@ -73,8 +73,12 @@ const (
 	idpConfigStateCount
 )
 
-func (f IDPConfigState) Valid() bool {
-	return f >= 0 && f < idpConfigStateCount
+func (s IDPConfigState) Valid() bool {
+	return s >= 0 && s < idpConfigStateCount
+}
+
+func (s IDPConfigState) Exists() bool {
+	return s != IDPConfigStateUnspecified || s == IDPConfigStateRemoved
 }
 
 type IDPConfigStylingType int32

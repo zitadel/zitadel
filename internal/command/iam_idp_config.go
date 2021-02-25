@@ -141,6 +141,17 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 	return err
 }
 
+func (c *Commands) getIAMIDPConfigByID(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
+	config, err := c.iamIDPConfigWriteModelByID(ctx, idpID)
+	if err != nil {
+		return nil, err
+	}
+	if !config.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotExisting")
+	}
+	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
+}
+
 func (c *Commands) iamIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *IAMIDPConfigWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
