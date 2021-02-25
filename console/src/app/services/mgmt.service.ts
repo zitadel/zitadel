@@ -154,7 +154,12 @@ import {
     UpdateHumanPhoneRequest,
     RemoveHumanPhoneRequest,
     DeactivateUserRequest,
-    DeactivateUserResponse
+    DeactivateUserResponse,
+    AddUserGrantRequest,
+    AddUserGrantResponse,
+    ReactivateUserResponse,
+    ReactivateUserRequest,
+    AddProjectRoleRequest
 } from '../proto/generated/zitadel/management_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -833,31 +838,31 @@ export class ManagementService {
         return this.grpcService.mgmt.deactivateUser(req);
     }
 
-    public CreateUserGrant(
+    public addUserGrant(
         userId: string,
         roleNamesList: string[],
         projectId?: string,
-        grantId?: string,
-    ): Promise<UserGrant> {
-        const req = new UserGrantCreate();
-        if (projectId) { req.setProjectId(projectId); }
-        if (grantId) { req.setGrantId(grantId); }
+    ): Promise<AddUserGrantResponse> {
+        const req = new AddUserGrantRequest();
+        if (projectId) {
+            req.setProjectId(projectId);
+        }
         req.setUserId(userId);
         req.setRoleKeysList(roleNamesList);
 
-        return this.grpcService.mgmt.createUserGrant(req);
+        return this.grpcService.mgmt.addUserGrant(req);
     }
 
-    public ReactivateUser(id: string): Promise<UserResponse> {
-        const req = new UserID();
+    public reactivateUser(id: string): Promise<ReactivateUserResponse> {
+        const req = new ReactivateUserRequest();
         req.setId(id);
         return this.grpcService.mgmt.reactivateUser(req);
     }
 
-    public AddRole(id: string, key: string, displayName: string, group: string): Promise<Empty> {
-        const req = new ProjectRoleAdd();
-        req.setId(id);
-        req.setKey(key);
+    public AddRole(projectId: string, roleKey: string, displayName: string, group: string): Promise<AddProjectRoleResponse> {
+        const req = new AddProjectRoleRequest();
+        req.setProjectId(projectId);
+        req.setRoleKey(roleKey);
         if (displayName) {
             req.setDisplayName(displayName);
         }
