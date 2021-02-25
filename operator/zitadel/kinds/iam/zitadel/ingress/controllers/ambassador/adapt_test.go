@@ -1,23 +1,5 @@
 package ambassador
 
-import (
-	"fmt"
-	"testing"
-
-	"github.com/caos/orbos/pkg/labels/mocklabels"
-
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol/core"
-
-	"github.com/caos/orbos/pkg/labels"
-
-	"github.com/caos/orbos/mntr"
-	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
-	apixv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-)
-
 /*
 func SetReturnResourceVersion(
 	k8sClient *kubernetesmock.MockClientInt,
@@ -297,7 +279,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 	assert.NoError(t, ensure(k8sClient))
 }
 */
-
+/*
 type hostScope struct {
 	input      hostArgs
 	expect     expectFunc
@@ -455,3 +437,4 @@ func TestAdapt(t *testing.T) {
 		}
 	}
 }
+*/
