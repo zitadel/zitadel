@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { IdpSearchResponse as AdminIdpSearchResponse, IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
+import { IdpSearchResponse as AdminIdpSearchResponse, IdpState, IdpStylingType, IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
 import { IdpProviderType, IdpView as MgmtIdpView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -34,7 +34,9 @@ export class IdpTableComponent implements OnInit {
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
     public IdpProviderType: any = IdpProviderType;
-    @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state'];
+    public IdpState: any = IdpState;
+    public IdpStylingType: any = IdpStylingType;
+    @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'dates', 'state'];
 
     @Output() public changedSelection: EventEmitter<Array<AdminIdpView.AsObject | MgmtIdpView.AsObject>>
         = new EventEmitter();
@@ -48,7 +50,7 @@ export class IdpTableComponent implements OnInit {
     ngOnInit(): void {
         this.getData(10, 0);
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            this.displayedColumns = ['select', 'name', 'config', 'creationDate', 'changeDate', 'state', 'type'];
+            this.displayedColumns = ['select', 'name', 'config', 'dates', 'state', 'type'];
         }
 
         if (!this.disabled) {

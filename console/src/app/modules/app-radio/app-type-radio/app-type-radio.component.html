@@ -1,8 +1,7 @@
 <div class="radio-button-wrapper">
     <ng-container *ngFor="let type of types">
-        <input type="radio" [disabled]="type.disabled" (change)="emitChange()" [value]="type.type"
-            [(ngModel)]="selected" [id]="type.type" />
-        <label class="cnsl-type-radio-button" [for]="type.type">
+        <input type="radio" (change)="emitChange()" [value]="type" [(ngModel)]="selected" [id]="type.prefix" />
+        <label class="cnsl-type-radio-button" [for]="type.prefix">
             <div class="cnsl-type-radio-header" [ngStyle]="{'background': type.background}">
                 <span>{{type.prefix}}</span>
             </div>
