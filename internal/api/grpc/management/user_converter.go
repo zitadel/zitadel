@@ -542,6 +542,19 @@ func genderFromDomain(gender domain.Gender) management.Gender {
 	}
 }
 
+func genderFromModel(gender usr_model.Gender) management.Gender {
+	switch gender {
+	case usr_model.GenderFemale:
+		return management.Gender_GENDER_FEMALE
+	case usr_model.GenderMale:
+		return management.Gender_GENDER_MALE
+	case usr_model.GenderDiverse:
+		return management.Gender_GENDER_DIVERSE
+	default:
+		return management.Gender_GENDER_UNSPECIFIED
+	}
+}
+
 func memberTypeFromModel(memberType usr_model.MemberType) management.MemberType {
 	switch memberType {
 	case usr_model.MemberTypeOrganisation:

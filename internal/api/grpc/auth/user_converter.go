@@ -81,17 +81,16 @@ func profileViewFromModel(profile *usr_model.Profile) *auth.UserProfileView {
 	logging.Log("GRPC-9sujE").OnError(err).Debug("unable to parse timestamp")
 
 	return &auth.UserProfileView{
-		Id:                profile.AggregateID,
-		CreationDate:      creationDate,
-		ChangeDate:        changeDate,
-		Sequence:          profile.Sequence,
-		FirstName:         profile.FirstName,
-		LastName:          profile.LastName,
-		DisplayName:       profile.DisplayName,
-		NickName:          profile.NickName,
-		PreferredLanguage: profile.PreferredLanguage.String(),
-		//TODO: Use converter
-		Gender:             auth.Gender(profile.Gender),
+		Id:                 profile.AggregateID,
+		CreationDate:       creationDate,
+		ChangeDate:         changeDate,
+		Sequence:           profile.Sequence,
+		FirstName:          profile.FirstName,
+		LastName:           profile.LastName,
+		DisplayName:        profile.DisplayName,
+		NickName:           profile.NickName,
+		PreferredLanguage:  profile.PreferredLanguage.String(),
+		Gender:             genderFromModel(profile.Gender),
 		LoginNames:         profile.LoginNames,
 		PreferredLoginName: profile.PreferredLoginName,
 	}
@@ -340,6 +339,19 @@ func genderFromDomain(gender domain.Gender) auth.Gender {
 	case domain.GenderMale:
 		return auth.Gender_GENDER_MALE
 	case domain.GenderDiverse:
+		return auth.Gender_GENDER_DIVERSE
+	default:
+		return auth.Gender_GENDER_UNSPECIFIED
+	}
+}
+
+func genderFromModel(gender usr_model.Gender) auth.Gender {
+	switch gender {
+	case usr_model.GenderFemale:
+		return auth.Gender_GENDER_FEMALE
+	case usr_model.GenderMale:
+		return auth.Gender_GENDER_MALE
+	case usr_model.GenderDiverse:
 		return auth.Gender_GENDER_DIVERSE
 	default:
 		return auth.Gender_GENDER_UNSPECIFIED
