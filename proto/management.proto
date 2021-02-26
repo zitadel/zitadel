@@ -2884,7 +2884,7 @@ message AddCustomLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    zitadel.policy.v1.MultiFactorType passwordless_type = 5;
+    zitadel.policy.v1.MultiFactorType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
 }
 
 message AddCustomLoginPolicyResponse {
@@ -2896,7 +2896,7 @@ message UpdateCustomLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    zitadel.policy.v1.MultiFactorType passwordless_type = 5;
+    zitadel.policy.v1.MultiFactorType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateCustomLoginPolicyResponse {

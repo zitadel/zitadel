@@ -677,7 +677,7 @@ message RemoveIDPResponse {
 message UpdateIDPRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.IDPStylingType styling_type = 3;
+    zitadel.idp.v1.IDPStylingType styling_type = 3 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateIDPResponse {
@@ -773,7 +773,7 @@ message UpdateLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    zitadel.policy.v1.PasswordlessType passwordless_type = 5;
+    zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateLoginPolicyResponse {
