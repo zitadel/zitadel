@@ -222,7 +222,7 @@ export class LoginPolicyComponent implements OnDestroy {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
                 (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId).then(() => {
-                    const index = this.idps.findIndex(temp => temp === idp);
+                    const index = (this.idps as MgmtIdpProviderView.AsObject[]).findIndex(temp => temp === idp);
                     if (index > -1) {
                         this.idps.splice(index, 1);
                     }
@@ -230,7 +230,7 @@ export class LoginPolicyComponent implements OnDestroy {
                 break;
             case PolicyComponentServiceType.ADMIN:
                 (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId).then(() => {
-                    const index = this.idps.findIndex(temp => temp === idp);
+                    const index = (this.idps as AdminIdpProviderView.AsObject[]).findIndex(temp => temp === idp);
                     if (index > -1) {
                         this.idps.splice(index, 1);
                     }
