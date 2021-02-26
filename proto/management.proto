@@ -2685,7 +2685,7 @@ message ListProjectGrantsRequest {
 
 message ListProjectGrantsResponse {
     zitadel.v1.ListDetails meta_data = 1;
-    repeated zitadel.project.v1.GrantedProject result = 2; //TODO: naming?
+    repeated zitadel.project.v1.GrantedProject result = 2;
 }
 
 message AddProjectGrantRequest {
