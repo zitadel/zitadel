@@ -43,7 +43,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     public searchOrg(domain: string): void {
         this.mgmtService.getOrgByDomainGlobal(domain).then((ret) => {
             const tmp = ret.toObject();
-            this.authService.GetActiveOrg().then((org) => {
+            this.authService.getActiveOrg().then((org) => {
                 if (tmp !== org) {
                     this.org = tmp;
                 }

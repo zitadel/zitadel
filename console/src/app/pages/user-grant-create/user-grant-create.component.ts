@@ -4,8 +4,8 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserTarget } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
-import { Org } from 'src/app/proto/generated/auth_pb';
-import { ProjectGrantView, ProjectRole, ProjectView, UserGrant, UserView } from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView, ProjectRole, ProjectView, UserGrant, UserView } from 'src/app/proto/generated/zitadel/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -78,7 +78,7 @@ export class UserGrantCreateComponent implements OnDestroy {
             }
         });
 
-        this.authService.GetActiveOrg().then(org => {
+        this.authService.getActiveOrg().then(org => {
             this.org = org;
         });
     }

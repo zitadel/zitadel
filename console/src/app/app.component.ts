@@ -152,7 +152,7 @@ export class AppComponent implements OnDestroy {
 
         this.authSub = this.authenticationService.authenticationChanged.subscribe((authenticated) => {
             if (authenticated) {
-                this.authService.GetActiveOrg().then(org => {
+                this.authService.getActiveOrg().then(org => {
                     this.org = org;
                 });
             }
