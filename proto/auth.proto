@@ -58,7 +58,7 @@ service AuthService {
         };
     
         option (zitadel.v1.auth_option) = {
-            permission: "user.read"
+            permission: "authenticated"
         };
     }
 
@@ -148,7 +148,7 @@ service AuthService {
 
     rpc VerifyMyEmail(VerifyMyEmailRequest) returns (VerifyMyEmailResponse) {
         option (google.api.http) = {
-            post: "/users/me/email:verify"
+            post: "/users/me/email/_verify"
             body: "*"
         };
 
@@ -214,27 +214,6 @@ service AuthService {
     rpc RemoveMyPhone(RemoveMyPhoneRequest) returns (RemoveMyPhoneResponse) {
         option (google.api.http) = {
             delete: "/users/me/phone"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
-    rpc GetMyAddress(GetMyAddressRequest) returns (GetMyAddressResponse) {
-        option (google.api.http) = {
-            get: "/users/me/address"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
-    rpc UpdateMyUserAddress(UpdateMyAddressRequest) returns (UpdateMyAddressResponse) {
-        option (google.api.http) = {
-            put: "/users/me/address"
-            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -375,6 +354,7 @@ service AuthService {
         };
     }
 
+    //DISCUSS: should we return the user grants for all resource owners or only context based?
     rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
         option (google.api.http) = {
             post: "/usergrants/me/_search"
@@ -446,7 +426,7 @@ message ListMyUserSessionsResponse {
 }
 
 message UpdateMyUserNameRequest {
-    string user_name = 1;
+    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UpdateMyUserNameResponse {
@@ -460,8 +440,8 @@ message GetMyPasswordComplexityPolicyResponse {
 }
 
 message UpdateMyPasswordRequest {
-    string old_password = 1 [(validate.rules).string = {min_len: 1, max_len: 72}];
-    string new_password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
+    string old_password = 1 [(validate.rules).string = {min_len: 1, max_bytes: 70}];
+    string new_password = 2 [(validate.rules).string = {min_len: 1, max_bytes: 70}];
 }
 
 message UpdateMyPasswordResponse {
@@ -476,11 +456,11 @@ message GetMyProfileResponse {
 }
 
 message UpdateMyProfileRequest {
-    string first_name = 1;
-    string last_name = 2;
-    string nick_name = 3;
-    string display_name = 4;
-    string preferred_language = 5;
+    string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+    string display_name = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
     zitadel.user.v1.Gender gender = 6;
 }
 
@@ -496,7 +476,7 @@ message GetMyEmailResponse {
 }
 
 message SetMyEmailRequest {
-    string email = 1;
+    string email = 1 [(validate.rules).string.email = true]; //TODO: check if no value is allowed
 }
 
 message SetMyEmailResponse {
@@ -504,7 +484,7 @@ message SetMyEmailResponse {
 }
 
 message VerifyMyEmailRequest {
-    string code = 1;
+    string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message VerifyMyEmailResponse {
@@ -525,7 +505,7 @@ message GetMyPhoneResponse {
 }
 
 message SetMyPhoneRequest {
-    string phone = 1;
+    string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
 }
 
 message SetMyPhoneResponse {
@@ -533,7 +513,7 @@ message SetMyPhoneResponse {
 }
 
 message VerifyMyPhoneRequest {
-    string code = 1;
+    string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message VerifyMyPhoneResponse {}
@@ -550,28 +530,9 @@ message RemoveMyPhoneResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetMyAddressRequest {}
-
-message GetMyAddressResponse {
-    zitadel.v1.ObjectDetails details = 1;
-    zitadel.user.v1.Address address = 2;
-}
-
-message UpdateMyAddressRequest {
-    string country = 1;
-    string locality = 2;
-    string postal_code = 3;
-    string region = 4;
-    string street_address = 5;
-}
-
-message UpdateMyAddressResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
 message ListMyLinkedIDPsRequest {
     zitadel.v1.ListQuery meta_data = 1;
-    //TODO: maybe search for idp name and linked login name?
+    //PLANNED: queries for idp name and login name
 }
 
 message ListMyLinkedIDPsResponse {
@@ -580,8 +541,8 @@ message ListMyLinkedIDPsResponse {
 }
 
 message RemoveMyLinkedIDPRequest {
-    string idp_id = 1;
-    string linked_user_id = 2;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string linked_user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveMyLinkedIDPResponse {
@@ -610,7 +571,7 @@ message AddMyMultiFactorOTPResponse {
 }
 
 message VerifyMyMultiFactorOTPRequest {
-    string code = 1;
+    string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message VerifyMyMultiFactorOTPResponse {
@@ -618,7 +579,7 @@ message VerifyMyMultiFactorOTPResponse {
 }
 
 message VerifyMyMultiFactorU2FRequest {
-    zitadel.user.v1.WebAuthNVerification verification = 1;
+    zitadel.user.v1.WebAuthNVerification verification = 1 [(validate.rules).message.required = true];
 }
 
 message VerifyMyMultiFactorU2FResponse {
@@ -632,7 +593,7 @@ message RemoveMyMultiFactorOTPResponse {
 }
 
 message RemoveMyMultiFactorU2FRequest {
-    string token_id = 1;
+    string token_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveMyMultiFactorU2FResponse {
@@ -653,7 +614,7 @@ message AddMyPasswordlessResponse {
 }
 
 message VerifyMyPasswordlessRequest {
-    zitadel.user.v1.WebAuthNVerification verification = 1;
+    zitadel.user.v1.WebAuthNVerification verification = 1 [(validate.rules).message.required = true];
 }
 
 message VerifyMyPasswordlessResponse {
@@ -661,7 +622,7 @@ message VerifyMyPasswordlessResponse {
 }
 
 message RemoveMyPasswordlessRequest {
-    string token_id = 1;
+    string token_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveMyPasswordlessResponse {
@@ -670,12 +631,20 @@ message RemoveMyPasswordlessResponse {
 
 message ListMyUserGrantsRequest {
     zitadel.v1.ListQuery query = 1;
-    //TODO: simplify i would use project.usergrant
 }
 
 message ListMyUserGrantsResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.user.v1.UserGrant result = 2;
+    repeated UserGrant result = 2;
+}
+
+message UserGrant {
+    string org_id = 1;
+    string project_id = 2;
+    string user_id = 3;
+    repeated string roles = 4;
+    string org_name = 5;
+    string grant_id = 6;
 }
 
 message ListMyProjectOrgsRequest {

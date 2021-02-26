@@ -56,7 +56,6 @@ message Email {
 }
 
 message Phone {
-    //TODO: use https://github.com/google/libphonenumber/blob/master/resources/phonenumber.proto
     string phone = 1;
     bool is_phone_verified = 2;
 }
@@ -78,6 +77,8 @@ enum Gender {
 
 message SearchQuery {
     oneof query {
+        option (validate.required) = true;
+
         UserNameQuery user_name = 1;
         FirstNameQuery first_name = 2;
         LastNameQuery last_name = 3;
@@ -90,43 +91,43 @@ message SearchQuery {
 }
 
 message UserNameQuery {
-    string user_name = 1;//TODO: validate
-    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
+    string user_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message FirstNameQuery {
-    string first_name = 1;//TODO: validate
-    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
+    string first_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message LastNameQuery {
-    string last_name = 1;//TODO: validate
-    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
+    string last_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message NickNameQuery {
-    string nick_name = 1;//TODO: validate
-    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
+    string nick_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message DisplayNameQuery {
-    string display_name = 1;//TODO: validate
-    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
+    string display_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message EmailQuery {
-    string email_address = 1; //TODO: validate
-    zitadel.v1.TextQueryMethod method = 2;//TODO: validate
+    string email_address = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 //UserStateQuery is always equals
 message StateQuery {
-    UserState state = 1; //TODO: validate
+    UserState state = 1 [(validate.rules).enum.defined_only = true];
 }
 
 //UserTypeQuery is always equals
 message TypeQuery {
-    Type type = 1; //TODO: validate
+    Type type = 1 [(validate.rules).enum.defined_only = true];
 }
 
 enum Type {
@@ -136,15 +137,15 @@ enum Type {
 }
 
 enum UserFieldName {
-    USERFIELDNAME_UNSPECIFIED = 0;
-    USERFIELDNAME_USER_NAME = 1;
-    USERFIELDNAME_FIRST_NAME = 2;
-    USERFIELDNAME_LAST_NAME = 3;
-    USERFIELDNAME_NICK_NAME = 4;
-    USERFIELDNAME_DISPLAY_NAME = 5;
-    USERFIELDNAME_EMAIL = 6;
-    USERFIELDNAME_STATE = 7;
-    USERFIELDNAME_TYPE = 8;
+    USER_FIELD_NAME_UNSPECIFIED = 0;
+    USER_FIELD_NAME_USER_NAME = 1;
+    USER_FIELD_NAME_FIRST_NAME = 2;
+    USER_FIELD_NAME_LAST_NAME = 3;
+    USER_FIELD_NAME_NICK_NAME = 4;
+    USER_FIELD_NAME_DISPLAY_NAME = 5;
+    USER_FIELD_NAME_EMAIL = 6;
+    USER_FIELD_NAME_STATE = 7;
+    USER_FIELD_NAME_TYPE = 8;
 }
 
 message MultiFactor {
@@ -153,20 +154,13 @@ message MultiFactor {
         MultiFactorOTP otp = 2;
         MultiFactorU2F u2f = 3;
     }
-    //TODO: should it contain objectdetails?
 }
 
 enum MultiFactorState {
-    MultiFactor_STATE_UNSPECIFIED = 0;
-    MultiFactor_STATE_NOT_READY = 1;
-    MultiFactor_STATE_READY = 2;
-    MultiFactor_STATE_REMOVED = 3;
-}
-
-enum MultiFactorType {
-    MULTI_FACTOR_TYPE_UNSPECIFIED = 0;
-    MULTI_FACTOR_TYPE_OTP = 1;
-    MULTI_FACTOR_TYPE_U2F = 2;
+    MULTI_FACTOR_STATE_UNSPECIFIED = 0;
+    MULTI_FACTOR_STATE_NOT_READY = 1;
+    MULTI_FACTOR_STATE_READY = 2;
+    MULTI_FACTOR_STATE_REMOVED = 3;
 }
 
 message MultiFactorOTP {}
@@ -182,8 +176,8 @@ message WebAuthNKey {
 }
 
 message WebAuthNVerification {
-    bytes public_key_credential = 1;
-    string token_name = 2;
+    bytes public_key_credential = 1 [(validate.rules).bytes.min_len = 50]; //TODO: define correct min and max len
+    string token_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message WebAuthNToken {
@@ -194,34 +188,42 @@ message WebAuthNToken {
 
 message Membership {
     string user_id = 1;
-    zitadel.v1.ObjectDetails details = 2; //TODO: needed?
+    zitadel.v1.ObjectDetails details = 2;
     repeated string roles = 3;
     string display_name = 4;
     oneof type {
-        string org_id = 5;
-        string project_id = 6;
-        string project_grant_id = 7;
+        bool iam = 5;
+        string org_id = 6;
+        string project_id = 7;
+        string project_grant_id = 8;
     }
 }
 
 message MembershipQuery {
     oneof query {
+        option (validate.required) = true;
+
         MembershipOrgQuery org = 1;
         MembershipProjectQuery project = 2;
         MembershipProjectGrantQuery project_grant = 3;
+        MembershipIAMQuery iam = 4;
     }
 }
 
 message MembershipOrgQuery {
-    string org_id = 1;
+    string org_id = 1 [(validate.rules).string = {max_len: 200}];
 }
 
 message MembershipProjectQuery {
-    string project_id = 1;
+    string project_id = 1 [(validate.rules).string = {max_len: 200}];
 }
 
 message MembershipProjectGrantQuery {
-    string project_grant_id = 1;
+    string project_grant_id = 1 [(validate.rules).string = {max_len: 200}];
+}
+
+message MembershipIAMQuery {
+    bool iam = 1;
 }
 
 message Session {
@@ -242,25 +244,106 @@ enum SessionState {
 }
 
 message UserGrant {
-    string org_id = 1;
-    string project_id = 2;
-    string user_id = 3;
-    repeated string roles = 4;
-    string org_name = 5;
-    string grant_id = 6;
+    string grant_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    repeated string role_keys = 3;
+    UserGrantState state = 4;
+    
+    string user_id = 5;
+    string user_name = 6;
+    string first_name = 7;
+    string last_name = 8;
+    string email = 9;
+    string display_name = 10;
+    
+    string org_id = 11;
+    string org_name = 12;
+    string org_domain = 13;
+    
+    string project_id = 14;
+    string project_name = 15;
 }
 
 message UserGrantQuery {
     oneof query {
+        option (validate.required) = true;
+
         UserGrantProjectIDQuery project_id = 1;
-        UserGrantOrgIDQuery org_id = 2;
+        UserGrantUserIDQuery user_id = 2;
+        UserGrantWithGrantedQuery with_granted = 3;
+        UserGrantRoleKeyQuery role_key = 4;
+        UserGrantProjectGrantIDQuery project_grant_id = 5;
+        UserGrantUserNameQuery user_name = 6;
+        UserGrantFirstNameQuery first_name = 7;
+        UserGrantLastNameQuery last_name = 8;
+        UserGrantEmailQuery email = 9;
+        UserGrantOrgNameQuery org_name = 10;
+        UserGrantOrgDomainQuery org_domain = 11;
+        UserGrantProjectNameQuery project_name = 12;
+        UserGrantDisplayNameQuery display_name = 13;
     }
 }
 
 message UserGrantProjectIDQuery {
-    string project_id = 1;
+    string project_id = 1 [(validate.rules).string = {max_len: 200}];
 }
 
-message UserGrantOrgIDQuery {
-    string org_id = 1;
+message UserGrantUserIDQuery {
+    string user_id = 1 [(validate.rules).string = {max_len: 200}];
 }
+
+message UserGrantWithGrantedQuery {
+    bool with_granted = 1;
+}
+
+message UserGrantRoleKeyQuery {
+    string role_key = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantProjectGrantIDQuery {
+    string project_grant_id = 1 [(validate.rules).string = {max_len: 200}];
+}
+
+message UserGrantUserNameQuery {
+    string user_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantFirstNameQuery {
+    string first_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantLastNameQuery {
+    string last_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantEmailQuery {
+    string email = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantOrgNameQuery {
+    string org_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantOrgDomainQuery {
+    string org_domain = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantProjectNameQuery {
+    string project_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+//TODO: needed as you can search first and last name?
+message UserGrantDisplayNameQuery {
+    string first_name = 1;
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+//PLANNED: login name query

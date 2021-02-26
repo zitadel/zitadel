@@ -11,7 +11,7 @@ import "zitadel/project.proto";
 import "zitadel/policy.proto";
 import "zitadel/message.proto";
 import "zitadel/change.proto";
-import "zitadel/auth_n.proto";
+import "zitadel/auth_n_key.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -343,27 +343,6 @@ service ManagementService {
         };
     }
 
-    rpc GetHumanAddress(GetHumanAddressRequest) returns (GetHumanAddressResponse) {
-        option (google.api.http) = {
-            get: "/users/{user_id}/address"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "user.read"
-        };
-    }
-
-    rpc UpdateHumanAddress(UpdateHumanAddressRequest) returns (UpdateHumanAddressResponse) {
-        option (google.api.http) = {
-            put: "/users/{user_id}/address"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "user.write"
-        };
-    }
-
     // A Manager is only allowed to set an initial password, on the next login the user has to change his password
     rpc SetHumanInitialPassword(SetHumanInitialPasswordRequest) returns (SetHumanInitialPasswordResponse) {
         option (google.api.http) = {
@@ -387,7 +366,7 @@ service ManagementService {
         };
     }
 
-    rpc ListUserMultiFactors(ListUserMultiFactorsRequest) returns (ListUserMultiFactorsResponse) {
+    rpc ListHumanMultiFactors(ListHumanMultiFactorsRequest) returns (ListHumanMultiFactorsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/mfas"
         };
@@ -545,7 +524,7 @@ service ManagementService {
 
     rpc ListOrgChanges(ListOrgChangesRequest) returns (ListOrgChangesResponse) {
         option (google.api.http) = {
-            get: "/orgs/{org_id}/changes"
+            get: "/orgs/me/changes"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -974,7 +953,8 @@ service ManagementService {
         };
     
         option (zitadel.v1.auth_option) = {
-            permission: "app.read"
+            permission: "project.app.read"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -1760,23 +1740,15 @@ message GetOIDCInformationResponse {
     string discovery_endpoint = 2;  
 }
 
-message GetIAMRequest {
-    enum SetupStep {
-        SETUP_STEP_UNDEFINED = 0;
-        SETUP_STEP_1 = 1;
-        SETUP_STEP_2 = 2;
-    }
+message GetIAMRequest {}
 
+message GetIAMResponse {
     string global_org_id = 1;
     string iam_project_id = 2;
-    SetupStep set_up_done = 3;
-    SetupStep set_up_started = 4;
 }
 
-message GetIAMResponse {}
-
 message GetUserByIDRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetUserByIDResponse {
@@ -1784,7 +1756,7 @@ message GetUserByIDResponse {
 }
 
 message GetUserByLoginNameGlobalRequest{
-    string login_name = 1;
+    string login_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetUserByLoginNameGlobalResponse {
@@ -1805,7 +1777,7 @@ message ListUsersResponse {
 
 message ListUserChangesRequest {
     zitadel.v1.ListQuery query = 1;
-    string user_id = 2;
+    string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ListUserChangesResponse {
@@ -1814,12 +1786,8 @@ message ListUserChangesResponse {
 }
 
 message IsUserUniqueRequest {
-    string user_name = 1 [
-        (validate.rules).string.pattern = "^[^[:space:]]{1,200}$"
-    ];
-    string login_name = 2  [
-        (validate.rules).string = {min_len: 1, max_len: 200}
-    ];
+    string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
+    string email = 2  [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message IsUserUniqueResponse {
@@ -1828,36 +1796,28 @@ message IsUserUniqueResponse {
 
 message AddHumanUserRequest {
     message Profile {
-        string first_name = 1;
-        string last_name = 2;
-        string nick_name = 3;
-        string display_name = 4;
-        string preferred_language = 5;
+        string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+        string display_name = 4 [(validate.rules).string = {max_len: 200}];
+        string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
         zitadel.user.v1.Gender gender = 6;
     }
     message Email {
-        string email = 1;
+        string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
         bool is_email_verified = 2;
     }
     message Phone {
-        //TODO: use https://github.com/google/libphonenumber/blob/master/resources/phonenumber.proto
-        string phone = 1;
+        // has to be a global number
+        string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
         bool is_phone_verified = 2;
     }
-    message Address {
-        string country = 1;
-        string locality = 2;
-        string postal_code = 3;
-        string region = 4;
-        string street_address = 5;
-    }
 
-    string user_name = 1;
+    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-    Profile profile = 2;
-    Email email = 3;
+    Profile profile = 2 [(validate.rules).message.required = true];
+    Email email = 3 [(validate.rules).message.required = true];
     Phone phone = 4;
-    Address address = 5;
 }
 message AddHumanUserResponse {
     string user_id = 1;
@@ -1865,10 +1825,10 @@ message AddHumanUserResponse {
 }
 
 message AddMachineUserRequest {
-    string user_name = 1;
+    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-    string name = 2;
-    string description = 3;
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string description = 3 [(validate.rules).string = {max_len: 500}];
 }
 
 message AddMachineUserResponse {
@@ -1877,7 +1837,7 @@ message AddMachineUserResponse {
 }
 
 message DeactivateUserRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateUserResponse {
@@ -1885,7 +1845,7 @@ message DeactivateUserResponse {
 }
 
 message ReactivateUserRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ReactivateUserResponse {
@@ -1893,7 +1853,7 @@ message ReactivateUserResponse {
 }
 
 message LockUserRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message LockUserResponse {
@@ -1901,7 +1861,7 @@ message LockUserResponse {
 }
 
 message UnlockUserRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UnlockUserResponse {
@@ -1909,7 +1869,7 @@ message UnlockUserResponse {
 }
 
 message RemoveUserRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveUserResponse {
@@ -1917,8 +1877,8 @@ message RemoveUserResponse {
 }
 
 message UpdateUserNameRequest {
-    string user_id = 1;
-    string user_name = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UpdateUserNameResponse {
@@ -1926,7 +1886,7 @@ message UpdateUserNameResponse {
 }
 
 message GetHumanProfileRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetHumanProfileResponse {
@@ -1935,13 +1895,13 @@ message GetHumanProfileResponse {
 }
 
 message UpdateHumanProfileRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-    string first_name = 2;
-    string last_name = 3;
-    string nick_name = 4;
-    string display_name = 5;
-    string preferred_language = 6;
+    string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string nick_name = 4 [(validate.rules).string = {max_len: 200}];
+    string display_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string preferred_language = 6 [(validate.rules).string = {max_len: 10}];
     zitadel.user.v1.Gender gender = 7;
 }
 
@@ -1950,7 +1910,7 @@ message UpdateHumanProfileResponse {
 }
 
 message GetHumanEmailRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetHumanEmailResponse {
@@ -1959,9 +1919,9 @@ message GetHumanEmailResponse {
 }
 
 message UpdateHumanEmailRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-    string email = 2;
+    string email = 2 [(validate.rules).string.email = true];
     bool is_email_verified = 3;
 }
 
@@ -1970,13 +1930,13 @@ message UpdateHumanEmailResponse {
 }
 
 message ResendHumanInitializationRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ResendHumanInitializationResponse {}
 
 message ResendEmailVerificationRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ResendEmailVerificationResponse {
@@ -1984,7 +1944,7 @@ message ResendEmailVerificationResponse {
 }
 
 message GetHumanPhoneRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetHumanPhoneResponse {
@@ -1993,10 +1953,10 @@ message GetHumanPhoneResponse {
 }
 
 message UpdateHumanPhoneRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
 
-    string phone = 2;
+    string phone = 2 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
     bool is_phone_verified = 3;
 }
 
@@ -2005,7 +1965,7 @@ message UpdateHumanPhoneResponse {
 }
 
 message RemoveHumanPhoneRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveHumanPhoneResponse {
@@ -2013,33 +1973,10 @@ message RemoveHumanPhoneResponse {
 }
 
 message ResendHumanPhoneVerificationRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ResendHumanPhoneVerificationResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message GetHumanAddressRequest {
-    string user_id = 1;
-}
-
-message GetHumanAddressResponse {
-    zitadel.v1.ObjectDetails details = 1;
-    zitadel.user.v1.Address address = 2;
-}
-
-message UpdateHumanAddressRequest {
-    string user_id = 1;
-
-    string country = 2;
-    string locality = 3;
-    string postal_code = 4;
-    string region = 5;
-    string street_address = 6;
-}
-
-message UpdateHumanAddressResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -2057,24 +1994,24 @@ message SendHumanResetPasswordNotificationRequest {
         TYPE_EMAIL = 0;
         TYPE_SMS = 1;
     }
-    string user_id = 1;
-    Type type = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    Type type = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message SendHumanResetPasswordNotificationResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListUserMultiFactorsRequest {
-    string user_id = 1;
+message ListHumanMultiFactorsRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message ListUserMultiFactorsResponse {
+message ListHumanMultiFactorsResponse {
     repeated zitadel.user.v1.MultiFactor result = 1;
 }
 
 message RemoveHumanMultiFactorOTPRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveHumanMultiFactorOTPResponse {
@@ -2082,7 +2019,7 @@ message RemoveHumanMultiFactorOTPResponse {
 }
 
 message RemoveHumanMultiFactorU2FRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveHumanMultiFactorU2FResponse {
@@ -2090,7 +2027,7 @@ message RemoveHumanMultiFactorU2FResponse {
 }
 
 message ListHumanPasswordlessRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ListHumanPasswordlessResponse {
@@ -2098,8 +2035,8 @@ message ListHumanPasswordlessResponse {
 }
 
 message RemoveHumanPasswordlessRequest {
-    string user_id = 1;
-    string token_id = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveHumanPasswordlessResponse {
@@ -2107,7 +2044,7 @@ message RemoveHumanPasswordlessResponse {
 }
 
 message UpdateMachineRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string description = 2 [(validate.rules).string.max_len = 500];
     string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -2117,8 +2054,8 @@ message UpdateMachineResponse {
 }
 
 message GetMachineKeyByIDsRequest {
-    string user_id = 1;
-    string key_id = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetMachineKeyByIDsResponse {
@@ -2126,7 +2063,7 @@ message GetMachineKeyByIDsResponse {
 }
 
 message ListMachineKeysRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery meta_data = 2;
 }
 
@@ -2137,7 +2074,7 @@ message ListMachineKeysResponse {
 
 message AddMachineKeyRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
-    zitadel.authn.v1.KeyType type = 2 [(validate.rules).enum = {not_in: [0]}];
+    zitadel.authn.v1.KeyType type = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
     google.protobuf.Timestamp expiration_date = 3;
 }
   
@@ -2148,8 +2085,8 @@ message AddMachineKeyResponse {
 }
 
 message RemoveMachineKeyRequest {
-    string user_id = 1;
-    string key_id = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveMachineKeyResponse {
@@ -2157,7 +2094,7 @@ message RemoveMachineKeyResponse {
 }
 
 message ListUserIDPsRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery meta_data = 2;
 }
 
@@ -2167,9 +2104,9 @@ message ListUserIDPsResponse {
 }
 
 message RemoveUserIDPRequest {
-    string user_id = 1;
-    string idp_id = 2;
-    string linked_user_id = 3;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string idp_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string linked_user_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveUserIDPResponse {
@@ -2177,7 +2114,7 @@ message RemoveUserIDPResponse {
 }
 
 message ListUserMembershipsRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.user.v1.MembershipQuery queries = 3;
 }
@@ -2194,12 +2131,11 @@ message GetMyOrgResponse {
 }
 
 message GetOrgByDomainGlobalRequest {
-    string domain = 1;
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ListOrgChangesRequest {
     zitadel.v1.ListQuery query = 1;
-    string org_id = 2;
 }
 
 message ListOrgChangesResponse {
@@ -2212,7 +2148,7 @@ message GetOrgByDomainGlobalResponse {
 }
 
 message AddOrgRequest {
-    string name = 1;
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message AddOrgResponse {
@@ -2249,7 +2185,7 @@ message ListOrgDomainsResponse {
 }
 
 message AddOrgDomainRequest {
-    string domain = 1;
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message AddOrgDomainResponse {
@@ -2257,7 +2193,7 @@ message AddOrgDomainResponse {
 }
 
 message RemoveOrgDomainRequest {
-    string domain = 1;
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveOrgDomainResponse {
@@ -2265,8 +2201,8 @@ message RemoveOrgDomainResponse {
 }
 
 message GenerateOrgDomainValidationRequest {
-    string domain = 1;
-    zitadel.org.v1.DomainValidationType type = 2;
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.org.v1.DomainValidationType type = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message GenerateOrgDomainValidationResponse {
@@ -2276,7 +2212,7 @@ message GenerateOrgDomainValidationResponse {
 }
 
 message ValidateOrgDomainRequest {
-    string domain = 1;
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ValidateOrgDomainResponse {
@@ -2284,7 +2220,7 @@ message ValidateOrgDomainResponse {
 }
 
 message SetPrimaryOrgDomainRequest {
-    string domain = 1;
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message SetPrimaryOrgDomainResponse {
@@ -2308,7 +2244,7 @@ message ListOrgMembersResponse {
 }
 
 message AddOrgMemberRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 2;
 }
 message AddOrgMemberResponse {
@@ -2316,7 +2252,7 @@ message AddOrgMemberResponse {
 }
 
 message UpdateOrgMemberRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 2;
 }
 
@@ -2325,7 +2261,7 @@ message UpdateOrgMemberResponse {
 }
 
 message RemoveOrgMemberRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveOrgMemberResponse {
@@ -2333,7 +2269,7 @@ message RemoveOrgMemberResponse {
 }
 
 message GetProjectByIDRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetProjectByIDResponse {
@@ -2341,8 +2277,8 @@ message GetProjectByIDResponse {
 }
 
 message GetGrantedProjectByIDRequest {
-    string project_id = 1;
-    string grant_id = 2;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetGrantedProjectByIDResponse {
@@ -2371,7 +2307,7 @@ message ListGrantedProjectsResponse {
 
 message ListProjectChangesRequest {
     zitadel.v1.ListQuery query = 1;
-    string project_id = 2;
+    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ListProjectChangesResponse {
@@ -2386,12 +2322,12 @@ message AddProjectRequest {
 }
 
 message AddProjectResponse {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ObjectDetails details = 2;
 }
 
 message UpdateProjectRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1}];
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool project_role_assertion = 3;
     bool project_role_check = 4;
@@ -2402,7 +2338,7 @@ message UpdateProjectResponse {
 }
 
 message DeactivateProjectRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateProjectResponse {
@@ -2410,7 +2346,7 @@ message DeactivateProjectResponse {
 }
 
 message ReactivateProjectRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ReactivateProjectResponse {
@@ -2418,7 +2354,7 @@ message ReactivateProjectResponse {
 }
 
 message RemoveProjectRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveProjectResponse {
@@ -2433,10 +2369,10 @@ message ListProjectMemberRolesResponse {
 }
 
 message AddProjectRoleRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string role_key = 2 [(validate.rules).string = {min_len: 1}];
-    string display_name = 3;
-    string group = 4;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string role_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string display_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string group = 4 [(validate.rules).string = {max_len: 200}];
 }
 
 message AddProjectRoleResponse {
@@ -2445,12 +2381,12 @@ message AddProjectRoleResponse {
 
 message BulkAddProjectRolesRequest {
     message Role {
-        string key = 1 [(validate.rules).string = {min_len: 1}];
-        string display_name = 2;
-        string group = 3;
+        string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string display_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string group = 3 [(validate.rules).string = {max_len: 200}];
     }
 
-    string project_id = 1;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated Role roles = 2;
 }
 
@@ -2459,10 +2395,10 @@ message BulkAddProjectRolesResponse {
 }
 
 message UpdateProjectRoleRequest {
-    string project_id = 1;
-    string role_key = 2 [(validate.rules).string = {min_len: 1}];
-    string display_name = 3;
-    string group = 4;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string role_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string display_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string group = 4 [(validate.rules).string = {max_len: 200}];
 }
 
 message UpdateProjectRoleResponse {
@@ -2470,8 +2406,8 @@ message UpdateProjectRoleResponse {
 }
 
 message RemoveProjectRoleRequest {
-    string project_id = 1;
-    string role_key = 2;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string role_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveProjectRoleResponse {
@@ -2479,7 +2415,7 @@ message RemoveProjectRoleResponse {
 }
 
 message ListProjectRolesRequest {
-    string project_id = 1;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.project.v1.RoleQuery queries = 3;
 }
@@ -2490,7 +2426,7 @@ message ListProjectRolesResponse {
 }
 
 message ListProjectMembersRequest {
-    string project_id = 1;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.member.v1.SearchQuery queries = 3;
 }
@@ -2501,8 +2437,8 @@ message ListProjectMembersResponse {
 }
 
 message AddProjectMemberRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string user_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 3;
 }
 
@@ -2511,8 +2447,8 @@ message AddProjectMemberResponse {
 }
 
 message UpdateProjectMemberRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string user_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 3;
 }
 
@@ -2521,8 +2457,8 @@ message UpdateProjectMemberResponse {
 }
 
 message RemoveProjectMemberRequest {
-    string project_id = 1;
-    string user_id = 2;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveProjectMemberResponse {
@@ -2530,8 +2466,8 @@ message RemoveProjectMemberResponse {
 }
 
 message GetAppByIDRequest {
-    string project_id = 1;
-    string app_id = 2;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetAppByIDResponse {
@@ -2539,7 +2475,7 @@ message GetAppByIDResponse {
 }
 
 message ListAppsRequest {
-    string project_id = 1;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.app.v1.AppQuery queries = 3;
 }
@@ -2551,8 +2487,8 @@ message ListAppsResponse {
    
 message ListAppChangesRequest {
     zitadel.v1.ListQuery query = 1;
-    string project_id = 2;
-    string app_id = 3;
+    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ListAppChangesResponse {
@@ -2561,17 +2497,17 @@ message ListAppChangesResponse {
 }
 
 message AddOIDCAppRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string redirect_uris = 3;
     repeated zitadel.app.v1.OIDCResponseType response_types = 4;
     repeated zitadel.app.v1.OIDCGrantType grant_types = 5;
-    zitadel.app.v1.OIDCAppType app_type = 6;
-    zitadel.app.v1.OIDCAuthMethodType auth_method_type = 7;
+    zitadel.app.v1.OIDCAppType app_type = 6 [(validate.rules).enum = {defined_only: true}];
+    zitadel.app.v1.OIDCAuthMethodType auth_method_type = 7 [(validate.rules).enum = {defined_only: true}];
     repeated string post_logout_redirect_uris = 8;
-    zitadel.app.v1.OIDCVersion version = 9;
+    zitadel.app.v1.OIDCVersion version = 9 [(validate.rules).enum = {defined_only: true}];
     bool dev_mode = 10;
-    zitadel.app.v1.OIDCTokenType access_token_type = 11;
+    zitadel.app.v1.OIDCTokenType access_token_type = 11 [(validate.rules).enum = {defined_only: true}];
     bool access_token_role_assertion = 12;
     bool id_token_role_assertion = 13;
     bool id_token_userinfo_assertion = 14;
@@ -2579,7 +2515,7 @@ message AddOIDCAppRequest {
 }
 
 message AddOIDCAppResponse {
-    string app_id = 1;
+    string app_id = 1
     zitadel.v1.ObjectDetails details = 2;
     string client_id = 3;
     string client_secret = 4;
@@ -2588,9 +2524,9 @@ message AddOIDCAppResponse {
 }
 
 message AddAPIAppRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.app.v1.APIAuthMethodType auth_method_type = 3;
+    zitadel.app.v1.APIAuthMethodType auth_method_type = 3 [(validate.rules).enum = {defined_only: true}];
 }
 
 message AddAPIAppResponse {
@@ -2601,8 +2537,8 @@ message AddAPIAppResponse {
 }
 
 message UpdateAppRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string app_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -2611,17 +2547,17 @@ message UpdateAppResponse {
 }
 
 message UpdateOIDCAppConfigRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string app_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     
     repeated string redirect_uris = 3;
     repeated zitadel.app.v1.OIDCResponseType response_types = 4;
     repeated zitadel.app.v1.OIDCGrantType grant_types = 5;
-    zitadel.app.v1.OIDCAppType app_type = 6;
-    zitadel.app.v1.OIDCAuthMethodType auth_method_type = 7;
+    zitadel.app.v1.OIDCAppType app_type = 6 [(validate.rules).enum = {defined_only: true}];
+    zitadel.app.v1.OIDCAuthMethodType auth_method_type = 7 [(validate.rules).enum = {defined_only: true}];
     repeated string post_logout_redirect_uris = 8;
     bool dev_mode = 9;
-    zitadel.app.v1.OIDCTokenType access_token_type = 10;
+    zitadel.app.v1.OIDCTokenType access_token_type = 10 [(validate.rules).enum = {defined_only: true}];
     bool access_token_role_assertion = 11;
     bool id_token_role_assertion = 12;
     bool id_token_userinfo_assertion = 13;
@@ -2633,9 +2569,9 @@ message UpdateOIDCAppConfigResponse {
 }
 
 message UpdateAPIAppConfigRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string app_id = 2 [(validate.rules).string = {min_len: 1}];
-    zitadel.app.v1.APIAuthMethodType auth_method_type = 7;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.app.v1.APIAuthMethodType auth_method_type = 7 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateAPIAppConfigResponse {
@@ -2643,8 +2579,8 @@ message UpdateAPIAppConfigResponse {
 }
 
 message DeactivateAppRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string app_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateAppResponse {
@@ -2652,8 +2588,8 @@ message DeactivateAppResponse {
 }
 
 message ReactivateAppRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string app_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ReactivateAppResponse {
@@ -2661,8 +2597,8 @@ message ReactivateAppResponse {
 }
 
 message RemoveAppRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string app_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveAppResponse {
@@ -2670,8 +2606,8 @@ message RemoveAppResponse {
 }
 
 message RegenerateOIDCClientSecretRequest {
-    string project_id = 1;
-    string app_id = 2;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RegenerateOIDCClientSecretResponse {
@@ -2680,8 +2616,8 @@ message RegenerateOIDCClientSecretResponse {
 }
 
 message RegenerateAPIClientSecretRequest {
-    string project_id = 1;
-    string app_id = 2;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RegenerateAPIClientSecretResponse {
@@ -2690,9 +2626,9 @@ message RegenerateAPIClientSecretResponse {
 }
 
 message GetAPIClientKeyRequest {
-    string project_id = 1 [(validate.rules).string.min_len = 1];
-    string app_id = 2 [(validate.rules).string.min_len = 1];
-    string key_id = 3 [(validate.rules).string.min_len = 1];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetAPIClientKeyResponse {
@@ -2701,8 +2637,8 @@ message GetAPIClientKeyResponse {
 
 message ListAPIClientKeysRequest {
     zitadel.v1.ListQuery meta_data = 1;
-    string app_id = 2;
-    string project_id = 3;
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 message ListAPIClientKeysResponse {
     zitadel.v1.ListDetails details = 1;
@@ -2710,9 +2646,9 @@ message ListAPIClientKeysResponse {
 }
 
 message AddAPIClientKeyRequest {
-    string project_id = 1 [(validate.rules).string.min_len = 1];
-    string app_id = 2 [(validate.rules).string.min_len = 1];
-    zitadel.authn.v1.KeyType type = 3 [(validate.rules).enum = {not_in: [0]}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.authn.v1.KeyType type = 3 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
     google.protobuf.Timestamp expiration_date = 4;
 }
 
@@ -2723,9 +2659,9 @@ message AddAPIClientKeyResponse {
 }
 
 message RemoveAPIClientKeyRequest {
-    string project_id = 1 [(validate.rules).string.min_len = 1];
-    string app_id = 2 [(validate.rules).string.min_len = 1];
-    string key_id = 3 [(validate.rules).string.min_len = 1];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveAPIClientKeyResponse {
@@ -2733,8 +2669,8 @@ message RemoveAPIClientKeyResponse {
 }
 
 message GetProjectGrantByIDRequest {
-    string project_id = 1;
-    string grant_id = 2;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetProjectGrantByIDResponse {
@@ -2742,19 +2678,19 @@ message GetProjectGrantByIDResponse {
 }
 
 message ListProjectGrantsRequest {
-    string project_id = 1;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery meta_data = 2;
     repeated zitadel.project.v1.ProjectGrantQuery queries = 3;
 }
 
 message ListProjectGrantsResponse {
     zitadel.v1.ListDetails meta_data = 1;
-    repeated zitadel.project.v1.GrantedProject result = 2;
+    repeated zitadel.project.v1.GrantedProject result = 2; //TODO: naming?
 }
 
 message AddProjectGrantRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string granted_org_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string granted_org_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string role_keys = 3;
 }
 
@@ -2764,8 +2700,8 @@ message AddProjectGrantResponse {
 }
 
 message UpdateProjectGrantRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string role_keys = 3;
 }
 
@@ -2774,8 +2710,8 @@ message UpdateProjectGrantResponse {
 }
 
 message DeactivateProjectGrantRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateProjectGrantResponse {
@@ -2783,23 +2719,22 @@ message DeactivateProjectGrantResponse {
 }
 
 message ReactivateProjectGrantRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 message ReactivateProjectGrantResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveProjectGrantRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 message RemoveProjectGrantResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListProjectGrantMemberRolesRequest {
-    //TODO: shall we create an object per member type? ProjectMember, ...
     zitadel.v1.ListQuery meta_data = 1;
     repeated string result = 2;
 }
@@ -2810,8 +2745,8 @@ message ListProjectGrantMemberRolesResponse {
 }
 
 message ListProjectGrantMembersRequest {
-    string project_id = 1;
-    string grant_id = 2;
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery meta_data = 3;
     repeated zitadel.member.v1.SearchQuery queries = 4;
 }
@@ -2822,9 +2757,9 @@ message ListProjectGrantMembersResponse {
 }
 
 message AddProjectGrantMemberRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
-    string user_id = 3 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 4;
 }
 
@@ -2833,9 +2768,9 @@ message AddProjectGrantMemberResponse {
 }
 
 message UpdateProjectGrantMemberRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
-    string user_id = 3 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 4;
 }
 
@@ -2844,9 +2779,9 @@ message UpdateProjectGrantMemberResponse {
 }
 
 message RemoveProjectGrantMemberRequest {
-    string project_id = 1 [(validate.rules).string = {min_len: 1}];
-    string grant_id = 2 [(validate.rules).string = {min_len: 1}];
-    string user_id = 3 [(validate.rules).string = {min_len: 1}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveProjectGrantMemberResponse {
@@ -2854,27 +2789,27 @@ message RemoveProjectGrantMemberResponse {
 }
 
 message GetUserGrantByIDRequest {
-    string user_id = 1;
-    string grant_id = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetUserGrantByIDResponse {
-    zitadel.project.v1.UserGrant user_grant = 1;
+    zitadel.user.v1.UserGrant user_grant = 1;
 }
 
 message ListUserGrantRequest {
     zitadel.v1.ListQuery meta_data = 1;
-    repeated zitadel.project.v1.UserGrantQuery queries = 2;
+    repeated zitadel.user.v1.UserGrantQuery queries = 2;
 }
 
 message ListUserGrantResponse {
     zitadel.v1.ListDetails meta_data = 1;
-    repeated zitadel.project.v1.UserGrant result = 2;
+    repeated zitadel.user.v1.UserGrant result = 2;
 }
 
 message AddUserGrantRequest {
-    string user_id = 1;
-    string project_id = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message AddUserGrantResponse {
@@ -2883,8 +2818,8 @@ message AddUserGrantResponse {
 }
 
 message UpdateUserGrantRequest {
-    string user_id = 1;
-    string grant_id = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UpdateUserGrantResponse {
@@ -2892,8 +2827,8 @@ message UpdateUserGrantResponse {
 }
 
 message DeactivateUserGrantRequest {
-    string user_id = 1;
-    string grant_id = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateUserGrantResponse {
@@ -2901,8 +2836,8 @@ message DeactivateUserGrantResponse {
 }
 
 message ReactivateUserGrantRequest {
-    string user_id = 1;
-    string grant_id = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ReactivateUserGrantResponse {
@@ -2910,8 +2845,8 @@ message ReactivateUserGrantResponse {
 }
 
 message RemoveUserGrantRequest {
-    string user_id = 1;
-    string grant_id = 2;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveUserGrantResponse {
@@ -2919,7 +2854,6 @@ message RemoveUserGrantResponse {
 }
 
 message BulkRemoveUserGrantRequest {
-    //TODO: dont we need user_id?
     repeated string grant_id = 1;
 }
 
@@ -2950,7 +2884,7 @@ message AddCustomLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    zitadel.user.v1.MultiFactorType passwordless_type = 5;
+    zitadel.policy.v1.MultiFactorType passwordless_type = 5;
 }
 
 message AddCustomLoginPolicyResponse {
@@ -2962,7 +2896,7 @@ message UpdateCustomLoginPolicyRequest {
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
-    zitadel.user.v1.MultiFactorType passwordless_type = 5;
+    zitadel.policy.v1.MultiFactorType passwordless_type = 5;
 }
 
 message UpdateCustomLoginPolicyResponse {
@@ -2985,7 +2919,7 @@ message ListLoginPolicyIDPsResponse {
 }
 
 message AddIDPToLoginPolicyRequest {
-    string idp_id = 1;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message AddIDPToLoginPolicyResponse {
@@ -2993,7 +2927,7 @@ message AddIDPToLoginPolicyResponse {
 }
 
 message RemoveIDPFromLoginPolicyRequest {
-    string idp_id = 1;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveIDPFromLoginPolicyResponse {
@@ -3008,14 +2942,14 @@ message ListLoginPolicySecondFactorsResponse {
 }
 
 message AddSecondFactorToLoginPolicyRequest {
-    zitadel.policy.v1.SecondFactorType second_factor = 1;
+    zitadel.policy.v1.SecondFactorType second_factor = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 message AddSecondFactorToLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveSecondFactorFromLoginPolicyRequest {
-    zitadel.policy.v1.SecondFactorType second_factor = 1;
+    zitadel.policy.v1.SecondFactorType second_factor = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message RemoveSecondFactorFromLoginPolicyResponse {
@@ -3030,7 +2964,7 @@ message ListLoginPolicyMultiFactorsResponse {
 }
 
 message AddMultiFactorToLoginPolicyRequest {
-    zitadel.policy.v1.MultiFactorType multi_factor = 1;
+    zitadel.policy.v1.MultiFactorType multi_factor = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message AddMultiFactorToLoginPolicyResponse {
@@ -3038,7 +2972,7 @@ message AddMultiFactorToLoginPolicyResponse {
 }
 
 message RemoveMultiFactorFromLoginPolicyRequest {
-    zitadel.policy.v1.MultiFactorType multi_factor = 1;
+    zitadel.policy.v1.MultiFactorType multi_factor = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message RemoveMultiFactorFromLoginPolicyResponse {
@@ -3102,8 +3036,8 @@ message GetDefaultPasswordAgePolicyResponse {
 }
 
 message AddCustomPasswordAgePolicyRequest {
-    uint64 max_age_days = 1;
-    uint64 expire_warn_days = 2;
+    uint32 max_age_days = 1;
+    uint32 expire_warn_days = 2;
 }
 
 message AddCustomPasswordAgePolicyResponse {
@@ -3111,8 +3045,8 @@ message AddCustomPasswordAgePolicyResponse {
 }
 
 message UpdateCustomPasswordAgePolicyRequest {
-    uint64 max_age_days = 1;
-    uint64 expire_warn_days = 2;
+    uint32 max_age_days = 1;
+    uint32 expire_warn_days = 2;
 }
 
 message UpdateCustomPasswordAgePolicyResponse {
@@ -3139,7 +3073,7 @@ message GetDefaultPasswordLockoutPolicyResponse {
 }
 
 message AddCustomPasswordLockoutPolicyRequest {
-    uint64 max_attempts = 1;
+    uint32 max_attempts = 1;
     bool show_lockout_failure = 2;
 }
 
@@ -3148,7 +3082,7 @@ message AddCustomPasswordLockoutPolicyResponse {
 }
 
 message UpdateCustomPasswordLockoutPolicyRequest {
-    uint64 max_attempts = 1;
+    uint32 max_attempts = 1;
     bool show_lockout_failure = 2;
 }
 
@@ -3163,7 +3097,7 @@ message ResetPasswordLockoutPolicyToDefaultResponse {
 }
 
 message GetOrgIDPByIDRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetOrgIDPByIDResponse {
@@ -3173,7 +3107,17 @@ message GetOrgIDPByIDResponse {
 message ListOrgIDPsRequest {
     zitadel.v1.ListQuery meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
-    repeated zitadel.idp.v1.IDPQuery queries = 3;
+    repeated IDPQuery queries = 3;
+}
+
+message IDPQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        zitadel.idp.v1.IDPIDQuery idp_id = 1;
+        zitadel.idp.v1.IDPNameQuery idp_name = 2;
+        zitadel.idp.v1.IDPOwnerTypeQuery owner_type = 3;
+    }
 }
 
 message ListOrgIDPsResponse {
@@ -3183,16 +3127,15 @@ message ListOrgIDPsResponse {
 }
 
 message AddOrgOIDCIDPRequest {
-    string id = 1;
-    string name = 2;
-    zitadel.idp.v1.IDPStylingType styling_type = 3;
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [(validate.rules).enum = {defined_only: true}];
 
-    string client_id = 4;
-    string client_secret = 5;
-    string issuer = 6;
-    repeated string scopes = 7;
-    zitadel.idp.v1.OIDCMappingField display_name_mapping = 8;
-    zitadel.idp.v1.OIDCMappingField username_mapping = 9;
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 6;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 7 [(validate.rules).enum = {defined_only: true}];
+    zitadel.idp.v1.OIDCMappingField username_mapping = 8 [(validate.rules).enum = {defined_only: true}];
 }
 
 message AddOrgOIDCIDPResponse {
@@ -3201,7 +3144,7 @@ message AddOrgOIDCIDPResponse {
 }
 
 message DeactivateOrgIDPRequest {
-    string idp_id = 1;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateOrgIDPResponse {
@@ -3209,7 +3152,7 @@ message DeactivateOrgIDPResponse {
 }
 
 message ReactivateOrgIDPRequest {
-    string idp_id = 1;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ReactivateOrgIDPResponse {
@@ -3217,15 +3160,15 @@ message ReactivateOrgIDPResponse {
 }
 
 message RemoveOrgIDPRequest {
-    string idp_id = 1;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveOrgIDPResponse {}
 
 message UpdateOrgIDPRequest {
-    string idp_id = 1;
-    string name = 2;
-    zitadel.idp.v1.IDPStylingType styling_type = 3;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.IDPStylingType styling_type = 3 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateOrgIDPResponse {
@@ -3233,14 +3176,14 @@ message UpdateOrgIDPResponse {
 }
 
 message UpdateOrgIDPOIDCConfigRequest {
-    string idp_id = 1;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-    string client_id = 2;
-    string client_secret = 3;
-    string issuer = 4;
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {max_len: 200}];
+    string issuer = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 5;
-    zitadel.idp.v1.OIDCMappingField display_name_mapping = 6;
-    zitadel.idp.v1.OIDCMappingField username_mapping = 7;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 6 [(validate.rules).enum = {defined_only: true}];
+    zitadel.idp.v1.OIDCMappingField username_mapping = 7 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateOrgIDPOIDCConfigResponse {

@@ -620,6 +620,13 @@ message ListIDPsRequest {
     repeated zitadel.idp.v1.IDPQuery queries = 3;
 }
 
+message IDPQuery {
+    oneof query {
+        zitadel.idp.v1.IDPIDQuery idp_id = 1;
+        zitadel.idp.v1.IDPNameQuery idp_name = 2;
+    }
+}
+
 message ListIDPsResponse {
     zitadel.v1.ListDetails meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
@@ -628,14 +635,14 @@ message ListIDPsResponse {
 
 message AddOIDCIDPRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.IDPStylingType styling_type = 2;
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [(validate.rules).enum = {defined_only: true}];
 
     string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 6;
-    zitadel.idp.v1.OIDCMappingField display_name_mapping = 7;
-    zitadel.idp.v1.OIDCMappingField username_mapping = 8;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 7 [(validate.rules).enum = {defined_only: true}];
+    zitadel.idp.v1.OIDCMappingField username_mapping = 8 [(validate.rules).enum = {defined_only: true}];
 }
 
 message AddOIDCIDPResponse {
@@ -681,10 +688,10 @@ message UpdateIDPOIDCConfigRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
     repeated string scopes = 5;
-    zitadel.idp.v1.OIDCMappingField display_name_mapping = 6;
-    zitadel.idp.v1.OIDCMappingField username_mapping = 7;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 6 [(validate.rules).enum = {defined_only: true}];
+    zitadel.idp.v1.OIDCMappingField username_mapping = 7 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateIDPOIDCConfigResponse {
@@ -927,14 +934,12 @@ message ListIAMMemberRolesResponse {
 
 message ListIAMMembersRequest {
     zitadel.v1.ListQuery meta_data = 1;
-    zitadel.member.v1.MemberFieldName sorting_column = 2;
-    zitadel.member.v1.SearchQuery query = 3;
+    zitadel.member.v1.SearchQuery query = 2;
 }
 
 message ListIAMMembersResponse {
     zitadel.v1.ListDetails meta_data = 1;
-    zitadel.member.v1.MemberFieldName sorting_column = 2;
-    repeated zitadel.member.v1.Member result = 3;
+    repeated zitadel.member.v1.Member result = 2;
 }
 
 message ListViewsRequest {}

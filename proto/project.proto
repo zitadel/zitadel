@@ -11,15 +11,11 @@ message Project {
     zitadel.v1.ObjectDetails details = 2;
     string name = 3;
     ProjectState state = 4;
+    // describes if roles of user should be added in token
+    bool project_role_assertion = 5;
+    // ZITADEL checks if the user has at least one on this project
+    bool project_role_check = 6;
 }
-
-//TODO: would it make sense to return
-// message GrantedProject {
-//     string grant_id = 1;
-//     zitadel.v1.ObjectDetails details = 2;
-//     zitadel.org.v1.Org org = 3;
-//     Project project = 4;
-// }
 
 message GrantedProject {
     string grant_id = 1;
@@ -36,93 +32,6 @@ message GrantedProject {
     zitadel.v1.ObjectDetails details = 10;
 }
 
-message UserGrant {
-    string user_id = 1;
-    string grant_id = 2;
-    zitadel.v1.ObjectDetails details = 3;
-}
-
-message UserGrantQuery {
-    oneof query {
-        UserGrantProjectIDQuery project_id = 1;
-        UserGrantUserIDQuery user_id = 2;
-        UserGrantWithGrantedQuery with_granted = 3;
-        UserGrantRoleKeyQuery role_key = 4;
-        UserGrantProjectGrantIDQuery project_grant_id = 5;
-        UserGrantUserNameQuery user_name = 6;
-        UserGrantFirstNameQuery first_name = 7;
-        UserGrantLastNameQuery last_name = 8;
-        UserGrantEmailQuery email = 9;
-        UserGrantOrgNameQuery org_name = 10;
-        UserGrantOrgDomainQuery org_domain = 11;
-        UserGrantProjectNameQuery project_name = 12;
-        UserGrantDisplayNameQuery display_name = 13;
-    }
-}
-
-message UserGrantProjectIDQuery {
-    string project_id = 1;
-}
-
-message UserGrantUserIDQuery {
-    string user_id = 1;
-}
-
-message UserGrantWithGrantedQuery {
-    bool with_granted = 1;
-}
-
-message UserGrantRoleKeyQuery {
-    string role_key = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-message UserGrantProjectGrantIDQuery {
-    string project_grant_id = 1;
-}
-
-message UserGrantUserNameQuery {
-    string user_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-message UserGrantFirstNameQuery {
-    string first_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-message UserGrantLastNameQuery {
-    string first_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-//TODO: Email or login name?
-message UserGrantEmailQuery {
-    string first_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-message UserGrantOrgNameQuery {
-    string first_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-message UserGrantOrgDomainQuery {
-    string first_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-message UserGrantProjectNameQuery {
-    string first_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
-//TODO: needed as you can search first and last name?
-message UserGrantDisplayNameQuery {
-    string first_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
-}
-
 enum ProjectState {
     PROJECT_STATE_UNSPECIFIED = 0;
     PROJECT_STATE_ACTIVE = 1;
@@ -137,16 +46,17 @@ enum ProjectGrantState {
 
 message ProjectQuery {
     oneof query {
+        option (validate.required) = true;
+
         ProjectNameQuery name = 1;
     }
 }
 
 message ProjectNameQuery {
-    string name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
-//TODO: seperate file
 message Role {
     string key = 1;
     zitadel.v1.ObjectDetails details = 2;
@@ -154,37 +64,40 @@ message Role {
     string group = 4;
 }
 
-//TODO: seperate file
 message RoleQuery {
     oneof query {
+        option (validate.required) = true;
+
         RoleKeyQuery key = 1;
         RoleDisplayNameQuery display_name = 2;
     }
 }
 
 message RoleKeyQuery {
-    string key = 1;
-    zitadel.v1.TextQueryMethod method = 2;
+    string key = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message RoleDisplayNameQuery {
-    string display_name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
+    string display_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message ProjectGrantQuery {
     oneof query {
+        option (validate.required) = true;
+
         GrantProjectNameQuery project_name = 1;
         GrantRoleKeyQuery role_key = 2;
     }
 }
 
 message GrantProjectNameQuery {
-    string name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message GrantRoleKeyQuery {
-    string role_key = 1;
-    zitadel.v1.TextQueryMethod method = 2;
+    string role_key = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }

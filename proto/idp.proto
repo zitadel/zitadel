@@ -12,8 +12,9 @@ message IDP {
     IDPState state = 3;
     string name = 4;
     IDPStylingType styling_type = 5;
+    IDPOwnerType owner = 6;
     oneof config {
-        OIDCConfig oidc_config = 6;
+        OIDCConfig oidc_config = 7;
     }
 }
 
@@ -32,8 +33,6 @@ message IDPLoginPolicyLink {
     IDPType idp_type = 3;
 }
 
-//TODO: discuss links? which data are needeD?
-
 enum IDPState {
     IDP_STATE_UNSPECIFIED = 0;
     IDP_STATE_ACTIVE = 1;
@@ -48,7 +47,13 @@ enum IDPStylingType {
 enum IDPType {
     IDP_TYPE_UNSPECIFIED = 0;
     IDP_TYPE_OIDC = 1;
-    IDP_TYPE_SAML = 2;
+    //PLANNED: IDP_TYPE_SAML
+}
+
+enum IDPOwnerType {
+    IDP_OWNER_TYPE_UNSPECIFIED = 0;
+    IDP_OWNER_TYPE_SYSTEM = 1;
+    IDP_OWNER_TYPE_ORG = 2;
 }
 
 message OIDCConfig {
@@ -65,14 +70,17 @@ enum OIDCMappingField {
     OIDC_MAPPING_FIELD_EMAIL = 2;
 }
 
-message IDPQuery {
-    oneof query {
-        UserIDQuery user_id = 1;
-    }
+message IDPIDQuery {
+    string id = 1 [(validate.rules).string = {max_len: 200}];
 }
 
-message UserIDQuery {
-    string id = 1;
+message IDPNameQuery {
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message IDPOwnerTypeQuery {
+    IDPOwnerType owner_type = 1 [(validate.rules).enum = {defined_only: true}];
 }
 
 enum IDPFieldName {

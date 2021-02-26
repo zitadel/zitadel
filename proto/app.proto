@@ -27,13 +27,15 @@ enum AppState {
 
 message AppQuery {
     oneof query {
+        option (validate.required) = true;
+
         AppNameQuery name = 1;
     }
 }
 
 message AppNameQuery {
-    string name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message OIDCConfig {
@@ -57,9 +59,9 @@ message OIDCConfig {
 }
 
 enum OIDCResponseType {
-    OIDC_REPSPONSE_TYPE_CODE = 0;
-    OIDC_REPSPONSE_TYPE_ID_TOKEN = 1;
-    OIDC_REPSPONSE_TYPE_ID_TOKEN_TOKEN = 2;
+    OIDC_RESPONSE_TYPE_CODE = 0;
+    OIDC_RESPONSE_TYPE_ID_TOKEN = 1;
+    OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN = 2;
 }
 
 enum OIDCGrantType{

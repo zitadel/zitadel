@@ -11,12 +11,13 @@ message Org {
     zitadel.v1.ObjectDetails details = 2;
     OrgState state = 3;
     string name = 4;
+    string primary_domain = 5;
 }
 
 enum OrgState {
-    ORGSTATE_UNSPECIFIED = 0;
-    ORGSTATE_ACTIVATE = 1;
-    ORGSTATE_INACTIVATE = 2;
+    ORG_STATE_UNSPECIFIED = 0;
+    ORG_STATE_ACTIVATE = 1;
+    ORG_STATE_INACTIVATE = 2;
 }
 
 message Domain {
@@ -29,26 +30,28 @@ message Domain {
 }
 
 enum DomainValidationType {
-    DOMAINVALIDATIONTYPE_UNSPECIFIED = 0;
-    DOMAINVALIDATIONTYPE_HTTP = 1;
-    DOMAINVALIDATIONTYPE_DNS = 2;
+    DOMAIN_VALIDATION_TYPE_UNSPECIFIED = 0;
+    DOMAIN_VALIDATION_TYPE_HTTP = 1;
+    DOMAIN_VALIDATION_TYPE_DNS = 2;
 }
 
 message OrgQuery {
     oneof query {
+        option (validate.required) = true;
+
         OrgNameQuery name = 1;
         OrgDomainQuery domain = 2;
     }
 }
 
 message OrgNameQuery {
-    string name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message OrgDomainQuery {
-    string domain = 1;
-    zitadel.v1.TextQueryMethod method = 2;
+    string domain = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 enum OrgFieldName {
@@ -58,11 +61,13 @@ enum OrgFieldName {
 
 message DomainSearchQuery {
     oneof query {
+        option (validate.required) = true;
+
         DomainNameQuery domain_name = 1;
     }
 }
 
 message DomainNameQuery {
-    string name = 1;
-    zitadel.v1.TextQueryMethod method = 2;
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
