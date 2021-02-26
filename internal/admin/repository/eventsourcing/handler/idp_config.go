@@ -92,6 +92,10 @@ func (i *IDPConfig) processIDPConfig(event *es_models.Event) (err error) {
 		err = idp.AppendEvent(iam_model.IDPProviderTypeSystem, event)
 	case model.IDPConfigDeactivated,
 		model.IDPConfigReactivated:
+		err = idp.SetData(event)
+		if err != nil {
+			return err
+		}
 		idp, err = i.view.IDPConfigByID(idp.IDPConfigID)
 		if err != nil {
 			return err
