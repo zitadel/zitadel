@@ -41,7 +41,7 @@ message ListDetails {
     google.protobuf.Timestamp view_timestamp = 3;
 }
 
-enum TextQueryMethod {//TODO: validate
+enum TextQueryMethod {
     TEXT_QUERY_METHOD_EQUALS = 0;
     TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE = 1;
     TEXT_QUERY_METHOD_STARTS_WITH = 2;

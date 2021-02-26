@@ -3,6 +3,7 @@ syntax = "proto3";
 import "zitadel/object.proto";
 import "zitadel/message.proto";
 import "google/protobuf/duration.proto";
+import "validate/validate.proto";
 
 package zitadel.app.v1;
 

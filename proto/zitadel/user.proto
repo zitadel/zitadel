@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
+import "validate/validate.proto";
 
 package zitadel.user.v1;
 
