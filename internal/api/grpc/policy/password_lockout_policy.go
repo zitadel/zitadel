@@ -2,8 +2,8 @@ package policy
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
 )
 

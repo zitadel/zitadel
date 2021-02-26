@@ -2,9 +2,9 @@ package idp
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 	idp_pb "github.com/caos/zitadel/pkg/grpc/idp"
 )
 

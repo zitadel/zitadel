@@ -2,8 +2,8 @@ package user
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 

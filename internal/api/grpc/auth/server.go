@@ -7,8 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 	"google.golang.org/grpc"
 )

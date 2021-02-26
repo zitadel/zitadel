@@ -1,7 +1,7 @@
 package policy
 
 import (
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
 )
 

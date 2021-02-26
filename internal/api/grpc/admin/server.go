@@ -5,7 +5,10 @@ import (
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/admin"
+	"google.golang.org/grpc"
 )
 
 const (

@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 

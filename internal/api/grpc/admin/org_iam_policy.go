@@ -5,8 +5,8 @@ import (
 
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 

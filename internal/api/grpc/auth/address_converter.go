@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 )
 

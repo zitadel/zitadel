@@ -5,7 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
 

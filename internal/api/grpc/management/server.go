@@ -8,8 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/management/repository"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"google.golang.org/grpc"
 )

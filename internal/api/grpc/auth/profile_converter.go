@@ -5,7 +5,7 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 	"golang.org/x/text/language"
 )
