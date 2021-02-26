@@ -70,21 +70,21 @@
                     </button>
                 </div>
             </div>
-            <ng-container  *ngFor="let environmentV of (environmentMap | keyvalue)">
-            <div *ngIf="environmentV.value" class="environment">
-                <span class="key">{{environmentV.key}}</span>
-                <div class="environment-row">
-                    <span>{{environmentV.value}}</span>
-                    <button color="primary" [disabled]="copiedKey == environmentV.value"
-                        [matTooltip]="(copiedKey != environmentV.value ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                        appCopyToClipboard [valueToCopy]="environmentV.value"
-                        (copiedValue)="copiedKey = environmentV.key" mat-icon-button>
-                        <i *ngIf="copiedKey != environmentV.key" class="las la-clipboard"></i>
-                        <i *ngIf="copiedKey == environmentV.key" class="las la-clipboard-check"></i>
-                    </button>
+            <ng-container *ngFor="let environmentV of (environmentMap | keyvalue)">
+                <div *ngIf="environmentV.value" class="environment">
+                    <span class="key">{{environmentV.key}}</span>
+                    <div class="environment-row">
+                        <span>{{environmentV.value}}</span>
+                        <button color="primary" [disabled]="copiedKey == environmentV.value"
+                            [matTooltip]="(copiedKey != environmentV.value ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                            appCopyToClipboard [valueToCopy]="environmentV.value"
+                            (copiedValue)="copiedKey = environmentV.key" mat-icon-button>
+                            <i *ngIf="copiedKey != environmentV.key" class="las la-clipboard"></i>
+                            <i *ngIf="copiedKey == environmentV.key" class="las la-clipboard-check"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </ng-container>
+            </ng-container>
         </div>
 
         <div class="compliance"
@@ -180,7 +180,7 @@
                     </cnsl-form-field>
 
                     <cnsl-form-field appearance="outline" class="formfield">
-                        <cnsl-label>{{ 'APP.APPTYPE' | translate }}</cnsl-label>
+                        <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
                         <mat-select formControlName="applicationType">
                             <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
                                 {{ 'APP.OIDC.APPTYPE.'+type | translate }}
