@@ -3,7 +3,7 @@ package bigcache
 import (
 	a_cache "github.com/allegro/bigcache"
 	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"reflect"
 	"testing"
 )

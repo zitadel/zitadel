@@ -7,8 +7,7 @@ import (
 	"github.com/caos/logging"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
@@ -74,7 +73,7 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 	}
 }
 
-func (t *TokenView) AppendEventIfMyToken(event *models.Event) (err error) {
+func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 	view := new(TokenView)
 	switch event.Type {
 	case usr_es_model.UserTokenAdded:
@@ -115,7 +114,7 @@ func (t *TokenView) AppendEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (t *TokenView) setRootData(event *models.Event) {
+func (t *TokenView) setRootData(event *es_models.Event) {
 	t.UserID = event.AggregateID
 	t.ResourceOwner = event.ResourceOwner
 }

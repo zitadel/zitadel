@@ -2,10 +2,10 @@ package handler
 
 import (
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -17,7 +17,7 @@ const (
 
 type IDPConfig struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newIDPConfig(handler handler) *IDPConfig {

@@ -2,7 +2,7 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"

@@ -1,6 +1,6 @@
 package model
 
-import "github.com/caos/zitadel/internal/eventstore/models"
+import "github.com/caos/zitadel/internal/eventstore/v1/models"
 
 const (
 	KeyPairAggregate models.AggregateType = "key_pair"

@@ -2,25 +2,24 @@ package handler
 
 import (
 	"context"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"strings"
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 const (
@@ -31,7 +30,7 @@ type UserGrant struct {
 	handler
 	iamID        string
 	iamProjectID string
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newUserGrant(
@@ -73,7 +72,7 @@ func (u *UserGrant) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
+func (u *UserGrant) EventQuery() (*es_models.SearchQuery, error) {
 	if u.iamProjectID == "" {
 		err := u.setIamProjectID()
 		if err != nil {
@@ -89,7 +88,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (u *UserGrant) Reduce(event *models.Event) (err error) {
+func (u *UserGrant) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case proj_es_model.ProjectAggregate:
 		err = u.processProject(event)
@@ -101,7 +100,7 @@ func (u *UserGrant) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (u *UserGrant) processProject(event *models.Event) (err error) {
+func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 	switch event.Type {
 	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectMemberRemoved:
 		member := new(proj_es_model.ProjectMember)
@@ -116,7 +115,7 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 	}
 }
 
-func (u *UserGrant) processOrg(event *models.Event) (err error) {
+func (u *UserGrant) processOrg(event *es_models.Event) (err error) {
 	switch event.Type {
 	case org_es_model.OrgMemberAdded, org_es_model.OrgMemberChanged, org_es_model.OrgMemberRemoved:
 		member := new(org_es_model.OrgMember)
@@ -127,7 +126,7 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 	}
 }
 
-func (u *UserGrant) processIAMMember(event *models.Event, rolePrefix string, suffix bool) error {
+func (u *UserGrant) processIAMMember(event *es_models.Event, rolePrefix string, suffix bool) error {
 	member := new(iam_es_model.IAMMember)
 
 	switch event.Type {
@@ -174,7 +173,7 @@ func (u *UserGrant) processIAMMember(event *models.Event, rolePrefix string, suf
 	}
 }
 
-func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix string, userID string, roleKeys []string) error {
+func (u *UserGrant) processMember(event *es_models.Event, rolePrefix, roleSuffix string, userID string, roleKeys []string) error {
 	switch event.Type {
 	case org_es_model.OrgMemberAdded, proj_es_model.ProjectMemberAdded, proj_es_model.ProjectGrantMemberAdded,
 		org_es_model.OrgMemberChanged, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectGrantMemberChanged:
@@ -268,7 +267,7 @@ func (u *UserGrant) setIamProjectID() error {
 	return nil
 }
 
-func (u *UserGrant) OnError(event *models.Event, err error) error {
+func (u *UserGrant) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-VcVoJ", "id", event.AggregateID).WithError(err).Warn("something went wrong in user grant handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserGrantFailedEvent, u.view.ProcessedUserGrantFailedEvent, u.view.ProcessedUserGrantSequence, u.errorCountUntilSkip)
 }
@@ -283,7 +282,7 @@ func (u *UserGrant) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
 		return nil, err
 	}
 	iam := &iam_es_model.IAM{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: domain.IAMID,
 		},
 	}

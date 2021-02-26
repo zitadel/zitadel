@@ -2,7 +2,7 @@ package model
 
 import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"regexp"
 )
 

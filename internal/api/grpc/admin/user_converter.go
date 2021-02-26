@@ -3,7 +3,10 @@ package admin
 import (
 	"github.com/caos/logging"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/pkg/grpc/admin"
 	admin_grpc "github.com/caos/zitadel/pkg/grpc/admin"
 	"golang.org/x/text/language"
 )

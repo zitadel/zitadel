@@ -11,11 +11,11 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
@@ -139,6 +139,13 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *manage
 		IdTokenRoleAssertion:     app.IDTokenRoleAssertion,
 		IdTokenUserinfoAssertion: app.IDTokenUserinfoAssertion,
 		ClockSkew:                durationpb.New(app.ClockSkew),
+	}
+}
+
+func apiConfigFromApplicationViewModel(app *proj_model.ApplicationView) *management.APIConfig {
+	return &management.APIConfig{
+		ClientId:       app.OIDCClientID,
+		AuthMethodType: apiAuthMethodTypeFromModel(proj_model.APIAuthMethodType(app.OIDCAuthMethodType)),
 	}
 }
 
@@ -325,6 +332,10 @@ func applicationViewFromModel(application *proj_model.ApplicationView) *manageme
 	if application.IsOIDC {
 		converted.AppConfig = &management.ApplicationView_OidcConfig{
 			OidcConfig: oidcConfigFromApplicationViewModel(application),
+		}
+	} else {
+		converted.AppConfig = &management.ApplicationView_ApiConfig{
+			ApiConfig: apiConfigFromApplicationViewModel(application),
 		}
 	}
 	return converted

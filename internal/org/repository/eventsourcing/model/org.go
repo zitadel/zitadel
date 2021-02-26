@@ -7,7 +7,7 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
@@ -127,7 +127,6 @@ func (o *Org) AppendEvents(events ...*es_models.Event) error {
 func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 	switch event.Type {
 	case OrgAdded:
-		*o = Org{}
 		err = o.setData(event)
 		if err != nil {
 			return err

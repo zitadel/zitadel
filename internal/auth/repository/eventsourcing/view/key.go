@@ -1,8 +1,10 @@
 package view
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/key/repository/view"
 	"github.com/caos/zitadel/internal/key/repository/view/model"
@@ -17,12 +19,21 @@ func (v *View) KeyByIDAndType(keyID string, private bool) (*model.KeyView, error
 	return view.KeyByIDAndType(v.Db, keyTable, keyID, private)
 }
 
-func (v *View) GetSigningKey() (*key_model.SigningKey, error) {
-	key, err := view.GetSigningKey(v.Db, keyTable)
+func (v *View) GetActivePrivateKeyForSigning(expiry time.Time) (*key_model.KeyView, error) {
+	key, err := view.GetSigningKey(v.Db, keyTable, expiry)
 	if err != nil {
 		return nil, err
 	}
-	return key_model.SigningKeyFromKeyView(model.KeyViewToModel(key), v.keyAlgorithm)
+	return model.KeyViewToModel(key), nil
+}
+
+func (v *View) GetSigningKey(expiry time.Time) (*key_model.SigningKey, time.Time, error) {
+	key, err := view.GetSigningKey(v.Db, keyTable, expiry)
+	if err != nil {
+		return nil, time.Time{}, err
+	}
+	signingKey, err := key_model.SigningKeyFromKeyView(model.KeyViewToModel(key), v.keyAlgorithm)
+	return signingKey, key.Expiry, err
 }
 
 func (v *View) GetActiveKeySet() ([]*key_model.PublicKey, error) {

@@ -2,11 +2,12 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"strings"
 
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view"
@@ -14,13 +15,12 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -30,7 +30,6 @@ import (
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	grant_es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 const (
@@ -41,7 +40,7 @@ type UserGrant struct {
 	handler
 	iamID        string
 	iamProjectID string
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newUserGrant(
@@ -83,7 +82,7 @@ func (u *UserGrant) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
+func (u *UserGrant) EventQuery() (*es_models.SearchQuery, error) {
 	if u.iamProjectID == "" {
 		err := u.setIamProjectID()
 		if err != nil {
@@ -99,7 +98,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (u *UserGrant) Reduce(event *models.Event) (err error) {
+func (u *UserGrant) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case grant_es_model.UserGrantAggregate:
 		err = u.processUserGrant(event)
@@ -115,7 +114,7 @@ func (u *UserGrant) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
+func (u *UserGrant) processUserGrant(event *es_models.Event) (err error) {
 	grant := new(view_model.UserGrantView)
 	switch event.Type {
 	case grant_es_model.UserGrantAdded:
@@ -144,7 +143,7 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 	return u.view.PutUserGrant(grant, event)
 }
 
-func (u *UserGrant) processUser(event *models.Event) (err error) {
+func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
 		usr_es_model.UserEmailChanged,
@@ -171,7 +170,7 @@ func (u *UserGrant) processUser(event *models.Event) (err error) {
 	}
 }
 
-func (u *UserGrant) processProject(event *models.Event) (err error) {
+func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 	switch event.Type {
 	case proj_es_model.ProjectChanged:
 		grants, err := u.view.UserGrantsByProjectID(event.AggregateID)
@@ -199,7 +198,7 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 	}
 }
 
-func (u *UserGrant) processOrg(event *models.Event) (err error) {
+func (u *UserGrant) processOrg(event *es_models.Event) (err error) {
 	switch event.Type {
 	case org_es_model.OrgMemberAdded, org_es_model.OrgMemberChanged, org_es_model.OrgMemberRemoved:
 		member := new(org_es_model.OrgMember)
@@ -210,7 +209,7 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 	}
 }
 
-func (u *UserGrant) processIAMMember(event *models.Event, rolePrefix string, suffix bool) error {
+func (u *UserGrant) processIAMMember(event *es_models.Event, rolePrefix string, suffix bool) error {
 	member := new(iam_es_model.IAMMember)
 
 	switch event.Type {
@@ -257,7 +256,7 @@ func (u *UserGrant) processIAMMember(event *models.Event, rolePrefix string, suf
 	}
 }
 
-func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix string, userID string, roleKeys []string) error {
+func (u *UserGrant) processMember(event *es_models.Event, rolePrefix, roleSuffix string, userID string, roleKeys []string) error {
 	switch event.Type {
 	case org_es_model.OrgMemberAdded, proj_es_model.ProjectMemberAdded, proj_es_model.ProjectGrantMemberAdded,
 		org_es_model.OrgMemberChanged, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectGrantMemberChanged:
@@ -400,7 +399,7 @@ func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.
 	}
 }
 
-func (u *UserGrant) OnError(event *models.Event, err error) error {
+func (u *UserGrant) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-UZmc7", "id", event.AggregateID).WithError(err).Warn("something went wrong in user grant handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserGrantFailedEvent, u.view.ProcessedUserGrantFailedEvent, u.view.ProcessedUserGrantSequence, u.errorCountUntilSkip)
 }
@@ -433,7 +432,7 @@ func (u *UserGrant) getUserByID(userID string) (*model.UserView, error) {
 	return &userCopy, nil
 }
 
-func (u *UserGrant) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+func (u *UserGrant) getUserEvents(userID string, sequence uint64) ([]*es_models.Event, error) {
 	query, err := view.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err
@@ -449,7 +448,7 @@ func (u *UserGrant) getOrgByID(ctx context.Context, orgID string) (*org_model.Or
 	}
 
 	esOrg := &org_es_model.Org{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: orgID,
 		},
 	}
@@ -470,7 +469,7 @@ func (u *UserGrant) getProjectByID(ctx context.Context, projID string) (*proj_mo
 		return nil, err
 	}
 	esProject := &proj_es_model.Project{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: projID,
 		},
 	}
@@ -491,7 +490,7 @@ func (u *UserGrant) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
 		return nil, err
 	}
 	iam := &iam_es_model.IAM{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: domain.IAMID,
 		},
 	}

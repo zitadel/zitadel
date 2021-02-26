@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 const (

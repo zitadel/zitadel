@@ -1,8 +1,8 @@
 package model
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 type Step int

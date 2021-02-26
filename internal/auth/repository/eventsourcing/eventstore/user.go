@@ -2,7 +2,7 @@ package eventstore
 
 import (
 	"context"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -13,8 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/user/model"
@@ -24,7 +23,7 @@ import (
 
 type UserRepo struct {
 	SearchLimit    uint64
-	Eventstore     eventstore.Eventstore
+	Eventstore     v1.Eventstore
 	View           *view.View
 	SystemDefaults systemdefaults.SystemDefaults
 }
@@ -163,7 +162,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 	return usr_view_model.UserToModel(&userCopy), nil
 }
 
-func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*models.Event, error) {
 	return repo.getUserEvents(ctx, id, sequence)
 }
 

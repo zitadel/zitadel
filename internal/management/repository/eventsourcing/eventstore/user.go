@@ -2,7 +2,8 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/golang/protobuf/ptypes"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_int "github.com/caos/zitadel/internal/eventstore"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
@@ -23,7 +23,7 @@ import (
 )
 
 type UserRepo struct {
-	es_int.Eventstore
+	v1.Eventstore
 	SearchLimit    uint64
 	View           *view.View
 	SystemDefaults systemdefaults.SystemDefaults

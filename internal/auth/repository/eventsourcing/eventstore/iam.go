@@ -2,7 +2,7 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/v2/query"
+	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/iam/model"
 )
@@ -10,7 +10,7 @@ import (
 type IAMRepository struct {
 	IAMID string
 
-	IAMV2QuerySide *query.QuerySide
+	IAMV2QuerySide *query.Queries
 }
 
 func (repo *IAMRepository) GetIAM(ctx context.Context) (*model.IAM, error) {

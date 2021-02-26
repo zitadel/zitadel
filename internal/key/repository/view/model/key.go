@@ -9,7 +9,7 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/key/model"
 	es_model "github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
 )
@@ -45,7 +45,7 @@ func KeysFromPairEvent(event *models.Event) (*KeyView, *KeyView, error) {
 		Algorithm: pair.Algorithm,
 		Usage:     pair.Usage,
 		Key:       pair.PrivateKey.Key,
-		Sequence:  pair.Sequence,
+		Sequence:  event.Sequence,
 	}
 	publicKey := &KeyView{
 		ID:        event.AggregateID,
@@ -54,7 +54,7 @@ func KeysFromPairEvent(event *models.Event) (*KeyView, *KeyView, error) {
 		Algorithm: pair.Algorithm,
 		Usage:     pair.Usage,
 		Key:       pair.PublicKey.Key,
-		Sequence:  pair.Sequence,
+		Sequence:  event.Sequence,
 	}
 	return privateKey, publicKey, nil
 }

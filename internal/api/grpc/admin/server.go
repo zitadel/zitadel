@@ -5,10 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
 	"github.com/caos/zitadel/pkg/grpc/admin"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -19,8 +16,8 @@ var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
 	admin.UnimplementedAdminServiceServer
-	command       *command.CommandSide
-	query         *query.QuerySide
+	command       *command.Commands
+	query         *query.Queries
 	org           repository.OrgRepository
 	iam           repository.IAMRepository
 	administrator repository.AdministratorRepository
@@ -31,7 +28,7 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.CommandSide, query *query.QuerySide, repo repository.Repository) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository) *Server {
 	return &Server{
 		command:       command,
 		query:         query,

@@ -8,7 +8,7 @@ import (
 	"github.com/lib/pq"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"

@@ -1,13 +1,13 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
 )
 
 type Configs map[string]*Config
@@ -22,14 +22,14 @@ type handler struct {
 	cycleDuration       time.Duration
 	errorCountUntilSkip uint64
 
-	es eventstore.Eventstore
+	es v1.Eventstore
 }
 
-func (h *handler) Eventstore() eventstore.Eventstore {
+func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		newUserGrant(
 			handler{view, bulkLimit, configs.cycleDuration("UserGrants"), errorCount, es},

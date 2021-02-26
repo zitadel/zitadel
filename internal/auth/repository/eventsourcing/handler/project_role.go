@@ -2,11 +2,11 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
@@ -18,7 +18,7 @@ const (
 
 type ProjectRole struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newProjectRole(

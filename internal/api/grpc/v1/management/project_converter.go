@@ -2,7 +2,7 @@ package management
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/domain"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/logging"
@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/caos/zitadel/pkg/grpc/message"

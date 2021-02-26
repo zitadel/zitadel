@@ -30,7 +30,7 @@ func SetReturnResourceVersion(
 			},
 		},
 	}
-	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).Return(ret, nil)
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).MinTimes(1).MaxTimes(1).Return(ret, nil)
 }
 
 func TestHosts_AdaptFunc(t *testing.T) {
@@ -52,7 +52,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	group := "getambassador.io"
 	version := "v2"
@@ -91,7 +91,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 		}}
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerHostName, issuerHost).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerHostName, issuerHost).MinTimes(1).MaxTimes(1)
 
 	consoleHostName := labels.MustForName(componentLabels, ConsoleHostName)
 	consoleHost := &unstructured.Unstructured{
@@ -126,7 +126,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 		}}
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ConsoleHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ConsoleHostName, consoleHost).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ConsoleHostName, consoleHost).MinTimes(1).MaxTimes(1)
 
 	apiHostName := labels.MustForName(componentLabels, ApiHostName)
 	apiHost := &unstructured.Unstructured{
@@ -161,7 +161,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 		}}
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ApiHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ApiHostName, apiHost).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ApiHostName, apiHost).MinTimes(1).MaxTimes(1)
 
 	accountsHostName := labels.MustForName(componentLabels, AccountsHostName)
 	accountsHost := &unstructured.Unstructured{
@@ -196,7 +196,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 		}}
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AccountsHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AccountsHostName, accountsHost).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AccountsHostName, accountsHost).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, dns)
 	assert.NoError(t, err)
@@ -224,7 +224,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	group := "getambassador.io"
 	version := "v2"
@@ -263,7 +263,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 		}}
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, IssuerHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerHostName, issuerHost).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, IssuerHostName, issuerHost).MinTimes(1).MaxTimes(1)
 
 	consoleHostName := labels.MustForName(componentLabels, ConsoleHostName)
 	consoleHost := &unstructured.Unstructured{
@@ -298,7 +298,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 		}}
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ConsoleHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ConsoleHostName, consoleHost).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ConsoleHostName, consoleHost).MinTimes(1).MaxTimes(1)
 
 	apiHostName := labels.MustForName(componentLabels, ApiHostName)
 	apiHost := &unstructured.Unstructured{
@@ -333,7 +333,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 		}}
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ApiHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ApiHostName, apiHost).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ApiHostName, apiHost).MinTimes(1).MaxTimes(1)
 
 	accountsHostName := labels.MustForName(componentLabels, AccountsHostName)
 	accountsHost := &unstructured.Unstructured{
@@ -368,7 +368,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 		}}
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AccountsHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AccountsHostName, accountsHost).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AccountsHostName, accountsHost).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, dns)
 	assert.NoError(t, err)

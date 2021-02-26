@@ -3,6 +3,7 @@ package view
 import (
 	"time"
 
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/view/repository"
 
 	"github.com/jinzhu/gorm"
@@ -22,15 +23,30 @@ func KeyByIDAndType(db *gorm.DB, table, keyID string, private bool) (*model.KeyV
 	return key, err
 }
 
-func GetSigningKey(db *gorm.DB, table string) (*model.KeyView, error) {
-	key := new(model.KeyView)
-	query := repository.PrepareGetByQuery(table,
-		model.KeySearchQuery{Key: key_model.KeySearchKeyPrivate, Method: global_model.SearchMethodEquals, Value: true},
-		model.KeySearchQuery{Key: key_model.KeySearchKeyUsage, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
-		model.KeySearchQuery{Key: key_model.KeySearchKeyExpiry, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
+func GetSigningKey(db *gorm.DB, table string, expiry time.Time) (*model.KeyView, error) {
+	if expiry.IsZero() {
+		expiry = time.Now().UTC()
+	}
+	keys := make([]*model.KeyView, 0)
+	query := repository.PrepareSearchQuery(table,
+		model.KeySearchRequest{
+			Queries: []*key_model.KeySearchQuery{
+				{Key: key_model.KeySearchKeyPrivate, Method: global_model.SearchMethodEquals, Value: true},
+				{Key: key_model.KeySearchKeyUsage, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
+				{Key: key_model.KeySearchKeyExpiry, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
+			},
+			SortingColumn: key_model.KeySearchKeyExpiry,
+			Limit:         1,
+		},
 	)
-	err := query(db, key)
-	return key, err
+	_, err := query(db, &keys)
+	if err != nil {
+		return nil, err
+	}
+	if len(keys) != 1 {
+		return nil, caos_errs.ThrowNotFound(err, "VIEW-BGD41", "key not found")
+	}
+	return keys[0], nil
 }
 
 func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {

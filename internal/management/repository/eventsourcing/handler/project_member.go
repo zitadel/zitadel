@@ -3,15 +3,14 @@ package handler
 import (
 	"context"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/user/repository/view"
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -25,7 +24,7 @@ const (
 
 type ProjectMember struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newProjectMember(
@@ -53,8 +52,8 @@ func (p *ProjectMember) ViewModel() string {
 	return projectMemberTable
 }
 
-func (_ *ProjectMember) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{proj_es_model.ProjectAggregate, usr_es_model.UserAggregate}
+func (_ *ProjectMember) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{proj_es_model.ProjectAggregate, usr_es_model.UserAggregate}
 }
 
 func (p *ProjectMember) CurrentSequence() (uint64, error) {
@@ -65,7 +64,7 @@ func (p *ProjectMember) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (p *ProjectMember) EventQuery() (*models.SearchQuery, error) {
+func (p *ProjectMember) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := p.view.GetLatestProjectMemberSequence()
 	if err != nil {
 		return nil, err
@@ -75,7 +74,7 @@ func (p *ProjectMember) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (p *ProjectMember) Reduce(event *models.Event) (err error) {
+func (p *ProjectMember) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case proj_es_model.ProjectAggregate:
 		err = p.processProjectMember(event)
@@ -85,7 +84,7 @@ func (p *ProjectMember) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
+func (p *ProjectMember) processProjectMember(event *es_models.Event) (err error) {
 	member := new(view_model.ProjectMemberView)
 	switch event.Type {
 	case proj_es_model.ProjectMemberAdded:
@@ -121,7 +120,7 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 	return p.view.PutProjectMember(member, event)
 }
 
-func (p *ProjectMember) processUser(event *models.Event) (err error) {
+func (p *ProjectMember) processUser(event *es_models.Event) (err error) {
 	switch event.Type {
 	case usr_es_model.UserProfileChanged,
 		usr_es_model.UserEmailChanged,
@@ -170,7 +169,7 @@ func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user 
 		member.DisplayName = user.MachineView.Name
 	}
 }
-func (p *ProjectMember) OnError(event *models.Event, err error) error {
+func (p *ProjectMember) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in projectmember handler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectMemberFailedEvent, p.view.ProcessedProjectMemberFailedEvent, p.view.ProcessedProjectMemberSequence, p.errorCountUntilSkip)
 }
@@ -203,7 +202,7 @@ func (u *ProjectMember) getUserByID(userID string) (*usr_view_model.UserView, er
 	return &userCopy, nil
 }
 
-func (u *ProjectMember) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+func (u *ProjectMember) getUserEvents(userID string, sequence uint64) ([]*es_models.Event, error) {
 	query, err := view.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err

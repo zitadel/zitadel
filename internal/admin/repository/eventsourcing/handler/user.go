@@ -3,22 +3,21 @@ package handler
 import (
 	"context"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view"
-	"github.com/caos/zitadel/internal/v2/domain"
 	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -31,9 +30,8 @@ const (
 
 type User struct {
 	handler
-	eventstore     eventstore.Eventstore
 	systemDefaults systemdefaults.SystemDefaults
-	subscription   *eventstore.Subscription
+	subscription   *v1.Subscription
 }
 
 func newUser(
@@ -63,8 +61,8 @@ func (u *User) ViewModel() string {
 	return userTable
 }
 
-func (u *User) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
+func (u *User) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
 }
 
 func (u *User) CurrentSequence() (uint64, error) {
@@ -75,7 +73,7 @@ func (u *User) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (u *User) EventQuery() (*models.SearchQuery, error) {
+func (u *User) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := u.view.GetLatestUserSequence()
 	if err != nil {
 		return nil, err
@@ -85,7 +83,7 @@ func (u *User) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (u *User) Reduce(event *models.Event) (err error) {
+func (u *User) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case es_model.UserAggregate:
 		return u.ProcessUser(event)
@@ -96,7 +94,7 @@ func (u *User) Reduce(event *models.Event) (err error) {
 	}
 }
 
-func (u *User) ProcessUser(event *models.Event) (err error) {
+func (u *User) ProcessUser(event *es_models.Event) (err error) {
 	user := new(view_model.UserView)
 	switch event.Type {
 	case es_model.UserAdded,
@@ -167,7 +165,7 @@ func (u *User) ProcessUser(event *models.Event) (err error) {
 	return u.view.PutUser(user, event)
 }
 
-func (u *User) ProcessOrg(event *models.Event) (err error) {
+func (u *User) ProcessOrg(event *es_models.Event) (err error) {
 	switch event.Type {
 	case org_es_model.OrgDomainVerified,
 		org_es_model.OrgDomainRemoved,
@@ -182,7 +180,7 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 	}
 }
 
-func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
+func (u *User) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
@@ -204,7 +202,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	return u.view.PutUsers(users, event)
 }
 
-func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
+func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
 	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
@@ -247,7 +245,7 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 	return nil
 }
 
-func (u *User) OnError(event *models.Event, err error) error {
+func (u *User) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-vLmwQ", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
 }
@@ -263,11 +261,11 @@ func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, er
 	}
 
 	esOrg := &org_es_model.Org{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: orgID,
 		},
 	}
-	err = es_sdk.Filter(ctx, u.eventstore.FilterEvents, esOrg.AppendEvents, query)
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
@@ -284,11 +282,11 @@ func (u *User) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
 		return nil, err
 	}
 	iam := &model.IAM{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: domain.IAMID,
 		},
 	}
-	err = es_sdk.Filter(ctx, u.eventstore.FilterEvents, iam.AppendEvents, query)
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, iam.AppendEvents, query)
 	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
 		return nil, err
 	}

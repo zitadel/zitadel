@@ -5,8 +5,8 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 

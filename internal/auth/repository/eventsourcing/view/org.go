@@ -1,7 +1,7 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/org/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"

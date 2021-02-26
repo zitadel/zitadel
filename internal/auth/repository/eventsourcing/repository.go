@@ -9,20 +9,22 @@ import (
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
-	es_int "github.com/caos/zitadel/internal/eventstore"
-	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	es2 "github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/query"
+	key_model "github.com/caos/zitadel/internal/key/model"
+	"github.com/caos/zitadel/internal/query"
 )
 
 type Config struct {
 	SearchLimit uint64
 	Domain      string
-	Eventstore  es_int.Config
+	Eventstore  v1.Config
 	AuthRequest cache.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
@@ -30,7 +32,7 @@ type Config struct {
 
 type EsRepository struct {
 	spooler    *es_spol.Spooler
-	Eventstore es_int.Eventstore
+	Eventstore v1.Eventstore
 	eventstore.UserRepo
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
@@ -42,12 +44,11 @@ type EsRepository struct {
 	eventstore.IAMRepository
 }
 
-func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.CommandSide, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
-	es, err := es_int.Start(conf.Eventstore)
+func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, authZRepo *authz_repo.EsRepository, esV2 *es2.Eventstore) (*EsRepository, error) {
+	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
 	}
-	esV2 := es.V2()
 
 	sqlClient, err := conf.View.Start()
 	if err != nil {
@@ -70,12 +71,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		return nil, err
 	}
 
-	iamV2Query, err := query.StartQuerySide(&query.Config{Eventstore: esV2, SystemDefaults: systemDefaults})
-	if err != nil {
-		return nil, err
-	}
-
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
+	keyChan := make(chan *key_model.KeyView)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, keyChan)
+	locker := spooler.NewLocker(sqlClient)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,
@@ -108,12 +106,17 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IAMID:                      systemDefaults.IamID,
 		},
 		eventstore.TokenRepo{
-			Eventstore: es,
-			View:       view,
+			View: view,
 		},
 		eventstore.KeyRepository{
-			View:               view,
-			SigningKeyRotation: systemDefaults.KeyConfig.SigningKeyRotation.Duration,
+			View:                     view,
+			Commands:                 command,
+			Eventstore:               esV2,
+			SigningKeyRotationCheck:  systemDefaults.KeyConfig.SigningKeyRotationCheck.Duration,
+			SigningKeyGracefulPeriod: systemDefaults.KeyConfig.SigningKeyGracefulPeriod.Duration,
+			KeyAlgorithm:             keyAlgorithm,
+			Locker:                   locker,
+			KeyChan:                  keyChan,
 		},
 		eventstore.ApplicationRepo{
 			Commands: command,
@@ -137,7 +140,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,
-			IAMV2QuerySide: iamV2Query,
+			IAMV2QuerySide: queries,
 		},
 	}, nil
 }

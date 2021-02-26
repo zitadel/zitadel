@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/project/model"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/v2/command"
 )
 
 type ApplicationRepo struct {
-	Commands *command.CommandSide
+	Commands *command.Commands
 	View     *view.View
 }
 

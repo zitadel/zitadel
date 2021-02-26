@@ -1,13 +1,14 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	key_model "github.com/caos/zitadel/internal/key/model"
 )
 
 type Configs map[string]*Config
@@ -22,14 +23,14 @@ type handler struct {
 	cycleDuration       time.Duration
 	errorCountUntilSkip uint64
 
-	es eventstore.Eventstore
+	es v1.Eventstore
 }
 
-func (h *handler) Eventstore() eventstore.Eventstore {
+func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults, keyChan chan<- *key_model.KeyView) []query.Handler {
 	return []query.Handler{
 		newUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
@@ -41,7 +42,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newToken(
 			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
 		newKey(
-			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es}),
+			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es},
+			keyChan),
 		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),

@@ -1,7 +1,8 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/v2/command"
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"net/http"
 	"time"
 
@@ -9,8 +10,7 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 )
@@ -27,14 +27,14 @@ type handler struct {
 	cycleDuration       time.Duration
 	errorCountUntilSkip uint64
 
-	es eventstore.Eventstore
+	es v1.Eventstore
 }
 
-func (h *handler) Eventstore() eventstore.Eventstore {
+func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es eventstore.Eventstore, command *command.CommandSide, systemDefaults sd.SystemDefaults, i18n *i18n.Translator, dir http.FileSystem) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, systemDefaults sd.SystemDefaults, i18n *i18n.Translator, dir http.FileSystem) []query.Handler {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")

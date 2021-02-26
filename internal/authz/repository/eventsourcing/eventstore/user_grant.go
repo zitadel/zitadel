@@ -2,9 +2,9 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
@@ -12,12 +12,12 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	"github.com/caos/zitadel/internal/v2/domain"
 )
 
 type UserGrantRepo struct {
@@ -25,7 +25,7 @@ type UserGrantRepo struct {
 	IamID        string
 	IamProjectID string
 	Auth         authz.Config
-	Eventstore   eventstore.Eventstore
+	Eventstore   v1.Eventstore
 }
 
 func (repo *UserGrantRepo) Health() error {

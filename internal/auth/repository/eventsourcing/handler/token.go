@@ -3,17 +3,16 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/logging"
 	"k8s.io/apimachinery/pkg/api/errors"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
@@ -27,7 +26,7 @@ const (
 
 type Token struct {
 	handler
-	subscription *eventstore.Subscription
+	subscription *v1.Subscription
 }
 
 func newToken(
@@ -67,7 +66,7 @@ func (p *Token) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (t *Token) EventQuery() (*models.SearchQuery, error) {
+func (t *Token) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := t.view.GetLatestTokenSequence()
 	if err != nil {
 		return nil, err
@@ -77,7 +76,7 @@ func (t *Token) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (t *Token) Reduce(event *models.Event) (err error) {
+func (t *Token) Reduce(event *es_models.Event) (err error) {
 	switch event.Type {
 	case user_es_model.UserTokenAdded:
 		token := new(view_model.TokenView)
@@ -132,12 +131,12 @@ func (t *Token) Reduce(event *models.Event) (err error) {
 	}
 }
 
-func (t *Token) OnError(event *models.Event, err error) error {
+func (t *Token) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-3jkl4", "id", event.AggregateID).WithError(err).Warn("something went wrong in token handler")
 	return spooler.HandleError(event, err, t.view.GetLatestTokenFailedEvent, t.view.ProcessedTokenFailedEvent, t.view.ProcessedTokenSequence, t.errorCountUntilSkip)
 }
 
-func agentIDFromSession(event *models.Event) (string, error) {
+func agentIDFromSession(event *es_models.Event) (string, error) {
 	session := make(map[string]interface{})
 	if err := json.Unmarshal(event.Data, &session); err != nil {
 		logging.Log("EVEN-s3bq9").WithError(err).Error("could not unmarshal event data")
@@ -146,7 +145,7 @@ func agentIDFromSession(event *models.Event) (string, error) {
 	return session["userAgentID"].(string), nil
 }
 
-func applicationFromSession(event *models.Event) (*project_es_model.Application, error) {
+func applicationFromSession(event *es_models.Event) (*project_es_model.Application, error) {
 	application := new(project_es_model.Application)
 	if err := json.Unmarshal(event.Data, &application); err != nil {
 		logging.Log("EVEN-GRE2q").WithError(err).Error("could not unmarshal event data")
@@ -165,7 +164,7 @@ func (t *Token) getProjectByID(ctx context.Context, projID string) (*proj_model.
 		return nil, err
 	}
 	esProject := &project_es_model.Project{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: projID,
 		},
 	}

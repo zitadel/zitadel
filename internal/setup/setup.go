@@ -5,10 +5,10 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/v2/command"
-	"github.com/caos/zitadel/internal/v2/domain"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 	SetupUser    = "SETUP"
 )
 
-func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *command.CommandSide) error {
+func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *command.Commands) error {
 	logging.Log("SETUP-JAK2q").Info("starting setup")
 
 	iam, err := commands.GetIAM(ctx)

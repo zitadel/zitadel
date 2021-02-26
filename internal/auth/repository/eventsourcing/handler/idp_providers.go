@@ -2,22 +2,21 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
-	"github.com/caos/zitadel/internal/v2/domain"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/eventstore"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/query"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -30,7 +29,7 @@ const (
 type IDPProvider struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
-	subscription   *eventstore.Subscription
+	subscription   *v1.Subscription
 }
 
 func newIDPProvider(
@@ -60,8 +59,8 @@ func (i *IDPProvider) ViewModel() string {
 	return idpProviderTable
 }
 
-func (_ *IDPProvider) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
+func (_ *IDPProvider) AggregateTypes() []es_models.AggregateType {
+	return []es_models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
 }
 
 func (i *IDPProvider) CurrentSequence() (uint64, error) {
@@ -72,7 +71,7 @@ func (i *IDPProvider) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPProvider) EventQuery() (*models.SearchQuery, error) {
+func (i *IDPProvider) EventQuery() (*es_models.SearchQuery, error) {
 	sequence, err := i.view.GetLatestIDPProviderSequence()
 	if err != nil {
 		return nil, err
@@ -82,7 +81,7 @@ func (i *IDPProvider) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (i *IDPProvider) Reduce(event *models.Event) (err error) {
+func (i *IDPProvider) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case model.IAMAggregate, org_es_model.OrgAggregate:
 		err = i.processIdpProvider(event)
@@ -90,7 +89,7 @@ func (i *IDPProvider) Reduce(event *models.Event) (err error) {
 	return err
 }
 
-func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
+func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 	provider := new(iam_view_model.IDPProviderView)
 	switch event.Type {
 	case model.LoginPolicyIDPProviderAdded, org_es_model.LoginPolicyIDPProviderAdded:
@@ -162,7 +161,7 @@ func (i *IDPProvider) fillConfigData(provider *iam_view_model.IDPProviderView, c
 	provider.IDPState = int32(config.State)
 }
 
-func (i *IDPProvider) OnError(event *models.Event, err error) error {
+func (i *IDPProvider) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Fjd89", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
 	return spooler.HandleError(event, err, i.view.GetLatestIDPProviderFailedEvent, i.view.ProcessedIDPProviderFailedEvent, i.view.ProcessedIDPProviderSequence, i.errorCountUntilSkip)
 }
@@ -189,7 +188,7 @@ func (i *IDPProvider) getOrgByID(ctx context.Context, orgID string) (*org_model.
 	}
 
 	esOrg := &org_es_model.Org{
-		ObjectRoot: models.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			AggregateID: orgID,
 		},
 	}
