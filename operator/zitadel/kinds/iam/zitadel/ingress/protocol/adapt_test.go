@@ -27,7 +27,7 @@ func TestAdaptFuncCover(t *testing.T) {
 		&configuration.Ingress{
 			Subdomains: &configuration.Subdomains{},
 		},
-		map[string]interface{}{},
+		map[string]string{},
 		func(virtualHost string) core.PathAdapter {
 			return func(arguments core.PathArguments) (queryFunc operator.QueryFunc, destroyFunc operator.DestroyFunc, err error) {
 				return nil, nil, nil

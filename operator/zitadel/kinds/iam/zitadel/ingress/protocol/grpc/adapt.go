@@ -20,7 +20,7 @@ func AdaptFunc(
 	namespace string,
 	grpcService string,
 	grpcPort uint16,
-	controllerSpecifics map[string]interface{},
+	controllerSpecifics map[string]string,
 	originCASecretName string,
 	apiAdapter core.PathAdapter,
 ) (

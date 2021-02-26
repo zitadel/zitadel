@@ -23,7 +23,7 @@ func AdaptFunc(
 	uiService string,
 	uiPort uint16,
 	dns *configuration.Ingress,
-	controllerSpecifics map[string]interface{},
+	controllerSpecifics map[string]string,
 	hostAdapter core.HostAdapter,
 ) (
 	operator.QueryFunc,

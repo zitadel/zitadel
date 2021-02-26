@@ -31,5 +31,5 @@ type PathArguments struct {
 	ServicePort                                  uint16
 	TimeoutMS, ConnectTimeoutMS                  int
 	CORS                                         *CORS
-	ControllerSpecifics                          map[string]interface{}
+	ControllerSpecifics                          map[string]string
 }

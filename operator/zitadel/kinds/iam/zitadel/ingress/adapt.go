@@ -3,6 +3,7 @@ package ingress
 import (
 	"fmt"
 
+	anyingress "github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/controllers/ingress"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/controllers/nginx"
 
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ingress/protocol"
@@ -71,17 +72,25 @@ func AdaptFunc(
 		return nil, nil, err
 	}
 
+	anyIngQ, anyIngD, err := controllerIngressFunc(anyingress.Adapt)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	destroyers := []operator.DestroyFunc{
 		ambassadorIngD,
 		nginxIngD,
+		anyIngD,
 	}
 
 	var queriers []operator.QueryFunc
 	switch ingress.Controller {
 	case "Ambassador":
-		queriers = append(queriers, ambassadorIngQ, operator.DestroyerToQueryFunc(nginxIngD))
+		queriers = append(queriers, ambassadorIngQ, operator.DestroyerToQueryFunc(nginxIngD), operator.DestroyerToQueryFunc(anyIngD))
 	case "NGINX":
 		queriers = append(queriers, nginxIngQ, operator.DestroyerToQueryFunc(ambassadorIngD))
+	case "Any":
+		queriers = append(queriers, anyIngQ, operator.DestroyerToQueryFunc(ambassadorIngD))
 	case "None":
 		queriers = operator.DestroyersToQueryFuncs(destroyers)
 	default:

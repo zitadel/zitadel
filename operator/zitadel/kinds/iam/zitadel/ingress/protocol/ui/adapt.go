@@ -19,7 +19,7 @@ func AdaptFunc(
 	namespace string,
 	uiService string,
 	uiPort uint16,
-	controllerSpecifics map[string]interface{},
+	controllerSpecifics map[string]string,
 	originCASecretName string,
 	consoleAdapter core.PathAdapter,
 	accountsAdapter core.PathAdapter,

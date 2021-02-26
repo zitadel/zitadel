@@ -24,7 +24,7 @@ func AdaptFunc(
 	namespace string,
 	httpService string,
 	httpPort uint16,
-	controllerSpecifics map[string]interface{},
+	controllerSpecifics map[string]string,
 	originCASecretName string,
 	apiAdapter core.PathAdapter,
 	accountsAdapter core.PathAdapter,

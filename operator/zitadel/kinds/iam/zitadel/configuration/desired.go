@@ -15,11 +15,11 @@ type Configuration struct {
 }
 
 type Ingress struct {
-	Domain              string                 `yaml:"domain"`
-	TlsSecret           string                 `yaml:"tlsSecret"`
-	Subdomains          *Subdomains            `yaml:"subdomains"`
-	Controller          string                 `yaml:"controller"`
-	ControllerSpecifics map[string]interface{} `yaml:"controllerSpecifics,omitempty"`
+	Domain              string            `yaml:"domain"`
+	TlsSecret           string            `yaml:"tlsSecret"`
+	Subdomains          *Subdomains       `yaml:"subdomains"`
+	Controller          string            `yaml:"controller"`
+	ControllerSpecifics map[string]string `yaml:"controllerSpecifics,omitempty"`
 }
 
 type Subdomains struct {
