@@ -142,8 +142,12 @@ github.com/caos/logging v0.0.2/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX
 github.com/caos/oidc v0.6.2/go.mod h1:ozoi3b+aY33gzdvjz4w90VZShIHGsmDa0goruuV0arQ=
 github.com/caos/oidc v0.14.1 h1:MZ1wKomUnGeOjNWClf3dtcxqSKd2o37WXf0fpshSb0k=
 github.com/caos/oidc v0.14.1/go.mod h1:fSLPGlxZhjSMP2LYKZ5QMaM/YYmLHfj/Fce+ji48kYY=
+github.com/caos/orbos v1.5.14-0.20210211114922-a0ec6c27138f h1:po694rgWqoaqk0nNND43NBGuaQSMWBp+LYS8x6cVXEA=
+github.com/caos/orbos v1.5.14-0.20210211114922-a0ec6c27138f/go.mod h1:ZLxNgPuYIlSvr80trezGGUIXng9gY2hHEdky/m0B/P0=
 github.com/caos/orbos v1.5.14-0.20210211121904-d3fab469047a h1:UekNGhZhvUWElUCln84NWoq8oS9q3sBXPrCcBd1V3es=
 github.com/caos/orbos v1.5.14-0.20210211121904-d3fab469047a/go.mod h1:ZLxNgPuYIlSvr80trezGGUIXng9gY2hHEdky/m0B/P0=
+github.com/caos/orbos v1.5.14-0.20210226111620-af3aa155dde1 h1:xlF8JVBixkYaEvzWTruGutSgGVx/WRKzxy0DfZ1Dq5Q=
+github.com/caos/orbos v1.5.14-0.20210226111620-af3aa155dde1/go.mod h1:ZLxNgPuYIlSvr80trezGGUIXng9gY2hHEdky/m0B/P0=
 github.com/casbin/casbin/v2 v2.1.2/go.mod h1:YcPU1XXisHhLzuxH9coDNf2FbKpjGlbCg3n9yuLkIJQ=
 github.com/cenkalti/backoff v2.1.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=

@@ -26,6 +26,7 @@ func Adapt(virtualHost string) core.PathAdapter {
 		}
 
 		queryMapping, err := mapping.AdaptFuncToEnsure(
+			args.Monitor,
 			args.Namespace,
 			args.ID,
 			args.GRPC,
@@ -60,6 +61,7 @@ func Adapt(virtualHost string) core.PathAdapter {
 			}
 
 			queryHost, err := host.AdaptFuncToEnsure(
+				args.Monitor,
 				args.Namespace,
 				hostName,
 				labels.MustK8sMap(args.ID),
