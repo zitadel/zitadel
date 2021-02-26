@@ -5,6 +5,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IdpSearchResponse as AdminIdpSearchResponse, IdpState, IdpStylingType, IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
 import { IdpProviderType, IdpView as MgmtIdpView } from 'src/app/proto/generated/management_pb';
@@ -76,22 +77,28 @@ export class IdpTableComponent implements OnInit {
     }
 
     public deactivateSelectedIdps(): void {
-        this.selection.clear();
-        Promise.all(this.selection.selected.map(value => {
+        const map: Promise<Empty>[] = this.selection.selected.map(value => {
             return this.service.DeactivateIdpConfig(value.id);
-        })).then(() => {
+        });
+        Promise.all(map).then(() => {
+            this.selection.clear();
             this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
             this.refreshPage();
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 
     public reactivateSelectedIdps(): void {
-        this.selection.clear();
-        Promise.all(this.selection.selected.map(value => {
+        const map: Promise<Empty>[] = this.selection.selected.map(value => {
             return this.service.ReactivateIdpConfig(value.id);
-        })).then(() => {
+        });
+        Promise.all(map).then(() => {
+            this.selection.clear();
             this.toast.showInfo('IDP.TOAST.SELECTEDREACTIVATED', true);
             this.refreshPage();
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

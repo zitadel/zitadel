@@ -77,6 +77,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
         OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
         OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT,
     ];
 
     public oidcTokenTypes: OIDCTokenType[] = [
