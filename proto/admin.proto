@@ -173,9 +173,9 @@ service AdminService {
         };
     }
 
-    rpc GetDefaultOrgIAMPolicy(GetDefaultOrgIAMPolicyRequest) returns (GetDefaultOrgIAMPolicyResponse) {
+    rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/default/policies/orgiam"
+            get: "/policies/orgiam"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -183,9 +183,9 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultOrgIAMPolicy(UpdateDefaultOrgIAMPolicyRequest) returns (UpdateDefaultOrgIAMPolicyResponse) {
+    rpc UpdateOrgIAMPolicy(UpdateOrgIAMPolicyRequest) returns (UpdateOrgIAMPolicyResponse) {
         option (google.api.http) = {
-            put: "/orgs/default/policies/orgiam"
+            put: "/policies/orgiam"
             body: "*"
         };
 
@@ -194,7 +194,7 @@ service AdminService {
         };
     }
 
-    rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
+    rpc GetCustomOrgIAMPolicy(GetCustomOrgIAMPolicyRequest) returns (GetCustomOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/orgs/{org_id}/policies/orgiam"
         };
@@ -226,7 +226,7 @@ service AdminService {
         };
     }
 
-    rpc ResetOrgIAMPolicyToDefault(ResetOrgIAMPolicyToDefaultRequest) returns (ResetOrgIAMPolicyToDefaultResponse) {
+    rpc ResetCustomOrgIAMPolicyToDefault(ResetCustomOrgIAMPolicyToDefaultRequest) returns (ResetCustomOrgIAMPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/orgs/{org_id}/policies/orgiam"
         };
@@ -236,9 +236,9 @@ service AdminService {
         };
     }
 
-    rpc GetDefaultLabelPolicy(GetDefaultLabelPolicyRequest) returns (GetDefaultLabelPolicyResponse) {
+    rpc GetLabelPolicy(GetLabelPolicyRequest) returns (GetLabelPolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/default/policies/label"
+            get: "/policies/label"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -246,9 +246,9 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultLabelPolicy(UpdateDefaultLabelPolicyRequest) returns (UpdateDefaultLabelPolicyResponse) {
+    rpc UpdateLabelPolicy(UpdateLabelPolicyRequest) returns (UpdateLabelPolicyResponse) {
         option (google.api.http) = {
-            put: "/orgs/default/policies/label"
+            put: "/policies/label"
             body: "*"
         };
 
@@ -257,30 +257,9 @@ service AdminService {
         };
     }
 
-    rpc GetDefaultMailTemplatePolicy(GetDefaultMailTemplatePolicyRequest) returns (GetDefaultMailTemplatePolicyResponse) {
+    rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/mailtemplate"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.policy.read"
-        };
-    }
-
-    rpc UpdateDefaultMailTemplatePolicy(UpdateDefaultMailTemplatePolicyRequest) returns (UpdateDefaultMailTemplatePolicyResponse) {
-        option (google.api.http) = {
-            put: "/policies/mailtemplate"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.policy.write"
-        };
-    }
-
-    rpc GetDefaultLoginPolicy(GetDefaultLoginPolicyRequest) returns (GetDefaultLoginPolicyResponse) {
-        option (google.api.http) = {
-            get: "/orgs/default/policies/login"
+            get: "/policies/login"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -288,9 +267,9 @@ service AdminService {
         };
     }
     
-    rpc UpdateDefaultLoginPolicy(UpdateDefaultLoginPolicyRequest) returns (UpdateDefaultLoginPolicyResponse) {
+    rpc UpdateLoginPolicy(UpdateLoginPolicyRequest) returns (UpdateLoginPolicyResponse) {
         option (google.api.http) = {
-            put: "/orgs/default/policies/login"
+            put: "/policies/login"
             body: "*"
         };
     
@@ -299,7 +278,7 @@ service AdminService {
         };
     }
 
-    rpc ListDefaultLoginPolicyIDPs(ListDefaultLoginPolicyIDPsRequest) returns (ListDefaultLoginPolicyIDPsResponse) {
+    rpc ListLoginPolicyIDPs(ListLoginPolicyIDPsRequest) returns (ListLoginPolicyIDPsResponse) {
         option (google.api.http) = {
             post: "/policies/login/idps/_search"
             body: "*"
@@ -310,8 +289,7 @@ service AdminService {
         };
     }
 
-    //TODO: discuss EnableIDPOnDefaultLoginPolicy
-    rpc AddIDPToDefaultLoginPolicy(AddIDPToDefaultLoginPolicyRequest) returns (AddIDPToDefaultLoginPolicyResponse) {
+    rpc AddIDPToLoginPolicy(AddIDPToLoginPolicyRequest) returns (AddIDPToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/idps"
             body: "*"
@@ -322,8 +300,7 @@ service AdminService {
         };
     }
 
-    //TODO: discuss DisableIDPOnDefaultLoginPolicy
-    rpc RemoveIDPFromDefaultLoginPolicy(RemoveIDPFromDefaultLoginPolicyRequest) returns (RemoveIDPFromDefaultLoginPolicyResponse) {
+    rpc RemoveIDPFromLoginPolicy(RemoveIDPFromLoginPolicyRequest) returns (RemoveIDPFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/idps/{idp_id}"
         };
@@ -333,7 +310,7 @@ service AdminService {
         };
     }
 
-    rpc ListDefaultLoginPolicySecondFactors(ListDefaultLoginPolicySecondFactorsRequest) returns (ListDefaultLoginPolicySecondFactorsResponse) {
+    rpc ListLoginPolicySecondFactors(ListLoginPolicySecondFactorsRequest) returns (ListLoginPolicySecondFactorsResponse) {
         option (google.api.http) = {
             get: "/policies/login/secondfactors/_search"
         };
@@ -343,8 +320,7 @@ service AdminService {
         };
     }
 
-    //TODO: discuss EnableSecondFactorFromDefaultLoginPolicy
-    rpc AddSecondFactorToDefaultLoginPolicy(AddSecondFactorToDefaultLoginPolicyRequest) returns (AddSecondFactorToDefaultLoginPolicyResponse) {
+    rpc AddSecondFactorToLoginPolicy(AddSecondFactorToLoginPolicyRequest) returns (AddSecondFactorToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/secondfactors"
             body: "*"
@@ -355,8 +331,7 @@ service AdminService {
         };
     }
 
-    //TODO: discuss DisableSecondFactorFromDefaultLoginPolicy
-    rpc RemoveSecondFactorFromDefaultLoginPolicy(RemoveSecondFactorFromDefaultLoginPolicyRequest) returns (RemoveSecondFactorFromDefaultLoginPolicyResponse) {
+    rpc RemoveSecondFactorFromLoginPolicy(RemoveSecondFactorFromLoginPolicyRequest) returns (RemoveSecondFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/secondfactors/{type}"
         };
@@ -366,7 +341,7 @@ service AdminService {
         };
     }
 
-    rpc ListDefaultLoginPolicyMultiFactors(ListDefaultLoginPolicyMultiFactorsRequest) returns (ListDefaultLoginPolicyMultiFactorsResponse) {
+    rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
             get: "/policies/login/mfas/_search"
         };
@@ -376,8 +351,7 @@ service AdminService {
         };
     }
 
-    //TODO: discuss EnableMultiFactorToDefaultLoginPolicy
-    rpc AddMultiFactorToDefaultLoginPolicy(AddMultiFactorToDefaultLoginPolicyRequest) returns (AddMultiFactorToDefaultLoginPolicyResponse) {
+    rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/mfas"
             body: "*"
@@ -388,8 +362,7 @@ service AdminService {
         };
     }
 
-    //TODO: discuss DisableMultiFactorToDefaultLoginPolicy
-    rpc RemoveMultiFactorFromDefaultLoginPolicy(RemoveMultiFactorFromDefaultLoginPolicyRequest) returns (RemoveMultiFactorFromDefaultLoginPolicyResponse) {
+    rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/mfas/{type}"
         };
@@ -399,20 +372,7 @@ service AdminService {
         };
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    rpc GetDefaultPasswordComplexityPolicy(GetDefaultPasswordComplexityPolicyRequest) returns (GetDefaultPasswordComplexityPolicyResponse) {
+    rpc GetPasswordComplexityPolicy(GetPasswordComplexityPolicyRequest) returns (GetPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/complexity"
         };
@@ -422,7 +382,7 @@ service AdminService {
         };
     }
 
-    rpc UpdateDefaultPasswordComplexityPolicy(UpdateDefaultPasswordComplexityPolicyRequest) returns (UpdateDefaultPasswordComplexityPolicyResponse) {
+    rpc UpdatePasswordComplexityPolicy(UpdatePasswordComplexityPolicyRequest) returns (UpdatePasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/complexity"
             body: "*"
@@ -433,7 +393,7 @@ service AdminService {
         };
     }
 
-    rpc GetDefaultPasswordAgePolicy(GetDefaultPasswordAgePolicyRequest) returns (GetDefaultPasswordAgePolicyResponse) {
+    rpc GetPasswordAgePolicy(GetPasswordAgePolicyRequest) returns (GetPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/age"
         };
@@ -443,7 +403,7 @@ service AdminService {
         };
     }
     
-    rpc UpdateDefaultPasswordAgePolicy(UpdateDefaultPasswordAgePolicyRequest) returns (UpdateDefaultPasswordAgePolicyResponse) {
+    rpc UpdatePasswordAgePolicy(UpdatePasswordAgePolicyRequest) returns (UpdatePasswordAgePolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/age"
             body: "*"
@@ -454,7 +414,7 @@ service AdminService {
         };
     }
 
-    rpc GetDefaultPasswordLockoutPolicy(GetDefaultPasswordLockoutPolicyRequest) returns (GetDefaultPasswordLockoutPolicyResponse) {
+    rpc GetPasswordLockoutPolicy(GetPasswordLockoutPolicyRequest) returns (GetPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/lockout"
         };
@@ -464,7 +424,7 @@ service AdminService {
         };
     }
     
-    rpc UpdateDefaultPasswordLockoutPolicy(UpdateDefaultPasswordLockoutPolicyRequest) returns (UpdateDefaultPasswordLockoutPolicyResponse) {
+    rpc UpdatePasswordLockoutPolicy(UpdatePasswordLockoutPolicyRequest) returns (UpdatePasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/lockout"
             body: "*"
@@ -604,52 +564,39 @@ message ListOrgsResponse {
 
 message SetUpOrgRequest {
     message Org {
-        string name = 1 [(validate.rules).string.min_len = 1];
+        string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
         string domain = 2;
     }
     message Human {
         message Profile {
-            string first_name = 1;
-            string last_name = 2;
-            string nick_name = 3;
-            string display_name = 4;
-            string preferred_language = 5;
+            string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+            string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+            string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+            string display_name = 4 [(validate.rules).string = {max_len: 200}];
+            string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
             zitadel.user.v1.Gender gender = 6;
         }
         message Email {
-            string email = 1;
+            string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
             bool is_email_verified = 2;
         }
         message Phone {
-            //TODO: use https://github.com/google/libphonenumber/blob/master/resources/phonenumber.proto
-            string phone = 1;
+            // has to be a global number
+            string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
             bool is_phone_verified = 2;
         }
-        message Address {
-            string country = 1;
-            string locality = 2;
-            string postal_code = 3;
-            string region = 4;
-            string street_address = 5;
-        }
     
-        string user_name = 1;
+        string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
         
-        Profile profile = 2;
-        Email email = 3;
+        Profile profile = 2 [(validate.rules).message.required = true];
+        Email email = 3 [(validate.rules).message.required = true];
         Phone phone = 4;
-        Address address = 5;
     }
-    message Machine {
-        string user_name = 1;
-
-        string name = 2;
-        string description = 3;
-    }
-    Org org = 1;
+    Org org = 1 [(validate.rules).message.required = true];
     oneof user {
+        option (validate.required) = true;
+
         Human human = 2;
-        Machine machine = 3;
     }
 }
 
@@ -660,7 +607,7 @@ message SetUpOrgResponse {
 }
 
 message GetIDPByIDRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetIDPByIDResponse {
@@ -680,16 +627,15 @@ message ListIDPsResponse {
 }
 
 message AddOIDCIDPRequest {
-    string id = 1;
-    string name = 2;
-    zitadel.idp.v1.IDPStylingType styling_type = 3;
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.IDPStylingType styling_type = 2;
 
-    string client_id = 4;
-    string client_secret = 5;
-    string issuer = 6;
-    repeated string scopes = 7;
-    zitadel.idp.v1.OIDCMappingField display_name_mapping = 8;
-    zitadel.idp.v1.OIDCMappingField username_mapping = 9;
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 6;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 7;
+    zitadel.idp.v1.OIDCMappingField username_mapping = 8;
 }
 
 message AddOIDCIDPResponse {
@@ -698,7 +644,7 @@ message AddOIDCIDPResponse {
 }
 
 message DeactivateIDPRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateIDPResponse {
@@ -706,7 +652,7 @@ message DeactivateIDPResponse {
 }
 
 message ReactivateIDPRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ReactivateIDPResponse {
@@ -714,7 +660,7 @@ message ReactivateIDPResponse {
 }
 
 message RemoveIDPRequest {
-    string id = 1;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveIDPResponse {
@@ -722,8 +668,8 @@ message RemoveIDPResponse {
 }
 
 message UpdateIDPRequest {
-    string id = 1;
-    string name = 2;
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.idp.v1.IDPStylingType styling_type = 3;
 }
 
@@ -732,42 +678,44 @@ message UpdateIDPResponse {
 }
 
 message UpdateIDPOIDCConfigRequest {
-    string idp_id = 1;
-    string issuer = 2;
-    repeated string scopes = 3;
-    zitadel.idp.v1.OIDCMappingField display_name_mapping = 4;
-    zitadel.idp.v1.OIDCMappingField username_mapping = 5;
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 5;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 6;
+    zitadel.idp.v1.OIDCMappingField username_mapping = 7;
 }
 
 message UpdateIDPOIDCConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetDefaultOrgIAMPolicyRequest {}
+message GetOrgIAMPolicyRequest {}
 
-message GetDefaultOrgIAMPolicyResponse {
+message GetOrgIAMPolicyResponse {
     zitadel.policy.v1.OrgIAMPolicy policy = 1;
 }
 
-message UpdateDefaultOrgIAMPolicyRequest {
+message UpdateOrgIAMPolicyRequest {
     bool user_login_must_be_domain = 1;
 }
 
-message UpdateDefaultOrgIAMPolicyResponse {
+message UpdateOrgIAMPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetOrgIAMPolicyRequest {
-    string org_id = 1;
+message GetCustomOrgIAMPolicyRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetOrgIAMPolicyResponse {
+message GetCustomOrgIAMPolicyResponse {
     zitadel.policy.v1.OrgIAMPolicy policy = 1;
     bool is_default = 2;
 }
 
 message AddCustomOrgIAMPolicyRequest {
-    string org_id = 1;
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool user_login_must_be_domain = 2;
 }
 
@@ -776,7 +724,7 @@ message AddCustomOrgIAMPolicyResponse {
 }
 
 message UpdateCustomOrgIAMPolicyRequest {
-    string org_id = 1;
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool user_login_must_be_domain = 2;
 }
 
@@ -784,57 +732,36 @@ message UpdateCustomOrgIAMPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ResetOrgIAMPolicyToDefaultRequest {
-    string org_id = 1;
+message ResetCustomOrgIAMPolicyToDefaultRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message ResetOrgIAMPolicyToDefaultResponse {
+message ResetCustomOrgIAMPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetDefaultLabelPolicyRequest {}
+message GetLabelPolicyRequest {}
 
-message GetDefaultLabelPolicyResponse {
+message GetLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
 }
 
-message UpdateDefaultLabelPolicyRequest {
-    string primary_color = 1;
-    string secondary_color = 2;
+message UpdateLabelPolicyRequest {
+    string primary_color = 1 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
 }
 
-message UpdateDefaultLabelPolicyResponse {
+message UpdateLabelPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetDefaultMailTemplatePolicyRequest {}
+message GetLoginPolicyRequest {}
 
-message GetDefaultMailTemplatePolicyResponse {
-    zitadel.policy.v1.MailTemplatePolicy policy = 1;
-}
-
-message UpdateDefaultMailTemplatePolicyRequest {
-    string mail_text_type = 1; //TODO: type sounds like an enum
-	string language = 2; //TODO: enum?
-	string title = 3;
-	string pre_header = 4;
-	string subject = 5;
-	string greeting = 6;
-	string text = 7;
-	string button_text = 8;
-}
-
-message UpdateDefaultMailTemplatePolicyResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message GetDefaultLoginPolicyRequest {}
-
-message GetDefaultLoginPolicyResponse {
+message GetLoginPolicyResponse {
     zitadel.policy.v1.LoginPolicy policy = 1;
 }
 
-message UpdateDefaultLoginPolicyRequest {
+message UpdateLoginPolicyRequest {
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
@@ -842,88 +769,88 @@ message UpdateDefaultLoginPolicyRequest {
     zitadel.policy.v1.PasswordlessType passwordless_type = 5;
 }
 
-message UpdateDefaultLoginPolicyResponse {
+message UpdateLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListDefaultLoginPolicyIDPsRequest {
+message ListLoginPolicyIDPsRequest {
     zitadel.v1.ListQuery meta_data = 1;
 }
 
-message ListDefaultLoginPolicyIDPsResponse {
+message ListLoginPolicyIDPsResponse {
     zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.idp.v1.IDPLoginPolicyLink result = 2;
 }
 
-message AddIDPToDefaultLoginPolicyRequest {
-    string idp_id = 1;
+message AddIDPToLoginPolicyRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message AddIDPToDefaultLoginPolicyResponse {
+message AddIDPToLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveIDPFromDefaultLoginPolicyRequest {
-    string idp_id = 1;
+message RemoveIDPFromLoginPolicyRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveIDPFromDefaultLoginPolicyResponse {
+message RemoveIDPFromLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListDefaultLoginPolicySecondFactorsRequest {}
+message ListLoginPolicySecondFactorsRequest {}
 
-message ListDefaultLoginPolicySecondFactorsResponse {
+message ListLoginPolicySecondFactorsResponse {
     zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.policy.v1.SecondFactorType result = 2;
 }
 
-message AddSecondFactorToDefaultLoginPolicyRequest {
-    zitadel.policy.v1.SecondFactorType type = 1;
+message AddSecondFactorToLoginPolicyRequest {
+    zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
-message AddSecondFactorToDefaultLoginPolicyResponse {
+message AddSecondFactorToLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveSecondFactorFromDefaultLoginPolicyRequest {
-    zitadel.policy.v1.SecondFactorType type = 1;
+message RemoveSecondFactorFromLoginPolicyRequest {
+    zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
-message RemoveSecondFactorFromDefaultLoginPolicyResponse {
+message RemoveSecondFactorFromLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListDefaultLoginPolicyMultiFactorsRequest {}
+message ListLoginPolicyMultiFactorsRequest {}
 
-message ListDefaultLoginPolicyMultiFactorsResponse {
+message ListLoginPolicyMultiFactorsResponse {
     zitadel.v1.ListDetails meta_data = 1;
     repeated zitadel.policy.v1.MultiFactorType result = 2;
 }
 
-message AddMultiFactorToDefaultLoginPolicyRequest {
-    zitadel.policy.v1.MultiFactorType type = 1;
+message AddMultiFactorToLoginPolicyRequest {
+    zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
-message AddMultiFactorToDefaultLoginPolicyResponse {
+message AddMultiFactorToLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveMultiFactorFromDefaultLoginPolicyRequest {
-    zitadel.policy.v1.MultiFactorType type = 1;
+message RemoveMultiFactorFromLoginPolicyRequest {
+    zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
-message RemoveMultiFactorFromDefaultLoginPolicyResponse {
+message RemoveMultiFactorFromLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetDefaultPasswordComplexityPolicyRequest {}
+message GetPasswordComplexityPolicyRequest {}
 
-message GetDefaultPasswordComplexityPolicyResponse {
+message GetPasswordComplexityPolicyResponse {
     zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
 }
 
-message UpdateDefaultPasswordComplexityPolicyRequest {
+message UpdatePasswordComplexityPolicyRequest {
     uint32 min_length = 1;
     bool has_uppercase = 2;
     bool has_lowercase = 3;
@@ -931,42 +858,42 @@ message UpdateDefaultPasswordComplexityPolicyRequest {
     bool has_symbol = 5;
 }
 
-message UpdateDefaultPasswordComplexityPolicyResponse {
+message UpdatePasswordComplexityPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetDefaultPasswordAgePolicyRequest {}
+message GetPasswordAgePolicyRequest {}
 
-message GetDefaultPasswordAgePolicyResponse {
+message GetPasswordAgePolicyResponse {
     zitadel.policy.v1.PasswordAgePolicy policy = 1;
 }
 
-message UpdateDefaultPasswordAgePolicyRequest {
+message UpdatePasswordAgePolicyRequest {
     uint32 max_age_days = 1;
     uint32 expire_warn_days = 2;
 }
 
-message UpdateDefaultPasswordAgePolicyResponse {
+message UpdatePasswordAgePolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetDefaultPasswordLockoutPolicyRequest {}
+message GetPasswordLockoutPolicyRequest {}
 
-message GetDefaultPasswordLockoutPolicyResponse {
+message GetPasswordLockoutPolicyResponse {
     zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
 }
 
-message UpdateDefaultPasswordLockoutPolicyRequest {
+message UpdatePasswordLockoutPolicyRequest {
     uint32 max_attempts = 1;
     bool show_lockout_failure = 2;
 }
 
-message UpdateDefaultPasswordLockoutPolicyResponse {
+message UpdatePasswordLockoutPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
 message AddIAMMemberRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 2;
 }
 
@@ -975,7 +902,7 @@ message AddIAMMemberResponse {
 }
 
 message UpdateIAMMemberRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 2;
 }
 
@@ -984,7 +911,7 @@ message UpdateIAMMemberResponse {
 }
 
 message RemoveIAMMemberRequest {
-    string user_id = 1;
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveIAMMemberResponse {
@@ -1018,8 +945,8 @@ message ListViewsResponse {
 }
 
 message ClearViewRequest {
-    string database = 1 [(validate.rules).string = {min_len: 1}];
-    string view_name = 2 [(validate.rules).string = {min_len: 1}];
+    string database = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string view_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ClearViewResponse {}
@@ -1032,8 +959,8 @@ message ListFailedEventsResponse {
 }
 
 message RemoveFailedEventRequest {
-    string database = 1 [(validate.rules).string = {min_len: 1}];
-    string view_name = 2 [(validate.rules).string = {min_len: 1}];
+    string database = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string view_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     uint64 failed_sequence = 3;
 }
 
