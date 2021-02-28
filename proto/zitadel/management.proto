@@ -290,7 +290,7 @@ service ManagementService {
         };
     }
 
-    rpc ResendHumanEmailVerification(ResendEmailVerificationRequest) returns (ResendEmailVerificationResponse) {
+    rpc ResendHumanEmailVerification(ResendHumanEmailVerificationRequest) returns (ResendHumanEmailVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/email/_resendverification"
             body: "*"
@@ -1937,11 +1937,11 @@ message ResendHumanInitializationRequest {
 
 message ResendHumanInitializationResponse {}
 
-message ResendEmailVerificationRequest {
+message ResendHumanEmailVerificationRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message ResendEmailVerificationResponse {
+message ResendHumanEmailVerificationResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
