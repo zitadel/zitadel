@@ -2,15 +2,20 @@ package management
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/grpc/authn"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
+	"github.com/caos/zitadel/internal/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 )
 
@@ -21,8 +26,8 @@ func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest)
 				OrgID: authz.GetCtxData(ctx).OrgID,
 			},
 		},
-	},
-	)
+	})
+
 	return &user_model.UserSearchRequest{
 		Offset:  req.MetaData.Offset,
 		Limit:   uint64(req.MetaData.Limit),
@@ -117,5 +122,41 @@ func UpdateMachineRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateMachin
 		},
 		Name:        req.Name,
 		Description: req.Description,
+	}
+}
+
+func ListMachineKeysRequestToModel(req *mgmt_pb.ListMachineKeysRequest) *key_model.AuthNKeySearchRequest {
+	return &key_model.AuthNKeySearchRequest{
+		Offset: req.MetaData.Offset,
+		Limit:  uint64(req.MetaData.Limit),
+		Asc:    req.MetaData.Asc,
+		Queries: []*key_model.AuthNKeySearchQuery{
+			{
+				Key:    key_model.AuthNKeyObjectType,
+				Method: model.SearchMethodEquals,
+				Value:  key_model.AuthNKeyObjectTypeUser,
+			}, {
+				Key:    key_model.AuthNKeyObjectID,
+				Method: model.SearchMethodEquals,
+				Value:  req.UserId,
+			},
+		},
+	}
+}
+
+func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.MachineKey {
+	expDate := time.Time{}
+	if req.ExpirationDate != nil {
+		var err error
+		expDate, err = ptypes.Timestamp(req.ExpirationDate)
+		logging.Log("MANAG-iNshR").OnError(err).Debug("unable to parse expiration date")
+	}
+
+	return &domain.MachineKey{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: req.UserId,
+		},
+		ExpirationDate: expDate,
+		Type:           authn.KeyTypeToDomain(req.Type),
 	}
 }

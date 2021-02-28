@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/grpc/authn"
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
@@ -390,5 +392,57 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 			machine.ChangeDate,
 			machine.ResourceOwner,
 		),
+	}, nil
+}
+
+func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachineKeyByIDsRequest) (*mgmt_pb.GetMachineKeyByIDsResponse, error) {
+	key, err := s.user.GetMachineKey(ctx, req.UserId, req.KeyId)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetMachineKeyByIDsResponse{
+		Key: authn.KeyToPb(key),
+	}, nil
+}
+
+func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
+	result, err := s.user.SearchMachineKeys(ctx, ListMachineKeysRequestToModel(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListMachineKeysResponse{
+		Result: authn.KeyViewsToPb(result.Result),
+		MetaData: obj_grpc.ToListDetails(
+			result.TotalResult,
+			result.Sequence,
+			result.Timestamp,
+		),
+	}, nil
+}
+
+func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRequest) (*mgmt_pb.AddMachineKeyResponse, error) {
+	key, err := s.command.AddUserMachineKey(ctx, AddMachineKeyRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddMachineKeyResponse{
+		KeyId:      key.KeyID,
+		KeyDetails: authn.KeyDetailsToPb(key),
+		Details: object.ToDetailsPb(
+			key.Sequence,
+			key.CreationDate,
+			key.ChangeDate,
+			key.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachineKeyRequest) (*mgmt_pb.RemoveMachineKeyResponse, error) {
+	err := s.command.RemoveUserMachineKey(ctx, req.UserId, req.KeyId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveMachineKeyResponse{
+		//TODO: details
 	}, nil
 }
