@@ -1818,7 +1818,9 @@ message AddHumanUserRequest {
     Profile profile = 2 [(validate.rules).message.required = true];
     Email email = 3 [(validate.rules).message.required = true];
     Phone phone = 4;
+    string inital_password = 5;
 }
+
 message AddHumanUserResponse {
     string user_id = 1;
     zitadel.v1.ObjectDetails details = 2;
