@@ -2515,7 +2515,7 @@ message AddOIDCAppRequest {
 }
 
 message AddOIDCAppResponse {
-    string app_id = 1
+    string app_id = 1;
     zitadel.v1.ObjectDetails details = 2;
     string client_id = 3;
     string client_secret = 4;

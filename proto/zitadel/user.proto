@@ -265,6 +265,12 @@ message UserGrant {
     string project_name = 15;
 }
 
+enum UserGrantState {
+    USER_GRANT_STATE_UNSPECIFIED = 0;
+    USER_GRANT_STATE_ACTIVE = 1;
+    USER_GRANT_STATE_INACTIVE = 2;
+}
+
 message UserGrantQuery {
     oneof query {
         option (validate.required) = true;
