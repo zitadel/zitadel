@@ -1,7 +1,7 @@
 package member
 
 import (
-	"github.com/caos/zitadel/interna/domain"
+	"github.com/caos/zitadel/internal/domain"
 	member_pb "github.com/caos/zitadel/pkg/grpc/member"
 )
 
