@@ -6,7 +6,7 @@ import (
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func updateDefaultLoginPolicyToDomain(p *admin_pb.UpdateDefaultLoginPolicyRequest) *domain.LoginPolicy {
+func updateLoginPolicyToDomain(p *admin_pb.UpdateLoginPolicyRequest) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
 		AllowUsernamePassword: p.AllowUsernamePassword,
 		AllowRegister:         p.AllowRegister,

@@ -84,10 +84,10 @@ func OrgToPb(org *org_model.OrgView) *org_pb.Org {
 func OrgStateToPb(state org_model.OrgState) org_pb.OrgState {
 	switch state {
 	case org_model.OrgStateActive:
-		return org_pb.OrgState_ORGSTATE_ACTIVATE
+		return org_pb.OrgState_ORG_STATE_ACTIVATE
 	case org_model.OrgStateInactive:
-		return org_pb.OrgState_ORGSTATE_INACTIVATE
+		return org_pb.OrgState_ORG_STATE_INACTIVATE
 	default:
-		return org_pb.OrgState_ORGSTATE_UNSPECIFIED
+		return org_pb.OrgState_ORG_STATE_UNSPECIFIED
 	}
 }

@@ -122,12 +122,28 @@ func Test_updateOIDCConfigToDomain(t *testing.T) {
 		name string
 		args args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "all fields filled",
+			args: args{
+				req: &admin_pb.UpdateIDPOIDCConfigRequest{
+					IdpId:              "4208",
+					Issuer:             "zitadel.ch",
+					ClientId:           "ZITEADEL",
+					ClientSecret:       "i'm so secret",
+					Scopes:             []string{"profile"},
+					DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
+					UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := updateOIDCConfigToDomain(tt.args.req)
-			test.AssertFieldsMapped(t, got, "ObjectRoot")
+			test.AssertFieldsMapped(t, got,
+				"ObjectRoot",
+				"ClientSecret",
+			)
 		})
 	}
 }

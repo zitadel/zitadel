@@ -12,7 +12,6 @@ func setUpOrgHumanToDomain(human *admin_grpc.SetUpOrgRequest_Human) *domain.Huma
 	return &domain.Human{
 		Username: human.UserName,
 		Profile:  setUpOrgHumanProfileToDomain(human.Profile),
-		Address:  setUpOrgHumanAddressToDomain(human.Address),
 		Email:    setUpOrgHumanEmailToDomain(human.Email),
 		Phone:    setUpOrgHumanPhoneToDomain(human.Phone),
 	}
@@ -30,19 +29,6 @@ func setUpOrgHumanProfileToDomain(profile *admin_grpc.SetUpOrgRequest_Human_Prof
 		DisplayName:       profile.DisplayName,
 		PreferredLanguage: lang,
 		Gender:            user_grpc.GenderToDomain(profile.Gender),
-	}
-}
-
-func setUpOrgHumanAddressToDomain(address *admin_grpc.SetUpOrgRequest_Human_Address) *domain.Address {
-	if address == nil {
-		return nil
-	}
-	return &domain.Address{
-		Country:       address.Country,
-		Locality:      address.Locality,
-		PostalCode:    address.PostalCode,
-		Region:        address.Region,
-		StreetAddress: address.StreetAddress,
 	}
 }
 

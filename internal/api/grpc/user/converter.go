@@ -134,11 +134,11 @@ func MultiFactorToPb(mfa *model.MultiFactor) *user_pb.MultiFactor {
 func MFAStateToPb(state model.MFAState) user_pb.MultiFactorState {
 	switch state {
 	case model.MFAStateNotReady:
-		return user_pb.MultiFactorState_MultiFactor_STATE_NOT_READY
+		return user_pb.MultiFactorState_MULTI_FACTOR_STATE_NOT_READY
 	case model.MFAStateReady:
-		return user_pb.MultiFactorState_MultiFactor_STATE_READY
+		return user_pb.MultiFactorState_MULTI_FACTOR_STATE_READY
 	default:
-		return user_pb.MultiFactorState_MultiFactor_STATE_UNSPECIFIED
+		return user_pb.MultiFactorState_MULTI_FACTOR_STATE_UNSPECIFIED
 	}
 }
 

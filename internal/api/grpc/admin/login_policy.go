@@ -10,20 +10,20 @@ import (
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func (s *Server) GetDefaultLoginPolicy(ctx context.Context, _ *admin_pb.GetDefaultLoginPolicyRequest) (*admin_pb.GetDefaultLoginPolicyResponse, error) {
+func (s *Server) GetLoginPolicy(ctx context.Context, _ *admin_pb.GetLoginPolicyRequest) (*admin_pb.GetLoginPolicyResponse, error) {
 	policy, err := s.iam.GetDefaultLoginPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.GetDefaultLoginPolicyResponse{Policy: policy_grpc.ModelLoginPolicyToPb(policy)}, nil
+	return &admin_pb.GetLoginPolicyResponse{Policy: policy_grpc.ModelLoginPolicyToPb(policy)}, nil
 }
 
-func (s *Server) UpdateDefaultLoginPolicy(ctx context.Context, p *admin_pb.UpdateDefaultLoginPolicyRequest) (*admin_pb.UpdateDefaultLoginPolicyResponse, error) {
-	policy, err := s.command.ChangeDefaultLoginPolicy(ctx, updateDefaultLoginPolicyToDomain(p))
+func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginPolicyRequest) (*admin_pb.UpdateLoginPolicyResponse, error) {
+	policy, err := s.command.ChangeDefaultLoginPolicy(ctx, updateLoginPolicyToDomain(p))
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.UpdateDefaultLoginPolicyResponse{
+	return &admin_pb.UpdateLoginPolicyResponse{
 		Details: object.ToDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,
@@ -33,12 +33,12 @@ func (s *Server) UpdateDefaultLoginPolicy(ctx context.Context, p *admin_pb.Updat
 	}, nil
 }
 
-func (s *Server) AddIDPToDefaultLoginPolicy(ctx context.Context, req *admin_pb.AddIDPToDefaultLoginPolicyRequest) (*admin_pb.AddIDPToDefaultLoginPolicyResponse, error) {
+func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *admin_pb.AddIDPToLoginPolicyRequest) (*admin_pb.AddIDPToLoginPolicyResponse, error) {
 	idp, err := s.command.AddIDPProviderToDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId}) //TODO: old way was to also add type but this doesnt make sense in my point of view
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.AddIDPToDefaultLoginPolicyResponse{
+	return &admin_pb.AddIDPToLoginPolicyResponse{
 		Details: object.ToDetailsPb(
 			idp.Sequence,
 			idp.CreationDate,
@@ -47,19 +47,19 @@ func (s *Server) AddIDPToDefaultLoginPolicy(ctx context.Context, req *admin_pb.A
 	}, nil
 }
 
-func (s *Server) RemoveIDPFromDefaultLoginPolicy(ctx context.Context, req *admin_pb.RemoveIDPFromDefaultLoginPolicyRequest) (*admin_pb.RemoveIDPFromDefaultLoginPolicyResponse, error) {
+func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveIDPFromLoginPolicyRequest) (*admin_pb.RemoveIDPFromLoginPolicyResponse, error) {
 	//TODO: dont understand current impelementation
 	return nil, nil
 }
 
-func (s *Server) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, req *admin_pb.AddSecondFactorToDefaultLoginPolicyRequest) (*admin_pb.AddSecondFactorToDefaultLoginPolicyResponse, error) {
+func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddSecondFactorToLoginPolicyRequest) (*admin_pb.AddSecondFactorToLoginPolicyResponse, error) {
 	result, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
 	//TODO: return value
 	_ = result
-	// return &admin_pb.AddSecondFactorToDefaultLoginPolicyResponse{
+	// return &admin_pb.AddSecondFactorToLoginPolicyResponse{
 	// 	Details: object.ToDetailsPb(
 	// 		result.Sequence,
 	// 		result.CreationDate,
@@ -70,23 +70,23 @@ func (s *Server) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, req *a
 	return nil, nil
 }
 
-func (s *Server) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, req *admin_pb.RemoveSecondFactorFromDefaultLoginPolicyRequest) (*admin_pb.RemoveSecondFactorFromDefaultLoginPolicyResponse, error) {
+func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveSecondFactorFromLoginPolicyRequest) (*admin_pb.RemoveSecondFactorFromLoginPolicyResponse, error) {
 	err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, policy.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
 	//TODO: missing return value
-	return &admin_pb.RemoveSecondFactorFromDefaultLoginPolicyResponse{}, nil
+	return &admin_pb.RemoveSecondFactorFromLoginPolicyResponse{}, nil
 }
 
-func (s *Server) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, req *admin_pb.AddMultiFactorToDefaultLoginPolicyRequest) (*admin_pb.AddMultiFactorToDefaultLoginPolicyResponse, error) {
+func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddMultiFactorToLoginPolicyRequest) (*admin_pb.AddMultiFactorToLoginPolicyResponse, error) {
 	result, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
 	//TODO: return value
 	_ = result
-	// return &admin_pb.AddMultiFactorToDefaultLoginPolicyResponse{
+	// return &admin_pb.AddMultiFactorToLoginPolicyResponse{
 	// 	Details: object.ToDetailsPb(
 	// 		result.Sequence,
 	// 		result.CreationDate,
@@ -97,11 +97,11 @@ func (s *Server) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, req *ad
 	return nil, nil
 }
 
-func (s *Server) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, req *admin_pb.RemoveMultiFactorFromDefaultLoginPolicyRequest) (*admin_pb.RemoveMultiFactorFromDefaultLoginPolicyResponse, error) {
+func (s *Server) RemoveMultiFactorFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveMultiFactorFromLoginPolicyRequest) (*admin_pb.RemoveMultiFactorFromLoginPolicyResponse, error) {
 	err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, policy.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
 	//TODO: missing return value
-	return &admin_pb.RemoveMultiFactorFromDefaultLoginPolicyResponse{}, nil
+	return &admin_pb.RemoveMultiFactorFromLoginPolicyResponse{}, nil
 }

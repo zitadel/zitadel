@@ -5,7 +5,7 @@ import (
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func updateDefaultLabelPolicyToDomain(policy *admin_pb.UpdateDefaultLabelPolicyRequest) *domain.LabelPolicy {
+func updateLabelPolicyToDomain(policy *admin_pb.UpdateLabelPolicyRequest) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
 		PrimaryColor:   policy.PrimaryColor,
 		SecondaryColor: policy.SecondaryColor,

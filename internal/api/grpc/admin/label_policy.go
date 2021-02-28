@@ -8,20 +8,20 @@ import (
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func (s *Server) GetDefaultLabelPolicy(ctx context.Context, req *admin_pb.GetDefaultLabelPolicyRequest) (*admin_pb.GetDefaultLabelPolicyResponse, error) {
+func (s *Server) GetLabelPolicy(ctx context.Context, req *admin_pb.GetLabelPolicyRequest) (*admin_pb.GetLabelPolicyResponse, error) {
 	policy, err := s.iam.GetDefaultLabelPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.GetDefaultLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
+	return &admin_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
 }
 
-func (s *Server) UpdateDefaultLabelPolicy(ctx context.Context, req *admin_pb.UpdateDefaultLabelPolicyRequest) (*admin_pb.UpdateDefaultLabelPolicyResponse, error) {
-	policy, err := s.command.ChangeDefaultLabelPolicy(ctx, updateDefaultLabelPolicyToDomain(req))
+func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabelPolicyRequest) (*admin_pb.UpdateLabelPolicyResponse, error) {
+	policy, err := s.command.ChangeDefaultLabelPolicy(ctx, updateLabelPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.UpdateDefaultLabelPolicyResponse{
+	return &admin_pb.UpdateLabelPolicyResponse{
 		Details: object.ToDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,
