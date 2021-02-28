@@ -3,7 +3,6 @@ package admin
 import (
 	"context"
 
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
@@ -18,7 +17,7 @@ func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.GetOrgByIDResponse{Org: org_grpc.OrgToPb(org)}, nil
+	return &admin_pb.GetOrgByIDResponse{Org: org_grpc.OrgViewToPb(org)}, nil
 }
 
 func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*admin_pb.ListOrgsResponse, error) {
@@ -30,7 +29,7 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.ListOrgsResponse{Result: org_grpc.OrgsToPb(orgs.Result)}, nil
+	return &admin_pb.ListOrgsResponse{Result: org_grpc.OrgViewsToPb(orgs.Result)}, nil
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*admin_pb.SetUpOrgResponse, error) {
@@ -42,12 +41,4 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 		return nil, err
 	}
 	return &admin_pb.SetUpOrgResponse{}, nil //TODO: return obejct details
-}
-
-func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest) (*admin_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.DefaultIDPConfigByID(ctx, req.Id)
-	if err != nil {
-		return nil, err
-	}
-	return &admin_pb.GetIDPByIDResponse{Idp: idp_grpc.IDPViewToPb(idp)}, nil
 }

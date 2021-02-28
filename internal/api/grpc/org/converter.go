@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	object_pb "github.com/caos/zitadel/pkg/grpc/object"
 	org_pb "github.com/caos/zitadel/pkg/grpc/org"
 )
@@ -59,15 +60,15 @@ func TextMethodToModel(method object_pb.TextQueryMethod) model.SearchMethod {
 	}
 }
 
-func OrgsToPb(orgs []*org_model.OrgView) []*org_pb.Org {
+func OrgViewsToPb(orgs []*org_model.OrgView) []*org_pb.Org {
 	o := make([]*org_pb.Org, len(orgs))
 	for i, org := range orgs {
-		o[i] = OrgToPb(org)
+		o[i] = OrgViewToPb(org)
 	}
 	return o
 }
 
-func OrgToPb(org *org_model.OrgView) *org_pb.Org {
+func OrgViewToPb(org *org_model.OrgView) *org_pb.Org {
 	return &org_pb.Org{
 		Id:    org.ID,
 		State: OrgStateToPb(org.State),
@@ -78,6 +79,28 @@ func OrgToPb(org *org_model.OrgView) *org_pb.Org {
 			org.ChangeDate,
 			org.ResourceOwner,
 		),
+	}
+}
+
+func OrgsToPb(orgs []*grant_model.Org) []*org_pb.Org {
+	o := make([]*org_pb.Org, len(orgs))
+	for i, org := range orgs {
+		o[i] = OrgToPb(org)
+	}
+	return o
+}
+
+func OrgToPb(org *grant_model.Org) *org_pb.Org {
+	return &org_pb.Org{
+		Id:   org.OrgID,
+		Name: org.OrgName,
+		// State: OrgStateToPb(org.State), //TODO: not provided
+		// Details: object.ToDetailsPb(//TODO: not provided
+		// 	org.Sequence,//TODO: not provided
+		// 	org.CreationDate,//TODO: not provided
+		// 	org.ChangeDate,//TODO: not provided
+		// 	org.ResourceOwner,//TODO: not provided
+		// ),//TODO: not provided
 	}
 }
 

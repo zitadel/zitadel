@@ -2,10 +2,30 @@ package admin
 
 import (
 	"context"
+	"time"
 
+	"github.com/caos/zitadel/internal/api/grpc/member"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
+
+func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMemberRolesRequest) (*admin_pb.ListIAMMemberRolesResponse, error) {
+	roles := s.iam.GetIAMMemberRoles()
+	return &admin_pb.ListIAMMemberRolesResponse{
+		MetaData: object.ToListDetails(uint64(len(roles)), 0, time.Now()),
+	}, nil
+}
+
+func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMembersRequest) (*admin_pb.ListIAMMembersResponse, error) {
+	res, err := s.iam.SearchIAMMembers(ctx, ListIAMMemberRequestToModel(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ListIAMMembersResponse{
+		MetaData: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
+		Result:   member.IAMMembersToPb(res.Result),
+	}, nil
+}
 
 func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberRequest) (*admin_pb.AddIAMMemberResponse, error) {
 	member, err := s.command.AddIAMMember(ctx, AddIAMMemberToDomain(req))

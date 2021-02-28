@@ -1,12 +1,38 @@
 package idp
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
+	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/model"
+	user_model "github.com/caos/zitadel/internal/user/model"
 	idp_pb "github.com/caos/zitadel/pkg/grpc/idp"
 )
+
+func IDPViewsToPb(idps []*iam_model.IDPConfigView) []*idp_pb.IDP {
+	resp := make([]*idp_pb.IDP, len(idps))
+	for i, idp := range idps {
+		resp[i] = ModelIDPViewToPb(idp)
+	}
+	return resp
+}
+
+func ModelIDPViewToPb(idp *iam_model.IDPConfigView) *idp_pb.IDP {
+	return &idp_pb.IDP{
+		Id:          idp.IDPConfigID,
+		State:       ModelIDPStateToPb(idp.State),
+		Name:        idp.Name,
+		StylingType: ModelIDPStylingTypeToPb(idp.StylingType),
+		Owner:       ModelIDPProviderTypeToPb(idp.IDPProviderType),
+		Config:      ModelIDPViewToConfigPb(idp),
+		Details: obj_grpc.ToDetailsPb(
+			idp.Sequence,
+			idp.CreationDate,
+			idp.ChangeDate,
+			"idp.ResourceOwner", //TODO: backend
+		),
+	}
+}
 
 func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
 	mapped := &idp_pb.IDP{
@@ -15,20 +41,36 @@ func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
 		Name:        idp.Name,
 		StylingType: IDPStylingTypeToPb(idp.StylingType),
 		Config:      IDPViewToConfigPb(idp),
-		Details:     object.ToDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, "idp.ResourceOwner"), //TODO: resource owner in view
+		Details:     obj_grpc.ToDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, "idp.ResourceOwner"), //TODO: resource owner in view
 	}
 	return mapped
 }
 
-func IDPsToUserLinkPb(resp *model.ExternalIDPSearchResponse) []*idp_pb.IDPUserLink {
-	links := make([]*idp_pb.IDPUserLink, len(resp.Result))
-	for i, link := range resp.Result {
+func ExternalIDPViewsToLoginPolicyLinkPb(links []*iam_model.IDPProviderView) []*idp_pb.IDPLoginPolicyLink {
+	l := make([]*idp_pb.IDPLoginPolicyLink, len(links))
+	for i, link := range links {
+		l[i] = ExternalIDPViewToLoginPolicyLinkPb(link)
+	}
+	return l
+}
+
+func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb.IDPLoginPolicyLink {
+	return &idp_pb.IDPLoginPolicyLink{
+		IdpId:   link.IDPConfigID,
+		IdpName: link.Name,
+		IdpType: idp_pb.IDPType_IDP_TYPE_OIDC,
+	}
+}
+
+func IDPsToUserLinkPb(res []*user_model.ExternalIDPView) []*idp_pb.IDPUserLink {
+	links := make([]*idp_pb.IDPUserLink, len(res))
+	for i, link := range res {
 		links[i] = ExternalIDPViewToUserLinkPb(link)
 	}
 	return links
 }
 
-func ExternalIDPViewToUserLinkPb(link *model.ExternalIDPView) *idp_pb.IDPUserLink {
+func ExternalIDPViewToUserLinkPb(link *user_model.ExternalIDPView) *idp_pb.IDPUserLink {
 	return &idp_pb.IDPUserLink{
 		UserId:           link.UserID,
 		IdpId:            link.IDPConfigID,
@@ -45,6 +87,17 @@ func IDPStateToPb(state domain.IDPConfigState) idp_pb.IDPState {
 	case domain.IDPConfigStateActive:
 		return idp_pb.IDPState_IDP_STATE_ACTIVE
 	case domain.IDPConfigStateInactive:
+		return idp_pb.IDPState_IDP_STATE_INACTIVE
+	default:
+		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
+	}
+}
+
+func ModelIDPStateToPb(state iam_model.IDPConfigState) idp_pb.IDPState {
+	switch state {
+	case iam_model.IDPConfigStateActive:
+		return idp_pb.IDPState_IDP_STATE_ACTIVE
+	case iam_model.IDPConfigStateInactive:
 		return idp_pb.IDPState_IDP_STATE_INACTIVE
 	default:
 		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
@@ -105,13 +158,23 @@ func IDPViewToConfigPb(config *domain.IDPConfigView) *idp_pb.IDP_OidcConfig {
 func OIDCConfigToPb(config *domain.OIDCIDPConfig) *idp_pb.IDP_OidcConfig {
 	return &idp_pb.IDP_OidcConfig{
 		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId: config.ClientID,
-			// ClientSecret:       config.ClientSecretString,
+			ClientId:           config.ClientID,
 			Issuer:             config.Issuer,
 			Scopes:             config.Scopes,
 			DisplayNameMapping: MappingFieldToPb(config.IDPDisplayNameMapping),
 			UsernameMapping:    MappingFieldToPb(config.UsernameMapping),
 		},
+	}
+}
+
+func FieldNameToModel(fieldName idp_pb.IDPFieldName) iam_model.IDPConfigSearchKey {
+	switch fieldName {
+	// case admin.IdpSearchKey_IDPSEARCHKEY_IDP_CONFIG_ID: //TODO: not implemented in proto
+	// 	return iam_model.IDPConfigSearchKeyIdpConfigID
+	case idp_pb.IDPFieldName_IDP_FIELD_NAME_NAME:
+		return iam_model.IDPConfigSearchKeyName
+	default:
+		return iam_model.IDPConfigSearchKeyUnspecified
 	}
 }
 
@@ -145,5 +208,32 @@ func MappingFieldToDomain(mappingField idp_pb.OIDCMappingField) domain.OIDCMappi
 		return domain.OIDCMappingFieldPreferredLoginName
 	default:
 		return domain.OIDCMappingFieldUnspecified
+	}
+}
+
+func ModelIDPProviderTypeToPb(typ iam_model.IDPProviderType) idp_pb.IDPOwnerType {
+	switch typ {
+	case iam_model.IDPProviderTypeOrg:
+		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG
+	case iam_model.IDPProviderTypeSystem:
+		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
+	default:
+		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
+	}
+}
+
+func IDPIDQueryToModel(query *idp_pb.IDPIDQuery) *iam_model.IDPConfigSearchQuery {
+	return &iam_model.IDPConfigSearchQuery{
+		Key:    iam_model.IDPConfigSearchKeyIdpConfigID, //TODO: whats the difference between idpconfigid and aggregateid search key?
+		Method: model.SearchMethodEquals,
+		Value:  query.Id,
+	}
+}
+
+func IDPNameQueryToModel(query *idp_pb.IDPNameQuery) *iam_model.IDPConfigSearchQuery {
+	return &iam_model.IDPConfigSearchQuery{
+		Key:    iam_model.IDPConfigSearchKeyName,
+		Method: obj_grpc.TextMethodToModel(query.Method),
+		Value:  query.Name,
 	}
 }

@@ -3,11 +3,29 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/grpc/object"
+	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
+	object_pb "github.com/caos/zitadel/internal/api/grpc/object"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-//TODO: listidps
+func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest) (*admin_pb.GetIDPByIDResponse, error) {
+	idp, err := s.query.DefaultIDPConfigByID(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetIDPByIDResponse{Idp: idp_grpc.IDPViewToPb(idp)}, nil
+}
+
+func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*admin_pb.ListIDPsResponse, error) {
+	resp, err := s.iam.SearchIDPConfigs(ctx, listIDPsToModel(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ListIDPsResponse{
+		Result:   idp_grpc.IDPViewsToPb(resp.Result),
+		MetaData: object_pb.ToListDetails(resp.TotalResult, resp.Sequence, resp.Timestamp),
+	}, nil
+}
 
 func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest) (*admin_pb.AddOIDCIDPResponse, error) {
 	config, err := s.command.AddDefaultIDPConfig(ctx, addOIDCIDPRequestToDomain(req))
@@ -16,7 +34,7 @@ func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest
 	}
 	return &admin_pb.AddOIDCIDPResponse{
 		IdpId: config.AggregateID,
-		Details: object.ToDetailsPb(config.Sequence,
+		Details: object_pb.ToDetailsPb(config.Sequence,
 			config.CreationDate,
 			config.ChangeDate,
 			config.ResourceOwner,
@@ -30,7 +48,7 @@ func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) 
 		return nil, err
 	}
 	return &admin_pb.UpdateIDPResponse{
-		Details: object.ToDetailsPb(
+		Details: object_pb.ToDetailsPb(
 			config.Sequence,
 			config.CreationDate,
 			config.ChangeDate,
@@ -56,8 +74,20 @@ func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPR
 }
 
 func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) (*admin_pb.RemoveIDPResponse, error) {
-	//TODO: current impl is fucking wild
-	return nil, nil
+	idpProviders, err := s.iam.IDPProvidersByIDPConfigID(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	externalIDPs, err := s.iam.ExternalIDPsByIDPConfigID(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	err = s.command.RemoveDefaultIDPConfig(ctx, req.Id, idpProviderViewsToDomain(idpProviders), externalIDPViewsToDomain(externalIDPs)...)
+	if err != nil {
+		return nil, err
+	}
+	//TODO: response from backend
+	return &admin_pb.RemoveIDPResponse{}, nil
 }
 
 func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateIDPOIDCConfigRequest) (*admin_pb.UpdateIDPOIDCConfigResponse, error) {
@@ -66,7 +96,7 @@ func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateID
 		return nil, err
 	}
 	return &admin_pb.UpdateIDPOIDCConfigResponse{
-		Details: object.ToDetailsPb(
+		Details: object_pb.ToDetailsPb(
 			config.Sequence,
 			config.CreationDate,
 			config.ChangeDate,

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/pkg/grpc/object"
 	object_pb "github.com/caos/zitadel/pkg/grpc/object"
 	"github.com/golang/protobuf/ptypes"
@@ -39,5 +40,28 @@ func ToListDetails(
 		TotalResult:       totalResult,
 		ProcessedSequence: processedSequence,
 		ViewTimestamp:     viewTs,
+	}
+}
+
+func TextMethodToModel(method object_pb.TextQueryMethod) model.SearchMethod {
+	switch method {
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
+		return model.SearchMethodEquals
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
+		return model.SearchMethodEqualsIgnoreCase
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
+		return model.SearchMethodStartsWith
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
+		return model.SearchMethodStartsWithIgnoreCase
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
+		return model.SearchMethodContains
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
+		return model.SearchMethodContainsIgnoreCase
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
+		fallthrough
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+		fallthrough
+	default:
+		return -1
 	}
 }
