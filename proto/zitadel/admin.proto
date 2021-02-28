@@ -617,7 +617,7 @@ message GetIDPByIDResponse {
 message ListIDPsRequest {
     zitadel.v1.ListQuery meta_data = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
-    repeated zitadel.idp.v1.IDPQuery queries = 3;
+    repeated IDPQuery queries = 3;
 }
 
 message IDPQuery {
