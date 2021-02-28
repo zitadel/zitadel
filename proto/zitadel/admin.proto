@@ -934,7 +934,7 @@ message ListIAMMemberRolesResponse {
 
 message ListIAMMembersRequest {
     zitadel.v1.ListQuery meta_data = 1;
-    zitadel.member.v1.SearchQuery query = 2;
+    repeated zitadel.member.v1.SearchQuery queries = 2;
 }
 
 message ListIAMMembersResponse {
