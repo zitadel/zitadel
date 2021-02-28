@@ -7,6 +7,13 @@ import (
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 
+func UsersToPb(users []*model.UserView) []*user_pb.User {
+	u := make([]*user_pb.User, len(users))
+	for i, user := range users {
+		u[i] = UserToPb(user)
+	}
+	return u
+}
 func UserToPb(user *model.UserView) *user_pb.User {
 	return &user_pb.User{
 		Id:                 user.ID,
@@ -31,6 +38,20 @@ func ProfileToPb(profile *model.Profile) *user_pb.Profile {
 		DisplayName:       profile.DisplayName,
 		PreferredLanguage: profile.PreferredLanguage.String(),
 		Gender:            GenderToPb(profile.Gender),
+	}
+}
+
+func EmailToPb(email *model.Email) *user_pb.Email {
+	return &user_pb.Email{
+		Email:           email.EmailAddress,
+		IsEmailVerified: email.IsEmailVerified,
+	}
+}
+
+func PhoneToPb(phone *model.Phone) *user_pb.Phone {
+	return &user_pb.Phone{
+		Phone:           phone.PhoneNumber,
+		IsPhoneVerified: phone.IsPhoneVerified,
 	}
 }
 

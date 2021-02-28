@@ -1818,7 +1818,7 @@ message AddHumanUserRequest {
     Profile profile = 2 [(validate.rules).message.required = true];
     Email email = 3 [(validate.rules).message.required = true];
     Phone phone = 4;
-    string inital_password = 5;
+    string initial_password = 5;
 }
 
 message AddHumanUserResponse {

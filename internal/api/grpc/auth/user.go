@@ -74,6 +74,7 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 		),
 	}, nil
 }
+
 func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProjectOrgsRequest) (*auth_pb.ListMyProjectOrgsResponse, error) {
 	res, err := s.repo.SearchMyProjectOrgs(ctx, ListMyProjectOrgsRequestToModel(req))
 	if err != nil {
