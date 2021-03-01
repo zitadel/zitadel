@@ -20,13 +20,11 @@ func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDeta
 
 func ToDetailsPb(
 	sequence uint64,
-	creationDate,
 	changeDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
 	return &object_pb.ObjectDetails{
 		Sequence:      sequence,
-		CreationDate:  timestamppb.New(creationDate),
 		ChangeDate:    timestamppb.New(changeDate),
 		ResourceOwner: resourceOwner,
 	}

@@ -2,6 +2,7 @@ package org
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
@@ -50,7 +51,6 @@ func OrgViewToPb(org *org_model.OrgView) *org_pb.Org {
 		Name:  org.Name,
 		Details: object.ToDetailsPb(
 			org.Sequence,
-			org.CreationDate,
 			org.ChangeDate,
 			org.ResourceOwner,
 		),
@@ -87,5 +87,78 @@ func OrgStateToPb(state org_model.OrgState) org_pb.OrgState {
 		return org_pb.OrgState_ORG_STATE_INACTIVATE
 	default:
 		return org_pb.OrgState_ORG_STATE_UNSPECIFIED
+	}
+}
+
+func DomainQueriesToModel(queries []*org_pb.DomainSearchQuery) (_ []*org_model.OrgDomainSearchQuery, err error) {
+	q := make([]*org_model.OrgDomainSearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = DomainQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func DomainQueryToModel(query *org_pb.DomainSearchQuery) (*org_model.OrgDomainSearchQuery, error) {
+	switch q := query.Query.(type) {
+	case *org_pb.DomainSearchQuery_DomainName:
+		return DomainNameQueryToModel(q.DomainName)
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
+	}
+}
+
+func DomainNameQueryToModel(query *org_pb.DomainNameQuery) (*org_model.OrgDomainSearchQuery, error) {
+	return &org_model.OrgDomainSearchQuery{
+		Key:    org_model.OrgDomainSearchKeyDomain,
+		Method: object.TextMethodToModel(query.Method),
+		Value:  query.Name,
+	}, nil
+}
+
+func DomainsToPb(domains []*org_model.OrgDomainView) []*org_pb.Domain {
+	d := make([]*org_pb.Domain, len(domains))
+	for i, domain := range domains {
+		d[i] = DomainToPb(domain)
+	}
+	return d
+}
+
+func DomainToPb(domain *org_model.OrgDomainView) *org_pb.Domain {
+	return &org_pb.Domain{
+		OrgId:          domain.OrgID,
+		DomainName:     domain.Domain,
+		IsVerified:     domain.Verified,
+		IsPrimary:      domain.Primary,
+		ValidationType: DomainValidationTypeFromModel(domain.ValidationType),
+		Details: object.ToDetailsPb(
+			0,
+			domain.ChangeDate,
+			"",
+		),
+	}
+}
+
+func DomainValidationTypeToDomain(validationType org_pb.DomainValidationType) domain.OrgDomainValidationType {
+	switch validationType {
+	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP:
+		return domain.OrgDomainValidationTypeHTTP
+	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS:
+		return domain.OrgDomainValidationTypeDNS
+	default:
+		return domain.OrgDomainValidationTypeUnspecified
+	}
+}
+
+func DomainValidationTypeFromModel(validationType org_model.OrgDomainValidationType) org_pb.DomainValidationType {
+	switch validationType {
+	case org_model.OrgDomainValidationTypeDNS:
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS
+	case org_model.OrgDomainValidationTypeHTTP:
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP
+	default:
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
 	}
 }

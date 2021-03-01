@@ -107,7 +107,6 @@ func MembershipToMembershipPb(membership *user_model.UserMembershipView) *user_p
 		Roles:       membership.Roles,
 		Details: object.ToDetailsPb(
 			membership.Sequence,
-			membership.CreationDate,
 			membership.ChangeDate,
 			membership.ResourceOwner,
 		),
