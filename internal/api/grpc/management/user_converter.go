@@ -5,6 +5,9 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/authn"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
@@ -14,8 +17,6 @@ import (
 	user_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
-	"github.com/golang/protobuf/ptypes"
-	"golang.org/x/text/language"
 )
 
 func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest) *user_model.UserSearchRequest {
@@ -158,4 +159,31 @@ func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.Mac
 		ExpirationDate: expDate,
 		Type:           authn.KeyTypeToDomain(req.Type),
 	}
+}
+
+func ListUserIDPsRequestToModel(req *mgmt_pb.ListUserIDPsRequest) *user_model.ExternalIDPSearchRequest {
+	return &user_model.ExternalIDPSearchRequest{
+		Limit:   uint64(req.MetaData.Limit),
+		Offset:  req.MetaData.Offset,
+		Queries: []*user_model.ExternalIDPSearchQuery{{Key: user_model.ExternalIDPSearchKeyUserID, Method: domain.SearchMethodEquals, Value: req.UserId}},
+	}
+}
+
+func ListUserMembershipsRequestToModel(req *mgmt_pb.ListUserMembershipsRequest) (*user_model.UserMembershipSearchRequest, error) {
+	queries, err := user_grpc.MembershipQueriesToModel(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, &user_model.UserMembershipSearchQuery{
+		Key:    user_model.UserMembershipSearchKeyUserID,
+		Method: domain.SearchMethodEquals,
+		Value:  req.UserId,
+	})
+	return &user_model.UserMembershipSearchRequest{
+		Offset: req.MetaData.Offset,
+		Limit:  uint64(req.MetaData.Limit),
+		Asc:    req.MetaData.Asc,
+		//SortingColumn: //TODO: sorting
+		Queries: queries,
+	}, nil
 }

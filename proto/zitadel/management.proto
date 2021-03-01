@@ -2022,6 +2022,7 @@ message RemoveHumanMultiFactorOTPResponse {
 
 message RemoveHumanMultiFactorU2FRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveHumanMultiFactorU2FResponse {
