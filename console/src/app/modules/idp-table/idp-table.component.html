@@ -29,21 +29,19 @@
                     </mat-checkbox>
                 </th>
                 <td mat-cell *matCellDef="let idp">
-                    <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                    <mat-checkbox color="primary" (click)="$event.stopPropagation()" class="chbox"
                         [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM"
                         (change)="$event ? selection.toggle(idp) : null" [checked]="selection.isSelected(idp)">
-                        <ng-template #genAvatar>
-                            <div class="avatar">
-                                <span>{{idp.name.charAt(0)}}</span>
-                            </div>
-                        </ng-template>
+                        <img src="../../../assets/images/google.png"
+                            *ngIf="idp.stylingType == IdpStylingType.IDPSTYLINGTYPE_GOOGLE" alt="google" />
                     </mat-checkbox>
                 </td>
             </ng-container>
 
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.NAME' | translate }} </th>
-                <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp"> {{idp?.name}} </td>
+                <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp"><strong>{{idp?.name}}</strong>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="config">
@@ -59,19 +57,24 @@
             <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.STATE' | translate }} </th>
                 <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
-                    {{ 'IDP.STATES.'+idp.state | translate }} </td>
+                    <span class="state"
+                        [ngClass]="{'active': idp.state === IdpState.IDPCONFIGSTATE_ACTIVE, 'inactive': idp.state === IdpState.IDPCONFIGSTATE_INACTIVE}">{{
+                        'IDP.STATES.'+idp.state | translate }}</span>
+                </td>
             </ng-container>
 
-            <ng-container matColumnDef="creationDate">
+            <ng-container matColumnDef="dates">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.CREATIONDATE' | translate }} </th>
                 <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
-                    {{idp.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="changeDate">
-                <th mat-header-cell *matHeaderCellDef> {{ 'IDP.CHANGEDATE' | translate }} </th>
-                <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
-                    {{idp.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
+                    <div class="date-block">
+                        <span class="date-sub">{{ 'IDP.CREATIONDATE' | translate }}:</span>
+                        <span>{{idp.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                    </div>
+                    <div class="date-block">
+                        <span class="date-sub">{{ 'IDP.CHANGEDATE' | translate }}</span>
+                        <span>{{idp.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                    </div>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="type">

@@ -19,9 +19,11 @@
     position: relative;
     flex: 1 0 300px;
     padding: 1rem;
+    max-width: 300px;
 
     @media only screen and (min-width: 1500px) {
       flex-basis: 400px;
+      max-width: 400px;
     }
 
     .meta-content {

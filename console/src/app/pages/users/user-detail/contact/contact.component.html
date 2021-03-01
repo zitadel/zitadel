@@ -19,9 +19,10 @@
         <div class="left">
             <span class="label">{{ 'USER.EMAIL' | translate }}</span>
             <span class="name">{{human?.email}}</span>
-            <span *ngIf="human?.isEmailVerified" class="state verified">{{'USER.EMAILVERIFIED' | translate}}</span>
+            <span *ngIf="human?.isEmailVerified" class="contact-state verified">{{'USER.EMAILVERIFIED' |
+                translate}}</span>
             <div *ngIf="!human?.isEmailVerified" class="block">
-                <span class="state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
+                <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
                 <ng-container *ngIf="human?.email">
                     <a *ngIf="canWrite && state != userStateEnum?.USERSTATE_INITIAL" class="verify"
@@ -45,9 +46,10 @@
         <div class="left">
             <span class="label">{{ 'USER.PHONE' | translate }}</span>
             <span class="name">{{human?.phone ? human.phone : ('USER.PHONEEMPTY' | translate)}}</span>
-            <span *ngIf="human?.isPhoneVerified" class="state verified">{{'USER.PHONEVERIFIED' | translate}}</span>
+            <span *ngIf="human?.isPhoneVerified" class="contact-state verified">{{'USER.PHONEVERIFIED' |
+                translate}}</span>
             <div *ngIf="!human?.isPhoneVerified" class="block">
-                <span class="state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
+                <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
                 <ng-container *ngIf="human?.phone">
                     <a *ngIf="!disablePhoneCode && canWrite" class="verify"

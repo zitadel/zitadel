@@ -23,6 +23,15 @@
 
 td {
   outline: none;
+
+  img {
+      height: 30px;
+      width: 30px;
+      margin-left: 1rem;
+      border-radius: .5rem;
+      object-fit: contain;
+      margin-top: .5rem;
+  }
 }
 
 tr {
@@ -88,3 +97,16 @@ tr {
     padding-bottom: .5rem;
   }
 }
+
+
+.date-block {
+    margin: .5rem 0;
+    display: block;
+    min-width: 120px;
+  
+    .date-sub {
+      font-size: 13px;
+      display: block;
+    }
+}
+  

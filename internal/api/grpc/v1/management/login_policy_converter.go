@@ -118,7 +118,7 @@ func idpProviderViewFromModel(provider *iam_model.IDPProviderView) *management.I
 	return &management.IdpProviderView{
 		IdpConfigId: provider.IDPConfigID,
 		Name:        provider.Name,
-		Type:        idpConfigTypeToModel(provider.IDPConfigType),
+		Type:        idpProviderTypeFromModel(provider.IDPProviderType),
 	}
 }
 
