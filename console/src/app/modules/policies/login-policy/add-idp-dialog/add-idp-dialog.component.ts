@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
+import { IDP } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
     Idp,
     IdpProviderType,
@@ -8,7 +8,7 @@ import {
     IdpSearchQuery,
     IdpView as MgmtIdpView,
     SearchMethod,
-} from 'src/app/proto/generated/management_pb';
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -30,7 +30,7 @@ export class AddIdpDialogComponent {
     ];
 
     public idp: Idp.AsObject | undefined = undefined;
-    public availableIdps: Array<AdminIdpView.AsObject | MgmtIdpView.AsObject> | string[] = [];
+    public availableIdps: Array<IDP.AsObject[] | MgmtIdpView.AsObject> | string[] = [];
     public IdpProviderType: any = IdpProviderType;
 
     constructor(
@@ -63,11 +63,11 @@ export class AddIdpDialogComponent {
             query.setValue(this.idpType.toString());
 
             this.mgmtService.SearchIdps(undefined, undefined, [query]).then(idps => {
-                this.availableIdps = idps.toObject().resultList;
+                this.availableIdps = idps.resultList;
             });
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-            this.adminService.SearchIdps().then(idps => {
-                this.availableIdps = idps.toObject().resultList;
+            this.adminService.listIDPs().then(idps => {
+                this.availableIdps = idps.resultList;
             });
         }
     }

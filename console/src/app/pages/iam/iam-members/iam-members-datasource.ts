@@ -27,14 +27,13 @@ export class IamMembersDataSource extends DataSource<IamMemberView.AsObject> {
 
         this.loadingSubject.next(true);
 
-        from(this.adminService.SearchIamMembers(pageSize, offset)).pipe(
+        from(this.adminService.listIAMMembers(pageSize, offset)).pipe(
             map(resp => {
-                const response = resp.toObject();
-                this.totalResult = response.totalResult;
-                if (response.viewTimestamp) {
-                    this.viewTimestamp = response.viewTimestamp;
+                this.totalResult = resp.metaData?.totalResult || 0;
+                if (resp.metaData?.viewTimestamp) {
+                    this.viewTimestamp = resp.metaData?.viewTimestamp;
                 }
-                return response.resultList;
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),

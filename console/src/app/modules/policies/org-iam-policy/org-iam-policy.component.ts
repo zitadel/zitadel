@@ -9,9 +9,15 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { CnslLinks } from '../../links/links.component';
-import { IAM_COMPLEXITY_LINK, IAM_LABEL_LINK, IAM_LOGIN_POLICY_LINK, ORG_LOGIN_POLICY_LINK, ORG_COMPLEXITY_LINK } from '../../policy-grid/policy-links';
 
+import { CnslLinks } from '../../links/links.component';
+import {
+    IAM_COMPLEXITY_LINK,
+    IAM_LABEL_LINK,
+    IAM_LOGIN_POLICY_LINK,
+    ORG_COMPLEXITY_LINK,
+    ORG_LOGIN_POLICY_LINK,
+} from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -81,7 +87,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
                 return this.managementService.GetMyOrgIamPolicy();
             case PolicyComponentServiceType.ADMIN:
                 if (this.org?.id) {
-                    return this.adminService.GetOrgIamPolicy(this.org.id);
+                    return this.adminService.getCustomOrgIAMPolicy(this.org.id);
                 }
                 break;
         }
@@ -91,7 +97,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
                 if ((this.iamData as MgmtOrgIamPolicyView.AsObject).pb_default) {
-                    this.adminService.CreateOrgIamPolicy(
+                    this.adminService.addCustomOrgIAMPolicy(
                         this.org.id,
                         this.iamData.userLoginMustBeDomain,
                     ).then(() => {
@@ -101,7 +107,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
                     });
                     break;
                 } else {
-                    this.adminService.UpdateOrgIamPolicy(
+                    this.adminService.updateCustomOrgIAMPolicy(
                         this.org.id,
                         this.iamData.userLoginMustBeDomain,
                     ).then(() => {
@@ -113,8 +119,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
                 }
             case PolicyComponentServiceType.ADMIN:
                 // update Default org iam policy?
-                this.adminService.UpdateOrgIamPolicy(
-                    this.org.id,
+                this.adminService.updateOrgIAMPolicy(
                     this.iamData.userLoginMustBeDomain,
                 ).then(() => {
                     this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -127,7 +132,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
 
     public removePolicy(): void {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            this.adminService.RemoveOrgIamPolicy(this.org.id).then(() => {
+            this.adminService.resetCustomOrgIAMPolicyToDefault(this.org.id).then(() => {
                 this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
                 setTimeout(() => {
                     this.fetchData();
