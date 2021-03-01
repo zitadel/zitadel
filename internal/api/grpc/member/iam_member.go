@@ -2,8 +2,8 @@ package member
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/model"
 	member_pb "github.com/caos/zitadel/pkg/grpc/member"
 )
 
@@ -83,7 +83,7 @@ func EmailQueryToIAMMemberQuery(query *member_pb.EmailQuery) *iam_model.IAMMembe
 func UserIDQueryToIAMMemberQuery(query *member_pb.UserIDQuery) *iam_model.IAMMemberSearchQuery {
 	return &iam_model.IAMMemberSearchQuery{
 		Key:    iam_model.IAMMemberSearchKeyUserID,
-		Method: model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  query.UserId,
 	}
 }

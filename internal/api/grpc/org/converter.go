@@ -2,8 +2,8 @@ package org
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	object_pb "github.com/caos/zitadel/pkg/grpc/object"
@@ -37,24 +37,25 @@ func OrgQueryToModel(query *org_pb.OrgQuery) (*org_model.OrgSearchQuery, error) 
 	}
 }
 
-func TextMethodToModel(method object_pb.TextQueryMethod) model.SearchMethod {
+func TextMethodToModel(method object_pb.TextQueryMethod) domain.SearchMethod {
 	switch method {
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
-		return model.SearchMethodEquals
+		return domain.SearchMethodEquals
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
-		return model.SearchMethodEqualsIgnoreCase
+		return domain.SearchMethodEqualsIgnoreCase
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
-		return model.SearchMethodStartsWith
+		return domain.SearchMethodStartsWith
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
-		return model.SearchMethodStartsWithIgnoreCase
+		return domain.SearchMethodStartsWithIgnoreCase
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
-		return model.SearchMethodContains
+		return domain.SearchMethodContains
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
-		return model.SearchMethodContainsIgnoreCase
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
-		return model.SearchMethodEndsWith
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
-		return model.SearchMethodEndsWithIgnoreCase
+		return domain.SearchMethodContainsIgnoreCase
+		//TODO: uncoment when added in proto
+	//case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
+	//	return domain.SearchMethodEndsWith
+	//case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+	//	return domain.SearchMethodEndsWithIgnoreCase
 	default:
 		return -1
 	}
