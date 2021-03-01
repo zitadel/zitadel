@@ -32,7 +32,7 @@ export class IamComponent {
 
     public loadMembers(): void {
         this.loadingSubject.next(true);
-        from(this.adminService.SearchIamMembers(100, 0)).pipe(
+        from(this.adminService.listIAMMembers(100, 0)).pipe(
             map(resp => {
                 this.totalMemberResult = resp.toObject().totalResult;
                 return resp.toObject().resultList;
