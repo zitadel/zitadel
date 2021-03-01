@@ -2,6 +2,7 @@ package object
 
 import (
 	"github.com/caos/zitadel/internal/domain"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
 	"github.com/caos/logging"
@@ -9,6 +10,14 @@ import (
 	object_pb "github.com/caos/zitadel/pkg/grpc/object"
 	"github.com/golang/protobuf/ptypes"
 )
+
+func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
+	return &object_pb.ObjectDetails{
+		Sequence:      objectDetail.Sequence,
+		ChangeDate:    timestamppb.New(objectDetail.ChangeDate),
+		ResourceOwner: objectDetail.ResourceOwner,
+	}
+}
 
 func ToDetailsPb(
 	sequence uint64,

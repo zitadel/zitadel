@@ -58,19 +58,19 @@ func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) 
 }
 
 func (s *Server) DeactivateIDP(ctx context.Context, req *admin_pb.DeactivateIDPRequest) (*admin_pb.DeactivateIDPResponse, error) {
-	err := s.command.DeactivateDefaultIDPConfig(ctx, req.Id)
+	objectDetails, err := s.command.DeactivateDefaultIDPConfig(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.DeactivateIDPResponse{}, nil //TODO: details
+	return &admin_pb.DeactivateIDPResponse{Details: object_pb.DomainToDetailsPb(objectDetails)}, nil
 }
 
 func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPRequest) (*admin_pb.ReactivateIDPResponse, error) {
-	err := s.command.ReactivateDefaultIDPConfig(ctx, req.Id)
+	objectDetails, err := s.command.ReactivateDefaultIDPConfig(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.ReactivateIDPResponse{}, nil //TODO: details
+	return &admin_pb.ReactivateIDPResponse{Details: object_pb.DomainToDetailsPb(objectDetails)}, nil
 }
 
 func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) (*admin_pb.RemoveIDPResponse, error) {
@@ -82,12 +82,11 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 	if err != nil {
 		return nil, err
 	}
-	err = s.command.RemoveDefaultIDPConfig(ctx, req.Id, idpProviderViewsToDomain(idpProviders), externalIDPViewsToDomain(externalIDPs)...)
+	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, req.Id, idpProviderViewsToDomain(idpProviders), externalIDPViewsToDomain(externalIDPs)...)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from backend
-	return &admin_pb.RemoveIDPResponse{}, nil
+	return &admin_pb.RemoveIDPResponse{Details: object_pb.DomainToDetailsPb(objectDetails)}, nil
 }
 
 func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateIDPOIDCConfigRequest) (*admin_pb.UpdateIDPOIDCConfigResponse, error) {

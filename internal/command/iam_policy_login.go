@@ -143,19 +143,23 @@ func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	return events
 }
 
-func (c *Commands) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) (domain.SecondFactorType, error) {
+func (c *Commands) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) (domain.SecondFactorType, *domain.ObjectDetails, error) {
 	secondFactorModel := NewIAMSecondFactorWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 	event, err := c.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, secondFactor)
 	if err != nil {
-		return domain.SecondFactorTypeUnspecified, err
+		return domain.SecondFactorTypeUnspecified, nil, err
 	}
 
-	if _, err = c.eventstore.PushEvents(ctx, event); err != nil {
-		return domain.SecondFactorTypeUnspecified, err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	if err != nil {
+		return domain.SecondFactorTypeUnspecified, nil, err
 	}
-
-	return secondFactorModel.MFAType, nil
+	err = AppendAndReduce(secondFactorModel, pushedEvents...)
+	if err != nil {
+		return domain.SecondFactorTypeUnspecified, nil, err
+	}
+	return secondFactorModel.MFAType, writeModelToObjectDetails(&secondFactorModel.WriteModel), nil
 }
 
 func (c *Commands) addSecondFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, secondFactorModel *IAMSecondFactorWriteModel, secondFactor domain.SecondFactorType) (eventstore.EventPusher, error) {
@@ -170,33 +174,44 @@ func (c *Commands) addSecondFactorToDefaultLoginPolicy(ctx context.Context, iamA
 	return iam_repo.NewLoginPolicySecondFactorAddedEvent(ctx, iamAgg, secondFactor), nil
 }
 
-func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) error {
+func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) (*domain.ObjectDetails, error) {
 	secondFactorModel := NewIAMSecondFactorWriteModel()
 	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if secondFactorModel.State == domain.FactorStateUnspecified || secondFactorModel.State == domain.FactorStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "IAM-3M9od", "Errors.IAM.LoginPolicy.MFA.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-3M9od", "Errors.IAM.LoginPolicy.MFA.NotExisting")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, iam_repo.NewLoginPolicySecondFactorRemovedEvent(ctx, iamAgg, secondFactor))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLoginPolicySecondFactorRemovedEvent(ctx, iamAgg, secondFactor))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(secondFactorModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&secondFactorModel.WriteModel), nil
 }
 
-func (c *Commands) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) (domain.MultiFactorType, error) {
+func (c *Commands) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) (domain.MultiFactorType, *domain.ObjectDetails, error) {
 	multiFactorModel := NewIAMMultiFactorWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
 	event, err := c.addMultiFactorToDefaultLoginPolicy(ctx, iamAgg, multiFactorModel, multiFactor)
 	if err != nil {
-		return domain.MultiFactorTypeUnspecified, err
+		return domain.MultiFactorTypeUnspecified, nil, err
 	}
 
-	if _, err = c.eventstore.PushEvents(ctx, event); err != nil {
-		return domain.MultiFactorTypeUnspecified, err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	if err != nil {
+		return domain.MultiFactorTypeUnspecified, nil, err
 	}
-
-	return multiFactorModel.MultiFactoryWriteModel.MFAType, nil
+	err = AppendAndReduce(multiFactorModel, pushedEvents...)
+	if err != nil {
+		return domain.MultiFactorTypeUnspecified, nil, err
+	}
+	return multiFactorModel.MultiFactoryWriteModel.MFAType, writeModelToObjectDetails(&multiFactorModel.WriteModel), nil
 }
 
 func (c *Commands) addMultiFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, multiFactorModel *IAMMultiFactorWriteModel, multiFactor domain.MultiFactorType) (eventstore.EventPusher, error) {
@@ -211,18 +226,25 @@ func (c *Commands) addMultiFactorToDefaultLoginPolicy(ctx context.Context, iamAg
 	return iam_repo.NewLoginPolicyMultiFactorAddedEvent(ctx, iamAgg, multiFactor), nil
 }
 
-func (c *Commands) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) error {
+func (c *Commands) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) (*domain.ObjectDetails, error) {
 	multiFactorModel := NewIAMMultiFactorWriteModel()
 	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if multiFactorModel.State == domain.FactorStateUnspecified || multiFactorModel.State == domain.FactorStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "IAM-3M9df", "Errors.IAM.LoginPolicy.MFA.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-3M9df", "Errors.IAM.LoginPolicy.MFA.NotExisting")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactoryWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, iam_repo.NewLoginPolicyMultiFactorRemovedEvent(ctx, iamAgg, multiFactor))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLoginPolicyMultiFactorRemovedEvent(ctx, iamAgg, multiFactor))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(multiFactorModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&multiFactorModel.WriteModel), nil
 }
 
 func (c *Commands) defaultLoginPolicyWriteModelByID(ctx context.Context, writeModel *IAMLoginPolicyWriteModel) (err error) {

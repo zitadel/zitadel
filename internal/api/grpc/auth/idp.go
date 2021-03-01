@@ -24,10 +24,11 @@ func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinked
 }
 
 func (s *Server) RemoveMyLinkedIDP(ctx context.Context, req *auth_pb.RemoveMyLinkedIDPRequest) (*auth_pb.RemoveMyLinkedIDPResponse, error) {
-	err := s.command.RemoveHumanExternalIDP(ctx, RemoveMyLinkedIDPRequestToDomain(ctx, req))
+	objectDetails, err := s.command.RemoveHumanExternalIDP(ctx, RemoveMyLinkedIDPRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.RemoveMyLinkedIDPResponse{}, nil
+	return &auth_pb.RemoveMyLinkedIDPResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }

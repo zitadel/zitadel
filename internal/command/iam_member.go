@@ -80,18 +80,26 @@ func (c *Commands) ChangeIAMMember(ctx context.Context, member *domain.Member) (
 	return memberWriteModelToMember(&existingMember.MemberWriteModel), nil
 }
 
-func (c *Commands) RemoveIAMMember(ctx context.Context, userID string) error {
-	m, err := c.iamMemberWriteModelByID(ctx, userID)
+func (c *Commands) RemoveIAMMember(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	memberWriteModel, err := c.iamMemberWriteModelByID(ctx, userID)
 	if err != nil && !errors.IsNotFound(err) {
-		return err
+		return nil, err
 	}
 	if errors.IsNotFound(err) {
-		return nil
+		return nil, nil
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, iam_repo.NewMemberRemovedEvent(ctx, iamAgg, userID))
-	return err
+	iamAgg := IAMAggregateFromWriteModel(&memberWriteModel.MemberWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewMemberRemovedEvent(ctx, iamAgg, userID))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(memberWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToObjectDetails(&memberWriteModel.MemberWriteModel.WriteModel), nil
 }
 
 func (c *Commands) iamMemberWriteModelByID(ctx context.Context, userID string) (member *IAMMemberWriteModel, err error) {

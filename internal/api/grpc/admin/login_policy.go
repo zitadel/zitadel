@@ -78,29 +78,24 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *admin_pb
 }
 
 func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddSecondFactorToLoginPolicyRequest) (*admin_pb.AddSecondFactorToLoginPolicyResponse, error) {
-	result, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy.SecondFactorTypeToDomain(req.Type))
+	result, objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
-	//TODO: details from be
 	_ = result
 	return &admin_pb.AddSecondFactorToLoginPolicyResponse{
-		// Details: object.ToDetailsPb(
-		// 	result.Sequence,
-		// 	result.CreationDate,
-		// 	result.ChangeDate,
-		// 	result.ResourceOwner,
-		// ),
+		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveSecondFactorFromLoginPolicyRequest) (*admin_pb.RemoveSecondFactorFromLoginPolicyResponse, error) {
-	err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, policy.SecondFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, policy.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
-	//TODO: missing return value
-	return &admin_pb.RemoveSecondFactorFromLoginPolicyResponse{}, nil
+	return &admin_pb.RemoveSecondFactorFromLoginPolicyResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.ListLoginPolicyMultiFactorsRequest) (*admin_pb.ListLoginPolicyMultiFactorsResponse, error) {
@@ -116,27 +111,22 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.
 }
 
 func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddMultiFactorToLoginPolicyRequest) (*admin_pb.AddMultiFactorToLoginPolicyResponse, error) {
-	result, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
+	result, objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
-	//TODO: return value
 	_ = result
 	return &admin_pb.AddMultiFactorToLoginPolicyResponse{
-		// 	Details: object.ToDetailsPb(
-		// 		result.Sequence,
-		// 		result.CreationDate,
-		// 		result.ChangeDate,
-		// 		result.ResourceOwner,
-		// 	),
+		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) RemoveMultiFactorFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveMultiFactorFromLoginPolicyRequest) (*admin_pb.RemoveMultiFactorFromLoginPolicyResponse, error) {
-	err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, policy.MultiFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, policy.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
-	//TODO: missing return value
-	return &admin_pb.RemoveMultiFactorFromLoginPolicyResponse{}, nil
+	return &admin_pb.RemoveMultiFactorFromLoginPolicyResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }

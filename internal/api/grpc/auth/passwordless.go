@@ -38,20 +38,22 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 
 func (s *Server) VerifyMyPasswordless(ctx context.Context, req *auth_pb.VerifyMyPasswordlessRequest) (*auth_pb.VerifyMyPasswordlessResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanHumanPasswordlessSetup(ctx, ctxData.UserID, ctxData.OrgID, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
+	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, ctxData.UserID, ctxData.OrgID, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.VerifyMyPasswordlessResponse{}, nil
+	return &auth_pb.VerifyMyPasswordlessResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func (s *Server) RemoveMyPasswordless(ctx context.Context, req *auth_pb.RemoveMyPasswordlessRequest) (*auth_pb.RemoveMyPasswordlessResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanRemovePasswordless(ctx, ctxData.UserID, req.TokenId, ctxData.ResourceOwner)
+	objectDetails, err := s.command.HumanRemovePasswordless(ctx, ctxData.UserID, req.TokenId, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.RemoveMyPasswordlessResponse{}, nil
+	return &auth_pb.RemoveMyPasswordlessResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }

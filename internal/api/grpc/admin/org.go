@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
@@ -36,9 +37,11 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 	human := setUpOrgHumanToDomain(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
 	org := setUpOrgOrgToDomain(req.Org)
 
-	err := s.command.SetUpOrg(ctx, org, human)
+	objectDetails, err := s.command.SetUpOrg(ctx, org, human)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.SetUpOrgResponse{}, nil //TODO: return obejct details
+	return &admin_pb.SetUpOrgResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }

@@ -101,7 +101,7 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 	logging.Log("SETUP-sd2hj").Info("default login policy set up")
 	//create orgs
 	for _, organisation := range step1.Orgs {
-		orgAgg, humanWriteModel, _, setUpOrgEvents, err := c.setUpOrg(ctx,
+		orgAgg, _, humanWriteModel, _, setUpOrgEvents, err := c.setUpOrg(ctx,
 			&domain.Org{
 				Name:    organisation.Name,
 				Domains: []*domain.OrgDomain{{Domain: organisation.Domain}},

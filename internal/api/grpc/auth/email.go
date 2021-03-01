@@ -42,21 +42,22 @@ func (s *Server) SetMyEmail(ctx context.Context, req *auth_pb.SetMyEmailRequest)
 
 func (s *Server) VerifyMyEmail(ctx context.Context, req *auth_pb.VerifyMyEmailRequest) (*auth_pb.VerifyMyEmailResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, req.Code, ctxData.OrgID)
+	objectDetails, err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, req.Code, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
-
-	//TODO: response from business
-	return &auth_pb.VerifyMyEmailResponse{}, nil
+	return &auth_pb.VerifyMyEmailResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func (s *Server) ResendMyEmailVerification(ctx context.Context, _ *auth_pb.ResendMyEmailVerificationRequest) (*auth_pb.ResendMyEmailVerificationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.CreateHumanEmailVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.ResendMyEmailVerificationResponse{}, nil
+	return &auth_pb.ResendMyEmailVerificationResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }

@@ -40,22 +40,24 @@ func (s *Server) AddMyMultiFactorOTP(ctx context.Context, _ *auth_pb.AddMyMultiF
 
 func (s *Server) VerifyMyMultiFactorOTP(ctx context.Context, req *auth_pb.VerifyMyMultiFactorOTPRequest) (*auth_pb.VerifyMyMultiFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanCheckMFAOTPSetup(ctx, ctxData.UserID, req.Code, "", ctxData.ResourceOwner)
+	objectDetails, err := s.command.HumanCheckMFAOTPSetup(ctx, ctxData.UserID, req.Code, "", ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.VerifyMyMultiFactorOTPResponse{}, nil
+	return &auth_pb.VerifyMyMultiFactorOTPResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func (s *Server) RemoveMyMultiFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyMultiFactorOTPRequest) (*auth_pb.RemoveMyMultiFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.OrgID)
+	objectDetails, err := s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.RemoveMyMultiFactorOTPResponse{}, nil
+	return &auth_pb.RemoveMyMultiFactorOTPResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func (s *Server) AddMyMultiFactorU2F(ctx context.Context, _ *auth_pb.AddMyMultiFactorU2FRequest) (*auth_pb.AddMyMultiFactorU2FResponse, error) {
@@ -80,20 +82,22 @@ func (s *Server) AddMyMultiFactorU2F(ctx context.Context, _ *auth_pb.AddMyMultiF
 
 func (s *Server) VerifyMyMultiFactorU2F(ctx context.Context, req *auth_pb.VerifyMyMultiFactorU2FRequest) (*auth_pb.VerifyMyMultiFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanVerifyU2FSetup(ctx, ctxData.UserID, ctxData.OrgID, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
+	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, ctxData.UserID, ctxData.OrgID, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.VerifyMyMultiFactorU2FResponse{}, nil
+	return &auth_pb.VerifyMyMultiFactorU2FResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func (s *Server) RemoveMyMultiFactorU2F(ctx context.Context, req *auth_pb.RemoveMyMultiFactorU2FRequest) (*auth_pb.RemoveMyMultiFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanRemovePasswordless(ctx, ctxData.UserID, req.TokenId, ctxData.ResourceOwner)
+	objectDetails, err := s.command.HumanRemovePasswordless(ctx, ctxData.UserID, req.TokenId, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.RemoveMyMultiFactorU2FResponse{}, nil
+	return &auth_pb.RemoveMyMultiFactorU2FResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
