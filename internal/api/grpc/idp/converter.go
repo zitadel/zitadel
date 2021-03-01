@@ -4,7 +4,6 @@ import (
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	idp_pb "github.com/caos/zitadel/pkg/grpc/idp"
 )
@@ -225,7 +224,7 @@ func ModelIDPProviderTypeToPb(typ iam_model.IDPProviderType) idp_pb.IDPOwnerType
 func IDPIDQueryToModel(query *idp_pb.IDPIDQuery) *iam_model.IDPConfigSearchQuery {
 	return &iam_model.IDPConfigSearchQuery{
 		Key:    iam_model.IDPConfigSearchKeyIdpConfigID, //TODO: whats the difference between idpconfigid and aggregateid search key?
-		Method: model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  query.Id,
 	}
 }

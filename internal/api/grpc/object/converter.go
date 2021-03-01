@@ -1,10 +1,10 @@
 package object
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/pkg/grpc/object"
 	object_pb "github.com/caos/zitadel/pkg/grpc/object"
 	"github.com/golang/protobuf/ptypes"
@@ -43,24 +43,25 @@ func ToListDetails(
 	}
 }
 
-func TextMethodToModel(method object_pb.TextQueryMethod) model.SearchMethod {
+func TextMethodToModel(method object_pb.TextQueryMethod) domain.SearchMethod {
 	switch method {
 	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
-		return model.SearchMethodEquals
+		return domain.SearchMethodEquals
 	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
-		return model.SearchMethodEqualsIgnoreCase
+		return domain.SearchMethodEqualsIgnoreCase
 	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
-		return model.SearchMethodStartsWith
+		return domain.SearchMethodStartsWith
 	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
-		return model.SearchMethodStartsWithIgnoreCase
+		return domain.SearchMethodStartsWithIgnoreCase
 	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
-		return model.SearchMethodContains
+		return domain.SearchMethodContains
 	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
-		return model.SearchMethodContainsIgnoreCase
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
-		fallthrough
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
-		fallthrough
+		return domain.SearchMethodContainsIgnoreCase
+		//TODO: uncomment when added in proto
+	//case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
+	//	fallthrough
+	//case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+	//	fallthrough
 	default:
 		return -1
 	}

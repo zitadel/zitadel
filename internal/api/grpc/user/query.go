@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
@@ -91,7 +91,7 @@ func EmailQueryToModel(q *user_pb.EmailQuery) *user_model.UserSearchQuery {
 func StateQueryToModel(q *user_pb.StateQuery) *user_model.UserSearchQuery {
 	return &user_model.UserSearchQuery{
 		Key:    user_model.UserSearchKeyState,
-		Method: model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  q.State,
 	}
 }
@@ -99,7 +99,7 @@ func StateQueryToModel(q *user_pb.StateQuery) *user_model.UserSearchQuery {
 func TypeQueryToModel(q *user_pb.TypeQuery) *user_model.UserSearchQuery {
 	return &user_model.UserSearchQuery{
 		Key:    user_model.UserSearchKeyType,
-		Method: model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  q.Type,
 	}
 }
@@ -107,7 +107,7 @@ func TypeQueryToModel(q *user_pb.TypeQuery) *user_model.UserSearchQuery {
 func ResourceOwnerQueryToModel(q *user_pb.ResourceOwnerQuery) *user_model.UserSearchQuery {
 	return &user_model.UserSearchQuery{
 		Key:    user_model.UserSearchKeyResourceOwner,
-		Method: model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  q.OrgID,
 	}
 }
