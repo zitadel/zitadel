@@ -6,10 +6,13 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/authn"
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
+	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -349,9 +352,7 @@ func (s *Server) RemoveHumanMultiFactorOTP(ctx context.Context, req *mgmt_pb.Rem
 }
 
 func (s *Server) RemoveHumanMultiFactorU2F(ctx context.Context, req *mgmt_pb.RemoveHumanMultiFactorU2FRequest) (*mgmt_pb.RemoveHumanMultiFactorU2FResponse, error) {
-	//TODO: token id missing in proto
-	panic("token id missing in proto")
-	err := s.command.HumanRemoveU2F(ctx, req.UserId, "req.TokenId", authz.GetCtxData(ctx).OrgID)
+	err := s.command.HumanRemoveU2F(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -444,5 +445,59 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 	}
 	return &mgmt_pb.RemoveMachineKeyResponse{
 		//TODO: details
+	}, nil
+}
+
+func (s *Server) ListUserIDPs(ctx context.Context, req *mgmt_pb.ListUserIDPsRequest) (*mgmt_pb.ListUserIDPsResponse, error) {
+	res, err := s.user.SearchExternalIDPs(ctx, ListUserIDPsRequestToModel(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListUserIDPsResponse{
+		Result: idp_grpc.IDPsToUserLinkPb(res.Result),
+		MetaData: obj_grpc.ToListDetails(
+			res.TotalResult,
+			res.Sequence,
+			res.Timestamp,
+		),
+	}, nil
+}
+func (s *Server) RemoveUserIDP(ctx context.Context, req *mgmt_pb.RemoveUserIDPRequest) (*mgmt_pb.RemoveUserIDPResponse, error) {
+	err := s.command.RemoveHumanExternalIDP(ctx, RemoveUserIDPRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveUserIDPResponse{
+		//TODO: details
+	}, nil
+}
+
+func RemoveUserIDPRequestToDomain(ctx context.Context, req *mgmt_pb.RemoveUserIDPRequest) *domain.ExternalIDP {
+	return &domain.ExternalIDP{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		},
+		IDPConfigID:    req.IdpId,
+		ExternalUserID: req.LinkedUserId,
+	}
+}
+
+func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*mgmt_pb.ListUserMembershipsResponse, error) {
+	request, err := ListUserMembershipsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	response, err := s.user.SearchUserMemberships(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListUserMembershipsResponse{
+		Result: user_grpc.MembershipsToMembershipsPb(response.Result),
+		MetaData: obj_grpc.ToListDetails(
+			response.TotalResult,
+			response.Sequence,
+			response.Timestamp,
+		),
 	}, nil
 }

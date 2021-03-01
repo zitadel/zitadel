@@ -1,14 +1,13 @@
 package object
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
-	"github.com/caos/logging"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/pkg/grpc/object"
 	object_pb "github.com/caos/zitadel/pkg/grpc/object"
-	"github.com/golang/protobuf/ptypes"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
@@ -25,15 +24,10 @@ func ToDetailsPb(
 	changeDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
-	creationDatePb, err := ptypes.TimestampProto(creationDate)
-	logging.Log("ADMIN-yzma4").OnError(err).Debug("unable to parse creation date")
-	changeDatePb, err := ptypes.TimestampProto(changeDate)
-	logging.Log("ADMIN-NTgjY").OnError(err).Debug("unable to parse change date")
-
 	return &object_pb.ObjectDetails{
 		Sequence:      sequence,
-		CreationDate:  creationDatePb,
-		ChangeDate:    changeDatePb,
+		CreationDate:  timestamppb.New(creationDate),
+		ChangeDate:    timestamppb.New(changeDate),
 		ResourceOwner: resourceOwner,
 	}
 }
@@ -43,12 +37,10 @@ func ToListDetails(
 	processedSequence uint64,
 	viewTimestamp time.Time,
 ) *object.ListDetails {
-	viewTs, err := ptypes.TimestampProto(viewTimestamp)
-	logging.Log("OBJEC-WoeFH").OnError(err).Debug("")
 	return &object_pb.ListDetails{
 		TotalResult:       totalResult,
 		ProcessedSequence: processedSequence,
-		ViewTimestamp:     viewTs,
+		ViewTimestamp:     timestamppb.New(viewTimestamp),
 	}
 }
 
@@ -66,11 +58,10 @@ func TextMethodToModel(method object_pb.TextQueryMethod) domain.SearchMethod {
 		return domain.SearchMethodContains
 	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
 		return domain.SearchMethodContainsIgnoreCase
-		//TODO: uncomment when added in proto
-	//case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
-	//	fallthrough
-	//case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
-	//	fallthrough
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
+		return domain.SearchMethodEndsWith
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+		return domain.SearchMethodEndsWithIgnoreCase
 	default:
 		return -1
 	}

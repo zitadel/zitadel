@@ -4,19 +4,16 @@ Log:
     Format: text
 
 Eventstore:
-  ServiceName: 'Admin'
-  Repository:
-    SQL:
-      Host: $ZITADEL_EVENTSTORE_HOST
-      Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'eventstore'
-      Database: 'eventstore'
-      Password: $CR_EVENTSTORE_PASSWORD
-      SSL:
-        Mode: $CR_SSL_MODE
-        RootCert: $CR_ROOT_CERT
-        Cert: $CR_EVENTSTORE_CERT
-        Key: $CR_EVENTSTORE_KEY
+  Host: $ZITADEL_EVENTSTORE_HOST
+  Port: $ZITADEL_EVENTSTORE_PORT
+  User: 'eventstore'
+  Database: 'eventstore'
+  Password: $CR_EVENTSTORE_PASSWORD
+  SSL:
+    Mode: $CR_SSL_MODE
+    RootCert: $CR_ROOT_CERT
+    Cert: $CR_EVENTSTORE_CERT
+    Key: $CR_EVENTSTORE_KEY
 
 SetUp:
   Step1:

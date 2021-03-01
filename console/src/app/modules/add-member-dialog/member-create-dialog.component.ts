@@ -86,8 +86,8 @@ export class MemberCreateDialogComponent {
                 });
                 break;
             case CreationType.IAM:
-                this.adminService.GetIamMemberRoles().then(resp => {
-                    this.memberRoleOptions = resp.toObject().rolesList;
+                this.adminService.listIAMMemberRoles().then(resp => {
+                    this.memberRoleOptions = resp.rolesList;
                 }).catch(error => {
                     this.toastService.showError(error);
                 });
