@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type IAMMemberView struct {
@@ -42,7 +41,7 @@ const (
 
 type IAMMemberSearchQuery struct {
 	Key    IAMMemberSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

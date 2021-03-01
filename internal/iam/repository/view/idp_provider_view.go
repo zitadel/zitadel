@@ -1,18 +1,18 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 )
 
 func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idpConfigID string) (*model.IDPProviderView, error) {
 	policy := new(model.IDPProviderView)
-	aggIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	idpConfigIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyIdpConfigID, Value: idpConfigID, Method: global_model.SearchMethodEquals}
+	aggIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
+	idpConfigIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyIdpConfigID, Value: idpConfigID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggIDQuery, idpConfigIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
@@ -27,7 +27,7 @@ func IDPProvidersByIdpConfigID(db *gorm.DB, table string, idpConfigID string) ([
 		{
 			Key:    iam_model.IDPProviderSearchKeyIdpConfigID,
 			Value:  idpConfigID,
-			Method: global_model.SearchMethodEquals,
+			Method: domain.SearchMethodEquals,
 		},
 	}
 	query := repository.PrepareSearchQuery(table, model.IDPProviderSearchRequest{Queries: queries})
@@ -44,12 +44,12 @@ func IDPProvidersByAggregateIDAndState(db *gorm.DB, table string, aggregateID st
 		{
 			Key:    iam_model.IDPProviderSearchKeyAggregateID,
 			Value:  aggregateID,
-			Method: global_model.SearchMethodEquals,
+			Method: domain.SearchMethodEquals,
 		},
 		{
 			Key:    iam_model.IDPProviderSearchKeyState,
 			Value:  int(idpConfigState),
-			Method: global_model.SearchMethodEquals,
+			Method: domain.SearchMethodEquals,
 		},
 	}
 	query := repository.PrepareSearchQuery(table, model.IDPProviderSearchRequest{Queries: queries})

@@ -11,11 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
-const (
-	OrgOwnerRole = "ORG_OWNER"
-	SetupUser    = "SETUP"
-)
-
 func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *command.Commands) error {
 	logging.Log("SETUP-JAK2q").Info("starting setup")
 

@@ -14,22 +14,10 @@ type IDPConfigWriteModel struct {
 	ConfigID    string
 	Name        string
 	StylingType domain.IDPConfigStylingType
-
-	//TODO: sub writemodels not used anymore?
-	OIDCConfig *OIDCConfigWriteModel
 }
 
 func (rm *IDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	rm.WriteModel.AppendEvents(events...)
-	for _, event := range events {
-		switch event.(type) {
-		case *idpconfig.OIDCConfigAddedEvent:
-			rm.OIDCConfig = new(OIDCConfigWriteModel)
-			rm.OIDCConfig.AppendEvents(event)
-		case *idpconfig.OIDCConfigChangedEvent:
-			rm.OIDCConfig.AppendEvents(event)
-		}
-	}
 }
 
 func (rm *IDPConfigWriteModel) Reduce() error {
@@ -45,11 +33,6 @@ func (rm *IDPConfigWriteModel) Reduce() error {
 			rm.reduceConfigStateChanged(e.ConfigID, domain.IDPConfigStateActive)
 		case *idpconfig.IDPConfigRemovedEvent:
 			rm.reduceConfigStateChanged(e.ConfigID, domain.IDPConfigStateRemoved)
-		}
-	}
-	if rm.OIDCConfig != nil {
-		if err := rm.OIDCConfig.Reduce(); err != nil {
-			return err
 		}
 	}
 	return rm.WriteModel.Reduce()

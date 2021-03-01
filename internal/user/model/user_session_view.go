@@ -1,10 +1,10 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/model"
 )
 
 type UserSessionView struct {
@@ -48,7 +48,7 @@ const (
 
 type UserSessionSearchQuery struct {
 	Key    UserSessionSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

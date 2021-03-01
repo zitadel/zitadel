@@ -1,10 +1,10 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 )
@@ -12,8 +12,8 @@ import (
 func IAMMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.IAMMemberView, error) {
 	member := new(model.IAMMemberView)
 
-	iamIDQuery := &model.IAMMemberSearchQuery{Key: iam_model.IAMMemberSearchKeyIamID, Value: orgID, Method: global_model.SearchMethodEquals}
-	userIDQuery := &model.IAMMemberSearchQuery{Key: iam_model.IAMMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
+	iamIDQuery := &model.IAMMemberSearchQuery{Key: iam_model.IAMMemberSearchKeyIamID, Value: orgID, Method: domain.SearchMethodEquals}
+	userIDQuery := &model.IAMMemberSearchQuery{Key: iam_model.IAMMemberSearchKeyUserID, Value: userID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, iamIDQuery, userIDQuery)
 	err := query(db, member)
 	if caos_errs.IsNotFound(err) {
@@ -37,7 +37,7 @@ func IAMMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.IAMM
 		{
 			Key:    iam_model.IAMMemberSearchKeyUserID,
 			Value:  userID,
-			Method: global_model.SearchMethodEquals,
+			Method: domain.SearchMethodEquals,
 		},
 	}
 	query := repository.PrepareSearchQuery(table, model.IAMMemberSearchRequest{Queries: queries})

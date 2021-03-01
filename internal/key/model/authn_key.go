@@ -1,10 +1,10 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/model"
 )
 
 const (
@@ -77,7 +77,7 @@ const (
 
 type AuthNKeySearchQuery struct {
 	Key    AuthNKeySearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

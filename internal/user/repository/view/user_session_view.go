@@ -2,11 +2,11 @@ package view
 
 import (
 	auth_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 
-	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -15,12 +15,12 @@ func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSe
 	userSession := new(model.UserSessionView)
 	userAgentQuery := model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyUserAgentID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  agentID,
 	}
 	userQuery := model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyUserID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  userID,
 	}
 	query := repository.PrepareGetByQuery(table, userAgentQuery, userQuery)
@@ -35,7 +35,7 @@ func UserSessionsByUserID(db *gorm.DB, table, userID string) ([]*model.UserSessi
 	userSessions := make([]*model.UserSessionView, 0)
 	userAgentQuery := &usr_model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyUserID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  userID,
 	}
 	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
@@ -49,7 +49,7 @@ func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSes
 	userSessions := make([]*model.UserSessionView, 0)
 	userAgentQuery := &usr_model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyUserAgentID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  agentID,
 	}
 	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
@@ -63,7 +63,7 @@ func ActiveUserSessions(db *gorm.DB, table string) ([]*model.UserSessionView, er
 	userSessions := make([]*model.UserSessionView, 0)
 	activeQuery := &usr_model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyState,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  auth_model.UserSessionStateActive,
 	}
 	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{

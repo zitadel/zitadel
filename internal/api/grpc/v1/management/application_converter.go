@@ -14,7 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	key_model "github.com/caos/zitadel/internal/key/model"
-	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/caos/zitadel/pkg/grpc/message"
@@ -271,7 +270,7 @@ func applicationSearchQueriesToModel(projectID string, queries []*management.App
 	for i, q := range queries {
 		converted[i] = applicationSearchQueryToModel(q)
 	}
-	converted[len(queries)] = &proj_model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyProjectID, Method: model.SearchMethodEquals, Value: projectID}
+	converted[len(queries)] = &proj_model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: projectID}
 
 	return converted
 }
@@ -711,11 +710,11 @@ func clientKeySearchRequestToModel(req *management.ClientKeySearchRequest) *key_
 		Queries: []*key_model.AuthNKeySearchQuery{
 			{
 				Key:    key_model.AuthNKeyObjectType,
-				Method: model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  key_model.AuthNKeyObjectTypeApplication,
 			}, {
 				Key:    key_model.AuthNKeyObjectID,
-				Method: model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  req.ApplicationId,
 			},
 		},

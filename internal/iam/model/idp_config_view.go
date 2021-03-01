@@ -2,7 +2,7 @@ package model
 
 import (
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 )
 
@@ -46,7 +46,7 @@ const (
 
 type IDPConfigSearchQuery struct {
 	Key    IDPConfigSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -66,5 +66,5 @@ func (r *IDPConfigSearchRequest) EnsureLimit(limit uint64) {
 }
 
 func (r *IDPConfigSearchRequest) AppendMyOrgQuery(orgID, iamID string) {
-	r.Queries = append(r.Queries, &IDPConfigSearchQuery{Key: IDPConfigSearchKeyAggregateID, Method: model.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
+	r.Queries = append(r.Queries, &IDPConfigSearchQuery{Key: IDPConfigSearchKeyAggregateID, Method: domain.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
 }

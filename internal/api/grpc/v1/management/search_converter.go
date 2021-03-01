@@ -1,31 +1,31 @@
 package management
 
 import (
-	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func searchMethodToModel(method management.SearchMethod) model.SearchMethod {
+func searchMethodToModel(method management.SearchMethod) domain.SearchMethod {
 	switch method {
 	case management.SearchMethod_SEARCHMETHOD_EQUALS:
-		return model.SearchMethodEquals
+		return domain.SearchMethodEquals
 	case management.SearchMethod_SEARCHMETHOD_CONTAINS:
-		return model.SearchMethodContains
+		return domain.SearchMethodContains
 	case management.SearchMethod_SEARCHMETHOD_STARTS_WITH:
-		return model.SearchMethodStartsWith
+		return domain.SearchMethodStartsWith
 	case management.SearchMethod_SEARCHMETHOD_EQUALS_IGNORE_CASE:
-		return model.SearchMethodEqualsIgnoreCase
+		return domain.SearchMethodEqualsIgnoreCase
 	case management.SearchMethod_SEARCHMETHOD_CONTAINS_IGNORE_CASE:
-		return model.SearchMethodContainsIgnoreCase
+		return domain.SearchMethodContainsIgnoreCase
 	case management.SearchMethod_SEARCHMETHOD_STARTS_WITH_IGNORE_CASE:
-		return model.SearchMethodStartsWithIgnoreCase
+		return domain.SearchMethodStartsWithIgnoreCase
 	case management.SearchMethod_SEARCHMETHOD_NOT_EQUALS:
-		return model.SearchMethodNotEquals
+		return domain.SearchMethodNotEquals
 	case management.SearchMethod_SEARCHMETHOD_IS_ONE_OF:
-		return model.SearchMethodIsOneOf
+		return domain.SearchMethodIsOneOf
 	case management.SearchMethod_SEARCHMETHOD_LIST_CONTAINS:
-		return model.SearchMethodListContains
+		return domain.SearchMethodListContains
 	default:
-		return model.SearchMethodEquals
+		return domain.SearchMethodEquals
 	}
 }

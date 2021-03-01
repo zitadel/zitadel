@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type UserGrantView struct {
@@ -69,7 +68,7 @@ const (
 
 type UserGrantSearchQuery struct {
 	Key    UserGrantSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -98,9 +97,9 @@ func (r *UserGrantSearchRequest) GetSearchQuery(key UserGrantSearchKey) (int, *U
 }
 
 func (r *UserGrantSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
+	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: orgID})
 }
 
 func (r *UserGrantSearchRequest) AppendProjectIDQuery(projectID string) {
-	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyProjectID, Method: model.SearchMethodEquals, Value: projectID})
+	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: projectID})
 }

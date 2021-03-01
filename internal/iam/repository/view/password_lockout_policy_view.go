@@ -1,17 +1,17 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 )
 
 func GetPasswordLockoutPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.PasswordLockoutPolicyView, error) {
 	policy := new(model.PasswordLockoutPolicyView)
-	aggregateIDQuery := &model.PasswordLockoutPolicySearchQuery{Key: iam_model.PasswordLockoutPolicySearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	aggregateIDQuery := &model.PasswordLockoutPolicySearchQuery{Key: iam_model.PasswordLockoutPolicySearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {

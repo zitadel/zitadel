@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type ProjectGrantMemberView struct {
@@ -44,7 +43,7 @@ const (
 
 type ProjectGrantMemberSearchQuery struct {
 	Key    ProjectGrantMemberSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

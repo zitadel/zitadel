@@ -21,7 +21,7 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone) (*
 	if err != nil {
 		return nil, err
 	}
-	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
+	if !existingPhone.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-aM9cs", "Errors.User.Phone.NotFound")
 	}
 
@@ -66,7 +66,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 	if err != nil {
 		return err
 	}
-	if existingCode.Code == nil || existingCode.State == domain.PhoneStateUnspecified || existingCode.State == domain.PhoneStateRemoved {
+	if !existingCode.State.Exists() {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-Rsj8c", "Errors.User.Code.NotFound")
 	}
 
@@ -92,8 +92,7 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 		return err
 	}
 
-	//TODO: code like the following if is written many times find way to simplify
-	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
+	if !existingPhone.State.Exists() {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-2b7Hf", "Errors.User.Phone.NotFound")
 	}
 	if existingPhone.IsPhoneVerified {
@@ -115,7 +114,7 @@ func (c *Commands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, us
 	if err != nil {
 		return err
 	}
-	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
+	if !existingPhone.State.Exists() {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-66n8J", "Errors.User.Phone.NotFound")
 	}
 
@@ -133,7 +132,7 @@ func (c *Commands) RemoveHumanPhone(ctx context.Context, userID, resourceOwner s
 	if err != nil {
 		return err
 	}
-	if existingPhone.State == domain.PhoneStateUnspecified || existingPhone.State == domain.PhoneStateRemoved {
+	if !existingPhone.State.Exists() {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-p6rsc", "Errors.User.Phone.NotFound")
 	}
 

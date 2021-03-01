@@ -21,7 +21,6 @@ import (
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -100,7 +99,7 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 				return result, nil
 			}
 		} else {
-			request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+			request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: domain.SearchMethodIsOneOf, Value: ids})
 		}
 	}
 
@@ -392,7 +391,7 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 				return result, nil
 			}
 		} else {
-			request.Queries = append(request.Queries, &proj_model.ProjectGrantViewSearchQuery{Key: proj_model.GrantedProjectSearchKeyGrantID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+			request.Queries = append(request.Queries, &proj_model.ProjectGrantViewSearchQuery{Key: proj_model.GrantedProjectSearchKeyGrantID, Method: domain.SearchMethodIsOneOf, Value: ids})
 		}
 	}
 

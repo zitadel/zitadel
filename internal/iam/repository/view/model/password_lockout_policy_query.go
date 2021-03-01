@@ -1,8 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -41,7 +41,7 @@ func (req PasswordLockoutPolicySearchQuery) GetKey() repository.ColumnKey {
 	return PasswordLockoutPolicySearchKey(req.Key)
 }
 
-func (req PasswordLockoutPolicySearchQuery) GetMethod() global_model.SearchMethod {
+func (req PasswordLockoutPolicySearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 

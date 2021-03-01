@@ -3,7 +3,6 @@ package management
 import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/model"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -66,8 +65,8 @@ func projectGrantMemberSearchRequestsToModel(memberSearch *management.ProjectGra
 		Limit:   memberSearch.Limit,
 		Queries: projectGrantMemberSearchQueriesToModel(memberSearch.Queries),
 	}
-	request.Queries = append(request.Queries, &proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyProjectID, Method: model.SearchMethodEquals, Value: memberSearch.ProjectId})
-	request.Queries = append(request.Queries, &proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyGrantID, Method: model.SearchMethodEquals, Value: memberSearch.GrantId})
+	request.Queries = append(request.Queries, &proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: memberSearch.ProjectId})
+	request.Queries = append(request.Queries, &proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyGrantID, Method: domain.SearchMethodEquals, Value: memberSearch.GrantId})
 	return request
 }
 

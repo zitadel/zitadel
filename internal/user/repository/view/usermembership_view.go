@@ -1,7 +1,7 @@
 package view
 
 import (
-	global_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 
@@ -12,10 +12,10 @@ import (
 
 func UserMembershipByIDs(db *gorm.DB, table, userID, aggregateID, objectID string, membertype usr_model.MemberType) (*model.UserMembershipView, error) {
 	memberships := new(model.UserMembershipView)
-	userIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
-	aggregateIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	objectIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyObjectID, Value: objectID, Method: global_model.SearchMethodEquals}
-	memberTypeQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Value: int32(membertype), Method: global_model.SearchMethodEquals}
+	userIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyUserID, Value: userID, Method: domain.SearchMethodEquals}
+	aggregateIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
+	objectIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyObjectID, Value: objectID, Method: domain.SearchMethodEquals}
+	memberTypeQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Value: int32(membertype), Method: domain.SearchMethodEquals}
 
 	query := repository.PrepareGetByQuery(table, userIDQuery, aggregateIDQuery, objectIDQuery, memberTypeQuery)
 	err := query(db, memberships)
@@ -27,7 +27,7 @@ func UserMembershipByIDs(db *gorm.DB, table, userID, aggregateID, objectID strin
 
 func UserMembershipsByAggregateID(db *gorm.DB, table, aggregateID string) ([]*model.UserMembershipView, error) {
 	memberships := make([]*model.UserMembershipView, 0)
-	aggregateIDQuery := &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
+	aggregateIDQuery := &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareSearchQuery(table, model.UserMembershipSearchRequest{
 		Queries: []*usr_model.UserMembershipSearchQuery{aggregateIDQuery},
 	})
@@ -37,7 +37,7 @@ func UserMembershipsByAggregateID(db *gorm.DB, table, aggregateID string) ([]*mo
 
 func UserMembershipsByResourceOwner(db *gorm.DB, table, resourceOwner string) ([]*model.UserMembershipView, error) {
 	memberships := make([]*model.UserMembershipView, 0)
-	aggregateIDQuery := &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals}
+	aggregateIDQuery := &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyResourceOwner, Value: resourceOwner, Method: domain.SearchMethodEquals}
 	query := repository.PrepareSearchQuery(table, model.UserMembershipSearchRequest{
 		Queries: []*usr_model.UserMembershipSearchQuery{aggregateIDQuery},
 	})

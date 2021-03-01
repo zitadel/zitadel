@@ -1,8 +1,8 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/user/model"
 	usr_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -24,7 +24,7 @@ func TokensByUserID(db *gorm.DB, table, userID string) ([]*usr_model.TokenView, 
 	tokens := make([]*usr_model.TokenView, 0)
 	userIDQuery := &model.TokenSearchQuery{
 		Key:    model.TokenSearchKeyUserID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  userID,
 	}
 	query := repository.PrepareSearchQuery(table, usr_model.TokenSearchRequest{

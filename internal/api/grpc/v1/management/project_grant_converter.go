@@ -8,7 +8,6 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -77,7 +76,7 @@ func projectGrantSearchQueriesToModel(projectId string, queries []*management.Pr
 	converted := make([]*proj_model.ProjectGrantViewSearchQuery, 0)
 	converted = append(converted, &proj_model.ProjectGrantViewSearchQuery{
 		Key:    proj_model.GrantedProjectSearchKeyProjectID,
-		Method: model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  projectId,
 	})
 	for i, query := range queries {

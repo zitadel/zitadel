@@ -1,8 +1,8 @@
 package view
 
 import (
+	domain2 "github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -11,8 +11,8 @@ import (
 
 func OrgDomainByOrgIDAndDomain(db *gorm.DB, table, orgID, domain string) (*model.OrgDomainView, error) {
 	domainView := new(model.OrgDomainView)
-	orgIDQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Value: orgID, Method: global_model.SearchMethodEquals}
-	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyDomain, Value: domain, Method: global_model.SearchMethodEquals}
+	orgIDQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Value: orgID, Method: domain2.SearchMethodEquals}
+	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyDomain, Value: domain, Method: domain2.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, orgIDQuery, domainQuery)
 	err := query(db, domainView)
 	if caos_errs.IsNotFound(err) {
@@ -23,8 +23,8 @@ func OrgDomainByOrgIDAndDomain(db *gorm.DB, table, orgID, domain string) (*model
 
 func VerifiedOrgDomain(db *gorm.DB, table, domain string) (*model.OrgDomainView, error) {
 	domainView := new(model.OrgDomainView)
-	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyDomain, Value: domain, Method: global_model.SearchMethodEquals}
-	verifiedQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyVerified, Value: true, Method: global_model.SearchMethodEquals}
+	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyDomain, Value: domain, Method: domain2.SearchMethodEquals}
+	verifiedQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyVerified, Value: true, Method: domain2.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, domainQuery, verifiedQuery)
 	err := query(db, domainView)
 	if caos_errs.IsNotFound(err) {
@@ -49,7 +49,7 @@ func OrgDomainsByOrgID(db *gorm.DB, table string, orgID string) ([]*model.OrgDom
 		{
 			Key:    org_model.OrgDomainSearchKeyOrgID,
 			Value:  orgID,
-			Method: global_model.SearchMethodEquals,
+			Method: domain2.SearchMethodEquals,
 		},
 	}
 	query := repository.PrepareSearchQuery(table, model.OrgDomainSearchRequest{Queries: queries})

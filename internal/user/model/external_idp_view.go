@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 )
 
@@ -37,7 +37,7 @@ const (
 
 type ExternalIDPSearchQuery struct {
 	Key    ExternalIDPSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -57,5 +57,5 @@ func (r *ExternalIDPSearchRequest) EnsureLimit(limit uint64) {
 }
 
 func (r *ExternalIDPSearchRequest) AppendUserQuery(userID string) {
-	r.Queries = append(r.Queries, &ExternalIDPSearchQuery{Key: ExternalIDPSearchKeyUserID, Method: model.SearchMethodEquals, Value: userID})
+	r.Queries = append(r.Queries, &ExternalIDPSearchQuery{Key: ExternalIDPSearchKeyUserID, Method: domain.SearchMethodEquals, Value: userID})
 }

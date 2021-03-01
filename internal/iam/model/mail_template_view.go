@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type MailTemplateView struct {
@@ -33,7 +32,7 @@ const (
 
 type MailTemplateSearchQuery struct {
 	Key    MailTemplateSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
