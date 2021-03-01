@@ -61,11 +61,12 @@ type setupConfig struct {
 	Eventstore     types.SQL
 	SystemDefaults sd.SystemDefaults
 	SetUp          setup.IAMSetUp
+	InternalAuthZ  internal_authz.Config
 }
 
 var (
 	configPaths         = config.NewArrayFlags("authz.yaml", "startup.yaml", "system-defaults.yaml")
-	setupPaths          = config.NewArrayFlags("system-defaults.yaml", "setup.yaml")
+	setupPaths          = config.NewArrayFlags("authz.yaml", "system-defaults.yaml", "setup.yaml")
 	adminEnabled        = flag.Bool("admin", true, "enable admin api")
 	managementEnabled   = flag.Bool("management", true, "enable management api")
 	authEnabled         = flag.Bool("auth", true, "enable auth api")
@@ -106,7 +107,7 @@ func startZitadel(configPaths []string) {
 	if err != nil {
 		return
 	}
-	commands, err := command.StartCommands(esCommands, conf.SystemDefaults)
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ)
 	if err != nil {
 		return
 	}
@@ -189,7 +190,7 @@ func startSetup(configPaths []string, localDevMode bool) {
 	es, err := eventstore.Start(conf.Eventstore)
 	logging.Log("MAIN-Ddt3").OnError(err).Fatal("cannot start eventstore")
 
-	commands, err := command.StartCommands(es, conf.SystemDefaults)
+	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ)
 	logging.Log("MAIN-dsjrr").OnError(err).Fatal("cannot start command side")
 
 	err = setup.Execute(ctx, conf.SetUp, conf.SystemDefaults.IamID, commands)

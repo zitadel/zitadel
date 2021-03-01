@@ -72,8 +72,6 @@ func (wm *OrgDomainWriteModel) Reduce() error {
 		case *org.DomainVerificationAddedEvent:
 			wm.ValidationType = e.ValidationType
 			wm.ValidationCode = e.ValidationCode
-		case *org.DomainVerificationFailedEvent:
-			//TODO: not handled in v1
 		case *org.DomainVerifiedEvent:
 			wm.Verified = true
 		case *org.DomainPrimarySetEvent:

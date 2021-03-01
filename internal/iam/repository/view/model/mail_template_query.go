@@ -1,8 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -41,7 +41,7 @@ func (req MailTemplateSearchQuery) GetKey() repository.ColumnKey {
 	return MailTemplateSearchKey(req.Key)
 }
 
-func (req MailTemplateSearchQuery) GetMethod() global_model.SearchMethod {
+func (req MailTemplateSearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 

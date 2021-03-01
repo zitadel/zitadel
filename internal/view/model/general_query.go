@@ -1,6 +1,8 @@
 package model
 
-import "github.com/caos/zitadel/internal/model"
+import (
+	"github.com/caos/zitadel/internal/domain"
+)
 
 type GeneralSearchRequest struct {
 	Offset        uint64
@@ -18,6 +20,6 @@ const (
 
 type GeneralSearchQuery struct {
 	Key    GeneralSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }

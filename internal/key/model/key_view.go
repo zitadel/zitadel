@@ -1,11 +1,11 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/model"
 )
 
 type KeyView struct {
@@ -52,7 +52,7 @@ const (
 
 type KeySearchQuery struct {
 	Key    KeySearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

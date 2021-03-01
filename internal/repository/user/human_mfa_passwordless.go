@@ -196,7 +196,10 @@ type HumanPasswordlessCheckSucceededEvent struct {
 	HumanWebAuthNCheckSucceededEvent
 }
 
-func NewHumanPasswordlessCheckSucceededEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordlessCheckSucceededEvent {
+func NewHumanPasswordlessCheckSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo) *HumanPasswordlessCheckSucceededEvent {
 	return &HumanPasswordlessCheckSucceededEvent{
 		HumanWebAuthNCheckSucceededEvent: *NewHumanWebAuthNCheckSucceededEvent(
 			eventstore.NewBaseEventForPush(
@@ -204,6 +207,7 @@ func NewHumanPasswordlessCheckSucceededEvent(ctx context.Context, aggregate *eve
 				aggregate,
 				HumanPasswordlessTokenCheckSucceededType,
 			),
+			info,
 		),
 	}
 }
@@ -221,7 +225,10 @@ type HumanPasswordlessCheckFailedEvent struct {
 	HumanWebAuthNCheckFailedEvent
 }
 
-func NewHumanPasswordlessCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordlessCheckFailedEvent {
+func NewHumanPasswordlessCheckFailedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo) *HumanPasswordlessCheckFailedEvent {
 	return &HumanPasswordlessCheckFailedEvent{
 		HumanWebAuthNCheckFailedEvent: *NewHumanWebAuthNCheckFailedEvent(
 			eventstore.NewBaseEventForPush(
@@ -229,6 +236,7 @@ func NewHumanPasswordlessCheckFailedEvent(ctx context.Context, aggregate *events
 				aggregate,
 				HumanPasswordlessTokenCheckFailedType,
 			),
+			info,
 		),
 	}
 }

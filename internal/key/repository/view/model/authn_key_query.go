@@ -1,8 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	key_model "github.com/caos/zitadel/internal/key/model"
-	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -41,7 +41,7 @@ func (req AuthNKeySearchQuery) GetKey() repository.ColumnKey {
 	return AuthNKeySearchKey(req.Key)
 }
 
-func (req AuthNKeySearchQuery) GetMethod() global_model.SearchMethod {
+func (req AuthNKeySearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 

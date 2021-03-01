@@ -13,7 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/caos/zitadel/pkg/grpc/message"
@@ -74,7 +73,7 @@ func externalIDPSearchRequestToModel(request *management.ExternalIDPSearchReques
 	return &usr_model.ExternalIDPSearchRequest{
 		Limit:   request.Limit,
 		Offset:  request.Offset,
-		Queries: []*usr_model.ExternalIDPSearchQuery{{Key: usr_model.ExternalIDPSearchKeyUserID, Method: model.SearchMethodEquals, Value: request.UserId}},
+		Queries: []*usr_model.ExternalIDPSearchQuery{{Key: usr_model.ExternalIDPSearchKeyUserID, Method: domain.SearchMethodEquals, Value: request.UserId}},
 	}
 }
 
@@ -537,6 +536,19 @@ func genderFromDomain(gender domain.Gender) management.Gender {
 	case domain.GenderMale:
 		return management.Gender_GENDER_MALE
 	case domain.GenderDiverse:
+		return management.Gender_GENDER_DIVERSE
+	default:
+		return management.Gender_GENDER_UNSPECIFIED
+	}
+}
+
+func genderFromModel(gender usr_model.Gender) management.Gender {
+	switch gender {
+	case usr_model.GenderFemale:
+		return management.Gender_GENDER_FEMALE
+	case usr_model.GenderMale:
+		return management.Gender_GENDER_MALE
+	case usr_model.GenderDiverse:
 		return management.Gender_GENDER_DIVERSE
 	default:
 		return management.Gender_GENDER_UNSPECIFIED

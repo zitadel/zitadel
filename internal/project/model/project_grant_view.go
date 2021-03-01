@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 )
 
@@ -43,7 +43,7 @@ const (
 
 type ProjectGrantViewSearchQuery struct {
 	Key    ProjectGrantViewSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -66,15 +66,15 @@ func (r *ProjectGrantViewSearchRequest) GetSearchQuery(key ProjectGrantViewSearc
 }
 
 func (r *ProjectGrantViewSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: model.SearchMethodEquals, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: orgID})
 }
 
 func (r *ProjectGrantViewSearchRequest) AppendNotMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: model.SearchMethodNotEquals, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: domain.SearchMethodNotEquals, Value: orgID})
 }
 
 func (r *ProjectGrantViewSearchRequest) AppendMyResourceOwnerQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: orgID})
 }
 
 func (r *ProjectGrantViewSearchRequest) EnsureLimit(limit uint64) {

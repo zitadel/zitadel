@@ -1,10 +1,10 @@
 package repository
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/model"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"github.com/jinzhu/gorm"
 )
@@ -23,7 +23,7 @@ type FailedEvent struct {
 
 type FailedEventSearchQuery struct {
 	Key    FailedEventSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -31,7 +31,7 @@ func (req FailedEventSearchQuery) GetKey() ColumnKey {
 	return failedEventSearchKey(req.Key)
 }
 
-func (req FailedEventSearchQuery) GetMethod() model.SearchMethod {
+func (req FailedEventSearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 
@@ -100,8 +100,8 @@ func RemoveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) erro
 func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*FailedEvent, error) {
 	failedEvent := new(FailedEvent)
 	queries := []SearchQuery{
-		FailedEventSearchQuery{Key: FailedEventKeyViewName, Method: model.SearchMethodEqualsIgnoreCase, Value: viewName},
-		FailedEventSearchQuery{Key: FailedEventKeyFailedSequence, Method: model.SearchMethodEquals, Value: sequence},
+		FailedEventSearchQuery{Key: FailedEventKeyViewName, Method: domain.SearchMethodEqualsIgnoreCase, Value: viewName},
+		FailedEventSearchQuery{Key: FailedEventKeyFailedSequence, Method: domain.SearchMethodEquals, Value: sequence},
 	}
 	query := PrepareGetByQuery(table, queries...)
 	err := query(db, failedEvent)

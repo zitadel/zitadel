@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
-//TODO: private
+//TODO: private as soon as setup uses query
 func (c *Commands) GetIAM(ctx context.Context) (*domain.IAM, error) {
 	iamWriteModel := NewIAMWriteModel()
 	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)

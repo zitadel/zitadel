@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type ProjectView struct {
@@ -37,7 +36,7 @@ const (
 
 type ProjectViewSearchQuery struct {
 	Key    ProjectViewSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -60,7 +59,7 @@ func (r *ProjectViewSearchRequest) GetSearchQuery(key ProjectViewSearchKey) (int
 }
 
 func (r *ProjectViewSearchRequest) AppendMyResourceOwnerQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectViewSearchQuery{Key: ProjectViewSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectViewSearchQuery{Key: ProjectViewSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: orgID})
 }
 
 func (r *ProjectViewSearchRequest) EnsureLimit(limit uint64) {

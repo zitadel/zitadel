@@ -13,7 +13,6 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	key_model "github.com/caos/zitadel/internal/key/model"
-	"github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -151,11 +150,11 @@ func machineKeySearchRequestToModel(req *management.MachineKeySearchRequest) *ke
 		Queries: []*key_model.AuthNKeySearchQuery{
 			{
 				Key:    key_model.AuthNKeyObjectType,
-				Method: model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  key_model.AuthNKeyObjectTypeUser,
 			}, {
 				Key:    key_model.AuthNKeyObjectID,
-				Method: model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  req.UserId,
 			},
 		},

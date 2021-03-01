@@ -1,12 +1,12 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/view/repository"
 
 	"github.com/jinzhu/gorm"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -15,12 +15,12 @@ func ExternalIDPByExternalUserIDAndIDPConfigID(db *gorm.DB, table, externalUserI
 	user := new(model.ExternalIDPView)
 	userIDQuery := &model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyExternalUserID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  externalUserID,
 	}
 	idpConfigIDQuery := &model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyIdpConfigID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  idpConfigID,
 	}
 	query := repository.PrepareGetByQuery(table, userIDQuery, idpConfigIDQuery)
@@ -35,17 +35,17 @@ func ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(db *gorm.DB, tabl
 	user := new(model.ExternalIDPView)
 	userIDQuery := &model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyExternalUserID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  externalUserID,
 	}
 	idpConfigIDQuery := &model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyIdpConfigID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  idpConfigID,
 	}
 	resourceOwnerQuery := &model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyResourceOwner,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  resourceOwner,
 	}
 	query := repository.PrepareGetByQuery(table, userIDQuery, idpConfigIDQuery, resourceOwnerQuery)
@@ -60,7 +60,7 @@ func ExternalIDPsByIDPConfigID(db *gorm.DB, table, idpConfigID string) ([]*model
 	externalIDPs := make([]*model.ExternalIDPView, 0)
 	orgIDQuery := &usr_model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyIdpConfigID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  idpConfigID,
 	}
 	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{
@@ -74,12 +74,12 @@ func ExternalIDPsByIDPConfigIDAndResourceOwner(db *gorm.DB, table, idpConfigID, 
 	externalIDPs := make([]*model.ExternalIDPView, 0)
 	idpConfigIDQuery := &usr_model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyIdpConfigID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  idpConfigID,
 	}
 	orgIDQuery := &usr_model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyResourceOwner,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  resourceOwner,
 	}
 	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{
@@ -93,12 +93,12 @@ func ExternalIDPsByIDPConfigIDAndResourceOwners(db *gorm.DB, table, idpConfigID 
 	externalIDPs := make([]*model.ExternalIDPView, 0)
 	idpConfigIDQuery := &usr_model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyIdpConfigID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  idpConfigID,
 	}
 	orgIDQuery := &usr_model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyResourceOwner,
-		Method: global_model.SearchMethodIsOneOf,
+		Method: domain.SearchMethodIsOneOf,
 		Value:  resourceOwners,
 	}
 	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{
@@ -112,7 +112,7 @@ func ExternalIDPsByUserID(db *gorm.DB, table, userID string) ([]*model.ExternalI
 	externalIDPs := make([]*model.ExternalIDPView, 0)
 	orgIDQuery := &usr_model.ExternalIDPSearchQuery{
 		Key:    usr_model.ExternalIDPSearchKeyUserID,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  userID,
 	}
 	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{

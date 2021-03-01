@@ -2,10 +2,10 @@ package view
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -89,7 +89,7 @@ func (v *View) AppIDsFromProjectByClientID(ctx context.Context, clientID string)
 		Queries: []*proj_model.ApplicationSearchQuery{
 			{
 				Key:    proj_model.AppSearchKeyProjectID,
-				Method: global_model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  app.ProjectID,
 			},
 		},
@@ -113,7 +113,7 @@ func (v *View) AppIDsFromProjectID(ctx context.Context, projectID string) ([]str
 		Queries: []*proj_model.ApplicationSearchQuery{
 			{
 				Key:    proj_model.AppSearchKeyProjectID,
-				Method: global_model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  projectID,
 			},
 		},

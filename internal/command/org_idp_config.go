@@ -143,6 +143,17 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 	return err
 }
 
+func (c *Commands) getOrgIDPConfigByID(ctx context.Context, idpID, orgID string) (*domain.IDPConfig, error) {
+	config, err := c.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if !config.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.Org.IDPConfig.NotExisting")
+	}
+	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
+}
+
 func (c *Commands) orgIDPConfigWriteModelByID(ctx context.Context, idpID, orgID string) (policy *OrgIDPConfigWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

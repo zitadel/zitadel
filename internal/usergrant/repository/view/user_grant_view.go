@@ -1,8 +1,8 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -22,9 +22,9 @@ func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, er
 func UserGrantByIDs(db *gorm.DB, table, resourceOwnerID, projectID, userID string) (*model.UserGrantView, error) {
 	user := new(model.UserGrantView)
 
-	resourceOwnerIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyResourceOwner, Value: resourceOwnerID, Method: global_model.SearchMethodEquals}
-	projectIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
-	userIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
+	resourceOwnerIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyResourceOwner, Value: resourceOwnerID, Method: domain.SearchMethodEquals}
+	projectIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals}
+	userIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, resourceOwnerIDQuery, projectIDQuery, userIDQuery)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
@@ -72,7 +72,7 @@ func SearchUserGrants(db *gorm.DB, table string, req *grant_model.UserGrantSearc
 func UserGrantsByUserID(db *gorm.DB, table, userID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -85,7 +85,7 @@ func UserGrantsByUserID(db *gorm.DB, table, userID string) ([]*model.UserGrantVi
 func UserGrantsByProjectID(db *gorm.DB, table, projectID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -98,8 +98,8 @@ func UserGrantsByProjectID(db *gorm.DB, table, projectID string) ([]*model.UserG
 func UserGrantsByProjectAndUserID(db *gorm.DB, table, projectID, userID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
-		{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -112,8 +112,8 @@ func UserGrantsByProjectAndUserID(db *gorm.DB, table, projectID, userID string) 
 func UserGrantsByProjectAndGrantID(db *gorm.DB, table, projectID, grantID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
-		{Key: grant_model.UserGrantSearchKeyGrantID, Value: grantID, Method: global_model.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyGrantID, Value: grantID, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -126,8 +126,8 @@ func UserGrantsByProjectAndGrantID(db *gorm.DB, table, projectID, grantID string
 func UserGrantsByProjectIDAndRole(db *gorm.DB, table, projectID, roleKey string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
-		{Key: grant_model.UserGrantSearchKeyRoleKey, Value: roleKey, Method: global_model.SearchMethodListContains},
+		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyRoleKey, Value: roleKey, Method: domain.SearchMethodListContains},
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -140,8 +140,8 @@ func UserGrantsByProjectIDAndRole(db *gorm.DB, table, projectID, roleKey string)
 func UserGrantsByOrgIDAndProjectID(db *gorm.DB, table, orgID, projectID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		{Key: grant_model.UserGrantSearchKeyResourceOwner, Value: orgID, Method: global_model.SearchMethodEquals},
-		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyResourceOwner, Value: orgID, Method: domain.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -154,7 +154,7 @@ func UserGrantsByOrgIDAndProjectID(db *gorm.DB, table, orgID, projectID string) 
 func UserGrantsByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		{Key: grant_model.UserGrantSearchKeyResourceOwner, Value: orgID, Method: global_model.SearchMethodEquals},
+		{Key: grant_model.UserGrantSearchKeyResourceOwner, Value: orgID, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)

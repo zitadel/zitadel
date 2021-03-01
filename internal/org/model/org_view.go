@@ -1,10 +1,10 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/model"
 )
 
 type OrgView struct {
@@ -39,7 +39,7 @@ const (
 
 type OrgSearchQuery struct {
 	Key    OrgSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

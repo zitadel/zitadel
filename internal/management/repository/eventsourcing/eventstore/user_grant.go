@@ -2,11 +2,11 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	global_model "github.com/caos/zitadel/internal/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -105,7 +105,7 @@ func handleSearchUserGrantPermissions(ctx context.Context, request *grant_model.
 			return result
 		}
 	}
-	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: domain.SearchMethodIsOneOf, Value: ids})
 	return nil
 }
 

@@ -1,8 +1,8 @@
 package repository
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/model"
 	"github.com/jinzhu/gorm"
 	"testing"
 )
@@ -113,7 +113,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQuery("TESTTABLE", "test", "=", "VALUE"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodEqualsIgnoreCase, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: domain.SearchMethodEqualsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -126,7 +126,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryCaseSensitive("TESTTABLE", "test", "=", "VALUE"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodEquals, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: domain.SearchMethodEquals, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -139,7 +139,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQuery("TESTTABLE", "test", "LIKE", "VALUE%"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodStartsWithIgnoreCase, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: domain.SearchMethodStartsWithIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -152,7 +152,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryCaseSensitive("TESTTABLE", "test", "LIKE", "VALUE%"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodStartsWith, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: domain.SearchMethodStartsWith, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -165,7 +165,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQuery("TESTTABLE", "test", "LIKE", "%VALUE%"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodContainsIgnoreCase, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: domain.SearchMethodContainsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -178,7 +178,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryCaseSensitive("TESTTABLE", "test", "LIKE", "%VALUE%"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodContains, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: domain.SearchMethodContains, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -191,7 +191,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryErr("TESTTABLE", "test", "LIKE", "%VALUE%", gorm.ErrRecordNotFound),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodContainsIgnoreCase, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: domain.SearchMethodContainsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -205,7 +205,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryErr("TESTTABLE", "test", "LIKE", "%VALUE%", gorm.ErrUnaddressable),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodContainsIgnoreCase, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: domain.SearchMethodContainsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -219,7 +219,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQuery("TESTTABLE", "", "=", "VALUE"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_UNDEFINED, method: model.SearchMethodEqualsIgnoreCase, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_UNDEFINED, method: domain.SearchMethodEqualsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},

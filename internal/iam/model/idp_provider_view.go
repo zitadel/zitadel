@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/model"
 	"time"
 )
 
@@ -39,7 +38,7 @@ const (
 
 type IDPProviderSearchQuery struct {
 	Key    IDPProviderSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -59,7 +58,7 @@ func (r *IDPProviderSearchRequest) EnsureLimit(limit uint64) {
 }
 
 func (r *IDPProviderSearchRequest) AppendAggregateIDQuery(aggregateID string) {
-	r.Queries = append(r.Queries, &IDPProviderSearchQuery{Key: IDPProviderSearchKeyAggregateID, Method: model.SearchMethodEquals, Value: aggregateID})
+	r.Queries = append(r.Queries, &IDPProviderSearchQuery{Key: IDPProviderSearchKeyAggregateID, Method: domain.SearchMethodEquals, Value: aggregateID})
 }
 
 func IdpProviderViewsToDomain(idpProviders []*IDPProviderView) []*domain.IDPProvider {

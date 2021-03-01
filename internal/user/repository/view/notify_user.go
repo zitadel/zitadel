@@ -1,8 +1,8 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -23,7 +23,7 @@ func NotifyUsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.NotifyUser, 
 	users := make([]*model.NotifyUser, 0)
 	orgIDQuery := &usr_model.NotifyUserSearchQuery{
 		Key:    usr_model.NotifyUserSearchKeyResourceOwner,
-		Method: global_model.SearchMethodEquals,
+		Method: domain.SearchMethodEquals,
 		Value:  orgID,
 	}
 	query := repository.PrepareSearchQuery(table, model.NotifyUserSearchRequest{

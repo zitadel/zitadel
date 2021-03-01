@@ -64,3 +64,7 @@ const (
 func (s PhoneState) Valid() bool {
 	return s >= 0 && s < phoneStateCount
 }
+
+func (s PhoneState) Exists() bool {
+	return s == PhoneStateActive
+}

@@ -3,12 +3,12 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -30,7 +30,7 @@ func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *gran
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestUserGrantSequence()
 	logging.Log("EVENT-Hd7s3").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest user grant sequence")
-	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).UserID})
+	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).UserID})
 	grants, count, err := repo.View.SearchUserGrants(request)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 		}
 		return repo.searchZitadelOrgs(ctxData, request)
 	}
-	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: global_model.SearchMethodEquals, Value: ctxData.ProjectID})
+	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: ctxData.ProjectID})
 
 	grants, err := repo.SearchMyUserGrants(ctx, request)
 	if err != nil {
@@ -135,12 +135,12 @@ func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*user_v
 		Queries: []*user_model.UserMembershipSearchQuery{
 			{
 				Key:    user_model.UserMembershipSearchKeyUserID,
-				Method: global_model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  ctxData.UserID,
 			},
 			{
 				Key:    user_model.UserMembershipSearchKeyResourceOwner,
-				Method: global_model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  ctxData.OrgID,
 			},
 		},
@@ -152,12 +152,12 @@ func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*user_v
 		Queries: []*user_model.UserMembershipSearchQuery{
 			{
 				Key:    user_model.UserMembershipSearchKeyUserID,
-				Method: global_model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  ctxData.UserID,
 			},
 			{
 				Key:    user_model.UserMembershipSearchKeyAggregateID,
-				Method: global_model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  repo.IamID,
 			},
 		},
@@ -203,7 +203,7 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 func (repo *UserGrantRepo) IsIamAdmin(ctx context.Context) (bool, error) {
 	grantSearch := &grant_model.UserGrantSearchRequest{
 		Queries: []*grant_model.UserGrantSearchQuery{
-			{Key: grant_model.UserGrantSearchKeyResourceOwner, Method: global_model.SearchMethodEquals, Value: repo.IamID},
+			{Key: grant_model.UserGrantSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: repo.IamID},
 		}}
 	result, err := repo.SearchMyUserGrants(ctx, grantSearch)
 	if err != nil {
@@ -246,7 +246,7 @@ func (repo *UserGrantRepo) searchZitadelOrgs(ctxData authz.CtxData, request *gra
 		Queries: []*user_model.UserMembershipSearchQuery{
 			{
 				Key:    user_model.UserMembershipSearchKeyUserID,
-				Method: global_model.SearchMethodEquals,
+				Method: domain.SearchMethodEquals,
 				Value:  ctxData.UserID,
 			},
 		},

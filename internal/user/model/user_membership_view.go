@@ -1,9 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
-
-	"github.com/caos/zitadel/internal/model"
 )
 
 type UserMembershipView struct {
@@ -53,7 +52,7 @@ const (
 
 type UserMembershipSearchQuery struct {
 	Key    UserMembershipSearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 
@@ -82,9 +81,9 @@ func (r *UserMembershipSearchRequest) GetSearchQuery(key UserMembershipSearchKey
 }
 
 func (r *UserMembershipSearchRequest) AppendResourceOwnerAndIamQuery(orgID, iamID string) {
-	r.Queries = append(r.Queries, &UserMembershipSearchQuery{Key: UserMembershipSearchKeyResourceOwner, Method: model.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
+	r.Queries = append(r.Queries, &UserMembershipSearchQuery{Key: UserMembershipSearchKeyResourceOwner, Method: domain.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
 }
 
 func (r *UserMembershipSearchRequest) AppendUserIDQuery(userID string) {
-	r.Queries = append(r.Queries, &UserMembershipSearchQuery{Key: UserMembershipSearchKeyUserID, Method: model.SearchMethodEquals, Value: userID})
+	r.Queries = append(r.Queries, &UserMembershipSearchQuery{Key: UserMembershipSearchKeyUserID, Method: domain.SearchMethodEquals, Value: userID})
 }

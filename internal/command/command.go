@@ -2,7 +2,9 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"time"
 
@@ -10,7 +12,6 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/id"
-	global_model "github.com/caos/zitadel/internal/model"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
 	keypair "github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -22,9 +23,10 @@ import (
 )
 
 type Commands struct {
-	eventstore  *eventstore.Eventstore
-	idGenerator id.Generator
-	iamDomain   string
+	eventstore   *eventstore.Eventstore
+	idGenerator  id.Generator
+	iamDomain    string
+	zitadelRoles []authz.RoleMapping
 
 	idpConfigSecretCrypto crypto.Crypto
 
@@ -40,8 +42,7 @@ type Commands struct {
 	domainVerificationAlg       *crypto.AESCrypto
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
-	//TODO: remove global model, or move to domain
-	multifactors global_model.Multifactors
+	multifactors                domain.MultifactorConfigs
 
 	webauthn           *webauthn_helper.WebAuthN
 	keySize            int
@@ -54,11 +55,12 @@ type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults) (repo *Commands, err error) {
+func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         eventstore,
 		idGenerator:        id.SonyFlakeGenerator,
 		iamDomain:          defaults.Domain,
+		zitadelRoles:       authZConfig.RolePermissionMappings,
 		keySize:            defaults.KeyConfig.Size,
 		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
 		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,
@@ -70,7 +72,6 @@ func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults
 	proj_repo.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
 
-	//TODO: simplify!!!!
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
 	if err != nil {
 		return nil, err
@@ -92,8 +93,8 @@ func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults
 	if err != nil {
 		return nil, err
 	}
-	repo.multifactors = global_model.Multifactors{
-		OTP: global_model.OTP{
+	repo.multifactors = domain.MultifactorConfigs{
+		OTP: domain.OTPConfig{
 			CryptoMFA: aesOTPCrypto,
 			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},

@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 )
 
@@ -33,7 +33,7 @@ const (
 
 type OrgIAMPolicySearchQuery struct {
 	Key    OrgIAMPolicySearchKey
-	Method model.SearchMethod
+	Method domain.SearchMethod
 	Value  interface{}
 }
 

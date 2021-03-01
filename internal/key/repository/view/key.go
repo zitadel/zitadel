@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"time"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -10,14 +11,13 @@ import (
 
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/key/repository/view/model"
-	global_model "github.com/caos/zitadel/internal/model"
 )
 
 func KeyByIDAndType(db *gorm.DB, table, keyID string, private bool) (*model.KeyView, error) {
 	key := new(model.KeyView)
 	query := repository.PrepareGetByQuery(table,
-		model.KeySearchQuery{Key: key_model.KeySearchKeyID, Method: global_model.SearchMethodEquals, Value: keyID},
-		model.KeySearchQuery{Key: key_model.KeySearchKeyPrivate, Method: global_model.SearchMethodEquals, Value: private},
+		model.KeySearchQuery{Key: key_model.KeySearchKeyID, Method: domain.SearchMethodEquals, Value: keyID},
+		model.KeySearchQuery{Key: key_model.KeySearchKeyPrivate, Method: domain.SearchMethodEquals, Value: private},
 	)
 	err := query(db, key)
 	return key, err
@@ -31,9 +31,9 @@ func GetSigningKey(db *gorm.DB, table string, expiry time.Time) (*model.KeyView,
 	query := repository.PrepareSearchQuery(table,
 		model.KeySearchRequest{
 			Queries: []*key_model.KeySearchQuery{
-				{Key: key_model.KeySearchKeyPrivate, Method: global_model.SearchMethodEquals, Value: true},
-				{Key: key_model.KeySearchKeyUsage, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
-				{Key: key_model.KeySearchKeyExpiry, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
+				{Key: key_model.KeySearchKeyPrivate, Method: domain.SearchMethodEquals, Value: true},
+				{Key: key_model.KeySearchKeyUsage, Method: domain.SearchMethodEquals, Value: key_model.KeyUsageSigning},
+				{Key: key_model.KeySearchKeyExpiry, Method: domain.SearchMethodGreaterThan, Value: time.Now().UTC()},
 			},
 			SortingColumn: key_model.KeySearchKeyExpiry,
 			Limit:         1,
@@ -54,9 +54,9 @@ func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {
 	query := repository.PrepareSearchQuery(table,
 		model.KeySearchRequest{
 			Queries: []*key_model.KeySearchQuery{
-				{Key: key_model.KeySearchKeyPrivate, Method: global_model.SearchMethodEquals, Value: false},
-				{Key: key_model.KeySearchKeyUsage, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
-				{Key: key_model.KeySearchKeyExpiry, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
+				{Key: key_model.KeySearchKeyPrivate, Method: domain.SearchMethodEquals, Value: false},
+				{Key: key_model.KeySearchKeyUsage, Method: domain.SearchMethodEquals, Value: key_model.KeyUsageSigning},
+				{Key: key_model.KeySearchKeyExpiry, Method: domain.SearchMethodGreaterThan, Value: time.Now().UTC()},
 			},
 		},
 	)

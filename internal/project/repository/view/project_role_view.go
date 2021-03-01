@@ -1,8 +1,8 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -12,9 +12,9 @@ import (
 func ProjectRoleByIDs(db *gorm.DB, table, projectID, orgID, key string) (*model.ProjectRoleView, error) {
 	role := new(model.ProjectRoleView)
 
-	projectIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
-	grantIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyOrgID, Value: orgID, Method: global_model.SearchMethodEquals}
-	keyQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyKey, Value: key, Method: global_model.SearchMethodEquals}
+	projectIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals}
+	grantIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyOrgID, Value: orgID, Method: domain.SearchMethodEquals}
+	keyQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyKey, Value: key, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, projectIDQuery, grantIDQuery, keyQuery)
 	err := query(db, role)
 	if caos_errs.IsNotFound(err) {
@@ -26,7 +26,7 @@ func ProjectRoleByIDs(db *gorm.DB, table, projectID, orgID, key string) (*model.
 func ProjectRolesByProjectID(db *gorm.DB, table, projectID string) ([]*model.ProjectRoleView, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	queries := []*proj_model.ProjectRoleSearchQuery{
-		{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Queries: queries})
 	_, err := query(db, &roles)
@@ -39,9 +39,9 @@ func ProjectRolesByProjectID(db *gorm.DB, table, projectID string) ([]*model.Pro
 func ResourceOwnerProjectRolesByKey(db *gorm.DB, table, projectID, resourceOwner, key string) ([]*model.ProjectRoleView, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	queries := []*proj_model.ProjectRoleSearchQuery{
-		{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
-		{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals},
-		{Key: proj_model.ProjectRoleSearchKeyKey, Value: key, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: domain.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyKey, Value: key, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Queries: queries})
 	_, err := query(db, &roles)
@@ -54,8 +54,8 @@ func ResourceOwnerProjectRolesByKey(db *gorm.DB, table, projectID, resourceOwner
 func ResourceOwnerProjectRoles(db *gorm.DB, table, projectID, resourceOwner string) ([]*model.ProjectRoleView, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	queries := []*proj_model.ProjectRoleSearchQuery{
-		{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
-		{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals},
+		{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: domain.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Queries: queries})
 	_, err := query(db, &roles)

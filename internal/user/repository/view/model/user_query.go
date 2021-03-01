@@ -1,7 +1,7 @@
 package model
 
 import (
-	global_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/domain"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
@@ -41,7 +41,7 @@ func (req UserSearchQuery) GetKey() repository.ColumnKey {
 	return UserSearchKey(req.Key)
 }
 
-func (req UserSearchQuery) GetMethod() global_model.SearchMethod {
+func (req UserSearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 
