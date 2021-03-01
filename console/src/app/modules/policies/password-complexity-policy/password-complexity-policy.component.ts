@@ -7,6 +7,8 @@ import { PasswordComplexityPolicyView } from 'src/app/proto/generated/management
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { CnslLinks } from '../../links/links.component';
+import { IAM_LABEL_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK, ORG_IAM_POLICY_LINK, ORG_LOGIN_POLICY_LINK } from '../../policy-grid/policy-links';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
@@ -25,6 +27,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
     public loading: boolean = false;
+    public nextLinks: CnslLinks[] = [];
     constructor(
         private route: ActivatedRoute,
         private toast: ToastService,
@@ -36,9 +39,18 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
+                    this.nextLinks = [
+                        ORG_IAM_POLICY_LINK,
+                        ORG_LOGIN_POLICY_LINK,
+                    ];
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
+                    this.nextLinks = [
+                        IAM_POLICY_LINK,
+                        IAM_LOGIN_POLICY_LINK,
+                        IAM_LABEL_LINK,
+                    ];
                     break;
             }
 

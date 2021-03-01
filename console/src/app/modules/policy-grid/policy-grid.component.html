@@ -19,6 +19,20 @@
             <p class="desc">
                 {{'POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate}}</p>
 
+            <div class="icons">
+                <mat-icon matTooltip="{{'POLICY.DATA.HASUPPERCASE' | translate}}" *ngIf="complexityPolicy?.hasUppercase"
+                    class="icon" svgIcon="mdi_format-letter-case-upper">
+                </mat-icon>
+                <mat-icon matTooltip="{{'POLICY.DATA.HASLOWERCASE' | translate}}" *ngIf="complexityPolicy?.hasLowercase"
+                    class="icon" svgIcon="mdi_format-letter-case-lower">
+                </mat-icon>
+                <mat-icon matTooltip="{{'POLICY.DATA.HASNUMBER' | translate}}" *ngIf="complexityPolicy?.hasNumber"
+                    class="icon" svgIcon="mdi_numeric"></mat-icon>
+                <mat-icon matTooltip="{{'POLICY.DATA.HASSYMBOL' | translate}}" *ngIf="complexityPolicy?.hasSymbol"
+                    class="icon" svgIcon="mdi_symbol"></mat-icon>
+                <!-- <mat-icon *ngIf="complexityPolicy?." class="icon" svgIcon="mdi_counter"></mat-icon> -->
+            </div>
+
             <span class="fill-space"></span>
             <div class="btn-wrapper">
                 <button
@@ -67,10 +81,8 @@
                 </button>
             </div>
 
-            <ng-template #showDescIAM>
-                <p class="desc">
-                    {{'POLICY.LOGIN_POLICY.DESCRIPTION' | translate}}</p>
-            </ng-template>
+            <p class="desc">
+                {{'POLICY.LOGIN_POLICY.DESCRIPTION' | translate}}</p>
 
             <span class="fill-space"></span>
             <div class="btn-wrapper">

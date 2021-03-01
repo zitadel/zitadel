@@ -1,0 +1,27 @@
+<div class="next-steps">
+    <h5>{{'NEXTSTEPS.TITLE' | translate}}</h5>
+    <div class="row">
+        <ng-container *ngFor="let link of links">
+            <ng-template *ngIf="link.withRole" appHasRole [appHasRole]="link.withRole">
+                <div class="step">
+                    <h6>{{ link.i18nTitle | translate }}</h6>
+                    <p>{{link.i18nDesc | translate}}</p>
+                    <span class="fill-space"></span>
+                    <a *ngIf="link.routerLink" [routerLink]="link.routerLink" color="primary" mat-mini-fab><i
+                            class="las la-angle-right"></i></a>
+                    <a *ngIf="link.href" [href]="link.href" target="_blank" color="primary" mat-mini-fab><i
+                            class="las la-angle-right"></i></a>
+                </div>
+            </ng-template>
+            <div class="step" *ngIf="!link.withRole">
+                <h6>{{ link.i18nTitle | translate }}</h6>
+                <p>{{link.i18nDesc | translate}}</p>
+                <span class="fill-space"></span>
+                <a *ngIf="link.routerLink" [routerLink]="link.routerLink" color="primary" mat-mini-fab><i
+                        class="las la-angle-right"></i></a>
+                <a *ngIf="link.href" [href]="link.href" target="_blank" color="primary" mat-mini-fab><i
+                        class="las la-angle-right"></i></a>
+            </div>
+        </ng-container>
+    </div>
+</div>

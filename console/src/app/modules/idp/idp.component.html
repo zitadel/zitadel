@@ -54,16 +54,24 @@
                             <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
                             <input cnslInput formControlName="clientSecret" />
                         </cnsl-form-field>
+                        <div class="line">
+                            <cnsl-form-field appearance="outline" class="formfield">
+                                <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
+
+                                <input cnslInput [matChipInputFor]="chipScopesList"
+                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                                    (matChipInputTokenEnd)="addScope($event)">
+                            </cnsl-form-field>
+                            <button (click)="addScope($event)" mat-icon-button>
+                                <mat-icon>add</mat-icon>
+                            </button>
+                        </div>
                         <cnsl-form-field appearance="outline" class="formfield fullwidth">
-                            <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
-                            <mat-chip-list #chipScopesList aria-label="scope selection">
+                            <mat-chip-list class="chip-list" #chipScopesList aria-label="scope selection">
                                 <mat-chip class="chip" *ngFor="let scope of scopesList?.value" selectable="false"
                                     removable (removed)="removeScope(scope)">
                                     {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
                                 </mat-chip>
-                                <input cnslInput [matChipInputFor]="chipScopesList"
-                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
-                                    (matChipInputTokenEnd)="addScope($event)">
                             </mat-chip-list>
                         </cnsl-form-field>
 

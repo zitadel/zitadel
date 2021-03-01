@@ -69,21 +69,3 @@
 td {
   outline: none;
 }
-
-.state {
-  border-radius: 50vw;
-  padding: 2px .5rem;
-  letter-spacing: .05em;
-  font-size: 11px;
-  background-color: #8795a120;
-
-  &.active {
-    background-color: #85d996;
-    color: black;
-  }
-
-  &.inactive {
-    background-color: #ff8981;
-    color: black;
-  }
-}
