@@ -34,8 +34,8 @@ func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest
 	}
 	return &admin_pb.AddOIDCIDPResponse{
 		IdpId: config.AggregateID,
-		Details: object_pb.ToDetailsPb(config.Sequence,
-			config.CreationDate,
+		Details: object_pb.ToDetailsPb(
+			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -50,7 +50,6 @@ func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) 
 	return &admin_pb.UpdateIDPResponse{
 		Details: object_pb.ToDetailsPb(
 			config.Sequence,
-			config.CreationDate,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -97,7 +96,6 @@ func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateID
 	return &admin_pb.UpdateIDPOIDCConfigResponse{
 		Details: object_pb.ToDetailsPb(
 			config.Sequence,
-			config.CreationDate,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),

@@ -29,7 +29,6 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 		Key: user_grpc.WebAuthNTokenToWebAuthNKeyPb(u2f),
 		Details: object.ToDetailsPb(
 			u2f.Sequence,
-			u2f.CreationDate,
 			u2f.ChangeDate,
 			u2f.ResourceOwner,
 		),

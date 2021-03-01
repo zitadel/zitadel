@@ -24,7 +24,6 @@ func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabe
 	return &admin_pb.UpdateLabelPolicyResponse{
 		Details: object.ToDetailsPb(
 			policy.Sequence,
-			policy.CreationDate,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),

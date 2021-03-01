@@ -133,7 +133,7 @@ func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	}
 
 	for _, idp := range cascadeExternalIDPs {
-		userEvent, err := c.removeHumanExternalIDP(ctx, idp, true)
+		userEvent, _, err := c.removeHumanExternalIDP(ctx, idp, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-4nfsf", "userid", idp.AggregateID, "idp-id", idp.IDPConfigID).WithError(err).Warn("could not cascade remove externalidp in remove provider from policy")
 			continue

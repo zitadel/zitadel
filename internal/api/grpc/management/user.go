@@ -82,7 +82,6 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 		UserId: human.AggregateID,
 		Details: obj_grpc.ToDetailsPb(
 			human.Sequence,
-			human.CreationDate,
 			human.ChangeDate,
 			human.ResourceOwner,
 		),
@@ -98,7 +97,6 @@ func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUser
 		UserId: machine.AggregateID,
 		Details: obj_grpc.ToDetailsPb(
 			machine.Sequence,
-			machine.CreationDate,
 			machine.ChangeDate,
 			machine.ResourceOwner,
 		),
@@ -186,7 +184,6 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 		Profile: user_grpc.ProfileToPb(profile),
 		Details: obj_grpc.ToDetailsPb(
 			profile.Sequence,
-			profile.CreationDate,
 			profile.ChangeDate,
 			profile.ResourceOwner,
 		),
@@ -201,7 +198,6 @@ func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHuma
 	return &mgmt_pb.UpdateHumanProfileResponse{
 		Details: obj_grpc.ToDetailsPb(
 			profile.Sequence,
-			profile.CreationDate,
 			profile.ChangeDate,
 			profile.ResourceOwner,
 		),
@@ -217,7 +213,6 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 		Email: user_grpc.EmailToPb(email),
 		Details: obj_grpc.ToDetailsPb(
 			email.Sequence,
-			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
@@ -232,7 +227,6 @@ func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanE
 	return &mgmt_pb.UpdateHumanEmailResponse{
 		Details: obj_grpc.ToDetailsPb(
 			email.Sequence,
-			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
@@ -251,12 +245,12 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 }
 
 func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.ResendHumanEmailVerificationRequest) (*mgmt_pb.ResendHumanEmailVerificationResponse, error) {
-	err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanEmailVerificationResponse{
-		//TODO: details
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -269,7 +263,6 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 		Phone: user_grpc.PhoneToPb(phone),
 		Details: obj_grpc.ToDetailsPb(
 			phone.Sequence,
-			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),
@@ -284,7 +277,6 @@ func (s *Server) UpdateHumanPhone(ctx context.Context, req *mgmt_pb.UpdateHumanP
 	return &mgmt_pb.UpdateHumanPhoneResponse{
 		Details: obj_grpc.ToDetailsPb(
 			phone.Sequence,
-			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),
@@ -342,22 +334,22 @@ func (s *Server) ListHumanMultiFactors(ctx context.Context, req *mgmt_pb.ListHum
 }
 
 func (s *Server) RemoveHumanMultiFactorOTP(ctx context.Context, req *mgmt_pb.RemoveHumanMultiFactorOTPRequest) (*mgmt_pb.RemoveHumanMultiFactorOTPResponse, error) {
-	err := s.command.HumanRemoveOTP(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.HumanRemoveOTP(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanMultiFactorOTPResponse{
-		//TODO: details
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) RemoveHumanMultiFactorU2F(ctx context.Context, req *mgmt_pb.RemoveHumanMultiFactorU2FRequest) (*mgmt_pb.RemoveHumanMultiFactorU2FResponse, error) {
-	err := s.command.HumanRemoveU2F(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.HumanRemoveU2F(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanMultiFactorU2FResponse{
-		//TODO: details
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -372,12 +364,12 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 }
 
 func (s *Server) RemoveHumanPasswordless(ctx context.Context, req *mgmt_pb.RemoveHumanPasswordlessRequest) (*mgmt_pb.RemoveHumanPasswordlessResponse, error) {
-	err := s.command.HumanRemovePasswordless(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.HumanRemovePasswordless(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanPasswordlessResponse{
-		// TODO: details
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -389,7 +381,6 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 	return &mgmt_pb.UpdateMachineResponse{
 		Details: obj_grpc.ToDetailsPb(
 			machine.Sequence,
-			machine.CreationDate,
 			machine.ChangeDate,
 			machine.ResourceOwner,
 		),
@@ -431,7 +422,6 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 		KeyDetails: authn.KeyDetailsToPb(key),
 		Details: object.ToDetailsPb(
 			key.Sequence,
-			key.CreationDate,
 			key.ChangeDate,
 			key.ResourceOwner,
 		),
@@ -463,12 +453,12 @@ func (s *Server) ListUserIDPs(ctx context.Context, req *mgmt_pb.ListUserIDPsRequ
 	}, nil
 }
 func (s *Server) RemoveUserIDP(ctx context.Context, req *mgmt_pb.RemoveUserIDPRequest) (*mgmt_pb.RemoveUserIDPResponse, error) {
-	err := s.command.RemoveHumanExternalIDP(ctx, RemoveUserIDPRequestToDomain(ctx, req))
+	details, err := s.command.RemoveHumanExternalIDP(ctx, RemoveUserIDPRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveUserIDPResponse{
-		//TODO: details
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 

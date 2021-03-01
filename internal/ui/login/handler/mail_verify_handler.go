@@ -50,7 +50,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg)
+	_, err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg)
 	l.renderMailVerification(w, r, authReq, data.UserID, err)
 }
 
@@ -60,7 +60,7 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 		userID = authReq.UserID
 		userOrg = authReq.UserOrgID
 	}
-	err := l.command.VerifyHumanEmail(setContext(r.Context(), userOrg), userID, code, userOrg)
+	_, err := l.command.VerifyHumanEmail(setContext(r.Context(), userOrg), userID, code, userOrg)
 	if err != nil {
 		l.renderMailVerification(w, r, authReq, userID, err)
 		return

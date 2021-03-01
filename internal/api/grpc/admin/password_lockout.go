@@ -24,7 +24,6 @@ func (s *Server) UpdatePasswordLockoutPolicy(ctx context.Context, req *admin_pb.
 	return &admin_pb.UpdatePasswordLockoutPolicyResponse{
 		Details: object.ToDetailsPb(
 			policy.Sequence,
-			policy.CreationDate,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),

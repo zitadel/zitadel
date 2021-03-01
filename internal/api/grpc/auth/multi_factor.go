@@ -31,7 +31,6 @@ func (s *Server) AddMyMultiFactorOTP(ctx context.Context, _ *auth_pb.AddMyMultiF
 		Secret: otp.SecretString,
 		Details: object.ToDetailsPb(
 			otp.Sequence,
-			otp.CreationDate,
 			otp.ChangeDate,
 			otp.ResourceOwner,
 		),
@@ -73,7 +72,6 @@ func (s *Server) AddMyMultiFactorU2F(ctx context.Context, _ *auth_pb.AddMyMultiF
 		},
 		Details: object.ToDetailsPb(
 			u2f.Sequence,
-			u2f.CreationDate,
 			u2f.ChangeDate,
 			u2f.ResourceOwner,
 		),

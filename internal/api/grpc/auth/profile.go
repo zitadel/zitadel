@@ -17,7 +17,6 @@ func (s *Server) GetMyProfile(ctx context.Context, req *auth_pb.GetMyProfileRequ
 		Profile: user_grpc.ProfileToPb(profile),
 		Details: object_grpc.ToDetailsPb(
 			profile.Sequence,
-			profile.CreationDate,
 			profile.ChangeDate,
 			profile.ResourceOwner,
 		),
@@ -32,7 +31,6 @@ func (s *Server) UpdateMyProfile(ctx context.Context, req *auth_pb.UpdateMyProfi
 	return &auth_pb.UpdateMyProfileResponse{
 		Details: object_grpc.ToDetailsPb(
 			profile.Sequence,
-			profile.CreationDate,
 			profile.ChangeDate,
 			profile.ResourceOwner,
 		),

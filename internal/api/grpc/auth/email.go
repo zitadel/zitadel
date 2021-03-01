@@ -18,7 +18,6 @@ func (s *Server) GetMyEmail(ctx context.Context, _ *auth_pb.GetMyEmailRequest) (
 		Email: user.ModelEmailToPb(email),
 		Details: object.ToDetailsPb(
 			email.Sequence,
-			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
@@ -33,7 +32,6 @@ func (s *Server) SetMyEmail(ctx context.Context, req *auth_pb.SetMyEmailRequest)
 	return &auth_pb.SetMyEmailResponse{
 		Details: object.ToDetailsPb(
 			email.Sequence,
-			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
