@@ -2,9 +2,9 @@ package repository
 
 import (
 	"fmt"
+	"github.com/caos/zitadel/internal/domain"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/model"
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 )
@@ -19,7 +19,7 @@ type SearchRequest interface {
 
 type SearchQuery interface {
 	GetKey() ColumnKey
-	GetMethod() model.SearchMethod
+	GetMethod() domain.SearchMethod
 	GetValue() interface{}
 }
 
@@ -60,66 +60,66 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 	}
 }
 
-func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.SearchMethod) (*gorm.DB, error) {
+func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method domain.SearchMethod) (*gorm.DB, error) {
 	column := key.ToColumnName()
 	if column == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-7dz3w", "Column name missing")
 	}
 
 	switch method {
-	case model.SearchMethodEquals:
+	case domain.SearchMethodEquals:
 		query = query.Where(""+column+" = ?", value)
-	case model.SearchMethodEqualsIgnoreCase:
+	case domain.SearchMethodEqualsIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-idu8e", "Equal ignore case only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") = LOWER(?)", valueText)
-	case model.SearchMethodStartsWith:
+	case domain.SearchMethodStartsWith:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-SLj7s", "Starts with only possible for strings")
 		}
 		query = query.Where(column+" LIKE ?", valueText+"%")
-	case model.SearchMethodStartsWithIgnoreCase:
+	case domain.SearchMethodStartsWithIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-eidus", "Starts with ignore case only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", valueText+"%")
-	case model.SearchMethodEndsWith:
+	case domain.SearchMethodEndsWith:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-Hswd3", "Ends with only possible for strings")
 		}
 		query = query.Where(column+" LIKE ?", "%"+valueText)
-	case model.SearchMethodEndsWithIgnoreCase:
+	case domain.SearchMethodEndsWithIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-dAG31", "Ends with ignore case only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", "%"+valueText)
-	case model.SearchMethodContains:
+	case domain.SearchMethodContains:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-3ids", "Contains with only possible for strings")
 		}
 		query = query.Where(column+" LIKE ?", "%"+valueText+"%")
-	case model.SearchMethodContainsIgnoreCase:
+	case domain.SearchMethodContainsIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-eid73", "Contains with ignore case only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", "%"+valueText+"%")
-	case model.SearchMethodNotEquals:
+	case domain.SearchMethodNotEquals:
 		query = query.Where(""+column+" <> ?", value)
-	case model.SearchMethodGreaterThan:
+	case domain.SearchMethodGreaterThan:
 		query = query.Where(column+" > ?", value)
-	case model.SearchMethodLessThan:
+	case domain.SearchMethodLessThan:
 		query = query.Where(column+" < ?", value)
-	case model.SearchMethodIsOneOf:
+	case domain.SearchMethodIsOneOf:
 		query = query.Where(column+" IN (?)", value)
-	case model.SearchMethodListContains:
+	case domain.SearchMethodListContains:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-Psois", "list contains only possible for strings")
