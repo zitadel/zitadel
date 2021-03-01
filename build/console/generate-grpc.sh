@@ -13,5 +13,5 @@ protoc \
   -I=/proto/include \
   -I=node_modules/google-proto-files \
   --js_out=import_style=commonjs,binary:$GEN_PATH \
-  --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:$GEN_PATH \
+  --grpc-web_out=import_style=typescript,mode=grpcweb:$GEN_PATH \
   $(find /proto/include -iname "*.proto")

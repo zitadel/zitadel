@@ -4,9 +4,9 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthConfig } from 'angular-oauth2-oidc';
 
-import { AdminServicePromiseClient } from '../proto/generated/zitadel/admin_grpc_web_pb';
-import { AuthServicePromiseClient } from '../proto/generated/zitadel/auth_grpc_web_pb';
-import { ManagementServicePromiseClient } from '../proto/generated/zitadel/management_grpc_web_pb';
+import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
+import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
+import { ManagementServiceClient } from '../proto/generated/zitadel/ManagementServiceClientPb';
 import { AuthenticationService } from './authentication.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
@@ -17,9 +17,9 @@ import { StorageService } from './storage.service';
     providedIn: 'root',
 })
 export class GrpcService {
-    public auth!: AuthServicePromiseClient;
-    public mgmt!: ManagementServicePromiseClient;
-    public admin!: AdminServicePromiseClient;
+    public auth!: AuthServiceClient;
+    public mgmt!: ManagementServiceClient;
+    public admin!: AdminServiceClient;
 
     constructor(
         private http: HttpClient,
@@ -42,19 +42,19 @@ export class GrpcService {
                         ],
                     };
 
-                    this.auth = new AuthServicePromiseClient(
+                    this.auth = new AuthServiceClient(
                         data.authServiceUrl,
                         null,
                         // @ts-ignore
                         interceptors,
                     );
-                    this.mgmt = new ManagementServicePromiseClient(
+                    this.mgmt = new ManagementServiceClient(
                         data.mgmtServiceUrl,
                         null,
                         // @ts-ignore
                         interceptors,
                     );
-                    this.admin = new AdminServicePromiseClient(
+                    this.admin = new AdminServiceClient(
                         // TODO: replace with service url
                         data.mgmtServiceUrl,
                         null,
