@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
-import { ProjectGrantView, ProjectRole, ProjectView, UserView } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -72,15 +71,15 @@ export class MemberCreateDialogComponent {
     public loadRoles(): void {
         switch (this.creationType) {
             case CreationType.PROJECT_GRANTED:
-                this.mgmtService.GetProjectGrantMemberRoles().then(resp => {
-                    this.memberRoleOptions = resp.toObject().rolesList;
+                this.mgmtService.listProjectGrantMemberRoles().then(resp => {
+                    this.memberRoleOptions = resp.resultList;
                 }).catch(error => {
                     this.toastService.showError(error);
                 });
                 break;
             case CreationType.PROJECT_OWNED:
-                this.mgmtService.GetProjectMemberRoles().then(resp => {
-                    this.memberRoleOptions = resp.toObject().rolesList;
+                this.mgmtService.listProjectMemberRoles().then(resp => {
+                    this.memberRoleOptions = resp.resultList;
                 }).catch(error => {
                     this.toastService.showError(error);
                 });
