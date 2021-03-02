@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/key/repository/view/model"
@@ -56,6 +57,7 @@ func AuthNKeyByID(db *gorm.DB, table string, keyID string) (*model.AuthNKeyView,
 	)
 	err := query(db, key)
 	if caos_errs.IsNotFound(err) {
+		logging.LogWithFields("Keys-9fjsd", "table", table, "keyid", keyID).WithError(err).Error("key not found")
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-BjN6x", "Errors.User.KeyNotFound")
 	}
 	return key, err

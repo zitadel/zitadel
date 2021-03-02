@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"strings"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -64,9 +65,11 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 	defer func() { span.EndWithError(err) }()
 	key, err := o.repo.MachineKeyByID(ctx, keyID)
 	if err != nil {
+		logging.LogWithFields("OIDC-4m9fs", "keyid", keyID).WithError(err).Error("could not get key")
 		return nil, err
 	}
 	if key.AuthIdentifier != issuer {
+		logging.LogWithFields("OIDC-4m9fs", "keyid", keyID, "issuer", issuer).WithError(err).Error("authidentifier doesnt match issuer")
 		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
 	}
 	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)
