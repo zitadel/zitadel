@@ -2,9 +2,10 @@ import { Component, Injector, Input, OnDestroy, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { OrgIamPolicyView as AdminOrgIamPolicyView } from 'src/app/proto/generated/admin_pb';
-import { Org } from 'src/app/proto/generated/auth_pb';
-import { OrgIamPolicyView as MgmtOrgIamPolicyView } from 'src/app/proto/generated/management_pb';
+import { GetCustomOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import { GetOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
@@ -30,7 +31,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
     private managementService!: ManagementService;
     public serviceType!: PolicyComponentServiceType;
 
-    public iamData!: AdminOrgIamPolicyView.AsObject | MgmtOrgIamPolicyView.AsObject;
+    public iamData!: OrgIAMPolicy.AsObject;
 
     private sub: Subscription = new Subscription();
     private org!: Org.AsObject;
@@ -74,17 +75,17 @@ export class OrgIamPolicyComponent implements OnDestroy {
     }
 
     public fetchData(): void {
-        this.getData().then(data => {
-            if (data) {
-                this.iamData = data.toObject();
+        this.getData().then(resp => {
+            if (resp?.policy) {
+                this.iamData = resp.policy;
             }
         });
     }
 
-    private async getData(): Promise<AdminOrgIamPolicyView | MgmtOrgIamPolicyView | undefined> {
+    private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | undefined> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                return this.managementService.GetMyOrgIamPolicy();
+                return this.managementService.getOrgIAMPolicy();
             case PolicyComponentServiceType.ADMIN:
                 if (this.org?.id) {
                     return this.adminService.getCustomOrgIAMPolicy(this.org.id);
@@ -96,7 +97,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
     public savePolicy(): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                if ((this.iamData as MgmtOrgIamPolicyView.AsObject).pb_default) {
+                if ((this.iamData as OrgIAMPolicy.AsObject).isDefault) {
                     this.adminService.addCustomOrgIAMPolicy(
                         this.org.id,
                         this.iamData.userLoginMustBeDomain,
@@ -145,7 +146,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
 
     public get isDefault(): boolean {
         if (this.iamData && this.serviceType === PolicyComponentServiceType.MGMT) {
-            return (this.iamData as MgmtOrgIamPolicyView.AsObject).pb_default;
+            return (this.iamData as OrgIAMPolicy.AsObject).isDefault;
         } else {
             return false;
         }

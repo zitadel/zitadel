@@ -29,7 +29,7 @@ export class ProjectRoleDetailComponent {
 
     submitForm(): void {
         if (this.formGroup.valid && this.key?.value && this.group?.value && this.displayName?.value) {
-            this.mgmtService.ChangeProjectRole(this.projectId, this.key.value, this.displayName.value, this.group.value)
+            this.mgmtService.updateProjectRole(this.projectId, this.key.value, this.displayName.value, this.group.value)
                 .then(() => {
                     this.toast.showInfo('PROJECT.TOAST.ROLECHANGED', true);
                     this.dialogRef.close(true);

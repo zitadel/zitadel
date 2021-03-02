@@ -3,172 +3,282 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
-import { IDPQuery } from '../proto/generated/zitadel/idp_pb';
+import { AppQuery } from '../proto/generated/zitadel/app_pb';
+import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import {
-    AddMachineKeyRequest,
-    AddMachineKeyResponse,
-    AddOrgDomainRequest,
-    AddOrgMemberRequest,
-    ListHumanPasswordlessRequest,
-    ListHumanPasswordlessResponse,
-    ListLoginPolicyMultiFactorsResponse,
-    ListOrgIDPsRequest,
-    ListOrgIDPsResponse,
-    RemoveHumanPasswordlessRequest,
-    RemoveHumanPasswordlessResponse,
-    RemoveOrgDomainRequest,
-    RemoveOrgMemberRequest,
-    UpdateMachineRequest,
-    ListLoginPolicyMultiFactorsRequest,
-    ValidateOrgDomainRequest,
-    AddMultiFactorToLoginPolicyRequest,
-    AddMultiFactorToLoginPolicyResponse,
-    RemoveMultiFactorFromLoginPolicyRequest,
-    RemoveMultiFactorFromLoginPolicyResponse,
-    ListLoginPolicySecondFactorsResponse,
-    AddSecondFactorToLoginPolicyResponse,
-    AddSecondFactorToLoginPolicyRequest,
-    UpdateOrgIDPResponse,
-    AddOrgOIDCIDPRequest,
-    RemoveSecondFactorFromLoginPolicyRequest,
-    RemoveSecondFactorFromLoginPolicyResponse,
-    GetLoginPolicyResponse,
-    GetLoginPolicyRequest,
-    UpdateCustomLoginPolicyRequest,
-    UpdateCustomLoginPolicyResponse,
-    GetOrgIDPByIDRequest,
-    GetOrgIDPByIDResponse,
     AddCustomLoginPolicyRequest,
     AddCustomLoginPolicyResponse,
-    ListMachineKeysRequest,
-    ListMachineKeysResponse,
-    ResetLoginPolicyToDefaultRequest,
-    ResetLoginPolicyToDefaultResponse,
-    AddIDPToLoginPolicyRequest,
-    AddIDPToLoginPolicyResponse,
-    RemoveIDPFromLoginPolicyRequest,
-    ListLoginPolicyIDPsRequest,
-    ListLoginPolicyIDPsResponse,
-    UpdateOrgIDPRequest,
-    AddOrgOIDCIDPResponse,
-    UpdateOrgIDPOIDCConfigRequest,
-    RemoveOrgIDPRequest,
-    UpdateOrgIDPOIDCConfigResponse,
-    RemoveOrgIDPResponse,
-    ReactivateOrgIDPRequest,
-    DeactivateOrgIDPRequest,
-    AddHumanUserResponse,
-    AddHumanUserRequest,
-    AddMachineUserRequest,
-    AddMachineUserResponse,
-    UpdateMachineResponse,
-    RemoveMachineKeyRequest,
-    RemoveMachineKeyResponse,
-    RemoveUserIDPRequest,
-    RemoveUserIDPResponse,
-    ListUserIDPsRequest,
-    ListUserIDPsResponse,
-    GetIAMResponse,
-    GetIAMRequest,
-    GetDefaultPasswordComplexityPolicyResponse,
-    GetDefaultPasswordComplexityPolicyRequest,
-    GetMyOrgRequest,
-    GetMyOrgResponse,
-    AddOrgDomainResponse,
-    RemoveOrgDomainResponse,
-    ListOrgDomainsRequest,
-    ListOrgDomainsResponse,
-    SetPrimaryOrgDomainRequest,
-    SetPrimaryOrgDomainResponse,
-    GenerateOrgDomainValidationResponse,
-    GenerateOrgDomainValidationRequest,
-    ValidateOrgDomainResponse,
-    ListOrgMembersRequest,
-    ListOrgMembersResponse,
-    GetOrgByDomainGlobalResponse,
-    GetOrgByDomainGlobalRequest,
-    AddOrgResponse,
-    AddOrgRequest,
-    UpdateOrgMemberResponse,
-    UpdateOrgMemberRequest,
-    RemoveOrgMemberResponse,
-    DeactivateOrgResponse,
-    DeactivateOrgRequest,
-    ReactivateOrgResponse,
-    ReactivateOrgRequest,
-    AddProjectGrantRequest,
-    AddProjectGrantResponse,
-    ListOrgMemberRolesResponse,
-    ListOrgMemberRolesRequest,
-    GetOrgIAMPolicyRequest,
-    GetOrgIAMPolicyResponse,
-    GetPasswordAgePolicyResponse,
-    GetPasswordAgePolicyRequest,
     AddCustomPasswordAgePolicyRequest,
     AddCustomPasswordAgePolicyResponse,
-    ResetPasswordAgePolicyToDefaultRequest,
-    ResetPasswordAgePolicyToDefaultResponse,
-    UpdateCustomPasswordAgePolicyRequest,
-    UpdateCustomPasswordAgePolicyResponse,
-    GetPasswordComplexityPolicyResponse,
-    GetPasswordComplexityPolicyRequest,
     AddCustomPasswordComplexityPolicyRequest,
     AddCustomPasswordComplexityPolicyResponse,
-    ResetPasswordComplexityPolicyToDefaultResponse,
-    ResetPasswordComplexityPolicyToDefaultRequest,
-    UpdateCustomPasswordComplexityPolicyResponse,
-    UpdateCustomPasswordComplexityPolicyRequest,
-    GetPasswordLockoutPolicyResponse,
-    GetPasswordLockoutPolicyRequest,
     AddCustomPasswordLockoutPolicyRequest,
     AddCustomPasswordLockoutPolicyResponse,
-    ResetPasswordLockoutPolicyToDefaultRequest,
-    ResetPasswordLockoutPolicyToDefaultResponse,
-    UpdateCustomPasswordLockoutPolicyResponse,
-    UpdateCustomPasswordLockoutPolicyRequest,
-    GetUserByIDRequest,
-    GetUserByIDResponse,
-    RemoveUserRequest,
-    RemoveUserResponse,
-    ListProjectMembersRequest,
-    ListProjectMembersResponse,
-    ListUserMembershipsRequest,
-    ListUserMembershipsResponse,
-    GetHumanProfileResponse,
-    GetHumanProfileRequest,
-    ListUserMultiFactorsResponse,
-    ListUserMultiFactorsRequest,
-    RemoveHumanMultiFactorOTPResponse,
-    RemoveHumanMultiFactorOTPRequest,
-    RemoveHumanMultiFactorU2FRequest,
-    RemoveHumanMultiFactorU2FResponse,
-    UpdateHumanProfileRequest,
-    UpdateHumanProfileResponse,
-    GetHumanEmailResponse,
-    GetHumanEmailRequest,
-    UpdateHumanEmailResponse,
-    UpdateHumanEmailRequest,
-    GetHumanPhoneResponse,
-    GetHumanPhoneRequest,
-    UpdateHumanPhoneResponse,
-    UpdateHumanPhoneRequest,
-    RemoveHumanPhoneRequest,
-    DeactivateUserRequest,
-    DeactivateUserResponse,
+    AddHumanUserRequest,
+    AddHumanUserResponse,
+    AddIDPToLoginPolicyRequest,
+    AddIDPToLoginPolicyResponse,
+    AddMachineKeyRequest,
+    AddMachineKeyResponse,
+    AddMachineUserRequest,
+    AddMachineUserResponse,
+    AddMultiFactorToLoginPolicyRequest,
+    AddMultiFactorToLoginPolicyResponse,
+    AddOIDCAppRequest,
+    AddOIDCAppResponse,
+    AddOrgDomainRequest,
+    AddOrgDomainResponse,
+    AddOrgMemberRequest,
+    AddOrgMemberResponse,
+    AddOrgOIDCIDPRequest,
+    AddOrgOIDCIDPResponse,
+    AddOrgRequest,
+    AddOrgResponse,
+    AddProjectGrantMemberRequest,
+    AddProjectGrantMemberResponse,
+    AddProjectGrantRequest,
+    AddProjectGrantResponse,
+    AddProjectMemberRequest,
+    AddProjectMemberResponse,
+    AddProjectRequest,
+    AddProjectResponse,
+    AddProjectRoleRequest,
+    AddProjectRoleResponse,
+    AddSecondFactorToLoginPolicyRequest,
+    AddSecondFactorToLoginPolicyResponse,
     AddUserGrantRequest,
     AddUserGrantResponse,
-    ReactivateUserResponse,
+    BulkAddProjectRolesRequest,
+    BulkAddProjectRolesResponse,
+    BulkRemoveUserGrantRequest,
+    BulkRemoveUserGrantResponse,
+    DeactivateAppRequest,
+    DeactivateAppResponse,
+    DeactivateOrgIDPRequest,
+    DeactivateOrgIDPResponse,
+    DeactivateOrgRequest,
+    DeactivateOrgResponse,
+    DeactivateProjectGrantRequest,
+    DeactivateProjectGrantResponse,
+    DeactivateProjectRequest,
+    DeactivateProjectResponse,
+    DeactivateUserRequest,
+    DeactivateUserResponse,
+    GenerateOrgDomainValidationRequest,
+    GenerateOrgDomainValidationResponse,
+    GetAppByIDRequest,
+    GetAppByIDResponse,
+    GetDefaultPasswordComplexityPolicyRequest,
+    GetDefaultPasswordComplexityPolicyResponse,
+    GetGrantedProjectByIDRequest,
+    GetGrantedProjectByIDResponse,
+    GetHumanEmailRequest,
+    GetHumanEmailResponse,
+    GetHumanPhoneRequest,
+    GetHumanPhoneResponse,
+    GetHumanProfileRequest,
+    GetHumanProfileResponse,
+    GetIAMRequest,
+    GetIAMResponse,
+    GetLoginPolicyRequest,
+    GetLoginPolicyResponse,
+    GetMyOrgRequest,
+    GetMyOrgResponse,
+    GetOIDCInformationRequest,
+    GetOIDCInformationResponse,
+    GetOrgByDomainGlobalRequest,
+    GetOrgByDomainGlobalResponse,
+    GetOrgIAMPolicyRequest,
+    GetOrgIAMPolicyResponse,
+    GetOrgIDPByIDRequest,
+    GetOrgIDPByIDResponse,
+    GetPasswordAgePolicyRequest,
+    GetPasswordAgePolicyResponse,
+    GetPasswordComplexityPolicyRequest,
+    GetPasswordComplexityPolicyResponse,
+    GetPasswordLockoutPolicyRequest,
+    GetPasswordLockoutPolicyResponse,
+    GetProjectByIDRequest,
+    GetProjectByIDResponse,
+    GetProjectGrantByIDRequest,
+    GetProjectGrantByIDResponse,
+    GetUserByIDRequest,
+    GetUserByIDResponse,
+    GetUserByLoginNameGlobalRequest,
+    GetUserByLoginNameGlobalResponse,
+    GetUserGrantByIDRequest,
+    GetUserGrantByIDResponse,
+    IDPQuery,
+    ListAppChangesRequest,
+    ListAppChangesResponse,
+    ListAppsRequest,
+    ListAppsResponse,
+    ListGrantedProjectsRequest,
+    ListGrantedProjectsResponse,
+    ListHumanMultiFactorsRequest,
+    ListHumanMultiFactorsResponse,
+    ListHumanPasswordlessRequest,
+    ListHumanPasswordlessResponse,
+    ListLoginPolicyIDPsRequest,
+    ListLoginPolicyIDPsResponse,
+    ListLoginPolicyMultiFactorsRequest,
+    ListLoginPolicyMultiFactorsResponse,
+    ListLoginPolicySecondFactorsResponse,
+    ListMachineKeysRequest,
+    ListMachineKeysResponse,
+    ListOrgChangesRequest,
+    ListOrgChangesResponse,
+    ListOrgDomainsRequest,
+    ListOrgDomainsResponse,
+    ListOrgIDPsRequest,
+    ListOrgIDPsResponse,
+    ListOrgMemberRolesRequest,
+    ListOrgMemberRolesResponse,
+    ListOrgMembersRequest,
+    ListOrgMembersResponse,
+    ListProjectChangesRequest,
+    ListProjectChangesResponse,
+    ListProjectGrantMemberRolesRequest,
+    ListProjectGrantMemberRolesResponse,
+    ListProjectGrantMembersRequest,
+    ListProjectGrantMembersResponse,
+    ListProjectGrantsRequest,
+    ListProjectGrantsResponse,
+    ListProjectMemberRolesRequest,
+    ListProjectMemberRolesResponse,
+    ListProjectMembersRequest,
+    ListProjectMembersResponse,
+    ListProjectRolesRequest,
+    ListProjectRolesResponse,
+    ListProjectsRequest,
+    ListProjectsResponse,
+    ListUserChangesRequest,
+    ListUserChangesResponse,
+    ListUserGrantRequest,
+    ListUserGrantResponse,
+    ListUserIDPsRequest,
+    ListUserIDPsResponse,
+    ListUserMembershipsRequest,
+    ListUserMembershipsResponse,
+    ListUsersRequest,
+    ListUsersResponse,
+    ReactivateAppRequest,
+    ReactivateAppResponse,
+    ReactivateOrgIDPRequest,
+    ReactivateOrgIDPResponse,
+    ReactivateOrgRequest,
+    ReactivateOrgResponse,
+    ReactivateProjectGrantRequest,
+    ReactivateProjectGrantResponse,
+    ReactivateProjectRequest,
+    ReactivateProjectResponse,
     ReactivateUserRequest,
-    AddProjectRoleRequest
+    ReactivateUserResponse,
+    RegenerateOIDCClientSecretRequest,
+    RemoveAppRequest,
+    RemoveAppResponse,
+    RemoveHumanMultiFactorOTPRequest,
+    RemoveHumanMultiFactorOTPResponse,
+    RemoveHumanMultiFactorU2FRequest,
+    RemoveHumanMultiFactorU2FResponse,
+    RemoveHumanPasswordlessRequest,
+    RemoveHumanPasswordlessResponse,
+    RemoveHumanPhoneRequest,
+    RemoveHumanPhoneResponse,
+    RemoveIDPFromLoginPolicyRequest,
+    RemoveIDPFromLoginPolicyResponse,
+    RemoveMachineKeyRequest,
+    RemoveMachineKeyResponse,
+    RemoveMultiFactorFromLoginPolicyRequest,
+    RemoveMultiFactorFromLoginPolicyResponse,
+    RemoveOrgDomainRequest,
+    RemoveOrgDomainResponse,
+    RemoveOrgIDPRequest,
+    RemoveOrgIDPResponse,
+    RemoveOrgMemberRequest,
+    RemoveOrgMemberResponse,
+    RemoveProjectGrantMemberRequest,
+    RemoveProjectGrantMemberResponse,
+    RemoveProjectGrantRequest,
+    RemoveProjectGrantResponse,
+    RemoveProjectMemberRequest,
+    RemoveProjectMemberResponse,
+    RemoveProjectRequest,
+    RemoveProjectResponse,
+    RemoveProjectRoleRequest,
+    RemoveProjectRoleResponse,
+    RemoveSecondFactorFromLoginPolicyRequest,
+    RemoveSecondFactorFromLoginPolicyResponse,
+    RemoveUserGrantRequest,
+    RemoveUserGrantResponse,
+    RemoveUserIDPRequest,
+    RemoveUserIDPResponse,
+    RemoveUserRequest,
+    RemoveUserResponse,
+    ResendHumanEmailVerificationRequest,
+    ResendHumanInitializationRequest,
+    ResendHumanInitializationResponse,
+    ResendHumanPhoneVerificationRequest,
+    ResetLoginPolicyToDefaultRequest,
+    ResetLoginPolicyToDefaultResponse,
+    ResetPasswordAgePolicyToDefaultRequest,
+    ResetPasswordAgePolicyToDefaultResponse,
+    ResetPasswordComplexityPolicyToDefaultRequest,
+    ResetPasswordComplexityPolicyToDefaultResponse,
+    ResetPasswordLockoutPolicyToDefaultRequest,
+    ResetPasswordLockoutPolicyToDefaultResponse,
+    SendHumanResetPasswordNotificationRequest,
+    SetHumanInitialPasswordRequest,
+    SetPrimaryOrgDomainRequest,
+    SetPrimaryOrgDomainResponse,
+    UpdateAppRequest,
+    UpdateAppResponse,
+    UpdateCustomLoginPolicyRequest,
+    UpdateCustomLoginPolicyResponse,
+    UpdateCustomPasswordAgePolicyRequest,
+    UpdateCustomPasswordAgePolicyResponse,
+    UpdateCustomPasswordComplexityPolicyRequest,
+    UpdateCustomPasswordComplexityPolicyResponse,
+    UpdateCustomPasswordLockoutPolicyRequest,
+    UpdateCustomPasswordLockoutPolicyResponse,
+    UpdateHumanEmailRequest,
+    UpdateHumanEmailResponse,
+    UpdateHumanPhoneRequest,
+    UpdateHumanPhoneResponse,
+    UpdateHumanProfileRequest,
+    UpdateHumanProfileResponse,
+    UpdateMachineRequest,
+    UpdateMachineResponse,
+    UpdateOIDCAppConfigRequest,
+    UpdateOIDCAppConfigResponse,
+    UpdateOrgIDPOIDCConfigRequest,
+    UpdateOrgIDPOIDCConfigResponse,
+    UpdateOrgIDPRequest,
+    UpdateOrgIDPResponse,
+    UpdateOrgMemberRequest,
+    UpdateOrgMemberResponse,
+    UpdateProjectGrantMemberRequest,
+    UpdateProjectGrantMemberResponse,
+    UpdateProjectGrantRequest,
+    UpdateProjectGrantResponse,
+    UpdateProjectMemberRequest,
+    UpdateProjectMemberResponse,
+    UpdateProjectRequest,
+    UpdateProjectResponse,
+    UpdateProjectRoleRequest,
+    UpdateProjectRoleResponse,
+    UpdateUserGrantRequest,
+    UpdateUserGrantResponse,
+    ValidateOrgDomainRequest,
+    ValidateOrgDomainResponse,
 } from '../proto/generated/zitadel/management_pb';
-import { KeyType } from '../proto/generated/zitadel/auth_n_pb';
+import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
-import { GrpcService } from './grpc.service';
-import { Metadata } from 'grpc';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
-import { PasswordComplexityPolicy } from '../proto/generated/management_pb';
-import { Member, SearchQuery } from '../proto/generated/zitadel/member_pb';
-import { Gender, MembershipQuery } from '../proto/generated/zitadel/user_pb';
+import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
+import { ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
+import { Gender, MembershipQuery, SearchQuery as UserSearchQuery, UserGrantQuery } from '../proto/generated/zitadel/user_pb';
+import { GrpcService } from './grpc.service';
 
 export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
 
@@ -185,7 +295,7 @@ export class ManagementService {
         limit?: number,
         offset?: number,
         queryList?: IDPQuery[],
-    ): Promise<ListOrgIDPsResponse> {
+    ): Promise<ListOrgIDPsResponse.AsObject> {
         const req = new ListOrgIDPsRequest();
         const metadata = new ListQuery();
 
@@ -198,78 +308,79 @@ export class ManagementService {
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.listOrgIDPs(req);
+        return this.grpcService.mgmt.listOrgIDPs(req, null).then(resp => resp.toObject());
     }
 
-    public listHumanPasswordless(userId: string): Promise<ListHumanPasswordlessResponse> {
+    public listHumanPasswordless(userId: string): Promise<ListHumanPasswordlessResponse.AsObject> {
         const req = new ListHumanPasswordlessRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.listHumanPasswordless(req);
+        return this.grpcService.mgmt.listHumanPasswordless(req, null).then(resp => resp.toObject());
     }
 
-    public removeHumanPasswordless(tokenId: string, userId: string): Promise<RemoveHumanPasswordlessResponse> {
+    public removeHumanPasswordless(tokenId: string, userId: string): Promise<RemoveHumanPasswordlessResponse.AsObject> {
         const req = new RemoveHumanPasswordlessRequest();
         req.setTokenId(tokenId);
         req.setUserId(userId);
-        return this.grpcService.mgmt.removeHumanPasswordless(req);
+        return this.grpcService.mgmt.removeHumanPasswordless(req, null).then(resp => resp.toObject());
     }
 
-    public listLoginPolicyMultiFactors(): Promise<ListLoginPolicyMultiFactorsResponse> {
+    public listLoginPolicyMultiFactors(): Promise<ListLoginPolicyMultiFactorsResponse.AsObject> {
         const req = new ListLoginPolicyMultiFactorsRequest();
-        return this.grpcService.mgmt.listLoginPolicyMultiFactors(req);
+        return this.grpcService.mgmt.listLoginPolicyMultiFactors(req, null).then(resp => resp.toObject());
     }
 
-    public addMultiFactorToLoginPolicy(req: AddMultiFactorToLoginPolicyRequest): Promise<AddMultiFactorToLoginPolicyResponse> {
-        return this.grpcService.mgmt.addMultiFactorToLoginPolicy(req);
+    public addMultiFactorToLoginPolicy(req: AddMultiFactorToLoginPolicyRequest): Promise<AddMultiFactorToLoginPolicyResponse.AsObject> {
+        return this.grpcService.mgmt.addMultiFactorToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public removeMultiFactorFromLoginPolicy(req: RemoveMultiFactorFromLoginPolicyRequest): Promise<RemoveMultiFactorFromLoginPolicyResponse> {
-        return this.grpcService.mgmt.removeMultiFactorFromLoginPolicy(req);
+    public removeMultiFactorFromLoginPolicy(req: RemoveMultiFactorFromLoginPolicyRequest): Promise<RemoveMultiFactorFromLoginPolicyResponse.AsObject> {
+        return this.grpcService.mgmt.removeMultiFactorFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public listLoginPolicySecondFactors(): Promise<ListLoginPolicySecondFactorsResponse> {
+    public listLoginPolicySecondFactors(): Promise<ListLoginPolicySecondFactorsResponse.AsObject> {
         const req = new Empty();
-        return this.grpcService.mgmt.listLoginPolicySecondFactors(req);
+        return this.grpcService.mgmt.listLoginPolicySecondFactors(req, null).then(resp => resp.toObject());
     }
 
-    public addSecondFactorToLoginPolicy(req: AddSecondFactorToLoginPolicyRequest): Promise<AddSecondFactorToLoginPolicyResponse> {
-        return this.grpcService.mgmt.addSecondFactorToLoginPolicy(req);
+    public addSecondFactorToLoginPolicy(req: AddSecondFactorToLoginPolicyRequest): Promise<AddSecondFactorToLoginPolicyResponse.AsObject> {
+        return this.grpcService.mgmt.addSecondFactorToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public removeSecondFactorFromLoginPolicy(req: RemoveSecondFactorFromLoginPolicyRequest): Promise<RemoveSecondFactorFromLoginPolicyResponse> {
-        return this.grpcService.mgmt.removeSecondFactorFromLoginPolicy(req);
+    public removeSecondFactorFromLoginPolicy(req: RemoveSecondFactorFromLoginPolicyRequest): Promise<RemoveSecondFactorFromLoginPolicyResponse.AsObject> {
+        return this.grpcService.mgmt.removeSecondFactorFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public getLoginPolicy(): Promise<GetLoginPolicyResponse> {
+    public getLoginPolicy(): Promise<GetLoginPolicyResponse.AsObject> {
         const req = new GetLoginPolicyRequest();
-        return this.grpcService.mgmt.getLoginPolicy(req);
+        return this.grpcService.mgmt.getLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public updateCustomLoginPolicy(req: UpdateCustomLoginPolicyRequest): Promise<UpdateCustomLoginPolicyResponse> {
-        return this.grpcService.mgmt.updateCustomLoginPolicy(req);
+    public updateCustomLoginPolicy(req: UpdateCustomLoginPolicyRequest): Promise<UpdateCustomLoginPolicyResponse.AsObject> {
+        return this.grpcService.mgmt.updateCustomLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public addCustomLoginPolicy(req: AddCustomLoginPolicyRequest): Promise<AddCustomLoginPolicyResponse> {
-        return this.grpcService.mgmt.addCustomLoginPolicy(req);
+    public addCustomLoginPolicy(req: AddCustomLoginPolicyRequest): Promise<AddCustomLoginPolicyResponse.AsObject> {
+        return this.grpcService.mgmt.addCustomLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public resetLoginPolicyToDefault(): Promise<ResetLoginPolicyToDefaultResponse> {
-        return this.grpcService.mgmt.resetLoginPolicyToDefault(new ResetLoginPolicyToDefaultRequest());
+    public resetLoginPolicyToDefault(): Promise<ResetLoginPolicyToDefaultResponse.AsObject> {
+        const req = new ResetLoginPolicyToDefaultRequest();
+        return this.grpcService.mgmt.resetLoginPolicyToDefault(req, null).then(resp => resp.toObject());
     }
 
-    public addIDPToLoginPolicy(idpId: string): Promise<AddIDPToLoginPolicyResponse> {
+    public addIDPToLoginPolicy(idpId: string): Promise<AddIDPToLoginPolicyResponse.AsObject> {
         const req = new AddIDPToLoginPolicyRequest();
         req.setIdpId(idpId);
-        return this.grpcService.mgmt.addIDPToLoginPolicy(req);
+        return this.grpcService.mgmt.addIDPToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public removeIDPFromLoginPolicy(idpId: string): Promise<Empty> {
+    public removeIDPFromLoginPolicy(idpId: string): Promise<RemoveIDPFromLoginPolicyResponse.AsObject> {
         const req = new RemoveIDPFromLoginPolicyRequest();
         req.setIdpId(idpId);
-        return this.grpcService.mgmt.removeIDPFromLoginPolicy(req);
+        return this.grpcService.mgmt.removeIDPFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public listLoginPolicyIDPs(limit?: number, offset?: number): Promise<ListLoginPolicyIDPsResponse> {
+    public listLoginPolicyIDPs(limit?: number, offset?: number): Promise<ListLoginPolicyIDPsResponse.AsObject> {
         const req = new ListLoginPolicyIDPsRequest();
         const metadata = new ListQuery();
         if (limit) {
@@ -278,72 +389,72 @@ export class ManagementService {
         if (offset) {
             metadata.setOffset(offset);
         }
-        return this.grpcService.mgmt.listLoginPolicyIDPs(req);
+        return this.grpcService.mgmt.listLoginPolicyIDPs(req, null).then(resp => resp.toObject());
     }
 
     public getOrgIDPByID(
         id: string,
-    ): Promise<GetOrgIDPByIDResponse> {
+    ): Promise<GetOrgIDPByIDResponse.AsObject> {
         const req = new GetOrgIDPByIDRequest();
         req.setId(id);
-        return this.grpcService.mgmt.getOrgIDPByID(req);
+        return this.grpcService.mgmt.getOrgIDPByID(req, null).then(resp => resp.toObject());
     }
 
     public updateOrgIDP(
         req: UpdateOrgIDPRequest,
-    ): Promise<UpdateOrgIDPResponse> {
-        return this.grpcService.mgmt.updateOrgIDP(req);
+    ): Promise<UpdateOrgIDPResponse.AsObject> {
+        return this.grpcService.mgmt.updateOrgIDP(req, null).then(resp => resp.toObject());
     }
 
     public addOrgOIDCIDP(
         req: AddOrgOIDCIDPRequest,
-    ): Promise<AddOrgOIDCIDPResponse> {
-        return this.grpcService.mgmt.addOrgOIDCIDP(req);
+    ): Promise<AddOrgOIDCIDPResponse.AsObject> {
+        return this.grpcService.mgmt.addOrgOIDCIDP(req, null).then(resp => resp.toObject());
     }
 
     public updateOrgIDPOIDCConfig(
         req: UpdateOrgIDPOIDCConfigRequest,
-    ): Promise<UpdateOrgIDPOIDCConfigResponse> {
-        return this.grpcService.mgmt.updateOrgIDPOIDCConfig(req);
+    ): Promise<UpdateOrgIDPOIDCConfigResponse.AsObject> {
+        return this.grpcService.mgmt.updateOrgIDPOIDCConfig(req, null).then(resp => resp.toObject());
     }
 
     public removeOrgIDP(
         idpId: string,
-    ): Promise<RemoveOrgIDPResponse> {
+    ): Promise<RemoveOrgIDPResponse.AsObject> {
         const req = new RemoveOrgIDPRequest();
         req.setIdpId(idpId);
-        return this.grpcService.mgmt.removeOrgIDP(req);
+        return this.grpcService.mgmt.removeOrgIDP(req, null).then(resp => resp.toObject());
     }
 
     public deactivateOrgIDP(
         idpId: string,
-    ): Promise<Empty> {
+    ): Promise<DeactivateOrgIDPResponse.AsObject> {
         const req = new DeactivateOrgIDPRequest();
         req.setIdpId(idpId);
-        return this.grpcService.mgmt.deactivateOrgIDP(req);
+        return this.grpcService.mgmt.deactivateOrgIDP(req, null).then(resp => resp.toObject());
     }
 
     public reactivateOrgIDP(
         idpId: string,
-    ): Promise<Empty> {
+    ): Promise<ReactivateOrgIDPResponse.AsObject> {
         const req = new ReactivateOrgIDPRequest();
         req.setIdpId(idpId);
-        return this.grpcService.mgmt.reactivateOrgIDP(req);
+        return this.grpcService.mgmt.reactivateOrgIDP(req, null).then(resp => resp.toObject());
     }
 
-    public addHumanUser(request: AddHumanUserRequest): Promise<AddHumanUserResponse> {
-        return this.grpcService.mgmt.addHumanUser(request);
+    public addHumanUser(req: AddHumanUserRequest): Promise<AddHumanUserResponse.AsObject> {
+        return this.grpcService.mgmt.addHumanUser(req, null).then(resp => resp.toObject());
     }
 
-    public addMachineUser(request: AddMachineUserRequest): Promise<AddMachineUserResponse> {
-        return this.grpcService.mgmt.addMachineUser(request);
+    public addMachineUser(req: AddMachineUserRequest): Promise<AddMachineUserResponse.AsObject> {
+        return this.grpcService.mgmt.addMachineUser(req, null).then(resp => resp.toObject());
     }
 
     public updateMachine(
         userId: string,
         name?: string,
         description?: string,
-    ): Promise<UpdateMachineResponse> {
+    ): Promise<UpdateMachineResponse.AsObject> {
         const req = new UpdateMachineRequest();
         req.setUserId(userId);
         if (name) {
@@ -352,32 +463,32 @@ export class ManagementService {
         if (description) {
             req.setDescription(description);
         }
-        return this.grpcService.mgmt.updateMachine(req);
+        return this.grpcService.mgmt.updateMachine(req, null).then(resp => resp.toObject());
     }
 
     public addMachineKey(
         userId: string,
         type: KeyType,
         date?: Timestamp,
-    ): Promise<AddMachineKeyResponse> {
+    ): Promise<AddMachineKeyResponse.AsObject> {
         const req = new AddMachineKeyRequest();
         req.setType(type);
         req.setUserId(userId);
         if (date) {
             req.setExpirationDate(date);
         }
-        return this.grpcService.mgmt.addMachineKey(req);
+        return this.grpcService.mgmt.addMachineKey(req, null).then(resp => resp.toObject());
     }
 
     public removeMachineKey(
         keyId: string,
         userId: string,
-    ): Promise<RemoveMachineKeyResponse> {
+    ): Promise<RemoveMachineKeyResponse.AsObject> {
         const req = new RemoveMachineKeyRequest();
         req.setKeyId(keyId);
         req.setUserId(userId);
 
-        return this.grpcService.mgmt.removeMachineKey(req);
+        return this.grpcService.mgmt.removeMachineKey(req, null).then(resp => resp.toObject());
     }
 
     public listMachineKeys(
@@ -385,7 +496,7 @@ export class ManagementService {
         limit?: number,
         offset?: number,
         asc?: boolean,
-    ): Promise<ListMachineKeysResponse> {
+    ): Promise<ListMachineKeysResponse.AsObject> {
         const req = new ListMachineKeysRequest();
         const metadata = new ListQuery();
         req.setUserId(userId);
@@ -399,27 +510,27 @@ export class ManagementService {
             metadata.setAsc(asc);
         }
         req.setMetaData(metadata);
-        return this.grpcService.mgmt.listMachineKeys(req);
+        return this.grpcService.mgmt.listMachineKeys(req, null).then(resp => resp.toObject());
     }
 
     public removeUserIDP(
         idpId: string,
         userId: string,
         linkedUserId: string,
-    ): Promise<RemoveUserIDPResponse> {
+    ): Promise<RemoveUserIDPResponse.AsObject> {
         const req = new RemoveUserIDPRequest();
         req.setUserId(userId);
         req.setIdpId(idpId);
         req.setUserId(userId);
         req.setLinkedUserId(linkedUserId);
-        return this.grpcService.mgmt.removeUserIDP(req);
+        return this.grpcService.mgmt.removeUserIDP(req, null).then(resp => resp.toObject());
     }
 
     public listUserIDPs(
         userId: string,
         limit?: number,
         offset?: number,
-    ): Promise<ListUserIDPsResponse> {
+    ): Promise<ListUserIDPsResponse.AsObject> {
         const req = new ListUserIDPsRequest();
         const metadata = new ListQuery();
         req.setUserId(userId);
@@ -430,70 +541,70 @@ export class ManagementService {
             metadata.setOffset(offset);
         }
         req.setMetaData(metadata);
-        return this.grpcService.mgmt.listUserIDPs(req);
+        return this.grpcService.mgmt.listUserIDPs(req, null).then(resp => resp.toObject());
     }
 
-    public getIAM(): Promise<GetIAMResponse> {
+    public getIAM(): Promise<GetIAMResponse.AsObject> {
         const req = new GetIAMRequest();
-        return this.grpcService.mgmt.getIAM(req);
+        return this.grpcService.mgmt.getIAM(req, null).then(resp => resp.toObject());
     }
 
-    public getDefaultPasswordComplexityPolicy(): Promise<GetDefaultPasswordComplexityPolicyResponse> {
+    public getDefaultPasswordComplexityPolicy(): Promise<GetDefaultPasswordComplexityPolicyResponse.AsObject> {
         const req = new GetDefaultPasswordComplexityPolicyRequest();
-        return this.grpcService.mgmt.getDefaultPasswordComplexityPolicy(req);
+        return this.grpcService.mgmt.getDefaultPasswordComplexityPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public getMyOrg(): Promise<GetMyOrgResponse> {
+    public getMyOrg(): Promise<GetMyOrgResponse.AsObject> {
         const req = new GetMyOrgRequest();
-        return this.grpcService.mgmt.getMyOrg(req);
+        return this.grpcService.mgmt.getMyOrg(req, null).then(resp => resp.toObject());
     }
 
-    public addOrgDomain(domain: string): Promise<AddOrgDomainResponse> {
+    public addOrgDomain(domain: string): Promise<AddOrgDomainResponse.AsObject> {
         const req = new AddOrgDomainRequest();
         req.setDomain(domain);
-        return this.grpcService.mgmt.addOrgDomain(req);
+        return this.grpcService.mgmt.addOrgDomain(req, null).then(resp => resp.toObject());
     }
 
-    public removeOrgDomain(domain: string): Promise<RemoveOrgDomainResponse> {
+    public removeOrgDomain(domain: string): Promise<RemoveOrgDomainResponse.AsObject> {
         const req = new RemoveOrgDomainRequest();
         req.setDomain(domain);
-        return this.grpcService.mgmt.removeOrgDomain(req);
+        return this.grpcService.mgmt.removeOrgDomain(req, null).then(resp => resp.toObject());
     }
 
     public listOrgDomains(queryList?: DomainSearchQuery[]):
-        Promise<ListOrgDomainsResponse> {
+        Promise<ListOrgDomainsResponse.AsObject> {
         const req: ListOrgDomainsRequest = new ListOrgDomainsRequest();
         // const metadata= new ListQuery();
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.listOrgDomains(req);
+        return this.grpcService.mgmt.listOrgDomains(req, null).then(resp => resp.toObject());
     }
 
-    public setPrimaryOrgDomain(domain: string): Promise<SetPrimaryOrgDomainResponse> {
+    public setPrimaryOrgDomain(domain: string): Promise<SetPrimaryOrgDomainResponse.AsObject> {
         const req = new SetPrimaryOrgDomainRequest();
         req.setDomain(domain);
-        return this.grpcService.mgmt.setPrimaryOrgDomain(req);
+        return this.grpcService.mgmt.setPrimaryOrgDomain(req, null).then(resp => resp.toObject());
     }
 
     public generateOrgDomainValidation(domain: string, type: DomainValidationType):
-        Promise<GenerateOrgDomainValidationResponse> {
+        Promise<GenerateOrgDomainValidationResponse.AsObject> {
         const req: GenerateOrgDomainValidationRequest = new GenerateOrgDomainValidationRequest();
         req.setDomain(domain);
         req.setType(type);
 
-        return this.grpcService.mgmt.generateOrgDomainValidation(req);
+        return this.grpcService.mgmt.generateOrgDomainValidation(req, null).then(resp => resp.toObject());
     }
 
     public validateOrgDomain(domain: string):
-        Promise<ValidateOrgDomainResponse> {
+        Promise<ValidateOrgDomainResponse.AsObject> {
         const req = new ValidateOrgDomainRequest();
         req.setDomain(domain);
 
-        return this.grpcService.mgmt.validateOrgDomain(req);
+        return this.grpcService.mgmt.validateOrgDomain(req, null).then(resp => resp.toObject());
     }
 
-    public listOrgMembers(limit: number, offset: number): Promise<ListOrgMembersResponse> {
+    public listOrgMembers(limit: number, offset: number): Promise<ListOrgMembersResponse.AsObject> {
         const req = new ListOrgMembersRequest();
         const query = new ListQuery();
         if (limit) {
@@ -504,112 +615,112 @@ export class ManagementService {
         }
         req.setMetaData(query);
 
-        return this.grpcService.mgmt.listOrgMembers(req);
+        return this.grpcService.mgmt.listOrgMembers(req, null).then(resp => resp.toObject());
     }
 
-    public getOrgByDomainGlobal(domain: string): Promise<GetOrgByDomainGlobalResponse> {
+    public getOrgByDomainGlobal(domain: string): Promise<GetOrgByDomainGlobalResponse.AsObject> {
         const req = new GetOrgByDomainGlobalRequest();
         req.setDomain(domain);
-        return this.grpcService.mgmt.getOrgByDomainGlobal(req);
+        return this.grpcService.mgmt.getOrgByDomainGlobal(req, null).then(resp => resp.toObject());
     }
 
-    public addOrg(name: string): Promise<AddOrgResponse> {
+    public addOrg(name: string): Promise<AddOrgResponse.AsObject> {
         const req = new AddOrgRequest();
         req.setName(name);
-        return this.grpcService.mgmt.addOrg(req);
+        return this.grpcService.mgmt.addOrg(req, null).then(resp => resp.toObject());
     }
 
-    public addOrgMember(userId: string, rolesList: string[]): Promise<Empty> {
+    public addOrgMember(userId: string, rolesList: string[]): Promise<AddOrgMemberResponse.AsObject> {
         const req = new AddOrgMemberRequest();
         req.setUserId(userId);
         if (rolesList) {
             req.setRolesList(rolesList);
         }
-        return this.grpcService.mgmt.addOrgMember(req);
+        return this.grpcService.mgmt.addOrgMember(req, null).then(resp => resp.toObject());
     }
 
-    public updateOrgMember(userId: string, rolesList: string[]): Promise<UpdateOrgMemberResponse> {
+    public updateOrgMember(userId: string, rolesList: string[]): Promise<UpdateOrgMemberResponse.AsObject> {
         const req = new UpdateOrgMemberRequest();
         req.setUserId(userId);
         req.setRolesList(rolesList);
-        return this.grpcService.mgmt.updateOrgMember(req);
+        return this.grpcService.mgmt.updateOrgMember(req, null).then(resp => resp.toObject());
     }
 
 
-    public removeOrgMember(userId: string): Promise<RemoveOrgMemberResponse> {
+    public removeOrgMember(userId: string): Promise<RemoveOrgMemberResponse.AsObject> {
         const req = new RemoveOrgMemberRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.removeOrgMember(req);
+        return this.grpcService.mgmt.removeOrgMember(req, null).then(resp => resp.toObject());
     }
 
-    public deactivateOrg(): Promise<DeactivateOrgResponse> {
+    public deactivateOrg(): Promise<DeactivateOrgResponse.AsObject> {
         const req = new DeactivateOrgRequest();
-        return this.grpcService.mgmt.deactivateOrg(req);
+        return this.grpcService.mgmt.deactivateOrg(req, null).then(resp => resp.toObject());
     }
 
-    public reactivateOrg(): Promise<ReactivateOrgResponse> {
+    public reactivateOrg(): Promise<ReactivateOrgResponse.AsObject> {
         const req = new ReactivateOrgRequest();
-        return this.grpcService.mgmt.reactivateOrg(req);
+        return this.grpcService.mgmt.reactivateOrg(req, null).then(resp => resp.toObject());
     }
 
     public addProjectGrant(
         orgId: string,
         projectId: string,
         roleKeysList: string[],
-    ): Promise<AddProjectGrantResponse> {
+    ): Promise<AddProjectGrantResponse.AsObject> {
         const req = new AddProjectGrantRequest();
         req.setProjectId(projectId);
         req.setGrantedOrgId(orgId);
         req.setRoleKeysList(roleKeysList);
-        return this.grpcService.mgmt.addProjectGrant(req);
+        return this.grpcService.mgmt.addProjectGrant(req, null).then(resp => resp.toObject());
     }
 
-    public listOrgMemberRoles(): Promise<ListOrgMemberRolesResponse> {
+    public listOrgMemberRoles(): Promise<ListOrgMemberRolesResponse.AsObject> {
         const req = new ListOrgMemberRolesRequest();
-        return this.grpcService.mgmt.listOrgMemberRoles(req);
+        return this.grpcService.mgmt.listOrgMemberRoles(req, null).then(resp => resp.toObject());
     }
 
     // Policy
 
-    public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse> {
+    public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse.AsObject> {
         const req = new GetOrgIAMPolicyRequest();
-        return this.grpcService.mgmt.getOrgIAMPolicy(req);
+        return this.grpcService.mgmt.getOrgIAMPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public GetPasswordAgePolicy(): Promise<GetPasswordAgePolicyResponse> {
+    public getPasswordAgePolicy(): Promise<GetPasswordAgePolicyResponse.AsObject> {
         const req = new GetPasswordAgePolicyRequest();
-        return this.grpcService.mgmt.getPasswordAgePolicy(req);
+        return this.grpcService.mgmt.getPasswordAgePolicy(req, null).then(resp => resp.toObject());
     }
 
     public addCustomPasswordAgePolicy(
         maxAgeDays: number,
         expireWarnDays: number,
-    ): Promise<AddCustomPasswordAgePolicyResponse> {
+    ): Promise<AddCustomPasswordAgePolicyResponse.AsObject> {
         const req = new AddCustomPasswordAgePolicyRequest();
         req.setMaxAgeDays(maxAgeDays);
         req.setExpireWarnDays(expireWarnDays);
 
-        return this.grpcService.mgmt.addCustomPasswordAgePolicy(req);
+        return this.grpcService.mgmt.addCustomPasswordAgePolicy(req, null).then(resp => resp.toObject());
     }
 
-    public resetPasswordAgePolicyToDefault(): Promise<ResetPasswordAgePolicyToDefaultResponse> {
+    public resetPasswordAgePolicyToDefault(): Promise<ResetPasswordAgePolicyToDefaultResponse.AsObject> {
         const req = new ResetPasswordAgePolicyToDefaultRequest();
-        return this.grpcService.mgmt.resetPasswordAgePolicyToDefault(req);
+        return this.grpcService.mgmt.resetPasswordAgePolicyToDefault(req, null).then(resp => resp.toObject());
     }
 
     public updateCustomPasswordAgePolicy(
         maxAgeDays: number,
         expireWarnDays: number,
-    ): Promise<UpdateCustomPasswordAgePolicyResponse> {
+    ): Promise<UpdateCustomPasswordAgePolicyResponse.AsObject> {
         const req = new UpdateCustomPasswordAgePolicyRequest();
         req.setMaxAgeDays(maxAgeDays);
         req.setExpireWarnDays(expireWarnDays);
-        return this.grpcService.mgmt.updateCustomPasswordAgePolicy(req);
+        return this.grpcService.mgmt.updateCustomPasswordAgePolicy(req, null).then(resp => resp.toObject());
     }
 
-    public GetPasswordComplexityPolicy(): Promise<GetPasswordComplexityPolicyResponse> {
+    public getPasswordComplexityPolicy(): Promise<GetPasswordComplexityPolicyResponse.AsObject> {
         const req = new GetPasswordComplexityPolicyRequest();
-        return this.grpcService.mgmt.getPasswordComplexityPolicy(req);
+        return this.grpcService.mgmt.getPasswordComplexityPolicy(req, null).then(resp => resp.toObject());
     }
 
     public addCustomPasswordComplexityPolicy(
@@ -618,19 +729,19 @@ export class ManagementService {
         hasNumber: boolean,
         hasSymbol: boolean,
         minLength: number,
-    ): Promise<AddCustomPasswordComplexityPolicyResponse> {
+    ): Promise<AddCustomPasswordComplexityPolicyResponse.AsObject> {
         const req = new AddCustomPasswordComplexityPolicyRequest();
         req.setHasLowercase(hasLowerCase);
         req.setHasUppercase(hasUpperCase);
         req.setHasNumber(hasNumber);
         req.setHasSymbol(hasSymbol);
         req.setMinLength(minLength);
-        return this.grpcService.mgmt.addCustomPasswordComplexityPolicy(req);
+        return this.grpcService.mgmt.addCustomPasswordComplexityPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public resetPasswordComplexityPolicyToDefault(): Promise<ResetPasswordComplexityPolicyToDefaultResponse> {
+    public resetPasswordComplexityPolicyToDefault(): Promise<ResetPasswordComplexityPolicyToDefaultResponse.AsObject> {
         const req = new ResetPasswordComplexityPolicyToDefaultRequest();
-        return this.grpcService.mgmt.resetPasswordComplexityPolicyToDefault(req);
+        return this.grpcService.mgmt.resetPasswordComplexityPolicyToDefault(req, null).then(resp => resp.toObject());
     }
 
     public updateCustomPasswordComplexityPolicy(
@@ -639,46 +750,46 @@ export class ManagementService {
         hasNumber: boolean,
         hasSymbol: boolean,
         minLength: number,
-    ): Promise<UpdateCustomPasswordComplexityPolicyResponse> {
+    ): Promise<UpdateCustomPasswordComplexityPolicyResponse.AsObject> {
         const req = new UpdateCustomPasswordComplexityPolicyRequest();
         req.setHasLowercase(hasLowerCase);
         req.setHasUppercase(hasUpperCase);
         req.setHasNumber(hasNumber);
         req.setHasSymbol(hasSymbol);
         req.setMinLength(minLength);
-        return this.grpcService.mgmt.updateCustomPasswordComplexityPolicy(req);
+        return this.grpcService.mgmt.updateCustomPasswordComplexityPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public getPasswordLockoutPolicy(): Promise<GetPasswordLockoutPolicyResponse> {
+    public getPasswordLockoutPolicy(): Promise<GetPasswordLockoutPolicyResponse.AsObject> {
         const req = new GetPasswordLockoutPolicyRequest();
 
-        return this.grpcService.mgmt.getPasswordLockoutPolicy(req);
+        return this.grpcService.mgmt.getPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
     }
 
     public addCustomPasswordLockoutPolicy(
         maxAttempts: number,
         showLockoutFailures: boolean,
-    ): Promise<AddCustomPasswordLockoutPolicyResponse> {
+    ): Promise<AddCustomPasswordLockoutPolicyResponse.AsObject> {
         const req = new AddCustomPasswordLockoutPolicyRequest();
         req.setMaxAttempts(maxAttempts);
         req.setShowLockoutFailure(showLockoutFailures);
 
-        return this.grpcService.mgmt.addCustomPasswordLockoutPolicy(req);
+        return this.grpcService.mgmt.addCustomPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public resetPasswordLockoutPolicyToDefault(): Promise<ResetPasswordLockoutPolicyToDefaultResponse> {
+    public resetPasswordLockoutPolicyToDefault(): Promise<ResetPasswordLockoutPolicyToDefaultResponse.AsObject> {
         const req = new ResetPasswordLockoutPolicyToDefaultRequest();
-        return this.grpcService.mgmt.resetPasswordLockoutPolicyToDefault(req);
+        return this.grpcService.mgmt.resetPasswordLockoutPolicyToDefault(req, null).then(resp => resp.toObject());
     }
 
     public updateCustomPasswordLockoutPolicy(
         maxAttempts: number,
         showLockoutFailures: boolean,
-    ): Promise<UpdateCustomPasswordLockoutPolicyResponse> {
+    ): Promise<UpdateCustomPasswordLockoutPolicyResponse.AsObject> {
         const req = new UpdateCustomPasswordLockoutPolicyRequest();
         req.setMaxAttempts(maxAttempts);
         req.setShowLockoutFailure(showLockoutFailures);
-        return this.grpcService.mgmt.updateCustomPasswordLockoutPolicy(req);
+        return this.grpcService.mgmt.updateCustomPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
     }
 
     public getLocalizedComplexityPolicyPatternErrorString(policy: PasswordComplexityPolicy.AsObject): string {
@@ -693,16 +804,16 @@ export class ManagementService {
         }
     }
 
-    public getUserByID(id: string): Promise<GetUserByIDResponse> {
+    public getUserByID(id: string): Promise<GetUserByIDResponse.AsObject> {
         const req = new GetUserByIDRequest();
         req.setId(id);
-        return this.grpcService.mgmt.getUserByID(req);
+        return this.grpcService.mgmt.getUserByID(req, null).then(resp => resp.toObject());
     }
 
-    public removeUser(id: string): Promise<RemoveUserResponse> {
+    public removeUser(id: string): Promise<RemoveUserResponse.AsObject> {
         const req = new RemoveUserRequest();
         req.setId(id);
-        return this.grpcService.mgmt.removeUser(req);
+        return this.grpcService.mgmt.removeUser(req, null).then(resp => resp.toObject());
     }
 
     public listProjectMembers(
@@ -710,7 +821,7 @@ export class ManagementService {
         limit: number,
         offset: number,
         queryList?: SearchQuery[],
-    ): Promise<ListProjectMembersResponse> {
+    ): Promise<ListProjectMembersResponse.AsObject> {
         const req = new ListProjectMembersRequest();
         const query = new ListQuery();
         req.setMetaData(query);
@@ -725,13 +836,13 @@ export class ManagementService {
             req.setQueriesList(queryList);
         }
         req.setMetaData(query);
-        return this.grpcService.mgmt.listProjectMembers(req);
+        return this.grpcService.mgmt.listProjectMembers(req, null).then(resp => resp.toObject());
     }
 
     public listUserMemberships(userId: string,
         limit: number, offset: number,
         queryList?: MembershipQuery[],
-    ): Promise<ListUserMembershipsResponse> {
+    ): Promise<ListUserMembershipsResponse.AsObject> {
         const req = new ListUserMembershipsRequest();
         req.setUserId(userId);
         const metadata = new ListQuery();
@@ -745,31 +856,31 @@ export class ManagementService {
             req.setQueriesList(queryList);
         }
         req.setMetaData(metadata);
-        return this.grpcService.mgmt.listUserMemberships(req);
+        return this.grpcService.mgmt.listUserMemberships(req, null).then(resp => resp.toObject());
     }
 
-    public GetUserProfile(userId: string): Promise<GetHumanProfileResponse> {
+    public getHumanProfile(userId: string): Promise<GetHumanProfileResponse.AsObject> {
         const req = new GetHumanProfileRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.getHumanProfile(req);
+        return this.grpcService.mgmt.getHumanProfile(req, null).then(resp => resp.toObject());
     }
 
-    public listUserMultiFactors(userId: string): Promise<ListUserMultiFactorsResponse> {
-        const req = new ListUserMultiFactorsRequest();
+    public listHumanMultiFactors(userId: string): Promise<ListHumanMultiFactorsResponse.AsObject> {
+        const req = new ListHumanMultiFactorsRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.listUserMultiFactors(req);
+        return this.grpcService.mgmt.listHumanMultiFactors(req, null).then(resp => resp.toObject());
     }
 
-    public removeHumanMultiFactorOTP(userId: string): Promise<RemoveHumanMultiFactorOTPResponse> {
+    public removeHumanMultiFactorOTP(userId: string): Promise<RemoveHumanMultiFactorOTPResponse.AsObject> {
         const req = new RemoveHumanMultiFactorOTPRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.removeHumanMultiFactorOTP(req);
+        return this.grpcService.mgmt.removeHumanMultiFactorOTP(req, null).then(resp => resp.toObject());
     }
 
-    public removeHumanMultiFactorU2F(userId: string, id: string): Promise<RemoveHumanMultiFactorU2FResponse> {
+    public removeHumanMultiFactorU2F(userId: string, id: string): Promise<RemoveHumanMultiFactorU2FResponse.AsObject> {
         const req = new RemoveHumanMultiFactorU2FRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.removeHumanMultiFactorU2F(req);
+        return this.grpcService.mgmt.removeHumanMultiFactorU2F(req, null).then(resp => resp.toObject());
     }
 
     public updateHumanProfile(
@@ -779,7 +890,7 @@ export class ManagementService {
         nickName?: string,
         preferredLanguage?: string,
         gender?: Gender,
-    ): Promise<UpdateHumanProfileResponse> {
+    ): Promise<UpdateHumanProfileResponse.AsObject> {
         const req = new UpdateHumanProfileRequest();
         req.setUserId(userId);
         if (firstName) {
@@ -797,52 +908,52 @@ export class ManagementService {
         if (preferredLanguage) {
             req.setPreferredLanguage(preferredLanguage);
         }
-        return this.grpcService.mgmt.updateHumanProfile(req);
+        return this.grpcService.mgmt.updateHumanProfile(req, null).then(resp => resp.toObject());
     }
 
-    public getHumanEmail(id: string): Promise<GetHumanEmailResponse> {
+    public getHumanEmail(id: string): Promise<GetHumanEmailResponse.AsObject> {
         const req = new GetHumanEmailRequest();
         req.setUserId(id);
-        return this.grpcService.mgmt.getHumanEmail(req);
+        return this.grpcService.mgmt.getHumanEmail(req, null).then(resp => resp.toObject());
     }
 
-    public updateHumanEmail(userId: string, email: string): Promise<UpdateHumanEmailResponse> {
+    public updateHumanEmail(userId: string, email: string): Promise<UpdateHumanEmailResponse.AsObject> {
         const req = new UpdateHumanEmailRequest();
         req.setUserId(userId);
         req.setEmail(email);
-        return this.grpcService.mgmt.updateHumanEmail(req);
+        return this.grpcService.mgmt.updateHumanEmail(req, null).then(resp => resp.toObject());
     }
 
-    public getHumanPhone(userId: string): Promise<GetHumanPhoneResponse> {
+    public getHumanPhone(userId: string): Promise<GetHumanPhoneResponse.AsObject> {
         const req = new GetHumanPhoneRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.getHumanPhone(req);
+        return this.grpcService.mgmt.getHumanPhone(req, null).then(resp => resp.toObject());
     }
 
-    public updateHumanPhone(userId: string, phone: string): Promise<UpdateHumanPhoneResponse> {
+    public updateHumanPhone(userId: string, phone: string): Promise<UpdateHumanPhoneResponse.AsObject> {
         const req = new UpdateHumanPhoneRequest();
         req.setUserId(userId);
         req.setPhone(phone);
-        return this.grpcService.mgmt.updateHumanPhone(req);
+        return this.grpcService.mgmt.updateHumanPhone(req, null).then(resp => resp.toObject());
     }
 
-    public removeHumanPhone(userId: string): Promise<Empty> {
+    public removeHumanPhone(userId: string): Promise<RemoveHumanPhoneResponse.AsObject> {
         const req = new RemoveHumanPhoneRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.removeHumanPhone(req);
+        return this.grpcService.mgmt.removeHumanPhone(req, null).then(resp => resp.toObject());
     }
 
-    public deactivateUser(id: string): Promise<DeactivateUserResponse> {
+    public deactivateUser(id: string): Promise<DeactivateUserResponse.AsObject> {
         const req = new DeactivateUserRequest();
         req.setId(id);
-        return this.grpcService.mgmt.deactivateUser(req);
+        return this.grpcService.mgmt.deactivateUser(req, null).then(resp => resp.toObject());
     }
 
     public addUserGrant(
         userId: string,
         roleNamesList: string[],
         projectId?: string,
-    ): Promise<AddUserGrantResponse> {
+    ): Promise<AddUserGrantResponse.AsObject> {
         const req = new AddUserGrantRequest();
         if (projectId) {
             req.setProjectId(projectId);
@@ -850,16 +961,16 @@ export class ManagementService {
         req.setUserId(userId);
         req.setRoleKeysList(roleNamesList);
 
-        return this.grpcService.mgmt.addUserGrant(req);
+        return this.grpcService.mgmt.addUserGrant(req, null).then(resp => resp.toObject());
     }
 
-    public reactivateUser(id: string): Promise<ReactivateUserResponse> {
+    public reactivateUser(id: string): Promise<ReactivateUserResponse.AsObject> {
         const req = new ReactivateUserRequest();
         req.setId(id);
-        return this.grpcService.mgmt.reactivateUser(req);
+        return this.grpcService.mgmt.reactivateUser(req, null).then(resp => resp.toObject());
     }
 
-    public AddRole(projectId: string, roleKey: string, displayName: string, group: string): Promise<AddProjectRoleResponse> {
+    public addProjectRole(projectId: string, roleKey: string, displayName: string, group: string): Promise<AddProjectRoleResponse.AsObject> {
         const req = new AddProjectRoleRequest();
         req.setProjectId(projectId);
         req.setRoleKey(roleKey);
@@ -867,543 +978,581 @@ export class ManagementService {
             req.setDisplayName(displayName);
         }
         req.setGroup(group);
-        return this.grpcService.mgmt.addProjectRole(req);
+        return this.grpcService.mgmt.addProjectRole(req, null).then(resp => resp.toObject());
     }
 
-    public GetUserAddress(id: string): Promise<UserAddress> {
-        const req = new UserID();
-        req.setId(id);
-        return this.grpcService.mgmt.getUserAddress(req);
+    public resendHumanEmailVerification(userId: string): Promise<any> {
+        const req = new ResendHumanEmailVerificationRequest();
+        req.setUserId(userId);
+        return this.grpcService.mgmt.resendHumanEmailVerification(req, null).then(resp => resp.toObject());
     }
 
-    public ResendEmailVerification(id: string): Promise<any> {
-        const req = new UserID();
-        req.setId(id);
-        return this.grpcService.mgmt.resendEmailVerificationMail(req);
-    }
-
-    public ResendInitialMail(userId: string, newemail: string): Promise<Empty> {
-        const req = new InitialMailRequest();
+    public resendHumanInitialization(userId: string, newemail: string): Promise<ResendHumanInitializationResponse.AsObject> {
+        const req = new ResendHumanInitializationRequest();
         if (newemail) {
             req.setEmail(newemail);
         }
-        req.setId(userId);
+        req.setUserId(userId);
 
-        return this.grpcService.mgmt.resendInitialMail(req);
+        return this.grpcService.mgmt.resendHumanInitialization(req, null).then(resp => resp.toObject());
     }
 
-    public ResendPhoneVerification(id: string): Promise<any> {
-        const req = new UserID();
-        req.setId(id);
-        return this.grpcService.mgmt.resendPhoneVerificationCode(req);
+    public resendHumanPhoneVerification(userId: string): Promise<any> {
+        const req = new ResendHumanPhoneVerificationRequest();
+        req.setUserId(userId);
+        return this.grpcService.mgmt.resendHumanPhoneVerification(req, null).then(resp => resp.toObject());
     }
 
-    public SetInitialPassword(id: string, password: string): Promise<any> {
-        const req = new PasswordRequest();
-        req.setId(id);
+    public setHumanInitialPassword(id: string, password: string): Promise<any> {
+        const req = new SetHumanInitialPasswordRequest();
+        req.setUserId(id);
         req.setPassword(password);
-        return this.grpcService.mgmt.setInitialPassword(req);
+        return this.grpcService.mgmt.setHumanInitialPassword(req, null).then(resp => resp.toObject());
     }
 
-    public SendSetPasswordNotification(id: string, type: NotificationType): Promise<any> {
-        const req = new SetPasswordNotificationRequest();
-        req.setId(id);
+    public sendHumanResetPasswordNotification(id: string, type: SendHumanResetPasswordNotificationRequest.Type): Promise<any> {
+        const req = new SendHumanResetPasswordNotificationRequest();
+        req.setUserId(id);
         req.setType(type);
-        return this.grpcService.mgmt.sendSetPasswordNotification(req);
+        return this.grpcService.mgmt.sendHumanResetPasswordNotification(req, null).then(resp => resp.toObject());
     }
 
-    public SaveUserAddress(address: UserAddress.AsObject): Promise<UserAddress> {
-        const req = new UpdateUserAddressRequest();
-        req.setId(address.id);
-        req.setStreetAddress(address.streetAddress);
-        req.setPostalCode(address.postalCode);
-        req.setLocality(address.locality);
-        req.setRegion(address.region);
-        req.setCountry(address.country);
-        return this.grpcService.mgmt.updateUserAddress(req);
-    }
-
-    public SearchUsers(limit: number, offset: number, queryList?: UserSearchQuery[]): Promise<UserSearchResponse> {
-        const req = new UserSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
-        if (queryList) {
-            req.setQueriesList(queryList);
+    public listUsers(limit: number, offset: number, queriesList?: UserSearchQuery[]): Promise<ListUsersResponse.AsObject> {
+        const req = new ListUsersRequest();
+        const query = new ListQuery();
+        if (limit) {
+            query.setLimit(limit);
         }
-        return this.grpcService.mgmt.searchUsers(req);
+        if (offset) {
+            query.setOffset(offset);
+        }
+        req.setMetaData(query);
+        if (queriesList) {
+            req.setQueriesList(queriesList);
+        }
+        return this.grpcService.mgmt.listUsers(req, null).then(resp => resp.toObject());
     }
 
-    public GetUserByLoginNameGlobal(loginname: string): Promise<UserView> {
-        const req = new LoginName();
+    public getUserByLoginNameGlobal(loginname: string): Promise<GetUserByLoginNameGlobalResponse.AsObject> {
+        const req = new GetUserByLoginNameGlobalRequest();
         req.setLoginName(loginname);
-        return this.grpcService.mgmt.getUserByLoginNameGlobal(req);
+        return this.grpcService.mgmt.getUserByLoginNameGlobal(req, null).then(resp => resp.toObject());
     }
 
     // USER GRANTS
 
-    public SearchUserGrants(
+    public listUserGrants(
         limit?: number,
         offset?: number,
-        queryList?: UserGrantSearchQuery[],
-    ): Promise<UserGrantSearchResponse> {
-        const req = new UserGrantSearchRequest();
+        queryList?: UserGrantQuery[],
+    ): Promise<ListUserGrantResponse.AsObject> {
+        const req = new ListUserGrantRequest();
+        const query = new ListQuery();
         if (limit) {
-            req.setLimit(limit);
+            query.setLimit(limit);
         }
         if (offset) {
-            req.setOffset(offset);
+            query.setOffset(offset);
         }
+        req.setMetaData(query);
+
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.searchUserGrants(req);
+        return this.grpcService.mgmt.listUserGrants(req, null).then(resp => resp.toObject());
     }
 
 
-    public UserGrantByID(
-        id: string,
+    public getUserGrantByID(
+        grantId: string,
         userId: string,
-    ): Promise<UserGrantView> {
-        const req = new UserGrantID();
-        req.setId(id);
+    ): Promise<GetUserGrantByIDResponse.AsObject> {
+        const req = new GetUserGrantByIDRequest();
+        req.setGrantId(grantId);
         req.setUserId(userId);
 
-        return this.grpcService.mgmt.userGrantByID(req);
+        return this.grpcService.mgmt.getUserGrantByID(req, null).then(resp => resp.toObject());
     }
 
-    public UpdateUserGrant(
-        id: string,
+    public updateUserGrant(
+        grantId: string,
         userId: string,
         roleKeysList: string[],
-    ): Promise<UserGrant> {
-        const req = new UserGrantUpdate();
-        req.setId(id);
+    ): Promise<UpdateUserGrantResponse.AsObject> {
+        const req = new UpdateUserGrantRequest();
+        req.setGrantId(grantId);
         req.setRoleKeysList(roleKeysList);
         req.setUserId(userId);
 
-        return this.grpcService.mgmt.updateUserGrant(req);
+        return this.grpcService.mgmt.updateUserGrant(req, null).then(resp => resp.toObject());
     }
 
-    public RemoveUserGrant(
-        id: string,
+    public removeUserGrant(
+        grantId: string,
         userId: string,
-    ): Promise<Empty> {
-        const req = new UserGrantID();
-        req.setId(id);
+    ): Promise<RemoveUserGrantResponse.AsObject> {
+        const req = new RemoveUserGrantRequest();
+        req.setGrantId(grantId);
         req.setUserId(userId);
 
-        return this.grpcService.mgmt.removeUserGrant(req);
+        return this.grpcService.mgmt.removeUserGrant(req, null).then(resp => resp.toObject());
     }
 
-    public BulkRemoveUserGrant(
-        idsList: string[],
-    ): Promise<Empty> {
-        const req = new UserGrantRemoveBulk();
-        req.setIdsList(idsList);
+    public bulkRemoveUserGrant(
+        grantIdsList: string[],
+    ): Promise<BulkRemoveUserGrantResponse.AsObject> {
+        const req = new BulkRemoveUserGrantRequest();
+        req.setGrantIdList(grantIdsList);
 
-        return this.grpcService.mgmt.bulkRemoveUserGrant(req);
+        return this.grpcService.mgmt.bulkRemoveUserGrant(req, null).then(resp => resp.toObject());
     }
 
-    //
-
-    public ApplicationChanges(id: string, secId: string, limit: number, offset: number): Promise<Changes> {
-        const req = new ChangeRequest();
-        req.setId(id);
-        req.setSecId(secId);
-        req.setLimit(limit);
-        req.setSequenceOffset(offset);
-        return this.grpcService.mgmt.applicationChanges(req);
+    public listAppChanges(appId: string, projectId: string, limit: number, offset: number): Promise<ListAppChangesResponse.AsObject> {
+        const req = new ListAppChangesRequest();
+        const query = new ListQuery();
+        req.setAppId(appId);
+        req.setProjectId(projectId);
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
+        req.setQuery(query);
+        return this.grpcService.mgmt.listAppChanges(req, null).then(resp => resp.toObject());
     }
 
-    public OrgChanges(id: string, limit: number, offset: number): Promise<Changes> {
-        const req = new ChangeRequest();
-        req.setId(id);
-        req.setLimit(limit);
-        req.setSequenceOffset(offset);
-        return this.grpcService.mgmt.orgChanges(req);
+    public listOrgChanges(limit: number, offset: number): Promise<ListOrgChangesResponse.AsObject> {
+        const req = new ListOrgChangesRequest();
+        const query = new ListQuery();
+
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
+
+        req.setQuery(query);
+        return this.grpcService.mgmt.listOrgChanges(req, null).then(resp => resp.toObject());
     }
 
-    public ProjectChanges(id: string, limit: number, offset: number): Promise<Changes> {
-        const req = new ChangeRequest();
-        req.setId(id);
-        req.setLimit(limit);
-        req.setSequenceOffset(offset);
-        return this.grpcService.mgmt.projectChanges(req);
+    public listProjectChanges(projectId: string, limit: number, offset: number): Promise<ListProjectChangesResponse.AsObject> {
+        const req = new ListProjectChangesRequest();
+        req.setProjectId(projectId);
+        const query = new ListQuery();
+
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
+
+        req.setQuery(query);
+        return this.grpcService.mgmt.listProjectChanges(req, null).then(resp => resp.toObject());
     }
 
-    public UserChanges(id: string, limit: number, sequenceoffset: number): Promise<Changes> {
-        const req = new ChangeRequest();
-        req.setId(id);
-        req.setLimit(limit);
-        req.setSequenceOffset(sequenceoffset);
-        return this.grpcService.mgmt.userChanges(req);
+    public listUserChanges(userId: string, limit: number, offset: number): Promise<ListUserChangesResponse.AsObject> {
+        const req = new ListUserChangesRequest();
+        req.setUserId(userId);
+        const query = new ListQuery();
+
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
+
+        req.setQuery(query);
+        return this.grpcService.mgmt.listUserChanges(req, null).then(resp => resp.toObject());
     }
 
     // project
 
-    public SearchProjects(
-        limit?: number, offset?: number, queryList?: ProjectSearchQuery[]): Promise<ProjectSearchResponse> {
-        const req = new ProjectSearchRequest();
+    public listProjects(
+        limit?: number, offset?: number, queryList?: ProjectQuery[]): Promise<ListProjectsResponse.AsObject> {
+        const req = new ListProjectsRequest();
+        const query = new ListQuery();
+
         if (limit) {
-            req.setLimit(limit);
+            query.setLimit(limit);
         }
         if (offset) {
-            req.setOffset(offset);
+            query.setOffset(offset);
         }
+
+        req.setMetaData(query);
 
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.searchProjects(req).then(value => {
-            const count = value.toObject().resultList.length;
+        return this.grpcService.mgmt.listProjects(req, null).then(value => {
+            const obj = value.toObject();
+            const count = obj.resultList.length;
             if (count >= 0) {
                 this.ownedProjectsCount.next(count);
             }
 
-            return value;
+            return obj;
         });
     }
 
-    public SearchGrantedProjects(
-        limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectGrantSearchResponse> {
-        const req = new GrantedProjectSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
+    public listGrantedProjects(
+        limit: number, offset: number, queryList?: ProjectQuery[]): Promise<ListGrantedProjectsResponse.AsObject> {
+        const req = new ListGrantedProjectsRequest();
+        const query = new ListQuery();
+
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
+
+        req.setMetaData(query);
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.searchGrantedProjects(req).then(value => {
-            this.grantedProjectsCount.next(value.toObject().resultList.length);
-            return value;
+        return this.grpcService.mgmt.listGrantedProjects(req, null).then(value => {
+            const obj = value.toObject();
+            this.grantedProjectsCount.next(obj.resultList.length);
+            return obj;
         });
     }
 
-    public GetZitadelDocs(): Promise<ZitadelDocs> {
-        const req = new Empty();
-        return this.grpcService.mgmt.getZitadelDocs(req);
+    public getOIDCInformation(): Promise<GetOIDCInformationResponse.AsObject> {
+        const req = new GetOIDCInformationRequest();
+        return this.grpcService.mgmt.getOIDCInformation(req, null).then(resp => resp.toObject());
     }
 
-    public GetProjectById(projectId: string): Promise<ProjectView> {
-        const req = new ProjectID();
+    public getProjectByID(projectId: string): Promise<GetProjectByIDResponse.AsObject> {
+        const req = new GetProjectByIDRequest();
         req.setId(projectId);
-        return this.grpcService.mgmt.projectByID(req);
+        return this.grpcService.mgmt.getProjectByID(req, null).then(resp => resp.toObject());
     }
 
-    public GetGrantedProjectByID(projectId: string, id: string): Promise<ProjectGrantView> {
-        const req = new ProjectGrantID();
-        req.setId(id);
+    public getGrantedProjectByID(projectId: string, grantId: string): Promise<GetGrantedProjectByIDResponse.AsObject> {
+        const req = new GetGrantedProjectByIDRequest();
+        req.setGrantId(grantId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.getGrantedProjectByID(req);
+        return this.grpcService.mgmt.getGrantedProjectByID(req, null).then(resp => resp.toObject());
     }
 
-    public CreateProject(project: ProjectCreateRequest.AsObject): Promise<Project> {
-        const req = new ProjectCreateRequest();
+    public addProject(project: AddProjectRequest.AsObject): Promise<AddProjectResponse.AsObject> {
+        const req = new AddProjectRequest();
         req.setName(project.name);
-        return this.grpcService.mgmt.createProject(req).then(value => {
+        return this.grpcService.mgmt.addProject(req, null).then(value => {
             const current = this.ownedProjectsCount.getValue();
             this.ownedProjectsCount.next(current + 1);
-            return value;
+            return value.toObject();
         });
     }
 
-    public UpdateProject(id: string, projectView: ProjectView.AsObject): Promise<Project> {
-        const req = new ProjectUpdateRequest();
-        req.setId(id);
-        req.setName(projectView.name);
-        req.setProjectRoleAssertion(projectView.projectRoleAssertion);
-        req.setProjectRoleCheck(projectView.projectRoleCheck);
-        return this.grpcService.mgmt.updateProject(req);
+    public updateProject(req: UpdateProjectRequest): Promise<UpdateProjectResponse.AsObject> {
+        return this.grpcService.mgmt.updateProject(req, null).then(resp => resp.toObject());
     }
 
-    public UpdateProjectGrant(id: string, projectId: string, rolesList: string[]): Promise<ProjectGrant> {
-        const req = new ProjectGrantUpdate();
+    public updateProjectGrant(grantId: string, projectId: string, rolesList: string[]): Promise<UpdateProjectGrantResponse.AsObject> {
+        const req = new UpdateProjectGrantRequest();
         req.setRoleKeysList(rolesList);
-        req.setId(id);
+        req.setGrantId(grantId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.updateProjectGrant(req);
+        return this.grpcService.mgmt.updateProjectGrant(req, null).then(resp => resp.toObject());
     }
 
-    public RemoveProjectGrant(id: string, projectId: string): Promise<Empty> {
-        const req = new ProjectGrantID();
-        req.setId(id);
+    public removeProjectGrant(grantId: string, projectId: string): Promise<RemoveProjectGrantResponse.AsObject> {
+        const req = new RemoveProjectGrantRequest();
+        req.setGrantId(grantId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.removeProjectGrant(req);
+        return this.grpcService.mgmt.removeProjectGrant(req, null).then(resp => resp.toObject());
     }
 
-    public DeactivateProject(projectId: string): Promise<Project> {
-        const req = new ProjectID();
+    public deactivateProject(projectId: string): Promise<DeactivateProjectResponse.AsObject> {
+        const req = new DeactivateProjectRequest();
         req.setId(projectId);
-        return this.grpcService.mgmt.deactivateProject(req);
+        return this.grpcService.mgmt.deactivateProject(req, null).then(resp => resp.toObject());
     }
 
-    public ReactivateProject(projectId: string): Promise<Project> {
-        const req = new ProjectID();
+    public reactivateProject(projectId: string): Promise<ReactivateProjectResponse.AsObject> {
+        const req = new ReactivateProjectRequest();
         req.setId(projectId);
-        return this.grpcService.mgmt.reactivateProject(req);
+        return this.grpcService.mgmt.reactivateProject(req, null).then(resp => resp.toObject());
     }
 
-    public SearchProjectGrants(projectId: string, limit: number, offset: number): Promise<ProjectGrantSearchResponse> {
-        const req = new ProjectGrantSearchRequest();
+    public listProjectGrants(projectId: string, limit: number, offset: number): Promise<ListProjectGrantsResponse.AsObject> {
+        const req = new ListProjectGrantsRequest();
         req.setProjectId(projectId);
-        req.setLimit(limit);
-        req.setOffset(offset);
-        return this.grpcService.mgmt.searchProjectGrants(req);
+        const query = new ListQuery();
+
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
+
+        req.setMetaData(query);
+        return this.grpcService.mgmt.listProjectGrants(req, null).then(resp => resp.toObject());
     }
 
-    public GetProjectGrantMemberRoles(): Promise<ProjectGrantMemberRoles> {
-        const req = new Empty();
-        return this.grpcService.mgmt.getProjectGrantMemberRoles(req);
+    public listProjectGrantMemberRoles(): Promise<ListProjectGrantMemberRolesResponse.AsObject> {
+        const req = new ListProjectGrantMemberRolesRequest();
+        return this.grpcService.mgmt.listProjectGrantMemberRoles(req, null).then(resp => resp.toObject());
     }
 
-    public AddProjectMember(id: string, userId: string, rolesList: string[]): Promise<Empty> {
-        const req = new ProjectMemberAdd();
-        req.setId(id);
+    public addProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<AddProjectMemberResponse.AsObject> {
+        const req = new AddProjectMemberRequest();
+        req.setProjectId(projectId);
         req.setUserId(userId);
         req.setRolesList(rolesList);
-        return this.grpcService.mgmt.addProjectMember(req);
+        return this.grpcService.mgmt.addProjectMember(req, null).then(resp => resp.toObject());
     }
 
-    public ChangeProjectMember(id: string, userId: string, rolesList: string[]): Promise<ProjectMember> {
-        const req = new ProjectMemberChange();
-        req.setId(id);
+    public updateProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<UpdateProjectMemberResponse.AsObject> {
+        const req = new UpdateProjectMemberRequest();
+        req.setProjectId(projectId);
         req.setUserId(userId);
         req.setRolesList(rolesList);
-        return this.grpcService.mgmt.changeProjectMember(req);
+        return this.grpcService.mgmt.updateProjectMember(req, null).then(resp => resp.toObject());
     }
 
-    public AddProjectGrantMember(
+    public addProjectGrantMember(
         projectId: string,
         grantId: string,
         userId: string,
         rolesList: string[],
-    ): Promise<Empty> {
-        const req = new ProjectGrantMemberAdd();
+    ): Promise<AddProjectGrantMemberResponse.AsObject> {
+        const req = new AddProjectGrantMemberRequest();
         req.setProjectId(projectId);
         req.setGrantId(grantId);
         req.setUserId(userId);
         req.setRolesList(rolesList);
-        return this.grpcService.mgmt.addProjectGrantMember(req);
+        return this.grpcService.mgmt.addProjectGrantMember(req, null).then(resp => resp.toObject());
     }
 
-    public ChangeProjectGrantMember(
+    public updateProjectGrantMember(
         projectId: string,
         grantId: string,
         userId: string,
         rolesList: string[],
-    ): Promise<ProjectGrantMember> {
-        const req = new ProjectGrantMemberChange();
+    ): Promise<UpdateProjectGrantMemberResponse.AsObject> {
+        const req = new UpdateProjectGrantMemberRequest();
         req.setProjectId(projectId);
         req.setGrantId(grantId);
         req.setUserId(userId);
         req.setRolesList(rolesList);
-        return this.grpcService.mgmt.changeProjectGrantMember(req);
+        return this.grpcService.mgmt.updateProjectGrantMember(req, null).then(resp => resp.toObject());
     }
 
-    public SearchProjectGrantMembers(
+    public listProjectGrantMembers(
         projectId: string,
         grantId: string,
         limit: number,
         offset: number,
-        queryList?: ProjectGrantMemberSearchQuery[],
-    ): Promise<ProjectMemberSearchResponse> {
-        const req = new ProjectGrantMemberSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
+        queryList?: SearchQuery[],
+    ): Promise<ListProjectGrantMembersResponse.AsObject> {
+        const req = new ListProjectGrantMembersRequest();
+        req.setProjectId(projectId);
+        req.setGrantId(grantId);
+
+        const query = new ListQuery();
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
+
+        req.setMetaData(query);
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        req.setProjectId(projectId);
-        req.setGrantId(grantId);
-        return this.grpcService.mgmt.searchProjectGrantMembers(req);
+
+        return this.grpcService.mgmt.listProjectGrantMembers(req, null).then(resp => resp.toObject());
     }
 
-    public RemoveProjectGrantMember(
+    public removeProjectGrantMember(
         projectId: string,
         grantId: string,
         userId: string,
-    ): Promise<Empty> {
-        const req = new ProjectGrantMemberRemove();
+    ): Promise<RemoveProjectGrantMemberResponse.AsObject> {
+        const req = new RemoveProjectGrantMemberRequest();
         req.setGrantId(grantId);
         req.setUserId(userId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.removeProjectGrantMember(req);
+        return this.grpcService.mgmt.removeProjectGrantMember(req, null).then(resp => resp.toObject());
     }
 
-    public ReactivateApplication(projectId: string, appId: string): Promise<Application> {
-        const req = new ApplicationID();
-        req.setId(appId);
+    public reactivateApp(projectId: string, appId: string): Promise<ReactivateAppResponse.AsObject> {
+        const req = new ReactivateAppRequest();
+        req.setAppId(appId);
         req.setProjectId(projectId);
 
-        return this.grpcService.mgmt.reactivateApplication(req);
+        return this.grpcService.mgmt.reactivateApp(req, null).then(resp => resp.toObject());
     }
 
-    public DeactivateApplication(projectId: string, appId: string): Promise<Application> {
-        const req = new ApplicationID();
-        req.setId(appId);
+    public deactivateApp(projectId: string, appId: string): Promise<DeactivateAppResponse.AsObject> {
+        const req = new DeactivateAppRequest();
+        req.setAppId(appId);
         req.setProjectId(projectId);
 
-        return this.grpcService.mgmt.deactivateApplication(req);
+        return this.grpcService.mgmt.deactivateApp(req, null).then(resp => resp.toObject());
     }
 
-    public RegenerateOIDCClientSecret(id: string, projectId: string): Promise<any> {
-        const req = new ApplicationID();
-        req.setId(id);
+    public regenerateOIDCClientSecret(appId: string, projectId: string): Promise<any> {
+        const req = new RegenerateOIDCClientSecretRequest();
+        req.setAppId(appId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.regenerateOIDCClientSecret(req);
+        return this.grpcService.mgmt.regenerateOIDCClientSecret(req, null).then(resp => resp.toObject());
     }
 
-    public SearchProjectRoles(
+    public listProjectRoles(
         projectId: string,
         limit: number,
         offset: number,
-        queryList?: ProjectRoleSearchQuery[],
-    ): Promise<ProjectRoleSearchResponse> {
-        const req = new ProjectRoleSearchRequest();
+        queryList?: RoleQuery[],
+    ): Promise<ListProjectRolesResponse.AsObject> {
+        const req = new ListProjectRolesRequest();
         req.setProjectId(projectId);
-        req.setLimit(limit);
-        req.setOffset(offset);
+
+        const query = new ListQuery();
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
+
+        req.setMetaData(query);
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.searchProjectRoles(req);
+        return this.grpcService.mgmt.listProjectRoles(req, null).then(resp => resp.toObject());
     }
 
-    public AddProjectRole(role: ProjectRoleAdd.AsObject): Promise<Empty> {
-        const req = new ProjectRoleAdd();
-        req.setId(role.id);
-        if (role.displayName) {
-            req.setDisplayName(role.displayName);
-        }
-        req.setKey(role.key);
-        req.setGroup(role.group);
-        return this.grpcService.mgmt.addProjectRole(req);
+    public bulkAddProjectRoles(
+        projectId: string,
+        rolesList: BulkAddProjectRolesRequest.Role[],
+    ): Promise<BulkAddProjectRolesResponse.AsObject> {
+        const req = new BulkAddProjectRolesRequest();
+        req.setProjectId(projectId);
+        req.setRolesList(rolesList);
+        return this.grpcService.mgmt.bulkAddProjectRoles(req, null).then(resp => resp.toObject());
     }
 
-    public BulkAddProjectRole(
-        id: string,
-        rolesList: ProjectRoleAdd[],
-    ): Promise<Empty> {
-        const req = new ProjectRoleAddBulk();
-        req.setId(id);
-        req.setProjectRolesList(rolesList);
-        return this.grpcService.mgmt.bulkAddProjectRole(req);
-    }
-
-    public RemoveProjectRole(projectId: string, key: string): Promise<Empty> {
-        const req = new ProjectRoleRemove();
-        req.setId(projectId);
-        req.setKey(key);
-        return this.grpcService.mgmt.removeProjectRole(req);
+    public removeProjectRole(projectId: string, roleKey: string): Promise<RemoveProjectRoleResponse.AsObject> {
+        const req = new RemoveProjectRoleRequest();
+        req.setProjectId(projectId);
+        req.setRoleKey(roleKey);
+        return this.grpcService.mgmt.removeProjectRole(req, null).then(resp => resp.toObject());
     }
 
 
-    public ChangeProjectRole(projectId: string, key: string, displayName: string, group: string):
-        Promise<ProjectRole> {
-        const req = new ProjectRoleChange();
-        req.setId(projectId);
-        req.setKey(key);
+    public updateProjectRole(projectId: string, roleKey: string, displayName: string, group: string):
+        Promise<UpdateProjectRoleResponse.AsObject> {
+        const req = new UpdateProjectRoleRequest();
+        req.setProjectId(projectId);
+        req.setRoleKey(roleKey);
         req.setGroup(group);
         req.setDisplayName(displayName);
-        return this.grpcService.mgmt.changeProjectRole(req);
+        return this.grpcService.mgmt.updateProjectRole(req, null).then(resp => resp.toObject());
     }
 
 
-    public RemoveProjectMember(id: string, userId: string): Promise<Empty> {
-        const req = new ProjectMemberRemove();
-        req.setId(id);
+    public removeProjectMember(projectId: string, userId: string): Promise<RemoveProjectMemberResponse.AsObject> {
+        const req = new RemoveProjectMemberRequest();
+        req.setProjectId(projectId);
         req.setUserId(userId);
-        return this.grpcService.mgmt.removeProjectMember(req);
+        return this.grpcService.mgmt.removeProjectMember(req, null).then(resp => resp.toObject());
     }
 
-    public SearchApplications(
+    public listApps(
         projectId: string,
         limit: number,
         offset: number,
-        queryList?: ApplicationSearchQuery[]): Promise<ApplicationSearchResponse> {
-        const req = new ApplicationSearchRequest();
+        queryList?: AppQuery[]): Promise<ListAppsResponse.AsObject> {
+        const req = new ListAppsRequest();
         req.setProjectId(projectId);
-        req.setLimit(limit);
-        req.setOffset(offset);
+        const query = new ListQuery();
+        if (limit) {
+            query.setLimit(limit);
+        }
+        if (offset) {
+            query.setOffset(offset);
+        }
+
+        req.setMetaData(query);
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        return this.grpcService.mgmt.searchApplications(req);
+        return this.grpcService.mgmt.listApps(req, null).then(resp => resp.toObject());
     }
 
-    public GetApplicationById(projectId: string, applicationId: string): Promise<ApplicationView> {
-        const req = new ApplicationID();
+    public getAppByID(projectId: string, appId: string): Promise<GetAppByIDResponse.AsObject> {
+        const req = new GetAppByIDRequest();
         req.setProjectId(projectId);
-        req.setId(applicationId);
-        return this.grpcService.mgmt.applicationByID(req);
+        req.setAppId(appId);
+        return this.grpcService.mgmt.getAppByID(req, null).then(resp => resp.toObject());
     }
 
-    public GetProjectMemberRoles(): Promise<ProjectMemberRoles> {
-        const req = new Empty();
-        return this.grpcService.mgmt.getProjectMemberRoles(req);
+    public listProjectMemberRoles(): Promise<ListProjectMemberRolesResponse.AsObject> {
+        const req = new ListProjectMemberRolesRequest();
+        return this.grpcService.mgmt.listProjectMemberRoles(req, null).then(resp => resp.toObject());
     }
 
-    public ProjectGrantByID(id: string, projectId: string): Promise<ProjectGrantView> {
-        const req = new ProjectGrantID();
-        req.setId(id);
+    public getProjectGrantByID(grantId: string, projectId: string): Promise<GetProjectGrantByIDResponse.AsObject> {
+        const req = new GetProjectGrantByIDRequest();
+        req.setGrantId(grantId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.projectGrantByID(req);
+        return this.grpcService.mgmt.getProjectGrantByID(req, null).then(resp => resp.toObject());
     }
 
-    public RemoveProject(id: string): Promise<Empty> {
-        const req = new ProjectID();
+    public removeProject(id: string): Promise<RemoveProjectResponse.AsObject> {
+        const req = new RemoveProjectRequest();
         req.setId(id);
-        return this.grpcService.mgmt.removeProject(req).then(value => {
+        return this.grpcService.mgmt.removeProject(req, null).then(value => {
             const current = this.ownedProjectsCount.getValue();
             this.ownedProjectsCount.next(current > 0 ? current - 1 : 0);
-            return value;
+            return value.toObject();
         });
     }
 
-
-    public DeactivateProjectGrant(id: string, projectId: string): Promise<ProjectGrant> {
-        const req = new ProjectGrantID();
-        req.setId(id);
+    public deactivateProjectGrant(grantId: string, projectId: string): Promise<DeactivateProjectGrantResponse.AsObject> {
+        const req = new DeactivateProjectGrantRequest();
+        req.setGrantId(grantId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.deactivateProjectGrant(req);
+        return this.grpcService.mgmt.deactivateProjectGrant(req, null).then(resp => resp.toObject());
     }
 
-    public ReactivateProjectGrant(id: string, projectId: string): Promise<ProjectGrant> {
-        const req = new ProjectGrantID();
-        req.setId(id);
+    public reactivateProjectGrant(grantId: string, projectId: string): Promise<ReactivateProjectGrantResponse.AsObject> {
+        const req = new ReactivateProjectGrantRequest();
+        req.setGrantId(grantId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.reactivateProjectGrant(req);
+        return this.grpcService.mgmt.reactivateProjectGrant(req, null).then(resp => resp.toObject());
     }
 
-    public CreateOIDCApp(app: OIDCApplicationCreate.AsObject): Promise<Application> {
-        const req = new OIDCApplicationCreate();
-        req.setProjectId(app.projectId);
-        req.setName(app.name);
-        req.setRedirectUrisList(app.redirectUrisList);
-        req.setResponseTypesList(app.responseTypesList);
-        req.setGrantTypesList(app.grantTypesList);
-        req.setApplicationType(app.applicationType);
-        req.setAuthMethodType(app.authMethodType);
-        req.setPostLogoutRedirectUrisList(app.postLogoutRedirectUrisList);
-
-        return this.grpcService.mgmt.createOIDCApplication(req);
+    public addOIDCApp(req: AddOIDCAppRequest): Promise<AddOIDCAppResponse.AsObject> {
+        return this.grpcService.mgmt.addOIDCApp(req, null).then(resp => resp.toObject());
     }
 
-    public UpdateApplication(projectId: string, appId: string, name: string): Promise<Application> {
-        const req = new ApplicationUpdate();
-        req.setId(appId);
+    public updateApp(projectId: string, appId: string, name: string): Promise<UpdateAppResponse.AsObject> {
+        const req = new UpdateAppRequest();
+        req.setAppId(appId);
         req.setName(name);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.updateApplication(req);
+        return this.grpcService.mgmt.updateApp(req, null).then(resp => resp.toObject());
     }
 
-    public UpdateOIDCAppConfig(req: OIDCConfigUpdate): Promise<OIDCConfig> {
-        return this.grpcService.mgmt.updateApplicationOIDCConfig(req);
+    public updateOIDCAppConfig(req: UpdateOIDCAppConfigRequest): Promise<UpdateOIDCAppConfigResponse.AsObject> {
+        return this.grpcService.mgmt.updateOIDCAppConfig(req, null).then(resp => resp.toObject());
     }
 
-    public RemoveApplication(projectId: string, appId: string): Promise<Empty> {
-        const req = new ApplicationID();
-        req.setId(appId);
+    public removeApp(projectId: string, appId: string): Promise<RemoveAppResponse.AsObject> {
+        const req = new RemoveAppRequest();
+        req.setAppId(appId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.removeApplication(req);
+        return this.grpcService.mgmt.removeApp(req, null).then(resp => resp.toObject());
     }
 }

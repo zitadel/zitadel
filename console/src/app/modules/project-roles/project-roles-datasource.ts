@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { ProjectRole } from 'src/app/proto/generated/management_pb';
+import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 /**
@@ -10,11 +10,11 @@ import { ManagementService } from 'src/app/services/mgmt.service';
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class ProjectRolesDataSource extends DataSource<ProjectRole.AsObject> {
+export class ProjectRolesDataSource extends DataSource<Role.AsObject> {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
 
-    public rolesSubject: BehaviorSubject<ProjectRole.AsObject[]> = new BehaviorSubject<ProjectRole.AsObject[]>([]);
+    public rolesSubject: BehaviorSubject<Role.AsObject[]> = new BehaviorSubject<Role.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -26,14 +26,15 @@ export class ProjectRolesDataSource extends DataSource<ProjectRole.AsObject> {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        from(this.mgmtService.SearchProjectRoles(projectId, pageSize, offset)).pipe(
+        from(this.mgmtService.listProjectRoles(projectId, pageSize, offset)).pipe(
             map(resp => {
-                const response = resp.toObject();
-                this.totalResult = response.totalResult;
-                if (response.viewTimestamp) {
-                    this.viewTimestamp = response.viewTimestamp;
+                if (resp.metaData?.totalResult !== undefined) {
+                    this.totalResult = resp.metaData?.totalResult;
                 }
-                return resp.toObject().resultList;
+                if (resp.metaData?.viewTimestamp) {
+                    this.viewTimestamp = resp.metaData.viewTimestamp;
+                }
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -48,7 +49,7 @@ export class ProjectRolesDataSource extends DataSource<ProjectRole.AsObject> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<ProjectRole.AsObject[]> {
+    public connect(): Observable<Role.AsObject[]> {
         return this.rolesSubject.asObservable();
     }
 

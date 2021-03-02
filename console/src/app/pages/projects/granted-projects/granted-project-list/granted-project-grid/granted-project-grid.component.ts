@@ -2,8 +2,9 @@ import { animate, animateChild, query, stagger, style, transition, trigger } fro
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
-import { Org } from 'src/app/proto/generated/auth_pb';
-import { ProjectGrantView, ProjectState, ProjectType } from 'src/app/proto/generated/management_pb';
+import { ProjectType } from 'src/app/modules/project-members/project-members.component';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { GrantedProject, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { StorageKey, StorageService } from 'src/app/services/storage.service';
 
 @Component({
@@ -31,12 +32,12 @@ import { StorageKey, StorageService } from 'src/app/services/storage.service';
     ],
 })
 export class GrantedProjectGridComponent implements OnChanges {
-    @Input() items: Array<ProjectGrantView.AsObject> = [];
-    public notPinned: Array<ProjectGrantView.AsObject> = [];
+    @Input() items: Array<GrantedProject.AsObject> = [];
+    public notPinned: Array<GrantedProject.AsObject> = [];
     @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
     @Output() changedView: EventEmitter<boolean> = new EventEmitter();
     @Input() loading: boolean = false;
-    public selection: SelectionModel<ProjectGrantView.AsObject> = new SelectionModel<ProjectGrantView.AsObject>(true, []);
+    public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
 
     public showNewProject: boolean = false;
     public ProjectState: any = ProjectState;
@@ -71,7 +72,7 @@ export class GrantedProjectGridComponent implements OnChanges {
         this.getPrefixedItem('pinned-granted-projects').then(storageEntry => {
             if (storageEntry) {
                 const array: string[] = JSON.parse(storageEntry);
-                const toSelect: ProjectGrantView.AsObject[] = this.items.filter((item, index) => {
+                const toSelect: GrantedProject.AsObject[] = this.items.filter((item, index) => {
                     if (array.includes(item.projectId)) {
                         return true;
                     }

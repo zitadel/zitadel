@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig } from 'angular-oauth2-oidc';
-import { UserProfileView, UserSessionView } from 'src/app/proto/generated/auth_pb';
+import { Profile, Session } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
@@ -11,15 +11,15 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
     styleUrls: ['./accounts-card.component.scss'],
 })
 export class AccountsCardComponent implements OnInit {
-    @Input() public profile!: UserProfileView.AsObject;
+    @Input() public profile!: Profile.AsObject;
     @Input() public iamuser: boolean = false;
 
     @Output() public close: EventEmitter<void> = new EventEmitter();
-    public users: UserSessionView.AsObject[] = [];
+    public users: Session.AsObject[] = [];
     public loadingUsers: boolean = false;
     constructor(public authService: AuthenticationService, private router: Router, private userService: GrpcAuthService) {
-        this.userService.getMyUserSessions().then(sessions => {
-            this.users = sessions.toObject().userSessionsList;
+        this.userService.listMyUserSessions().then(sessions => {
+            this.users = sessions.resultList;
             const index = this.users.findIndex(user => user.loginName === this.profile.preferredLoginName);
             if (index > -1) {
                 this.users.splice(index, 1);

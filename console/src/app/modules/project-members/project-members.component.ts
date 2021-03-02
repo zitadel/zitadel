@@ -4,21 +4,19 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
-import {
-    ProjectGrantMemberView,
-    ProjectGrantView,
-    ProjectMember,
-    ProjectMemberView,
-    ProjectType,
-    ProjectView,
-    UserView,
-} from 'src/app/proto/generated/management_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CreationType, MemberCreateDialogComponent } from '../add-member-dialog/member-create-dialog.component';
 import { ProjectMembersDataSource } from './project-members-datasource';
 
+export enum ProjectType {
+    PROJECTTYPE_OWNED = "OWNED",
+    PROJECTTYPE_GRANTED = "GRANTED"
+}
 
 @Component({
     selector: 'app-project-members',
@@ -27,7 +25,7 @@ import { ProjectMembersDataSource } from './project-members-datasource';
 })
 export class ProjectMembersComponent {
     public INITIALPAGESIZE: number = 25;
-    public project!: ProjectView.AsObject | ProjectGrantView.AsObject;
+    public project!: Project.AsObject | GrantedProject.AsObject;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public grantId: string = '';
     public projectName: string = '';
@@ -36,7 +34,9 @@ export class ProjectMembersComponent {
 
     public changePageFactory!: Function;
     public changePage: EventEmitter<void> = new EventEmitter();
-    public selection: Array<ProjectMemberView.AsObject | ProjectGrantMemberView.AsObject> = [];
+    public selection: Array<Member.AsObject> = [];
+
+    public ProjectType: any = ProjectType;
     constructor(
         private mgmtService: ManagementService,
         private dialog: MatDialog,
@@ -50,43 +50,47 @@ export class ProjectMembersComponent {
             this.route.params.subscribe(params => {
                 this.grantId = params.grantid;
                 if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-                    this.mgmtService.GetProjectById(params.projectid).then(project => {
-                        this.project = project.toObject();
-                        this.projectName = this.project.name;
-                        this.dataSource = new ProjectMembersDataSource(this.mgmtService);
-                        this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, this.INITIALPAGESIZE);
+                    this.mgmtService.getProjectByID(params.projectid).then(resp => {
+                        if (resp.project) {
+                            this.project = resp.project;
+                            this.projectName = this.project.name;
+                            this.dataSource = new ProjectMembersDataSource(this.mgmtService);
+                            this.dataSource.loadMembers(this.project.id, this.projectType, 0, this.INITIALPAGESIZE);
 
-                        this.changePageFactory = (event?: PageEvent) => {
-                            return this.dataSource.loadMembers(
-                                this.project.projectId,
-                                this.projectType,
-                                event?.pageIndex ?? 0,
-                                event?.pageSize ?? this.INITIALPAGESIZE,
-                                this.grantId,
-                            );
-                        };
+                            this.changePageFactory = (event?: PageEvent) => {
+                                return this.dataSource.loadMembers(
+                                    (this.project as Project.AsObject).id,
+                                    this.projectType,
+                                    event?.pageIndex ?? 0,
+                                    event?.pageSize ?? this.INITIALPAGESIZE,
+                                    this.grantId,
+                                );
+                            };
+                        }
                     });
                 } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                    this.mgmtService.GetGrantedProjectByID(params.projectid, params.grantid).then(project => {
-                        this.project = project.toObject();
-                        this.projectName = this.project.projectName;
-                        this.dataSource = new ProjectMembersDataSource(this.mgmtService);
-                        this.dataSource.loadMembers(this.project.projectId,
-                            this.projectType,
-                            0,
-                            this.INITIALPAGESIZE,
-                            this.grantId,
-                        );
-
-                        this.changePageFactory = (event?: PageEvent) => {
-                            return this.dataSource.loadMembers(
-                                this.project.projectId,
+                    this.mgmtService.getGrantedProjectByID(params.projectid, params.grantid).then(resp => {
+                        if (resp.grantedProject) {
+                            this.project = resp.grantedProject;
+                            this.projectName = this.project.projectName;
+                            this.dataSource = new ProjectMembersDataSource(this.mgmtService);
+                            this.dataSource.loadMembers(this.project.projectId,
                                 this.projectType,
-                                event?.pageIndex ?? 0,
-                                event?.pageSize ?? this.INITIALPAGESIZE,
+                                0,
+                                this.INITIALPAGESIZE,
                                 this.grantId,
                             );
-                        };
+
+                            this.changePageFactory = (event?: PageEvent) => {
+                                return this.dataSource.loadMembers(
+                                    (this.project as GrantedProject.AsObject).projectId,
+                                    this.projectType,
+                                    event?.pageIndex ?? 0,
+                                    event?.pageSize ?? this.INITIALPAGESIZE,
+                                    this.grantId,
+                                );
+                            };
+                        }
                     });
                 }
             });
@@ -95,14 +99,14 @@ export class ProjectMembersComponent {
 
     public getRoleOptions(): void {
         if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-            this.mgmtService.GetProjectGrantMemberRoles().then(resp => {
-                this.memberRoleOptions = resp.toObject().rolesList;
+            this.mgmtService.listProjectGrantMemberRoles().then(resp => {
+                this.memberRoleOptions = resp.resultList;
             }).catch(error => {
                 this.toast.showError(error);
             });
         } else if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-            this.mgmtService.GetProjectMemberRoles().then(resp => {
-                this.memberRoleOptions = resp.toObject().rolesList;
+            this.mgmtService.listProjectMemberRoles().then(resp => {
+                this.memberRoleOptions = resp.resultList;
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -112,13 +116,13 @@ export class ProjectMembersComponent {
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.map(member => {
             if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-                return this.mgmtService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
+                return this.mgmtService.removeProjectMember((this.project as Project.AsObject).id, member.userId).then(() => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
             } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                return this.mgmtService.RemoveProjectGrantMember(this.project.projectId, this.grantId,
+                return this.mgmtService.removeProjectGrantMember((this.project as GrantedProject.AsObject).projectId, this.grantId,
                     member.userId).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
                     }).catch(error => {
@@ -132,9 +136,9 @@ export class ProjectMembersComponent {
         });
     }
 
-    public removeProjectMember(member: ProjectMemberView.AsObject | ProjectGrantMemberView.AsObject): void {
+    public removeProjectMember(member: Member.AsObject | Member.AsObject): void {
         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-            this.mgmtService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
+            this.mgmtService.removeProjectMember((this.project as Project.AsObject).id, member.userId).then(() => {
                 setTimeout(() => {
                     this.changePage.emit();
                 }, 1000);
@@ -143,7 +147,7 @@ export class ProjectMembersComponent {
                 this.toast.showError(error);
             });
         } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-            this.mgmtService.RemoveProjectGrantMember(this.project.projectId, this.grantId,
+            this.mgmtService.removeProjectGrantMember((this.project as GrantedProject.AsObject).projectId, this.grantId,
                 member.userId).then(() => {
                     setTimeout(() => {
                         this.changePage.emit();
@@ -165,16 +169,16 @@ export class ProjectMembersComponent {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: UserView.AsObject[] = resp.users;
+                const users: User.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
                         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-                            return this.mgmtService.AddProjectMember(this.project.projectId, user.id, roles);
+                            return this.mgmtService.addProjectMember((this.project as Project.AsObject).id, user.id, roles);
 
                         } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                            return this.mgmtService.AddProjectGrantMember(this.project.projectId, this.grantId,
+                            return this.mgmtService.addProjectGrantMember((this.project as GrantedProject.AsObject).projectId, this.grantId,
                                 user.id, roles);
                         }
                     })).then(() => {
@@ -190,18 +194,18 @@ export class ProjectMembersComponent {
         });
     }
 
-    updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
+    updateRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-            this.mgmtService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
-                .then((_: ProjectMember) => {
+            this.mgmtService.updateProjectMember((this.project as Project.AsObject).id, member.userId, selectionChange.value)
+                .then(() => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
         } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-            this.mgmtService.ChangeProjectGrantMember(this.project.projectId,
+            this.mgmtService.updateProjectGrantMember((this.project as GrantedProject.AsObject).projectId,
                 this.grantId, member.userId, selectionChange.value)
-                .then((_: ProjectMember) => {
+                .then(() => {
                     this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
                 }).catch(error => {
                     this.toast.showError(error);
