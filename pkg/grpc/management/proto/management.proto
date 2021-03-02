@@ -3426,7 +3426,7 @@ message LoginPolicyView {
 message IdpProviderView {
   string idp_config_id = 1;
   string name = 2;
-  IdpType type = 3;
+  IdpProviderType type = 3;
 }
 
 enum IdpType {

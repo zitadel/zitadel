@@ -1,7 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MachineKeyType } from 'src/app/proto/generated/management_pb';
+import { AuthNKeyType, MachineKeyType } from 'src/app/proto/generated/management_pb';
+
+export enum AddKeyDialogType {
+    MACHINE = "MACHINE",
+    AUTHNKEY = "AUTHNKEY",
+}
 
 @Component({
     selector: 'app-add-key-dialog',
@@ -10,16 +15,21 @@ import { MachineKeyType } from 'src/app/proto/generated/management_pb';
 })
 export class AddKeyDialogComponent {
     public startDate: Date = new Date();
-    types: MachineKeyType[] = [
-        MachineKeyType.MACHINEKEY_JSON,
-    ];
-    public type: MachineKeyType = MachineKeyType.MACHINEKEY_JSON;
+    types: MachineKeyType[] | AuthNKeyType[] = [];
+    public type!: MachineKeyType | AuthNKeyType;
     public dateControl: FormControl = new FormControl('', []);
 
     constructor(
         public dialogRef: MatDialogRef<AddKeyDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
+        if (data.type = AddKeyDialogType.MACHINE) {
+            this.types = [MachineKeyType.MACHINEKEY_JSON];
+            this.type = MachineKeyType.MACHINEKEY_JSON;
+        } else if (data.type = AddKeyDialogType.AUTHNKEY) {
+            this.types = [AuthNKeyType.AUTHNKEY_JSON];
+            this.type = AuthNKeyType.AUTHNKEY_JSON;
+        }
         const today = new Date();
         this.startDate.setDate(today.getDate() + 1);
     }

@@ -42,15 +42,13 @@ import { ContactComponent } from './contact/contact.component';
 import { DetailFormMachineModule } from './detail-form-machine/detail-form-machine.module';
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { ExternalIdpsComponent } from './external-idps/external-idps.component';
-import { AddKeyDialogModule } from './machine-keys/add-key-dialog/add-key-dialog.module';
-import { MachineKeysComponent } from './machine-keys/machine-keys.component';
-import { ShowKeyDialogModule } from './machine-keys/show-key-dialog/show-key-dialog.module';
 import { MembershipsComponent } from './memberships/memberships.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
+import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.module';
 
 @NgModule({
     declarations: [
@@ -66,7 +64,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         PasswordComponent,
         CodeDialogComponent,
         MembershipsComponent,
-        MachineKeysComponent,
         ExternalIdpsComponent,
         ContactComponent,
         ResendEmailDialogComponent,
@@ -84,8 +81,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         MatDialogModule,
         QRCodeModule,
         MetaLayoutModule,
-        AddKeyDialogModule,
-        ShowKeyDialogModule,
         MatCheckboxModule,
         HasRolePipeModule,
         UserGrantsModule,
@@ -108,6 +103,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         TimestampToDatePipeModule,
         LocalizedDatePipeModule,
         InputModule,
+        MachineKeysModule,
     ],
 })
 export class UserDetailModule { }

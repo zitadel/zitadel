@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -60,7 +61,7 @@ func (s *Server) AddIdpProviderToLoginPolicy(ctx context.Context, provider *mana
 }
 
 func (s *Server) RemoveIdpProviderFromLoginPolicy(ctx context.Context, provider *management.IdpProviderID) (*empty.Empty, error) {
-	err := s.org.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderToModel(provider))
+	err := s.org.RemoveIDPProviderFromLoginPolicy(ctx, idpProviderToModel(authz.GetCtxData(ctx).OrgID, provider))
 	return &empty.Empty{}, err
 }
 

@@ -1,6 +1,6 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
     [timestamp]="keyResult?.viewTimestamp" [selection]="selection">
-    <ng-template appHasRole [appHasRole]="['user.write']" actions>
+    <div actions>
         <button color="warn" [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false"
             (click)="deleteSelectedKeys()" matTooltip="{{'ACTIONS.DELETE' | translate}}" class="icon-button"
             mat-icon-button *ngIf="selection.hasValue()">
@@ -10,7 +10,7 @@
             mat-raised-button (click)="openAddKey()">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
-    </ng-template>
+    </div>
 
     <div class="table-wrapper">
         <table class="table" mat-table [dataSource]="dataSource">
@@ -54,8 +54,7 @@
 
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"
-                [routerLink]="row.id ? ['/users', row.id ]: null">
+            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
             </tr>
 
         </table>

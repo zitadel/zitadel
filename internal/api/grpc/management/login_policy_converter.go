@@ -2,6 +2,7 @@ package management
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/golang/protobuf/ptypes"
@@ -70,10 +71,12 @@ func idpProviderSearchResponseFromModel(response *iam_model.IDPProviderSearchRes
 	}
 }
 
-func idpProviderToModel(provider *management.IdpProviderID) *iam_model.IDPProvider {
+func idpProviderToModel(orgID string, provider *management.IdpProviderID) *iam_model.IDPProvider {
 	return &iam_model.IDPProvider{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: orgID,
+		},
 		IdpConfigID: provider.IdpConfigId,
-		Type:        iam_model.IDPProviderTypeSystem,
 	}
 }
 
@@ -110,7 +113,7 @@ func idpProviderViewFromModel(provider *iam_model.IDPProviderView) *management.I
 	return &management.IdpProviderView{
 		IdpConfigId: provider.IDPConfigID,
 		Name:        provider.Name,
-		Type:        idpConfigTypeToModel(provider.IDPConfigType),
+		Type:        idpProviderTypeFromModel(provider.IDPProviderType),
 	}
 }
 
