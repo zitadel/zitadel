@@ -18,7 +18,7 @@
                 <path d="M16.88 3.549L7.12 20.451"></path>
             </svg>
 
-            <button class="org-button" (click)="loadOrgs()" *ngIf="profile?.id && org" mat-button
+            <button class="org-button" (click)="loadOrgs()" *ngIf="profile && org" mat-button
                 [matMenuTriggerFor]="menu" (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
                 <mat-icon>
                     arrow_drop_down</mat-icon>

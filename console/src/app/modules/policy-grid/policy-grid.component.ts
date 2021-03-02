@@ -19,18 +19,22 @@ export class PolicyGridComponent implements OnInit {
     public PolicyComponentType: any = PolicyComponentType;
     public PolicyGridType: any = PolicyGridType;
 
-    public complexityPolicy!: PasswordComplexityPolicy | any;
+    public complexityPolicy!: PasswordComplexityPolicy.AsObject;
 
     constructor(private mgmtService: ManagementService, private adminService: AdminService) { }
 
     public ngOnInit(): void {
         if (this.type == PolicyGridType.ORG) {
-            this.mgmtService.GetDefaultPasswordComplexityPolicy().then((policy) => {
-                this.complexityPolicy = policy;
+            this.mgmtService.getPasswordComplexityPolicy().then((resp) => {
+                if (resp.policy) {
+                    this.complexityPolicy = resp.policy;
+                }
             });
         } else if (this.type == PolicyGridType.IAM) {
             this.adminService.getPasswordComplexityPolicy().then((resp) => {
-                this.complexityPolicy = resp.policy;
+                if (resp.policy) {
+                    this.complexityPolicy = resp.policy;
+                }
             });
         }
     }

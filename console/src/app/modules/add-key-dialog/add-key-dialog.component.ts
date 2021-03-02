@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AuthNKeyType, MachineKeyType } from 'src/app/proto/generated/management_pb';
 
 export enum AddKeyDialogType {
     MACHINE = "MACHINE",

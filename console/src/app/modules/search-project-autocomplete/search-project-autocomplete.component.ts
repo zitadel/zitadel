@@ -5,15 +5,8 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { forkJoin, from, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
-import {
-    ProjectGrantSearchResponse,
-    ProjectGrantView,
-    ProjectSearchKey,
-    ProjectSearchQuery,
-    ProjectSearchResponse,
-    ProjectView,
-    SearchMethod,
-} from 'src/app/proto/generated/management_pb';
+import { ListProjectGrantsResponse, ListProjectsResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { GrantedProject, Project, ProjectQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 
@@ -34,18 +27,18 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
     public separatorKeysCodes: number[] = [ENTER, COMMA];
     public myControl: FormControl = new FormControl();
     public names: string[] = [];
-    public projects: Array<ProjectGrantView.AsObject | ProjectView.AsObject | any> = [];
-    public filteredProjects: Array<ProjectGrantView.AsObject | ProjectView.AsObject | any> = [];
+    public projects: Array<GrantedProject.AsObject | Project.AsObject | any> = [];
+    public filteredProjects: Array<GrantedProject.AsObject | Project.AsObject | any> = [];
     public isLoading: boolean = false;
     @ViewChild('nameInput') public nameInput!: ElementRef<HTMLInputElement>;
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Input() public singleOutput: boolean = false;
     @Input() public autocompleteType!: ProjectAutocompleteType;
     @Output() public selectionChanged: EventEmitter<
-        ProjectGrantView.AsObject[]
-        | ProjectGrantView.AsObject
-        | ProjectView.AsObject
-        | ProjectView.AsObject[]
+        GrantedProject.AsObject[]
+        | GrantedProject.AsObject
+        | Project.AsObject
+        | Project.AsObject[]
     > = new EventEmitter();
 
     private unsubscribed$: Subject<void> = new Subject();
@@ -56,20 +49,20 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
                 debounceTime(200),
                 tap(() => this.isLoading = true),
                 switchMap(value => {
-                    const query = new ProjectSearchQuery();
-                    query.setKey(ProjectSearchKey.PROJECTSEARCHKEY_PROJECT_NAME);
+                    const query = new ProjectQuery();
+                    query.set(ProjectSearchKey.PROJECTSEARCHKEY_PROJECT_NAME);
                     query.setValue(value);
                     query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
 
                     switch (this.autocompleteType) {
                         case ProjectAutocompleteType.PROJECT_GRANTED:
-                            return from(this.mgmtService.SearchGrantedProjects(10, 0, [query]));
+                            return from(this.mgmtService.listGrantedProjects(10, 0, [query]));
                         case ProjectAutocompleteType.PROJECT_OWNED:
-                            return from(this.mgmtService.SearchProjects(10, 0, [query]));
+                            return from(this.mgmtService.listProjects(10, 0, [query]));
                         default:
                             return forkJoin([
-                                from(this.mgmtService.SearchGrantedProjects(10, 0, [query])),
-                                from(this.mgmtService.SearchProjects(10, 0, [query])),
+                                from(this.mgmtService.listGrantedProjects(10, 0, [query])),
+                                from(this.mgmtService.listProjects(10, 0, [query])),
                             ]);
                     }
                 }),
@@ -77,19 +70,19 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
                 switch (this.autocompleteType) {
                     case ProjectAutocompleteType.PROJECT_GRANTED:
                         this.isLoading = false;
-                        this.filteredProjects = [...(returnValue as ProjectGrantSearchResponse).toObject().resultList];
+                        this.filteredProjects = [...(returnValue as ListProjectGrantsResponse.AsObject).resultList];
                         break;
                     case ProjectAutocompleteType.PROJECT_OWNED:
                         this.isLoading = false;
-                        this.filteredProjects = [...(returnValue as ProjectSearchResponse).toObject().resultList];
+                        this.filteredProjects = [...(returnValue as ListProjectsResponse.AsObject).resultList];
                         break;
                     default:
                         this.isLoading = false;
                         this.filteredProjects = [
-                            ...(returnValue as (ProjectSearchResponse | ProjectGrantSearchResponse)[])[0]
-                                .toObject().resultList,
-                            ...(returnValue as (ProjectSearchResponse | ProjectGrantSearchResponse)[])[1]
-                                .toObject().resultList,
+                            ...(returnValue as (ListProjectsResponse.AsObject | ListProjectGrantsResponse.AsObject)[])[0]
+                                .resultList,
+                            ...(returnValue as (ListProjectsResponse.AsObject | ListProjectGrantsResponse.AsObject)[])[1]
+                                .resultList,
                         ];
                         break;
                 }
@@ -133,7 +126,7 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
         }
     }
 
-    public remove(project: ProjectGrantView.AsObject): void {
+    public remove(project: GrantedProject.AsObject): void {
         const index = this.projects.indexOf(project);
 
         if (index >= 0) {

@@ -1,14 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { IDP } from 'src/app/proto/generated/zitadel/idp_pb';
-import {
-    Idp,
-    IdpProviderType,
-    IdpSearchKey,
-    IdpSearchQuery,
-    IdpView as MgmtIdpView,
-    SearchMethod,
-} from 'src/app/proto/generated/zitadel/management_pb';
+import { IDP, IDPOwnerType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDPQuery } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -23,15 +16,15 @@ export class AddIdpDialogComponent {
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
-    public idpType!: IdpProviderType;
-    public idpTypes: IdpProviderType[] = [
-        IdpProviderType.IDPPROVIDERTYPE_SYSTEM,
-        IdpProviderType.IDPPROVIDERTYPE_ORG,
+    public idpType!: IDPOwnerType;
+    public idpTypes: IDPOwnerType[] = [
+        IDPOwnerType.IDP_OWNER_TYPE_SYSTEM,
+        IDPOwnerType.IDP_OWNER_TYPE_ORG,
     ];
 
-    public idp: Idp.AsObject | undefined = undefined;
-    public availableIdps: Array<IDP.AsObject[] | MgmtIdpView.AsObject> | string[] = [];
-    public IdpProviderType: any = IdpProviderType;
+    public idp: IDP.AsObject | undefined = undefined;
+    public availableIdps: Array<IDP.AsObject[] | IDP.AsObject> | string[] = [];
+    public IdpProviderType: any = IDPOwnerType;
 
     constructor(
         private mgmtService: ManagementService,
@@ -43,10 +36,10 @@ export class AddIdpDialogComponent {
             this.serviceType = data.serviceType;
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
-                    this.idpType = IdpProviderType.IDPPROVIDERTYPE_ORG;
+                    this.idpType = IDPOwnerType.IDP_OWNER_TYPE_ORG;
                     break;
                 case PolicyComponentServiceType.ADMIN:
-                    this.idpType = IdpProviderType.IDPPROVIDERTYPE_SYSTEM;
+                    this.idpType = IDPOwnerType.IDP_OWNER_TYPE_SYSTEM;
                     break;
             }
         }
@@ -57,17 +50,17 @@ export class AddIdpDialogComponent {
     public loadIdps(): void {
         this.idp = undefined;
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            const query: IdpSearchQuery = new IdpSearchQuery();
-            query.setKey(IdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
+            const query: IDPQuery = new IDPQuery();
+            query.set(IdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
             query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
             query.setValue(this.idpType.toString());
 
-            this.mgmtService.SearchIdps(undefined, undefined, [query]).then(idps => {
-                this.availableIdps = idps.resultList;
+            this.mgmtService.listOrgIDPs(undefined, undefined, [query]).then(resp => {
+                this.availableIdps = resp.resultList;
             });
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-            this.adminService.listIDPs().then(idps => {
-                this.availableIdps = idps.resultList;
+            this.adminService.listIDPs().then(resp => {
+                this.availableIdps = resp.resultList;
             });
         }
     }

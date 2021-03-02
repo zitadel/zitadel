@@ -1,14 +1,14 @@
-<app-detail-layout *ngIf="project" [backRouterLink]="[ '/projects', project?.projectId]"
+<app-detail-layout *ngIf="project" [backRouterLink]="[ '/projects', (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '']"
     title="{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}"
     description="{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}">
     <app-members-table *ngIf="project" [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
         (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
         (changedSelection)="selection = $event" [refreshTrigger]="changePage"
-        [canWrite]="['project.member.write$', 'project.member.write:'+ project.projectId] | hasRole | async"
-        [canDelete]="['project.member.delete$', 'project.member.delete:'+project.projectId] | hasRole | async"
+        [canWrite]="['project.member.write$', 'project.member.write:'+ (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: ''] | hasRole | async"
+        [canDelete]="['project.member.delete$', 'project.member.delete:'+(projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: ''] | hasRole | async"
         (deleteMember)="removeProjectMember($event)">
         <ng-template appHasRole selectactions
-            [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">
+            [appHasRole]="['project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '', 'project.member.delete']">
             <button (click)="removeProjectMemberSelection()" color="warn"
                 matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="del-button" mat-raised-button>
                 <i class="las la-trash"></i>
@@ -16,7 +16,7 @@
             </button>
         </ng-template>
         <ng-template appHasRole writeactions
-            [appHasRole]="['project.member.write:'+project.projectId,'project.member.write']">
+            [appHasRole]="['project.member.write:'+(projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '','project.member.write']">
             <a color="primary" (click)="openAddMember()" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>

@@ -2,19 +2,22 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { ProjectMember, ProjectMemberSearchResponse, ProjectType } from 'src/app/proto/generated/management_pb';
+import { ListProjectGrantMembersResponse, ListProjectMembersResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
+
+import { ProjectType } from './project-members.component';
 
 /**
  * Data source for the ProjectMembers view. This class should
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject> {
+export class ProjectMembersDataSource extends DataSource<Member.AsObject> {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
 
-    public membersSubject: BehaviorSubject<ProjectMember.AsObject[]> = new BehaviorSubject<ProjectMember.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -29,21 +32,22 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
 
         this.loadingSubject.next(true);
 
-        const promise: Promise<ProjectMemberSearchResponse> | undefined =
+        const promise: Promise<ListProjectMembersResponse.AsObject> | Promise<ListProjectGrantMembersResponse.AsObject> | undefined =
             projectType === ProjectType.PROJECTTYPE_OWNED ?
-                this.mgmtService.SearchProjectMembers(projectId, pageSize, offset) :
+                this.mgmtService.listProjectMembers(projectId, pageSize, offset) :
                 projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?
-                    this.mgmtService.SearchProjectGrantMembers(projectId,
+                    this.mgmtService.listProjectGrantMembers(projectId,
                         grantId, pageSize, offset) : undefined;
         if (promise) {
             from(promise).pipe(
                 map(resp => {
-                    const response = resp.toObject();
-                    this.totalResult = response.totalResult;
-                    if (response.viewTimestamp) {
-                        this.viewTimestamp = response.viewTimestamp;
+                    if (resp.metaData?.totalResult) {
+                        this.totalResult = resp.metaData?.totalResult;
                     }
-                    return response.resultList;
+                    if (resp.metaData?.viewTimestamp) {
+                        this.viewTimestamp = resp.metaData.viewTimestamp;
+                    }
+                    return resp.resultList;
                 }),
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false)),
@@ -59,7 +63,7 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<ProjectMember.AsObject[]> {
+    public connect(): Observable<Member.AsObject[]> {
         return this.membersSubject.asObservable();
     }
 

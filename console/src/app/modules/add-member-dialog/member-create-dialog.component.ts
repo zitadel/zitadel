@@ -1,6 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
+import { GrantedProject, Project, Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -22,7 +24,7 @@ export enum CreationType {
 export class MemberCreateDialogComponent {
     private projectId: string = '';
     private grantId: string = '';
-    public preselectedUsers: Array<UserView.AsObject> = [];
+    public preselectedUsers: Array<User.AsObject> = [];
 
     public creationType!: CreationType;
 
@@ -37,8 +39,8 @@ export class MemberCreateDialogComponent {
         { type: CreationType.PROJECT_OWNED, disabled$: this.authService.isAllowed(['project.member.write']) },
         { type: CreationType.PROJECT_GRANTED, disabled$: this.authService.isAllowed(['project.grant.member.write']) },
     ];
-    public users: Array<UserView.AsObject> = [];
-    public roles: Array<ProjectRole.AsObject> | string[] = [];
+    public users: Array<User.AsObject> = [];
+    public roles: Array<Role.AsObject> | string[] = [];
     public CreationType: any = CreationType;
     public ProjectAutocompleteType: any = ProjectAutocompleteType;
     public memberRoleOptions: string[] = [];
@@ -94,7 +96,7 @@ export class MemberCreateDialogComponent {
         }
     }
 
-    public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
+    public selectProject(project: Project.AsObject | GrantedProject.AsObject | any): void {
         this.projectId = project.projectId;
         if (project.id) {
             this.grantId = project.id;
