@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/user/model"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
@@ -183,4 +184,20 @@ func WebAuthNTokenToWebAuthNKeyPb(token *domain.WebAuthNToken) *user_pb.WebAuthN
 		Id:        string(token.KeyID), //TODO: ask if it's the correct id?
 		PublicKey: token.PublicKey,
 	}
+}
+
+func ExternalIDPViewsToExternalIDPs(externalIDPs []*model.ExternalIDPView) []*domain.ExternalIDP {
+	idps := make([]*domain.ExternalIDP, len(externalIDPs))
+	for i, idp := range externalIDPs {
+		idps[i] = &domain.ExternalIDP{
+			ObjectRoot: models.ObjectRoot{
+				AggregateID:   idp.UserID,
+				ResourceOwner: idp.ResourceOwner,
+			},
+			IDPConfigID:    idp.IDPConfigID,
+			ExternalUserID: idp.ExternalUserID,
+			DisplayName:    idp.UserDisplayName,
+		}
+	}
+	return idps
 }
