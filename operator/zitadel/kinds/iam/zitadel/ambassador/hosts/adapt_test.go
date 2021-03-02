@@ -1,15 +1,15 @@
 package hosts
 
 import (
+	"github.com/caos/orbos/mntr"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/labels/mocklabels"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	apixv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
@@ -76,7 +76,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -111,7 +111,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -146,7 +146,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -181,7 +181,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -248,7 +248,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -283,7 +283,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -318,7 +318,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -353,7 +353,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
