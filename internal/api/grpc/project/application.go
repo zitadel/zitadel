@@ -5,10 +5,19 @@ import (
 
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	app_pb "github.com/caos/zitadel/pkg/grpc/app"
 	message_pb "github.com/caos/zitadel/pkg/grpc/message"
 )
+
+func AppsToPb(apps []*proj_model.ApplicationView) []*app_pb.App {
+	a := make([]*app_pb.App, len(apps))
+	for i, app := range apps {
+		a[i] = AppToPb(app)
+	}
+	return a
+}
 
 func AppToPb(app *proj_model.ApplicationView) *app_pb.App {
 	return &app_pb.App{
@@ -258,5 +267,33 @@ func APIAuthMethodTypeToDomain(authType app_pb.APIAuthMethodType) domain.APIAuth
 		return domain.APIAuthMethodTypePrivateKeyJWT
 	default:
 		return domain.APIAuthMethodTypeBasic
+	}
+}
+
+func AppQueriesToModel(queries []*app_pb.AppQuery) (_ []*proj_model.ApplicationSearchQuery, err error) {
+	q := make([]*proj_model.ApplicationSearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = AppQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func AppQueryToModel(query *app_pb.AppQuery) (*proj_model.ApplicationSearchQuery, error) {
+	switch q := query.Query.(type) {
+	case *app_pb.AppQuery_Name:
+		return AppQueryNameToModel(q.Name), nil
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "APP-Add46", "List.Query.Invalid")
+	}
+}
+
+func AppQueryNameToModel(query *app_pb.AppNameQuery) *proj_model.ApplicationSearchQuery {
+	return &proj_model.ApplicationSearchQuery{
+		Key:    proj_model.AppSearchKeyName,
+		Method: object_grpc.TextMethodToModel(query.Method),
+		Value:  query.Name,
 	}
 }

@@ -64,3 +64,22 @@ func ProjectChangeToPb(change *proj_model.ProjectChange) *change_pb.Change {
 		// ResourceOwnerId: change.,TODO: resource owner not returned
 	}
 }
+
+func AppChangesToPb(changes []*proj_model.ApplicationChange) []*change_pb.Change {
+	c := make([]*change_pb.Change, len(changes))
+	for i, change := range changes {
+		c[i] = AppChangeToPb(change)
+	}
+	return c
+}
+
+func AppChangeToPb(change *proj_model.ApplicationChange) *change_pb.Change {
+	return &change_pb.Change{
+		ChangeDate:        change.ChangeDate,
+		EventType:         message.NewLocalizedEventType(change.EventType),
+		Sequence:          change.Sequence,
+		EditorId:          change.ModifierId,
+		EditorDisplayName: change.ModifierName,
+		// ResourceOwnerId: change.,TODO: resource owner not returned
+	}
+}
