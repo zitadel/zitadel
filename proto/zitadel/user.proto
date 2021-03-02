@@ -349,7 +349,7 @@ message UserGrantProjectNameQuery {
 
 //TODO: needed as you can search first and last name?
 message UserGrantDisplayNameQuery {
-    string first_name = 1;
+    string display_name = 1;
     zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 

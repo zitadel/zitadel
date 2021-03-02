@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/user/model"
+	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 
@@ -108,6 +109,17 @@ func ModelUserStateToPb(state model.UserState) user_pb.UserState {
 		return user_pb.UserState_USER_STATE_SUSPEND
 	default:
 		return user_pb.UserState_USER_STATE_UNSPECIFIED
+	}
+}
+
+func ModelUserGrantStateToPb(state usr_grant_model.UserGrantState) user_pb.UserGrantState {
+	switch state {
+	case usr_grant_model.UserGrantStateActive:
+		return user_pb.UserGrantState_USER_GRANT_STATE_ACTIVE
+	case usr_grant_model.UserGrantStateInactive:
+		return user_pb.UserGrantState_USER_GRANT_STATE_INACTIVE
+	default:
+		return user_pb.UserGrantState_USER_GRANT_STATE_UNSPECIFIED
 	}
 }
 
