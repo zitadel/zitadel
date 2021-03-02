@@ -13,7 +13,6 @@ func ModelPasswordLockoutPolicyToPb(policy *model.PasswordLockoutPolicyView) *po
 		ShowLockoutFailure: policy.ShowLockOutFailures,
 		Details: object.ToDetailsPb(
 			policy.Sequence,
-			policy.CreationDate,
 			policy.ChangeDate,
 			"policy.ResourceOwner", //TODO: uuueli
 		),
@@ -26,7 +25,6 @@ func PasswordLockoutPolicyToDomain(policy *domain.PasswordLockoutPolicy) *policy
 		ShowLockoutFailure: policy.ShowLockOutFailures,
 		Details: object.ToDetailsPb(
 			policy.Sequence,
-			policy.CreationDate,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),

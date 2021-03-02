@@ -3,13 +3,15 @@ package management
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
+	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
+	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -49,7 +51,6 @@ func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_
 		Id: org.AggregateID,
 		Details: object.ToDetailsPb(
 			org.Sequence,
-			org.CreationDate,
 			org.ChangeDate,
 			org.ResourceOwner,
 		),
@@ -77,43 +78,171 @@ func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRe
 }
 
 func (s *Server) GetOrgIAMPolicy(ctx context.Context, req *mgmt_pb.GetOrgIAMPolicyRequest) (*mgmt_pb.GetOrgIAMPolicyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetOrgIAMPolicy not implemented")
+	policy, err := s.org.GetMyOrgIamPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetOrgIAMPolicyResponse{
+		Policy: policy_grpc.OrgIAMPolicyToPb(policy),
+	}, nil
 }
 
-//func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomainsRequest) (*mgmt_pb.ListOrgDomainsResponse, error) {
-//	domains, err := s.org.SearchMyOrgDomains(ctx, ListOrgDomainsRequestToModel(req))
-//	if err != nil {
-//		return nil, err
-//	}
-//	return orgDomainSearchResponseFromModel(domains), nil
-//}
+func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomainsRequest) (*mgmt_pb.ListOrgDomainsResponse, error) {
+	queries, err := ListOrgDomainsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	domains, err := s.org.SearchMyOrgDomains(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListOrgDomainsResponse{
+		Result: org_grpc.DomainsToPb(domains.Result),
+		MetaData: object.ToListDetails(
+			domains.TotalResult,
+			domains.Sequence,
+			domains.Timestamp,
+		),
+	}, nil
+}
+
 func (s *Server) AddOrgDomain(ctx context.Context, req *mgmt_pb.AddOrgDomainRequest) (*mgmt_pb.AddOrgDomainResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddOrgDomain not implemented")
+	domain, err := s.command.AddOrgDomain(ctx, AddOrgDomainRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddOrgDomainResponse{
+		Details: object.ToDetailsPb(
+			domain.Sequence,
+			domain.ChangeDate,
+			domain.ResourceOwner,
+		),
+	}, nil
 }
+
 func (s *Server) RemoveOrgDomain(ctx context.Context, req *mgmt_pb.RemoveOrgDomainRequest) (*mgmt_pb.RemoveOrgDomainResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoveOrgDomain not implemented")
+	err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveOrgDomainResponse{
+		//TODO: details
+	}, err
 }
+
 func (s *Server) GenerateOrgDomainValidation(ctx context.Context, req *mgmt_pb.GenerateOrgDomainValidationRequest) (*mgmt_pb.GenerateOrgDomainValidationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateOrgDomainValidation not implemented")
+	token, url, err := s.command.GenerateOrgDomainValidation(ctx, GenerateOrgDomainValidationRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GenerateOrgDomainValidationResponse{
+		Token: token,
+		Url:   url,
+		//TODO: remove details from proto
+	}, nil
 }
+
+func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *mgmt_pb.GenerateOrgDomainValidationRequest) *domain.OrgDomain {
+	return &domain.OrgDomain{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: authz.GetCtxData(ctx).OrgID,
+		},
+		Domain:         req.Domain,
+		ValidationType: org_grpc.DomainValidationTypeToDomain(req.Type),
+	}
+}
+
 func (s *Server) ValidateOrgDomain(ctx context.Context, req *mgmt_pb.ValidateOrgDomainRequest) (*mgmt_pb.ValidateOrgDomainResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ValidateOrgDomain not implemented")
+	err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ValidateOrgDomainResponse{
+		//TODO: details
+	}, nil
 }
+
 func (s *Server) SetPrimaryOrgDomain(ctx context.Context, req *mgmt_pb.SetPrimaryOrgDomainRequest) (*mgmt_pb.SetPrimaryOrgDomainResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetPrimaryOrgDomain not implemented")
+	err := s.command.SetPrimaryOrgDomain(ctx, SetPrimaryOrgDomainRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetPrimaryOrgDomainResponse{
+		//TODO: details
+	}, nil
 }
+
 func (s *Server) ListOrgMemberRoles(ctx context.Context, req *mgmt_pb.ListOrgMemberRolesRequest) (*mgmt_pb.ListOrgMemberRolesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListOrgMemberRoles not implemented")
+	roles := s.org.GetOrgMemberRoles()
+	return &mgmt_pb.ListOrgMemberRolesResponse{
+		Result: roles,
+	}, nil
 }
+
 func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*mgmt_pb.ListOrgMembersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListOrgMembers not implemented")
+	queries, err := ListOrgMembersRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	members, err := s.org.SearchMyOrgMembers(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListOrgMembersResponse{
+		Result: member_grpc.OrgMembersToPb(members.Result),
+		MetaData: object.ToListDetails(
+			members.TotalResult,
+			members.Sequence,
+			members.Timestamp,
+		),
+	}, nil
 }
+
+func ListOrgMembersRequestToModel(req *mgmt_pb.ListOrgMembersRequest) (*org_model.OrgMemberSearchRequest, error) {
+	queries := member_grpc.MemberQueriesToOrgMember(req.Queries)
+	return &org_model.OrgMemberSearchRequest{
+		Offset: req.MetaData.Offset,
+		Limit:  uint64(req.MetaData.Limit),
+		Asc:    req.MetaData.Asc,
+		//SortingColumn: //TODO: sorting
+		Queries: queries,
+	}, nil
+}
+
 func (s *Server) AddOrgMember(ctx context.Context, req *mgmt_pb.AddOrgMemberRequest) (*mgmt_pb.AddOrgMemberResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddOrgMember not implemented")
+	addedMember, err := s.command.AddOrgMember(ctx, AddOrgMemberRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddOrgMemberResponse{
+		Details: object.ToDetailsPb(
+			addedMember.Sequence,
+			addedMember.ChangeDate,
+			addedMember.ResourceOwner,
+		),
+	}, nil
 }
+
 func (s *Server) UpdateOrgMember(ctx context.Context, req *mgmt_pb.UpdateOrgMemberRequest) (*mgmt_pb.UpdateOrgMemberResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateOrgMember not implemented")
+	changedMember, err := s.command.ChangeOrgMember(ctx, UpdateOrgMemberRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateOrgMemberResponse{
+		Details: object.ToDetailsPb(
+			changedMember.Sequence,
+			changedMember.ChangeDate,
+			changedMember.ResourceOwner,
+		),
+	}, nil
 }
+
 func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemberRequest) (*mgmt_pb.RemoveOrgMemberResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoveOrgMember not implemented")
+	err := s.command.RemoveOrgMember(ctx, authz.GetCtxData(ctx).OrgID, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveOrgMemberResponse{
+		//TODO: details
+	}, nil
 }

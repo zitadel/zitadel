@@ -22,3 +22,5 @@ func (a *App) Localizers() []middleware.Localizer {
 	}
 	return nil
 }
+
+type AppConfig = isApp_Config

@@ -12,7 +12,6 @@ func ModelLabelPolicyToPb(policy *model.LabelPolicyView) *policy_pb.LabelPolicy 
 		SecondaryColor: policy.SecondaryColor,
 		Details: object.ToDetailsPb(
 			policy.Sequence,
-			policy.CreationDate,
 			policy.ChangeDate,
 			"policy.ResourceOwner", //TODO: für da haui öppert
 		),

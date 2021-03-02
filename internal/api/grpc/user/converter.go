@@ -23,7 +23,6 @@ func UserToPb(user *model.UserView) *user_pb.User {
 		PreferredLoginName: user.PreferredLoginName,
 		Details: object.ToDetailsPb(
 			user.Sequence,
-			user.CreationDate,
 			user.ChangeDate,
 			user.ResourceOwner,
 		),

@@ -15,7 +15,6 @@ func ModelPasswordComplexityPolicyToPb(policy *model.PasswordComplexityPolicyVie
 		HasSymbol:    policy.HasSymbol,
 		Details: object.ToDetailsPb(
 			policy.Sequence,
-			policy.CreationDate,
 			policy.ChangeDate,
 			"policy.ResourceOwner", //TODO: ro
 		),

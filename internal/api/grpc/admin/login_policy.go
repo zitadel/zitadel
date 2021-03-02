@@ -28,7 +28,6 @@ func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginP
 	return &admin_pb.UpdateLoginPolicyResponse{
 		Details: object.ToDetailsPb(
 			policy.Sequence,
-			policy.CreationDate,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
@@ -54,8 +53,8 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *admin_pb.AddIDPTo
 	return &admin_pb.AddIDPToLoginPolicyResponse{
 		Details: object.ToDetailsPb(
 			idp.Sequence,
-			idp.CreationDate,
-			idp.ChangeDate, idp.ResourceOwner,
+			idp.ChangeDate,
+			idp.ResourceOwner,
 		),
 	}, nil
 }

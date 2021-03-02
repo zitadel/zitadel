@@ -35,7 +35,6 @@ func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberReq
 	return &admin_pb.AddIAMMemberResponse{
 		Details: object.ToDetailsPb(
 			member.Sequence,
-			member.CreationDate,
 			member.ChangeDate,
 			member.ResourceOwner,
 		),
@@ -50,7 +49,6 @@ func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMem
 	return &admin_pb.UpdateIAMMemberResponse{
 		Details: object.ToDetailsPb(
 			member.Sequence,
-			member.CreationDate,
 			member.ChangeDate,
 			member.ResourceOwner,
 		),

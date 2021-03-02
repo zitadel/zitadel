@@ -53,7 +53,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	}, nil
 }
 
-func (s *Server) ListMyUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
+func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
 	res, err := s.user.UserChanges(ctx, req.UserId, req.Query.Offset, uint64(req.Query.Limit), req.Query.Asc)
 	if err != nil {
 		return nil, err
@@ -82,7 +82,6 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 		UserId: human.AggregateID,
 		Details: obj_grpc.ToDetailsPb(
 			human.Sequence,
-			human.CreationDate,
 			human.ChangeDate,
 			human.ResourceOwner,
 		),
@@ -98,7 +97,6 @@ func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUser
 		UserId: machine.AggregateID,
 		Details: obj_grpc.ToDetailsPb(
 			machine.Sequence,
-			machine.CreationDate,
 			machine.ChangeDate,
 			machine.ResourceOwner,
 		),
@@ -186,7 +184,6 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 		Profile: user_grpc.ProfileToPb(profile),
 		Details: obj_grpc.ToDetailsPb(
 			profile.Sequence,
-			profile.CreationDate,
 			profile.ChangeDate,
 			profile.ResourceOwner,
 		),
@@ -201,7 +198,6 @@ func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHuma
 	return &mgmt_pb.UpdateHumanProfileResponse{
 		Details: obj_grpc.ToDetailsPb(
 			profile.Sequence,
-			profile.CreationDate,
 			profile.ChangeDate,
 			profile.ResourceOwner,
 		),
@@ -217,7 +213,6 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 		Email: user_grpc.EmailToPb(email),
 		Details: obj_grpc.ToDetailsPb(
 			email.Sequence,
-			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
@@ -232,7 +227,6 @@ func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanE
 	return &mgmt_pb.UpdateHumanEmailResponse{
 		Details: obj_grpc.ToDetailsPb(
 			email.Sequence,
-			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
@@ -253,11 +247,13 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 
 func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.ResendHumanEmailVerificationRequest) (*mgmt_pb.ResendHumanEmailVerificationResponse, error) {
 	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanEmailVerificationResponse{
 		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -270,7 +266,6 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 		Phone: user_grpc.PhoneToPb(phone),
 		Details: obj_grpc.ToDetailsPb(
 			phone.Sequence,
-			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),
@@ -285,7 +280,6 @@ func (s *Server) UpdateHumanPhone(ctx context.Context, req *mgmt_pb.UpdateHumanP
 	return &mgmt_pb.UpdateHumanPhoneResponse{
 		Details: obj_grpc.ToDetailsPb(
 			phone.Sequence,
-			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),
@@ -390,7 +384,6 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 	return &mgmt_pb.UpdateMachineResponse{
 		Details: obj_grpc.ToDetailsPb(
 			machine.Sequence,
-			machine.CreationDate,
 			machine.ChangeDate,
 			machine.ResourceOwner,
 		),
@@ -432,7 +425,6 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 		KeyDetails: authn.KeyDetailsToPb(key),
 		Details: object.ToDetailsPb(
 			key.Sequence,
-			key.CreationDate,
 			key.ChangeDate,
 			key.ResourceOwner,
 		),

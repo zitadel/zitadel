@@ -12,7 +12,6 @@ func ModelPasswordAgePolicyToPb(policy *model.PasswordAgePolicyView) *policy_pb.
 		ExpireWarnDays: policy.ExpireWarnDays,
 		Details: object.ToDetailsPb(
 			policy.Sequence,
-			policy.CreationDate,
 			policy.ChangeDate,
 			"policy.ResourceOwner", //TODO: uueli
 		),
