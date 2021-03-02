@@ -53,7 +53,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	}, nil
 }
 
-func (s *Server) ListMyUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
+func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
 	res, err := s.user.UserChanges(ctx, req.UserId, req.Query.Offset, uint64(req.Query.Limit), req.Query.Asc)
 	if err != nil {
 		return nil, err
