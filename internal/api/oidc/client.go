@@ -69,7 +69,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 		return nil, err
 	}
 	if key.AuthIdentifier != issuer {
-		logging.LogWithFields("OIDC-4m9fs", "keyid", keyID, "issuer", issuer).WithError(err).Error("authidentifier doesnt match issuer")
+		logging.LogWithFields("OIDC-4m9fs", "keyid", keyID, "issuer", issuer, "auth_identifier", key.AuthIdentifier).WithError(err).Error("authidentifier doesnt match issuer")
 		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
 	}
 	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)
