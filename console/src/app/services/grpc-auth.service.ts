@@ -208,7 +208,7 @@ export class GrpcAuthService {
     }
 
     public getMyProfile(): Promise<GetMyProfileResponse.AsObject> {
-        return this.grpcService.auth.getMyProfile(new GetMyProfileRequest(), null).then(resp => resp.toObject());;
+        return this.grpcService.auth.getMyProfile(new GetMyProfileRequest(), null).then(resp => resp.toObject());
     }
 
     public getMyPasswordComplexityPolicy(): Promise<GetMyPasswordComplexityPolicyResponse.AsObject> {
@@ -226,7 +226,7 @@ export class GrpcAuthService {
     public listMyMultiFactors(): Promise<ListMyMultiFactorsResponse.AsObject> {
         return this.grpcService.auth.listMyMultiFactors(
             new ListMyMultiFactorsRequest(), null
-        ).then(resp => resp.toObject());;
+        ).then(resp => resp.toObject());
     }
 
     public listMyProjectOrgs(
@@ -246,7 +246,7 @@ export class GrpcAuthService {
             req.setQueriesList(queryList);
         }
 
-        return this.grpcService.auth.listMyProjectOrgs(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.listMyProjectOrgs(req, null).then(resp => resp.toObject());
     }
 
     public updateMyProfile(
@@ -272,7 +272,7 @@ export class GrpcAuthService {
         if (preferredLanguage) {
             req.setPreferredLanguage(preferredLanguage);
         }
-        return this.grpcService.auth.updateMyProfile(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.updateMyProfile(req, null).then(resp => resp.toObject());
     }
 
     public get zitadelPermissionsChanged(): Observable<string[]> {
@@ -294,7 +294,7 @@ export class GrpcAuthService {
             query.setOffset(offset);
         }
         req.setQuery(query);
-        return this.grpcService.auth.listMyUserGrants(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.listMyUserGrants(req, null).then(resp => resp.toObject());
     }
 
     public getMyEmail(): Promise<GetMyEmailResponse.AsObject> {
@@ -305,48 +305,48 @@ export class GrpcAuthService {
     public setMyEmail(email: string): Promise<SetMyEmailResponse.AsObject> {
         const req = new SetMyEmailRequest();
         req.setEmail(email);
-        return this.grpcService.auth.setMyEmail(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.setMyEmail(req, null).then(resp => resp.toObject());
     }
 
     public resendMyEmailVerification(): Promise<ResendMyEmailVerificationResponse.AsObject> {
         const req = new ResendMyEmailVerificationRequest();
-        return this.grpcService.auth.resendMyEmailVerification(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.resendMyEmailVerification(req, null).then(resp => resp.toObject());
     }
 
     public removeMyPhone(): Promise<RemoveMyPhoneResponse.AsObject> {
         return this.grpcService.auth.removeMyPhone(
             new RemoveMyPhoneRequest(), null
-        ).then(resp => resp.toObject());;
+        ).then(resp => resp.toObject());
     }
 
     public listMyZitadelPermissions(): Promise<ListMyZitadelPermissionsResponse.AsObject> {
         return this.grpcService.auth.listMyZitadelPermissions(
             new ListMyZitadelPermissionsRequest(), null
-        ).then(resp => resp.toObject());;
+        ).then(resp => resp.toObject());
     }
 
     public getMyPhone(): Promise<GetMyPhoneResponse.AsObject> {
         return this.grpcService.auth.getMyPhone(
             new GetMyPhoneRequest(), null
-        ).then(resp => resp.toObject());;
+        ).then(resp => resp.toObject());
     }
 
     public setMyPhone(phone: string): Promise<SetMyPhoneResponse.AsObject> {
         const req = new SetMyPhoneRequest();
         req.setPhone(phone);
-        return this.grpcService.auth.setMyPhone(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.setMyPhone(req, null).then(resp => resp.toObject());
     }
 
     public resendMyPhoneVerification(): Promise<ResendMyPhoneVerificationResponse.AsObject> {
         const req = new ResendMyPhoneVerificationRequest();
-        return this.grpcService.auth.resendMyPhoneVerification(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.resendMyPhoneVerification(req, null).then(resp => resp.toObject());
     }
 
     public updateMyPassword(oldPassword: string, newPassword: string): Promise<UpdateMyPasswordResponse.AsObject> {
         const req = new UpdateMyPasswordRequest();
         req.setOldPassword(oldPassword);
         req.setNewPassword(newPassword);
-        return this.grpcService.auth.updateMyPassword(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.updateMyPassword(req, null).then(resp => resp.toObject());
     }
 
     public removeMyLinkedIDP(
@@ -356,7 +356,7 @@ export class GrpcAuthService {
         const req = new RemoveMyLinkedIDPRequest();
         req.setLinkedUserId(externalUserId);
         req.setIdpId(idpId);
-        return this.grpcService.auth.removeMyLinkedIDP(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.removeMyLinkedIDP(req, null).then(resp => resp.toObject());
     }
 
     public listMyLinkedIDPs(
@@ -372,25 +372,25 @@ export class GrpcAuthService {
             metadata.setOffset(offset);
         }
         req.setMetaData(metadata);
-        return this.grpcService.auth.listMyLinkedIDPs(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.listMyLinkedIDPs(req, null).then(resp => resp.toObject());
     }
 
     public addMyMultiFactorOTP(): Promise<AddMyMultiFactorOTPResponse.AsObject> {
         return this.grpcService.auth.addMyMultiFactorOTP(
             new AddMyMultiFactorOTPRequest(), null
-        ).then(resp => resp.toObject());;
+        ).then(resp => resp.toObject());
     }
 
     public addMyMultiFactorU2F(): Promise<AddMyMultiFactorU2FResponse.AsObject> {
         return this.grpcService.auth.addMyMultiFactorU2F(
             new AddMyMultiFactorU2FRequest(), null
-        ).then(resp => resp.toObject());;
+        ).then(resp => resp.toObject());
     }
 
     public removeMyMultiFactorU2F(tokenId: string): Promise<RemoveMyMultiFactorU2FResponse.AsObject> {
         const req = new RemoveMyMultiFactorU2FRequest();
         req.setTokenId(tokenId);
-        return this.grpcService.auth.removeMyMultiFactorU2F(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.removeMyMultiFactorU2F(req, null).then(resp => resp.toObject());
     }
 
     public verifyMyMultiFactorU2F(credential: string, tokenname: string): Promise<VerifyMyMultiFactorU2FResponse.AsObject> {
@@ -400,7 +400,7 @@ export class GrpcAuthService {
         verification.setTokenName(tokenname);
         req.setVerification(verification);
 
-        return this.grpcService.auth.verifyMyMultiFactorU2F(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.verifyMyMultiFactorU2F(req, null).then(resp => resp.toObject());
     }
 
     public listMyPasswordless(): Promise<ListMyPasswordlessResponse.AsObject> {
@@ -418,7 +418,7 @@ export class GrpcAuthService {
     public removeMyPasswordless(tokenId: string): Promise<RemoveMyPasswordlessResponse.AsObject> {
         const req = new RemoveMyPasswordlessRequest();
         req.setTokenId(tokenId);
-        return this.grpcService.auth.removeMyPasswordless(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.removeMyPasswordless(req, null).then(resp => resp.toObject());
     }
 
     public verifyMyPasswordless(credential: string, tokenname: string): Promise<VerifyMyPasswordlessResponse.AsObject> {
@@ -448,7 +448,7 @@ export class GrpcAuthService {
     public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse.AsObject> {
         const req = new VerifyMyPhoneRequest();
         req.setCode(code);
-        return this.grpcService.auth.verifyMyPhone(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.verifyMyPhone(req, null).then(resp => resp.toObject());
     }
 
     public listMyUserChanges(limit: number, offset: number): Promise<ListMyUserChangesResponse.AsObject> {
@@ -461,6 +461,6 @@ export class GrpcAuthService {
             query.setOffset(offset);
         }
         req.setQuery(query);
-        return this.grpcService.auth.listMyUserChanges(req, null).then(resp => resp.toObject());;
+        return this.grpcService.auth.listMyUserChanges(req, null).then(resp => resp.toObject());
     }
 }

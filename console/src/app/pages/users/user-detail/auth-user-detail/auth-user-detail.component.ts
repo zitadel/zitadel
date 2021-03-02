@@ -4,15 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
-import {
-    Gender,
-    UserAddress,
-    UserEmail,
-    UserPhone,
-    UserProfile,
-    UserState,
-    UserView,
-} from 'src/app/proto/generated/auth_pb';
+import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -25,8 +17,7 @@ import { EditDialogComponent } from './edit-dialog/edit-dialog.component';
     styleUrls: ['./auth-user-detail.component.scss'],
 })
 export class AuthUserDetailComponent implements OnDestroy {
-    public user!: UserView.AsObject;
-    public address: UserAddress.AsObject = { id: '' } as any;
+    public user!: User.AsObject;
     public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
 
@@ -55,8 +46,10 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     refreshUser(): void {
         this.refreshChanges$.emit();
-        this.userService.GetMyUser().then(user => {
-            this.user = user.toObject();
+        this.userService.getMyUser().then(resp => {
+            if (resp.user) {
+                this.user = resp.user;
+            }
             this.loading = false;
         }).catch(error => {
             this.toast.showError(error);
@@ -68,26 +61,20 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.subscription.unsubscribe();
     }
 
-    public saveProfile(profileData: UserProfile.AsObject): void {
+    public saveProfile(profileData: Profile.AsObject): void {
         if (this.user.human) {
-            this.user.human.firstName = profileData.firstName;
-            this.user.human.lastName = profileData.lastName;
-            this.user.human.nickName = profileData.nickName;
-            this.user.human.displayName = profileData.displayName;
-            this.user.human.gender = profileData.gender;
-            this.user.human.preferredLanguage = profileData.preferredLanguage;
+            this.user.human.profile = profileData;
 
             this.userService
-                .SaveMyUserProfile(
-                    this.user.human.firstName,
-                    this.user.human.lastName,
-                    this.user.human.nickName,
-                    this.user.human.preferredLanguage,
-                    this.user.human.gender,
+                .updateMyProfile(
+                    this.user.human.profile?.firstName,
+                    this.user.human.profile?.lastName,
+                    this.user.human.profile?.nickName,
+                    this.user.human.profile?.preferredLanguage,
+                    this.user.human.profile?.gender,
                 )
-                .then((data: UserProfile) => {
+                .then(() => {
                     this.toast.showInfo('USER.TOAST.SAVED', true);
-                    this.user = Object.assign(this.user, data.toObject());
                     this.refreshChanges$.emit();
                 })
                 .catch(error => {
@@ -98,10 +85,12 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public saveEmail(email: string): void {
         this.userService
-            .SaveMyUserEmail(email).then((data: UserEmail) => {
+            .setMyPhone(email).then(() => {
                 this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
                 if (this.user.human) {
-                    this.user.human.email = data.toObject().email;
+                    const mailToSet = new Email();
+                    mailToSet.setEmail(email);
+                    this.user.human.email = mailToSet.toObject();
                     this.refreshUser();
                 }
             }).catch(error => {
@@ -110,7 +99,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public enteredPhoneCode(code: string): void {
-        this.userService.VerifyMyUserPhone(code).then(() => {
+        this.userService.verifyMyPhone(code).then(() => {
             this.toast.showInfo('USER.TOAST.PHONESAVED', true);
             this.refreshUser();
         }).catch(error => {
@@ -123,7 +112,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public resendPhoneVerification(): void {
-        this.userService.ResendPhoneVerification().then(() => {
+        this.userService.resendMyPhoneVerification().then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
             this.refreshChanges$.emit();
         }).catch(error => {
@@ -132,7 +121,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public resendEmailVerification(): void {
-        this.userService.ResendMyEmailVerificationMail().then(() => {
+        this.userService.resendMyEmailVerification().then(() => {
             this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
             this.refreshChanges$.emit();
         }).catch(error => {
@@ -141,10 +130,11 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public deletePhone(): void {
-        this.userService.RemoveMyUserPhone().then(() => {
+        this.userService.removeMyPhone().then(() => {
             this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-            if (this.user.human) {
-                this.user.human.phone = '';
+            if (this.user.human?.phone) {
+                const phone = new Phone();
+                this.user.human.phone = phone.toObject();
                 this.refreshUser();
             }
         }).catch(error => {
@@ -155,10 +145,12 @@ export class AuthUserDetailComponent implements OnDestroy {
     public savePhone(phone: string): void {
         if (this.user.human) {
             this.userService
-                .SaveMyUserPhone(phone).then((data: UserPhone) => {
+                .setMyPhone(phone).then(() => {
                     this.toast.showInfo('USER.TOAST.PHONESAVED', true);
                     if (this.user.human) {
-                        this.user.human.phone = data.toObject().phone;
+                        const phoneToSet = new Phone();
+                        phoneToSet.setPhone(phone);
+                        this.user.human.phone = phoneToSet.toObject();
                         this.refreshUser();
                     }
                 }).catch(error => {

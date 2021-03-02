@@ -2,13 +2,9 @@ import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/cor
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import {
-    CreateHumanRequest,
-    CreateUserRequest,
-    Gender,
-    OrgDomain,
-    UserResponse,
-} from 'src/app/proto/generated/management_pb';
+import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
+import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -36,7 +32,7 @@ function noEmailValidator(c: AbstractControl): any {
     styleUrls: ['./user-create.component.scss'],
 })
 export class UserCreateComponent implements OnDestroy {
-    public user: CreateUserRequest.AsObject = new CreateUserRequest().toObject();
+    public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
     public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
     public languages: string[] = ['de', 'en'];
     public userForm!: FormGroup;
@@ -47,7 +43,7 @@ export class UserCreateComponent implements OnDestroy {
     public loading: boolean = false;
 
     @ViewChild('suffix') public suffix!: any;
-    private primaryDomain!: OrgDomain.AsObject;
+    private primaryDomain!: Domain.AsObject;
 
     constructor(
         private router: Router,
@@ -58,8 +54,10 @@ export class UserCreateComponent implements OnDestroy {
     ) {
         this.loading = true;
         this.loadOrg();
-        this.mgmtService.GetMyOrgIamPolicy().then((iampolicy) => {
-            this.userLoginMustBeDomain = iampolicy.toObject().userLoginMustBeDomain;
+        this.mgmtService.getOrgIAMPolicy().then((resp) => {
+            if (resp.policy?.userLoginMustBeDomain) {
+                this.userLoginMustBeDomain = resp.policy.userLoginMustBeDomain;
+            }
             this.initForm();
             this.loading = false;
             this.envSuffixLabel = this.envSuffix();
@@ -74,8 +72,8 @@ export class UserCreateComponent implements OnDestroy {
     }
 
     private async loadOrg(): Promise<void> {
-        const domains = (await this.mgmtService.SearchMyOrgDomains().then(doms => doms.toObject()));
-        const found = domains.resultList.find(domain => domain.primary);
+        const domains = (await this.mgmtService.listOrgDomains());
+        const found = domains.resultList.find(resp => resp.isPrimary);
         if (found) {
             this.primaryDomain = found;
         }
@@ -110,22 +108,26 @@ export class UserCreateComponent implements OnDestroy {
 
         this.loading = true;
 
-        const humanReq = new CreateHumanRequest();
-        humanReq.setFirstName(this.firstName?.value);
-        humanReq.setLastName(this.lastName?.value);
-        humanReq.setNickName(this.nickName?.value);
-        humanReq.setPreferredLanguage(this.preferredLanguage?.value);
+        const profileReq = new AddHumanUserRequest.Profile();
+        profileReq.setFirstName(this.firstName?.value);
+        profileReq.setLastName(this.lastName?.value);
+        profileReq.setNickName(this.nickName?.value);
+        profileReq.setPreferredLanguage(this.preferredLanguage?.value);
+        profileReq.setGender(this.gender?.value);
+
+        const humanReq = new AddHumanUserRequest();
+        humanReq.setUserName(this.userName?.value);
+        humanReq.setProfile(profileReq);
+
         humanReq.setEmail(this.email?.value);
         humanReq.setPhone(this.phone?.value);
-        humanReq.setGender(this.gender?.value);
-        humanReq.setCountry(this.country?.value);
 
         this.mgmtService
-            .CreateUserHuman(this.userName?.value, humanReq)
-            .then((data: UserResponse) => {
+            .addHumanUser(humanReq)
+            .then((data) => {
                 this.loading = false;
                 this.toast.showInfo('USER.TOAST.CREATED', true);
-                this.router.navigate(['users', data.getId()]);
+                this.router.navigate(['users', data.userId]);
             })
             .catch(error => {
                 this.loading = false;
@@ -161,25 +163,10 @@ export class UserCreateComponent implements OnDestroy {
     public get phone(): AbstractControl | null {
         return this.userForm.get('phone');
     }
-    public get streetAddress(): AbstractControl | null {
-        return this.userForm.get('streetAddress');
-    }
-    public get postalCode(): AbstractControl | null {
-        return this.userForm.get('postalCode');
-    }
-    public get locality(): AbstractControl | null {
-        return this.userForm.get('locality');
-    }
-    public get region(): AbstractControl | null {
-        return this.userForm.get('region');
-    }
-    public get country(): AbstractControl | null {
-        return this.userForm.get('country');
-    }
 
     private envSuffix(): string {
-        if (this.userLoginMustBeDomain && this.primaryDomain?.domain) {
-            return `@${this.primaryDomain.domain}`;
+        if (this.userLoginMustBeDomain && this.primaryDomain?.domainName) {
+            return `@${this.primaryDomain.domainName}`;
         } else {
             return '';
         }
