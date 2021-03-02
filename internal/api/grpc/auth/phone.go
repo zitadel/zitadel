@@ -42,31 +42,35 @@ func (s *Server) SetMyPhone(ctx context.Context, req *auth_pb.SetMyPhoneRequest)
 
 func (s *Server) VerifyMyPhone(ctx context.Context, req *auth_pb.VerifyMyPhoneRequest) (*auth_pb.VerifyMyPhoneResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.OrgID)
+	_, err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
 
 	//TODO: response from business
-	return &auth_pb.VerifyMyPhoneResponse{}, nil
+	return &auth_pb.VerifyMyPhoneResponse{
+		//Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func (s *Server) ResendMyPhoneVerification(ctx context.Context, _ *auth_pb.ResendMyPhoneVerificationRequest) (*auth_pb.ResendMyPhoneVerificationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.CreateHumanPhoneVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.ResendMyPhoneVerificationResponse{}, nil
+	return &auth_pb.ResendMyPhoneVerificationResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func (s *Server) RemoveMyPhone(ctx context.Context, _ *auth_pb.RemoveMyPhoneRequest) (*auth_pb.RemoveMyPhoneResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.RemoveHumanPhone(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	objectDetails, err := s.command.RemoveHumanPhone(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: response from business
-	return &auth_pb.RemoveMyPhoneResponse{}, nil
+	return &auth_pb.RemoveMyPhoneResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }

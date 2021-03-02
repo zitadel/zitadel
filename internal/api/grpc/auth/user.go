@@ -44,12 +44,13 @@ func (s *Server) ListMyUserSessions(ctx context.Context, req *auth_pb.ListMyUser
 
 func (s *Server) UpdateMyUserName(ctx context.Context, req *auth_pb.UpdateMyUserNameRequest) (*auth_pb.UpdateMyUserNameResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.ChangeUsername(ctx, ctxData.ResourceOwner, ctxData.UserID, req.UserName)
+	objectDetails, err := s.command.ChangeUsername(ctx, ctxData.ResourceOwner, ctxData.UserID, req.UserName)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: return values
-	return &auth_pb.UpdateMyUserNameResponse{}, nil
+	return &auth_pb.UpdateMyUserNameResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func ctxToObjectRoot(ctx context.Context) models.ObjectRoot {

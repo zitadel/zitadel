@@ -106,42 +106,42 @@ func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUser
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, req *mgmt_pb.DeactivateUserRequest) (*mgmt_pb.DeactivateUserResponse, error) {
-	err := s.command.DeactivateUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.DeactivateUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateUserResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) ReactivateUser(ctx context.Context, req *mgmt_pb.ReactivateUserRequest) (*mgmt_pb.ReactivateUserResponse, error) {
-	err := s.command.ReactivateUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.ReactivateUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateUserResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) LockUser(ctx context.Context, req *mgmt_pb.LockUserRequest) (*mgmt_pb.LockUserResponse, error) {
-	err := s.command.LockUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.LockUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.LockUserResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest) (*mgmt_pb.UnlockUserResponse, error) {
-	err := s.command.UnlockUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.UnlockUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UnlockUserResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -150,12 +150,12 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	err = s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants)...)
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants)...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveUserResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -168,12 +168,12 @@ func userGrantsToIDs(userGrants []*grant_model.UserGrantView) []string {
 }
 
 func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserNameRequest) (*mgmt_pb.UpdateUserNameResponse, error) {
-	err := s.command.ChangeUsername(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.UserName)
+	objectDetails, err := s.command.ChangeUsername(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.UserName)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateUserNameResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -241,22 +241,23 @@ func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanE
 
 func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.ResendHumanInitializationRequest) (*mgmt_pb.ResendHumanInitializationResponse, error) {
 	//TODO: why do we need the email again?
-	err := s.command.ResendInitialMail(ctx, req.UserId, "email", authz.GetCtxData(ctx).OrgID)
+	_, err := s.command.ResendInitialMail(ctx, req.UserId, "email", authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanInitializationResponse{
-		//TODO: details
+		//TODO: implement in proto
+		//Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.ResendHumanEmailVerificationRequest) (*mgmt_pb.ResendHumanEmailVerificationResponse, error) {
-	err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanEmailVerificationResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -292,42 +293,42 @@ func (s *Server) UpdateHumanPhone(ctx context.Context, req *mgmt_pb.UpdateHumanP
 }
 
 func (s *Server) RemoveHumanPhone(ctx context.Context, req *mgmt_pb.RemoveHumanPhoneRequest) (*mgmt_pb.RemoveHumanPhoneResponse, error) {
-	err := s.command.RemoveHumanPhone(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveHumanPhone(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanPhoneResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) ResendHumanPhoneVerification(ctx context.Context, req *mgmt_pb.ResendHumanPhoneVerificationRequest) (*mgmt_pb.ResendHumanPhoneVerificationResponse, error) {
-	err := s.command.CreateHumanPhoneVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanPhoneVerificationResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHumanInitialPasswordRequest) (*mgmt_pb.SetHumanInitialPasswordResponse, error) {
-	err := s.command.SetOneTimePassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password)
+	objectDetails, err := s.command.SetOneTimePassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.SetHumanInitialPasswordResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mgmt_pb.SendHumanResetPasswordNotificationRequest) (*mgmt_pb.SendHumanResetPasswordNotificationResponse, error) {
-	err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type))
+	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.SendHumanResetPasswordNotificationResponse{
-		// TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -342,22 +343,22 @@ func (s *Server) ListHumanMultiFactors(ctx context.Context, req *mgmt_pb.ListHum
 }
 
 func (s *Server) RemoveHumanMultiFactorOTP(ctx context.Context, req *mgmt_pb.RemoveHumanMultiFactorOTPRequest) (*mgmt_pb.RemoveHumanMultiFactorOTPResponse, error) {
-	err := s.command.HumanRemoveOTP(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.HumanRemoveOTP(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanMultiFactorOTPResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) RemoveHumanMultiFactorU2F(ctx context.Context, req *mgmt_pb.RemoveHumanMultiFactorU2FRequest) (*mgmt_pb.RemoveHumanMultiFactorU2FResponse, error) {
-	err := s.command.HumanRemoveU2F(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.HumanRemoveU2F(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanMultiFactorU2FResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -372,12 +373,12 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 }
 
 func (s *Server) RemoveHumanPasswordless(ctx context.Context, req *mgmt_pb.RemoveHumanPasswordlessRequest) (*mgmt_pb.RemoveHumanPasswordlessResponse, error) {
-	err := s.command.HumanRemovePasswordless(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.HumanRemovePasswordless(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanPasswordlessResponse{
-		// TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -439,12 +440,12 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 }
 
 func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachineKeyRequest) (*mgmt_pb.RemoveMachineKeyResponse, error) {
-	err := s.command.RemoveUserMachineKey(ctx, req.UserId, req.KeyId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveUserMachineKey(ctx, req.UserId, req.KeyId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveMachineKeyResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -463,12 +464,12 @@ func (s *Server) ListUserIDPs(ctx context.Context, req *mgmt_pb.ListUserIDPsRequ
 	}, nil
 }
 func (s *Server) RemoveUserIDP(ctx context.Context, req *mgmt_pb.RemoveUserIDPRequest) (*mgmt_pb.RemoveUserIDPResponse, error) {
-	err := s.command.RemoveHumanExternalIDP(ctx, RemoveUserIDPRequestToDomain(ctx, req))
+	objectDetails, err := s.command.RemoveHumanExternalIDP(ctx, RemoveUserIDPRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveUserIDPResponse{
-		//TODO: details
+		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 

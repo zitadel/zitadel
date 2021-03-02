@@ -73,36 +73,50 @@ func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner strin
 	return orgWriteModelToOrg(addedOrg), nil
 }
 
-func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) error {
+func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "ORG-oL9nT", "Errors.Org.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-oL9nT", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateInactive {
-		return caos_errs.ThrowInvalidArgument(nil, "EVENT-Dbs2g", "Errors.Org.AlreadyDeactivated")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-Dbs2g", "Errors.Org.AlreadyDeactivated")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewOrgDeactivatedEvent(ctx, orgAgg))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewOrgDeactivatedEvent(ctx, orgAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(orgWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) error {
+func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "ORG-Dgf3g", "Errors.Org.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-Dgf3g", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateActive {
-		return caos_errs.ThrowInvalidArgument(nil, "EVENT-bfnrh", "Errors.Org.AlreadyActive")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-bfnrh", "Errors.Org.AlreadyActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewOrgReactivatedEvent(ctx, orgAgg))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewOrgReactivatedEvent(ctx, orgAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(orgWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
 func (c *Commands) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human) (orgAgg *eventstore.Aggregate, org *OrgWriteModel, human *HumanWriteModel, orgMember *OrgMemberWriteModel, events []eventstore.EventPusher, err error) {

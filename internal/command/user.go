@@ -15,140 +15,174 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName string) error {
+func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName string) (*domain.ObjectDetails, error) {
 	if orgID == "" || userID == "" || userName == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.IDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.IDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !isUserStateExists(existingUser.UserState) {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-5N9ds", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5N9ds", "Errors.User.NotFound")
 	}
 
 	if existingUser.UserName == userName {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
 	}
 
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := CheckOrgIAMPolicyForUserName(userName, orgIAMPolicy); err != nil {
-		return err
+		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
-	_, err = c.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.PushEvents(ctx,
 		user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, orgIAMPolicy.UserLoginMustBeDomain))
-
-	return err
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingUser, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0gDf", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0gDf", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3M9ds", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9ds", "Errors.User.NotFound")
 	}
 	if isUserStateInactive(existingUser.UserState) {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.PushEvents(ctx,
 		user.NewUserDeactivatedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
-	return err
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingUser, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9ds", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-4M0sd", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-4M0sd", "Errors.User.NotFound")
 	}
 	if !isUserStateInactive(existingUser.UserState) {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive")
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.PushEvents(ctx,
 		user.NewUserReactivatedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
-	return err
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingUser, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-5M9fs", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5M9fs", "Errors.User.NotFound")
 	}
 	if !hasUserState(existingUser.UserState, domain.UserStateActive, domain.UserStateInitial) {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.PushEvents(ctx,
 		user.NewUserLockedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
-	return err
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingUser, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M0dse", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M0dse", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-M0dos", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-M0dos", "Errors.User.NotFound")
 	}
 	if !hasUserState(existingUser.UserState, domain.UserStateLocked) {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked")
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.PushEvents(ctx,
 		user.NewUserUnlockedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
-	return err
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingUser, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingGrantIDs ...string) error {
+func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 	}
 
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var events []eventstore.EventPusher
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
@@ -163,8 +197,15 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		events = append(events, removeEvent)
 	}
 
-	_, err = c.eventstore.PushEvents(ctx, events...)
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingUser, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
 func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {

@@ -53,18 +53,25 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *domain.Mac
 	return key, nil
 }
 
-func (c *Commands) RemoveUserMachineKey(ctx context.Context, userID, keyID, resourceOwner string) error {
+func (c *Commands) RemoveUserMachineKey(ctx context.Context, userID, keyID, resourceOwner string) (*domain.ObjectDetails, error) {
 	keyWriteModel, err := c.machineKeyWriteModelByID(ctx, userID, keyID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !keyWriteModel.Exists() {
-		return errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.User.Machine.Key.NotFound")
+		return nil, errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.User.Machine.Key.NotFound")
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.PushEvents(ctx,
 		user.NewMachineKeyRemovedEvent(ctx, UserAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
-	return err
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(keyWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&keyWriteModel.WriteModel), nil
 }
 
 func (c *Commands) machineKeyWriteModelByID(ctx context.Context, userID, keyID, resourceOwner string) (writeModel *MachineKeyWriteModel, err error) {

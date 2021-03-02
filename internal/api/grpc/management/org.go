@@ -57,16 +57,22 @@ func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_
 }
 
 func (s *Server) DeactivateOrg(ctx context.Context, req *mgmt_pb.DeactivateOrgRequest) (*mgmt_pb.DeactivateOrgResponse, error) {
-	err := s.command.DeactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.DeactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
 	return &mgmt_pb.DeactivateOrgResponse{
-		//TODO: details
-	}, err
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
 func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRequest) (*mgmt_pb.ReactivateOrgResponse, error) {
-	err := s.command.ReactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.ReactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
 	return &mgmt_pb.ReactivateOrgResponse{
-		//TODO: details
+		Details: object.DomainToDetailsPb(objectDetails),
 	}, err
 }
 
