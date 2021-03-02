@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -10,12 +11,18 @@ import (
 )
 
 func ListUserGrantsRequestToModel(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) *model.UserGrantSearchRequest {
-	return &model.UserGrantSearchRequest{
+	request := &model.UserGrantSearchRequest{
 		Offset:  req.MetaData.Offset,
 		Limit:   uint64(req.MetaData.Limit),
 		Asc:     req.MetaData.Asc,
 		Queries: user_grpc.UserGrantQueriesToModel(req.Queries),
 	}
+	request.Queries = append(request.Queries, &model.UserGrantSearchQuery{
+		Key:    model.UserGrantSearchKeyResourceOwner,
+		Method: domain.SearchMethodEquals,
+		Value:  authz.GetCtxData(ctx).OrgID,
+	})
+	return request
 }
 
 func AddUserGrantRequestToDomain(req *mgmt_pb.AddUserGrantRequest) *domain.UserGrant {
