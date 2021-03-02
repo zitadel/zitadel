@@ -165,7 +165,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 	}
 
 	for _, grantID := range cascadingUserGrantIDs {
-		event, err := c.removeUserGrant(ctx, grantID, "", true)
+		event, _, err := c.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
