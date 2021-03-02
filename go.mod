@@ -66,7 +66,6 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout v0.13.0
 	go.opentelemetry.io/otel/sdk v0.13.0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
-	golang.org/x/net v0.0.0-20201031054903-ff519b6c9102 // indirect
 	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
 	golang.org/x/text v0.3.5
 	golang.org/x/tools v0.0.0-20201103235415-b653051172e4
@@ -81,5 +80,5 @@ require (
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.18.5
 	k8s.io/apiextensions-apiserver v0.18.5
-	k8s.io/apimachinery v0.18.5
+	k8s.io/apimachinery v0.20.4
 )
