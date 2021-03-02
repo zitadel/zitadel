@@ -113,6 +113,11 @@ func ListProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*proj
 	if err != nil {
 		return nil, err
 	}
+	queries = append(queries, &proj_model.ProjectRoleSearchQuery{
+		Key:    proj_model.ProjectRoleSearchKeyProjectID,
+		Method: domain.SearchMethodEquals,
+		Value:  req.ProjectId,
+	})
 	return &proj_model.ProjectRoleSearchRequest{
 		Offset: req.MetaData.Offset,
 		Limit:  uint64(req.MetaData.Limit),

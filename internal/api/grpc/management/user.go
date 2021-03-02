@@ -418,9 +418,13 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	if err != nil {
 		return nil, err
 	}
+	keyDetails, err := key.Detail()
+	if err != nil {
+		return nil, err
+	}
 	return &mgmt_pb.AddMachineKeyResponse{
 		KeyId:      key.KeyID,
-		KeyDetails: authn.KeyDetailsToPb(key),
+		KeyDetails: keyDetails,
 		Details: object.ToDetailsPb(
 			key.Sequence,
 			key.ChangeDate,

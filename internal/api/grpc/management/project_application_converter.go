@@ -1,11 +1,35 @@
 package management
 
 import (
+	"time"
+
+	authn_grpc "github.com/caos/zitadel/internal/api/grpc/authn"
 	app_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
+
+func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*proj_model.ApplicationSearchRequest, error) {
+	queries, err := app_grpc.AppQueriesToModel(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, &proj_model.ApplicationSearchQuery{
+		Key:    proj_model.AppSearchKeyProjectID,
+		Method: domain.SearchMethodEquals,
+		Value:  req.ProjectId,
+	})
+	return &proj_model.ApplicationSearchRequest{
+		Offset: req.MetaData.Offset,
+		Limit:  uint64(req.MetaData.Limit),
+		Asc:    req.MetaData.Asc,
+		//SortingColumn: //TODO: sorting
+		Queries: queries,
+	}, nil
+}
 
 func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) *domain.OIDCApp {
 	return &domain.OIDCApp{
@@ -44,4 +68,67 @@ func UpdateAppRequestToDomain(app *mgmt_pb.UpdateAppRequest) domain.Application 
 		AppID:   app.AppId,
 		AppName: app.Name,
 	}
+}
+
+func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest) *domain.OIDCApp {
+	return &domain.OIDCApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: app.ProjectId,
+		},
+		AppID:                    app.AppId,
+		RedirectUris:             app.RedirectUris,
+		ResponseTypes:            app_grpc.OIDCResponseTypesToDomain(app.ResponseTypes),
+		GrantTypes:               app_grpc.OIDCGrantTypesToDomain(app.GrantTypes),
+		ApplicationType:          app_grpc.OIDCApplicationTypeToDomain(app.AppType),
+		AuthMethodType:           app_grpc.OIDCAuthMethodTypeToDomain(app.AuthMethodType),
+		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
+		DevMode:                  app.DevMode,
+		AccessTokenType:          app_grpc.OIDCTokenTypeToDomain(app.AccessTokenType),
+		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
+		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
+		ClockSkew:                app.ClockSkew.AsDuration(),
+	}
+}
+
+func UpdateAPIAppConfigRequestToDomain(app *mgmt_pb.UpdateAPIAppConfigRequest) *domain.APIApp {
+	return &domain.APIApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: app.ProjectId,
+		},
+		AppID:          app.AppId,
+		AuthMethodType: app_grpc.APIAuthMethodTypeToDomain(app.AuthMethodType),
+	}
+}
+
+func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAPIClientKeyRequest) *domain.ApplicationKey {
+	expirationDate := time.Time{}
+	if key.ExpirationDate != nil {
+		expirationDate = key.ExpirationDate.AsTime()
+	}
+
+	return &domain.ApplicationKey{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: key.ProjectId,
+		},
+		ExpirationDate: expirationDate,
+		Type:           authn_grpc.KeyTypeToDomain(key.Type),
+		ApplicationID:  key.AppId,
+	}
+}
+
+func ListAPIClientKeysRequestToModel(req *mgmt_pb.ListAPIClientKeysRequest) (*key_model.AuthNKeySearchRequest, error) {
+	queries := make([]*key_model.AuthNKeySearchQuery, 2)
+	queries = append(queries, &key_model.AuthNKeySearchQuery{
+		Key:    key_model.AuthNKeyObjectID,
+		Method: domain.SearchMethodEquals,
+		Value:  req.AppId,
+	})
+	return &key_model.AuthNKeySearchRequest{
+		Offset: req.MetaData.Offset,
+		Limit:  uint64(req.MetaData.Limit),
+		Asc:    req.MetaData.Asc,
+		//SortingColumn: //TODO: sorting
+		Queries: queries,
+	}, nil
 }

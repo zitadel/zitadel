@@ -3,10 +3,9 @@ package management
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/caos/zitadel/internal/api/authz"
+	authn_grpc "github.com/caos/zitadel/internal/api/grpc/authn"
+	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	project_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
@@ -23,11 +22,32 @@ func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest)
 }
 
 func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*mgmt_pb.ListAppsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListApps not implemented")
+	queries, err := ListAppsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	domains, err := s.project.SearchApplications(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListAppsResponse{
+		Result: project_grpc.AppsToPb(domains.Result),
+		MetaData: object_grpc.ToListDetails(
+			domains.TotalResult,
+			domains.Sequence,
+			domains.Timestamp,
+		),
+	}, nil
 }
 
 func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChangesRequest) (*mgmt_pb.ListAppChangesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListAppChanges not implemented")
+	res, err := s.project.ApplicationChanges(ctx, req.ProjectId, req.AppId, req.Query.Offset, uint64(req.Query.Limit), req.Query.Asc)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListAppChangesResponse{
+		Result: change_grpc.AppChangesToPb(res.Changes),
+	}, nil
 }
 
 func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest) (*mgmt_pb.AddOIDCAppResponse, error) {
@@ -72,36 +92,146 @@ func (s *Server) UpdateApp(ctx context.Context, req *mgmt_pb.UpdateAppRequest) (
 		//),
 	}, nil
 }
+
 func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOIDCAppConfigRequest) (*mgmt_pb.UpdateOIDCAppConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateOIDCAppConfig not implemented")
+	config, err := s.command.ChangeOIDCApplication(ctx, UpdateOIDCAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateOIDCAppConfigResponse{
+		Details: object_grpc.ToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
 }
+
 func (s *Server) UpdateAPIAppConfig(ctx context.Context, req *mgmt_pb.UpdateAPIAppConfigRequest) (*mgmt_pb.UpdateAPIAppConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateAPIAppConfig not implemented")
+	config, err := s.command.ChangeAPIApplication(ctx, UpdateAPIAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateAPIAppConfigResponse{
+		Details: object_grpc.ToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
 }
+
 func (s *Server) DeactivateApp(ctx context.Context, req *mgmt_pb.DeactivateAppRequest) (*mgmt_pb.DeactivateAppResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeactivateApp not implemented")
+	err := s.command.DeactivateApplication(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.DeactivateAppResponse{
+		//TODO: details
+	}, nil
 }
+
 func (s *Server) ReactivateApp(ctx context.Context, req *mgmt_pb.ReactivateAppRequest) (*mgmt_pb.ReactivateAppResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReactivateApp not implemented")
+	err := s.command.ReactivateApplication(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ReactivateAppResponse{
+		//TODO: details
+	}, nil
 }
+
 func (s *Server) RemoveApp(ctx context.Context, req *mgmt_pb.RemoveAppRequest) (*mgmt_pb.RemoveAppResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoveApp not implemented")
+	err := s.command.RemoveApplication(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveAppResponse{
+		//TODO: details
+	}, nil
 }
+
 func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, req *mgmt_pb.RegenerateOIDCClientSecretRequest) (*mgmt_pb.RegenerateOIDCClientSecretResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegenerateOIDCClientSecret not implemented")
+	config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RegenerateOIDCClientSecretResponse{
+		ClientSecret: config.ClientSecretString,
+		Details: object_grpc.ToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
 }
+
 func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.RegenerateAPIClientSecretRequest) (*mgmt_pb.RegenerateAPIClientSecretResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegenerateAPIClientSecret not implemented")
+	config, err := s.command.ChangeAPIApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RegenerateAPIClientSecretResponse{
+		ClientSecret: config.ClientSecretString,
+		Details: object_grpc.ToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
 }
+
 func (s *Server) GetAPIClientKey(ctx context.Context, req *mgmt_pb.GetAPIClientKeyRequest) (*mgmt_pb.GetAPIClientKeyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAPIClientKey not implemented")
+	key, err := s.project.GetClientKey(ctx, req.ProjectId, req.AppId, req.KeyId)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetAPIClientKeyResponse{
+		Key: authn_grpc.KeyToPb(key),
+	}, nil
 }
+
 func (s *Server) ListAPIClientKeys(ctx context.Context, req *mgmt_pb.ListAPIClientKeysRequest) (*mgmt_pb.ListAPIClientKeysResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListAPIClientKeys not implemented")
+	queries, err := ListAPIClientKeysRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	domains, err := s.project.SearchClientKeys(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListAPIClientKeysResponse{
+		Result: authn_grpc.KeyViewsToPb(domains.Result),
+		Details: object_grpc.ToListDetails(
+			domains.TotalResult,
+			domains.Sequence,
+			domains.Timestamp,
+		),
+	}, nil
 }
+
 func (s *Server) AddAPIClientKey(ctx context.Context, req *mgmt_pb.AddAPIClientKeyRequest) (*mgmt_pb.AddAPIClientKeyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddAPIClientKey not implemented")
+	key, err := s.command.AddApplicationKey(ctx, AddAPIClientKeyRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	keyDetails, err := key.Detail()
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddAPIClientKeyResponse{
+		Id:         key.KeyID,
+		Details:    object_grpc.ToDetailsPb(key.Sequence, key.ChangeDate, key.ResourceOwner),
+		KeyDetails: keyDetails,
+	}, nil
 }
+
 func (s *Server) RemoveAPIClientKey(ctx context.Context, req *mgmt_pb.RemoveAPIClientKeyRequest) (*mgmt_pb.RemoveAPIClientKeyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoveAPIClientKey not implemented")
+	err := s.command.RemoveApplicationKey(ctx, req.ProjectId, req.AppId, req.KeyId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveAPIClientKeyResponse{
+		//TODO: details
+	}, nil
 }

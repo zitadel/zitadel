@@ -1,14 +1,13 @@
 package authn
 
 import (
-	"encoding/json"
-
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/pkg/grpc/authn"
-	"github.com/golang/protobuf/ptypes"
 )
 
 func KeyViewsToPb(keys []*key_model.AuthNKeyView) []*authn.Key {
@@ -67,21 +66,4 @@ func KeyTypeToDomain(typ authn.KeyType) domain.AuthNKeyType {
 	default:
 		return domain.AuthNKeyTypeNONE
 	}
-}
-
-func KeyDetailsToPb(key *domain.MachineKey) []byte {
-	details, err := json.Marshal(struct {
-		Type   string `json:"type"`
-		KeyID  string `json:"keyId"`
-		Key    string `json:"key"`
-		UserID string `json:"userId"`
-	}{
-		Type:   "serviceaccount",
-		KeyID:  key.KeyID,
-		Key:    string(key.PrivateKey),
-		UserID: key.AggregateID,
-	})
-	logging.Log("AUTHN-sAiH5").OnError(err).Warn("unable to marshall key")
-
-	return details
 }
