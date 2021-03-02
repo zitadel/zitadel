@@ -91,7 +91,7 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
 	}
-	err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), user.ID, user.ResourceOwner, domain.NotificationTypeEmail)
+	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), user.ID, user.ResourceOwner, domain.NotificationTypeEmail)
 	l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 }
 

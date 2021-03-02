@@ -247,13 +247,11 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 
 func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.ResendHumanEmailVerificationRequest) (*mgmt_pb.ResendHumanEmailVerificationResponse, error) {
 	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
-	details, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanEmailVerificationResponse{
 		Details: obj_grpc.DomainToDetailsPb(objectDetails),
-		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
