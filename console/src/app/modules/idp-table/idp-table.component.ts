@@ -7,8 +7,7 @@ import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { IdpSearchResponse as AdminIdpSearchResponse, IdpState, IdpStylingType, IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
-import { IdpProviderType, IdpView as MgmtIdpView } from 'src/app/proto/generated/management_pb';
+import { IDP, IDPState, IDPStylingType, IDPType } from 'src/app/proto/generated/zitadel/idp_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -26,20 +25,20 @@ export class IdpTableComponent implements OnInit {
     @Input() service!: AdminService | ManagementService;
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    public dataSource: MatTableDataSource<AdminIdpView.AsObject | MgmtIdpView.AsObject>
-        = new MatTableDataSource<AdminIdpView.AsObject | MgmtIdpView.AsObject>();
-    public selection: SelectionModel<AdminIdpView.AsObject | MgmtIdpView.AsObject>
-        = new SelectionModel<AdminIdpView.AsObject | MgmtIdpView.AsObject>(true, []);
+    public dataSource: MatTableDataSource<IDP.AsObject>
+        = new MatTableDataSource<IDP.AsObject>();
+    public selection: SelectionModel<IDP.AsObject>
+        = new SelectionModel<IDP.AsObject>(true, []);
     public idpResult!: AdminIdpSearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
-    public IdpProviderType: any = IdpProviderType;
-    public IdpState: any = IdpState;
-    public IdpStylingType: any = IdpStylingType;
+    public IDPType: any = IDPType;
+    public IDPState: any = IDPState;
+    public IdpStylingType: any = IDPStylingType;
     @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'dates', 'state'];
 
-    @Output() public changedSelection: EventEmitter<Array<AdminIdpView.AsObject | MgmtIdpView.AsObject>>
+    @Output() public changedSelection: EventEmitter<Array<IDP.AsObject>>
         = new EventEmitter();
 
     constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {
@@ -77,8 +76,12 @@ export class IdpTableComponent implements OnInit {
     }
 
     public deactivateSelectedIdps(): void {
-        const map: Promise<Empty>[] = this.selection.selected.map(value => {
-            return this.service.DeactivateIdpConfig(value.id);
+        const map: Promise<any>[] = this.selection.selected.map(value => {
+            if (this.serviceType === PolicyComponentServiceType.MGMT) {
+                return (this.service as ManagementService).deactivateOrgIDP(value.id);
+            } else {
+                return (this.service as AdminService).deactivateIDP(value.id);
+            }
         });
         Promise.all(map).then(() => {
             this.selection.clear();
@@ -127,7 +130,7 @@ export class IdpTableComponent implements OnInit {
         });
     }
 
-    public removeIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject): void {
+    public removeIdp(idp: IDP.AsObject): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -175,11 +178,11 @@ export class IdpTableComponent implements OnInit {
         }
     }
 
-    public routerLinkForRow(row: MgmtIdpView.AsObject | AdminIdpView.AsObject): any {
+    public routerLinkForRow(row: IDP.AsObject): any {
         if (row.id) {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
-                    switch ((row as MgmtIdpView.AsObject).providerType) {
+                    switch ((row as IDP.AsObject).) {
                         case IdpProviderType.IDPPROVIDERTYPE_SYSTEM:
                             return ['/iam', 'idp', row.id];
                         case IdpProviderType.IDPPROVIDERTYPE_ORG:
