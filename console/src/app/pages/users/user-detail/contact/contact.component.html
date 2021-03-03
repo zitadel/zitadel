@@ -19,9 +19,9 @@
         <div class="left">
             <span class="label">{{ 'USER.EMAIL' | translate }}</span>
             <span class="name">{{human?.email}}</span>
-            <span *ngIf="human?.isEmailVerified" class="contact-state verified">{{'USER.EMAILVERIFIED' |
+            <span *ngIf="human?.profile.email.isEmailVerified" class="contact-state verified">{{'USER.EMAILVERIFIED' |
                 translate}}</span>
-            <div *ngIf="!human?.isEmailVerified" class="block">
+            <div *ngIf="!human?.profile.email.isEmailVerified" class="block">
                 <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
                 <ng-container *ngIf="human?.email">
@@ -46,9 +46,9 @@
         <div class="left">
             <span class="label">{{ 'USER.PHONE' | translate }}</span>
             <span class="name">{{human?.phone ? human.phone : ('USER.PHONEEMPTY' | translate)}}</span>
-            <span *ngIf="human?.isPhoneVerified" class="contact-state verified">{{'USER.PHONEVERIFIED' |
+            <span *ngIf="human?.profile.phone.isPhoneVerified" class="contact-state verified">{{'USER.PHONEVERIFIED' |
                 translate}}</span>
-            <div *ngIf="!human?.isPhoneVerified" class="block">
+            <div *ngIf="!human?.profile.phone.isPhoneVerified" class="block">
                 <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
                 <ng-container *ngIf="human?.phone">

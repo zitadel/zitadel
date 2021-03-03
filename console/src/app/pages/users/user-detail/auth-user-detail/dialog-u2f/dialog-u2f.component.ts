@@ -70,7 +70,7 @@ export class DialogU2FComponent {
 
                     const base64 = btoa(data);
                     if (this.type === U2FComponentDestination.MFA) {
-                        this.service.VerifyMyMfaU2F(base64, this.name).then(() => {
+                        this.service.verifyMyMultiFactorU2F(base64, this.name).then(() => {
                             this.translate.get('USER.MFA.U2F_SUCCESS').pipe(take(1)).subscribe(msg => {
                                 this.toast.showInfo(msg);
                             });

@@ -3,8 +3,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { AuthServiceClient } from 'src/app/proto/generated/auth_grpc_web_pb';
-import { MemberType, UserMembershipSearchResponse, UserView } from 'src/app/proto/generated/management_pb';
+import { ListMyUserGrantsResponse } from 'src/app/proto/generated/zitadel/auth_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -33,10 +33,10 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class MembershipsComponent implements OnInit {
     public loading: boolean = false;
-    public memberships!: UserMembershipSearchResponse.AsObject;
+    public memberships!: ListMyUserGrantsResponse.AsObject;
 
     @Input() public auth: boolean = false;
-    @Input() public user!: UserView.AsObject;
+    @Input() public user!: User.AsObject;
     @Input() public disabled: boolean = false;
 
     public MemberType: any = MemberType;
@@ -56,13 +56,13 @@ export class MembershipsComponent implements OnInit {
 
     public async loadManager(userId: string): Promise<void> {
         if (this.auth) {
-            this.authService.SearchUserMemberships(100, 0, []).then(response => {
-                this.memberships = response.toObject();
+            this.authService.listMyUserGrants(100, 0, []).then(response => {
+                this.memberships = response;
                 this.loading = false;
             });
         } else {
-            this.mgmtService.SearchUserMemberships(userId, 100, 0, []).then(response => {
-                this.memberships = response.toObject();
+            this.mgmtService.listUserMemberships(userId, 100, 0, []).then(response => {
+                this.memberships = response.resultList;
                 this.loading = false;
             });
         }
@@ -103,12 +103,12 @@ export class MembershipsComponent implements OnInit {
     }
 
     public createIamMember(response: any): void {
-        const users: UserView.AsObject[] = response.users;
+        const users: User.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
             Promise.all(users.map(user => {
-                return this.adminService.AddIamMember(user.id, roles);
+                return this.adminService.addIAMMember(user.id, roles);
             })).then(() => {
                 this.toast.showInfo('IAM.TOAST.MEMBERADDED', true);
                 setTimeout(() => {
@@ -121,12 +121,12 @@ export class MembershipsComponent implements OnInit {
     }
 
     private createOrgMember(response: any): void {
-        const users: UserView.AsObject[] = response.users;
+        const users: User.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
             Promise.all(users.map(user => {
-                return this.mgmtService.AddMyOrgMember(user.id, roles);
+                return this.mgmtService.addOrgMember(user.id, roles);
             })).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                 setTimeout(() => {
@@ -139,12 +139,12 @@ export class MembershipsComponent implements OnInit {
     }
 
     private createGrantedProjectMember(response: any): void {
-        const users: UserView.AsObject[] = response.users;
+        const users: User.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.mgmtService.AddProjectGrantMember(
+                return this.mgmtService.addProjectGrantMember(
                     response.projectId,
                     response.grantId,
                     user.id,
@@ -162,12 +162,12 @@ export class MembershipsComponent implements OnInit {
     }
 
     private createOwnedProjectMember(response: any): void {
-        const users: UserView.AsObject[] = response.users;
+        const users: User.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.mgmtService.AddProjectMember(response.projectId, user.id, roles)
+                return this.mgmtService.addProjectMember(response.projectId, user.id, roles)
                     .then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                         setTimeout(() => {

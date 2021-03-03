@@ -18,7 +18,7 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLESTATE' | translate }} </th>
                 <td mat-cell *matCellDef="let mfa"><span class="centered">
                         {{'USER.MFA.STATE.'+ mfa.state | translate}}
-                        <i matTooltip="verified" *ngIf="mfa.state === MFAState.MFASTATE_READY"
+                        <i matTooltip="verified" *ngIf="mfa.state === MultiFactorState.MULTI_FACTOR_STATE_READY"
                             class="verified las la-check-circle"></i>
                     </span>
                 </td>

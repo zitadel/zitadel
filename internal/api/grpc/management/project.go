@@ -110,22 +110,22 @@ func (s *Server) UpdateProject(ctx context.Context, req *mgmt_pb.UpdateProjectRe
 }
 
 func (s *Server) DeactivateProject(ctx context.Context, req *mgmt_pb.DeactivateProjectRequest) (*mgmt_pb.DeactivateProjectResponse, error) {
-	err := s.command.DeactivateProject(ctx, req.Id, authz.GetCtxData(ctx).ResourceOwner)
+	details, err := s.command.DeactivateProject(ctx, req.Id, authz.GetCtxData(ctx).ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateProjectResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) ReactivateProject(ctx context.Context, req *mgmt_pb.ReactivateProjectRequest) (*mgmt_pb.ReactivateProjectResponse, error) {
-	err := s.command.ReactivateProject(ctx, req.Id, authz.GetCtxData(ctx).ResourceOwner)
+	details, err := s.command.ReactivateProject(ctx, req.Id, authz.GetCtxData(ctx).ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateProjectResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -134,12 +134,12 @@ func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRe
 	if err != nil {
 		return nil, err
 	}
-	err = s.command.RemoveProject(ctx, req.Id, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants)...)
+	details, err := s.command.RemoveProject(ctx, req.Id, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants)...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -177,12 +177,12 @@ func (s *Server) AddProjectRole(ctx context.Context, req *mgmt_pb.AddProjectRole
 }
 
 func (s *Server) BulkAddProjectRoles(ctx context.Context, req *mgmt_pb.BulkAddProjectRolesRequest) (*mgmt_pb.BulkAddProjectRolesResponse, error) {
-	err := s.command.BulkAddProjectRole(ctx, req.ProjectId, authz.GetCtxData(ctx).OrgID, BulkAddProjectRolesRequestToDomain(req))
+	details, err := s.command.BulkAddProjectRole(ctx, req.ProjectId, authz.GetCtxData(ctx).OrgID, BulkAddProjectRolesRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.BulkAddProjectRolesResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -209,12 +209,12 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 	if err != nil {
 		return nil, err
 	}
-	err = s.command.RemoveProjectRole(ctx, req.ProjectId, req.RoleKey, authz.GetCtxData(ctx).OrgID, ProjectGrantsToIDs(projectGrants), userGrantsToIDs(userGrants)...)
+	details, err := s.command.RemoveProjectRole(ctx, req.ProjectId, req.RoleKey, authz.GetCtxData(ctx).OrgID, ProjectGrantsToIDs(projectGrants), userGrantsToIDs(userGrants)...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectRoleResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -274,11 +274,11 @@ func (s *Server) UpdateProjectMember(ctx context.Context, req *mgmt_pb.UpdatePro
 }
 
 func (s *Server) RemoveProjectMember(ctx context.Context, req *mgmt_pb.RemoveProjectMemberRequest) (*mgmt_pb.RemoveProjectMemberResponse, error) {
-	err := s.command.RemoveProjectMember(ctx, req.ProjectId, req.UserId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.RemoveProjectMember(ctx, req.ProjectId, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectMemberResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }

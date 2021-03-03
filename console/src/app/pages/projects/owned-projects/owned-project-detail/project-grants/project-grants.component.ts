@@ -73,13 +73,13 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getRoleOptions(projectId: string): void {
-        this.mgmtService.SearchProjectRoles(projectId, 100, 0).then(resp => {
-            this.memberRoleOptions = resp.toObject().resultList;
+        this.mgmtService.listProjectRoles(projectId, 100, 0).then(resp => {
+            this.memberRoleOptions = resp.resultList;
         });
     }
 
     updateRoles(grant: ProjectGrant.AsObject, selectionChange: MatSelectChange): void {
-        this.mgmtService.UpdateProjectGrant(grant.id, grant.projectId, selectionChange.value)
+        this.mgmtService.updateProjectGrant(grant.id, grant.projectId, selectionChange.value)
             .then((newgrant: ProjectGrant) => {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTCHANGED', true);
             }).catch(error => {
@@ -89,7 +89,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
 
     deleteSelectedGrants(): void {
         const promises = this.selection.selected.map(grant => {
-            return this.mgmtService.RemoveProjectGrant(grant.id, grant.projectId);
+            return this.mgmtService.removeProjectGrant(grant.id, grant.projectId);
         });
 
         Promise.all(promises).then(() => {

@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { HumanView as AuthHumanView, UserState as AuthUserState } from 'src/app/proto/generated/auth_pb';
-import { HumanView as MgmtHumanView, UserState as MgmtUserState } from 'src/app/proto/generated/management_pb';
+import { Human, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { CodeDialogComponent } from '../auth-user-detail/code-dialog/code-dialog.component';
 import { EditDialogType } from '../user-detail/user-detail.component';
@@ -15,8 +14,8 @@ import { EditDialogType } from '../user-detail/user-detail.component';
 export class ContactComponent {
     @Input() disablePhoneCode: boolean = false;
     @Input() canWrite: boolean = false;
-    @Input() human!: AuthHumanView.AsObject | MgmtHumanView.AsObject;
-    @Input() state!: AuthUserState | MgmtUserState;
+    @Input() human!: Human.AsObject;
+    @Input() state!: UserState;
     @Output() editType: EventEmitter<EditDialogType> = new EventEmitter();
     @Output() resendEmailVerification: EventEmitter<void> = new EventEmitter();
     @Output() resendPhoneVerification: EventEmitter<void> = new EventEmitter();

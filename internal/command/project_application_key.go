@@ -62,16 +62,23 @@ func (c *Commands) AddApplicationKey(ctx context.Context, key *domain.Applicatio
 	return result, nil
 }
 
-func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID, resourceOwner string) error {
+func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID, resourceOwner string) (*domain.ObjectDetails, error) {
 	keyWriteModel := NewApplicationKeyWriteModel(projectID, applicationID, keyID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !keyWriteModel.State.Exists() {
-		return errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.Application.Key.NotFound")
+		return nil, errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.Application.Key.NotFound")
 	}
 
-	_, err = c.eventstore.PushEvents(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(keyWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&keyWriteModel.WriteModel), nil
 }
