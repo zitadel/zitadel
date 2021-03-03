@@ -140,11 +140,11 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                if (type === MultiFactorType.OTP) {
+                if (type === MultiFactorType.otp) {
                     this.service.removeMyMultiFactorOTP().then(() => {
                         this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
-                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
+                        const index = this.dataSource.data.findIndex(mfa => !!mfa.otp);
                         if (index > -1) {
                             this.dataSource.data.splice(index, 1);
                         }
@@ -156,7 +156,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                     this.service.removeMyMultiFactorU2F(id).then(() => {
                         this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
-                        const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
+                        const index = this.dataSource.data.findIndex(mfa => !!mfa.u2f);
                         if (index > -1) {
                             this.dataSource.data.splice(index, 1);
                         }
