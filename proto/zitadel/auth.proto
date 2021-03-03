@@ -54,7 +54,7 @@ service AuthService {
 
     rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
         option (google.api.http) = {
-            get: "/users/me/changes"
+            get: "/users/me/changes/_search"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -64,7 +64,7 @@ service AuthService {
 
     rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
         option (google.api.http) = {
-            get: "/users/me/sessions"
+            get: "/users/me/sessions/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -95,7 +95,7 @@ service AuthService {
 
     rpc UpdateMyPassword(UpdateMyPasswordRequest) returns (UpdateMyPasswordResponse) {
         option (google.api.http) = {
-            put: "/users/me/passwords/_change"
+            put: "/users/me/passwords"
             body: "*"
         };
 
@@ -135,7 +135,7 @@ service AuthService {
         };
     }
 
-    rpc SetMyEmail(SetMyEmailRequest) returns (SetMyEmailResponse) {
+    rpc UpdateMyEmail(UpdateMyEmailRequest) returns (UpdateMyEmailResponse) {
         option (google.api.http) = {
             put: "/users/me/email"
             body: "*"
@@ -159,7 +159,7 @@ service AuthService {
 
     rpc ResendMyEmailVerification(ResendMyEmailVerificationRequest) returns (ResendMyEmailVerificationResponse) {
         option (google.api.http) = {
-            post: "/users/me/email/_resendverification"
+            post: "/users/me/email/_resend_verification"
             body: "*"
         };
 
@@ -178,7 +178,9 @@ service AuthService {
         };
     }
 
-    rpc SetMyPhone(SetMyPhoneRequest) returns (SetMyPhoneResponse) {
+    //TODO: was SetMyPhone before. problem is, that this is the only call that has no create but a remove
+    // in management it's UpdateHumanPhone
+    rpc UpdateMyPhone(UpdateMyPhoneRequest) returns (UpdateMyPhoneResponse) {
         option (google.api.http) = {
             put: "/users/me/phone"
             body: "*"
@@ -202,7 +204,7 @@ service AuthService {
 
     rpc ResendMyPhoneVerification(ResendMyPhoneVerificationRequest) returns (ResendMyPhoneVerificationResponse) {
         option (google.api.http) = {
-            post: "/users/me/phone/_resendverification"
+            post: "/users/me/phone/_resend_verification"
             body: "*"
         };
 
@@ -244,7 +246,7 @@ service AuthService {
 
     rpc ListMyMultiFactors(ListMyMultiFactorsRequest) returns (ListMyMultiFactorsResponse) {
         option (google.api.http) = {
-            get: "/users/me/mfas"
+            get: "/users/me/mfas/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -264,7 +266,7 @@ service AuthService {
 
     rpc VerifyMyMultiFactorOTP(VerifyMyMultiFactorOTPRequest) returns (VerifyMyMultiFactorOTPResponse) {
         option (google.api.http) = {
-            put: "/users/me/mfas/otp/_verify"
+            post: "/users/me/mfas/otp/_verify"
             body: "*"
         };
 
@@ -295,7 +297,7 @@ service AuthService {
 
     rpc VerifyMyMultiFactorU2F(VerifyMyMultiFactorU2FRequest) returns (VerifyMyMultiFactorU2FResponse) {
         option (google.api.http) = {
-            put: "/users/me/mfas/u2f/_verify"
+            post: "/users/me/mfas/u2f/_verify"
             body: "*"
         };
 
@@ -316,7 +318,7 @@ service AuthService {
 
     rpc ListMyPasswordless(ListMyPasswordlessRequest) returns (ListMyPasswordlessResponse) {
         option (google.api.http) = {
-            get: "/users/me/passwordless"
+            get: "/users/me/passwordless/_search"
         };
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
@@ -335,7 +337,7 @@ service AuthService {
 
     rpc VerifyMyPasswordless(VerifyMyPasswordlessRequest) returns (VerifyMyPasswordlessResponse) {
         option (google.api.http) = {
-            put: "/users/me/passwordless/_verify"
+            post: "/users/me/passwordless/_verify"
             body: "*"
         };
 
@@ -354,7 +356,6 @@ service AuthService {
         };
     }
 
-    //DISCUSS: should we return the user grants for all resource owners or only context based?
     rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
         option (google.api.http) = {
             post: "/usergrants/me/_search"
@@ -378,7 +379,7 @@ service AuthService {
 
     rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
         option (google.api.http) = {
-            get: "/permissions/zitadel/me"
+            get: "/permissions/zitadel/me/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -388,7 +389,7 @@ service AuthService {
 
     rpc ListMyProjectPermissions(ListMyProjectPermissionsRequest) returns (ListMyProjectPermissionsResponse) {
         option (google.api.http) = {
-            get: "/permissions/me"
+            get: "/permissions/me/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -475,11 +476,11 @@ message GetMyEmailResponse {
     zitadel.user.v1.Email email = 2;
 }
 
-message SetMyEmailRequest {
+message UpdateMyEmailRequest {
     string email = 1 [(validate.rules).string.email = true]; //TODO: check if no value is allowed
 }
 
-message SetMyEmailResponse {
+message UpdateMyEmailResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -504,11 +505,11 @@ message GetMyPhoneResponse {
     zitadel.user.v1.Phone phone = 2;
 }
 
-message SetMyPhoneRequest {
+message UpdateMyPhoneRequest {
     string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
 }
 
-message SetMyPhoneResponse {
+message UpdateMyPhoneResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

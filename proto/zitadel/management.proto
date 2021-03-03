@@ -97,7 +97,7 @@ service ManagementService {
     // the login name has to match exactly
     rpc GetUserByLoginNameGlobal(GetUserByLoginNameGlobalRequest) returns (GetUserByLoginNameGlobalResponse) {
         option (google.api.http) = {
-            get: "/global/users/_byloginname"
+            get: "/global/users/_by_login_name"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -133,7 +133,7 @@ service ManagementService {
 
     rpc ListUserChanges(ListUserChangesRequest) returns (ListUserChangesResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/changes"
+            get: "/users/{user_id}/changes/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -143,7 +143,7 @@ service ManagementService {
 
     rpc IsUserUnique(IsUserUniqueRequest) returns (IsUserUniqueResponse) {
         option (google.api.http) = {
-            get: "/users/_isunique"
+            get: "/users/_is_unique"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -175,7 +175,7 @@ service ManagementService {
 
     rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
         option (google.api.http) = {
-            put: "/users/{id}/_deactivate"
+            post: "/users/{id}/_deactivate"
             body: "*"
         };
 
@@ -186,7 +186,7 @@ service ManagementService {
 
     rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
         option (google.api.http) = {
-            put: "/users/{id}/_reactivate"
+            post: "/users/{id}/_reactivate"
             body: "*"
         };
 
@@ -197,7 +197,7 @@ service ManagementService {
 
     rpc LockUser(LockUserRequest) returns (LockUserResponse) {
         option (google.api.http) = {
-            put: "/users/{id}/_lock"
+            post: "/users/{id}/_lock"
             body: "*"
         };
 
@@ -208,7 +208,7 @@ service ManagementService {
 
     rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
         option (google.api.http) = {
-            put: "/users/{id}/_unlock"
+            post: "/users/{id}/_unlock"
             body: "*"
         };
 
@@ -281,7 +281,7 @@ service ManagementService {
 
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/_resendinitialization" 
+            post: "/users/{user_id}/_resend_initialization" 
             body: "*"
         };
 
@@ -292,7 +292,7 @@ service ManagementService {
 
     rpc ResendHumanEmailVerification(ResendHumanEmailVerificationRequest) returns (ResendHumanEmailVerificationResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/email/_resendverification"
+            post: "/users/{user_id}/email/_resend_verification"
             body: "*"
         };
 
@@ -334,7 +334,7 @@ service ManagementService {
 
     rpc ResendHumanPhoneVerification(ResendHumanPhoneVerificationRequest) returns (ResendHumanPhoneVerificationResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/phone/_resendverification"
+            post: "/users/{user_id}/phone/_resend_verification"
             body: "*"
         };
 
@@ -368,7 +368,7 @@ service ManagementService {
 
     rpc ListHumanMultiFactors(ListHumanMultiFactorsRequest) returns (ListHumanMultiFactorsResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/mfas"
+            get: "/users/{user_id}/multi_factor/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -378,7 +378,7 @@ service ManagementService {
 
     rpc RemoveHumanMultiFactorOTP(RemoveHumanMultiFactorOTPRequest) returns (RemoveHumanMultiFactorOTPResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/mfas/otp"
+            delete: "/users/{user_id}/multi_factor/otp"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -388,7 +388,7 @@ service ManagementService {
 
     rpc RemoveHumanMultiFactorU2F(RemoveHumanMultiFactorU2FRequest) returns (RemoveHumanMultiFactorU2FResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/mfas/u2f"
+            delete: "/users/{user_id}/multi_factor/u2f"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -398,7 +398,7 @@ service ManagementService {
 
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/passwordless"
+            get: "/users/{user_id}/passwordless/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -514,7 +514,7 @@ service ManagementService {
 
     rpc GetOrgByDomainGlobal(GetOrgByDomainGlobalRequest) returns (GetOrgByDomainGlobalResponse) {
         option (google.api.http) = {
-            get: "/global/orgs/_bydomain"
+            get: "/global/orgs/_by_domain"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -524,7 +524,7 @@ service ManagementService {
 
     rpc ListOrgChanges(ListOrgChangesRequest) returns (ListOrgChangesResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/changes"
+            get: "/orgs/me/changes/_search"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -545,7 +545,7 @@ service ManagementService {
 
     rpc DeactivateOrg(DeactivateOrgRequest) returns (DeactivateOrgResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/_deactivate"
+            post: "/orgs/me/_deactivate"
             body: "*"
         };
 
@@ -556,22 +556,12 @@ service ManagementService {
 
     rpc ReactivateOrg(ReactivateOrgRequest) returns (ReactivateOrgResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/_reactivate"
+            post: "/orgs/me/_reactivate"
             body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
-        };
-    }
-
-    rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
-        option (google.api.http) = {
-            get: "/orgs/me/iampolicy"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
         };
     }
 
@@ -609,7 +599,7 @@ service ManagementService {
 
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/domains/{domain}/validation/create"
+            post: "/orgs/me/domains/{domain}/validation/_generate"
             body: "*"
         };
 
@@ -620,7 +610,7 @@ service ManagementService {
 
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/domains/{domain}/validation/check"
+            post: "/orgs/me/domains/{domain}/validation/_validate"
             body: "*"
         };
 
@@ -631,7 +621,7 @@ service ManagementService {
 
     rpc SetPrimaryOrgDomain(SetPrimaryOrgDomainRequest) returns (SetPrimaryOrgDomainResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/domains/{domain}/_primary"
+            post: "/orgs/me/domains/{domain}/_set_primary"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -641,7 +631,7 @@ service ManagementService {
 
     rpc ListOrgMemberRoles(ListOrgMemberRolesRequest) returns (ListOrgMemberRolesResponse) {
         option (google.api.http) = {
-            get: "/orgs/members/roles"
+            get: "/orgs/members/roles/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -706,7 +696,7 @@ service ManagementService {
     // returns a project my organisation got granted from another organisation
     rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
         option (google.api.http) = {
-            get: "/grantedprojects/{project_id}/grants/{grant_id}"
+            get: "/granted_projects/{project_id}/grants/{grant_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -729,7 +719,7 @@ service ManagementService {
       // returns all projects my organisation got granted from another organisation
     rpc ListGrantedProjects(ListGrantedProjectsRequest) returns (ListGrantedProjectsResponse) {
         option (google.api.http) = {
-            post: "/grantedprojects/_search"
+            post: "/granted_projects/_search"
             body: "*"
         };
 
@@ -740,7 +730,7 @@ service ManagementService {
 
     rpc ListProjectChanges(ListProjectChangesRequest) returns (ListProjectChangesResponse) {
         option (google.api.http) = {
-            get: "/projects/{project_id}/changes"
+            get: "/projects/{project_id}/changes/_search"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -773,7 +763,7 @@ service ManagementService {
 
     rpc DeactivateProject(DeactivateProjectRequest) returns (DeactivateProjectResponse) {
         option (google.api.http) = {
-            put: "/projects/{id}/_deactivate"
+            post: "/projects/{id}/_deactivate"
             body: "*"
         };
 
@@ -785,7 +775,7 @@ service ManagementService {
 
     rpc ReactivateProject(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
         option (google.api.http) = {
-            put: "/projects/{id}/_reactivate"
+            post: "/projects/{id}/_reactivate"
             body: "*"
         };
 
@@ -830,7 +820,7 @@ service ManagementService {
         };
     }
 
-  // add a list of project roles in one request
+    // add a list of project roles in one request
     rpc BulkAddProjectRoles(BulkAddProjectRolesRequest) returns (BulkAddProjectRolesResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/roles/_bulk"
@@ -869,7 +859,7 @@ service ManagementService {
 
     rpc ListProjectMemberRoles(ListProjectMemberRolesRequest) returns (ListProjectMemberRolesResponse) {
         option (google.api.http) = {
-            get: "/projects/members/roles"
+            get: "/projects/members/roles/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -949,7 +939,7 @@ service ManagementService {
 
     rpc ListAppChanges(ListAppChangesRequest) returns (ListAppChangesResponse) {
         option (google.api.http) = {
-            get: "/projects/{project_id}/apps/{app_id}/changes"
+            get: "/projects/{project_id}/apps/{app_id}/changes/_search"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -996,7 +986,7 @@ service ManagementService {
 
     rpc UpdateOIDCAppConfig(UpdateOIDCAppConfigRequest) returns (UpdateOIDCAppConfigResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{app_id}/oidcconfig"
+            put: "/projects/{project_id}/apps/{app_id}/oidc_config"
             body: "*"
         };
 
@@ -1008,7 +998,7 @@ service ManagementService {
 
     rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{app_id}/apiconfig"
+            put: "/projects/{project_id}/apps/{app_id}/api_config"
             body: "*"
         };
 
@@ -1020,7 +1010,7 @@ service ManagementService {
 
     rpc DeactivateApp(DeactivateAppRequest) returns (DeactivateAppResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{app_id}/_deactivate"
+            post: "/projects/{project_id}/apps/{app_id}/_deactivate"
             body: "*"
         };
 
@@ -1032,7 +1022,7 @@ service ManagementService {
 
     rpc ReactivateApp(ReactivateAppRequest) returns (ReactivateAppResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{app_id}/_reactivate"
+            post: "/projects/{project_id}/apps/{app_id}/_reactivate"
             body: "*"
         };
 
@@ -1055,7 +1045,7 @@ service ManagementService {
 
     rpc RegenerateOIDCClientSecret(RegenerateOIDCClientSecretRequest) returns (RegenerateOIDCClientSecretResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{app_id}/oidcconfig/_changeclientsecret"
+            post: "/projects/{project_id}/apps/{app_id}/oidc_config/_generate_client_secret"
             body: "*"
         };
 
@@ -1067,7 +1057,7 @@ service ManagementService {
 
     rpc RegenerateAPIClientSecret(RegenerateAPIClientSecretRequest) returns (RegenerateAPIClientSecretResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{app_id}/apiconfig/_changeclientsecret"
+            post: "/projects/{project_id}/apps/{app_id}/api_config/_generate_client_secret"
             body: "*"
         };
 
@@ -1079,7 +1069,7 @@ service ManagementService {
 
     rpc GetAPIClientKey(GetAPIClientKeyRequest) returns (GetAPIClientKeyResponse) {
         option (google.api.http) = {
-            get: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
+            get: "/projects/{project_id}/apps/{app_id}/api_config/keys/{key_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1090,7 +1080,7 @@ service ManagementService {
 
     rpc ListAPIClientKeys(ListAPIClientKeysRequest) returns (ListAPIClientKeysResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/apps/{app_id}/keys/_search"
+            post: "/projects/{project_id}/apps/{app_id}/api_config/keys/_search"
             body: "*"
         };
 
@@ -1102,7 +1092,7 @@ service ManagementService {
 
     rpc AddAPIClientKey(AddAPIClientKeyRequest) returns (AddAPIClientKeyResponse){
         option (google.api.http) = {
-            post: "/projects/{project_id}/apps/{app_id}/keys"
+            post: "/projects/{project_id}/apps/{app_id}/api_config/keys"
             body: "*"
         };
 
@@ -1114,7 +1104,7 @@ service ManagementService {
 
     rpc RemoveAPIClientKey(RemoveAPIClientKeyRequest) returns (RemoveAPIClientKeyResponse) {
         option (google.api.http) = {
-            delete: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
+            delete: "/projects/{project_id}/apps/{app_id}/api_config/keys/{key_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1169,7 +1159,7 @@ service ManagementService {
 
     rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/grants/{grant_id}/_deactivate"
+            post: "/projects/{project_id}/grants/{grant_id}/_deactivate"
             body: "*"
         };
 
@@ -1180,7 +1170,7 @@ service ManagementService {
 
     rpc ReactivateProjectGrant(ReactivateProjectGrantRequest) returns (ReactivateProjectGrantResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/grants/{grant_id}/_reactivate"
+            post: "/projects/{project_id}/grants/{grant_id}/_reactivate"
             body: "*"
         };
 
@@ -1202,7 +1192,7 @@ service ManagementService {
 
     rpc ListProjectGrantMemberRoles(ListProjectGrantMemberRolesRequest) returns (ListProjectGrantMemberRolesResponse) {
         option (google.api.http) = {
-            get: "/projects/grants/members/roles"
+            get: "/projects/grants/members/roles/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1298,7 +1288,7 @@ service ManagementService {
 
     rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
         option (google.api.http) = {
-            put: "/users/{user_id}/grants/{grant_id}/_deactivate"
+            post: "/users/{user_id}/grants/{grant_id}/_deactivate"
             body: "*"
         };
 
@@ -1309,7 +1299,7 @@ service ManagementService {
 
     rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
         option (google.api.http) = {
-            put: "/users/{user_id}/grants/{grant_id}/_reactivate"
+            post: "/users/{user_id}/grants/{grant_id}/_reactivate"
             body: "*"
         };
 
@@ -1331,7 +1321,7 @@ service ManagementService {
     // remove a list of user grants in one request
     rpc BulkRemoveUserGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {
         option (google.api.http) = {
-            delete: "/usersgrants/_bulk"
+            delete: "/user_grants/_bulk"
             body: "*"
         };
 
@@ -1340,9 +1330,19 @@ service ManagementService {
         };
     }
 
+    rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/orgiam"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/policies/login"
+            get: "/policies/login"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1352,7 +1352,7 @@ service ManagementService {
 
     rpc GetDefaultLoginPolicy(GetDefaultLoginPolicyRequest) returns (GetDefaultLoginPolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/default/policies/login"
+            get: "/policies/default/login"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1362,7 +1362,7 @@ service ManagementService {
 
     rpc AddCustomLoginPolicy(AddCustomLoginPolicyRequest) returns (AddCustomLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/policies/login"
+            post: "/policies/login"
             body: "*"
         };
 
@@ -1373,7 +1373,7 @@ service ManagementService {
 
     rpc UpdateCustomLoginPolicy(UpdateCustomLoginPolicyRequest) returns (UpdateCustomLoginPolicyResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/policies/login"
+            put: "/policies/login"
             body: "*"
         };
 
@@ -1384,7 +1384,7 @@ service ManagementService {
 
     rpc ResetLoginPolicyToDefault(ResetLoginPolicyToDefaultRequest) returns (ResetLoginPolicyToDefaultResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/policies/login"
+            delete: "/policies/login"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1394,7 +1394,7 @@ service ManagementService {
 
     rpc ListLoginPolicyIDPs(ListLoginPolicyIDPsRequest) returns (ListLoginPolicyIDPsResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/policies/login/idpproviders/_search"
+            post: "/policies/login/idps/_search"
             body: "*"
         };
 
@@ -1405,7 +1405,7 @@ service ManagementService {
 
     rpc AddIDPToLoginPolicy(AddIDPToLoginPolicyRequest) returns (AddIDPToLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/policies/login/idpproviders"
+            post: "/policies/login/idps"
             body: "*"
         };
 
@@ -1416,7 +1416,7 @@ service ManagementService {
 
     rpc RemoveIDPFromLoginPolicy(RemoveIDPFromLoginPolicyRequest) returns (RemoveIDPFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/policies/login/idpproviders/{idp_id}"
+            delete: "/policies/login/idps/{idp_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1426,7 +1426,7 @@ service ManagementService {
 
     rpc ListLoginPolicySecondFactors(ListLoginPolicySecondFactorsRequest) returns (ListLoginPolicySecondFactorsResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/policies/login/secondfactors/_search"
+            get: "/policies/login/second_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1436,7 +1436,7 @@ service ManagementService {
 
     rpc AddSecondFactorToLoginPolicy(AddSecondFactorToLoginPolicyRequest) returns (AddSecondFactorToLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/policies/login/secondfactors"
+            post: "/policies/login/second_factors"
             body: "*"
         };
 
@@ -1447,7 +1447,7 @@ service ManagementService {
 
     rpc RemoveSecondFactorFromLoginPolicy(RemoveSecondFactorFromLoginPolicyRequest) returns (RemoveSecondFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/policies/login/secondfactors/{second_factor}"
+            delete: "/policies/login/second_factors/{second_factor}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1457,7 +1457,7 @@ service ManagementService {
 
     rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/policies/login/mfas/_search"
+            get: "/policies/login/multi_factor/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1467,7 +1467,7 @@ service ManagementService {
 
     rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/policies/login/mfas"
+            post: "/policies/login/multi_factor"
             body: "*"
         };
 
@@ -1478,7 +1478,7 @@ service ManagementService {
 
     rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/policies/login/mfas/{multi_factor}"
+            delete: "/policies/login/multi_factor/{multi_factor}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1488,7 +1488,7 @@ service ManagementService {
 
     rpc GetPasswordComplexityPolicy(GetPasswordComplexityPolicyRequest) returns (GetPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/policies/complexity"
+            get: "/policies/password/complexity"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1498,7 +1498,7 @@ service ManagementService {
     
     rpc GetDefaultPasswordComplexityPolicy(GetDefaultPasswordComplexityPolicyRequest) returns (GetDefaultPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/default/policies/complexity"
+            get: "/policies/default/password/complexity"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1508,7 +1508,7 @@ service ManagementService {
     
     rpc AddCustomPasswordComplexityPolicy(AddCustomPasswordComplexityPolicyRequest) returns (AddCustomPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/policies/complexity"
+            post: "/policies/password/complexity"
             body: "*"
         };
     
@@ -1519,7 +1519,7 @@ service ManagementService {
     
     rpc UpdateCustomPasswordComplexityPolicy(UpdateCustomPasswordComplexityPolicyRequest) returns (UpdateCustomPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/policies/complexity"
+            put: "/policies/password/complexity"
             body: "*"
         };
     
@@ -1530,7 +1530,7 @@ service ManagementService {
     
     rpc ResetPasswordComplexityPolicyToDefault(ResetPasswordComplexityPolicyToDefaultRequest) returns (ResetPasswordComplexityPolicyToDefaultResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/policies/complexity"
+            delete: "/policies/password/complexity"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1540,7 +1540,7 @@ service ManagementService {
 
     rpc GetPasswordAgePolicy(GetPasswordAgePolicyRequest) returns (GetPasswordAgePolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/policies/age"
+            get: "/policies/password/age"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1550,7 +1550,7 @@ service ManagementService {
     
     rpc GetDefaultPasswordAgePolicy(GetDefaultPasswordAgePolicyRequest) returns (GetDefaultPasswordAgePolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/default/policies/age"
+            get: "/policies/default/password/age"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1560,7 +1560,7 @@ service ManagementService {
     
     rpc AddCustomPasswordAgePolicy(AddCustomPasswordAgePolicyRequest) returns (AddCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/policies/age"
+            post: "/policies/password/age"
             body: "*"
         };
     
@@ -1571,7 +1571,7 @@ service ManagementService {
     
     rpc UpdateCustomPasswordAgePolicy(UpdateCustomPasswordAgePolicyRequest) returns (UpdateCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/policies/age"
+            put: "/policies/password/age"
             body: "*"
         };
     
@@ -1582,7 +1582,7 @@ service ManagementService {
     
     rpc ResetPasswordAgePolicyToDefault(ResetPasswordAgePolicyToDefaultRequest) returns (ResetPasswordAgePolicyToDefaultResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/policies/age"
+            delete: "/policies/password/age"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1592,7 +1592,7 @@ service ManagementService {
 
     rpc GetPasswordLockoutPolicy(GetPasswordLockoutPolicyRequest) returns (GetPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/policies/lockout"
+            get: "/policies/password/lockout"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1602,7 +1602,7 @@ service ManagementService {
     
     rpc GetDefaultPasswordLockoutPolicy(GetDefaultPasswordLockoutPolicyRequest) returns (GetDefaultPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
-            get: "/orgs/default/policies/lockout"
+            get: "/policies/default/password/lockout"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1612,7 +1612,7 @@ service ManagementService {
     
     rpc AddCustomPasswordLockoutPolicy(AddCustomPasswordLockoutPolicyRequest) returns (AddCustomPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/policies/lockout"
+            post: "/policies/password/lockout"
             body: "*"
         };
     
@@ -1623,7 +1623,7 @@ service ManagementService {
     
     rpc UpdateCustomPasswordLockoutPolicy(UpdateCustomPasswordLockoutPolicyRequest) returns (UpdateCustomPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/policies/lockout"
+            put: "/policies/password/lockout"
             body: "*"
         };
     
@@ -1634,7 +1634,7 @@ service ManagementService {
     
     rpc ResetPasswordLockoutPolicyToDefault(ResetPasswordLockoutPolicyToDefaultRequest) returns (ResetPasswordLockoutPolicyToDefaultResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/policies/lockout"
+            delete: "/policies/password/lockout"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1644,7 +1644,7 @@ service ManagementService {
 
     rpc GetOrgIDPByID(GetOrgIDPByIDRequest) returns (GetOrgIDPByIDResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/idps/{id}"
+            get: "/idps/{id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1654,7 +1654,7 @@ service ManagementService {
 
     rpc ListOrgIDPs(ListOrgIDPsRequest) returns (ListOrgIDPsResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/idps/_search"
+            post: "/idps/_search"
             body: "*"
         };
 
@@ -1665,7 +1665,7 @@ service ManagementService {
 
     rpc AddOrgOIDCIDP(AddOrgOIDCIDPRequest) returns (AddOrgOIDCIDPResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/idps"
+            post: "/idps/oidc"
             body: "*"
         };
 
@@ -1676,7 +1676,7 @@ service ManagementService {
 
     rpc DeactivateOrgIDP(DeactivateOrgIDPRequest) returns (DeactivateOrgIDPResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/idps/{idp_id}/_deactivate"
+            post: "/idps/{idp_id}/_deactivate"
             body: "*"
         };
 
@@ -1687,7 +1687,7 @@ service ManagementService {
 
     rpc ReactivateOrgIDP(ReactivateOrgIDPRequest) returns (ReactivateOrgIDPResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/idps/{idp_id}/_reactivate"
+            post: "/idps/{idp_id}/_reactivate"
             body: "*"
         };
 
@@ -1698,7 +1698,7 @@ service ManagementService {
 
     rpc RemoveOrgIDP(RemoveOrgIDPRequest) returns (RemoveOrgIDPResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/idps/{idp_id}"
+            delete: "/idps/{idp_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1708,7 +1708,7 @@ service ManagementService {
 
     rpc UpdateOrgIDP(UpdateOrgIDPRequest) returns (UpdateOrgIDPResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/idps/{idp_id}"
+            put: "/idps/{idp_id}"
             body: "*"
         };
 
@@ -1719,7 +1719,7 @@ service ManagementService {
 
     rpc UpdateOrgIDPOIDCConfig(UpdateOrgIDPOIDCConfigRequest) returns (UpdateOrgIDPOIDCConfigResponse) {
         option (google.api.http) = {
-            put: "/orgs/me/idps/{idp_id}/oidcconfig"
+            put: "/idps/{idp_id}/oidc_config"
             body: "*"
         };
 
