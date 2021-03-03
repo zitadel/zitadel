@@ -86,18 +86,25 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *domain.Membe
 	return memberWriteModelToMember(&existingMember.MemberWriteModel), nil
 }
 
-func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, resourceOwner string) error {
+func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	m, err := c.projectMemberWriteModelByID(ctx, projectID, userID, resourceOwner)
 	if err != nil && !errors.IsNotFound(err) {
-		return err
+		return nil, err
 	}
 	if errors.IsNotFound(err) {
-		return nil
+		return nil, nil
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, project.NewProjectMemberRemovedEvent(ctx, projectAgg, userID))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectMemberRemovedEvent(ctx, projectAgg, userID))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(m, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&m.WriteModel), nil
 }
 
 func (c *Commands) projectMemberWriteModelByID(ctx context.Context, projectID, userID, resourceOwner string) (member *ProjectMemberWriteModel, err error) {

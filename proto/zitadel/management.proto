@@ -1933,9 +1933,12 @@ message UpdateHumanEmailResponse {
 
 message ResendHumanInitializationRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string email = 2 [(validate.rules).string.email = true];
 }
 
-message ResendHumanInitializationResponse {}
+message ResendHumanInitializationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message ResendHumanEmailVerificationRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];

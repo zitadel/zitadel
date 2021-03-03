@@ -73,32 +73,32 @@ func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProj
 }
 
 func (s *Server) DeactivateProjectGrant(ctx context.Context, req *mgmt_pb.DeactivateProjectGrantRequest) (*mgmt_pb.DeactivateProjectGrantResponse, error) {
-	err := s.command.DeactivateProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.DeactivateProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateProjectGrantResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) ReactivateProjectGrant(ctx context.Context, req *mgmt_pb.ReactivateProjectGrantRequest) (*mgmt_pb.ReactivateProjectGrantResponse, error) {
-	err := s.command.ReactivateProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.ReactivateProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateProjectGrantResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) RemoveProjectGrant(ctx context.Context, req *mgmt_pb.RemoveProjectGrantRequest) (*mgmt_pb.RemoveProjectGrantResponse, error) {
-	err := s.command.RemoveProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.RemoveProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectGrantResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -154,11 +154,11 @@ func (s *Server) UpdateProjectGrantMember(ctx context.Context, req *mgmt_pb.Upda
 }
 
 func (s *Server) RemoveProjectGrantMember(ctx context.Context, req *mgmt_pb.RemoveProjectGrantMemberRequest) (*mgmt_pb.RemoveProjectGrantMemberResponse, error) {
-	err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectGrantMemberResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }

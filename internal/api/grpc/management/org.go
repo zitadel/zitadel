@@ -121,12 +121,12 @@ func (s *Server) AddOrgDomain(ctx context.Context, req *mgmt_pb.AddOrgDomainRequ
 }
 
 func (s *Server) RemoveOrgDomain(ctx context.Context, req *mgmt_pb.RemoveOrgDomainRequest) (*mgmt_pb.RemoveOrgDomainResponse, error) {
-	err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req))
+	details, err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveOrgDomainResponse{
-		//TODO: details
+		Details: object.DomainToDetailsPb(details),
 	}, err
 }
 
@@ -153,22 +153,22 @@ func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *mgmt_p
 }
 
 func (s *Server) ValidateOrgDomain(ctx context.Context, req *mgmt_pb.ValidateOrgDomainRequest) (*mgmt_pb.ValidateOrgDomainResponse, error) {
-	err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, req))
+	details, err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ValidateOrgDomainResponse{
-		//TODO: details
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) SetPrimaryOrgDomain(ctx context.Context, req *mgmt_pb.SetPrimaryOrgDomainRequest) (*mgmt_pb.SetPrimaryOrgDomainResponse, error) {
-	err := s.command.SetPrimaryOrgDomain(ctx, SetPrimaryOrgDomainRequestToDomain(ctx, req))
+	details, err := s.command.SetPrimaryOrgDomain(ctx, SetPrimaryOrgDomainRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.SetPrimaryOrgDomainResponse{
-		//TODO: details
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -238,11 +238,11 @@ func (s *Server) UpdateOrgMember(ctx context.Context, req *mgmt_pb.UpdateOrgMemb
 }
 
 func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemberRequest) (*mgmt_pb.RemoveOrgMemberResponse, error) {
-	err := s.command.RemoveOrgMember(ctx, authz.GetCtxData(ctx).OrgID, req.UserId)
+	details, err := s.command.RemoveOrgMember(ctx, authz.GetCtxData(ctx).OrgID, req.UserId)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveOrgMemberResponse{
-		//TODO: details
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }

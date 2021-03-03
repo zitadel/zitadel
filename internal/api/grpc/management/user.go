@@ -234,14 +234,12 @@ func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanE
 }
 
 func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.ResendHumanInitializationRequest) (*mgmt_pb.ResendHumanInitializationResponse, error) {
-	//TODO: why do we need the email again?
-	_, err := s.command.ResendInitialMail(ctx, req.UserId, "email", authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.ResendInitialMail(ctx, req.UserId, req.Email, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanInitializationResponse{
-		//TODO: implement in proto
-		//Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 

@@ -79,17 +79,12 @@ func (s *Server) AddAPIApp(ctx context.Context, req *mgmt_pb.AddAPIAppRequest) (
 }
 
 func (s *Server) UpdateApp(ctx context.Context, req *mgmt_pb.UpdateAppRequest) (*mgmt_pb.UpdateAppResponse, error) {
-	_, err := s.command.ChangeApplication(ctx, req.ProjectId, UpdateAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.ChangeApplication(ctx, req.ProjectId, UpdateAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateAppResponse{
-		//TODO: details
-		//Details: object_grpc.ToDetailsPb(
-		//	app.Sequence,
-		//	app.ChangeDate,
-		//	app.ResourceOwner,
-		//),
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -122,32 +117,32 @@ func (s *Server) UpdateAPIAppConfig(ctx context.Context, req *mgmt_pb.UpdateAPIA
 }
 
 func (s *Server) DeactivateApp(ctx context.Context, req *mgmt_pb.DeactivateAppRequest) (*mgmt_pb.DeactivateAppResponse, error) {
-	err := s.command.DeactivateApplication(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.DeactivateApplication(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateAppResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) ReactivateApp(ctx context.Context, req *mgmt_pb.ReactivateAppRequest) (*mgmt_pb.ReactivateAppResponse, error) {
-	err := s.command.ReactivateApplication(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.ReactivateApplication(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateAppResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) RemoveApp(ctx context.Context, req *mgmt_pb.RemoveAppRequest) (*mgmt_pb.RemoveAppResponse, error) {
-	err := s.command.RemoveApplication(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.RemoveApplication(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveAppResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -227,11 +222,11 @@ func (s *Server) AddAPIClientKey(ctx context.Context, req *mgmt_pb.AddAPIClientK
 }
 
 func (s *Server) RemoveAPIClientKey(ctx context.Context, req *mgmt_pb.RemoveAPIClientKeyRequest) (*mgmt_pb.RemoveAPIClientKeyResponse, error) {
-	err := s.command.RemoveApplicationKey(ctx, req.ProjectId, req.AppId, req.KeyId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.RemoveApplicationKey(ctx, req.ProjectId, req.AppId, req.KeyId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveAPIClientKeyResponse{
-		//TODO: details
+		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }
