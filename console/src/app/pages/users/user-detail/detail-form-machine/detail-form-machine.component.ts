@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-
-import { UserView } from '../../../../proto/generated/management_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 
 @Component({
     selector: 'app-detail-form-machine',
@@ -11,7 +10,7 @@ import { UserView } from '../../../../proto/generated/management_pb';
 })
 export class DetailFormMachineComponent implements OnInit, OnDestroy {
     @Input() public username!: string;
-    @Input() public user!: UserView;
+    @Input() public user!: User;
     @Input() public disabled: boolean = false;
     @Output() public submitData: EventEmitter<any> = new EventEmitter<any>();
 

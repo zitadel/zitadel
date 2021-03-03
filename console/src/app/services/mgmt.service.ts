@@ -953,10 +953,14 @@ export class ManagementService {
         userId: string,
         roleNamesList: string[],
         projectId?: string,
+        projectGrantId?: string,
     ): Promise<AddUserGrantResponse.AsObject> {
         const req = new AddUserGrantRequest();
         if (projectId) {
             req.setProjectId(projectId);
+        }
+        if (projectGrantId) {
+            req.setProjectGrantId(projectGrantId);
         }
         req.setUserId(userId);
         req.setRoleKeysList(roleNamesList);

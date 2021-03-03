@@ -1,5 +1,5 @@
-<app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="userResult?.totalResult"
-    [timestamp]="userResult?.viewTimestamp" [selection]="selection"
+<app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="totalResult"
+    [timestamp]="viewTimestamp" [selection]="selection"
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
     <cnsl-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
         <input cnslInput (keyup)="applyFilter($event)"
@@ -142,7 +142,7 @@
             <i class="las la-exclamation"></i>
             <span>{{'USER.TABLE.EMPTY' | translate}}</span>
         </div>
-        <mat-paginator #paginator class="paginator" [length]="userResult?.totalResult || 0" [pageSize]="10"
+        <mat-paginator #paginator class="paginator" [length]="totalResult || 0" [pageSize]="10"
             [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
     </div>
 </app-refresh-table>

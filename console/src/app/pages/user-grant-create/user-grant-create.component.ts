@@ -4,8 +4,9 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserTarget } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
-import { ProjectGrantView, ProjectRole, ProjectView, UserGrant, UserView } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { GrantedProject, Project, Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -22,7 +23,7 @@ export class UserGrantCreateComponent implements OnDestroy {
     public userId: string = '';
 
     public projectId: string = '';
-    public project!: ProjectGrantView.AsObject | ProjectView.AsObject;
+    public project!: GrantedProject.AsObject | Project.AsObject;
 
     public grantId: string = '';
     public rolesList: string[] = [];
@@ -38,11 +39,11 @@ export class UserGrantCreateComponent implements OnDestroy {
 
     public grantRolesKeyList: string[] = [];
 
-    public user!: UserView.AsObject;
+    public user!: User.AsObject;
     public UserTarget: any = UserTarget;
 
-    public ProjectGrantView: any = ProjectGrantView;
-    public ProjectView: any = ProjectView;
+    public ProjectGrantView: any = GrantedProject;
+    public ProjectView: any = Project;
     constructor(
         private userService: ManagementService,
         private toast: ToastService,
@@ -63,15 +64,19 @@ export class UserGrantCreateComponent implements OnDestroy {
                 this.context = UserGrantContext.OWNED_PROJECT;
             } else if (this.projectId && this.grantId) {
                 this.context = UserGrantContext.GRANTED_PROJECT;
-                this.mgmtService.GetGrantedProjectByID(this.projectId, this.grantId).then(resp => {
-                    this.grantRolesKeyList = resp.toObject().roleKeysList;
+                this.mgmtService.getGrantedProjectByID(this.projectId, this.grantId).then(resp => {
+                    if (resp.grantedProject?.grantedRoleKeysList) {
+                        this.grantRolesKeyList = resp.grantedProject?.grantedRoleKeysList;
+                    }
                 }).catch((error: any) => {
                     this.toast.showError(error);
                 });
             } else if (this.userId) {
                 this.context = UserGrantContext.USER;
-                this.mgmtService.GetUserByID(this.userId).then(resp => {
-                    this.user = resp.toObject();
+                this.mgmtService.getUserByID(this.userId).then(resp => {
+                    if (resp.user) {
+                        this.user = resp.user;
+                    }
                 }).catch((error: any) => {
                     this.toast.showError(error);
                 });
@@ -90,11 +95,11 @@ export class UserGrantCreateComponent implements OnDestroy {
     public addGrant(): void {
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:
-                this.userService.CreateUserGrant(
+                this.userService.addUserGrant(
                     this.userId,
                     this.rolesList,
                     this.projectId,
-                ).then((data: UserGrant) => {
+                ).then(() => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTADDED', true);
                     this.close();
                 }).catch((error: any) => {
@@ -102,12 +107,12 @@ export class UserGrantCreateComponent implements OnDestroy {
                 });
                 break;
             case UserGrantContext.GRANTED_PROJECT:
-                this.userService.CreateUserGrant(
+                this.userService.addUserGrant(
                     this.userId,
                     this.rolesList,
                     this.projectId,
                     this.grantId,
-                ).then((data: UserGrant) => {
+                ).then(() => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
                     this.close();
                 }).catch((error: any) => {
@@ -117,16 +122,16 @@ export class UserGrantCreateComponent implements OnDestroy {
             case UserGrantContext.USER:
                 let grantId;
 
-                if ((this.project as ProjectGrantView.AsObject)?.id) {
-                    grantId = (this.project as ProjectGrantView.AsObject).id;
+                if ((this.project as GrantedProject.AsObject)?.grantId) {
+                    grantId = (this.project as GrantedProject.AsObject).grantId;
                 }
 
-                this.userService.CreateUserGrant(
+                this.userService.addUserGrant(
                     this.userId,
                     this.rolesList,
-                    this.project.projectId,
+                    (this.project as GrantedProject.AsObject).projectId,
                     grantId,
-                ).then((data: UserGrant) => {
+                ).then(() => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
                     this.close();
                 }).catch((error: any) => {
@@ -136,16 +141,16 @@ export class UserGrantCreateComponent implements OnDestroy {
             case UserGrantContext.NONE:
                 let tempGrantId;
 
-                if ((this.project as ProjectGrantView.AsObject)?.id) {
-                    tempGrantId = (this.project as ProjectGrantView.AsObject).id;
+                if ((this.project as GrantedProject.AsObject)?.projectId) {
+                    tempGrantId = (this.project as GrantedProject.AsObject).projectId;
                 }
 
-                this.userService.CreateUserGrant(
+                this.userService.addUserGrant(
                     this.userId,
                     this.rolesList,
-                    this.project.projectId,
+                    (this.project as GrantedProject.AsObject).projectId,
                     tempGrantId,
-                ).then((data: UserGrant) => {
+                ).then(() => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
                     this.close();
                 }).catch((error: any) => {
@@ -156,17 +161,17 @@ export class UserGrantCreateComponent implements OnDestroy {
 
     }
 
-    public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
+    public selectProject(project: Project.AsObject | GrantedProject.AsObject | any): void {
         this.project = project;
         this.projectId = project.projectId;
         this.grantRolesKeyList = project.roleKeysList ?? [];
     }
 
-    public selectUser(user: UserView.AsObject): void {
+    public selectUser(user: User.AsObject): void {
         this.userId = user.id;
     }
 
-    public selectRoles(roles: ProjectRole.AsObject[]): void {
+    public selectRoles(roles: Role.AsObject[]): void {
         this.rolesList = roles.map(role => role.key);
     }
 

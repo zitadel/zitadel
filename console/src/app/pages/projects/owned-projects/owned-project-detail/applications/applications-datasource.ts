@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { Application } from 'src/app/proto/generated/management_pb';
+import { App } from 'src/app/proto/generated/zitadel/app_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 /**
@@ -10,11 +10,11 @@ import { ManagementService } from 'src/app/services/mgmt.service';
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class ProjectApplicationsDataSource extends DataSource<Application.AsObject> {
+export class ProjectApplicationsDataSource extends DataSource<App.AsObject> {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
 
-    public appsSubject: BehaviorSubject<Application.AsObject[]> = new BehaviorSubject<Application.AsObject[]>([]);
+    public appsSubject: BehaviorSubject<App.AsObject[]> = new BehaviorSubject<App.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -26,12 +26,14 @@ export class ProjectApplicationsDataSource extends DataSource<Application.AsObje
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        from(this.mgmtService.SearchApplications(projectId, pageSize, offset)).pipe(
+        from(this.mgmtService.listApps(projectId, pageSize, offset)).pipe(
             map(resp => {
-                const response = resp.toObject();
-                this.totalResult = response.totalResult;
-                if (response.viewTimestamp) {
-                    this.viewTimestamp = response.viewTimestamp;
+                const response = resp;
+                if (response.metaData?.totalResult) {
+                    this.totalResult = response.metaData.totalResult;
+                }
+                if (response.metaData?.viewTimestamp) {
+                    this.viewTimestamp = response.metaData.viewTimestamp;
                 }
                 return response.resultList;
             }),
@@ -48,7 +50,7 @@ export class ProjectApplicationsDataSource extends DataSource<Application.AsObje
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<Application.AsObject[]> {
+    public connect(): Observable<App.AsObject[]> {
         return this.appsSubject.asObservable();
     }
 

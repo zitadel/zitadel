@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
-import { MyProjectOrgSearchKey, MyProjectOrgSearchQuery, Org, SearchMethod } from 'src/app/proto/generated/auth_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Component({
@@ -56,7 +56,7 @@ export class OrgListComponent implements AfterViewInit {
 
         from(this.authService.listMyProjectOrgs(limit, offset, query ? [query] : undefined)).pipe(
             map(resp => {
-                return resp.toObject().resultList;
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),

@@ -6,24 +6,6 @@ import { AddMachineUserRequest } from 'src/app/proto/generated/zitadel/managemen
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-function noEmailValidator(c: AbstractControl): any {
-    const EMAIL_REGEXP: RegExp = /^((?!@).)*$/gm;
-    if (!c.parent || !c) {
-        return;
-    }
-    const username = c.parent.get('userName');
-
-    if (!username) {
-        return;
-    }
-
-    return EMAIL_REGEXP.test(username.value) ? null : {
-        noEmailValidator: {
-            valid: false,
-        },
-    };
-}
-
 @Component({
     selector: 'app-user-create-machine',
     templateUrl: './user-create-machine.component.html',

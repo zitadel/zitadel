@@ -9,14 +9,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { UserView } from 'src/app/proto/generated/auth_pb';
-import {
-    SearchMethod,
-    UserSearchKey,
-    UserSearchQuery,
-    UserSearchResponse,
-    UserState,
-} from 'src/app/proto/generated/management_pb';
+import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
+import { SearchQuery, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -38,14 +32,16 @@ export class UserTableComponent implements OnInit {
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild('input') public filter!: Input;
-    public dataSource: MatTableDataSource<UserView.AsObject> = new MatTableDataSource<UserView.AsObject>();
-    public selection: SelectionModel<UserView.AsObject> = new SelectionModel<UserView.AsObject>(true, []);
-    public userResult!: UserSearchResponse.AsObject;
+
+    public viewTimestamp!: Timestamp.AsObject;
+    public totalResult: number = 0;
+    public dataSource: MatTableDataSource<User.AsObject> = new MatTableDataSource<User.AsObject>();
+    public selection: SelectionModel<User.AsObject> = new SelectionModel<User.AsObject>(true, []);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     @Input() public displayedColumns: string[] = ['select', 'displayName', 'username', 'email', 'state', 'actions'];
 
-    @Output() public changedSelection: EventEmitter<Array<UserView.AsObject>> = new EventEmitter();
+    @Output() public changedSelection: EventEmitter<Array<User.AsObject>> = new EventEmitter();
     UserSearchKey: any = UserSearchKey;
 
     public UserState: any = UserState;
@@ -92,7 +88,7 @@ export class UserTableComponent implements OnInit {
 
     public deactivateSelectedUsers(): void {
         Promise.all(this.selection.selected.map(value => {
-            return this.userService.DeactivateUser(value.id);
+            return this.userService.deactivateUser(value.id);
         })).then(() => {
             this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
             this.selection.clear();
@@ -106,7 +102,7 @@ export class UserTableComponent implements OnInit {
 
     public reactivateSelectedUsers(): void {
         Promise.all(this.selection.selected.map(value => {
-            return this.userService.ReactivateUser(value.id);
+            return this.userService.reactivateUser(value.id);
         })).then(() => {
             this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
             this.selection.clear();
@@ -120,22 +116,27 @@ export class UserTableComponent implements OnInit {
 
     private async getData(limit: number, offset: number, filterTypeValue: UserType, filterName?: string): Promise<void> {
         this.loadingSubject.next(true);
-        const query = new UserSearchQuery();
-        query.setKey(UserSearchKey.USERSEARCHKEY_TYPE);
+        const query = new SearchQuery();
+        query.setType(UserSearchKey.USERSEARCHKEY_TYPE);
         query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-        query.setValue(filterTypeValue);
+        query.setType(filterTypeValue);
 
         let namequery;
         if (filterName && this.userSearchKey !== undefined) {
-            namequery = new UserSearchQuery();
+            namequery = new SearchQuery();
             namequery.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
             namequery.setKey(this.userSearchKey);
             namequery.setValue(filterName.toLowerCase());
         }
 
-        this.userService.SearchUsers(limit, offset, namequery ? [query, namequery] : [query]).then(resp => {
-            this.userResult = resp.toObject();
-            this.dataSource.data = this.userResult.resultList;
+        this.userService.listUsers(limit, offset, namequery ? [query, namequery] : [query]).then(resp => {
+            if (resp.metaData?.totalResult) {
+                this.totalResult = resp.metaData?.totalResult;
+            }
+            if (resp.metaData?.viewTimestamp) {
+                this.viewTimestamp = resp.metaData?.viewTimestamp;
+            }
+            this.dataSource.data = resp.resultList;
             this.loadingSubject.next(false);
         }).catch(error => {
             this.toast.showError(error);
@@ -174,7 +175,7 @@ export class UserTableComponent implements OnInit {
         }
     }
 
-    public deleteUser(user: UserView.AsObject): void {
+    public deleteUser(user: User.AsObject): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -187,7 +188,7 @@ export class UserTableComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.userService.DeleteUser(user.id).then(() => {
+                this.userService.removeUser(user.id).then(() => {
                     setTimeout(() => {
                         this.refreshPage();
                     }, 1000);

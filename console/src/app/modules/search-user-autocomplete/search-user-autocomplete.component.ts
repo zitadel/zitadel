@@ -15,7 +15,6 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { SearchMethod, UserSearchKey, UserSearchQuery, UserView } from 'src/app/proto/generated/management_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -90,7 +89,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         });
     }
 
-    public displayFn(user?: UserView.AsObject): string | undefined {
+    public displayFn(user?: User.AsObject): string | undefined {
         return user ? `${user.preferredLoginName}` : undefined;
     }
 
@@ -120,7 +119,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         }
     }
 
-    public remove(user: UserView.AsObject): void {
+    public remove(user: User.AsObject): void {
         const index = this.users.indexOf(user);
 
         if (index >= 0) {

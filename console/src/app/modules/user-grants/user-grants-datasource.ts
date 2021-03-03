@@ -2,14 +2,8 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import {
-    SearchMethod,
-    UserGrant,
-    UserGrantSearchKey,
-    UserGrantSearchQuery,
-    UserGrantSearchResponse,
-    UserGrantView,
-} from 'src/app/proto/generated/management_pb';
+import { ListUserGrantResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { UserGrant } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum UserGrantContext {
@@ -23,7 +17,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
 
-    public grantsSubject: BehaviorSubject<UserGrantView.AsObject[]> = new BehaviorSubject<UserGrantView.AsObject[]>([]);
+    public grantsSubject: BehaviorSubject<UserGrant.AsObject[]> = new BehaviorSubject<UserGrant.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -56,7 +50,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                         queries = [userfilter];
                     }
 
-                    const promise = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
+                    const promise = this.userService.listUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise);
                 }
                 break;
@@ -73,7 +67,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                         queries = [projectfilter];
                     }
 
-                    const promise1 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
+                    const promise1 = this.userService.listUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise1);
                 }
                 break;
@@ -97,27 +91,28 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                         queries = [projectfilter, grantquery];
                     }
 
-                    const promise2 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
+                    const promise2 = this.userService.listUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise2);
                 }
                 break;
             default:
                 this.loadingSubject.next(true);
-                const promise3 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries ?? []);
+                const promise3 = this.userService.listUserGrants(pageSize, pageSize * pageIndex, queries ?? []);
                 this.loadResponse(promise3);
                 break;
         }
     }
 
-    private loadResponse(promise: Promise<UserGrantSearchResponse>): void {
+    private loadResponse(promise: Promise<ListUserGrantResponse.AsObject>): void {
         from(promise).pipe(
             map(resp => {
-                const response = resp.toObject();
-                this.totalResult = response.totalResult;
-                if (response.viewTimestamp) {
-                    this.viewTimestamp = response.viewTimestamp;
+                if (resp.metaData?.totalResult) {
+                    this.totalResult = resp.metaData?.totalResult;
                 }
-                return response.resultList;
+                if (resp.metaData?.viewTimestamp) {
+                    this.viewTimestamp = resp.metaData.viewTimestamp;
+                }
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -132,7 +127,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<UserGrantView.AsObject[]> {
+    public connect(): Observable<UserGrant.AsObject[]> {
         return this.grantsSubject.asObservable();
     }
 

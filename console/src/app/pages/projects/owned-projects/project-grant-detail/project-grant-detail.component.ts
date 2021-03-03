@@ -3,15 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
-import {
-    ProjectGrant,
-    ProjectGrantMember,
-    ProjectGrantMemberView,
-    ProjectGrantState,
-    ProjectGrantView,
-    ProjectRoleView,
-    ProjectType,
-} from 'src/app/proto/generated/management_pb';
+import { ProjectType } from 'src/app/modules/project-members/project-members.component';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -29,7 +23,7 @@ import { ProjectGrantMembersDataSource } from './project-grant-members-datasourc
 export class ProjectGrantDetailComponent {
     public INITIALPAGESIZE: number = 25;
 
-    public grant!: ProjectGrantView.AsObject;
+    public grant!: GrantedProject.AsObject;
     public projectid: string = '';
     public grantid: string = '';
 
@@ -39,12 +33,12 @@ export class ProjectGrantDetailComponent {
     public isZitadel: boolean = false;
     ProjectGrantState: any = ProjectGrantState;
 
-    public projectRoleOptions: ProjectRoleView.AsObject[] = [];
+    public projectRoleOptions: Role.AsObject[] = [];
     public memberRoleOptions: Array<string> = [];
 
     public changePageFactory!: Function;
     public changePage: EventEmitter<void> = new EventEmitter();
-    public selection: Array<ProjectGrantMemberView.AsObject> = [];
+    public selection: Array<Member.AsObject> = [];
     public dataSource!: ProjectGrantMembersDataSource;
     constructor(
         private mgmtService: ManagementService,
@@ -71,22 +65,24 @@ export class ProjectGrantDetailComponent {
                 );
             };
 
-            this.mgmtService.ProjectGrantByID(this.grantid, this.projectid).then((grant) => {
-                this.grant = grant.toObject();
+            this.mgmtService.getProjectGrantByID(this.grantid, this.projectid).then((resp) => {
+                if (resp.projectGrant) {
+                    this.grant = resp.projectGrant;
+                }
             });
         });
     }
 
     public changeState(newState: ProjectGrantState): void {
-        if (newState === ProjectGrantState.PROJECTGRANTSTATE_ACTIVE) {
-            this.mgmtService.ReactivateProjectGrant(this.grantid, this.projectid).then(() => {
+        if (newState === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE) {
+            this.mgmtService.reactivateProjectGrant(this.grantid, this.projectid).then(() => {
                 this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
                 this.grant.state = newState;
             }).catch(error => {
                 this.toast.showError(error);
             });
-        } else if (newState === ProjectGrantState.PROJECTGRANTSTATE_INACTIVE) {
-            this.mgmtService.DeactivateProjectGrant(this.grantid, this.projectid).then(() => {
+        } else if (newState === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE) {
+            this.mgmtService.deactivateProjectGrant(this.grantid, this.projectid).then(() => {
                 this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
                 this.grant.state = newState;
             }).catch(error => {
@@ -96,22 +92,22 @@ export class ProjectGrantDetailComponent {
     }
 
     public getRoleOptions(projectId: string): void {
-        this.mgmtService.SearchProjectRoles(projectId, 100, 0).then(resp => {
-            this.projectRoleOptions = resp.toObject().resultList;
+        this.mgmtService.listProjectRoles(projectId, 100, 0).then(resp => {
+            this.projectRoleOptions = resp.resultList;
         });
     }
 
     public getMemberRoleOptions(): void {
-        this.mgmtService.GetProjectGrantMemberRoles().then(resp => {
-            this.memberRoleOptions = resp.toObject().rolesList;
+        this.mgmtService.listProjectGrantMemberRoles().then(resp => {
+            this.memberRoleOptions = resp.resultList;
         }).catch(error => {
             this.toast.showError(error);
         });
     }
 
     updateRoles(selectionChange: MatSelectChange): void {
-        this.mgmtService.UpdateProjectGrant(this.grant.id, this.grant.projectId, selectionChange.value)
-            .then((newgrant: ProjectGrant) => {
+        this.mgmtService.updateProjectGrant(this.grant.grantId, this.grant.projectId, selectionChange.value)
+            .then(() => {
                 this.toast.showInfo('PROJECT.TOAST.GRANTUPDATED');
             }).catch(error => {
                 this.toast.showError(error);
@@ -120,7 +116,7 @@ export class ProjectGrantDetailComponent {
 
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.map(member => {
-            return this.mgmtService.RemoveProjectGrantMember(this.grant.projectId, this.grant.id, member.userId).then(() => {
+            return this.mgmtService.removeProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId).then(() => {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
                 setTimeout(() => {
                     this.changePage.emit();
@@ -132,11 +128,11 @@ export class ProjectGrantDetailComponent {
     }
 
     public async openAddMember(): Promise<any> {
-        const keysList = (await this.mgmtService.GetProjectGrantMemberRoles()).toObject();
+        const keysList = (await this.mgmtService.listProjectGrantMemberRoles());
 
         const dialogRef = this.dialog.open(ProjectGrantMembersCreateDialogComponent, {
             data: {
-                roleKeysList: keysList.rolesList,
+                roleKeysList: keysList.resultList,
             },
             width: '400px',
         });
@@ -144,9 +140,9 @@ export class ProjectGrantDetailComponent {
         dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
             if (dataToAdd) {
                 Promise.all(dataToAdd.userIds.map((userid: string) => {
-                    return this.mgmtService.AddProjectGrantMember(
+                    return this.mgmtService.addProjectGrantMember(
                         this.grant.projectId,
-                        this.grant.id,
+                        this.grant.grantId,
                         userid,
                         dataToAdd.rolesKeyList,
                     );
@@ -162,9 +158,9 @@ export class ProjectGrantDetailComponent {
         });
     }
 
-    updateMemberRoles(member: ProjectGrantMember.AsObject, selectionChange: MatSelectChange): void {
-        this.mgmtService.ChangeProjectGrantMember(this.grant.projectId, this.grant.id, member.userId, selectionChange.value)
-            .then((_: ProjectGrantMember) => {
+    updateMemberRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
+        this.mgmtService.updateProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId, selectionChange.value)
+            .then(() => {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERCHANGED', true);
             }).catch(error => {
                 this.toast.showError(error);

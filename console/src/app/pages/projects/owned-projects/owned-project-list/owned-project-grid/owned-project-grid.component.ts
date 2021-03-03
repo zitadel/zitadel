@@ -3,9 +3,10 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ProjectType } from 'src/app/modules/project-members/project-members.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Org } from 'src/app/proto/generated/auth_pb';
-import { ProjectState, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -39,14 +40,14 @@ import { ToastService } from 'src/app/services/toast.service';
     ],
 })
 export class OwnedProjectGridComponent implements OnChanges {
-    @Input() items: Array<ProjectView.AsObject> = [];
-    public notPinned: Array<ProjectView.AsObject> = [];
+    @Input() items: Array<Project.AsObject> = [];
+    public notPinned: Array<Project.AsObject> = [];
 
     @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
     @Output() changedView: EventEmitter<boolean> = new EventEmitter();
     @Input() loading: boolean = false;
 
-    public selection: SelectionModel<ProjectView.AsObject> = new SelectionModel<ProjectView.AsObject>(true, []);
+    public selection: SelectionModel<Project.AsObject> = new SelectionModel<Project.AsObject>(true, []);
 
     public showNewProject: boolean = false;
     public ProjectState: any = ProjectState;
@@ -61,10 +62,10 @@ export class OwnedProjectGridComponent implements OnChanges {
     ) {
         this.selection.changed.subscribe(selection => {
             this.setPrefixedItem('pinned-projects', JSON.stringify(
-                this.selection.selected.map(item => item.projectId),
+                this.selection.selected.map(item => item.id),
             )).then(() => {
                 selection.added.forEach(item => {
-                    const index = this.notPinned.findIndex(i => i.projectId === item.projectId);
+                    const index = this.notPinned.findIndex(i => i.id === item.id);
                     this.notPinned.splice(index, 1);
                 });
                 this.notPinned.push(...selection.removed);
@@ -72,11 +73,11 @@ export class OwnedProjectGridComponent implements OnChanges {
         });
     }
 
-    public selectItem(item: ProjectView.AsObject, event?: any): void {
+    public selectItem(item: Project.AsObject, event?: any): void {
         if (event && !event.target.classList.contains('mat-icon')) {
-            this.router.navigate(['/projects', item.projectId]);
+            this.router.navigate(['/projects', item.id]);
         } else if (!event) {
-            this.router.navigate(['/projects', item.projectId]);
+            this.router.navigate(['/projects', item.id]);
         }
     }
 
@@ -95,8 +96,8 @@ export class OwnedProjectGridComponent implements OnChanges {
         this.getPrefixedItem('pinned-projects').then(storageEntry => {
             if (storageEntry) {
                 const array: string[] = JSON.parse(storageEntry);
-                const toSelect: ProjectView.AsObject[] = this.items.filter((item, index) => {
-                    if (array.includes(item.projectId)) {
+                const toSelect: Project.AsObject[] = this.items.filter((item, index) => {
+                    if (array.includes(item.id)) {
                         return true;
                     }
                 });
@@ -125,12 +126,12 @@ export class OwnedProjectGridComponent implements OnChanges {
         this.changedView.emit(true);
     }
 
-    public toggle(item: ProjectView.AsObject, event: any): void {
+    public toggle(item: Project.AsObject, event: any): void {
         event.stopPropagation();
         this.selection.toggle(item);
     }
 
-    public deleteProject(event: any, item: ProjectView.AsObject): void {
+    public deleteProject(event: any, item: Project.AsObject): void {
         event.stopPropagation();
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
@@ -143,20 +144,20 @@ export class OwnedProjectGridComponent implements OnChanges {
         });
 
         dialogRef.afterClosed().subscribe(resp => {
-            if (resp && item.projectId !== this.zitadelProjectId) {
-                this.mgmtService.RemoveProject(item.projectId).then(() => {
+            if (resp && item.id !== this.zitadelProjectId) {
+                this.mgmtService.removeProject(item.id).then(() => {
                     this.toast.showInfo('PROJECT.TOAST.DELETED', true);
-                    const index = this.items.findIndex(iter => iter.projectId === item.projectId);
+                    const index = this.items.findIndex(iter => iter.id === item.id);
                     if (index > -1) {
                         this.items.splice(index, 1);
                     }
 
-                    const indexSelection = this.selection.selected.findIndex(iter => iter.projectId === item.projectId);
+                    const indexSelection = this.selection.selected.findIndex(iter => iter.id === item.id);
                     if (indexSelection > -1) {
                         this.selection.selected.splice(indexSelection, 1);
                     }
 
-                    const indexPinned = this.notPinned.findIndex(iter => iter.projectId === item.projectId);
+                    const indexPinned = this.notPinned.findIndex(iter => iter.id === item.id);
                     if (indexPinned > -1) {
                         this.notPinned.splice(indexPinned, 1);
                     }

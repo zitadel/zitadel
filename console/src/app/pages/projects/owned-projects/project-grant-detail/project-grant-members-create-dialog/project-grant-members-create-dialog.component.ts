@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UserView } from 'src/app/proto/generated/management_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 
 export interface ProjectGrantMembersCreateDialogExportType {
     userIds: string[];
@@ -22,7 +22,7 @@ export class ProjectGrantMembersCreateDialogComponent {
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) { }
 
-    public selectUsers(users: UserView.AsObject[]): void {
+    public selectUsers(users: User.AsObject[]): void {
         this.userIds = users.map(user => user.id);
     }
 

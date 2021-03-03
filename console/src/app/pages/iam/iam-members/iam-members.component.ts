@@ -3,8 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { IamMember, IamMemberView } from 'src/app/proto/generated/admin_pb';
-import { ProjectMember, ProjectType, UserView } from 'src/app/proto/generated/management_pb';
+import { ProjectType } from 'src/app/modules/project-members/project-members.component';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -23,7 +24,7 @@ export class IamMembersComponent {
     public memberRoleOptions: string[] = [];
     public changePageFactory!: Function;
     public changePage: EventEmitter<void> = new EventEmitter();
-    public selection: Array<IamMemberView.AsObject> = [];
+    public selection: Array<Member.AsObject> = [];
 
     constructor(private adminService: AdminService,
         private dialog: MatDialog,
@@ -42,16 +43,16 @@ export class IamMembersComponent {
     }
 
     public getRoleOptions(): void {
-        this.adminService.GetIamMemberRoles().then(resp => {
-            this.memberRoleOptions = resp.toObject().rolesList;
+        this.adminService.listIAMMemberRoles().then(resp => {
+            this.memberRoleOptions = resp.rolesList;
         }).catch(error => {
             this.toast.showError(error);
         });
     }
 
-    updateRoles(member: IamMemberView.AsObject, selectionChange: MatSelectChange): void {
-        this.adminService.ChangeIamMember(member.userId, selectionChange.value)
-            .then((newmember: IamMember) => {
+    updateRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
+        this.adminService.updateIAMMember(member.userId, selectionChange.value)
+            .then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
             }).catch(error => {
                 this.toast.showError(error);
@@ -60,7 +61,7 @@ export class IamMembersComponent {
 
     public removeMemberSelection(): void {
         Promise.all(this.selection.map(member => {
-            return this.adminService.RemoveIamMember(member.userId).then(() => {
+            return this.adminService.removeIAMMember(member.userId).then(() => {
                 this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
                 this.changePage.emit();
             }).catch(error => {
@@ -69,8 +70,8 @@ export class IamMembersComponent {
         }));
     }
 
-    public removeMember(member: ProjectMember.AsObject): void {
-        this.adminService.RemoveIamMember(member.userId).then(() => {
+    public removeMember(member: Member.AsObject): void {
+        this.adminService.removeIAMMember(member.userId).then(() => {
             this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
             setTimeout(() => {
                 this.changePage.emit();
@@ -90,12 +91,12 @@ export class IamMembersComponent {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: UserView.AsObject[] = resp.users;
+                const users: User.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.adminService.AddIamMember(user.id, roles);
+                        return this.adminService.addIAMMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('IAM.TOAST.MEMBERADDED', true);
                         setTimeout(() => {
