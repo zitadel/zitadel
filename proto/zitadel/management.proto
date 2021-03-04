@@ -1067,9 +1067,9 @@ service ManagementService {
         };
     }
 
-    rpc GetAPIClientKey(GetAPIClientKeyRequest) returns (GetAPIClientKeyResponse) {
+    rpc GetAppKey(GetAppKeyRequest) returns (GetAppKeyResponse) {
         option (google.api.http) = {
-            get: "/projects/{project_id}/apps/{app_id}/api_config/keys/{key_id}"
+            get: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1078,9 +1078,9 @@ service ManagementService {
         };
     }
 
-    rpc ListAPIClientKeys(ListAPIClientKeysRequest) returns (ListAPIClientKeysResponse) {
+    rpc ListAppKeys(ListAppKeysRequest) returns (ListAppKeysResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/apps/{app_id}/api_config/keys/_search"
+            post: "/projects/{project_id}/apps/{app_id}/keys/_search"
             body: "*"
         };
 
@@ -1090,9 +1090,9 @@ service ManagementService {
         };
     }
 
-    rpc AddAPIClientKey(AddAPIClientKeyRequest) returns (AddAPIClientKeyResponse){
+    rpc AddAppKey(AddAppKeyRequest) returns (AddAppKeyResponse){
         option (google.api.http) = {
-            post: "/projects/{project_id}/apps/{app_id}/api_config/keys"
+            post: "/projects/{project_id}/apps/{app_id}/keys"
             body: "*"
         };
 
@@ -1102,9 +1102,9 @@ service ManagementService {
         };
     }
 
-    rpc RemoveAPIClientKey(RemoveAPIClientKeyRequest) returns (RemoveAPIClientKeyResponse) {
+    rpc RemoveAppKey(RemoveAppKeyRequest) returns (RemoveAppKeyResponse) {
         option (google.api.http) = {
-            delete: "/projects/{project_id}/apps/{app_id}/api_config/keys/{key_id}"
+            delete: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2625,46 +2625,46 @@ message RegenerateAPIClientSecretResponse {
     zitadel.v1.ObjectDetails details = 2;
 }
 
-message GetAPIClientKeyRequest {
+message GetAppKeyRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string key_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetAPIClientKeyResponse {
+message GetAppKeyResponse {
     zitadel.authn.v1.Key key = 1;
 }
 
-message ListAPIClientKeysRequest {
+message ListAppKeysRequest {
     zitadel.v1.ListQuery meta_data = 1;
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string project_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
-message ListAPIClientKeysResponse {
+message ListAppKeysResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.authn.v1.Key result = 2;
 }
 
-message AddAPIClientKeyRequest {
+message AddAppKeyRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.authn.v1.KeyType type = 3 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
     google.protobuf.Timestamp expiration_date = 4;
 }
 
-message AddAPIClientKeyResponse {
+message AddAppKeyResponse {
     string id = 1;
     zitadel.v1.ObjectDetails details = 2;
     bytes key_details = 3;
 }
 
-message RemoveAPIClientKeyRequest {
+message RemoveAppKeyRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string key_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveAPIClientKeyResponse {
+message RemoveAppKeyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
