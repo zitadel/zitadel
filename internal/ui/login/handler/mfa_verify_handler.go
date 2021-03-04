@@ -12,8 +12,9 @@ const (
 )
 
 type mfaVerifyFormData struct {
-	MFAType model.MFAType `schema:"mfaType"`
-	Code    string        `schema:"code"`
+	MFAType          model.MFAType `schema:"mfaType"`
+	Code             string        `schema:"code"`
+	SelectedProvider model.MFAType `schema:"provider"`
 }
 
 func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +22,15 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
+		return
+	}
+	if data.Code == "" {
+		step, ok := authReq.PossibleSteps[0].(*model.MFAVerificationStep)
+		if !ok {
+			l.renderError(w, r, authReq, err)
+			return
+		}
+		l.renderMFAVerifySelected(w, r, authReq, step, data.SelectedProvider, nil)
 		return
 	}
 	if data.MFAType == model.MFATypeOTP {
