@@ -2,10 +2,10 @@ package model
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/pkg/grpc/auth"
 	"testing"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/pkg/grpc/user"
 )
 
 func TestAppendMFAU2FAddedEvent(t *testing.T) {
@@ -28,7 +28,7 @@ func TestAppendMFAU2FAddedEvent(t *testing.T) {
 			},
 			result: &Human{
 				U2FTokens: []*WebAuthNToken{
-					{WebauthNTokenID: "WebauthNTokenID", Challenge: "Challenge", State: int32(auth.MFAState_MFASTATE_NOT_READY)},
+					{WebauthNTokenID: "WebauthNTokenID", Challenge: "Challenge", State: int32(user.MultiFactorState_MULTI_FACTOR_STATE_NOT_READY)},
 				},
 			},
 		},
@@ -63,7 +63,7 @@ func TestAppendMFAU2FVerifyEvent(t *testing.T) {
 			args: args{
 				user: &Human{
 					U2FTokens: []*WebAuthNToken{
-						{WebauthNTokenID: "WebauthNTokenID", Challenge: "Challenge", State: int32(auth.MFAState_MFASTATE_NOT_READY)},
+						{WebauthNTokenID: "WebauthNTokenID", Challenge: "Challenge", State: int32(user.MultiFactorState_MULTI_FACTOR_STATE_NOT_READY)},
 					},
 				},
 				u2f:   &WebAuthNVerify{WebAuthNTokenID: "WebauthNTokenID", KeyID: []byte("KeyID"), PublicKey: []byte("PublicKey"), AttestationType: "AttestationType", AAGUID: []byte("AAGUID"), SignCount: 1},
@@ -74,7 +74,7 @@ func TestAppendMFAU2FVerifyEvent(t *testing.T) {
 					{
 						WebauthNTokenID: "WebauthNTokenID",
 						Challenge:       "Challenge",
-						State:           int32(auth.MFAState_MFASTATE_READY),
+						State:           int32(user.MultiFactorState_MULTI_FACTOR_STATE_READY),
 						KeyID:           []byte("KeyID"),
 						PublicKey:       []byte("PublicKey"),
 						AttestationType: "AttestationType",
@@ -121,7 +121,7 @@ func TestAppendMFAU2FRemoveEvent(t *testing.T) {
 						{
 							WebauthNTokenID: "WebauthNTokenID",
 							Challenge:       "Challenge",
-							State:           int32(auth.MFAState_MFASTATE_NOT_READY),
+							State:           int32(user.MultiFactorState_MULTI_FACTOR_STATE_NOT_READY),
 							KeyID:           []byte("KeyID"),
 							PublicKey:       []byte("PublicKey"),
 							AttestationType: "AttestationType",
