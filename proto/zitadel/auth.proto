@@ -54,7 +54,7 @@ service AuthService {
 
     rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
         option (google.api.http) = {
-            get: "/users/me/changes"
+            post: "/users/me/changes/_search"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -64,7 +64,7 @@ service AuthService {
 
     rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
         option (google.api.http) = {
-            get: "/users/me/sessions"
+            post: "/users/me/sessions/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -95,7 +95,7 @@ service AuthService {
 
     rpc UpdateMyPassword(UpdateMyPasswordRequest) returns (UpdateMyPasswordResponse) {
         option (google.api.http) = {
-            put: "/users/me/passwords/_change"
+            put: "/users/me/password"
             body: "*"
         };
 
@@ -159,7 +159,7 @@ service AuthService {
 
     rpc ResendMyEmailVerification(ResendMyEmailVerificationRequest) returns (ResendMyEmailVerificationResponse) {
         option (google.api.http) = {
-            post: "/users/me/email/_resendverification"
+            post: "/users/me/email/_resend_verification"
             body: "*"
         };
 
@@ -202,7 +202,7 @@ service AuthService {
 
     rpc ResendMyPhoneVerification(ResendMyPhoneVerificationRequest) returns (ResendMyPhoneVerificationResponse) {
         option (google.api.http) = {
-            post: "/users/me/phone/_resendverification"
+            post: "/users/me/phone/_resend_verification"
             body: "*"
         };
 
@@ -244,7 +244,7 @@ service AuthService {
 
     rpc ListMyMultiFactors(ListMyMultiFactorsRequest) returns (ListMyMultiFactorsResponse) {
         option (google.api.http) = {
-            get: "/users/me/mfas"
+            post: "/users/me/multi_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -254,7 +254,7 @@ service AuthService {
 
     rpc AddMyMultiFactorOTP(AddMyMultiFactorOTPRequest) returns (AddMyMultiFactorOTPResponse) {
         option (google.api.http) = {
-            post: "/users/me/mfas/otp"
+            post: "/users/me/multi_factors/otp"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -264,7 +264,7 @@ service AuthService {
 
     rpc VerifyMyMultiFactorOTP(VerifyMyMultiFactorOTPRequest) returns (VerifyMyMultiFactorOTPResponse) {
         option (google.api.http) = {
-            put: "/users/me/mfas/otp/_verify"
+            post: "/users/me/multi_factors/otp/_verify"
             body: "*"
         };
 
@@ -275,7 +275,7 @@ service AuthService {
 
     rpc RemoveMyMultiFactorOTP(RemoveMyMultiFactorOTPRequest) returns (RemoveMyMultiFactorOTPResponse) {
         option (google.api.http) = {
-            delete: "/users/me/mfas/otp"
+            delete: "/users/me/multi_factors/otp"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -285,7 +285,7 @@ service AuthService {
 
     rpc AddMyMultiFactorU2F(AddMyMultiFactorU2FRequest) returns (AddMyMultiFactorU2FResponse) {
         option (google.api.http) = {
-            post: "/users/me/mfas/u2f"
+            post: "/users/me/multi_factors/u2f"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -295,7 +295,7 @@ service AuthService {
 
     rpc VerifyMyMultiFactorU2F(VerifyMyMultiFactorU2FRequest) returns (VerifyMyMultiFactorU2FResponse) {
         option (google.api.http) = {
-            put: "/users/me/mfas/u2f/_verify"
+            post: "/users/me/multi_factors/u2f/_verify"
             body: "*"
         };
 
@@ -306,7 +306,7 @@ service AuthService {
 
     rpc RemoveMyMultiFactorU2F(RemoveMyMultiFactorU2FRequest) returns (RemoveMyMultiFactorU2FResponse) {
         option (google.api.http) = {
-            delete: "/users/me/mfas/u2f/{token_id}"
+            delete: "/users/me/multi_factors/u2f/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -316,7 +316,7 @@ service AuthService {
 
     rpc ListMyPasswordless(ListMyPasswordlessRequest) returns (ListMyPasswordlessResponse) {
         option (google.api.http) = {
-            get: "/users/me/passwordless"
+            post: "/users/me/passwordless/_search"
         };
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
@@ -335,7 +335,7 @@ service AuthService {
 
     rpc VerifyMyPasswordless(VerifyMyPasswordlessRequest) returns (VerifyMyPasswordlessResponse) {
         option (google.api.http) = {
-            put: "/users/me/passwordless/_verify"
+            post: "/users/me/passwordless/_verify"
             body: "*"
         };
 
@@ -354,7 +354,6 @@ service AuthService {
         };
     }
 
-    //DISCUSS: should we return the user grants for all resource owners or only context based?
     rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
         option (google.api.http) = {
             post: "/usergrants/me/_search"
@@ -378,7 +377,7 @@ service AuthService {
 
     rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
         option (google.api.http) = {
-            get: "/permissions/zitadel/me"
+            post: "/permissions/zitadel/me/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -388,7 +387,7 @@ service AuthService {
 
     rpc ListMyProjectPermissions(ListMyProjectPermissionsRequest) returns (ListMyProjectPermissionsResponse) {
         option (google.api.http) = {
-            get: "/permissions/me"
+            post: "/permissions/me/_search"
         };
 
         option (zitadel.v1.auth_option) = {

@@ -47,7 +47,7 @@ service AdminService {
     
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
         option (google.api.http) = {
-            get: "/orgs/_isunique"
+            get: "/orgs/_is_unique"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -132,8 +132,7 @@ service AdminService {
 
     rpc DeactivateIDP(DeactivateIDPRequest) returns (DeactivateIDPResponse) {
         option (google.api.http) = {
-            put: "/idps/{id}/_deactivate"
-            body: "*"
+            post: "/idps/{id}/_deactivate"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -143,8 +142,7 @@ service AdminService {
 
     rpc ReactivateIDP(ReactivateIDPRequest) returns (ReactivateIDPResponse) {
         option (google.api.http) = {
-            put: "/idps/{id}/_reactivate"
-            body: "*"
+            post: "/idps/{id}/_reactivate"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -164,7 +162,7 @@ service AdminService {
 
     rpc UpdateIDPOIDCConfig(UpdateIDPOIDCConfigRequest) returns (UpdateIDPOIDCConfigResponse) {
         option (google.api.http) = {
-            put: "/idps/{idp_id}/oidcconfig"
+            put: "/idps/{idp_id}/oidc_config"
             body: "*"
         };
 
@@ -312,7 +310,7 @@ service AdminService {
 
     rpc ListLoginPolicySecondFactors(ListLoginPolicySecondFactorsRequest) returns (ListLoginPolicySecondFactorsResponse) {
         option (google.api.http) = {
-            get: "/policies/login/secondfactors/_search"
+            post: "/policies/login/second_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -322,7 +320,7 @@ service AdminService {
 
     rpc AddSecondFactorToLoginPolicy(AddSecondFactorToLoginPolicyRequest) returns (AddSecondFactorToLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/policies/login/secondfactors"
+            post: "/policies/login/second_factors"
             body: "*"
         };
 
@@ -333,7 +331,7 @@ service AdminService {
 
     rpc RemoveSecondFactorFromLoginPolicy(RemoveSecondFactorFromLoginPolicyRequest) returns (RemoveSecondFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/policies/login/secondfactors/{type}"
+            delete: "/policies/login/second_factors/{type}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -343,7 +341,7 @@ service AdminService {
 
     rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
-            get: "/policies/login/mfas/_search"
+            post: "/policies/login/multi_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -353,7 +351,7 @@ service AdminService {
 
     rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/policies/login/mfas"
+            post: "/policies/login/multi_factors"
             body: "*"
         };
 
@@ -364,7 +362,7 @@ service AdminService {
 
     rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/policies/login/mfas/{type}"
+            delete: "/policies/login/multi_factors/{type}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -437,7 +435,7 @@ service AdminService {
 
     rpc ListIAMMemberRoles(ListIAMMemberRolesRequest) returns (ListIAMMemberRolesResponse) {
         option (google.api.http) = {
-            get: "/members/roles"
+            post: "/members/roles/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -490,7 +488,7 @@ service AdminService {
 
     rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
         option (google.api.http) = {
-            get: "/views"
+            post: "/views/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -510,7 +508,7 @@ service AdminService {
 
     rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
-            get: "/failedevents"
+            post: "/failedevents/_search"
         };
 
         option (zitadel.v1.auth_option) = {
