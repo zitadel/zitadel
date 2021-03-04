@@ -195,6 +195,10 @@ func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func
 	return es
 }
 
+func EventData(event EventPusher) ([]byte, error) {
+	return eventData(event)
+}
+
 func eventData(event EventPusher) ([]byte, error) {
 	switch data := event.Data().(type) {
 	case nil:

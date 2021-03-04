@@ -2866,14 +2866,7 @@ message BulkRemoveUserGrantRequest {
     repeated string grant_id = 1;
 }
 
-message BulkRemoveUserGrantResponse {
-    message RemovedUserGrant {
-        zitadel.v1.ObjectDetails details = 1;
-        string grant_id = 2;
-    }
-
-    repeated RemovedUserGrant result = 1;
-}
+message BulkRemoveUserGrantResponse {}
 
 message GetLoginPolicyRequest {}
 
