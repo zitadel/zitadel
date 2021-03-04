@@ -133,7 +133,7 @@ service ManagementService {
 
     rpc ListUserChanges(ListUserChangesRequest) returns (ListUserChangesResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/changes/_search"
+            post: "/users/{user_id}/changes/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -368,7 +368,7 @@ service ManagementService {
 
     rpc ListHumanMultiFactors(ListHumanMultiFactorsRequest) returns (ListHumanMultiFactorsResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/multi_factor/_search"
+            post: "/users/{user_id}/multi_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -378,7 +378,7 @@ service ManagementService {
 
     rpc RemoveHumanMultiFactorOTP(RemoveHumanMultiFactorOTPRequest) returns (RemoveHumanMultiFactorOTPResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/multi_factor/otp"
+            delete: "/users/{user_id}/multi_factors/otp"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -388,7 +388,7 @@ service ManagementService {
 
     rpc RemoveHumanMultiFactorU2F(RemoveHumanMultiFactorU2FRequest) returns (RemoveHumanMultiFactorU2FResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/multi_factor/u2f"
+            delete: "/users/{user_id}/multi_factors/u2f"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -398,7 +398,7 @@ service ManagementService {
 
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/passwordless/_search"
+            post: "/users/{user_id}/passwordless/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -524,7 +524,7 @@ service ManagementService {
 
     rpc ListOrgChanges(ListOrgChangesRequest) returns (ListOrgChangesResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/changes/_search"
+            post: "/orgs/me/changes/_search"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -631,7 +631,7 @@ service ManagementService {
 
     rpc ListOrgMemberRoles(ListOrgMemberRolesRequest) returns (ListOrgMemberRolesResponse) {
         option (google.api.http) = {
-            get: "/orgs/members/roles/_search"
+            post: "/orgs/members/roles/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -730,7 +730,7 @@ service ManagementService {
 
     rpc ListProjectChanges(ListProjectChangesRequest) returns (ListProjectChangesResponse) {
         option (google.api.http) = {
-            get: "/projects/{project_id}/changes/_search"
+            post: "/projects/{project_id}/changes/_search"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -859,7 +859,7 @@ service ManagementService {
 
     rpc ListProjectMemberRoles(ListProjectMemberRolesRequest) returns (ListProjectMemberRolesResponse) {
         option (google.api.http) = {
-            get: "/projects/members/roles/_search"
+            post: "/projects/members/roles/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -939,7 +939,7 @@ service ManagementService {
 
     rpc ListAppChanges(ListAppChangesRequest) returns (ListAppChangesResponse) {
         option (google.api.http) = {
-            get: "/projects/{project_id}/apps/{app_id}/changes/_search"
+            post: "/projects/{project_id}/apps/{app_id}/changes/_search"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -1192,7 +1192,7 @@ service ManagementService {
 
     rpc ListProjectGrantMemberRoles(ListProjectGrantMemberRolesRequest) returns (ListProjectGrantMemberRolesResponse) {
         option (google.api.http) = {
-            get: "/projects/grants/members/roles/_search"
+            post: "/projects/grants/members/roles/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1426,7 +1426,7 @@ service ManagementService {
 
     rpc ListLoginPolicySecondFactors(ListLoginPolicySecondFactorsRequest) returns (ListLoginPolicySecondFactorsResponse) {
         option (google.api.http) = {
-            get: "/policies/login/second_factors/_search"
+            post: "/policies/login/second_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1457,7 +1457,7 @@ service ManagementService {
 
     rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
-            get: "/policies/login/multi_factor/_search"
+            post: "/policies/login/multi_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1467,7 +1467,7 @@ service ManagementService {
 
     rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/policies/login/multi_factor"
+            post: "/policies/login/multi_factors"
             body: "*"
         };
 
@@ -1478,7 +1478,7 @@ service ManagementService {
 
     rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/policies/login/multi_factor/{multi_factor}"
+            delete: "/policies/login/multi_factors/{multi_factor}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2174,12 +2174,6 @@ message ReactivateOrgResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetOrgIAMPolicyRequest {}
-
-message GetOrgIAMPolicyResponse {
-    zitadel.policy.v1.OrgIAMPolicy policy = 1;
-}
-
 message ListOrgDomainsRequest {
     zitadel.v1.ListQuery meta_data = 1;
     repeated zitadel.org.v1.DomainSearchQuery queries = 2;
@@ -2873,6 +2867,12 @@ message BulkRemoveUserGrantResponse {
     }
 
     repeated RemovedUserGrant result = 1;
+}
+
+message GetOrgIAMPolicyRequest {}
+
+message GetOrgIAMPolicyResponse {
+    zitadel.policy.v1.OrgIAMPolicy policy = 1;
 }
 
 message GetLoginPolicyRequest {}
