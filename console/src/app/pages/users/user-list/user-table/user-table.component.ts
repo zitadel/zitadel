@@ -10,11 +10,29 @@ import { take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
-import { SearchQuery, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
+import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
+import {
+    DisplayNameQuery,
+    EmailQuery,
+    FirstNameQuery,
+    LastNameQuery,
+    SearchQuery,
+    Type,
+    TypeQuery,
+    User,
+    UserNameQuery,
+    UserState,
+} from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { UserType } from '../user-list.component';
+enum UserListSearchKey {
+    FIRST_NAME,
+    LAST_NAME,
+    DISPLAY_NAME,
+    USER_NAME,
+    EMAIL,
+}
 
 @Component({
     selector: 'app-user-table',
@@ -25,9 +43,9 @@ import { UserType } from '../user-list.component';
     ],
 })
 export class UserTableComponent implements OnInit {
-    public userSearchKey: UserSearchKey | undefined = undefined;
-    public UserType: any = UserType;
-    @Input() userType: UserType = UserType.HUMAN;
+    public userSearchKey: UserListSearchKey | undefined = undefined;
+    public Type: any = Type;
+    @Input() type: Type = Type.TYPE_HUMAN;
     @Input() refreshOnPreviousRoutes: string[] = [];
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
@@ -42,9 +60,9 @@ export class UserTableComponent implements OnInit {
     @Input() public displayedColumns: string[] = ['select', 'displayName', 'username', 'email', 'state', 'actions'];
 
     @Output() public changedSelection: EventEmitter<Array<User.AsObject>> = new EventEmitter();
-    UserSearchKey: any = UserSearchKey;
 
     public UserState: any = UserState;
+    public UserListSearchKey: any = UserListSearchKey;
 
     constructor(
         public translate: TranslateService,
@@ -60,10 +78,10 @@ export class UserTableComponent implements OnInit {
 
     ngOnInit(): void {
         this.route.queryParams.pipe(take(1)).subscribe(params => {
-            this.getData(10, 0, this.userType);
+            this.getData(10, 0, this.type);
             if (params.deferredReload) {
                 setTimeout(() => {
-                    this.getData(10, 0, this.userType);
+                    this.getData(10, 0, this.type);
                 }, 2000);
             }
         });
@@ -83,7 +101,7 @@ export class UserTableComponent implements OnInit {
 
 
     public changePage(event: PageEvent): void {
-        this.getData(event.pageSize, event.pageIndex * event.pageSize, this.userType);
+        this.getData(event.pageSize, event.pageIndex * event.pageSize, this.type);
     }
 
     public deactivateSelectedUsers(): void {
@@ -114,22 +132,54 @@ export class UserTableComponent implements OnInit {
         });
     }
 
-    private async getData(limit: number, offset: number, filterTypeValue: UserType, filterName?: string): Promise<void> {
+    private async getData(limit: number, offset: number, type: Type, searchValue?: string): Promise<void> {
         this.loadingSubject.next(true);
         const query = new SearchQuery();
-        query.setType(UserSearchKey.USERSEARCHKEY_TYPE);
-        query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-        query.setType(filterTypeValue);
+        const typeQuery = new TypeQuery();
+        typeQuery.setType(type);
+        query.setType(typeQuery);
 
-        let namequery;
-        if (filterName && this.userSearchKey !== undefined) {
-            namequery = new SearchQuery();
-            namequery.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
-            namequery.setKey(this.userSearchKey);
-            namequery.setValue(filterName.toLowerCase());
+        if (searchValue && this.userSearchKey !== undefined) {
+            switch (this.userSearchKey) {
+                case UserListSearchKey.DISPLAY_NAME:
+                    const dNQuery = new DisplayNameQuery();
+                    dNQuery.setDisplayName(searchValue);
+                    dNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+
+                    query.setDisplayName(dNQuery);
+                    break;
+                case UserListSearchKey.USER_NAME:
+                    const uNQuery = new UserNameQuery();
+                    uNQuery.setUserName(searchValue);
+                    uNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+
+                    query.setUserName(uNQuery);
+                    break;
+                case UserListSearchKey.FIRST_NAME:
+                    const fNQuery = new FirstNameQuery();
+                    fNQuery.setFirstName(searchValue);
+                    fNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+
+                    query.setFirstName(fNQuery);
+                    break;
+                case UserListSearchKey.FIRST_NAME:
+                    const lNQuery = new LastNameQuery();
+                    lNQuery.setLastName(searchValue);
+                    lNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+
+                    query.setLastName(lNQuery);
+                    break;
+                case UserListSearchKey.EMAIL:
+                    const eQuery = new EmailQuery();
+                    eQuery.setEmailAddress(searchValue);
+                    eQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+
+                    query.setEmail(eQuery);
+                    break;
+            }
         }
 
-        this.userService.listUsers(limit, offset, namequery ? [query, namequery] : [query]).then(resp => {
+        this.userService.listUsers(limit, offset, [query]).then(resp => {
             if (resp.metaData?.totalResult) {
                 this.totalResult = resp.metaData?.totalResult;
             }
@@ -145,7 +195,7 @@ export class UserTableComponent implements OnInit {
     }
 
     public refreshPage(): void {
-        this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.userType);
+        this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
     }
 
     public applyFilter(event: Event): void {
@@ -155,12 +205,12 @@ export class UserTableComponent implements OnInit {
         this.getData(
             this.paginator.pageSize,
             this.paginator.pageIndex * this.paginator.pageSize,
-            this.userType,
+            this.type,
             filterValue,
         );
     }
 
-    public setFilter(key: UserSearchKey): void {
+    public setFilter(key: UserListSearchKey): void {
         setTimeout(() => {
             if (this.filter) {
                 (this.filter as any).nativeElement.focus();

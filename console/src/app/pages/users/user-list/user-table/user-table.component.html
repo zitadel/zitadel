@@ -1,6 +1,5 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="totalResult"
-    [timestamp]="viewTimestamp" [selection]="selection"
-    [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
+    [timestamp]="viewTimestamp" [selection]="selection" [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
     <cnsl-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
         <input cnslInput (keyup)="applyFilter($event)"
             [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
@@ -15,7 +14,7 @@
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
         </button>
-        <a [routerLink]="[ '/users',userType == UserType.HUMAN ? 'create' : 'create-machine']" color="primary"
+        <a [routerLink]="[ '/users',type == Type.TYPE_HUMAN ? 'create' : 'create-machine']" color="primary"
             mat-raised-button [disabled]="disabled">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
@@ -34,8 +33,8 @@
                     <mat-checkbox [disabled]="disabled" color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(user) : null" [checked]="selection.isSelected(user)">
                         <app-avatar
-                            *ngIf="user[userType] && user[userType].displayName && user[userType]?.firstName && user[userType]?.lastName; else cog"
-                            class="avatar" [name]="user[userType].displayName" [size]="32">
+                            *ngIf="user[type] && user[type].displayName && user[type]?.firstName && user[type]?.lastName; else cog"
+                            class="avatar" [name]="user[type].displayName" [size]="32">
                         </app-avatar>
                         <ng-template #cog>
                             <div class="sa-icon">
@@ -48,35 +47,35 @@
 
             <ng-container matColumnDef="firstname">
                 <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_FIRST_NAME}">
+                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.FIRST_NAME}">
                     {{ 'USER.PROFILE.FIRSTNAME' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_FIRST_NAME}"></template>
+                        [ngTemplateOutletContext]="{key: UserListSearchKey.FIRST_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[userType]?.firstName}} </td>
+                    {{user[type]?.firstName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="lastname">
                 <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_LAST_NAME}">
+                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.LAST_NAME}">
                     {{ 'USER.PROFILE.LASTNAME' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_LAST_NAME}"></template>
+                        [ngTemplateOutletContext]="{key: UserListSearchKey.LAST_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[userType]?.lastName}} </td>
+                    {{user[type]?.lastName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="displayName">
                 <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_DISPLAY_NAME}">
+                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.USERSEARCHKEY_DISPLAY_NAME}">
                     {{ 'USER.PROFILE.DISPLAYNAME' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_DISPLAY_NAME}"></template>
+                        [ngTemplateOutletContext]="{key: UserListSearchKey.USERSEARCHKEY_DISPLAY_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[userType]?.displayName}} </td>
+                    {{user[type]?.displayName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="name">
@@ -84,21 +83,21 @@
                     {{ 'USER.MACHINE.NAME' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[userType]?.name}} </td>
+                    {{user[type]?.name}} </td>
             </ng-container>
 
             <ng-container matColumnDef="description">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.DESCRIPTION' | translate }} </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[userType]?.description}} </td>
+                    {{user[type]?.description}} </td>
             </ng-container>
 
             <ng-container matColumnDef="username">
                 <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_USER_NAME}">
+                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.USER_NAME}">
                     {{ 'USER.PROFILE.USERNAME' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_USER_NAME}"></template>
+                        [ngTemplateOutletContext]="{key: UserListSearchKey.USER_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
                     {{user.userName}} </td>
@@ -106,20 +105,21 @@
 
             <ng-container matColumnDef="email">
                 <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey == UserSearchKey.USERSEARCHKEY_EMAIL}">
+                    [ngClass]="{'search-active': this.UserListSearchKey == UserListSearchKey.EMAIL}">
                     {{ 'USER.EMAIL' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserSearchKey.USERSEARCHKEY_EMAIL}"></template>
+                        [ngTemplateOutletContext]="{key: UserListSearchKey.EMAIL}"></template>
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[userType]?.email}} </td>
+                    {{user[type]?.email}} </td>
             </ng-container>
 
             <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.DATA.STATE' | translate }} </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
                     <span class="state"
-                        [ngClass]="{'active': user.state === UserState.USERSTATE_ACTIVE, 'inactive': user.state === UserState.USERSTATE_INACTIVE}">{{ 'USER.DATA.STATE'+user.state | translate }}</span>
+                        [ngClass]="{'active': user.state === UserState.USERSTATE_ACTIVE, 'inactive': user.state === UserState.USERSTATE_INACTIVE}">{{
+                        'USER.DATA.STATE'+user.state | translate }}</span>
                 </td>
             </ng-container>
 

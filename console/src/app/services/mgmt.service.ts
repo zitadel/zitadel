@@ -277,7 +277,13 @@ import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
 import { ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
-import { Gender, MembershipQuery, SearchQuery as UserSearchQuery, UserGrantQuery } from '../proto/generated/zitadel/user_pb';
+import {
+    Gender,
+    MembershipQuery,
+    SearchQuery as UserSearchQuery,
+    UserFieldName,
+    UserGrantQuery,
+} from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 
 export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
@@ -1021,7 +1027,7 @@ export class ManagementService {
         return this.grpcService.mgmt.sendHumanResetPasswordNotification(req, null).then(resp => resp.toObject());
     }
 
-    public listUsers(limit: number, offset: number, queriesList?: UserSearchQuery[]): Promise<ListUsersResponse.AsObject> {
+    public listUsers(limit: number, offset: number, queriesList?: UserSearchQuery[], sortingColumn?: UserFieldName): Promise<ListUsersResponse.AsObject> {
         const req = new ListUsersRequest();
         const query = new ListQuery();
         if (limit) {
@@ -1031,6 +1037,9 @@ export class ManagementService {
             query.setOffset(offset);
         }
         req.setMetaData(query);
+        if (sortingColumn) {
+            req.setSortingColumn(sortingColumn);
+        }
         if (queriesList) {
             req.setQueriesList(queriesList);
         }
