@@ -17,8 +17,8 @@ message Org {
 
 enum OrgState {
     ORG_STATE_UNSPECIFIED = 0;
-    ORG_STATE_ACTIVATE = 1;
-    ORG_STATE_INACTIVATE = 2;
+    ORG_STATE_ACTIVE = 1;
+    ORG_STATE_INACTIVE = 2;
 }
 
 message Domain {
