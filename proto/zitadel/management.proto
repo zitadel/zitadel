@@ -2951,14 +2951,14 @@ message ListLoginPolicySecondFactorsResponse {
 }
 
 message AddSecondFactorToLoginPolicyRequest {
-    zitadel.policy.v1.SecondFactorType second_factor = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 message AddSecondFactorToLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveSecondFactorFromLoginPolicyRequest {
-    zitadel.policy.v1.SecondFactorType second_factor = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message RemoveSecondFactorFromLoginPolicyResponse {
@@ -2973,7 +2973,7 @@ message ListLoginPolicyMultiFactorsResponse {
 }
 
 message AddMultiFactorToLoginPolicyRequest {
-    zitadel.policy.v1.MultiFactorType multi_factor = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message AddMultiFactorToLoginPolicyResponse {
@@ -2981,7 +2981,7 @@ message AddMultiFactorToLoginPolicyResponse {
 }
 
 message RemoveMultiFactorFromLoginPolicyRequest {
-    zitadel.policy.v1.MultiFactorType multi_factor = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message RemoveMultiFactorFromLoginPolicyResponse {
