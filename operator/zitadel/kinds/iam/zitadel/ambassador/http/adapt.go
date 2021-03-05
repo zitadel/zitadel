@@ -98,15 +98,14 @@ func AdaptFunc(
 
 			queryAdminR, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				AdminRName,
-				labels.MustForNameK8SMap(componentLabels, AdminRName),
+				labels.MustForName(componentLabels, AdminRName),
 				false,
 				apiDomain,
 				"/admin/v1",
 				"",
 				httpUrl,
-				"30000",
-				"30000",
+				30000,
+				30000,
 				cors,
 			)
 			if err != nil {
@@ -115,15 +114,14 @@ func AdaptFunc(
 
 			queryMgmtRest, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				MgmtName,
-				labels.MustForNameK8SMap(componentLabels, MgmtName),
+				labels.MustForName(componentLabels, MgmtName),
 				false,
 				apiDomain,
 				"/management/v1/",
 				"",
 				httpUrl,
-				"30000",
-				"30000",
+				30000,
+				30000,
 				cors,
 			)
 			if err != nil {
@@ -132,15 +130,14 @@ func AdaptFunc(
 
 			queryOAuthv2, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				OauthName,
-				labels.MustForNameK8SMap(componentLabels, OauthName),
+				labels.MustForName(componentLabels, OauthName),
 				false,
 				apiDomain,
 				"/oauth/v2/",
 				"",
 				httpUrl,
-				"30000",
-				"30000",
+				30000,
+				30000,
 				cors,
 			)
 			if err != nil {
@@ -149,15 +146,14 @@ func AdaptFunc(
 
 			queryAuthR, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				AuthRName,
-				labels.MustForNameK8SMap(componentLabels, AuthRName),
+				labels.MustForName(componentLabels, AuthRName),
 				false,
 				apiDomain,
 				"/auth/v1/",
 				"",
 				httpUrl,
-				"30000",
-				"30000",
+				30000,
+				30000,
 				cors,
 			)
 			if err != nil {
@@ -166,15 +162,14 @@ func AdaptFunc(
 
 			queryAuthorize, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				AuthorizeName,
-				labels.MustForNameK8SMap(componentLabels, AuthorizeName),
+				labels.MustForName(componentLabels, AuthorizeName),
 				false,
 				accountsDomain,
 				"/oauth/v2/authorize",
 				"",
 				httpUrl,
-				"30000",
-				"30000",
+				30000,
+				30000,
 				cors,
 			)
 			if err != nil {
@@ -183,15 +178,14 @@ func AdaptFunc(
 
 			queryEndsession, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				EndsessionName,
-				labels.MustForNameK8SMap(componentLabels, EndsessionName),
+				labels.MustForName(componentLabels, EndsessionName),
 				false,
 				accountsDomain,
 				"/oauth/v2/endsession",
 				"",
 				httpUrl,
-				"30000",
-				"30000",
+				30000,
+				30000,
 				cors,
 			)
 			if err != nil {
@@ -200,15 +194,14 @@ func AdaptFunc(
 
 			queryIssuer, err := mapping.AdaptFuncToEnsure(
 				namespace,
-				IssuerName,
-				labels.MustForNameK8SMap(componentLabels, IssuerName),
+				labels.MustForName(componentLabels, IssuerName),
 				false,
 				issuerDomain,
 				"/.well-known/openid-configuration",
 				"/oauth/v2/.well-known/openid-configuration",
 				httpUrl,
-				"30000",
-				"30000",
+				30000,
+				30000,
 				cors,
 			)
 			if err != nil {

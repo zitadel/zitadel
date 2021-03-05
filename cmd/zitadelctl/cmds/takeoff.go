@@ -1,23 +1,23 @@
 package cmds
 
 import (
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	"io/ioutil"
 
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/caos/orbos/pkg/orb"
+
+	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator/api"
-	"github.com/caos/zitadel/operator/zitadel/kinds/orb"
+	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	"github.com/spf13/cobra"
 )
 
 func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	var (
-		kubeconfig     string
-		gitOpsOperator bool
+		gitOpsZitadel  bool
 		gitOpsDatabase bool
 		cmd            = &cobra.Command{
 			Use:   "takeoff",
@@ -27,8 +27,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	)
 
 	flags := cmd.Flags()
-	flags.StringVar(&kubeconfig, "kubeconfig", "~/.kube/config", "Kubeconfig for ZITADEL operator deployment")
-	flags.BoolVar(&gitOpsOperator, "gitops-operator", false, "defines if the zitadel operator should run in gitops mode")
+	flags.BoolVar(&gitOpsZitadel, "gitops-zitadel", false, "defines if the zitadel operator should run in gitops mode")
 	flags.BoolVar(&gitOpsDatabase, "gitops-database", false, "defines if the database operator should run in gitops mode")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
@@ -43,22 +42,27 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 		monitor := rv.Monitor
 		orbConfig := rv.OrbConfig
 		gitClient := rv.GitClient
-		kubeconfig = helpers.PruneHome(kubeconfig)
 
-		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-			monitor.Error(err)
-			return nil
+		orbConfigIsIncompleteErr := orb.IsComplete(orbConfig)
+		if orbConfigIsIncompleteErr != nil && (rv.Gitops || gitOpsZitadel || gitOpsDatabase) {
+			return err
+		}
+		if orbConfigIsIncompleteErr == nil {
+			if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
+				monitor.Error(err)
+				return nil
+			}
+
+			if err := gitClient.Clone(); err != nil {
+				monitor.Error(err)
+				return nil
+			}
 		}
 
-		if err := gitClient.Clone(); err != nil {
-			monitor.Error(err)
-			return nil
-		}
-
-		value, err := ioutil.ReadFile(kubeconfig)
+		value, err := ioutil.ReadFile(rv.Kubeconfig)
 		if err != nil {
-			monitor.Error(err)
-			return nil
+			// print help
+			return err
 		}
 		kubeconfigStr := string(value)
 
@@ -67,7 +71,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			gitClient,
 			&kubeconfigStr,
 			rv.Version,
-			gitOpsOperator,
+			rv.Gitops || gitOpsZitadel,
 		); err != nil {
 			monitor.Error(err)
 		}
@@ -77,7 +81,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			gitClient,
 			&kubeconfigStr,
 			rv.Version,
-			gitOpsDatabase,
+			rv.Gitops || gitOpsDatabase,
 		); err != nil {
 			monitor.Error(err)
 		}
@@ -105,7 +109,7 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 				if err != nil {
 					return err
 				}
-				desired, err := orb.ParseDesiredV0(desiredTree)
+				desired, err := orbzit.ParseDesiredV0(desiredTree)
 				if err != nil {
 					return err
 				}
@@ -114,7 +118,7 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 
 				// at takeoff the artifacts have to be applied
 				spec.SelfReconciling = true
-				if err := orb.Reconcile(monitor, spec)(k8sClient); err != nil {
+				if err := orbzit.Reconcile(monitor, spec)(k8sClient); err != nil {
 					return err
 				}
 			}
@@ -124,13 +128,13 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 
 		if k8sClient.Available() {
 			// at takeoff the artifacts have to be applied
-			spec := &orb.Spec{
+			spec := &orbzit.Spec{
 				Version:         version,
 				SelfReconciling: true,
 				GitOps:          gitops,
 			}
 
-			if err := orb.Reconcile(monitor, spec)(k8sClient); err != nil {
+			if err := orbzit.Reconcile(monitor, spec)(k8sClient); err != nil {
 				return err
 			}
 		} else {

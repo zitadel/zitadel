@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"fmt"
+
 	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
@@ -224,9 +225,27 @@ status:
 		}).Debug("Database Operator crd ensured")
 	}
 
-	cmd := []string{"/zitadelctl", "operator", "-f", "/secrets/orbconfig"}
+	var (
+		cmd          = []string{"/zitadelctl", "operator"}
+		volumes      []core.Volume
+		volumeMounts []core.VolumeMount
+	)
+
 	if gitops {
-		cmd = append(cmd, "--gitops")
+		cmd = append(cmd, "--gitops", "-f", "/secrets/orbconfig")
+		volumes = []core.Volume{{
+			Name: "orbconfig",
+			VolumeSource: core.VolumeSource{
+				Secret: &core.SecretVolumeSource{
+					SecretName: "caos",
+				},
+			},
+		}}
+		volumeMounts = []core.VolumeMount{{
+			Name:      "orbconfig",
+			ReadOnly:  true,
+			MountPath: "/secrets",
+		}}
 	}
 
 	deployment := &apps.Deployment{
@@ -257,11 +276,7 @@ status:
 							ContainerPort: 2112,
 							Protocol:      "TCP",
 						}},
-						VolumeMounts: []core.VolumeMount{{
-							Name:      "orbconfig",
-							ReadOnly:  true,
-							MountPath: "/secrets",
-						}},
+						VolumeMounts: volumeMounts,
 						Resources: core.ResourceRequirements{
 							Limits: core.ResourceList{
 								"cpu":    resource.MustParse("500m"),
@@ -273,16 +288,9 @@ status:
 							},
 						},
 					}},
-					NodeSelector: nodeselector,
-					Tolerations:  tolerations,
-					Volumes: []core.Volume{{
-						Name: "orbconfig",
-						VolumeSource: core.VolumeSource{
-							Secret: &core.SecretVolumeSource{
-								SecretName: "caos",
-							},
-						},
-					}},
+					NodeSelector:                  nodeselector,
+					Tolerations:                   tolerations,
+					Volumes:                       volumes,
 					TerminationGracePeriodSeconds: int64Ptr(10),
 				},
 			},
@@ -515,9 +523,27 @@ status:
 		}).Debug("Database Operator crd ensured")
 	}
 
-	cmd := []string{"/zitadelctl", "database", "-f", "/secrets/orbconfig"}
+	var (
+		cmd          = []string{"/zitadelctl", "database"}
+		volumes      []core.Volume
+		volumeMounts []core.VolumeMount
+	)
+
 	if gitops {
-		cmd = append(cmd, "--gitops")
+		cmd = append(cmd, "--gitops", "-f", "/secrets/orbconfig")
+		volumes = []core.Volume{{
+			Name: "orbconfig",
+			VolumeSource: core.VolumeSource{
+				Secret: &core.SecretVolumeSource{
+					SecretName: "caos",
+				},
+			},
+		}}
+		volumeMounts = []core.VolumeMount{{
+			Name:      "orbconfig",
+			ReadOnly:  true,
+			MountPath: "/secrets",
+		}}
 	}
 
 	deployment := &apps.Deployment{
@@ -548,11 +574,7 @@ status:
 							ContainerPort: 2112,
 							Protocol:      "TCP",
 						}},
-						VolumeMounts: []core.VolumeMount{{
-							Name:      "orbconfig",
-							ReadOnly:  true,
-							MountPath: "/secrets",
-						}},
+						VolumeMounts: volumeMounts,
 						Resources: core.ResourceRequirements{
 							Limits: core.ResourceList{
 								"cpu":    resource.MustParse("500m"),
@@ -564,16 +586,9 @@ status:
 							},
 						},
 					}},
-					NodeSelector: nodeselector,
-					Tolerations:  tolerations,
-					Volumes: []core.Volume{{
-						Name: "orbconfig",
-						VolumeSource: core.VolumeSource{
-							Secret: &core.SecretVolumeSource{
-								SecretName: "caos",
-							},
-						},
-					}},
+					NodeSelector:                  nodeselector,
+					Tolerations:                   tolerations,
+					Volumes:                       volumes,
 					TerminationGracePeriodSeconds: int64Ptr(10),
 				},
 			},

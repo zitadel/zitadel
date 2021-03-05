@@ -84,11 +84,11 @@ func AdaptFunc(
 			zitadelPodSelector,
 			namespace,
 			grpcServiceName,
-			grpcPort,
+			uint16(grpcPort),
 			httpServiceName,
-			httpPort,
+			uint16(httpPort),
 			uiServiceName,
-			uiPort)
+			uint16(uiPort))
 		if err != nil {
 			return nil, nil, allSecrets, err
 		}

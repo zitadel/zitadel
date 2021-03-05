@@ -42,11 +42,13 @@ func Start(monitor mntr.Monitor, version, metricsAddr string, features ...string
 		return errors.Wrap(err, "unable to start manager")
 	}
 
+	k8sClient := kubernetes.NewK8sClientWithConfig(monitor, cfg)
+
 	for _, feature := range features {
 		switch feature {
 		case Database:
 			if err = (&database.Reconciler{
-				ClientInt: kubernetes.NewK8sClientWithConfig(monitor, cfg),
+				ClientInt: k8sClient,
 				Monitor:   monitor,
 				Scheme:    mgr.GetScheme(),
 				Version:   version,
@@ -55,7 +57,7 @@ func Start(monitor mntr.Monitor, version, metricsAddr string, features ...string
 			}
 		case Zitadel:
 			if err = (&zitadel.Reconciler{
-				ClientInt: kubernetes.NewK8sClientWithConfig(monitor, cfg),
+				ClientInt: k8sClient,
 				Monitor:   monitor,
 				Scheme:    mgr.GetScheme(),
 				Version:   version,
