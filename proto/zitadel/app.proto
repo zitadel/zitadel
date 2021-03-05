@@ -43,7 +43,7 @@ message OIDCConfig {
     repeated string redirect_uris = 1;
     repeated OIDCResponseType response_types = 2;
     repeated OIDCGrantType grant_types = 3;
-    OIDCAppType application_type = 4;
+    OIDCAppType app_type = 4;
     string client_id = 5;
     string client_secret = 6;
     OIDCAuthMethodType auth_method_type = 7;
@@ -72,9 +72,9 @@ enum OIDCGrantType{
 }
 
 enum OIDCAppType {
-    OIDC_APPLICATION_TYPE_WEB = 0;
-    OIDC_APPLICATION_TYPE_USER_AGENT = 1;
-    OIDC_APPLICATION_TYPE_NATIVE = 2;
+    OIDC_APP_TYPE_WEB = 0;
+    OIDC_APP_TYPE_USER_AGENT = 1;
+    OIDC_APP_TYPE_NATIVE = 2;
 }
 
 enum OIDCAuthMethodType {
