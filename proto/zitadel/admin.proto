@@ -549,13 +549,13 @@ message GetOrgByIDResponse {
 }
 
 message ListOrgsRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     zitadel.org.v1.OrgFieldName sorting_column = 2;
     repeated zitadel.org.v1.OrgQuery queries = 3;
 }
 
 message ListOrgsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     zitadel.org.v1.OrgFieldName sorting_column = 2;
     repeated zitadel.org.v1.Org result = 3;
 }
@@ -613,7 +613,7 @@ message GetIDPByIDResponse {
 }
 
 message ListIDPsRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated IDPQuery queries = 3;
 }
@@ -626,7 +626,7 @@ message IDPQuery {
 }
 
 message ListIDPsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDP result = 3;
 }
@@ -779,11 +779,11 @@ message UpdateLoginPolicyResponse {
 }
 
 message ListLoginPolicyIDPsRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
 }
 
 message ListLoginPolicyIDPsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.idp.v1.IDPLoginPolicyLink result = 2;
 }
 
@@ -806,7 +806,7 @@ message RemoveIDPFromLoginPolicyResponse {
 message ListLoginPolicySecondFactorsRequest {}
 
 message ListLoginPolicySecondFactorsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.policy.v1.SecondFactorType result = 2;
 }
 
@@ -829,7 +829,7 @@ message RemoveSecondFactorFromLoginPolicyResponse {
 message ListLoginPolicyMultiFactorsRequest {}
 
 message ListLoginPolicyMultiFactorsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.policy.v1.MultiFactorType result = 2;
 }
 
@@ -926,17 +926,17 @@ message RemoveIAMMemberResponse {
 message ListIAMMemberRolesRequest {}
 
 message ListIAMMemberRolesResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated string roles = 2;
 }
 
 message ListIAMMembersRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     repeated zitadel.member.v1.SearchQuery queries = 2;
 }
 
 message ListIAMMembersResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.member.v1.Member result = 2;
 }
 

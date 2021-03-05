@@ -530,12 +530,12 @@ message RemoveMyPhoneResponse {
 }
 
 message ListMyLinkedIDPsRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     //PLANNED: queries for idp name and login name
 }
 
 message ListMyLinkedIDPsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.idp.v1.IDPUserLink result = 2;
 }
 

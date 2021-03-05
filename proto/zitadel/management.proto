@@ -1764,13 +1764,13 @@ message GetUserByLoginNameGlobalResponse {
 }
 
 message ListUsersRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     zitadel.user.v1.UserFieldName sorting_column = 2;
     repeated zitadel.user.v1.SearchQuery queries = 3;
 }
 
 message ListUsersResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     zitadel.user.v1.UserFieldName sorting_column = 2;
     repeated zitadel.user.v1.User result = 3;
 }
@@ -2070,11 +2070,11 @@ message GetMachineKeyByIDsResponse {
 
 message ListMachineKeysRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.v1.ListQuery meta_data = 2;
+    zitadel.v1.ListQuery query = 2;
 }
 
 message ListMachineKeysResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.authn.v1.Key result = 2;
 }
 
@@ -2101,11 +2101,11 @@ message RemoveMachineKeyResponse {
 
 message ListUserIDPsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.v1.ListQuery meta_data = 2;
+    zitadel.v1.ListQuery query = 2;
 }
 
 message ListUserIDPsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.idp.v1.IDPUserLink result = 2;
 }
 
@@ -2121,12 +2121,12 @@ message RemoveUserIDPResponse {
 
 message ListUserMembershipsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.v1.ListQuery meta_data = 2;
+    zitadel.v1.ListQuery query = 2;
     repeated zitadel.user.v1.MembershipQuery queries = 3;
 }
 
 message ListUserMembershipsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.user.v1.Membership result = 2;
 }
 
@@ -2175,12 +2175,12 @@ message ReactivateOrgResponse {
 }
 
 message ListOrgDomainsRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     repeated zitadel.org.v1.DomainSearchQuery queries = 2;
 }
 
 message ListOrgDomainsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.org.v1.Domain result = 2;
 }
 
@@ -2234,12 +2234,12 @@ message ListOrgMemberRolesResponse {
 }
 
 message ListOrgMembersRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     repeated zitadel.member.v1.SearchQuery queries = 2;
 }
 
 message ListOrgMembersResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.member.v1.Member result = 2;
 }
 
@@ -2286,22 +2286,22 @@ message GetGrantedProjectByIDResponse {
 }
 
 message ListProjectsRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
 message ListProjectsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.project.v1.Project result = 2;
 }
 
 message ListGrantedProjectsRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
 message ListGrantedProjectsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.project.v1.GrantedProject result = 2;
 }
 
@@ -2364,7 +2364,7 @@ message RemoveProjectResponse {
 message ListProjectMemberRolesRequest {}
 
 message ListProjectMemberRolesResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated string result = 2;
 }
 
@@ -2416,23 +2416,23 @@ message RemoveProjectRoleResponse {
 
 message ListProjectRolesRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.v1.ListQuery meta_data = 2;
+    zitadel.v1.ListQuery query = 2;
     repeated zitadel.project.v1.RoleQuery queries = 3;
 }
 
 message ListProjectRolesResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.project.v1.Role result = 2;
 }
 
 message ListProjectMembersRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.v1.ListQuery meta_data = 2;
+    zitadel.v1.ListQuery query = 2;
     repeated zitadel.member.v1.SearchQuery queries = 3;
 }
 
 message ListProjectMembersResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.member.v1.Member result = 2;
 }
 
@@ -2476,12 +2476,12 @@ message GetAppByIDResponse {
 
 message ListAppsRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.v1.ListQuery meta_data = 2;
+    zitadel.v1.ListQuery query = 2;
     repeated zitadel.app.v1.AppQuery queries = 3;
 }
 
 message ListAppsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.app.v1.App result = 2;
 }
    
@@ -2636,7 +2636,7 @@ message GetAppKeyResponse {
 }
 
 message ListAppKeysRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string project_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -2679,12 +2679,12 @@ message GetProjectGrantByIDResponse {
 
 message ListProjectGrantsRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.v1.ListQuery meta_data = 2;
+    zitadel.v1.ListQuery query = 2;
     repeated zitadel.project.v1.ProjectGrantQuery queries = 3;
 }
 
 message ListProjectGrantsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.project.v1.GrantedProject result = 2;
 }
 
@@ -2735,24 +2735,24 @@ message RemoveProjectGrantResponse {
 }
 
 message ListProjectGrantMemberRolesRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     repeated string result = 2;
 }
 
 message ListProjectGrantMemberRolesResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated string result = 2;
 }
 
 message ListProjectGrantMembersRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.v1.ListQuery meta_data = 3;
+    zitadel.v1.ListQuery query = 3;
     repeated zitadel.member.v1.SearchQuery queries = 4;
 }
 
 message ListProjectGrantMembersResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.member.v1.Member result = 2;
 }
 
@@ -2798,12 +2798,12 @@ message GetUserGrantByIDResponse {
 }
 
 message ListUserGrantRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     repeated zitadel.user.v1.UserGrantQuery queries = 2;
 }
 
 message ListUserGrantResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.user.v1.UserGrant result = 2;
 }
 
@@ -2919,11 +2919,11 @@ message ResetLoginPolicyToDefaultResponse {
 }
 
 message ListLoginPolicyIDPsRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
 }
 
 message ListLoginPolicyIDPsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.idp.v1.IDPLoginPolicyLink result = 2;
 }
 
@@ -2946,7 +2946,7 @@ message RemoveIDPFromLoginPolicyResponse {
 message ListLoginPolicySecondFactorsRequest {}
 
 message ListLoginPolicySecondFactorsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.policy.v1.SecondFactorType result = 2;
 }
 
@@ -2968,7 +2968,7 @@ message RemoveSecondFactorFromLoginPolicyResponse {
 message ListLoginPolicyMultiFactorsRequest {}
 
 message ListLoginPolicyMultiFactorsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     repeated zitadel.policy.v1.MultiFactorType result = 2;
 }
 
@@ -3114,7 +3114,7 @@ message GetOrgIDPByIDResponse {
 }
 
 message ListOrgIDPsRequest {
-    zitadel.v1.ListQuery meta_data = 1;
+    zitadel.v1.ListQuery query = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated IDPQuery queries = 3;
 }
@@ -3130,7 +3130,7 @@ message IDPQuery {
 }
 
 message ListOrgIDPsResponse {
-    zitadel.v1.ListDetails meta_data = 1;
+    zitadel.v1.ListDetails details = 1;
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
     repeated zitadel.idp.v1.IDP result = 3;
 }
