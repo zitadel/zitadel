@@ -34,13 +34,9 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 		return nil, nil, err
 	}
 	if !userGrant.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.UserGrant.Invalid")
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0fs", "Errors.UserGrant.Invalid")
 	}
-	err = c.checkUserExists(ctx, userGrant.UserID, "")
-	if err != nil {
-		return nil, nil, err
-	}
-	err = c.checkProjectExists(ctx, userGrant.ProjectID, resourceOwner)
+	err = c.checkUserGrantPreCondition(ctx, userGrant)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -273,6 +269,7 @@ func (c *Commands) removeUserGrant(ctx context.Context, grantID, resourceOwner s
 		existingUserGrant.ProjectID,
 		existingUserGrant.ProjectGrantID), existingUserGrant, nil
 }
+
 func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, resourceOwner string) (writeModel *UserGrantWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -283,4 +280,25 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant) error {
+	preConditions := NewUserGrantPreConditionReadModel(usergrant.UserID, usergrant.ProjectID, usergrant.ProjectGrantID)
+	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	if err != nil {
+		return err
+	}
+	if !preConditions.UserExists {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-4f8sg", "Errors.User.NotFound")
+	}
+	if !preConditions.ProjectExists {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
+	}
+	if usergrant.ProjectGrantID != "" && !preConditions.ProjectGrantExists {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-4m9ff", "Errors.Project.Grant.NotFound")
+	}
+	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
+	}
+	return nil
 }

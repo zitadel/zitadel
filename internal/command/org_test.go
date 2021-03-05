@@ -7,7 +7,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/repository/mock"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/id"
 	id_mock "github.com/caos/zitadel/internal/id/mock"
@@ -17,7 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 	"testing"
-	"time"
 )
 
 func TestCommandSide_AddOrg(t *testing.T) {
@@ -65,50 +63,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilterOrgDomainNotFound(),
-					expectFilterUser(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username1",
-								"firstname1",
-								"lastname1",
-								"nickname1",
-								"displayname1",
-								language.German,
-								domain.GenderMale,
-								"email1",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewUserRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username1",
-								true,
-							),
-						),
-					),
-				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "org2"),
-			},
-			args: args{
-				ctx:           context.Background(),
-				name:          "Org",
-				userID:        "user1",
-				resourceOwner: "org1",
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "user removed, error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilterOrgDomainNotFound(),
-					expectFilterUser(
+					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
@@ -151,7 +106,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilterOrgDomainNotFound(),
-					expectFilterUser(
+					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
@@ -220,7 +175,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilterOrgDomainNotFound(),
-					expectFilterUser(
+					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
@@ -289,7 +244,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilterOrgDomainNotFound(),
-					expectFilterUser(
+					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
@@ -403,54 +358,54 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "org not found, error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilterOrg(),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:   context.Background(),
-		//		orgID: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsNotFound,
-		//	},
-		//},
-		//{
-		//	name: "org already inactive, error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilterOrg(
-		//				eventFromEventPusher(
-		//					org.NewOrgAddedEvent(context.Background(),
-		//						&org.NewAggregate("org1", "org1").Aggregate,
-		//						"org"),
-		//				),
-		//				eventFromEventPusher(
-		//					org.NewOrgDeactivatedEvent(context.Background(),
-		//						&org.NewAggregate("org1", "org1").Aggregate),
-		//				),
-		//			),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:   context.Background(),
-		//		orgID: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
+		{
+			name: "org not found, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "org already inactive, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org"),
+						),
+						eventFromEventPusher(
+							org.NewOrgDeactivatedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
 		{
 			name: "push failed, error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilterOrg(
+					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -479,7 +434,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilterOrg(
+					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -543,7 +498,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilterOrg(),
+					expectFilter(),
 				),
 			},
 			args: args{
@@ -559,7 +514,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilterOrg(
+					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -581,7 +536,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilterOrg(
+					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -616,7 +571,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilterOrg(
+					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -657,78 +612,4 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 			}
 		})
 	}
-}
-
-func expectPush(events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
-	return func(m *mock.MockRepository) {
-		m.ExpectPush(events, uniqueConstraints...)
-	}
-}
-
-func expectPushFailed(err error, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
-	return func(m *mock.MockRepository) {
-		m.ExpectPushFailed(err, events, uniqueConstraints...)
-	}
-}
-
-func expectFilterUser(events ...*repository.Event) expect {
-	return func(m *mock.MockRepository) {
-		m.ExpectFilterEvents(events...)
-	}
-}
-
-func expectFilterOrgDomainNotFound() expect {
-	return func(m *mock.MockRepository) {
-		m.ExpectFilterNoEventsNoError()
-	}
-}
-
-func expectFilterOrgMemberNotFound() expect {
-	return func(m *mock.MockRepository) {
-		m.ExpectFilterNoEventsNoError()
-	}
-}
-
-func expectFilterOrgMember(events ...*repository.Event) expect {
-	return func(m *mock.MockRepository) {
-		m.ExpectFilterEvents(events...)
-	}
-}
-
-func expectFilterOrgDomainFound() expect {
-	return func(m *mock.MockRepository) {
-		m.ExpectFilterEvents()
-	}
-}
-
-func expectFilterOrg(events ...*repository.Event) expect {
-	return func(m *mock.MockRepository) {
-		m.ExpectFilterEvents(events...)
-	}
-}
-
-func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
-	data, _ := eventstore.EventData(event)
-	return &repository.Event{
-		ID:               "",
-		Sequence:         0,
-		PreviousSequence: 0,
-		CreationDate:     time.Time{},
-		Type:             repository.EventType(event.Type()),
-		Data:             data,
-		EditorService:    event.EditorService(),
-		EditorUser:       event.EditorUser(),
-		Version:          repository.Version(event.Aggregate().Version),
-		AggregateID:      event.Aggregate().ID,
-		AggregateType:    repository.AggregateType(event.Aggregate().Typ),
-		ResourceOwner:    event.Aggregate().ResourceOwner,
-	}
-}
-
-func uniqueConstraintsFromEventConstraint(constraint *eventstore.EventUniqueConstraint) *repository.UniqueConstraint {
-	return &repository.UniqueConstraint{
-		UniqueType:   constraint.UniqueType,
-		UniqueField:  constraint.UniqueField,
-		ErrorMessage: constraint.ErrorMessage,
-		Action:       repository.UniqueConstraintAction(constraint.Action)}
 }

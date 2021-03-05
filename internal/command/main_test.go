@@ -12,6 +12,7 @@ import (
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/repository/usergrant"
 	"testing"
+	"time"
 )
 
 //func newEventstore(events ...eventstore.EventPusher) *eventstore.Eventstore {
@@ -102,4 +103,60 @@ func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *reposito
 		return 0, repo.err
 	}
 	return repo.sequence, nil
+}
+
+func expectPush(events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectPush(events, uniqueConstraints...)
+	}
+}
+
+func expectPushFailed(err error, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectPushFailed(err, events, uniqueConstraints...)
+	}
+}
+
+func expectFilter(events ...*repository.Event) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectFilterEvents(events...)
+	}
+}
+
+func expectFilterOrgDomainNotFound() expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectFilterNoEventsNoError()
+	}
+}
+
+func expectFilterOrgMemberNotFound() expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectFilterNoEventsNoError()
+	}
+}
+
+func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
+	data, _ := eventstore.EventData(event)
+	return &repository.Event{
+		ID:               "",
+		Sequence:         0,
+		PreviousSequence: 0,
+		CreationDate:     time.Time{},
+		Type:             repository.EventType(event.Type()),
+		Data:             data,
+		EditorService:    event.EditorService(),
+		EditorUser:       event.EditorUser(),
+		Version:          repository.Version(event.Aggregate().Version),
+		AggregateID:      event.Aggregate().ID,
+		AggregateType:    repository.AggregateType(event.Aggregate().Typ),
+		ResourceOwner:    event.Aggregate().ResourceOwner,
+	}
+}
+
+func uniqueConstraintsFromEventConstraint(constraint *eventstore.EventUniqueConstraint) *repository.UniqueConstraint {
+	return &repository.UniqueConstraint{
+		UniqueType:   constraint.UniqueType,
+		UniqueField:  constraint.UniqueField,
+		ErrorMessage: constraint.ErrorMessage,
+		Action:       repository.UniqueConstraintAction(constraint.Action)}
 }
