@@ -16,6 +16,7 @@ message LabelPolicy {
     zitadel.v1.ObjectDetails details = 1;
     string primary_color = 2;
     string secondary_color = 3;
+    bool is_default = 4;
 }
 
 message LoginPolicy {
@@ -25,6 +26,7 @@ message LoginPolicy {
     bool allow_external_idp = 4;
     bool force_mfa = 5;
     PasswordlessType passwordless_type = 6;
+    bool is_default = 7;
 }
 
 enum SecondFactorType {
@@ -51,16 +53,19 @@ message PasswordComplexityPolicy {
     bool has_lowercase = 4;
     bool has_number = 5;
     bool has_symbol = 6;
+    bool is_default = 7;
 }
 
 message PasswordAgePolicy {
     zitadel.v1.ObjectDetails details = 1;
     uint64 max_age_days = 2;
     uint64 expire_warn_days = 3;
+    bool is_default = 4;
 }
 
 message PasswordLockoutPolicy {
     zitadel.v1.ObjectDetails details = 1;
-    uint64 max_attempts = 4;
+    uint64 max_attempts = 2;
     bool show_lockout_failure = 3;
+    bool is_default = 4;
 }
