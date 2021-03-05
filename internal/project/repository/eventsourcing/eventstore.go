@@ -879,7 +879,7 @@ func (es *ProjectEventstore) ChangeAPIConfigSecret(ctx context.Context, projectI
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-HBfju", "Errors.Internal")
 }
 
-func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, projectID, appID string, secret string) (err error) {
+func (es *ProjectEventstore) VerifyClientSecret(ctx context.Context, projectID, appID string, secret string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	if appID == "" {
@@ -893,12 +893,18 @@ func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, project
 	if _, app = existingProject.GetApp(appID); app == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-D6hba", "Errors.Project.AppNoExisting")
 	}
-	if app.Type != proj_model.AppTypeOIDC {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-huywq", "Errors.Project.AppIsNotOIDC")
+	if app.Type == proj_model.AppTypeAPI {
+		return es.verifyAPIClientSecret(ctx, app, secret)
 	}
+	if app.Type == proj_model.AppTypeOIDC {
+		return es.verifyOIDCClientSecret(ctx, app, existingProject, secret)
+	}
+	return caos_errs.ThrowPreconditionFailed(nil, "EVENT-huywq", "Errors.Project.AppIsNotOIDC")
+}
 
+func (es *ProjectEventstore) verifyOIDCClientSecret(ctx context.Context, app *proj_model.Application, existingProject *proj_model.Project, secret string) error {
 	ctx, spanHash := tracing.NewSpan(ctx)
-	err = crypto.CompareHash(app.OIDCConfig.ClientSecret, []byte(secret), es.passwordAlg)
+	err := crypto.CompareHash(app.OIDCConfig.ClientSecret, []byte(secret), es.passwordAlg)
 	spanHash.EndWithError(err)
 	if err == nil {
 		err = es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckSucceededAggregate)
@@ -907,7 +913,18 @@ func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, project
 	}
 	err = es.setOIDCClientSecretCheckResult(ctx, existingProject, app.AppID, OIDCClientSecretCheckFailedAggregate)
 	logging.Log("EVENT-GD1gh").OnError(err).Warn("could not push event OIDCClientSecretCheckFailed")
-	return caos_errs.ThrowInvalidArgument(nil, "EVENT-wg24q", "Errors.Project.OIDCSecretInvalid")
+	return caos_errs.ThrowInvalidArgument(nil, "EVENT-wg24q", "Errors.Project.ClientSecretInvalid")
+}
+
+func (es *ProjectEventstore) verifyAPIClientSecret(ctx context.Context, app *proj_model.Application, secret string) error {
+	ctx, spanHash := tracing.NewSpan(ctx)
+	err := crypto.CompareHash(app.APIConfig.ClientSecret, []byte(secret), es.passwordAlg)
+	spanHash.EndWithError(err)
+	if err == nil {
+		return nil
+	}
+	logging.LogWithFields("EVENT-sfsb4", "app id", app.AppID, "clientID", app.APIConfig.ClientID).Warn("API client secret invalid")
+	return caos_errs.ThrowInvalidArgument(nil, "EVENT-AEdt6", "Errors.Project.ClientSecretInvalid")
 }
 
 func (es *ProjectEventstore) setOIDCClientSecretCheckResult(ctx context.Context, project *proj_model.Project, appID string, check func(*es_models.AggregateCreator, *model.Project, string) es_sdk.AggregateFunc) error {
