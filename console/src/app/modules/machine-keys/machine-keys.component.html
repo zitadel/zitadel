@@ -1,5 +1,5 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    [timestamp]="keyResult?.metaData?.viewTimestamp" [selection]="selection">
+    [timestamp]="keyResult?.details?.viewTimestamp" [selection]="selection">
     <div actions>
         <button color="warn" [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false"
             (click)="deleteSelectedKeys()" matTooltip="{{'ACTIONS.DELETE' | translate}}" class="icon-button"
@@ -58,7 +58,7 @@
             </tr>
 
         </table>
-        <mat-paginator #paginator class="paginator" [length]="keyResult?.metaData?.totalResult || 0" [pageSize]="10"
+        <mat-paginator #paginator class="paginator" [length]="keyResult?.details?.totalResult || 0" [pageSize]="10"
             [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
     </div>
 </app-refresh-table>

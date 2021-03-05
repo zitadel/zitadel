@@ -33,7 +33,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class MembershipsComponent implements OnInit {
     public loading: boolean = false;
-    public memberships!: Array<Membership.AsObject | UserGrant.AsObject>;
+    public memberships!: Membership.AsObject[] | UserGrant.AsObject[];
     public totalResult: number = 0;
 
     @Input() public auth: boolean = false;

@@ -84,13 +84,13 @@ export class OrgDetailComponent implements OnInit {
     }
 
     public changeState(event: MatButtonToggleChange | any): void {
-        if (event.value === OrgState.ORG_STATE_ACTIVATE) {
+        if (event.value === OrgState.ORG_STATE_ACTIVE) {
             this.mgmtService.reactivateOrg().then(() => {
                 this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
             }).catch((error) => {
                 this.toast.showError(error);
             });
-        } else if (event.value === OrgState.ORG_STATE_INACTIVATE) {
+        } else if (event.value === OrgState.ORG_STATE_INACTIVE) {
             this.mgmtService.deactivateOrg().then(() => {
                 this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
             }).catch((error) => {
@@ -110,18 +110,8 @@ export class OrgDetailComponent implements OnInit {
                 this.mgmtService.addOrgDomain(resp).then(resp => {
                     const newDomain = resp;
 
-                    const newDomainView = new Domain();
-                    newDomainView.setChangeDate(newDomain.getChangeDate());
-                    newDomainView.setCreationDate(newDomain.getCreationDate());
-                    newDomainView.setDomain(newDomain.getDomain());
-                    newDomainView.setOrgId(newDomain.getOrgId());
-                    newDomainView.setPrimary(newDomain.getPrimary());
-                    newDomainView.setSequence(newDomain.getSequence());
-                    newDomainView.setVerified(newDomain.getVerified());
-
-                    this.domains.push(newDomainView.toObject());
-
-                    this.verifyDomain(newDomainView.toObject());
+                    // TODO send domainname only 
+                    // this.verifyDomain(newDomainView.toObject());
                     this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
                 });
             }
@@ -206,8 +196,8 @@ export class OrgDetailComponent implements OnInit {
         this.loadingSubject.next(true);
         from(this.mgmtService.listOrgMembers(100, 0)).pipe(
             map(resp => {
-                if (resp.metaData?.totalResult) {
-                    this.totalMemberResult = resp.metaData?.totalResult;
+                if (resp.details?.totalResult) {
+                    this.totalMemberResult = resp.details?.totalResult;
                 }
                 return resp.resultList;
             }),

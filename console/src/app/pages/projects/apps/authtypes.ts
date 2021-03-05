@@ -1,4 +1,4 @@
-import { OIDCApplicationType } from 'src/app/proto/generated/management_pb';
+import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 
 // export enum AppType {
 //     "WEB",
@@ -15,7 +15,7 @@ export enum AppCreateType {
 export interface RadioItemAppType {
     // key: string;
     createType: AppCreateType;
-    oidcApplicationType?: OIDCApplicationType;
+    oidcAppType?: OIDCAppType;
     titleI18nKey: string;
     descI18nKey: string;
     prefix: string;
@@ -27,7 +27,7 @@ export const WEB_TYPE = {
     titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.WEB.TITLE',
     descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.WEB.DESCRIPTION',
     createType: AppCreateType.OIDC,
-    oidcApplicationType: OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
+    oidcApplicationType: OIDCAppType.OIDC_APP_TYPE_WEB,
     prefix: 'WEB',
     background: 'rgb(80, 110, 110)',
 };
@@ -37,7 +37,7 @@ export const USER_AGENT_TYPE = {
     titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.USERAGENT.TITLE',
     descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.USERAGENT.DESCRIPTION',
     createType: AppCreateType.OIDC,
-    oidcApplicationType: OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
+    oidcApplicationType: OIDCAppType.OIDC_APP_TYPE_USER_AGENT,
     prefix: 'UA',
     background: '#6a506e',
 };
@@ -47,7 +47,7 @@ export const NATIVE_TYPE = {
     titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.TITLE',
     descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.DESCRIPTION',
     createType: AppCreateType.OIDC,
-    oidcApplicationType: OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE,
+    oidcApplicationType: OIDCAppType.OIDC_APP_TYPE_NATIVE,
     prefix: 'N',
     background: '#595d80',
 };

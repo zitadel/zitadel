@@ -5,7 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectGrant, ProjectRoleView } from 'src/app/proto/generated/management_pb';
+import { GrantedProject, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -28,10 +28,10 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<ProjectGrant.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<GrantedProject.AsObject>;
     public dataSource!: ProjectGrantsDataSource;
-    public selection: SelectionModel<ProjectGrant.AsObject> = new SelectionModel<ProjectGrant.AsObject>(true, []);
-    public memberRoleOptions: ProjectRoleView.AsObject[] = [];
+    public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
+    public memberRoleOptions: Role.AsObject[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'grantedOrgName', 'dates'];
@@ -78,9 +78,9 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
         });
     }
 
-    updateRoles(grant: ProjectGrant.AsObject, selectionChange: MatSelectChange): void {
-        this.mgmtService.updateProjectGrant(grant.id, grant.projectId, selectionChange.value)
-            .then((newgrant: ProjectGrant) => {
+    updateRoles(grant: GrantedProject.AsObject, selectionChange: MatSelectChange): void {
+        this.mgmtService.updateProjectGrant(grant.grantId, grant.projectId, selectionChange.value)
+            .then(() => {
                 this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTCHANGED', true);
             }).catch(error => {
                 this.toast.showError(error);
@@ -89,14 +89,14 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
 
     deleteSelectedGrants(): void {
         const promises = this.selection.selected.map(grant => {
-            return this.mgmtService.removeProjectGrant(grant.id, grant.projectId);
+            return this.mgmtService.removeProjectGrant(grant.grantId, grant.projectId);
         });
 
         Promise.all(promises).then(() => {
             this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
             const data = this.dataSource.grantsSubject.getValue();
             this.selection.selected.forEach((item) => {
-                const index = data.findIndex(i => i.id === item.id);
+                const index = data.findIndex(i => i.grantId === item.grantId);
                 if (index > -1) {
                     data.splice(index, 1);
                     this.dataSource.grantsSubject.next(data);

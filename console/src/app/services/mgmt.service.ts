@@ -1606,6 +1606,10 @@ export class ManagementService {
         return this.grpcService.mgmt.addOIDCApp(req, null).then(resp => resp.toObject());
     }
 
+    public addAPIApp(req: AddOIDCAppRequest): Promise<AddOIDCAppResponse.AsObject> {
+        return this.grpcService.mgmt.addAPIApp(req, null).then(resp => resp.toObject());
+    }
+
     public updateApp(projectId: string, appId: string, name: string): Promise<UpdateAppResponse.AsObject> {
         const req = new UpdateAppRequest();
         req.setAppId(appId);

@@ -1,7 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
-import { OrgDomainValidationResponse, OrgDomainValidationType, OrgDomainView } from 'src/app/proto/generated/management_pb';
+import { OrgDomainValidationType, OrgDomainView } from 'src/app/proto/generated/management_pb';
+import { GenerateOrgDomainValidationResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { DomainValidationType } from 'src/app/proto/generated/zitadel/org_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -15,8 +17,9 @@ export class DomainVerificationComponent {
 
     public OrgDomainValidationType: any = OrgDomainValidationType;
 
-    public http!: OrgDomainValidationResponse.AsObject;
-    public dns!: OrgDomainValidationResponse.AsObject;
+    public http!: GenerateOrgDomainValidationResponse.AsObject;
+    public dns!: GenerateOrgDomainValidationResponse.AsObject;
+
     public copied: string = '';
 
     public showNew: boolean = false;
@@ -35,18 +38,18 @@ export class DomainVerificationComponent {
     }
 
     async loadHttpToken(): Promise<void> {
-        this.mgmtService.GenerateMyOrgDomainValidation(
+        this.mgmtService.generateOrgDomainValidation(
             this.domain.domain,
-            OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_HTTP).then((http) => {
-                this.http = http.toObject();
+            DomainValidationType.DOMAIN_VALIDATION_TYPE_HTTP).then((http) => {
+                this.http = http;
             });
     }
 
     async loadDnsToken(): Promise<void> {
-        this.mgmtService.GenerateMyOrgDomainValidation(
+        this.mgmtService.generateOrgDomainValidation(
             this.domain.domain,
-            OrgDomainValidationType.ORGDOMAINVALIDATIONTYPE_DNS).then((dns) => {
-                this.dns = dns.toObject();
+            DomainValidationType.DOMAIN_VALIDATION_TYPE_DNS).then((dns) => {
+                this.dns = dns;
             });
     }
 
@@ -56,7 +59,7 @@ export class DomainVerificationComponent {
 
     public validate(): void {
         this.validating = true;
-        this.mgmtService.ValidateMyOrgDomain(this.domain.domain).then(() => {
+        this.mgmtService.validateOrgDomain(this.domain.domain).then(() => {
             this.dialogRef.close(true);
             this.toast.showInfo('ORG.PAGES.ORGDOMAIN.VERIFICATION_SUCCESSFUL', true);
             this.validating = false;

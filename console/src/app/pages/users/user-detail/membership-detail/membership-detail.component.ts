@@ -33,7 +33,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     public displayedColumns: string[] = ['select', 'memberType', 'displayName', 'creationDate', 'changeDate', 'roles'];
 
     public loading: boolean = false;
-    public memberships!: UserMembershipSearchResponse.AsObject;
+    public memberships!: Membership.AsObject[];
 
     constructor(
         activatedRoute: ActivatedRoute,

@@ -144,7 +144,7 @@ export class IdpComponent implements OnInit, OnDestroy {
         } else if (this.serviceType == PolicyComponentServiceType.ADMIN) {
             const req = new UpdateIDPRequest();
 
-            req.setId(this.id?.value);
+            req.setIdpId(this.id?.value);
             req.setName(this.name?.value);
             req.setStylingType(this.stylingType?.value);
 

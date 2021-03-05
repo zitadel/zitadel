@@ -18,7 +18,6 @@ import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.com
 import {
     APIAuthMethodType,
     APIConfig,
-    Application,
     AppState,
     ClientSecret,
     OIDCApplicationType,
@@ -28,7 +27,7 @@ import {
     OIDCTokenType,
     ZitadelDocs,
 } from 'src/app/proto/generated/management_pb';
-import { OIDCAuthMethodType } from 'src/app/proto/generated/zitadel/app_pb';
+import { App, OIDCAppType, OIDCAuthMethodType } from 'src/app/proto/generated/zitadel/app_pb';
 import { UpdateAPIAppConfigRequest, UpdateOIDCAppConfigRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -65,7 +64,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public authMethods: RadioItemAuthType[] = [];
     private subscription?: Subscription;
     public projectId: string = '';
-    public app!: Application.AsObject;
+    public app!: App.AsObject;
     public oidcResponseTypes: OIDCResponseType[] = [
         OIDCResponseType.OIDCRESPONSETYPE_CODE,
         OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
@@ -151,7 +150,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             clientId: [{ value: '', disabled: true }],
             responseTypesList: [{ value: [], disabled: true }],
             grantTypesList: [{ value: [], disabled: true }],
-            applicationType: [{ value: '', disabled: true }],
+            appType: [{ value: '', disabled: true }],
             authMethodType: [{ value: '', disabled: true }],
             accessTokenType: [{ value: '', disabled: true }],
             accessTokenRoleAssertion: [{ value: false, disabled: true }],
@@ -201,93 +200,95 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
         this.initLinks();
 
-        this.mgmtService.GetIam().then(iam => {
-            this.isZitadel = iam.toObject().iamProjectId === this.projectId;
+        this.mgmtService.getIAM().then(iam => {
+            this.isZitadel = iam.iamProjectId === this.projectId;
         });
         this.authService.isAllowed(['project.app.write$', 'project.app.write:' + projectid]).pipe(take(1)).subscribe((allowed) => {
             this.canWrite = allowed;
-            this.mgmtService.GetApplicationById(projectid, id).then(app => {
-                this.app = app.toObject();
-                this.appNameForm.patchValue(this.app);
+            this.mgmtService.getAppByID(projectid, id).then(app => {
+                if (app.app) {
+                    this.app = app.app;
+                    this.appNameForm.patchValue(this.app);
 
-                if (this.app.oidcConfig) {
-                    this.getAuthMethodOptions('OIDC');
+                    if (this.app.oidcConfig) {
+                        this.getAuthMethodOptions('OIDC');
 
-                    this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
-                    this.currentAuthMethod = this.initialAuthMethod;
-                    if (this.initialAuthMethod === CUSTOM_METHOD.key) {
-                        if (!this.authMethods.includes(CUSTOM_METHOD)) {
-                            this.authMethods.push(CUSTOM_METHOD);
+                        this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
+                        this.currentAuthMethod = this.initialAuthMethod;
+                        if (this.initialAuthMethod === CUSTOM_METHOD.key) {
+                            if (!this.authMethods.includes(CUSTOM_METHOD)) {
+                                this.authMethods.push(CUSTOM_METHOD);
+                            }
+                        } else {
+                            this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
                         }
-                    } else {
-                        this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
-                    }
-                } else if (this.app.apiConfig) {
-                    this.getAuthMethodOptions('API');
+                    } else if (this.app.apiConfig) {
+                        this.getAuthMethodOptions('API');
 
-                    this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
-                    this.currentAuthMethod = this.initialAuthMethod;
-                    if (this.initialAuthMethod === CUSTOM_METHOD.key) {
-                        if (!this.authMethods.includes(CUSTOM_METHOD)) {
-                            this.authMethods.push(CUSTOM_METHOD);
+                        this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
+                        this.currentAuthMethod = this.initialAuthMethod;
+                        if (this.initialAuthMethod === CUSTOM_METHOD.key) {
+                            if (!this.authMethods.includes(CUSTOM_METHOD)) {
+                                this.authMethods.push(CUSTOM_METHOD);
+                            }
+                        } else {
+                            this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
                         }
-                    } else {
-                        this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
-                    }
-                }
-
-                if (allowed) {
-                    this.appNameForm.enable();
-                    this.oidcForm.enable();
-                    this.apiForm.enable();
-                }
-
-                if (this.app.oidcConfig?.redirectUrisList) {
-                    this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
-                }
-                if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
-                    this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
-                }
-                if (this.app.oidcConfig?.clockSkew) {
-                    const inSecs = this.app.oidcConfig?.clockSkew.seconds + this.app.oidcConfig?.clockSkew.nanos / 100000;
-                    this.oidcForm.controls['clockSkewSeconds'].setValue(inSecs);
-                }
-                if (this.app.oidcConfig) {
-                    this.oidcForm.patchValue(this.app.oidcConfig);
-                }
-
-                this.oidcForm.valueChanges.subscribe((oidcConfig) => {
-                    this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: oidcConfig });
-                    if (this.initialAuthMethod === CUSTOM_METHOD.key) {
-                        if (!this.authMethods.includes(CUSTOM_METHOD)) {
-                            this.authMethods.push(CUSTOM_METHOD);
-                        }
-                    } else {
-                        this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
                     }
 
-                    this.showSaveSnack();
-                });
-
-                this.apiForm.valueChanges.subscribe((apiConfig) => {
-                    this.initialAuthMethod = this.authMethodFromPartialConfig({ api: apiConfig });
-                    if (this.initialAuthMethod === CUSTOM_METHOD.key) {
-                        if (!this.authMethods.includes(CUSTOM_METHOD)) {
-                            this.authMethods.push(CUSTOM_METHOD);
-                        }
-                    } else {
-                        this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
+                    if (allowed) {
+                        this.appNameForm.enable();
+                        this.oidcForm.enable();
+                        this.apiForm.enable();
                     }
 
-                    this.showSaveSnack();
-                });
+                    if (this.app.oidcConfig?.redirectUrisList) {
+                        this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
+                    }
+                    if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
+                        this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
+                    }
+                    if (this.app.oidcConfig?.clockSkew) {
+                        const inSecs = this.app.oidcConfig?.clockSkew.seconds + this.app.oidcConfig?.clockSkew.nanos / 100000;
+                        this.oidcForm.controls['clockSkewSeconds'].setValue(inSecs);
+                    }
+                    if (this.app.oidcConfig) {
+                        this.oidcForm.patchValue(this.app.oidcConfig);
+                    }
+
+                    this.oidcForm.valueChanges.subscribe((oidcConfig) => {
+                        this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: oidcConfig });
+                        if (this.initialAuthMethod === CUSTOM_METHOD.key) {
+                            if (!this.authMethods.includes(CUSTOM_METHOD)) {
+                                this.authMethods.push(CUSTOM_METHOD);
+                            }
+                        } else {
+                            this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
+                        }
+
+                        this.showSaveSnack();
+                    });
+
+                    this.apiForm.valueChanges.subscribe((apiConfig) => {
+                        this.initialAuthMethod = this.authMethodFromPartialConfig({ api: apiConfig });
+                        if (this.initialAuthMethod === CUSTOM_METHOD.key) {
+                            if (!this.authMethods.includes(CUSTOM_METHOD)) {
+                                this.authMethods.push(CUSTOM_METHOD);
+                            }
+                        } else {
+                            this.authMethods = this.authMethods.filter(element => element != CUSTOM_METHOD);
+                        }
+
+                        this.showSaveSnack();
+                    });
+                }
             }).catch(error => {
                 console.error(error);
                 this.toast.showError(error);
                 this.errorMessage = error.message;
             });
         });
-        this.docs = (await this.mgmtService.GetZitadelDocs()).toObject();
+        this.docs = (await this.mgmtService.getOIDCInformation());
     }
 
     private async showSaveSnack(): Promise<void> {
@@ -306,14 +307,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     private getAuthMethodOptions(type: string): void {
         if (type == 'OIDC') {
-            switch (this.app.oidcConfig?.applicationType) {
-                case OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE:
+            switch (this.app.oidcConfig?.appType) {
+                case OIDCAppType.OIDC_APP_TYPE_NATIVE:
                     this.authMethods = [
                         PKCE_METHOD,
                         CUSTOM_METHOD,
                     ];
                     break;
-                case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
+                case OIDCAppType.OIDC_APP_TYPE_WEB:
                     this.authMethods = [
                         PKCE_METHOD,
                         CODE_METHOD,
@@ -321,7 +322,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                         POST_METHOD,
                     ];
                     break;
-                case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
+                case OIDCAppType.OIDC_APP_TYPE_USER_AGENT:
                     this.authMethods = [
                         PKCE_METHOD,
                         IMPLICIT_METHOD,
@@ -367,7 +368,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         });
         dialogRef.afterClosed().subscribe(resp => {
             if (resp && this.projectId && this.app.id) {
-                this.mgmtService.RemoveApplication(this.projectId, this.app.id).then(() => {
+                this.mgmtService.removeApp(this.projectId, this.app.id).then(() => {
                     this.toast.showInfo('APP.TOAST.DELETED', true);
 
                     this.router.navigate(['/projects', this.projectId]);
@@ -380,13 +381,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public changeState(event: MatButtonToggleChange): void {
         if (event.value === AppState.APPSTATE_ACTIVE) {
-            this.mgmtService.ReactivateApplication(this.projectId, this.app.id).then(() => {
+            this.mgmtService.reactivateApp(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error);
             });
         } else if (event.value === AppState.APPSTATE_INACTIVE) {
-            this.mgmtService.DeactivateApplication(this.projectId, this.app.id).then(() => {
+            this.mgmtService.deactivateApp(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('APP.TOAST.DEACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error);
@@ -399,7 +400,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.app.name = this.name?.value;
 
             this.mgmtService
-                .UpdateApplication(this.projectId, this.app.id, this.name?.value)
+                .updateApp(this.projectId, this.app.id, this.name?.value)
                 .then(() => {
                     this.toast.showInfo('APP.TOAST.UPDATED', true);
                     this.editState = false;
@@ -421,7 +422,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             if (this.app.oidcConfig) {
                 this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
                 this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
-                this.app.oidcConfig.applicationType = this.applicationType?.value;
+                this.app.oidcConfig.appType = this.appType?.value;
                 this.app.oidcConfig.authMethodType = this.authMethodType?.value;
                 this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
                 this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
@@ -439,7 +440,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 req.setAuthMethodType(this.app.oidcConfig.authMethodType);
                 req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
                 req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
-                req.setAppType(this.app.oidcConfig.applicationType);
+                req.setAppType(this.app.oidcConfig.appType);
                 req.setDevMode(this.app.oidcConfig.devMode);
                 req.setAccessTokenType(this.app.oidcConfig.accessTokenType);
                 req.setAccessTokenRoleAssertion(this.app.oidcConfig.accessTokenRoleAssertion);
@@ -543,8 +544,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         return this.oidcForm.get('grantTypesList');
     }
 
-    public get applicationType(): AbstractControl | null {
-        return this.oidcForm.get('applicationType');
+    public get appType(): AbstractControl | null {
+        return this.oidcForm.get('appType');
     }
 
     public get authMethodType(): AbstractControl | null {

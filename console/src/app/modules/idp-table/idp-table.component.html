@@ -1,5 +1,5 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    [emitRefreshOnPreviousRoutes]="['/iam/idp/create']" [timestamp]="idpResult?.metaData?.viewTimestamp"
+    [emitRefreshOnPreviousRoutes]="['/iam/idp/create']" [timestamp]="idpResult?.details?.viewTimestamp"
     [selection]="selection">
     <div actions>
         <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="icon-button"
@@ -103,6 +103,6 @@
             </tr>
         </table>
     </div>
-    <mat-paginator #paginator class="paginator" [length]="idpResult?.metaData?.totalResult || 0" [pageSize]="10"
+    <mat-paginator #paginator class="paginator" [length]="idpResult?.details?.totalResult || 0" [pageSize]="10"
         [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
 </app-refresh-table>
