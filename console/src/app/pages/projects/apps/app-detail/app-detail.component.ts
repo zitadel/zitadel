@@ -2,11 +2,11 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { Subject, Subscription } from 'rxjs';
@@ -18,25 +18,34 @@ import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.com
 import {
     APIAuthMethodType,
     APIConfig,
-    APIConfigUpdate,
     Application,
     AppState,
     ClientSecret,
     OIDCApplicationType,
-    OIDCAuthMethodType,
     OIDCConfig,
-    OIDCConfigUpdate,
     OIDCGrantType,
     OIDCResponseType,
     OIDCTokenType,
     ZitadelDocs,
 } from 'src/app/proto/generated/management_pb';
+import { OIDCAuthMethodType } from 'src/app/proto/generated/zitadel/app_pb';
+import { UpdateAPIAppConfigRequest, UpdateOIDCAppConfigRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
-import { CODE_METHOD, getAuthMethodFromPartialConfig, getPartialConfigFromAuthMethod, IMPLICIT_METHOD, PKCE_METHOD, PK_JWT_METHOD, POST_METHOD, CUSTOM_METHOD, BASIC_AUTH_METHOD } from '../authmethods';
+import {
+    BASIC_AUTH_METHOD,
+    CODE_METHOD,
+    CUSTOM_METHOD,
+    getAuthMethodFromPartialConfig,
+    getPartialConfigFromAuthMethod,
+    IMPLICIT_METHOD,
+    PK_JWT_METHOD,
+    PKCE_METHOD,
+    POST_METHOD,
+} from '../authmethods';
 
 @Component({
     selector: 'app-app-detail',
@@ -74,10 +83,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     ];
 
     public oidcAuthMethodType: OIDCAuthMethodType[] = [
-        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
-        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
-        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_PRIVATE_KEY_JWT,
+        OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+        OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST,
+        OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+        OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
     ];
 
     public oidcTokenTypes: OIDCTokenType[] = [
@@ -422,16 +431,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
                 this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
 
-
-                const req = new OIDCConfigUpdate();
+                const req = new UpdateOIDCAppConfigRequest();
                 req.setProjectId(this.projectId);
-                req.setApplicationId(this.app.id);
+                req.setAppId(this.app.id);
                 req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
                 req.setResponseTypesList(this.app.oidcConfig.responseTypesList);
                 req.setAuthMethodType(this.app.oidcConfig.authMethodType);
                 req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
                 req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
-                req.setApplicationType(this.app.oidcConfig.applicationType);
+                req.setAppType(this.app.oidcConfig.applicationType);
                 req.setDevMode(this.app.oidcConfig.devMode);
                 req.setAccessTokenType(this.app.oidcConfig.accessTokenType);
                 req.setAccessTokenRoleAssertion(this.app.oidcConfig.accessTokenRoleAssertion);
@@ -444,7 +452,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                     req.setClockSkew(dur);
                 }
                 this.mgmtService
-                    .UpdateOIDCAppConfig(req)
+                    .updateOIDCAppConfig(req)
                     .then(() => {
                         if (this.app.oidcConfig) {
                             const config = { oidc: this.app.oidcConfig };
@@ -463,13 +471,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         if (this.apiForm.valid && this.app.apiConfig) {
             this.app.apiConfig.authMethodType = this.apiAuthMethodType?.value;
 
-            const req = new APIConfigUpdate();
+            const req = new UpdateAPIAppConfigRequest();
             req.setProjectId(this.projectId);
-            req.setApplicationId(this.app.id);
+            req.setAppId(this.app.id);
             req.setAuthMethodType(this.app.apiConfig.authMethodType);
 
             this.mgmtService
-                .UpdateAPIAppConfig(req)
+                .updateAPIAppConfig(req)
                 .then(() => {
                     if (this.app.apiConfig) {
                         const config = { api: this.app.apiConfig };
@@ -484,7 +492,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public regenerateOIDCClientSecret(): void {
-        this.mgmtService.RegenerateOIDCClientSecret(this.app.id, this.projectId).then((data: ClientSecret) => {
+        this.mgmtService.regenerateOIDCClientSecret(this.app.id, this.projectId).then((data: ClientSecret) => {
             this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
             this.dialog.open(AppSecretDialogComponent, {
                 data: {

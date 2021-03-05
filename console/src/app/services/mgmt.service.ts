@@ -6,7 +6,8 @@ import { BehaviorSubject } from 'rxjs';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import {
-    AddAPIClientKeyRequest,
+    AddAppKeyRequest,
+    AddAppKeyResponse,
     AddCustomLoginPolicyRequest,
     AddCustomLoginPolicyResponse,
     AddCustomPasswordAgePolicyRequest,
@@ -110,10 +111,10 @@ import {
     GetUserGrantByIDRequest,
     GetUserGrantByIDResponse,
     IDPQuery,
-    ListAPIClientKeysRequest,
-    ListAPIClientKeysResponse,
     ListAppChangesRequest,
     ListAppChangesResponse,
+    ListAppKeysRequest,
+    ListAppKeysResponse,
     ListAppsRequest,
     ListAppsResponse,
     ListGrantedProjectsRequest,
@@ -178,8 +179,8 @@ import {
     ReactivateUserRequest,
     ReactivateUserResponse,
     RegenerateOIDCClientSecretRequest,
-    RemoveAPIClientKeyRequest,
-    RemoveAPIClientKeyResponse,
+    RemoveAppKeyRequest,
+    RemoveAppKeyResponse,
     RemoveAppRequest,
     RemoveAppResponse,
     RemoveHumanMultiFactorOTPRequest,
@@ -236,6 +237,8 @@ import {
     SetHumanInitialPasswordRequest,
     SetPrimaryOrgDomainRequest,
     SetPrimaryOrgDomainResponse,
+    UpdateAPIAppConfigRequest,
+    UpdateAPIAppConfigResponse,
     UpdateAppRequest,
     UpdateAppResponse,
     UpdateCustomLoginPolicyRequest,
@@ -1426,13 +1429,13 @@ export class ManagementService {
         return this.grpcService.mgmt.regenerateOIDCClientSecret(req, null).then(resp => resp.toObject());
     }
 
-    public listAPIClientKeys(
+    public listAppKeys(
         projectId: string,
         appId: string,
         limit: number,
         offset: number,
-    ): Promise<ListAPIClientKeysResponse.AsObject> {
-        const req = new ListAPIClientKeysRequest();
+    ): Promise<ListAppKeysResponse.AsObject> {
+        const req = new ListAppKeysRequest();
         req.setProjectId(projectId);
         req.setAppId(appId);
         const metaData = new ListQuery();
@@ -1443,35 +1446,35 @@ export class ManagementService {
             metaData.setOffset(offset);
         }
         req.setMetaData(metaData);
-        return this.grpcService.mgmt.listAPIClientKeys(req, null).then(resp => resp.toObject());
+        return this.grpcService.mgmt.listAppKeys(req, null).then(resp => resp.toObject());
     }
 
-    public addAPIClientKey(
+    public addAppKey(
         projectId: string,
         appId: string,
         type: KeyType,
         expirationDate?: Timestamp,
-    ): Promise<AddProjectGrantMemberResponse.AsObject> {
-        const req = new AddAPIClientKeyRequest();
+    ): Promise<AddAppKeyResponse.AsObject> {
+        const req = new AddAppKeyRequest();
         req.setProjectId(projectId);
         req.setAppId(appId);
         req.setType(type);
         if (expirationDate) {
             req.setExpirationDate(expirationDate);
         }
-        return this.grpcService.mgmt.addAPIClientKey(req, null).then(resp => resp.toObject());
+        return this.grpcService.mgmt.addAppKey(req, null).then(resp => resp.toObject());
     }
 
-    public removeAPIClientKey(
+    public removeAppKey(
         projectId: string,
         appId: string,
         keyId: string,
-    ): Promise<RemoveAPIClientKeyResponse.AsObject> {
-        const req = new RemoveAPIClientKeyRequest();
+    ): Promise<RemoveAppKeyResponse.AsObject> {
+        const req = new RemoveAppKeyRequest();
         req.setAppId(appId);
         req.setKeyId(keyId);
         req.setProjectId(projectId);
-        return this.grpcService.mgmt.removeAPIClientKey(req, null).then(resp => resp.toObject());
+        return this.grpcService.mgmt.removeAppKey(req, null).then(resp => resp.toObject());
     }
 
     public listProjectRoles(
@@ -1613,6 +1616,10 @@ export class ManagementService {
 
     public updateOIDCAppConfig(req: UpdateOIDCAppConfigRequest): Promise<UpdateOIDCAppConfigResponse.AsObject> {
         return this.grpcService.mgmt.updateOIDCAppConfig(req, null).then(resp => resp.toObject());
+    }
+
+    public updateAPIAppConfig(req: UpdateAPIAppConfigRequest): Promise<UpdateAPIAppConfigResponse.AsObject> {
+        return this.grpcService.mgmt.updateAPIAppConfig(req, null).then(resp => resp.toObject());
     }
 
     public removeApp(projectId: string, appId: string): Promise<RemoveAppResponse.AsObject> {

@@ -10,7 +10,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { AddKeyDialogComponent, AddKeyDialogType } from 'src/app/modules/add-key-dialog/add-key-dialog.component';
 import { ShowKeyDialogComponent } from 'src/app/modules/show-key-dialog/show-key-dialog.component';
 import { Key, KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
-import { ListAPIClientKeysResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { ListAppKeysResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -26,7 +26,7 @@ export class ClientKeysComponent implements OnInit {
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     public dataSource: MatTableDataSource<Key.AsObject> = new MatTableDataSource<Key.AsObject>();
     public selection: SelectionModel<Key.AsObject> = new SelectionModel<Key.AsObject>(true, []);
-    public keyResult!: ListAPIClientKeysResponse.AsObject;
+    public keyResult!: ListAppKeysResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     @Input() public displayedColumns: string[] = ['select', 'id', 'type', 'creationDate', 'expirationDate'];
@@ -64,7 +64,7 @@ export class ClientKeysComponent implements OnInit {
 
     public deleteSelectedKeys(): void {
         const mappedDeletions = this.selection.selected.map(value => {
-            return this.mgmtService.removeAPIClientKey(this.projectId, this.appId, value.id);
+            return this.mgmtService.removeAppKey(this.projectId, this.appId, value.id);
         });
         Promise.all(mappedDeletions).then(() => {
             this.selection.clear();
@@ -99,7 +99,7 @@ export class ClientKeysComponent implements OnInit {
                 }
 
                 if (type) {
-                    return this.mgmtService.addAPIClientKey(this.projectId, this.appId, type, date ? date : undefined).then((response) => {
+                    return this.mgmtService.addAppKey(this.projectId, this.appId, type, date ? date : undefined).then((response) => {
                         if (response) {
                             setTimeout(() => {
                                 this.refreshPage();
@@ -124,7 +124,7 @@ export class ClientKeysComponent implements OnInit {
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
         if (this.projectId && this.appId) {
-            this.mgmtService.listAPIClientKeys(this.projectId, this.appId, limit, offset).then(resp => {
+            this.mgmtService.listAppKeys(this.projectId, this.appId, limit, offset).then(resp => {
                 this.keyResult = resp;
                 this.dataSource.data = this.keyResult.resultList;
                 this.loadingSubject.next(false);

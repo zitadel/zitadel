@@ -3,7 +3,13 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ListUserGrantResponse } from 'src/app/proto/generated/zitadel/management_pb';
-import { UserGrant } from 'src/app/proto/generated/zitadel/user_pb';
+import {
+    UserGrant,
+    UserGrantProjectGrantIDQuery,
+    UserGrantProjectIDQuery,
+    UserGrantQuery,
+    UserGrantUserIDQuery,
+} from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum UserGrantContext {
@@ -34,16 +40,18 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
             grantId?: string;
             userId?: string;
         },
-        queries?: UserGrantSearchQuery[],
+        queries?: UserGrantQuery[],
     ): void {
         switch (context) {
             case UserGrantContext.USER:
                 if (data && data.userId) {
                     this.loadingSubject.next(true);
-                    const userfilter = new UserGrantSearchQuery();
-                    userfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID);
-                    userfilter.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-                    userfilter.setValue(data.userId);
+
+                    const userfilter = new UserGrantQuery();
+                    const ugUiq = new UserGrantUserIDQuery();
+                    ugUiq.setUserId(data.userId);
+                    userfilter.setUserId(ugUiq);
+
                     if (queries) {
                         queries.push(userfilter);
                     } else {
@@ -57,10 +65,12 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
             case UserGrantContext.OWNED_PROJECT:
                 if (data && data.projectId) {
                     this.loadingSubject.next(true);
-                    const projectfilter = new UserGrantSearchQuery();
-                    projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
-                    projectfilter.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-                    projectfilter.setValue(data.projectId);
+
+                    const projectfilter = new UserGrantQuery();
+                    const ugPfq = new UserGrantProjectIDQuery();
+                    ugPfq.setProjectId(data.projectId);
+                    projectfilter.setProjectId(ugPfq);
+
                     if (queries) {
                         queries.push(projectfilter);
                     } else {
@@ -75,20 +85,21 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                 if (data && data.grantId && data.projectId) {
                     this.loadingSubject.next(true);
 
-                    const grantquery: UserGrantSearchQuery = new UserGrantSearchQuery();
-                    grantquery.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_GRANT_ID);
-                    grantquery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-                    grantquery.setValue(data.grantId);
+                    const grantfilter = new UserGrantQuery();
 
-                    const projectfilter = new UserGrantSearchQuery();
-                    projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
-                    projectfilter.setValue(data.projectId);
+                    const uggiq = new UserGrantProjectGrantIDQuery();
+                    uggiq.setProjectGrantId(data.grantId);
+                    grantfilter.setProjectGrantId(uggiq);
+
+                    const projectfilter = new UserGrantQuery();
+                    const ugPfq = new UserGrantProjectIDQuery();
+                    ugPfq.setProjectId(data.projectId);
+                    projectfilter.setProjectId(ugPfq);
 
                     if (queries) {
-                        queries.push(projectfilter);
-                        queries.push(grantquery);
+                        queries.push(grantfilter);
                     } else {
-                        queries = [projectfilter, grantquery];
+                        queries = [grantfilter];
                     }
 
                     const promise2 = this.userService.listUserGrants(pageSize, pageSize * pageIndex, queries);
