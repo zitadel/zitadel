@@ -15,7 +15,7 @@ SystemDefaults:
       IncludeLowerLetters: true
       IncludeUpperLetters: true
       IncludeDigits: true
-      IncludeSymbols: true
+      IncludeSymbols: false
     InitializeUserCode:
       Length: 6
       Expiry: '72h'

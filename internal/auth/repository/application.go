@@ -8,5 +8,5 @@ import (
 
 type ApplicationRepository interface {
 	ApplicationByClientID(ctx context.Context, clientID string) (*model.ApplicationView, error)
-	AuthorizeOIDCApplication(ctx context.Context, clientID, secret string) error
+	AuthorizeClientIDSecret(ctx context.Context, clientID, secret string) error
 }

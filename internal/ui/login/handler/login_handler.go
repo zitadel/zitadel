@@ -69,6 +69,9 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 	}
 	data := l.getUserData(r, authReq, "Login", errType, errMessage)
 	funcs := map[string]interface{}{
+		"hasUsernamePasswordLogin": func() bool {
+			return authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword
+		},
 		"hasExternalLogin": func() bool {
 			return authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
 		},

@@ -70,6 +70,21 @@
                     </button>
                 </div>
             </div>
+
+            <div class="environment" *ngIf="app?.apiConfig?.clientId">
+                <span class="key">{{'APP.API.INFO.CLIENTID' | translate}}</span>
+                <div class="environment-row">
+                    <span>{{this.app.apiConfig?.clientId}}</span>
+                    <button color="primary" [disabled]="copiedKey == this.app.apiConfig?.clientId"
+                        [matTooltip]="(copiedKey != this.app.apiConfig?.clientId ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                        appCopyToClipboard [valueToCopy]="this.app.apiConfig?.clientId"
+                        (copiedValue)="copiedKey = 'clientId'" mat-icon-button>
+                        <i *ngIf="copiedKey != 'clientId'" class="las la-clipboard"></i>
+                        <i *ngIf="copiedKey == 'clientId'" class="las la-clipboard-check"></i>
+                    </button>
+                </div>
+            </div>
+
             <ng-container *ngFor="let environmentV of (environmentMap | keyvalue)">
                 <div *ngIf="environmentV.value" class="environment">
                     <span class="key">{{environmentV.key}}</span>
