@@ -2,14 +2,27 @@
 ## By default we build the prod enviroment
 ARG ENV=prod
 
+
+#######################
+## These steps set platform / arch type specific variables
+#######################
+FROM alpine AS arm64-base
+ENV PROTOC_ARCH aarch_64
+
+FROM alpine AS amd64-base
+ENV PROTOC_ARCH x86_64
+
 #######################
 ## This step downloads the protofiles, protoc and protoc-gen-grpc-web for later use
 #######################
-FROM alpine as base
+FROM ${BUILDARCH}-base as base
 RUN apk add tar curl
 WORKDIR /.tmp
-RUN wget -O protoc https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-aarch_64.zip \
-    && unzip protoc
+RUN protoc_url="https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-${PROTOC_ARCH}.zip" \
+    && wget -O protoc ${protoc_url} \
+    && unzip protoc \
+    && wget -O bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64 \
+    && chmod +x bin/protoc-gen-grpc-web
 RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1/validate/validate.proto --create-dirs -o validate/validate.proto  \
     && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o protoc-gen-swagger/options/annotations.proto \
     && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto --create-dirs -o protoc-gen-swagger/options/openapiv2.proto \
@@ -99,13 +112,14 @@ COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 
 ## Go prod build
 FROM go-test as prod-go-build
+ARG BUILDARCH
 COPY --from=prod-angular-build console/dist/console console/dist/console/
 RUN go get github.com/rakyll/statik \
     && ./build/console/generate-static.sh \
     && ./build/login/generate-static.sh \
     && ./build/notification/generate-static.sh \
     && ./build/zitadel/generate-static.sh
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-amd64 cmd/zitadel/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
 
 ## Go dev build
 FROM go-base as dev-go-build
@@ -115,9 +129,10 @@ RUN go get github.com/go-delve/delve/cmd/dlv
 ## Final Production Image
 #######################
 FROM alpine:latest as artifact
+ARG BUILDARCH
 RUN adduser -D zitadel
 COPY cmd/zitadel/*.yaml /app/
-COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-amd64 /app/zitadel
+COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-${BUILDARCH} /app/zitadel
 RUN chmod a+x /app/zitadel
 RUN ls -la /
 
