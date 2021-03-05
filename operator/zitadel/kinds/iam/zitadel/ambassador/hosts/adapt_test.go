@@ -76,7 +76,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -111,7 +111,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -146,7 +146,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -181,7 +181,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -248,7 +248,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -283,7 +283,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -318,7 +318,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -353,7 +353,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassadorId": []string{
+				"ambassador_id": []string{
 					"default",
 				},
 				"selector": map[string]interface{}{
