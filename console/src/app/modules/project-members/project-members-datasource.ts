@@ -41,11 +41,11 @@ export class ProjectMembersDataSource extends DataSource<Member.AsObject> {
         if (promise) {
             from(promise).pipe(
                 map(resp => {
-                    if (resp.metaData?.totalResult) {
-                        this.totalResult = resp.metaData?.totalResult;
+                    if (resp.details?.totalResult) {
+                        this.totalResult = resp.details?.totalResult;
                     }
-                    if (resp.metaData?.viewTimestamp) {
-                        this.viewTimestamp = resp.metaData.viewTimestamp;
+                    if (resp.details?.viewTimestamp) {
+                        this.viewTimestamp = resp.details.viewTimestamp;
                     }
                     return resp.resultList;
                 }),

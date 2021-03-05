@@ -29,11 +29,11 @@ export class ProjectApplicationsDataSource extends DataSource<App.AsObject> {
         from(this.mgmtService.listApps(projectId, pageSize, offset)).pipe(
             map(resp => {
                 const response = resp;
-                if (response.metaData?.totalResult) {
-                    this.totalResult = response.metaData.totalResult;
+                if (response.details?.totalResult) {
+                    this.totalResult = response.details.totalResult;
                 }
-                if (response.metaData?.viewTimestamp) {
-                    this.viewTimestamp = response.metaData.viewTimestamp;
+                if (response.details?.viewTimestamp) {
+                    this.viewTimestamp = response.details.viewTimestamp;
                 }
                 return response.resultList;
             }),

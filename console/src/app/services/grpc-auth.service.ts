@@ -371,7 +371,7 @@ export class GrpcAuthService {
         if (offset) {
             metadata.setOffset(offset);
         }
-        req.setMetaData(metadata);
+        req.setQuery(metadata);
         return this.grpcService.auth.listMyLinkedIDPs(req, null).then(resp => resp.toObject());
     }
 

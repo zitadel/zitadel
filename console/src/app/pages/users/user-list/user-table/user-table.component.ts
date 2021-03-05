@@ -180,11 +180,11 @@ export class UserTableComponent implements OnInit {
         }
 
         this.userService.listUsers(limit, offset, [query]).then(resp => {
-            if (resp.metaData?.totalResult) {
-                this.totalResult = resp.metaData?.totalResult;
+            if (resp.details?.totalResult) {
+                this.totalResult = resp.details?.totalResult;
             }
-            if (resp.metaData?.viewTimestamp) {
-                this.viewTimestamp = resp.metaData?.viewTimestamp;
+            if (resp.details?.viewTimestamp) {
+                this.viewTimestamp = resp.details?.viewTimestamp;
             }
             this.dataSource.data = resp.resultList;
             this.loadingSubject.next(false);

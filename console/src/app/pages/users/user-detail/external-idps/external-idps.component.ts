@@ -3,14 +3,11 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { IDPUserLink } from 'src/app/proto/generated/zitadel/idp_pb';
 
-import { ExternalIDPView as AuthExternalIDPView } from '../../../../proto/generated/auth_pb';
-import {
-    ExternalIDPSearchResponse,
-    ExternalIDPView as MgmtExternalIDPView,
-} from '../../../../proto/generated/management_pb';
 import { GrpcAuthService } from '../../../../services/grpc-auth.service';
 import { ManagementService } from '../../../../services/mgmt.service';
 import { ToastService } from '../../../../services/toast.service';
@@ -24,11 +21,12 @@ export class ExternalIdpsComponent implements OnInit {
     @Input() service!: GrpcAuthService | ManagementService;
     @Input() userId!: string;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    public externalIdpResult!: ExternalIDPSearchResponse.AsObject;
-    public dataSource: MatTableDataSource<MgmtExternalIDPView.AsObject | AuthExternalIDPView.AsObject>
-        = new MatTableDataSource<MgmtExternalIDPView.AsObject | AuthExternalIDPView.AsObject>();
-    public selection: SelectionModel<MgmtExternalIDPView.AsObject | AuthExternalIDPView.AsObject>
-        = new SelectionModel<MgmtExternalIDPView.AsObject | AuthExternalIDPView.AsObject>(true, []);
+    public totalResult: number = 0;
+    public viewTimestamp!: Timestamp.AsObject;
+    public dataSource: MatTableDataSource<IDPUserLink.AsObject>
+        = new MatTableDataSource<IDPUserLink.AsObject>();
+    public selection: SelectionModel<IDPUserLink.AsObject>
+        = new SelectionModel<IDPUserLink.AsObject>(true, []);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     @Input() public displayedColumns: string[] = ['idpConfigId', 'idpName', 'externalUserId', 'externalUserDisplayName', 'actions'];
@@ -60,15 +58,20 @@ export class ExternalIdpsComponent implements OnInit {
 
         let promise;
         if (this.service instanceof ManagementService) {
-            promise = (this.service as ManagementService).SearchUserExternalIDPs(limit, offset, this.userId);
+            promise = (this.service as ManagementService).listUserIDPs(this.userId, limit, offset);
         } else if (this.service instanceof GrpcAuthService) {
-            promise = (this.service as GrpcAuthService).SearchMyExternalIdps(limit, offset);
+            promise = (this.service as GrpcAuthService).listMyLinkedIDPs(limit, offset);
         }
 
         if (promise) {
             promise.then(resp => {
-                this.externalIdpResult = resp.toObject();
-                this.dataSource.data = this.externalIdpResult.resultList;
+                this.dataSource.data = resp.resultList;
+                if (resp.details?.viewTimestamp) {
+                    this.viewTimestamp = resp.details.viewTimestamp;
+                }
+                if (resp.details?.totalResult) {
+                    this.totalResult = resp.details?.totalResult;
+                }
                 this.loadingSubject.next(false);
             }).catch((error: any) => {
                 this.toast.showError(error);
@@ -81,7 +84,7 @@ export class ExternalIdpsComponent implements OnInit {
         this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
     }
 
-    public removeExternalIdp(idp: AuthExternalIDPView.AsObject | MgmtExternalIDPView.AsObject): void {
+    public removeExternalIdp(idp: IDPUserLink.AsObject): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.REMOVE',
@@ -97,10 +100,10 @@ export class ExternalIdpsComponent implements OnInit {
                 let promise;
                 if (this.service instanceof ManagementService) {
                     promise = (this.service as ManagementService)
-                        .RemoveExternalIDP(idp.externalUserId, idp.idpConfigId, idp.userId);
+                        .removeUserIDP(idp.providedUserId, idp.idpId, idp.userId);
                 } else if (this.service instanceof GrpcAuthService) {
                     promise = (this.service as GrpcAuthService)
-                        .RemoveExternalIDP(idp.externalUserId, idp.idpConfigId);
+                        .removeMyLinkedIDP(idp.providedUserId, idp.idpId);
                 }
 
                 if (promise) {

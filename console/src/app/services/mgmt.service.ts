@@ -523,7 +523,7 @@ export class ManagementService {
         if (asc) {
             metadata.setAsc(asc);
         }
-        req.setMetaData(metadata);
+        req.setQuery(metadata);
         return this.grpcService.mgmt.listMachineKeys(req, null).then(resp => resp.toObject());
     }
 
@@ -554,7 +554,7 @@ export class ManagementService {
         if (offset) {
             metadata.setOffset(offset);
         }
-        req.setMetaData(metadata);
+        req.setQuery(metadata);
         return this.grpcService.mgmt.listUserIDPs(req, null).then(resp => resp.toObject());
     }
 
@@ -627,7 +627,7 @@ export class ManagementService {
         if (offset) {
             query.setOffset(offset);
         }
-        req.setMetaData(query);
+        req.setQuery(query);
 
         return this.grpcService.mgmt.listOrgMembers(req, null).then(resp => resp.toObject());
     }
@@ -838,7 +838,7 @@ export class ManagementService {
     ): Promise<ListProjectMembersResponse.AsObject> {
         const req = new ListProjectMembersRequest();
         const query = new ListQuery();
-        req.setMetaData(query);
+        req.setQuery(query);
         req.setProjectId(projectId);
         if (limit) {
             query.setLimit(limit);
@@ -849,7 +849,7 @@ export class ManagementService {
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        req.setMetaData(query);
+        req.setQuery(query);
         return this.grpcService.mgmt.listProjectMembers(req, null).then(resp => resp.toObject());
     }
 
@@ -869,7 +869,7 @@ export class ManagementService {
         if (queryList) {
             req.setQueriesList(queryList);
         }
-        req.setMetaData(metadata);
+        req.setQuery(metadata);
         return this.grpcService.mgmt.listUserMemberships(req, null).then(resp => resp.toObject());
     }
 
@@ -1044,7 +1044,7 @@ export class ManagementService {
         if (offset) {
             query.setOffset(offset);
         }
-        req.setMetaData(query);
+        req.setQuery(query);
         if (sortingColumn) {
             req.setSortingColumn(sortingColumn);
         }
@@ -1075,7 +1075,7 @@ export class ManagementService {
         if (offset) {
             query.setOffset(offset);
         }
-        req.setMetaData(query);
+        req.setQuery(query);
 
         if (queryList) {
             req.setQueriesList(queryList);
@@ -1204,7 +1204,7 @@ export class ManagementService {
             query.setOffset(offset);
         }
 
-        req.setMetaData(query);
+        req.setQuery(query);
 
         if (queryList) {
             req.setQueriesList(queryList);
@@ -1232,7 +1232,7 @@ export class ManagementService {
             query.setOffset(offset);
         }
 
-        req.setMetaData(query);
+        req.setQuery(query);
         if (queryList) {
             req.setQueriesList(queryList);
         }
@@ -1314,7 +1314,7 @@ export class ManagementService {
             query.setOffset(offset);
         }
 
-        req.setMetaData(query);
+        req.setQuery(query);
         return this.grpcService.mgmt.listProjectGrants(req, null).then(resp => resp.toObject());
     }
 
@@ -1386,7 +1386,7 @@ export class ManagementService {
             query.setOffset(offset);
         }
 
-        req.setMetaData(query);
+        req.setQuery(query);
         if (queryList) {
             req.setQueriesList(queryList);
         }
@@ -1445,7 +1445,7 @@ export class ManagementService {
         if (offset) {
             metaData.setOffset(offset);
         }
-        req.setMetaData(metaData);
+        req.setQuery(metaData);
         return this.grpcService.mgmt.listAppKeys(req, null).then(resp => resp.toObject());
     }
 
@@ -1494,7 +1494,7 @@ export class ManagementService {
             query.setOffset(offset);
         }
 
-        req.setMetaData(query);
+        req.setQuery(query);
         if (queryList) {
             req.setQueriesList(queryList);
         }
@@ -1552,7 +1552,7 @@ export class ManagementService {
             query.setOffset(offset);
         }
 
-        req.setMetaData(query);
+        req.setQuery(query);
         if (queryList) {
             req.setQueriesList(queryList);
         }

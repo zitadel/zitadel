@@ -152,19 +152,20 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                     }).catch(error => {
                         this.toast.showError(error);
                     });
-                } else if (type === MultiFactorType.MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION && id) {
-                    this.service.removeMyMultiFactorU2F(id).then(() => {
-                        this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+                } else
+                    if (type === MultiFactorType.MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION && id) {
+                        this.service.removeMyMultiFactorU2F(id).then(() => {
+                            this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
-                        const index = this.dataSource.data.findIndex(mfa => !!mfa.u2f);
-                        if (index > -1) {
-                            this.dataSource.data.splice(index, 1);
-                        }
-                        this.getMFAs();
-                    }).catch(error => {
-                        this.toast.showError(error);
-                    });
-                }
+                            const index = this.dataSource.data.findIndex(mfa => !!mfa.u2f);
+                            if (index > -1) {
+                                this.dataSource.data.splice(index, 1);
+                            }
+                            this.getMFAs();
+                        }).catch(error => {
+                            this.toast.showError(error);
+                        });
+                    }
             }
         });
     }

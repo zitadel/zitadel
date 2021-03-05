@@ -1,5 +1,5 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    [timestamp]="externalIdpResult?.viewTimestamp" [selection]="selection">
+    [timestamp]="viewTimestamp" [selection]="selection">
 
     <div class="table-wrapper">
         <table class="table" mat-table [dataSource]="dataSource">
@@ -52,7 +52,7 @@
             </tr>
 
         </table>
-        <mat-paginator #paginator class="paginator" [length]="externalIdpResult?.totalResult || 0" [pageSize]="10"
+        <mat-paginator #paginator class="paginator" [length]="totalResult || 0" [pageSize]="10"
             [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
     </div>
 

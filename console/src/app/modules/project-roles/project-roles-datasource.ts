@@ -28,11 +28,11 @@ export class ProjectRolesDataSource extends DataSource<Role.AsObject> {
         this.loadingSubject.next(true);
         from(this.mgmtService.listProjectRoles(projectId, pageSize, offset)).pipe(
             map(resp => {
-                if (resp.metaData?.totalResult !== undefined) {
-                    this.totalResult = resp.metaData?.totalResult;
+                if (resp.details?.totalResult !== undefined) {
+                    this.totalResult = resp.details.totalResult;
                 }
-                if (resp.metaData?.viewTimestamp) {
-                    this.viewTimestamp = resp.metaData.viewTimestamp;
+                if (resp.details?.viewTimestamp) {
+                    this.viewTimestamp = resp.details.viewTimestamp;
                 }
                 return resp.resultList;
             }),

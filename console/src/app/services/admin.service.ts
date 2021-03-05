@@ -323,7 +323,7 @@ export class AdminService {
         if (offset) {
             query.setOffset(offset);
         }
-        req.setMetaData(query);
+        req.setQuery(query);
         return this.grpcService.admin.listLoginPolicyIDPs(req, null).then(resp => resp.toObject());;
     }
 
@@ -344,7 +344,7 @@ export class AdminService {
         if (queriesList) {
             req.setQueriesList(queriesList);
         }
-        req.setMetaData(query);
+        req.setQuery(query);
         return this.grpcService.admin.listIDPs(req, null).then(resp => resp.toObject());;
     }
 
@@ -378,7 +378,7 @@ export class AdminService {
         id: string,
     ): Promise<RemoveIDPResponse.AsObject> {
         const req = new RemoveIDPRequest;
-        req.setId(id);
+        req.setIdpId(id);
         return this.grpcService.admin.removeIDP(req, null).then(resp => resp.toObject());;
     }
 
@@ -386,7 +386,7 @@ export class AdminService {
         id: string,
     ): Promise<DeactivateIDPResponse.AsObject> {
         const req = new DeactivateIDPRequest;
-        req.setId(id);
+        req.setIdpId(id);
         return this.grpcService.admin.deactivateIDP(req, null).then(resp => resp.toObject());;
     }
 
@@ -394,7 +394,7 @@ export class AdminService {
         id: string,
     ): Promise<ReactivateIDPResponse.AsObject> {
         const req = new ReactivateIDPRequest;
-        req.setId(id);
+        req.setIdpId(id);
         return this.grpcService.admin.reactivateIDP(req, null).then(resp => resp.toObject());;
     }
 
@@ -414,7 +414,7 @@ export class AdminService {
         if (queriesList) {
             req.setQueriesList(queriesList);
         }
-        req.setMetaData(metadata);
+        req.setQuery(metadata);
 
         return this.grpcService.admin.listIAMMembers(req, null).then(resp => resp.toObject());;
     }

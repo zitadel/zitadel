@@ -110,14 +110,14 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         this.loadingSubject.next(true);
         this.mgmtService.listProjects(limit, offset).then(resp => {
             this.ownedProjectList = resp.resultList;
-            if (resp.metaData?.totalResult) {
-                this.totalResult = resp.metaData.totalResult;
+            if (resp.details?.totalResult) {
+                this.totalResult = resp.details.totalResult;
             }
             if (this.totalResult > 10) {
                 this.grid = false;
             }
-            if (resp.metaData?.viewTimestamp) {
-                this.viewTimestamp = resp.metaData?.viewTimestamp;
+            if (resp.details?.viewTimestamp) {
+                this.viewTimestamp = resp.details?.viewTimestamp;
             }
             this.dataSource.data = this.ownedProjectList;
             this.loadingSubject.next(false);

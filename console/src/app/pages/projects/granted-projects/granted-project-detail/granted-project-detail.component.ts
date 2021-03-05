@@ -87,8 +87,8 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         from(this.mgmtService.listProjectGrantMembers(this.projectId,
             this.grantId, 100, 0)).pipe(
                 map(resp => {
-                    if (resp.metaData?.totalResult) {
-                        this.totalMemberResult = resp.metaData.totalResult;
+                    if (resp.details?.totalResult) {
+                        this.totalMemberResult = resp.details.totalResult;
                     }
                     return resp.resultList;
                 }),

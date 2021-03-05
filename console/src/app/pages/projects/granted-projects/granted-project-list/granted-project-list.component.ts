@@ -91,11 +91,11 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         this.loadingSubject.next(true);
         this.mgmtService.listGrantedProjects(limit, offset).then(resp => {
             this.grantedProjectList = resp.resultList;
-            if (resp.metaData?.totalResult) {
-                this.totalResult = resp.metaData.totalResult;
+            if (resp.details?.totalResult) {
+                this.totalResult = resp.details.totalResult;
             }
-            if (resp.metaData?.viewTimestamp) {
-                this.viewTimestamp = resp.metaData?.viewTimestamp;
+            if (resp.details?.viewTimestamp) {
+                this.viewTimestamp = resp.details?.viewTimestamp;
             }
             if (this.totalResult > 5) {
                 this.grid = false;
