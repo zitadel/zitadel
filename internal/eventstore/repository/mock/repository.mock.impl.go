@@ -41,6 +41,9 @@ func (m *MockRepository) ExpectPush(expectedEvents []*repository.Event, expected
 	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
 		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 			assert.Equal(m.ctrl.T, expectedEvents, events)
+			if expectedUniqueConstraints == nil {
+				expectedUniqueConstraints = []*repository.UniqueConstraint{}
+			}
 			assert.Equal(m.ctrl.T, expectedUniqueConstraints, uniqueConstraints)
 			return nil
 		},
@@ -52,6 +55,9 @@ func (m *MockRepository) ExpectPushFailed(err error, expectedEvents []*repositor
 	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
 		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 			assert.Equal(m.ctrl.T, expectedEvents, events)
+			if expectedUniqueConstraints == nil {
+				expectedUniqueConstraints = []*repository.UniqueConstraint{}
+			}
 			assert.Equal(m.ctrl.T, expectedUniqueConstraints, uniqueConstraints)
 			return err
 		},
