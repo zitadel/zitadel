@@ -12,7 +12,8 @@ import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
-import { MyProjectOrgSearchKey, MyProjectOrgSearchQuery, Org, SearchMethod } from './proto/generated/auth_pb';
+import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
+import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
 import { Profile } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
@@ -219,10 +220,11 @@ export class AppComponent implements OnDestroy {
     public loadOrgs(filter?: string): void {
         let query;
         if (filter) {
-            query = new MyProjectOrgSearchQuery();
-            query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
-            query.setKey(MyProjectOrgSearchKey.MYPROJECTORGSEARCHKEY_ORG_NAME);
-            query.setValue(filter);
+            query = new OrgQuery();
+            const orgNameQuery = new OrgNameQuery();
+            orgNameQuery.setName(filter);
+            orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+            query.setName(orgNameQuery);
         }
 
         this.orgLoading$.next(true);

@@ -7,12 +7,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ClientKeySearchResponse, MachineKeySearchResponse, MachineKeyType, MachineKeyView } from 'src/app/proto/generated/management_pb';
-import { ManagementService } from 'src/app/services/mgmt.service';
-import { ToastService } from 'src/app/services/toast.service';
-
 import { AddKeyDialogComponent, AddKeyDialogType } from 'src/app/modules/add-key-dialog/add-key-dialog.component';
 import { ShowKeyDialogComponent } from 'src/app/modules/show-key-dialog/show-key-dialog.component';
+import { Key, KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
+import { ListMachineKeysResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-machine-keys',
@@ -23,14 +23,14 @@ export class MachineKeysComponent implements OnInit {
     @Input() userId!: string;
 
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    public dataSource: MatTableDataSource<MachineKeyView.AsObject> = new MatTableDataSource<MachineKeyView.AsObject>();
-    public selection: SelectionModel<MachineKeyView.AsObject> = new SelectionModel<MachineKeyView.AsObject>(true, []);
-    public keyResult!: MachineKeySearchResponse.AsObject | ClientKeySearchResponse.AsObject;
+    public dataSource: MatTableDataSource<Key.AsObject> = new MatTableDataSource<Key.AsObject>();
+    public selection: SelectionModel<Key.AsObject> = new SelectionModel<Key.AsObject>(true, []);
+    public keyResult!: ListMachineKeysResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     @Input() public displayedColumns: string[] = ['select', 'id', 'type', 'creationDate', 'expirationDate'];
 
-    @Output() public changedSelection: EventEmitter<Array<MachineKeyView.AsObject>> = new EventEmitter();
+    @Output() public changedSelection: EventEmitter<Array<Key.AsObject>> = new EventEmitter();
 
     constructor(public translate: TranslateService, private mgmtService: ManagementService, private dialog: MatDialog,
         private toast: ToastService) {
@@ -63,7 +63,7 @@ export class MachineKeysComponent implements OnInit {
 
     public deleteSelectedKeys(): void {
         const mappedDeletions = this.selection.selected.map(value => {
-            return this.mgmtService.DeleteMachineKey(value.id, this.userId);
+            return this.mgmtService.removeMachineKey(value.id, this.userId);
         });
         Promise.all(mappedDeletions).then(() => {
             this.selection.clear();
@@ -82,7 +82,7 @@ export class MachineKeysComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const type: MachineKeyType = resp.type;
+                const type: KeyType = resp.type;
 
                 let date: Timestamp | undefined;
 
@@ -98,7 +98,7 @@ export class MachineKeysComponent implements OnInit {
                 }
 
                 if (type) {
-                    return this.mgmtService.AddMachineKey(this.userId, type, date).then((response) => {
+                    return this.mgmtService.addMachineKey(this.userId, type, date).then((response) => {
                         if (response) {
                             setTimeout(() => {
                                 this.refreshPage();
@@ -106,7 +106,7 @@ export class MachineKeysComponent implements OnInit {
 
                             this.dialog.open(ShowKeyDialogComponent, {
                                 data: {
-                                    key: response.toObject(),
+                                    key: response,
                                     type: AddKeyDialogType.MACHINE
                                 },
                                 width: '400px',
@@ -124,9 +124,11 @@ export class MachineKeysComponent implements OnInit {
         this.loadingSubject.next(true);
 
         if (this.userId) {
-            this.mgmtService.SearchMachineKeys(this.userId, limit, offset).then(resp => {
-                this.keyResult = resp.toObject();
-                this.dataSource.data = this.keyResult.resultList;
+            this.mgmtService.listMachineKeys(this.userId, limit, offset).then(resp => {
+                this.keyResult = resp;
+                if (resp.resultList) {
+                    this.dataSource.data = resp.resultList;
+                }
                 this.loadingSubject.next(false);
             }).catch((error: any) => {
                 this.toast.showError(error);

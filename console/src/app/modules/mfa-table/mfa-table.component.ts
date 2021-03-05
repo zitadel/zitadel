@@ -4,17 +4,18 @@ import { MatPaginator } from '@angular/material/paginator';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {
-    MultiFactor as AdminMultiFactor,
-    MultiFactorType as AdminMultiFactorType,
-    SecondFactor as AdminSecondFactor,
-    SecondFactorType as AdminSecondFactorType,
-} from 'src/app/proto/generated/admin_pb';
+    AddMultiFactorToLoginPolicyRequest as AdminAddMultiFactorToLoginPolicyRequest,
+    AddSecondFactorToLoginPolicyRequest as AdminAddSecondFactorToLoginPolicyRequest,
+    RemoveMultiFactorFromLoginPolicyRequest as AdminRemoveMultiFactorFromLoginPolicyRequest,
+    RemoveSecondFactorFromLoginPolicyRequest as AdminRemoveSecondFactorFromLoginPolicyRequest,
+} from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    MultiFactor as MgmtMultiFactor,
-    MultiFactorType as MgmtMultiFactorType,
-    SecondFactor as MgmtSecondFactor,
-    SecondFactorType as MgmtSecondFactorType,
-} from 'src/app/proto/generated/management_pb';
+    AddMultiFactorToLoginPolicyRequest as MgmtAddMultiFactorToLoginPolicyRequest,
+    AddSecondFactorToLoginPolicyRequest as MgmtAddSecondFactorToLoginPolicyRequest,
+    RemoveMultiFactorFromLoginPolicyRequest as MgmtRemoveMultiFactorFromLoginPolicyRequest,
+    RemoveSecondFactorFromLoginPolicyRequest as MgmtRemoveSecondFactorFromLoginPolicyRequest,
+} from 'src/app/proto/generated/zitadel/management_pb';
+import { MultiFactorType, SecondFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -40,7 +41,7 @@ export class MfaTableComponent implements OnInit {
     @Input() service!: AdminService | ManagementService;
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    public mfas: Array<AdminMultiFactorType | MgmtMultiFactorType | MgmtSecondFactorType | AdminSecondFactorType> = [];
+    public mfas: Array<MultiFactorType | SecondFactorType> = [];
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -53,7 +54,7 @@ export class MfaTableComponent implements OnInit {
         this.getData();
     }
 
-    public removeMfa(type: MgmtMultiFactorType | AdminMultiFactorType | MgmtSecondFactorType | AdminSecondFactorType): void {
+    public removeMfa(type: MultiFactorType | SecondFactorType): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -68,32 +69,32 @@ export class MfaTableComponent implements OnInit {
             if (resp) {
                 if (this.serviceType === PolicyComponentServiceType.MGMT) {
                     if (this.componentType === LoginMethodComponentType.MultiFactor) {
-                        const req = new MgmtMultiFactor();
-                        req.setMultiFactor(type as MgmtMultiFactorType);
-                        (this.service as ManagementService).RemoveMultiFactorFromLoginPolicy(req).then(() => {
+                        const req = new MgmtRemoveMultiFactorFromLoginPolicyRequest();
+                        req.setMultiFactor(type as MultiFactorType);
+                        (this.service as ManagementService).removeMultiFactorFromLoginPolicy(req).then(() => {
                             this.toast.showInfo('MFA.TOAST.DELETED', true);
                             this.refreshPageAfterTimout(2000);
                         });
                     } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-                        const req = new MgmtSecondFactor();
-                        req.setSecondFactor(type as MgmtSecondFactorType);
-                        (this.service as ManagementService).RemoveSecondFactorFromLoginPolicy(req).then(() => {
+                        const req = new MgmtRemoveSecondFactorFromLoginPolicyRequest();
+                        req.setSecondFactor(type as SecondFactorType);
+                        (this.service as ManagementService).removeSecondFactorFromLoginPolicy(req).then(() => {
                             this.toast.showInfo('MFA.TOAST.DELETED', true);
                             this.refreshPageAfterTimout(2000);
                         });
                     }
                 } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
                     if (this.componentType === LoginMethodComponentType.MultiFactor) {
-                        const req = new AdminMultiFactor();
-                        req.setMultiFactor(type as AdminMultiFactorType);
-                        (this.service as AdminService).RemoveMultiFactorFromDefaultLoginPolicy(req).then(() => {
+                        const req = new AdminRemoveMultiFactorFromLoginPolicyRequest();
+                        req.setType(type as MultiFactorType);
+                        (this.service as AdminService).removeMultiFactorFromLoginPolicy(req).then(() => {
                             this.toast.showInfo('MFA.TOAST.DELETED', true);
                             this.refreshPageAfterTimout(2000);
                         });
                     } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-                        const req = new AdminSecondFactor();
-                        req.setSecondFactor(type as AdminSecondFactorType);
-                        (this.service as AdminService).RemoveSecondFactorFromDefaultLoginPolicy(req).then(() => {
+                        const req = new AdminRemoveSecondFactorFromLoginPolicyRequest();
+                        req.setType(type as SecondFactorType);
+                        (this.service as AdminService).removeSecondFactorFromLoginPolicy(req).then(() => {
                             this.toast.showInfo('MFA.TOAST.DELETED', true);
                             this.refreshPageAfterTimout(2000);
                         });
@@ -108,17 +109,9 @@ export class MfaTableComponent implements OnInit {
         let selection: any[] = [];
 
         if (this.componentType === LoginMethodComponentType.MultiFactor) {
-            selection = this.serviceType === PolicyComponentServiceType.MGMT ?
-                [MgmtMultiFactorType.MULTIFACTORTYPE_U2F_WITH_PIN] :
-                this.serviceType === PolicyComponentServiceType.ADMIN ?
-                    [AdminMultiFactorType.MULTIFACTORTYPE_U2F_WITH_PIN] :
-                    [];
+            selection = [MultiFactorType.MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION];
         } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-            selection = this.serviceType === PolicyComponentServiceType.MGMT ?
-                [MgmtSecondFactorType.SECONDFACTORTYPE_U2F, MgmtSecondFactorType.SECONDFACTORTYPE_OTP] :
-                this.serviceType === PolicyComponentServiceType.ADMIN ?
-                    [AdminSecondFactorType.SECONDFACTORTYPE_OTP, AdminSecondFactorType.SECONDFACTORTYPE_U2F] :
-                    [];
+            selection = [SecondFactorType.SECOND_FACTOR_TYPE_U2F, SecondFactorType.SECOND_FACTOR_TYPE_OTP];
         }
 
         this.mfas.forEach(mfa => {
@@ -138,22 +131,22 @@ export class MfaTableComponent implements OnInit {
             width: '400px',
         });
 
-        dialogRef.afterClosed().subscribe((mfaType: AdminMultiFactorType | MgmtMultiFactorType |
-            AdminSecondFactorType | MgmtSecondFactorType) => {
+        dialogRef.afterClosed().subscribe((mfaType: MultiFactorType |
+            SecondFactorType) => {
             if (mfaType) {
                 if (this.serviceType === PolicyComponentServiceType.MGMT) {
                     if (this.componentType === LoginMethodComponentType.MultiFactor) {
-                        const req = new MgmtMultiFactor();
-                        req.setMultiFactor(mfaType as MgmtMultiFactorType);
-                        (this.service as ManagementService).AddMultiFactorToLoginPolicy(req).then(() => {
+                        const req = new MgmtAddMultiFactorToLoginPolicyRequest();
+                        req.setMultiFactor(mfaType as MultiFactorType);
+                        (this.service as ManagementService).addMultiFactorToLoginPolicy(req).then(() => {
                             this.refreshPageAfterTimout(2000);
                         }).catch(error => {
                             this.toast.showError(error);
                         });
                     } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-                        const req = new MgmtSecondFactor();
-                        req.setSecondFactor(mfaType as MgmtSecondFactorType);
-                        (this.service as ManagementService).AddSecondFactorToLoginPolicy(req).then(() => {
+                        const req = new MgmtAddSecondFactorToLoginPolicyRequest();
+                        req.setSecondFactor(mfaType as SecondFactorType);
+                        (this.service as ManagementService).addSecondFactorToLoginPolicy(req).then(() => {
                             this.refreshPageAfterTimout(2000);
                         }).catch(error => {
                             this.toast.showError(error);
@@ -161,17 +154,17 @@ export class MfaTableComponent implements OnInit {
                     }
                 } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
                     if (this.componentType === LoginMethodComponentType.MultiFactor) {
-                        const req = new AdminMultiFactor();
-                        req.setMultiFactor(mfaType as AdminMultiFactorType);
-                        (this.service as AdminService).addMultiFactorToDefaultLoginPolicy(req).then(() => {
+                        const req = new AdminAddMultiFactorToLoginPolicyRequest();
+                        req.setType(mfaType as MultiFactorType);
+                        (this.service as AdminService).addMultiFactorToLoginPolicy(req).then(() => {
                             this.refreshPageAfterTimout(2000);
                         }).catch(error => {
                             this.toast.showError(error);
                         });
                     } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-                        const req = new AdminSecondFactor();
-                        req.setSecondFactor(mfaType as AdminSecondFactorType);
-                        (this.service as AdminService).AddSecondFactorToDefaultLoginPolicy(req).then(() => {
+                        const req = new AdminAddSecondFactorToLoginPolicyRequest();
+                        req.setType(mfaType as SecondFactorType);
+                        (this.service as AdminService).addSecondFactorToLoginPolicy(req).then(() => {
                             this.refreshPageAfterTimout(2000);
                         }).catch(error => {
                             this.toast.showError(error);
@@ -187,16 +180,16 @@ export class MfaTableComponent implements OnInit {
 
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
             if (this.componentType === LoginMethodComponentType.MultiFactor) {
-                (this.service as ManagementService).GetLoginPolicyMultiFactors().then(resp => {
-                    this.mfas = resp.toObject().multiFactorsList;
+                (this.service as ManagementService).listLoginPolicyMultiFactors().then(resp => {
+                    this.mfas = resp.resultList;
                     this.loadingSubject.next(false);
                 }).catch(error => {
                     this.toast.showError(error);
                     this.loadingSubject.next(false);
                 });
             } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-                (this.service as ManagementService).GetLoginPolicySecondFactors().then(resp => {
-                    this.mfas = resp.toObject().secondFactorsList;
+                (this.service as ManagementService).listLoginPolicySecondFactors().then(resp => {
+                    this.mfas = resp.resultList;
                     this.loadingSubject.next(false);
                 }).catch(error => {
                     this.toast.showError(error);
@@ -205,16 +198,16 @@ export class MfaTableComponent implements OnInit {
             }
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
             if (this.componentType === LoginMethodComponentType.MultiFactor) {
-                (this.service as AdminService).getDefaultLoginPolicyMultiFactors().then(resp => {
-                    this.mfas = resp.toObject().multiFactorsList;
+                (this.service as AdminService).listLoginPolicyMultiFactors().then(resp => {
+                    this.mfas = resp.resultList;
                     this.loadingSubject.next(false);
                 }).catch(error => {
                     this.toast.showError(error);
                     this.loadingSubject.next(false);
                 });
             } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-                (this.service as AdminService).GetDefaultLoginPolicySecondFactors().then(resp => {
-                    this.mfas = resp.toObject().secondFactorsList;
+                (this.service as AdminService).listLoginPolicySecondFactors().then(resp => {
+                    this.mfas = resp.resultList;
                     this.loadingSubject.next(false);
                 }).catch(error => {
                     this.toast.showError(error);

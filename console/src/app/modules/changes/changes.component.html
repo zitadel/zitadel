@@ -11,8 +11,9 @@
             hist.values[0]?.dates[0]| timestampToDate | localizedDate: 'dd. MMMM YYYY' }}</span>
         <div class="item" *ngFor="let dayelement of hist.values; index as i">
             <div class="row">
-                <app-avatar matTooltip="{{ dayelement.editorName }}" *ngIf="dayelement.editorName; else spacer"
-                    class="avatar" [name]="dayelement.editorName" [size]="32">
+                <app-avatar matTooltip="{{ dayelement.editorDisplayName }}"
+                    *ngIf="dayelement.editorDisplayName; else spacer" class="avatar"
+                    [name]="dayelement.editorDisplayName" [size]="32">
                 </app-avatar>
                 <ng-template #spacer>
                     <div class="spacer"></div>

@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import {
+    AddAPIClientKeyRequest,
     AddCustomLoginPolicyRequest,
     AddCustomLoginPolicyResponse,
     AddCustomPasswordAgePolicyRequest,
@@ -109,6 +110,8 @@ import {
     GetUserGrantByIDRequest,
     GetUserGrantByIDResponse,
     IDPQuery,
+    ListAPIClientKeysRequest,
+    ListAPIClientKeysResponse,
     ListAppChangesRequest,
     ListAppChangesResponse,
     ListAppsRequest,
@@ -175,6 +178,8 @@ import {
     ReactivateUserRequest,
     ReactivateUserResponse,
     RegenerateOIDCClientSecretRequest,
+    RemoveAPIClientKeyRequest,
+    RemoveAPIClientKeyResponse,
     RemoveAppRequest,
     RemoveAppResponse,
     RemoveHumanMultiFactorOTPRequest,
@@ -1419,6 +1424,54 @@ export class ManagementService {
         req.setAppId(appId);
         req.setProjectId(projectId);
         return this.grpcService.mgmt.regenerateOIDCClientSecret(req, null).then(resp => resp.toObject());
+    }
+
+    public listAPIClientKeys(
+        projectId: string,
+        appId: string,
+        limit: number,
+        offset: number,
+    ): Promise<ListAPIClientKeysResponse.AsObject> {
+        const req = new ListAPIClientKeysRequest();
+        req.setProjectId(projectId);
+        req.setAppId(appId);
+        const metaData = new ListQuery();
+        if (limit) {
+            metaData.setLimit(limit);
+        }
+        if (offset) {
+            metaData.setOffset(offset);
+        }
+        req.setMetaData(metaData);
+        return this.grpcService.mgmt.listAPIClientKeys(req, null).then(resp => resp.toObject());
+    }
+
+    public addAPIClientKey(
+        projectId: string,
+        appId: string,
+        type: KeyType,
+        expirationDate?: Timestamp,
+    ): Promise<AddProjectGrantMemberResponse.AsObject> {
+        const req = new AddAPIClientKeyRequest();
+        req.setProjectId(projectId);
+        req.setAppId(appId);
+        req.setType(type);
+        if (expirationDate) {
+            req.setExpirationDate(expirationDate);
+        }
+        return this.grpcService.mgmt.addAPIClientKey(req, null).then(resp => resp.toObject());
+    }
+
+    public removeAPIClientKey(
+        projectId: string,
+        appId: string,
+        keyId: string,
+    ): Promise<RemoveAPIClientKeyResponse.AsObject> {
+        const req = new RemoveAPIClientKeyRequest();
+        req.setAppId(appId);
+        req.setKeyId(keyId);
+        req.setProjectId(projectId);
+        return this.grpcService.mgmt.removeAPIClientKey(req, null).then(resp => resp.toObject());
     }
 
     public listProjectRoles(

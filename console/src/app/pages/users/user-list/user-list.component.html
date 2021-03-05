@@ -1,17 +1,17 @@
 <div class="max-width-container" [ngSwitch]="type">
-    <ng-container *ngSwitchCase="UserType.HUMAN">
+    <ng-container *ngSwitchCase="Type.TYPE_HUMAN">
         <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
         <p class="sub">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
 
-        <app-user-table [userType]="UserType.HUMAN" [disabled]="(['user.write$'] | hasRole | async) == false">
+        <app-user-table [type]="Type.TYPE_HUMAN" [disabled]="(['user.write$'] | hasRole | async) == false">
         </app-user-table>
     </ng-container>
 
-    <ng-container *ngSwitchCase="UserType.MACHINE">
+    <ng-container *ngSwitchCase="Type.TYPE_MACHINE">
         <h1>{{ 'USER.PAGES.LISTMACHINE' | translate }}</h1>
         <p class="sub">{{ 'USER.PAGES.DESCRIPTIONMACHINE' | translate }}</p>
 
-        <app-user-table [userType]="UserType.MACHINE"
+        <app-user-table [type]="Type.TYPE_MACHINE"
             [displayedColumns]="['select','name', 'username', 'description','state', 'actions']"
             [disabled]="(['user.write$'] | hasRole | async) == false">
         </app-user-table>
