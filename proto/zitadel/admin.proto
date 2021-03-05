@@ -132,7 +132,7 @@ service AdminService {
 
     rpc DeactivateIDP(DeactivateIDPRequest) returns (DeactivateIDPResponse) {
         option (google.api.http) = {
-            post: "/idps/{id}/_deactivate"
+            post: "/idps/{idp_id}/_deactivate"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -142,7 +142,7 @@ service AdminService {
 
     rpc ReactivateIDP(ReactivateIDPRequest) returns (ReactivateIDPResponse) {
         option (google.api.http) = {
-            post: "/idps/{id}/_reactivate"
+            post: "/idps/{idp_id}/_reactivate"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -152,7 +152,7 @@ service AdminService {
 
     rpc RemoveIDP(RemoveIDPRequest) returns (RemoveIDPResponse) {
         option (google.api.http) = {
-            delete: "/idps/{id}"
+            delete: "/idps/{idp_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -649,7 +649,7 @@ message AddOIDCIDPResponse {
 }
 
 message DeactivateIDPRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateIDPResponse {
@@ -657,7 +657,7 @@ message DeactivateIDPResponse {
 }
 
 message ReactivateIDPRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ReactivateIDPResponse {
@@ -665,7 +665,7 @@ message ReactivateIDPResponse {
 }
 
 message RemoveIDPRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveIDPResponse {
@@ -673,7 +673,7 @@ message RemoveIDPResponse {
 }
 
 message UpdateIDPRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.idp.v1.IDPStylingType styling_type = 3 [(validate.rules).enum = {defined_only: true}];
 }
