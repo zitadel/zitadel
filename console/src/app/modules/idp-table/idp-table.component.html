@@ -1,5 +1,6 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    [emitRefreshOnPreviousRoutes]="['/iam/idp/create']" [timestamp]="idpResult?.viewTimestamp" [selection]="selection">
+    [emitRefreshOnPreviousRoutes]="['/iam/idp/create']" [timestamp]="idpResult?.metaData?.viewTimestamp"
+    [selection]="selection">
     <div actions>
         <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="icon-button"
             mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
@@ -30,7 +31,7 @@
                 </th>
                 <td mat-cell *matCellDef="let idp">
                     <mat-checkbox color="primary" (click)="$event.stopPropagation()" class="chbox"
-                        [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM"
+                        [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IDPOwnerType.IDPPROVIDERTYPE_SYSTEM"
                         (change)="$event ? selection.toggle(idp) : null" [checked]="selection.isSelected(idp)">
                         <img src="../../../assets/images/google.png"
                             *ngIf="idp.stylingType == IdpStylingType.IDPSTYLINGTYPE_GOOGLE" alt="google" />
@@ -58,7 +59,7 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.STATE' | translate }} </th>
                 <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
                     <span class="state"
-                        [ngClass]="{'active': idp.state === IdpState.IDPCONFIGSTATE_ACTIVE, 'inactive': idp.state === IdpState.IDPCONFIGSTATE_INACTIVE}">{{
+                        [ngClass]="{'active': idp.state === IDPState.IDP_STATE_ACTIVE, 'inactive': idp.state === IDPState.IDP_STATE_INACTIVE}">{{
                         'IDP.STATES.'+idp.state | translate }}</span>
                 </td>
             </ng-container>
@@ -87,7 +88,7 @@
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let idp">
                     <button
-                        [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM"
+                        [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IDPOwnerType.IDP_OWNER_TYPE_ORG"
                         mat-icon-button color="warn" matTooltip="{{'IAM.VIEWS.CLEAR' | translate}}"
                         (click)="removeIdp(idp)">
                         <i class="las la-trash"></i>
@@ -97,11 +98,11 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr class="highlight"
-                [ngClass]="{'disabled': serviceType==PolicyComponentServiceType.MGMT && row?.providerType == IdpProviderType.IDPPROVIDERTYPE_SYSTEM}"
+                [ngClass]="{'disabled': serviceType==PolicyComponentServiceType.MGMT && row?.providerType == IDPOwnerType.IDP_OWNER_TYPE_SYSTEM}"
                 mat-row *matRowDef="let row; columns: displayedColumns;">
             </tr>
         </table>
     </div>
-    <mat-paginator #paginator class="paginator" [length]="idpResult?.totalResult || 0" [pageSize]="10"
+    <mat-paginator #paginator class="paginator" [length]="idpResult?.metaData?.totalResult || 0" [pageSize]="10"
         [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
 </app-refresh-table>

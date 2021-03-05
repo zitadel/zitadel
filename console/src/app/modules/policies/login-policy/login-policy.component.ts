@@ -5,29 +5,37 @@ import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
 import {
-    DefaultLoginPolicy,
-    DefaultLoginPolicyRequest,
-    DefaultLoginPolicyView,
     IdpProviderView as AdminIdpProviderView,
     IdpStylingType,
-    IdpView as AdminIdpView,
     PasswordlessType as AdminPasswordlessType,
 } from 'src/app/proto/generated/admin_pb';
 import {
-    IdpProviderType,
     IdpProviderView as MgmtIdpProviderView,
-    IdpView as MgmtIdpView,
-    LoginPolicy,
-    LoginPolicyRequest,
-    LoginPolicyView,
     PasswordlessType as MgmtPasswordlessType,
 } from 'src/app/proto/generated/management_pb';
+import {
+    GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
+    UpdateLoginPolicyRequest,
+    UpdateLoginPolicyResponse,
+} from 'src/app/proto/generated/zitadel/admin_pb';
+import { IDP, IDPLoginPolicyLink } from 'src/app/proto/generated/zitadel/idp_pb';
+import {
+    AddCustomLoginPolicyRequest,
+    GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
+} from 'src/app/proto/generated/zitadel/management_pb';
+import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { CnslLinks } from '../../links/links.component';
-import { IAM_COMPLEXITY_LINK, IAM_LABEL_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK, ORG_COMPLEXITY_LINK, ORG_IAM_POLICY_LINK } from '../../policy-grid/policy-links';
 
+import { CnslLinks } from '../../links/links.component';
+import {
+    IAM_COMPLEXITY_LINK,
+    IAM_LABEL_LINK,
+    IAM_POLICY_LINK,
+    ORG_COMPLEXITY_LINK,
+    ORG_IAM_POLICY_LINK,
+} from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
 
@@ -39,7 +47,7 @@ import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component
 export class LoginPolicyComponent implements OnDestroy {
     public LoginMethodComponentType: any = LoginMethodComponentType;
     public passwordlessTypes: Array<AdminPasswordlessType | MgmtPasswordlessType> = [];
-    public loginData!: LoginPolicyView.AsObject | DefaultLoginPolicyView.AsObject;
+    public loginData!: LoginPolicy.AsObject;
 
     private sub: Subscription = new Subscription();
     public service!: ManagementService | AdminService;
@@ -89,11 +97,11 @@ export class LoginPolicyComponent implements OnDestroy {
     }
 
     private fetchData(): void {
-        this.getData().then(data => {
-            if (data) {
-                this.loginData = data.toObject();
+        this.getData().then(resp => {
+            if (resp.policy) {
+                this.loginData = resp.policy;
                 this.loading = false;
-                this.disabled = ((this.loginData as LoginPolicyView.AsObject)?.pb_default) ?? false;
+                this.disabled = ((this.loginData as LoginPolicy.AsObject)?.pb_default) ?? false;
             }
         });
         this.getIdps().then(idps => {
@@ -106,48 +114,48 @@ export class LoginPolicyComponent implements OnDestroy {
     }
 
     private async getData():
-        Promise<LoginPolicyView | DefaultLoginPolicyView> {
+        Promise<AdminGetLoginPolicyResponse.AsObject | MgmtGetLoginPolicyResponse.AsObject> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                return (this.service as ManagementService).GetLoginPolicy();
+                return (this.service as ManagementService).getLoginPolicy();
             case PolicyComponentServiceType.ADMIN:
-                return (this.service as AdminService).GetDefaultLoginPolicy();
+                return (this.service as AdminService).getLoginPolicy();
         }
     }
 
-    private async getIdps(): Promise<MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[]> {
+    private async getIdps(): Promise<IDPLoginPolicyLink.AsObject[]> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                return (this.service as ManagementService).GetLoginPolicyIdpProviders()
+                return (this.service as ManagementService).listLoginPolicyIDPs()
                     .then((providers) => {
-                        return providers.toObject().resultList;
+                        return providers.resultList;
                     });
             case PolicyComponentServiceType.ADMIN:
-                return (this.service as AdminService).GetDefaultLoginPolicyIdpProviders()
+                return (this.service as AdminService).listLoginPolicyIDPs()
                     .then((providers) => {
-                        return providers.toObject().resultList;
+                        return providers.resultList;
                     });
         }
     }
 
     private async updateData():
-        Promise<LoginPolicy | DefaultLoginPolicy> {
+        Promise<UpdateLoginPolicyResponse.AsObject> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                const mgmtreq = new LoginPolicyRequest();
+                const mgmtreq = new AddCustomLoginPolicyRequest();
                 mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 mgmtreq.setAllowRegister(this.loginData.allowRegister);
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
                 mgmtreq.setForceMfa(this.loginData.forceMfa);
                 mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
                 // console.log(mgmtreq.toObject());
-                if ((this.loginData as LoginPolicyView.AsObject).pb_default) {
-                    return (this.service as ManagementService).CreateLoginPolicy(mgmtreq);
+                if ((this.loginData as LoginPolicy.AsObject).isDefault) {
+                    return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
                 } else {
-                    return (this.service as ManagementService).UpdateLoginPolicy(mgmtreq);
+                    return (this.service as ManagementService).updateCustomLoginPolicy(mgmtreq);
                 }
             case PolicyComponentServiceType.ADMIN:
-                const adminreq = new DefaultLoginPolicyRequest();
+                const adminreq = new UpdateLoginPolicyRequest();
                 adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
                 adminreq.setAllowRegister(this.loginData.allowRegister);
                 adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
@@ -156,7 +164,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
                 // console.log(adminreq.toObject());
 
-                return (this.service as AdminService).UpdateDefaultLoginPolicy(adminreq);
+                return (this.service as AdminService).updateLoginPolicy(adminreq);
         }
     }
 
@@ -174,7 +182,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
     public removePolicy(): void {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            (this.service as ManagementService).RemoveLoginPolicy().then(() => {
+            (this.service as ManagementService).resetLoginPolicyToDefault().then(() => {
                 this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
                 this.loading = true;
                 setTimeout(() => {
@@ -195,8 +203,8 @@ export class LoginPolicyComponent implements OnDestroy {
         });
 
         dialogRef.afterClosed().subscribe(resp => {
-            if (resp && resp.idp && resp.type) {
-                this.addIdp(resp.idp, resp.type).then(() => {
+            if (resp && resp.idp) {
+                this.addIdp(resp.idp).then(() => {
                     this.loading = true;
                     setTimeout(() => {
                         this.fetchData();
@@ -208,20 +216,19 @@ export class LoginPolicyComponent implements OnDestroy {
         });
     }
 
-    private addIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject,
-        type: IdpProviderType = IdpProviderType.IDPPROVIDERTYPE_SYSTEM): Promise<any> {
+    private addIdp(idp: IDP.AsObject | IDP.AsObject): Promise<any> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                return (this.service as ManagementService).addIdpProviderToLoginPolicy(idp.id, type);
+                return (this.service as ManagementService).addIDPToLoginPolicy(idp.id);
             case PolicyComponentServiceType.ADMIN:
-                return (this.service as AdminService).AddIdpProviderToDefaultLoginPolicy(idp.id);
+                return (this.service as AdminService).addIDPToLoginPolicy(idp.id);
         }
     }
 
     public removeIdp(idp: AdminIdpProviderView.AsObject | MgmtIdpProviderView.AsObject): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                (this.service as ManagementService).RemoveIdpProviderFromLoginPolicy(idp.idpConfigId).then(() => {
+                (this.service as ManagementService).removeIDPFromLoginPolicy(idp.idpConfigId).then(() => {
                     const index = (this.idps as MgmtIdpProviderView.AsObject[]).findIndex(temp => temp === idp);
                     if (index > -1) {
                         this.idps.splice(index, 1);
@@ -229,7 +236,7 @@ export class LoginPolicyComponent implements OnDestroy {
                 });
                 break;
             case PolicyComponentServiceType.ADMIN:
-                (this.service as AdminService).RemoveIdpProviderFromDefaultLoginPolicy(idp.idpConfigId).then(() => {
+                (this.service as AdminService).removeIDPFromLoginPolicy(idp.idpConfigId).then(() => {
                     const index = (this.idps as AdminIdpProviderView.AsObject[]).findIndex(temp => temp === idp);
                     if (index > -1) {
                         this.idps.splice(index, 1);
@@ -241,7 +248,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
     public get isDefault(): boolean {
         if (this.loginData && this.serviceType === PolicyComponentServiceType.MGMT) {
-            return (this.loginData as LoginPolicyView.AsObject).pb_default;
+            return (this.loginData as LoginPolicy.AsObject).pb_default;
         } else {
             return false;
         }

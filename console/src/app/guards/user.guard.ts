@@ -17,7 +17,7 @@ export class UserGuard implements CanActivate {
         state: RouterStateSnapshot,
     ): Observable<boolean> | Promise<boolean> | boolean {
         return this.authService.user.pipe(
-            map(user => user.id !== route.params.id),
+            map(user => user?.id !== route.params.id),
             tap((isNotMe) => {
                 if (!isNotMe) {
                     this.router.navigate(['/users', 'me']);

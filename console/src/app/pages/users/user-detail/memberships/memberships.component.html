@@ -1,10 +1,10 @@
 <div class="membership-groups">
     <span class="me-header">{{ 'USER.MEMBERSHIPS.TITLE' | translate }}</span>
     <div class="people" *ngIf="memberships">
-        <div class="img-list" [@cardAnimation]="memberships?.details?.totalResult">
+        <div class="img-list" [@cardAnimation]="totalResult">
             <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
-            <ng-container *ngIf="memberships?.details?.totalResult < 8; else compact">
-                <ng-container *ngFor="let membership of memberships.resultList; index as i">
+            <ng-container *ngIf="totalResult < 8; else compact">
+                <ng-container *ngFor="let membership of memberships; index as i">
                     <div @animate class="avatar-circle" (click)="navigateToObject()"
                         matTooltip="{{ membership.displayName }} | {{membership.rolesList?.join(' ')}}"
                         [ngStyle]="{'z-index': 100 - i}">
@@ -25,7 +25,7 @@
             <ng-template #compact>
                 <div class="avatar-circle" matTooltip="Click to show detail" (click)="navigateToObject()" role="button">
                     <div class="membership-avatar">
-                        <span style="font-size: 16px;">{{memberships?.details?.totalResult}}</span>
+                        <span style="font-size: 16px;">{{totalResult}}</span>
                     </div>
                 </div>
             </ng-template>

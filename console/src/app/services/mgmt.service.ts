@@ -6,6 +6,8 @@ import { BehaviorSubject } from 'rxjs';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import {
+    AddAppKeyRequest,
+    AddAppKeyResponse,
     AddCustomLoginPolicyRequest,
     AddCustomLoginPolicyResponse,
     AddCustomPasswordAgePolicyRequest,
@@ -111,6 +113,8 @@ import {
     IDPQuery,
     ListAppChangesRequest,
     ListAppChangesResponse,
+    ListAppKeysRequest,
+    ListAppKeysResponse,
     ListAppsRequest,
     ListAppsResponse,
     ListGrantedProjectsRequest,
@@ -175,6 +179,8 @@ import {
     ReactivateUserRequest,
     ReactivateUserResponse,
     RegenerateOIDCClientSecretRequest,
+    RemoveAppKeyRequest,
+    RemoveAppKeyResponse,
     RemoveAppRequest,
     RemoveAppResponse,
     RemoveHumanMultiFactorOTPRequest,
@@ -231,6 +237,8 @@ import {
     SetHumanInitialPasswordRequest,
     SetPrimaryOrgDomainRequest,
     SetPrimaryOrgDomainResponse,
+    UpdateAPIAppConfigRequest,
+    UpdateAPIAppConfigResponse,
     UpdateAppRequest,
     UpdateAppResponse,
     UpdateCustomLoginPolicyRequest,
@@ -1421,6 +1429,54 @@ export class ManagementService {
         return this.grpcService.mgmt.regenerateOIDCClientSecret(req, null).then(resp => resp.toObject());
     }
 
+    public listAppKeys(
+        projectId: string,
+        appId: string,
+        limit: number,
+        offset: number,
+    ): Promise<ListAppKeysResponse.AsObject> {
+        const req = new ListAppKeysRequest();
+        req.setProjectId(projectId);
+        req.setAppId(appId);
+        const metaData = new ListQuery();
+        if (limit) {
+            metaData.setLimit(limit);
+        }
+        if (offset) {
+            metaData.setOffset(offset);
+        }
+        req.setMetaData(metaData);
+        return this.grpcService.mgmt.listAppKeys(req, null).then(resp => resp.toObject());
+    }
+
+    public addAppKey(
+        projectId: string,
+        appId: string,
+        type: KeyType,
+        expirationDate?: Timestamp,
+    ): Promise<AddAppKeyResponse.AsObject> {
+        const req = new AddAppKeyRequest();
+        req.setProjectId(projectId);
+        req.setAppId(appId);
+        req.setType(type);
+        if (expirationDate) {
+            req.setExpirationDate(expirationDate);
+        }
+        return this.grpcService.mgmt.addAppKey(req, null).then(resp => resp.toObject());
+    }
+
+    public removeAppKey(
+        projectId: string,
+        appId: string,
+        keyId: string,
+    ): Promise<RemoveAppKeyResponse.AsObject> {
+        const req = new RemoveAppKeyRequest();
+        req.setAppId(appId);
+        req.setKeyId(keyId);
+        req.setProjectId(projectId);
+        return this.grpcService.mgmt.removeAppKey(req, null).then(resp => resp.toObject());
+    }
+
     public listProjectRoles(
         projectId: string,
         limit: number,
@@ -1560,6 +1616,10 @@ export class ManagementService {
 
     public updateOIDCAppConfig(req: UpdateOIDCAppConfigRequest): Promise<UpdateOIDCAppConfigResponse.AsObject> {
         return this.grpcService.mgmt.updateOIDCAppConfig(req, null).then(resp => resp.toObject());
+    }
+
+    public updateAPIAppConfig(req: UpdateAPIAppConfigRequest): Promise<UpdateAPIAppConfigResponse.AsObject> {
+        return this.grpcService.mgmt.updateAPIAppConfig(req, null).then(resp => resp.toObject());
     }
 
     public removeApp(projectId: string, appId: string): Promise<RemoveAppResponse.AsObject> {

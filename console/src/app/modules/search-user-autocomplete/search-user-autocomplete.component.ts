@@ -15,7 +15,8 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
+import { SearchQuery, User, UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -71,14 +72,15 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
             takeUntil(this.unsubscribed$),
             tap(() => this.isLoading = true),
             switchMap(value => {
-                const query = new UserSearchQuery();
-                query.setKey(UserSearchKey.USERSEARCHKEY_USER_NAME);
-                query.setValue(value);
-                query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
+                const query = new SearchQuery();
+                const unQuery = new UserNameQuery();
+                unQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+                query.setUserName(value);
+
                 if (this.target === UserTarget.SELF) {
                     return from(this.userService.listUsers(10, 0, [query]));
                 } else {
-                    return of(); // from(this.userService.GetUserByEmailGlobal(value));
+                    return of();
                 }
             }),
         ).subscribe((userresp: any) => {
