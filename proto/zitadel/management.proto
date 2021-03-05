@@ -1447,7 +1447,7 @@ service ManagementService {
 
     rpc RemoveSecondFactorFromLoginPolicy(RemoveSecondFactorFromLoginPolicyRequest) returns (RemoveSecondFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/policies/login/second_factors/{second_factor}"
+            delete: "/policies/login/second_factors/{type}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1478,7 +1478,7 @@ service ManagementService {
 
     rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
-            delete: "/policies/login/multi_factors/{multi_factor}"
+            delete: "/policies/login/multi_factors/{type}"
         };
 
         option (zitadel.v1.auth_option) = {

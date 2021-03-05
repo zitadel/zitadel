@@ -121,7 +121,7 @@ service AdminService {
 
     rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
         option (google.api.http) = {
-            put: "/idps/{id}"
+            put: "/idps/{idp_id}"
             body: "*"
         };
 
@@ -648,6 +648,16 @@ message AddOIDCIDPResponse {
     string idp_id = 2;
 }
 
+message UpdateIDPRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.IDPStylingType styling_type = 3 [(validate.rules).enum = {defined_only: true}];
+}
+
+message UpdateIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message DeactivateIDPRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -669,16 +679,6 @@ message RemoveIDPRequest {
 }
 
 message RemoveIDPResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message UpdateIDPRequest {
-    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.IDPStylingType styling_type = 3 [(validate.rules).enum = {defined_only: true}];
-}
-
-message UpdateIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
