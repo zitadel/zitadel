@@ -130,7 +130,7 @@ func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID stri
 	if !keyExists {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5m8g9", "Errors.UserGrant.RoleKeyNotFound")
 	}
-	changedUserGrant := NewUserGrantWriteModel(userGrantID, "")
+	changedUserGrant := NewUserGrantWriteModel(userGrantID, existingUserGrant.ResourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&changedUserGrant.WriteModel)
 
 	if cascade {
