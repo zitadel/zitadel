@@ -22,10 +22,10 @@ message SearchQuery {
     oneof query {
         option (validate.required) = true;
 
-        FirstNameQuery first_name = 1;
-        LastNameQuery last_name = 2;
-        EmailQuery email = 3;
-        UserIDQuery user_id = 4;
+        FirstNameQuery first_name_query = 1;
+        LastNameQuery last_name_query = 2;
+        EmailQuery email_query = 3;
+        UserIDQuery user_id_query = 4;
     }
 }
 

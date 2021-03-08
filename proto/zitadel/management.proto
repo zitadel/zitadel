@@ -366,9 +366,9 @@ service ManagementService {
         };
     }
 
-    rpc ListHumanMultiFactors(ListHumanMultiFactorsRequest) returns (ListHumanMultiFactorsResponse) {
+    rpc ListHumanAuthFactors(ListHumanAuthFactorsRequest) returns (ListHumanAuthFactorsResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/multi_factors/_search"
+            post: "/users/{user_id}/auth_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -376,9 +376,9 @@ service ManagementService {
         };
     }
 
-    rpc RemoveHumanMultiFactorOTP(RemoveHumanMultiFactorOTPRequest) returns (RemoveHumanMultiFactorOTPResponse) {
+    rpc RemoveHumanAuthFactorOTP(RemoveHumanAuthFactorOTPRequest) returns (RemoveHumanAuthFactorOTPResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/multi_factors/otp"
+            delete: "/users/{user_id}/auth_factors/otp"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -386,9 +386,9 @@ service ManagementService {
         };
     }
 
-    rpc RemoveHumanMultiFactorU2F(RemoveHumanMultiFactorU2FRequest) returns (RemoveHumanMultiFactorU2FResponse) {
+    rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/multi_factors/u2f"
+            delete: "/users/{user_id}/auth_factors/u2f"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -470,7 +470,7 @@ service ManagementService {
         };
     }
 
-    rpc ListUserIDPs(ListUserIDPsRequest) returns (ListUserIDPsResponse) {
+    rpc ListHumanLinkedIDPs(ListHumanLinkedIDPsRequest) returns (ListHumanLinkedIDPsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/idps/_search"
             body: "*"
@@ -481,7 +481,7 @@ service ManagementService {
         };
     }
 
-    rpc RemoveUserIDP(RemoveUserIDPRequest) returns (RemoveUserIDPResponse) {
+    rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/idps/{idp_id}/{linked_user_id}"
         };
@@ -526,7 +526,7 @@ service ManagementService {
         option (google.api.http) = {
             post: "/orgs/me/changes/_search"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "org.read"
         };
@@ -732,7 +732,7 @@ service ManagementService {
         option (google.api.http) = {
             post: "/projects/{project_id}/changes/_search"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "project.read"
         };
@@ -941,7 +941,7 @@ service ManagementService {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/changes/_search"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "project.app.read"
             check_field_name: "ProjectId"
@@ -1242,17 +1242,17 @@ service ManagementService {
             permission: "project.grant.member.delete"
         };
     }
-    
+
     rpc GetUserGrantByID(GetUserGrantByIDRequest) returns (GetUserGrantByIDResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/grants/{grant_id}"
         };
-        
+
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.read"
         };
     }
-    
+
     rpc ListUserGrants(ListUserGrantRequest) returns (ListUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/grants/_search"
@@ -1457,7 +1457,7 @@ service ManagementService {
 
     rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
-            post: "/policies/login/multi_factors/_search"
+            post: "/policies/login/auth_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1490,49 +1490,49 @@ service ManagementService {
         option (google.api.http) = {
             get: "/policies/password/complexity"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
-    
+
     rpc GetDefaultPasswordComplexityPolicy(GetDefaultPasswordComplexityPolicyRequest) returns (GetDefaultPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/password/complexity"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
-    
+
     rpc AddCustomPasswordComplexityPolicy(AddCustomPasswordComplexityPolicyRequest) returns (AddCustomPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/password/complexity"
             body: "*"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
-    
+
     rpc UpdateCustomPasswordComplexityPolicy(UpdateCustomPasswordComplexityPolicyRequest) returns (UpdateCustomPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/complexity"
             body: "*"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
-    
+
     rpc ResetPasswordComplexityPolicyToDefault(ResetPasswordComplexityPolicyToDefaultRequest) returns (ResetPasswordComplexityPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/password/complexity"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
@@ -1542,49 +1542,49 @@ service ManagementService {
         option (google.api.http) = {
             get: "/policies/password/age"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
-    
+
     rpc GetDefaultPasswordAgePolicy(GetDefaultPasswordAgePolicyRequest) returns (GetDefaultPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/password/age"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
-    
+
     rpc AddCustomPasswordAgePolicy(AddCustomPasswordAgePolicyRequest) returns (AddCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
             post: "/policies/password/age"
             body: "*"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
-    
+
     rpc UpdateCustomPasswordAgePolicy(UpdateCustomPasswordAgePolicyRequest) returns (UpdateCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/age"
             body: "*"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
-    
+
     rpc ResetPasswordAgePolicyToDefault(ResetPasswordAgePolicyToDefaultRequest) returns (ResetPasswordAgePolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/password/age"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
@@ -1594,49 +1594,49 @@ service ManagementService {
         option (google.api.http) = {
             get: "/policies/password/lockout"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
-    
+
     rpc GetDefaultPasswordLockoutPolicy(GetDefaultPasswordLockoutPolicyRequest) returns (GetDefaultPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/password/lockout"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
     }
-    
+
     rpc AddCustomPasswordLockoutPolicy(AddCustomPasswordLockoutPolicyRequest) returns (AddCustomPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/password/lockout"
             body: "*"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
-    
+
     rpc UpdateCustomPasswordLockoutPolicy(UpdateCustomPasswordLockoutPolicyRequest) returns (UpdateCustomPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/lockout"
             body: "*"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
     }
-    
+
     rpc ResetPasswordLockoutPolicyToDefault(ResetPasswordLockoutPolicyToDefaultRequest) returns (ResetPasswordLockoutPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/password/lockout"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
@@ -1737,7 +1737,7 @@ message GetOIDCInformationRequest {}
 
 message GetOIDCInformationResponse {
     string issuer = 1;
-    string discovery_endpoint = 2;  
+    string discovery_endpoint = 2;
 }
 
 message GetIAMRequest {}
@@ -2007,28 +2007,28 @@ message SendHumanResetPasswordNotificationResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListHumanMultiFactorsRequest {
+message ListHumanAuthFactorsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message ListHumanMultiFactorsResponse {
-    repeated zitadel.user.v1.MultiFactor result = 1;
+message ListHumanAuthFactorsResponse {
+    repeated zitadel.user.v1.AuthFactor result = 1;
 }
 
-message RemoveHumanMultiFactorOTPRequest {
+message RemoveHumanAuthFactorOTPRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveHumanMultiFactorOTPResponse {
+message RemoveHumanAuthFactorOTPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveHumanMultiFactorU2FRequest {
+message RemoveHumanAuthFactorU2FRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveHumanMultiFactorU2FResponse {
+message RemoveHumanAuthFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -2083,7 +2083,7 @@ message AddMachineKeyRequest {
     zitadel.authn.v1.KeyType type = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
     google.protobuf.Timestamp expiration_date = 3;
 }
-  
+
 message AddMachineKeyResponse {
     string key_id = 1;
     bytes key_details = 2;
@@ -2099,23 +2099,23 @@ message RemoveMachineKeyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListUserIDPsRequest {
+message ListHumanLinkedIDPsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery query = 2;
 }
 
-message ListUserIDPsResponse {
+message ListHumanLinkedIDPsResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.idp.v1.IDPUserLink result = 2;
 }
 
-message RemoveUserIDPRequest {
+message RemoveHumanLinkedIDPRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string idp_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string linked_user_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveUserIDPResponse {
+message RemoveHumanLinkedIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -2484,7 +2484,7 @@ message ListAppsResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.app.v1.App result = 2;
 }
-   
+
 message ListAppChangesRequest {
     zitadel.v1.ListQuery query = 1;
     string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -2549,7 +2549,7 @@ message UpdateAppResponse {
 message UpdateOIDCAppConfigRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    
+
     repeated string redirect_uris = 3;
     repeated zitadel.app.v1.OIDCResponseType response_types = 4;
     repeated zitadel.app.v1.OIDCGrantType grant_types = 5;
@@ -3123,9 +3123,9 @@ message IDPQuery {
     oneof query {
         option (validate.required) = true;
 
-        zitadel.idp.v1.IDPIDQuery idp_id = 1;
-        zitadel.idp.v1.IDPNameQuery idp_name = 2;
-        zitadel.idp.v1.IDPOwnerTypeQuery owner_type = 3;
+        zitadel.idp.v1.IDPIDQuery idp_id_query = 1;
+        zitadel.idp.v1.IDPNameQuery idp_name_query = 2;
+        zitadel.idp.v1.IDPOwnerTypeQuery owner_type_query = 3;
     }
 }
 

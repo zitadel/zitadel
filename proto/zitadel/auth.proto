@@ -242,9 +242,9 @@ service AuthService {
         };
     }
 
-    rpc ListMyMultiFactors(ListMyMultiFactorsRequest) returns (ListMyMultiFactorsResponse) {
+    rpc ListMyAuthFactors(ListMyAuthFactorsRequest) returns (ListMyAuthFactorsResponse) {
         option (google.api.http) = {
-            post: "/users/me/multi_factors/_search"
+            post: "/users/me/auth_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -252,9 +252,9 @@ service AuthService {
         };
     }
 
-    rpc AddMyMultiFactorOTP(AddMyMultiFactorOTPRequest) returns (AddMyMultiFactorOTPResponse) {
+    rpc AddMyAuthFactorOTP(AddMyAuthFactorOTPRequest) returns (AddMyAuthFactorOTPResponse) {
         option (google.api.http) = {
-            post: "/users/me/multi_factors/otp"
+            post: "/users/me/auth_factors/otp"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -262,40 +262,9 @@ service AuthService {
         };
     }
 
-    rpc VerifyMyMultiFactorOTP(VerifyMyMultiFactorOTPRequest) returns (VerifyMyMultiFactorOTPResponse) {
+    rpc VerifyMyAuthFactorOTP(VerifyMyAuthFactorOTPRequest) returns (VerifyMyAuthFactorOTPResponse) {
         option (google.api.http) = {
-            post: "/users/me/multi_factors/otp/_verify"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
-    rpc RemoveMyMultiFactorOTP(RemoveMyMultiFactorOTPRequest) returns (RemoveMyMultiFactorOTPResponse) {
-        option (google.api.http) = {
-            delete: "/users/me/multi_factors/otp"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
-    rpc AddMyMultiFactorU2F(AddMyMultiFactorU2FRequest) returns (AddMyMultiFactorU2FResponse) {
-        option (google.api.http) = {
-            post: "/users/me/multi_factors/u2f"
-            body: "*"
-        };
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
-    rpc VerifyMyMultiFactorU2F(VerifyMyMultiFactorU2FRequest) returns (VerifyMyMultiFactorU2FResponse) {
-        option (google.api.http) = {
-            post: "/users/me/multi_factors/u2f/_verify"
+            post: "/users/me/auth_factors/otp/_verify"
             body: "*"
         };
 
@@ -304,9 +273,40 @@ service AuthService {
         };
     }
 
-    rpc RemoveMyMultiFactorU2F(RemoveMyMultiFactorU2FRequest) returns (RemoveMyMultiFactorU2FResponse) {
+    rpc RemoveMyAuthFactorOTP(RemoveMyAuthFactorOTPRequest) returns (RemoveMyAuthFactorOTPResponse) {
         option (google.api.http) = {
-            delete: "/users/me/multi_factors/u2f/{token_id}"
+            delete: "/users/me/auth_factors/otp"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc AddMyAuthFactorU2F(AddMyAuthFactorU2FRequest) returns (AddMyAuthFactorU2FResponse) {
+        option (google.api.http) = {
+            post: "/users/me/auth_factors/u2f"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyAuthFactorU2F(VerifyMyAuthFactorU2FRequest) returns (VerifyMyAuthFactorU2FResponse) {
+        option (google.api.http) = {
+            post: "/users/me/auth_factors/u2f/_verify"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyAuthFactorU2F(RemoveMyAuthFactorU2FRequest) returns (RemoveMyAuthFactorU2FResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/auth_factors/u2f/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -548,54 +548,54 @@ message RemoveMyLinkedIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListMyMultiFactorsRequest {}
+message ListMyAuthFactorsRequest {}
 
-message ListMyMultiFactorsResponse {
-    repeated zitadel.user.v1.MultiFactor result = 1;
+message ListMyAuthFactorsResponse {
+    repeated zitadel.user.v1.AuthFactor result = 1;
 }
 
-message AddMyMultiFactorU2FRequest {}
+message AddMyAuthFactorU2FRequest {}
 
-message AddMyMultiFactorU2FResponse {
+message AddMyAuthFactorU2FResponse {
     zitadel.user.v1.WebAuthNKey key = 1;
     zitadel.v1.ObjectDetails details = 2;
 }
 
-message AddMyMultiFactorOTPRequest {}
+message AddMyAuthFactorOTPRequest {}
 
-message AddMyMultiFactorOTPResponse {
+message AddMyAuthFactorOTPResponse {
     string url = 1;
     string secret = 2;
     zitadel.v1.ObjectDetails details = 3;
 }
 
-message VerifyMyMultiFactorOTPRequest {
+message VerifyMyAuthFactorOTPRequest {
     string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message VerifyMyMultiFactorOTPResponse {
+message VerifyMyAuthFactorOTPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message VerifyMyMultiFactorU2FRequest {
+message VerifyMyAuthFactorU2FRequest {
     zitadel.user.v1.WebAuthNVerification verification = 1 [(validate.rules).message.required = true];
 }
 
-message VerifyMyMultiFactorU2FResponse {
+message VerifyMyAuthFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveMyMultiFactorOTPRequest {}
+message RemoveMyAuthFactorOTPRequest {}
 
-message RemoveMyMultiFactorOTPResponse {
+message RemoveMyAuthFactorOTPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveMyMultiFactorU2FRequest {
+message RemoveMyAuthFactorU2FRequest {
     string token_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveMyMultiFactorU2FResponse {
+message RemoveMyAuthFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

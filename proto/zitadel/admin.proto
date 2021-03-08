@@ -589,6 +589,7 @@ message SetUpOrgRequest {
         Profile profile = 2 [(validate.rules).message.required = true];
         Email email = 3 [(validate.rules).message.required = true];
         Phone phone = 4;
+        string password = 5 [(validate.rules).string = {min_len: 1, max_len: 72}];
     }
     Org org = 1 [(validate.rules).message.required = true];
     oneof user {
@@ -620,8 +621,8 @@ message ListIDPsRequest {
 
 message IDPQuery {
     oneof query {
-        zitadel.idp.v1.IDPIDQuery idp_id = 1;
-        zitadel.idp.v1.IDPNameQuery idp_name = 2;
+        zitadel.idp.v1.IDPIDQuery idp_id_query = 1;
+        zitadel.idp.v1.IDPNameQuery idp_name_query = 2;
     }
 }
 

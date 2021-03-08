@@ -49,7 +49,7 @@ message ProjectQuery {
     oneof query {
         option (validate.required) = true;
 
-        ProjectNameQuery name = 1;
+        ProjectNameQuery name_query = 1;
     }
 }
 
@@ -69,8 +69,8 @@ message RoleQuery {
     oneof query {
         option (validate.required) = true;
 
-        RoleKeyQuery key = 1;
-        RoleDisplayNameQuery display_name = 2;
+        RoleKeyQuery key_query = 1;
+        RoleDisplayNameQuery display_name_query = 2;
     }
 }
 
@@ -88,8 +88,8 @@ message ProjectGrantQuery {
     oneof query {
         option (validate.required) = true;
 
-        GrantProjectNameQuery project_name = 1;
-        GrantRoleKeyQuery role_key = 2;
+        GrantProjectNameQuery project_name_query = 1;
+        GrantRoleKeyQuery role_key_query = 2;
     }
 }
 

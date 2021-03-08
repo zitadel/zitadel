@@ -30,7 +30,7 @@ message AppQuery {
     oneof query {
         option (validate.required) = true;
 
-        AppNameQuery name = 1;
+        AppNameQuery name_query = 1;
     }
 }
 

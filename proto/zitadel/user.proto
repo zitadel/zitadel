@@ -80,14 +80,14 @@ message SearchQuery {
     oneof query {
         option (validate.required) = true;
 
-        UserNameQuery user_name = 1;
-        FirstNameQuery first_name = 2;
-        LastNameQuery last_name = 3;
-        NickNameQuery nick_name = 4;
-        DisplayNameQuery display_name = 5;
-        EmailQuery email = 6;
-        StateQuery state = 7;
-        TypeQuery type = 8;
+        UserNameQuery user_name_query = 1;
+        FirstNameQuery first_name_query = 2;
+        LastNameQuery last_name_query = 3;
+        NickNameQuery nick_name_query = 4;
+        DisplayNameQuery display_name_query = 5;
+        EmailQuery email_query = 6;
+        StateQuery state_query = 7;
+        TypeQuery type_query = 8;
     }
 }
 
@@ -149,24 +149,24 @@ enum UserFieldName {
     USER_FIELD_NAME_TYPE = 8;
 }
 
-message MultiFactor {
-    MultiFactorState state = 1;
+message AuthFactor {
+    AuthFactorState state = 1;
     oneof type {
-        MultiFactorOTP otp = 2;
-        MultiFactorU2F u2f = 3;
+        AuthFactorOTP otp = 2;
+        AuthFactorU2F u2f = 3;
     }
 }
 
-enum MultiFactorState {
+enum AuthFactorState {
     MULTI_FACTOR_STATE_UNSPECIFIED = 0;
     MULTI_FACTOR_STATE_NOT_READY = 1;
     MULTI_FACTOR_STATE_READY = 2;
     MULTI_FACTOR_STATE_REMOVED = 3;
 }
 
-message MultiFactorOTP {}
+message AuthFactorOTP {}
 
-message MultiFactorU2F {
+message AuthFactorU2F {
     string id = 1;
     string name = 2;
 }
@@ -183,7 +183,7 @@ message WebAuthNVerification {
 
 message WebAuthNToken {
     string id = 1;
-    MultiFactorState state = 2;
+    AuthFactorState state = 2;
     string name = 3;
 }
 
@@ -204,10 +204,10 @@ message MembershipQuery {
     oneof query {
         option (validate.required) = true;
 
-        MembershipOrgQuery org = 1;
-        MembershipProjectQuery project = 2;
-        MembershipProjectGrantQuery project_grant = 3;
-        MembershipIAMQuery iam = 4;
+        MembershipOrgQuery org_query = 1;
+        MembershipProjectQuery project_query = 2;
+        MembershipProjectGrantQuery project_grant_query = 3;
+        MembershipIAMQuery iam_query = 4;
     }
 }
 
@@ -275,19 +275,19 @@ message UserGrantQuery {
     oneof query {
         option (validate.required) = true;
 
-        UserGrantProjectIDQuery project_id = 1;
-        UserGrantUserIDQuery user_id = 2;
-        UserGrantWithGrantedQuery with_granted = 3;
-        UserGrantRoleKeyQuery role_key = 4;
-        UserGrantProjectGrantIDQuery project_grant_id = 5;
-        UserGrantUserNameQuery user_name = 6;
-        UserGrantFirstNameQuery first_name = 7;
-        UserGrantLastNameQuery last_name = 8;
-        UserGrantEmailQuery email = 9;
-        UserGrantOrgNameQuery org_name = 10;
-        UserGrantOrgDomainQuery org_domain = 11;
-        UserGrantProjectNameQuery project_name = 12;
-        UserGrantDisplayNameQuery display_name = 13;
+        UserGrantProjectIDQuery project_id_query = 1;
+        UserGrantUserIDQuery user_id_query = 2;
+        UserGrantWithGrantedQuery with_granted_query = 3;
+        UserGrantRoleKeyQuery role_key_query = 4;
+        UserGrantProjectGrantIDQuery project_grant_id_query = 5;
+        UserGrantUserNameQuery user_name_query = 6;
+        UserGrantFirstNameQuery first_name_query = 7;
+        UserGrantLastNameQuery last_name_query = 8;
+        UserGrantEmailQuery email_query = 9;
+        UserGrantOrgNameQuery org_name_query = 10;
+        UserGrantOrgDomainQuery org_domain_query = 11;
+        UserGrantProjectNameQuery project_name_query = 12;
+        UserGrantDisplayNameQuery display_name_query = 13;
     }
 }
 
