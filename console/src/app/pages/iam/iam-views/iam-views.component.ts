@@ -35,9 +35,9 @@ export class IamViewsComponent implements AfterViewInit {
 
     public loadViews(): void {
         this.loadingSubject.next(true);
-        from(this.adminService.GetViews()).pipe(
+        from(this.adminService.listViews()).pipe(
             map(resp => {
-                return resp.toObject().viewsList;
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -61,7 +61,7 @@ export class IamViewsComponent implements AfterViewInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.adminService.ClearView(viewname, db).then(() => {
+                this.adminService.clearView(viewname, db).then(() => {
                     this.toast.showInfo('IAM.VIEWS.CLEARED', true);
                     this.loadViews();
                 }).catch(error => {

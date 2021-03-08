@@ -5,7 +5,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { Role, RoleKeyQuery, RoleQuery } from 'src/app/proto/generated/zitadel/project_pb';
+import { Role, RoleDisplayNameQuery, RoleQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 
@@ -39,11 +39,15 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
                 tap(() => this.isLoading = true),
                 switchMap(value => {
                     const query = new RoleQuery();
-                    const key = new RoleKeyQuery();
-                    key.setKey();
-                    query.setKey();
-                    query.setDisplayName(value);
-                    query.setValue(value);
+
+                    // const key = new RoleKeyQuery();
+                    // key.setKey(key)
+                    // query.setKey(key)
+
+                    const dQuery = new RoleDisplayNameQuery();
+                    dQuery.setDisplayName(value);
+                    query.setDisplayName(dQuery);
+
                     return from(this.mgmtService.listProjectRoles(this.projectId, 10, 0, [query]));
                 }),
             ).subscribe((resp) => {

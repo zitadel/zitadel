@@ -110,7 +110,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                 this.toast.showError(error);
             });
         } else {
-            if ((this.lockoutData as PasswordLockoutPolicy.AsObject).pb_default) {
+            if ((this.lockoutData as PasswordLockoutPolicy.AsObject).isDefault) {
                 promise = this.service.addCustomPasswordLockoutPolicy(
                     this.lockoutData.maxAttempts,
                     this.lockoutData.showLockoutFailure,
@@ -134,7 +134,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
     public get isDefault(): boolean {
         if (this.lockoutData && this.serviceType === PolicyComponentServiceType.MGMT) {
-            return (this.lockoutData as PasswordLockoutPolicy.AsObject).pb_default;
+            return (this.lockoutData as PasswordLockoutPolicy.AsObject).isDefault;
         } else {
             return false;
         }

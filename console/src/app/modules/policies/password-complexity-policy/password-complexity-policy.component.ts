@@ -169,7 +169,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
 
     public get isDefault(): boolean {
         if (this.complexityData && this.serviceType === PolicyComponentServiceType.MGMT) {
-            return (this.complexityData as PasswordComplexityPolicyView.AsObject).pb_default;
+            return (this.complexityData as PasswordComplexityPolicy.AsObject).isDefault;
         } else {
             return false;
         }

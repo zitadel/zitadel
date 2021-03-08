@@ -6,18 +6,14 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import {
-    OidcIdpConfigCreate as AdminOidcIdpConfigCreate,
-    OIDCMappingField as authMappingFields,
-} from 'src/app/proto/generated/admin_pb';
+import { OIDCMappingField as authMappingFields } from 'src/app/proto/generated/admin_pb';
+import { AddOIDCIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { AddOrgOIDCIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-    OidcIdpConfigCreate as MgmtOidcIdpConfigCreate,
-    OIDCMappingField as mgmtMappingFields,
-} from '../../proto/generated/management_pb';
+import { OIDCMappingField as mgmtMappingFields } from '../../proto/generated/management_pb';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 
 @Component({
@@ -87,36 +83,50 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     }
 
     public addIdp(): void {
-        let req: AdminOidcIdpConfigCreate | MgmtOidcIdpConfigCreate;
+        if (this.serviceType == PolicyComponentServiceType.MGMT) {
+            const req = new AddOrgOIDCIDPRequest();
 
-        switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-                req = new MgmtOidcIdpConfigCreate();
-                break;
-            case PolicyComponentServiceType.ADMIN:
-                req = new AdminOidcIdpConfigCreate();
-                break;
+            req.setName(this.name?.value);
+            req.setClientId(this.clientId?.value);
+            req.setClientSecret(this.clientSecret?.value);
+            req.setIssuer(this.issuer?.value);
+            req.setScopesList(this.scopesList?.value);
+            req.setDisplayNameMapping(this.idpDisplayNameMapping?.value);
+            req.setUsernameMapping(this.usernameMapping?.value);
+            this.loading = true;
+            (this.service as ManagementService).addOrgOIDCIDP(req).then((idp) => {
+                setTimeout(() => {
+                    this.loading = false;
+                    this.router.navigate([
+                        (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
+                            this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
+                        'policy', 'login']);
+                }, 2000);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+        } else if (PolicyComponentServiceType.ADMIN) {
+            const req = new AddOIDCIDPRequest();
+            req.setName(this.name?.value);
+            req.setClientId(this.clientId?.value);
+            req.setClientSecret(this.clientSecret?.value);
+            req.setIssuer(this.issuer?.value);
+            req.setScopesList(this.scopesList?.value);
+            req.setDisplayNameMapping(this.idpDisplayNameMapping?.value);
+            req.setUsernameMapping(this.usernameMapping?.value);
+            this.loading = true;
+            (this.service as AdminService).addOIDCIDP(req).then((idp) => {
+                setTimeout(() => {
+                    this.loading = false;
+                    this.router.navigate([
+                        (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
+                            this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
+                        'policy', 'login']);
+                }, 2000);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
         }
-
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setScopesList(this.scopesList?.value);
-        req.setIdpDisplayNameMapping(this.idpDisplayNameMapping?.value);
-        req.setUsernameMapping(this.usernameMapping?.value);
-        this.loading = true;
-        this.service.CreateOidcIdp(req).then((idp) => {
-            setTimeout(() => {
-                this.loading = false;
-                this.router.navigate([
-                    (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
-                        this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
-                    'policy', 'login']);
-            }, 2000);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
     }
 
     public close(): void {

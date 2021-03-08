@@ -6,6 +6,8 @@ import { BehaviorSubject } from 'rxjs';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import {
+    AddAPIAppRequest,
+    AddAPIAppResponse,
     AddAppKeyRequest,
     AddAppKeyResponse,
     AddCustomLoginPolicyRequest,
@@ -178,7 +180,10 @@ import {
     ReactivateProjectResponse,
     ReactivateUserRequest,
     ReactivateUserResponse,
+    RegenerateAPIClientSecretRequest,
+    RegenerateAPIClientSecretResponse,
     RegenerateOIDCClientSecretRequest,
+    RegenerateOIDCClientSecretResponse,
     RemoveAppKeyRequest,
     RemoveAppKeyResponse,
     RemoveAppRequest,
@@ -1422,7 +1427,7 @@ export class ManagementService {
         return this.grpcService.mgmt.deactivateApp(req, null).then(resp => resp.toObject());
     }
 
-    public regenerateOIDCClientSecret(appId: string, projectId: string): Promise<any> {
+    public regenerateOIDCClientSecret(appId: string, projectId: string): Promise<RegenerateOIDCClientSecretResponse.AsObject> {
         const req = new RegenerateOIDCClientSecretRequest();
         req.setAppId(appId);
         req.setProjectId(projectId);
@@ -1602,12 +1607,32 @@ export class ManagementService {
         return this.grpcService.mgmt.reactivateProjectGrant(req, null).then(resp => resp.toObject());
     }
 
-    public addOIDCApp(req: AddOIDCAppRequest): Promise<AddOIDCAppResponse.AsObject> {
+    public addOIDCApp(app: AddOIDCAppRequest.AsObject): Promise<AddOIDCAppResponse.AsObject> {
+        const req: AddOIDCAppRequest = new AddOIDCAppRequest();
+        req.setAuthMethodType(app.authMethodType);
+        req.setName(app.name);
+        req.setProjectId(app.projectId);
+        req.setResponseTypesList(app.responseTypesList);
+        req.setGrantTypesList(app.grantTypesList);
+        req.setAppType(app.appType);
+        req.setPostLogoutRedirectUrisList(app.postLogoutRedirectUrisList);
+        req.setRedirectUrisList(app.redirectUrisList);
         return this.grpcService.mgmt.addOIDCApp(req, null).then(resp => resp.toObject());
     }
 
-    public addAPIApp(req: AddOIDCAppRequest): Promise<AddOIDCAppResponse.AsObject> {
+    public addAPIApp(app: AddAPIAppRequest.AsObject): Promise<AddAPIAppResponse.AsObject> {
+        const req: AddAPIAppRequest = new AddAPIAppRequest();
+        req.setAuthMethodType(app.authMethodType);
+        req.setName(app.name);
+        req.setProjectId(app.projectId);
         return this.grpcService.mgmt.addAPIApp(req, null).then(resp => resp.toObject());
+    }
+
+    public regenerateAPIClientSecret(appId: string, projectId: string): Promise<RegenerateAPIClientSecretResponse.AsObject> {
+        const req = new RegenerateAPIClientSecretRequest();
+        req.setAppId(appId);
+        req.setProjectId(projectId);
+        return this.grpcService.mgmt.regenerateAPIClientSecret(req, null).then(resp => resp.toObject());
     }
 
     public updateApp(projectId: string, appId: string, name: string): Promise<UpdateAppResponse.AsObject> {

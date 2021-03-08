@@ -6,8 +6,9 @@ import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
-import { CreateHumanRequest, CreateOrgRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
-import { PasswordComplexityPolicy as MgmtPasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
+import { Gender } from 'src/app/proto/generated/admin_pb';
+import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -57,7 +58,7 @@ export class OrgCreateComponent {
     public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
     public languages: string[] = ['de', 'en'];
 
-    public policy!: MgmtPasswordComplexityPolicy.AsObject;
+    public policy!: PasswordComplexityPolicy.AsObject;
     public usePassword: boolean = false;
 
     public forSelf: boolean = true;
@@ -89,25 +90,30 @@ export class OrgCreateComponent {
     public currentCreateStep: number = 1;
 
     public finish(): void {
-        const createOrgRequest: CreateOrgRequest = new CreateOrgRequest();
+        const createOrgRequest: SetUpOrgRequest.Org = new SetUpOrgRequest.Org();
         createOrgRequest.setName(this.name?.value);
         createOrgRequest.setDomain(this.domain?.value);
 
-        const humanRequest: CreateHumanRequest = new CreateHumanRequest();
+        const humanRequest: SetUpOrgRequest.Human = new SetUpOrgRequest.Human();
         humanRequest.setEmail(this.email?.value);
-        humanRequest.setFirstName(this.firstName?.value);
-        humanRequest.setLastName(this.lastName?.value);
-        humanRequest.setNickName(this.nickName?.value);
-        humanRequest.setGender(this.gender?.value);
-        humanRequest.setPreferredLanguage(this.preferredLanguage?.value);
+        humanRequest.setUserName(this.userName?.value);
+
+        const profile: SetUpOrgRequest.Human.Profile = new SetUpOrgRequest.Human.Profile();
+        profile.setFirstName(this.firstName?.value);
+        profile.setLastName(this.lastName?.value);
+        profile.setNickName(this.nickName?.value);
+        profile.setGender(this.gender?.value);
+        profile.setPreferredLanguage(this.preferredLanguage?.value);
+
+        humanRequest.setProfile(this.firstName?.value);
 
         if (this.usePassword && this.password) {
-            humanRequest.setPassword(this.password?.value);
+            createOrgRequest.setPassword(this.password?.value);
         }
 
         this.adminService
             .SetUpOrg(createOrgRequest, humanRequest)
-            .then((org: OrgSetUpResponse) => {
+            .then(() => {
                 this.router.navigate(['/org/overview']);
                 // const orgResp = org.getOrg();
                 // if (orgResp) {
@@ -146,31 +152,33 @@ export class OrgCreateComponent {
         const validators: Validators[] = [Validators.required];
 
         if (this.usePassword) {
-            this.mgmtService.GetDefaultPasswordComplexityPolicy().then(data => {
-                this.policy = data.toObject();
+            this.mgmtService.getDefaultPasswordComplexityPolicy().then(data => {
+                if (data.policy) {
+                    this.policy = data.policy;
 
-                if (this.policy.minLength) {
-                    validators.push(Validators.minLength(this.policy.minLength));
-                }
-                if (this.policy.hasLowercase) {
-                    validators.push(lowerCaseValidator);
-                }
-                if (this.policy.hasUppercase) {
-                    validators.push(upperCaseValidator);
-                }
-                if (this.policy.hasNumber) {
-                    validators.push(numberValidator);
-                }
-                if (this.policy.hasSymbol) {
-                    validators.push(symbolValidator);
-                }
+                    if (this.policy.minLength) {
+                        validators.push(Validators.minLength(this.policy.minLength));
+                    }
+                    if (this.policy.hasLowercase) {
+                        validators.push(lowerCaseValidator);
+                    }
+                    if (this.policy.hasUppercase) {
+                        validators.push(upperCaseValidator);
+                    }
+                    if (this.policy.hasNumber) {
+                        validators.push(numberValidator);
+                    }
+                    if (this.policy.hasSymbol) {
+                        validators.push(symbolValidator);
+                    }
 
-                const pwdValidators = [...validators] as ValidatorFn[];
-                const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
-                this.pwdForm = this.fb.group({
-                    password: ['', pwdValidators],
-                    confirmPassword: ['', confirmPwdValidators],
-                });
+                    const pwdValidators = [...validators] as ValidatorFn[];
+                    const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+                    this.pwdForm = this.fb.group({
+                        password: ['', pwdValidators],
+                        confirmPassword: ['', confirmPwdValidators],
+                    });
+                }
             });
         } else {
             this.pwdForm = this.fb.group({
@@ -199,7 +207,7 @@ export class OrgCreateComponent {
 
     public createOrgForSelf(): void {
         if (this.name && this.name.value) {
-            this.mgmtService.CreateOrg(this.name.value).then((org) => {
+            this.mgmtService.addOrg(this.name.value).then(() => {
                 this.router.navigate(['/org/overview']);
                 // const newOrg = org.toObject();
                 // setTimeout(() => {

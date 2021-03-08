@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { IDP, IDPOwnerType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDP, IDPOwnerType, IDPOwnerTypeQuery } from 'src/app/proto/generated/zitadel/idp_pb';
 import { IDPQuery } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -51,9 +51,9 @@ export class AddIdpDialogComponent {
         this.idp = undefined;
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
             const query: IDPQuery = new IDPQuery();
-            query.set(IdpSearchKey.IDPSEARCHKEY_PROVIDER_TYPE);
-            query.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-            query.setValue(this.idpType.toString());
+            const idpOTQ: IDPOwnerTypeQuery = new IDPOwnerTypeQuery();
+            idpOTQ.setOwnerType(this.idpType);
+            query.setOwnerType(idpOTQ);
 
             this.mgmtService.listOrgIDPs(undefined, undefined, [query]).then(resp => {
                 this.availableIdps = resp.resultList;

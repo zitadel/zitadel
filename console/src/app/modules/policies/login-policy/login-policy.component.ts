@@ -4,15 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
-import {
-    IdpProviderView as AdminIdpProviderView,
-    IdpStylingType,
-    PasswordlessType as AdminPasswordlessType,
-} from 'src/app/proto/generated/admin_pb';
-import {
-    IdpProviderView as MgmtIdpProviderView,
-    PasswordlessType as MgmtPasswordlessType,
-} from 'src/app/proto/generated/management_pb';
+import { IdpStylingType } from 'src/app/proto/generated/admin_pb';
 import {
     GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
     UpdateLoginPolicyRequest,
@@ -23,7 +15,7 @@ import {
     AddCustomLoginPolicyRequest,
     GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -46,14 +38,14 @@ import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component
 })
 export class LoginPolicyComponent implements OnDestroy {
     public LoginMethodComponentType: any = LoginMethodComponentType;
-    public passwordlessTypes: Array<AdminPasswordlessType | MgmtPasswordlessType> = [];
+    public passwordlessTypes: Array<PasswordlessType> = [];
     public loginData!: LoginPolicy.AsObject;
 
     private sub: Subscription = new Subscription();
     public service!: ManagementService | AdminService;
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-    public idps: MgmtIdpProviderView.AsObject[] | AdminIdpProviderView.AsObject[] = [];
+    public idps: IDPLoginPolicyLink.AsObject[] = [];
 
     public loading: boolean = false;
     public disabled: boolean = true;
@@ -71,8 +63,10 @@ export class LoginPolicyComponent implements OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
-                    this.passwordlessTypes = [MgmtPasswordlessType.PASSWORDLESSTYPE_ALLOWED,
-                    MgmtPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
+                    this.passwordlessTypes = [
+                        PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+                        PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+                    ];
                     this.nextLinks = [
                         ORG_COMPLEXITY_LINK,
                         ORG_IAM_POLICY_LINK,
@@ -80,8 +74,10 @@ export class LoginPolicyComponent implements OnDestroy {
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
-                    this.passwordlessTypes = [AdminPasswordlessType.PASSWORDLESSTYPE_ALLOWED,
-                    AdminPasswordlessType.PASSWORDLESSTYPE_NOT_ALLOWED];
+                    this.passwordlessTypes = [
+                        PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+                        PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+                    ];
                     this.nextLinks = [
                         IAM_COMPLEXITY_LINK,
                         IAM_POLICY_LINK,
@@ -101,11 +97,11 @@ export class LoginPolicyComponent implements OnDestroy {
             if (resp.policy) {
                 this.loginData = resp.policy;
                 this.loading = false;
-                this.disabled = ((this.loginData as LoginPolicy.AsObject)?.pb_default) ?? false;
+                this.disabled = ((this.loginData as LoginPolicy.AsObject)?.isDefault) ?? false;
             }
         });
-        this.getIdps().then(idps => {
-            this.idps = idps;
+        this.getIdps().then(resp => {
+            this.idps = resp;
         });
     }
 
@@ -127,8 +123,8 @@ export class LoginPolicyComponent implements OnDestroy {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
                 return (this.service as ManagementService).listLoginPolicyIDPs()
-                    .then((providers) => {
-                        return providers.resultList;
+                    .then((resp) => {
+                        return resp.resultList;
                     });
             case PolicyComponentServiceType.ADMIN:
                 return (this.service as AdminService).listLoginPolicyIDPs()
@@ -225,19 +221,19 @@ export class LoginPolicyComponent implements OnDestroy {
         }
     }
 
-    public removeIdp(idp: AdminIdpProviderView.AsObject | MgmtIdpProviderView.AsObject): void {
+    public removeIdp(idp: IDPLoginPolicyLink.AsObject): void {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                (this.service as ManagementService).removeIDPFromLoginPolicy(idp.idpConfigId).then(() => {
-                    const index = (this.idps as MgmtIdpProviderView.AsObject[]).findIndex(temp => temp === idp);
+                (this.service as ManagementService).removeIDPFromLoginPolicy(idp.idpId).then(() => {
+                    const index = this.idps.findIndex(temp => temp === idp);
                     if (index > -1) {
                         this.idps.splice(index, 1);
                     }
                 });
                 break;
             case PolicyComponentServiceType.ADMIN:
-                (this.service as AdminService).removeIDPFromLoginPolicy(idp.idpConfigId).then(() => {
-                    const index = (this.idps as AdminIdpProviderView.AsObject[]).findIndex(temp => temp === idp);
+                (this.service as AdminService).removeIDPFromLoginPolicy(idp.idpId).then(() => {
+                    const index = this.idps.findIndex(temp => temp === idp);
                     if (index > -1) {
                         this.idps.splice(index, 1);
                     }
@@ -248,7 +244,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
     public get isDefault(): boolean {
         if (this.loginData && this.serviceType === PolicyComponentServiceType.MGMT) {
-            return (this.loginData as LoginPolicy.AsObject).pb_default;
+            return (this.loginData as LoginPolicy.AsObject).isDefault;
         } else {
             return false;
         }

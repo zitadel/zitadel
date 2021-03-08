@@ -18,17 +18,20 @@ import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.com
 import {
     APIAuthMethodType,
     APIConfig,
+    App,
     AppState,
-    ClientSecret,
-    OIDCApplicationType,
+    OIDCAppType,
+    OIDCAuthMethodType,
     OIDCConfig,
     OIDCGrantType,
     OIDCResponseType,
     OIDCTokenType,
-    ZitadelDocs,
-} from 'src/app/proto/generated/management_pb';
-import { App, OIDCAppType, OIDCAuthMethodType } from 'src/app/proto/generated/zitadel/app_pb';
-import { UpdateAPIAppConfigRequest, UpdateOIDCAppConfigRequest } from 'src/app/proto/generated/zitadel/management_pb';
+} from 'src/app/proto/generated/zitadel/app_pb';
+import {
+    GetOIDCInformationResponse,
+    UpdateAPIAppConfigRequest,
+    UpdateOIDCAppConfigRequest,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -66,19 +69,19 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public app!: App.AsObject;
     public oidcResponseTypes: OIDCResponseType[] = [
-        OIDCResponseType.OIDCRESPONSETYPE_CODE,
-        OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
-        OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN,
+        OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
+        OIDCResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN,
+        OIDCResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN,
     ];
     public oidcGrantTypes: OIDCGrantType[] = [
-        OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-        OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
-        OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN,
+        OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+        OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT,
+        OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
     ];
-    public oidcAppTypes: OIDCApplicationType[] = [
-        OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
-        OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
-        OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE,
+    public oidcAppTypes: OIDCAppType[] = [
+        OIDCAppType.OIDC_APP_TYPE_WEB,
+        OIDCAppType.OIDC_APP_TYPE_USER_AGENT,
+        OIDCAppType.OIDC_APP_TYPE_NATIVE,
     ];
 
     public oidcAuthMethodType: OIDCAuthMethodType[] = [
@@ -89,8 +92,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     ];
 
     public oidcTokenTypes: OIDCTokenType[] = [
-        OIDCTokenType.OIDCTOKENTYPE_BEARER,
-        OIDCTokenType.OIDCTOKENTYPE_JWT,
+        OIDCTokenType.OIDC_TOKEN_TYPE_BEARER,
+        OIDCTokenType.OIDC_TOKEN_TYPE_JWT,
     ];
 
     public AppState: any = AppState;
@@ -102,9 +105,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public postLogoutRedirectUrisList: string[] = [];
 
     public isZitadel: boolean = false;
-    public docs!: ZitadelDocs.AsObject;
+    public docs!: GetOIDCInformationResponse.AsObject;
 
-    public OIDCApplicationType: any = OIDCApplicationType;
+    public OIDCAppType: any = OIDCAppType;
     public OIDCAuthMethodType: any = OIDCAuthMethodType;
     public APIAuthMethodType: any = APIAuthMethodType;
     public OIDCTokenType: any = OIDCTokenType;
@@ -348,10 +351,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         if (partialConfig && partialConfig.oidc && this.app.oidcConfig) {
             this.app.oidcConfig.responseTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).responseTypesList ?? [];
             this.app.oidcConfig.grantTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).grantTypesList ?? [];
-            this.app.oidcConfig.authMethodType = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+            this.app.oidcConfig.authMethodType = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
             this.oidcForm.patchValue(this.app.oidcConfig);
         } else if (partialConfig && partialConfig.api && this.app.apiConfig) {
-            this.app.apiConfig.authMethodType = (partialConfig.api as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
+            this.app.apiConfig.authMethodType = (partialConfig.api as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC;
             this.apiAuthMethodType?.setValue(this.app.apiConfig.authMethodType);
         }
     }
@@ -380,13 +383,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public changeState(event: MatButtonToggleChange): void {
-        if (event.value === AppState.APPSTATE_ACTIVE) {
+        if (event.value === AppState.APP_STATE_ACTIVE) {
             this.mgmtService.reactivateApp(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error);
             });
-        } else if (event.value === AppState.APPSTATE_INACTIVE) {
+        } else if (event.value === AppState.APP_STATE_INACTIVE) {
             this.mgmtService.deactivateApp(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('APP.TOAST.DEACTIVATED', true);
             }).catch((error: any) => {
@@ -493,12 +496,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public regenerateOIDCClientSecret(): void {
-        this.mgmtService.regenerateOIDCClientSecret(this.app.id, this.projectId).then((data: ClientSecret) => {
+        this.mgmtService.regenerateOIDCClientSecret(this.app.id, this.projectId).then(resp => {
             this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
             this.dialog.open(AppSecretDialogComponent, {
                 data: {
                     // clientId: data.toObject() as ClientSecret.AsObject.clientId,
-                    clientSecret: data.toObject().clientSecret,
+                    clientSecret: resp.clientSecret,
                 },
                 width: '400px',
             });
@@ -509,12 +512,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public regenerateAPIClientSecret(): void {
-        this.mgmtService.RegenerateAPIClientSecret(this.app.id, this.projectId).then((data: ClientSecret) => {
+        this.mgmtService.regenerateAPIClientSecret(this.app.id, this.projectId).then(resp => {
             this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
             this.dialog.open(AppSecretDialogComponent, {
                 data: {
                     // clientId: data.toObject().clientId ?? '',
-                    clientSecret: data.toObject().clientSecret,
+                    clientSecret: resp.clientSecret,
                 },
                 width: '400px',
             });

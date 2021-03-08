@@ -6,7 +6,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { forkJoin, from, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ListProjectGrantsResponse, ListProjectsResponse } from 'src/app/proto/generated/zitadel/management_pb';
-import { GrantedProject, Project, ProjectQuery } from 'src/app/proto/generated/zitadel/project_pb';
+import { GrantedProject, Project, ProjectNameQuery, ProjectQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 
@@ -50,9 +50,9 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
                 tap(() => this.isLoading = true),
                 switchMap(value => {
                     const query = new ProjectQuery();
-                    query.set(ProjectSearchKey.PROJECTSEARCHKEY_PROJECT_NAME);
-                    query.setValue(value);
-                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
+                    const nameQuery = new ProjectNameQuery();
+                    nameQuery.setName(value);
+                    query.setName(nameQuery);
 
                     switch (this.autocompleteType) {
                         case ProjectAutocompleteType.PROJECT_GRANTED:

@@ -290,7 +290,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 .then((resp) => {
                     this.loading = false;
                     // if (resp.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
-                    this.showSavedDialog(resp);
+                    // this.showSavedDialog(resp);
                     // } else {
                     //     this.router.navigate(['projects', this.projectId, 'apps', response.id]);
                     // }
@@ -302,12 +302,12 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         } else if (appAPICheck) {
             this.loading = true;
             this.mgmtService
-                .addAPIApp(this.apiApp)
+                .addAPIApp(this.apiAppRequest)
                 .then((resp) => {
                     this.loading = false;
                     // const response = resp.toObject();
                     // if (response.apiConfig?.authMethodType == APIAuthMethodType.APIAUTHMETHODTYPE_BASIC) {
-                    this.showSavedDialog(resp);
+                    // this.showSavedDialog(resp);
                     // } else {
                     //     this.router.navigate(['projects', this.projectId, 'apps', response.id]);
                     // }
