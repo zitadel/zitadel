@@ -79,10 +79,14 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if err != nil {
 		return nil, nil, err
 	}
-	if userGrant.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
+	if !userGrant.IsValid() || userGrant.AggregateID == "" {
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
 	}
 
+	err = c.checkUserGrantPreCondition(ctx, userGrant)
+	if err != nil {
+		return nil, nil, err
+	}
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, userGrant.AggregateID, userGrant.ResourceOwner)
 	if err != nil {
 		return nil, nil, err
@@ -138,14 +142,10 @@ func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID stri
 
 func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID, resourceOwner string) (objectDetails *domain.ObjectDetails, err error) {
 	if grantID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M0dsf", "Errors.UserGrant.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-M0dsf", "Errors.UserGrant.IDMissing")
 	}
 
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, grantID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,11 @@ func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID, resourceOwn
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
 	}
 	if existingUserGrant.State != domain.UserGrantStateActive {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-1S9gx", "Errors.UserGrant.NotActive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1S9gx", "Errors.UserGrant.NotActive")
+	}
+	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
+	if err != nil {
+		return nil, err
 	}
 
 	deactivateUserGrant := NewUserGrantWriteModel(grantID, resourceOwner)
@@ -171,14 +175,10 @@ func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID, resourceOwn
 
 func (c *Commands) ReactivateUserGrant(ctx context.Context, grantID, resourceOwner string) (objectDetails *domain.ObjectDetails, err error) {
 	if grantID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Qxy8v", "Errors.UserGrant.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Qxy8v", "Errors.UserGrant.IDMissing")
 	}
 
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, grantID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
 	if err != nil {
 		return nil, err
 	}
@@ -186,9 +186,12 @@ func (c *Commands) ReactivateUserGrant(ctx context.Context, grantID, resourceOwn
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Lp0gs", "Errors.UserGrant.NotFound")
 	}
 	if existingUserGrant.State != domain.UserGrantStateInactive {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-1ML0v", "Errors.UserGrant.NotInactive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1ML0v", "Errors.UserGrant.NotInactive")
 	}
-
+	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
+	if err != nil {
+		return nil, err
+	}
 	deactivateUserGrant := NewUserGrantWriteModel(grantID, resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&deactivateUserGrant.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, usergrant.NewUserGrantReactivatedEvent(ctx, userGrantAgg))
@@ -220,11 +223,14 @@ func (c *Commands) RemoveUserGrant(ctx context.Context, grantID, resourceOwner s
 }
 
 func (c *Commands) BulkRemoveUserGrant(ctx context.Context, grantIDs []string, resourceOwner string) (err error) {
+	if len(grantIDs) == 0 {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.UserGrant.IDMissing")
+	}
 	events := make([]eventstore.EventPusher, len(grantIDs))
 	for i, grantID := range grantIDs {
 		event, _, err := c.removeUserGrant(ctx, grantID, resourceOwner, false)
 		if err != nil {
-			return nil
+			return err
 		}
 		events[i] = event
 	}
@@ -234,22 +240,21 @@ func (c *Commands) BulkRemoveUserGrant(ctx context.Context, grantIDs []string, r
 
 func (c *Commands) removeUserGrant(ctx context.Context, grantID, resourceOwner string, cascade bool) (_ eventstore.EventPusher, writeModel *UserGrantWriteModel, err error) {
 	if grantID == "" {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J9sc5", "Errors.UserGrant.IDMissing")
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-J9sc5", "Errors.UserGrant.IDMissing")
 	}
 
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, grantID, resourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
+	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1My0t", "Errors.UserGrant.NotFound")
+	}
 	if !cascade {
 		err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
 		if err != nil {
 			return nil, nil, err
 		}
-	}
-
-	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
-		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1My0t", "Errors.UserGrant.NotFound")
 	}
 
 	removeUserGrant := NewUserGrantWriteModel(grantID, resourceOwner)
