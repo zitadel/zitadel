@@ -137,7 +137,7 @@ export class UserTableComponent implements OnInit {
         const query = new SearchQuery();
         const typeQuery = new TypeQuery();
         typeQuery.setType(type);
-        query.setType(typeQuery);
+        query.setTypeQuery(typeQuery);
 
         if (searchValue && this.userSearchKey !== undefined) {
             switch (this.userSearchKey) {
@@ -146,35 +146,35 @@ export class UserTableComponent implements OnInit {
                     dNQuery.setDisplayName(searchValue);
                     dNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
 
-                    query.setDisplayName(dNQuery);
+                    query.setDisplayNameQuery(dNQuery);
                     break;
                 case UserListSearchKey.USER_NAME:
                     const uNQuery = new UserNameQuery();
                     uNQuery.setUserName(searchValue);
                     uNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
 
-                    query.setUserName(uNQuery);
+                    query.setUserNameQuery(uNQuery);
                     break;
                 case UserListSearchKey.FIRST_NAME:
                     const fNQuery = new FirstNameQuery();
                     fNQuery.setFirstName(searchValue);
                     fNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
 
-                    query.setFirstName(fNQuery);
+                    query.setFirstNameQuery(fNQuery);
                     break;
                 case UserListSearchKey.FIRST_NAME:
                     const lNQuery = new LastNameQuery();
                     lNQuery.setLastName(searchValue);
                     lNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
 
-                    query.setLastName(lNQuery);
+                    query.setLastNameQuery(lNQuery);
                     break;
                 case UserListSearchKey.EMAIL:
                     const eQuery = new EmailQuery();
                     eQuery.setEmailAddress(searchValue);
                     eQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
 
-                    query.setEmail(eQuery);
+                    query.setEmailQuery(eQuery);
                     break;
             }
         }

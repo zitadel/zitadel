@@ -8,8 +8,7 @@
                     <div @animate class="avatar-circle" (click)="navigateToObject()"
                         matTooltip="{{ membership.displayName }} | {{membership.rolesList?.join(' ')}}"
                         [ngStyle]="{'z-index': 100 - i}">
-                        <div class="membership-avatar"
-                            [ngStyle]="{'background-color': getColor(membership.memberType)}">
+                        <div class="membership-avatar" [ngStyle]="{'background-color': getColor(membership)}">
                             <i *ngIf="membership.orgId" class="las la-archway"></i>
                             <i *ngIf="membership.projectId && !membership.grantId" class="icon las la-layer-group"></i>
                             <i *ngIf="membership.projectId && membership.grantId" class="icon las la-layer-group"></i>

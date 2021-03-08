@@ -53,7 +53,7 @@ export class AddIdpDialogComponent {
             const query: IDPQuery = new IDPQuery();
             const idpOTQ: IDPOwnerTypeQuery = new IDPOwnerTypeQuery();
             idpOTQ.setOwnerType(this.idpType);
-            query.setOwnerType(idpOTQ);
+            query.setOwnerTypeQuery(idpOTQ);
 
             this.mgmtService.listOrgIDPs(undefined, undefined, [query]).then(resp => {
                 this.availableIdps = resp.resultList;

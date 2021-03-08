@@ -4,8 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { MultiFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
-import { MultiFactor, MultiFactorState, User } from 'src/app/proto/generated/zitadel/user_pb';
+import { AuthFactor, AuthFactorState, User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -23,16 +22,15 @@ export interface MFAItem {
 export class UserMfaComponent implements OnInit, OnDestroy {
     public displayedColumns: string[] = ['type', 'attr', 'state', 'actions'];
     @Input() private user!: User.AsObject;
-    public mfaSubject: BehaviorSubject<MultiFactor.AsObject[]> = new BehaviorSubject<MultiFactor.AsObject[]>([]);
+    public mfaSubject: BehaviorSubject<AuthFactor.AsObject[]> = new BehaviorSubject<AuthFactor.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    @ViewChild(MatTable) public table!: MatTable<MultiFactor.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<AuthFactor.AsObject>;
     @ViewChild(MatSort) public sort!: MatSort;
-    public dataSource!: MatTableDataSource<MultiFactor.AsObject>;
+    public dataSource!: MatTableDataSource<AuthFactor.AsObject>;
 
-    public MultiFactorType: any = MultiFactorType;
-    public MultiFactorState: any = MultiFactorState;
+    public AuthFactorState: any = AuthFactorState;
 
     public error: string = '';
     constructor(private mgmtUserService: ManagementService, private dialog: MatDialog, private toast: ToastService) { }
@@ -55,7 +53,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
         });
     }
 
-    public deleteMFA(type: MultiFactorType, id?: string): void {
+    public deleteMFA(factor: AuthFactor.AsObject): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -68,7 +66,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                if (type === MultiFactorType.otp) {
+                if (factor.otp) {
                     this.mgmtUserService.removeHumanMultiFactorOTP(this.user.id).then(() => {
                         this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
@@ -80,8 +78,8 @@ export class UserMfaComponent implements OnInit, OnDestroy {
                     }).catch(error => {
                         this.toast.showError(error);
                     });
-                } else if (type === MultiFactorType.MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION && id) {
-                    this.mgmtUserService.removeHumanMultiFactorU2F(this.user.id, id).then(() => {
+                } else if (factor.u2f) {
+                    this.mgmtUserService.removeHumanAuthFactorU2F(this.user.id).then(() => {
                         this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
                         const index = this.dataSource.data.findIndex(mfa => !!mfa.u2f);

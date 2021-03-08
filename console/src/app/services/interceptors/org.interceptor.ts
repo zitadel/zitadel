@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Request, UnaryInterceptor, UnaryResponse } from 'grpc-web';
-import { Org } from 'src/app/proto/generated/auth_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 
 import { StorageService } from '../storage.service';
 

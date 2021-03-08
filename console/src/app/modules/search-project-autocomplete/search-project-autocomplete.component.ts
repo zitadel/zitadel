@@ -52,7 +52,7 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
                     const query = new ProjectQuery();
                     const nameQuery = new ProjectNameQuery();
                     nameQuery.setName(value);
-                    query.setName(nameQuery);
+                    query.setNameQuery(nameQuery);
 
                     switch (this.autocompleteType) {
                         case ProjectAutocompleteType.PROJECT_GRANTED:

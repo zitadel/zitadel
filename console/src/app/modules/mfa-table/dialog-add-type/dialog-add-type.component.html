@@ -2,18 +2,18 @@
 <div mat-dialog-content>
     <p class="desc">{{data.desc | translate}}</p>
 
-    <cnsl-form-field class="form-field" label="Access Code" required="true">
+    <!-- <cnsl-form-field class="form-field" label="Access Code" required="true">
         <cnsl-label>{{'MFA.TYPE' | translate}}</cnsl-label>
         <mat-select [(ngModel)]="newMfaType">
-            <mat-option *ngFor="let mfa of availableMfaTypes" [value]="mfa">
+            <mat-option *ngFor="let mfa of []" [value]="mfa">
                 {{(data.componentType == LoginMethodComponentType.SecondFactor ? 'MFA.SECONDFACTORTYPES.': LoginMethodComponentType.MultiFactor ? 'MFA.MULTIFACTORTYPES.': '')+mfa | translate}}
             </mat-option>
         </mat-select>
-    </cnsl-form-field>
+    </cnsl-form-field> -->
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button (click)="closeDialog()"><span>{{'ACTIONS.CLOSE' | translate}}</span></button>
-    <button [disabled]="newMfaType == undefined" mat-raised-button class="ok-button" color="primary"
+    <button [disabled]="false" mat-raised-button class="ok-button" color="primary"
         (click)="closeDialogWithCode()"><span>{{'ACTIONS.OK' | translate}}</span>
     </button>
 </div>

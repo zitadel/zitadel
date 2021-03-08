@@ -50,7 +50,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                     const userfilter = new UserGrantQuery();
                     const ugUiq = new UserGrantUserIDQuery();
                     ugUiq.setUserId(data.userId);
-                    userfilter.setUserId(ugUiq);
+                    userfilter.setUserIdQuery(ugUiq);
 
                     if (queries) {
                         queries.push(userfilter);
@@ -69,7 +69,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                     const projectfilter = new UserGrantQuery();
                     const ugPfq = new UserGrantProjectIDQuery();
                     ugPfq.setProjectId(data.projectId);
-                    projectfilter.setProjectId(ugPfq);
+                    projectfilter.setProjectIdQuery(ugPfq);
 
                     if (queries) {
                         queries.push(projectfilter);
@@ -89,12 +89,12 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
 
                     const uggiq = new UserGrantProjectGrantIDQuery();
                     uggiq.setProjectGrantId(data.grantId);
-                    grantfilter.setProjectGrantId(uggiq);
+                    grantfilter.setProjectGrantIdQuery(uggiq);
 
                     const projectfilter = new UserGrantQuery();
                     const ugPfq = new UserGrantProjectIDQuery();
                     ugPfq.setProjectId(data.projectId);
-                    projectfilter.setProjectId(ugPfq);
+                    projectfilter.setProjectIdQuery(ugPfq);
 
                     if (queries) {
                         queries.push(grantfilter);

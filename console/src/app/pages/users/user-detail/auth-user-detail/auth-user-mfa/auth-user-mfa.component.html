@@ -18,7 +18,7 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLESTATE' | translate }} </th>
                 <td mat-cell *matCellDef="let mfa"><span class="centered">
                         {{'USER.MFA.STATE.'+ mfa.state | translate}}
-                        <i matTooltip="verified" *ngIf="mfa.state === MultiFactorState.MULTI_FACTOR_STATE_READY"
+                        <i matTooltip="verified" *ngIf="mfa.state === AuthFactorState.AUTH_FACTOR_STATE_READY"
                             class="verified las la-check-circle"></i>
                     </span>
                 </td>
@@ -28,7 +28,7 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLEACTIONS' | translate }} </th>
                 <td mat-cell *matCellDef="let mfa">
                     <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" mat-icon-button
-                        (click)="deleteMFA(mfa.type, mfa.id)">
+                        (click)="deleteMFA(mfa)">
                         <i class="las la-trash"></i>
                     </button>
                 </td>

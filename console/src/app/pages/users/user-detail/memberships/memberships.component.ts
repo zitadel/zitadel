@@ -180,7 +180,7 @@ export class MembershipsComponent implements OnInit {
         }
     }
 
-    getColor(type: MemberType): string {
+    getColor(type: Membership.AsObject[] | UserGrant.AsObject[]): string {
         const gen = type.toString();
         const colors = [
             'rgb(201, 115, 88)',

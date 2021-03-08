@@ -122,25 +122,25 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                     const ugDnQ = new UserGrantDisplayNameQuery();
                     ugDnQ.setDisplayName(filterValue);
                     ugDnQ.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-                    query.setDisplayName(ugDnQ);
+                    query.setDisplayNameQuery(ugDnQ);
                     break;
                 case UserGrantListSearchKey.ORG_NAME:
                     const ugOnQ = new UserGrantOrgNameQuery();
                     ugOnQ.setOrgName(filterValue);
                     ugOnQ.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-                    query.setOrgName(ugOnQ);
+                    query.setOrgNameQuery(ugOnQ);
                     break;
                 case UserGrantListSearchKey.PROJECT_NAME:
                     const ugPnQ = new UserGrantProjectNameQuery();
                     ugPnQ.setProjectName(filterValue);
                     ugPnQ.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-                    query.setProjectName(ugPnQ);
+                    query.setProjectNameQuery(ugPnQ);
                     break;
                 case UserGrantListSearchKey.ROLE_KEY:
                     const ugRkQ = new UserGrantRoleKeyQuery();
                     ugRkQ.setRoleKey(filterValue);
                     ugRkQ.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-                    query.setRoleKey(ugRkQ);
+                    query.setRoleKeyQuery(ugRkQ);
                     break;
 
             }

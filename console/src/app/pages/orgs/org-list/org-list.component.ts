@@ -57,7 +57,7 @@ export class OrgListComponent implements AfterViewInit {
             const orgNameQuery = new OrgNameQuery();
             orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
             orgNameQuery.setName(filter);
-            query.setName(orgNameQuery);
+            query.setNameQuery(orgNameQuery);
         }
 
         from(this.authService.listMyProjectOrgs(limit, offset, query ? [query] : undefined)).pipe(

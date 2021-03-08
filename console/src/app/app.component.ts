@@ -224,7 +224,7 @@ export class AppComponent implements OnDestroy {
             const orgNameQuery = new OrgNameQuery();
             orgNameQuery.setName(filter);
             orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-            query.setName(orgNameQuery);
+            query.setNameQuery(orgNameQuery);
         }
 
         this.orgLoading$.next(true);

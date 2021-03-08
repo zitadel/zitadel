@@ -3,7 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { FailedEvent } from 'src/app/proto/generated/admin_pb';
+import { FailedEvent } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 

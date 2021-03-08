@@ -6,7 +6,6 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { OIDCMappingField as authMappingFields } from 'src/app/proto/generated/admin_pb';
 import { AddOIDCIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
 import { AddOrgOIDCIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
@@ -63,8 +62,8 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
                     this.mappingFields = [
-                        authMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
-                        authMappingFields.OIDCMAPPINGFIELD_EMAIL];
+                        OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+                        OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL];
                     break;
             }
         });

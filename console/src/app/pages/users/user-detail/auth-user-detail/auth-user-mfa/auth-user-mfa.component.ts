@@ -4,8 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { MultiFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
-import { MultiFactor, MultiFactorState } from 'src/app/proto/generated/zitadel/user_pb';
+import { AuthFactor, AuthFactorState } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -33,11 +32,11 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    @ViewChild(MatTable) public table!: MatTable<MultiFactor.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<AuthFactor.AsObject>;
     @ViewChild(MatSort) public sort!: MatSort;
-    public dataSource!: MatTableDataSource<MultiFactor.AsObject>;
+    public dataSource!: MatTableDataSource<AuthFactor.AsObject>;
 
-    public MultiFactorState: any = MultiFactorState;
+    public AuthFactorState: any = AuthFactorState;
 
     public error: string = '';
     public otpAvailable: boolean = false;
@@ -127,7 +126,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
         });
     }
 
-    public deleteMFA(type: MultiFactorType, id?: string): void {
+    public deleteMFA(factor: AuthFactor.AsObject): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -140,7 +139,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                if (type === MultiFactorType.otp) {
+                if (factor.otp) {
                     this.service.removeMyMultiFactorOTP().then(() => {
                         this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
@@ -153,8 +152,8 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                         this.toast.showError(error);
                     });
                 } else
-                    if (type === MultiFactorType.MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION && id) {
-                        this.service.removeMyMultiFactorU2F(id).then(() => {
+                    if (factor.u2f) {
+                        this.service.removeMyMultiFactorU2F(factor.u2f.id).then(() => {
                             this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
                             const index = this.dataSource.data.findIndex(mfa => !!mfa.u2f);

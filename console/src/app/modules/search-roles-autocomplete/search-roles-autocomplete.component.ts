@@ -46,7 +46,7 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
 
                     const dQuery = new RoleDisplayNameQuery();
                     dQuery.setDisplayName(value);
-                    query.setDisplayName(dQuery);
+                    query.setDisplayNameQuery(dQuery);
 
                     return from(this.mgmtService.listProjectRoles(this.projectId, 10, 0, [query]));
                 }),

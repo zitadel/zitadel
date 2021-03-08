@@ -121,8 +121,10 @@ import {
     ListAppsResponse,
     ListGrantedProjectsRequest,
     ListGrantedProjectsResponse,
-    ListHumanMultiFactorsRequest,
-    ListHumanMultiFactorsResponse,
+    ListHumanAuthFactorsRequest,
+    ListHumanAuthFactorsResponse,
+    ListHumanLinkedIDPsRequest,
+    ListHumanLinkedIDPsResponse,
     ListHumanPasswordlessRequest,
     ListHumanPasswordlessResponse,
     ListLoginPolicyIDPsRequest,
@@ -162,8 +164,6 @@ import {
     ListUserChangesResponse,
     ListUserGrantRequest,
     ListUserGrantResponse,
-    ListUserIDPsRequest,
-    ListUserIDPsResponse,
     ListUserMembershipsRequest,
     ListUserMembershipsResponse,
     ListUsersRequest,
@@ -188,10 +188,12 @@ import {
     RemoveAppKeyResponse,
     RemoveAppRequest,
     RemoveAppResponse,
-    RemoveHumanMultiFactorOTPRequest,
-    RemoveHumanMultiFactorOTPResponse,
-    RemoveHumanMultiFactorU2FRequest,
-    RemoveHumanMultiFactorU2FResponse,
+    RemoveHumanAuthFactorOTPRequest,
+    RemoveHumanAuthFactorOTPResponse,
+    RemoveHumanAuthFactorU2FRequest,
+    RemoveHumanAuthFactorU2FResponse,
+    RemoveHumanLinkedIDPRequest,
+    RemoveHumanLinkedIDPResponse,
     RemoveHumanPasswordlessRequest,
     RemoveHumanPasswordlessResponse,
     RemoveHumanPhoneRequest,
@@ -222,8 +224,6 @@ import {
     RemoveSecondFactorFromLoginPolicyResponse,
     RemoveUserGrantRequest,
     RemoveUserGrantResponse,
-    RemoveUserIDPRequest,
-    RemoveUserIDPResponse,
     RemoveUserRequest,
     RemoveUserResponse,
     ResendHumanEmailVerificationRequest,
@@ -532,25 +532,25 @@ export class ManagementService {
         return this.grpcService.mgmt.listMachineKeys(req, null).then(resp => resp.toObject());
     }
 
-    public removeUserIDP(
+    public removeHumanLinkedIDP(
         idpId: string,
         userId: string,
         linkedUserId: string,
-    ): Promise<RemoveUserIDPResponse.AsObject> {
-        const req = new RemoveUserIDPRequest();
+    ): Promise<RemoveHumanLinkedIDPResponse.AsObject> {
+        const req = new RemoveHumanLinkedIDPRequest();
         req.setUserId(userId);
         req.setIdpId(idpId);
         req.setUserId(userId);
         req.setLinkedUserId(linkedUserId);
-        return this.grpcService.mgmt.removeUserIDP(req, null).then(resp => resp.toObject());
+        return this.grpcService.mgmt.removeHumanLinkedIDP(req, null).then(resp => resp.toObject());
     }
 
-    public listUserIDPs(
+    public listHumanLinkedIDPs(
         userId: string,
         limit?: number,
         offset?: number,
-    ): Promise<ListUserIDPsResponse.AsObject> {
-        const req = new ListUserIDPsRequest();
+    ): Promise<ListHumanLinkedIDPsResponse.AsObject> {
+        const req = new ListHumanLinkedIDPsRequest();
         const metadata = new ListQuery();
         req.setUserId(userId);
         if (limit) {
@@ -560,7 +560,7 @@ export class ManagementService {
             metadata.setOffset(offset);
         }
         req.setQuery(metadata);
-        return this.grpcService.mgmt.listUserIDPs(req, null).then(resp => resp.toObject());
+        return this.grpcService.mgmt.listHumanLinkedIDPs(req, null).then(resp => resp.toObject());
     }
 
     public getIAM(): Promise<GetIAMResponse.AsObject> {
@@ -884,22 +884,22 @@ export class ManagementService {
         return this.grpcService.mgmt.getHumanProfile(req, null).then(resp => resp.toObject());
     }
 
-    public listHumanMultiFactors(userId: string): Promise<ListHumanMultiFactorsResponse.AsObject> {
-        const req = new ListHumanMultiFactorsRequest();
+    public listHumanMultiFactors(userId: string): Promise<ListHumanAuthFactorsResponse.AsObject> {
+        const req = new ListHumanAuthFactorsRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.listHumanMultiFactors(req, null).then(resp => resp.toObject());
+        return this.grpcService.mgmt.listHumanAuthFactors(req, null).then(resp => resp.toObject());
     }
 
-    public removeHumanMultiFactorOTP(userId: string): Promise<RemoveHumanMultiFactorOTPResponse.AsObject> {
-        const req = new RemoveHumanMultiFactorOTPRequest();
+    public removeHumanMultiFactorOTP(userId: string): Promise<RemoveHumanAuthFactorOTPResponse.AsObject> {
+        const req = new RemoveHumanAuthFactorOTPRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.removeHumanMultiFactorOTP(req, null).then(resp => resp.toObject());
+        return this.grpcService.mgmt.removeHumanAuthFactorOTP(req, null).then(resp => resp.toObject());
     }
 
-    public removeHumanMultiFactorU2F(userId: string, id: string): Promise<RemoveHumanMultiFactorU2FResponse.AsObject> {
-        const req = new RemoveHumanMultiFactorU2FRequest();
+    public removeHumanAuthFactorU2F(userId: string): Promise<RemoveHumanAuthFactorU2FResponse.AsObject> {
+        const req = new RemoveHumanAuthFactorU2FRequest();
         req.setUserId(userId);
-        return this.grpcService.mgmt.removeHumanMultiFactorU2F(req, null).then(resp => resp.toObject());
+        return this.grpcService.mgmt.removeHumanAuthFactorU2F(req, null).then(resp => resp.toObject());
     }
 
     public updateHumanProfile(
@@ -908,7 +908,7 @@ export class ManagementService {
         lastName?: string,
         nickName?: string,
         preferredLanguage?: string,
-        gender?: Gender,
+        gender?: Gender
     ): Promise<UpdateHumanProfileResponse.AsObject> {
         const req = new UpdateHumanProfileRequest();
         req.setUserId(userId);

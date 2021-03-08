@@ -4,14 +4,10 @@ import { MatPaginator } from '@angular/material/paginator';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {
-    AddMultiFactorToLoginPolicyRequest as AdminAddMultiFactorToLoginPolicyRequest,
-    AddSecondFactorToLoginPolicyRequest as AdminAddSecondFactorToLoginPolicyRequest,
     RemoveMultiFactorFromLoginPolicyRequest as AdminRemoveMultiFactorFromLoginPolicyRequest,
     RemoveSecondFactorFromLoginPolicyRequest as AdminRemoveSecondFactorFromLoginPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    AddMultiFactorToLoginPolicyRequest as MgmtAddMultiFactorToLoginPolicyRequest,
-    AddSecondFactorToLoginPolicyRequest as MgmtAddSecondFactorToLoginPolicyRequest,
     RemoveMultiFactorFromLoginPolicyRequest as MgmtRemoveMultiFactorFromLoginPolicyRequest,
     RemoveSecondFactorFromLoginPolicyRequest as MgmtRemoveSecondFactorFromLoginPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
@@ -22,7 +18,6 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
-import { DialogAddTypeComponent } from './dialog-add-type/dialog-add-type.component';
 
 export enum LoginMethodComponentType {
     MultiFactor = 1,
@@ -121,58 +116,57 @@ export class MfaTableComponent implements OnInit {
             }
         });
 
-        const dialogRef = this.dialog.open(DialogAddTypeComponent, {
-            data: {
-                title: 'MFA.CREATE.TITLE',
-                desc: 'MFA.CREATE.DESCRIPTION',
-                componentType: this.componentType,
-                types: selection,
-            },
-            width: '400px',
-        });
+        // const dialogRef = this.dialog.open(DialogAddTypeComponent, {
+        //     data: {
+        //         title: 'MFA.CREATE.TITLE',
+        //         desc: 'MFA.CREATE.DESCRIPTION',
+        //         componentType: this.componentType,
+        //         types: selection,
+        //     },
+        //     width: '400px',
+        // });
 
-        dialogRef.afterClosed().subscribe((mfaType: MultiFactorType |
-            SecondFactorType) => {
-            if (mfaType) {
-                if (this.serviceType === PolicyComponentServiceType.MGMT) {
-                    if (this.componentType === LoginMethodComponentType.MultiFactor) {
-                        const req = new MgmtAddMultiFactorToLoginPolicyRequest();
-                        req.setType(mfaType as MultiFactorType);
-                        (this.service as ManagementService).addMultiFactorToLoginPolicy(req).then(() => {
-                            this.refreshPageAfterTimout(2000);
-                        }).catch(error => {
-                            this.toast.showError(error);
-                        });
-                    } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-                        const req = new MgmtAddSecondFactorToLoginPolicyRequest();
-                        req.setType(mfaType as SecondFactorType);
-                        (this.service as ManagementService).addSecondFactorToLoginPolicy(req).then(() => {
-                            this.refreshPageAfterTimout(2000);
-                        }).catch(error => {
-                            this.toast.showError(error);
-                        });
-                    }
-                } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-                    if (this.componentType === LoginMethodComponentType.MultiFactor) {
-                        const req = new AdminAddMultiFactorToLoginPolicyRequest();
-                        req.setType(mfaType as MultiFactorType);
-                        (this.service as AdminService).addMultiFactorToLoginPolicy(req).then(() => {
-                            this.refreshPageAfterTimout(2000);
-                        }).catch(error => {
-                            this.toast.showError(error);
-                        });
-                    } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-                        const req = new AdminAddSecondFactorToLoginPolicyRequest();
-                        req.setType(mfaType as SecondFactorType);
-                        (this.service as AdminService).addSecondFactorToLoginPolicy(req).then(() => {
-                            this.refreshPageAfterTimout(2000);
-                        }).catch(error => {
-                            this.toast.showError(error);
-                        });
-                    }
-                }
-            }
-        });
+        // dialogRef.afterClosed().subscribe((mfaType: ) => {
+        //     if (mfaType) {
+        //         if (this.serviceType === PolicyComponentServiceType.MGMT) {
+        //             if (this.componentType === LoginMethodComponentType.MultiFactor) {
+        //                 const req = new MgmtAddMultiFactorToLoginPolicyRequest();
+        //                 req.setType(mfaType as MultiFactorType);
+        //                 (this.service as ManagementService).addMultiFactorToLoginPolicy(req).then(() => {
+        //                     this.refreshPageAfterTimout(2000);
+        //                 }).catch(error => {
+        //                     this.toast.showError(error);
+        //                 });
+        //             } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
+        //                 const req = new MgmtAddSecondFactorToLoginPolicyRequest();
+        //                 req.setType(mfaType as SecondFactorType);
+        //                 (this.service as ManagementService).addSecondFactorToLoginPolicy(req).then(() => {
+        //                     this.refreshPageAfterTimout(2000);
+        //                 }).catch(error => {
+        //                     this.toast.showError(error);
+        //                 });
+        //             }
+        //         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+        //             if (this.componentType === LoginMethodComponentType.MultiFactor) {
+        //                 const req = new AdminAddMultiFactorToLoginPolicyRequest();
+        //                 req.setType(mfaType as MultiFactorType);
+        //                 (this.service as AdminService).addMultiFactorToLoginPolicy(req).then(() => {
+        //                     this.refreshPageAfterTimout(2000);
+        //                 }).catch(error => {
+        //                     this.toast.showError(error);
+        //                 });
+        //             } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
+        //                 const req = new AdminAddSecondFactorToLoginPolicyRequest();
+        //                 req.setType(mfaType as SecondFactorType);
+        //                 (this.service as AdminService).addSecondFactorToLoginPolicy(req).then(() => {
+        //                     this.refreshPageAfterTimout(2000);
+        //                 }).catch(error => {
+        //                     this.toast.showError(error);
+        //                 });
+        //             }
+        //         }
+        //     }
+        // });
     }
 
     private async getData(): Promise<void> {

@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { MultiFactorState, WebAuthNToken } from 'src/app/proto/generated/zitadel/user_pb';
+import { AuthFactorState, WebAuthNToken } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -35,7 +35,7 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
     @ViewChild(MatSort) public sort!: MatSort;
     public dataSource!: MatTableDataSource<WebAuthNToken.AsObject>;
 
-    public MFAState: any = MultiFactorState;
+    public AuthFactorState: any = AuthFactorState;
     public error: string = '';
 
     constructor(private service: GrpcAuthService,

@@ -75,7 +75,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
                 const query = new SearchQuery();
                 const unQuery = new UserNameQuery();
                 unQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-                query.setUserName(value);
+                query.setUserNameQuery(value);
 
                 if (this.target === UserTarget.SELF) {
                     return from(this.userService.listUsers(10, 0, [query]));

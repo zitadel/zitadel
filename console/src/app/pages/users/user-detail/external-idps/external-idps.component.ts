@@ -58,7 +58,7 @@ export class ExternalIdpsComponent implements OnInit {
 
         let promise;
         if (this.service instanceof ManagementService) {
-            promise = (this.service as ManagementService).listUserIDPs(this.userId, limit, offset);
+            promise = (this.service as ManagementService).listHumanLinkedIDPs(this.userId, limit, offset);
         } else if (this.service instanceof GrpcAuthService) {
             promise = (this.service as GrpcAuthService).listMyLinkedIDPs(limit, offset);
         }
@@ -100,7 +100,7 @@ export class ExternalIdpsComponent implements OnInit {
                 let promise;
                 if (this.service instanceof ManagementService) {
                     promise = (this.service as ManagementService)
-                        .removeUserIDP(idp.providedUserId, idp.idpId, idp.userId);
+                        .removeHumanLinkedIDP(idp.providedUserId, idp.idpId, idp.userId);
                 } else if (this.service instanceof GrpcAuthService) {
                     promise = (this.service as GrpcAuthService)
                         .removeMyLinkedIDP(idp.providedUserId, idp.idpId);
