@@ -3,8 +3,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { MemberType } from 'src/app/proto/generated/management_pb';
-import { Membership, User, UserGrant } from 'src/app/proto/generated/zitadel/user_pb';
+import { UserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
+import { Membership, User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -39,8 +39,6 @@ export class MembershipsComponent implements OnInit {
     @Input() public auth: boolean = false;
     @Input() public user!: User.AsObject;
     @Input() public disabled: boolean = false;
-
-    public MemberType: any = MemberType;
 
     constructor(
         private authService: GrpcAuthService,

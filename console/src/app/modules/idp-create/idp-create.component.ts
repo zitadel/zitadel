@@ -8,12 +8,12 @@ import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { OIDCMappingField as authMappingFields } from 'src/app/proto/generated/admin_pb';
 import { AddOIDCIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
 import { AddOrgOIDCIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { OIDCMappingField as mgmtMappingFields } from '../../proto/generated/management_pb';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 
 @Component({
@@ -25,7 +25,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
     private service!: ManagementService | AdminService;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-    public mappingFields: mgmtMappingFields[] | authMappingFields[] = [];
+    public mappingFields: OIDCMappingField[] = [];
 
     private subscription?: Subscription;
     public projectId: string = '';
@@ -57,8 +57,8 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
                     this.mappingFields = [
-                        mgmtMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
-                        mgmtMappingFields.OIDCMAPPINGFIELD_EMAIL];
+                        OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+                        OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL];
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);

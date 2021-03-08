@@ -4,13 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
-import { IdpStylingType } from 'src/app/proto/generated/admin_pb';
 import {
     GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
     UpdateLoginPolicyRequest,
     UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDP, IDPLoginPolicyLink } from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDP, IDPLoginPolicyLink, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
     AddCustomLoginPolicyRequest,
     GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
@@ -50,7 +49,7 @@ export class LoginPolicyComponent implements OnDestroy {
     public loading: boolean = false;
     public disabled: boolean = true;
 
-    public IdpStylingType: any = IdpStylingType;
+    public IDPStylingType: any = IDPStylingType;
     public nextLinks: CnslLinks[] = [];
     constructor(
         private route: ActivatedRoute,

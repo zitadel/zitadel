@@ -6,15 +6,8 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import {
-    IdpStylingType as adminIdpStylingType,
-    OIDCMappingField as adminMappingFields,
-} from 'src/app/proto/generated/admin_pb';
-import {
-    IdpStylingType as mgmtIdpStylingType,
-    OIDCMappingField as mgmtMappingFields,
-} from 'src/app/proto/generated/management_pb';
 import { UpdateIDPOIDCConfigRequest, UpdateIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { IDPStylingType, OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
 import { UpdateOrgIDPOIDCConfigRequest, UpdateOrgIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -28,8 +21,8 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
     styleUrls: ['./idp.component.scss'],
 })
 export class IdpComponent implements OnInit, OnDestroy {
-    public mappingFields: mgmtMappingFields[] | adminMappingFields[] = [];
-    public styleFields: mgmtIdpStylingType[] | adminIdpStylingType[] = [];
+    public mappingFields: OIDCMappingField[] = [];
+    public styleFields: IDPStylingType[] = [];
 
     public showIdSecretSection: boolean = false;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
@@ -68,23 +61,20 @@ export class IdpComponent implements OnInit, OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
-                    this.mappingFields = [
-                        mgmtMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
-                        mgmtMappingFields.OIDCMAPPINGFIELD_EMAIL];
-                    this.styleFields = [
-                        mgmtIdpStylingType.IDPSTYLINGTYPE_UNSPECIFIED,
-                        mgmtIdpStylingType.IDPSTYLINGTYPE_GOOGLE];
+
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
-                    this.mappingFields = [
-                        adminMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
-                        adminMappingFields.OIDCMAPPINGFIELD_EMAIL];
-                    this.styleFields = [
-                        adminIdpStylingType.IDPSTYLINGTYPE_UNSPECIFIED,
-                        adminIdpStylingType.IDPSTYLINGTYPE_GOOGLE];
+
                     break;
             }
+
+            this.mappingFields = [
+                OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+                OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL];
+            this.styleFields = [
+                IDPStylingType.STYLING_TYPE_UNSPECIFIED,
+                IDPStylingType.STYLING_TYPE_GOOGLE];
 
             return this.route.params.pipe(take(1));
         })).subscribe((params) => {

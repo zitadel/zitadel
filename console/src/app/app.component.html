@@ -18,8 +18,8 @@
                 <path d="M16.88 3.549L7.12 20.451"></path>
             </svg>
 
-            <button class="org-button" (click)="loadOrgs()" *ngIf="profile && org" mat-button
-                [matMenuTriggerFor]="menu" (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
+            <button class="org-button" (click)="loadOrgs()" *ngIf="user && org" mat-button [matMenuTriggerFor]="menu"
+                (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
                 <mat-icon>
                     arrow_drop_down</mat-icon>
             </button>
@@ -63,7 +63,7 @@
                     [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)" [size]="38">
                 </app-avatar>
                 <app-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount"
-                    (close)="showAccount = false" [profile]="profile" [iamuser]="iamuser$ | async">
+                    (close)="showAccount = false" [user]="user" [iamuser]="iamuser$ | async">
                 </app-accounts-card>
             </div>
         </mat-toolbar>

@@ -14,7 +14,7 @@ import { catchError, debounceTime, finalize, map, take } from 'rxjs/operators';
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
-import { Profile } from './proto/generated/zitadel/user_pb';
+import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
@@ -46,7 +46,7 @@ export class AppComponent implements OnDestroy {
     public showAccount: boolean = false;
     public org!: Org.AsObject;
     public orgs$: Observable<Org.AsObject[]> = of([]);
-    public profile!: Profile.AsObject;
+    public user!: User.AsObject;
     public isDarkTheme: Observable<boolean> = of(true);
 
     public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -262,10 +262,11 @@ export class AppComponent implements OnDestroy {
 
         this.authService.user.subscribe(userprofile => {
             if (userprofile) {
-                this.profile = userprofile;
+                this.user = userprofile;
                 const cropped = navigator.language.split('-')[0] ?? 'en';
                 const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
-                const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : fallbackLang;
+
+                const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de/) ? userprofile.human.profile?.preferredLanguage : fallbackLang;
                 this.translate.use(lang);
                 this.document.documentElement.lang = lang;
             }

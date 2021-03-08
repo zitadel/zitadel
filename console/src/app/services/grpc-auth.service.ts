@@ -4,10 +4,10 @@ import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import {
-    AddMyMultiFactorOTPRequest,
-    AddMyMultiFactorOTPResponse,
-    AddMyMultiFactorU2FRequest,
-    AddMyMultiFactorU2FResponse,
+    AddMyAuthFactorOTPRequest,
+    AddMyAuthFactorOTPResponse,
+    AddMyAuthFactorU2FRequest,
+    AddMyAuthFactorU2FResponse,
     AddMyPasswordlessRequest,
     AddMyPasswordlessResponse,
     GetMyEmailRequest,
@@ -20,10 +20,10 @@ import {
     GetMyProfileResponse,
     GetMyUserRequest,
     GetMyUserResponse,
+    ListMyAuthFactorsRequest,
+    ListMyAuthFactorsResponse,
     ListMyLinkedIDPsRequest,
     ListMyLinkedIDPsResponse,
-    ListMyMultiFactorsRequest,
-    ListMyMultiFactorsResponse,
     ListMyPasswordlessRequest,
     ListMyPasswordlessResponse,
     ListMyProjectOrgsRequest,
@@ -36,12 +36,12 @@ import {
     ListMyUserSessionsResponse,
     ListMyZitadelPermissionsRequest,
     ListMyZitadelPermissionsResponse,
+    RemoveMyAuthFactorOTPRequest,
+    RemoveMyAuthFactorOTPResponse,
+    RemoveMyAuthFactorU2FRequest,
+    RemoveMyAuthFactorU2FResponse,
     RemoveMyLinkedIDPRequest,
     RemoveMyLinkedIDPResponse,
-    RemoveMyMultiFactorOTPRequest,
-    RemoveMyMultiFactorOTPResponse,
-    RemoveMyMultiFactorU2FRequest,
-    RemoveMyMultiFactorU2FResponse,
     RemoveMyPasswordlessRequest,
     RemoveMyPasswordlessResponse,
     RemoveMyPhoneRequest,
@@ -58,10 +58,10 @@ import {
     UpdateMyPasswordResponse,
     UpdateMyProfileRequest,
     UpdateMyProfileResponse,
-    VerifyMyMultiFactorOTPRequest,
-    VerifyMyMultiFactorOTPResponse,
-    VerifyMyMultiFactorU2FRequest,
-    VerifyMyMultiFactorU2FResponse,
+    VerifyMyAuthFactorOTPRequest,
+    VerifyMyAuthFactorOTPResponse,
+    VerifyMyAuthFactorU2FRequest,
+    VerifyMyAuthFactorU2FResponse,
     VerifyMyPasswordlessRequest,
     VerifyMyPasswordlessResponse,
     VerifyMyPhoneRequest,
@@ -69,7 +69,7 @@ import {
 } from '../proto/generated/zitadel/auth_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
-import { Gender, Profile, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
+import { Gender, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageService } from './storage.service';
 
@@ -79,7 +79,7 @@ import { StorageKey, StorageService } from './storage.service';
 })
 export class GrpcAuthService {
     private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
-    public user!: Observable<Profile.AsObject | undefined>;
+    public user!: Observable<User.AsObject | undefined>;
     private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
     public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
 
@@ -103,10 +103,10 @@ export class GrpcAuthService {
         ).pipe(
             take(1),
             mergeMap(() => {
-                return from(this.getMyProfile().then(resp => {
-                    const profile = resp.profile;
-                    if (profile) {
-                        return profile;
+                return from(this.getMyUser().then(resp => {
+                    const user = resp.user;
+                    if (user) {
+                        return user;
                     } else {
                         return undefined;
                     }
@@ -223,9 +223,9 @@ export class GrpcAuthService {
         ).then(resp => resp.toObject());
     }
 
-    public listMyMultiFactors(): Promise<ListMyMultiFactorsResponse.AsObject> {
-        return this.grpcService.auth.listMyMultiFactors(
-            new ListMyMultiFactorsRequest(), null
+    public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse.AsObject> {
+        return this.grpcService.auth.listMyAuthFactors(
+            new ListMyAuthFactorsRequest(), null
         ).then(resp => resp.toObject());
     }
 
@@ -375,32 +375,32 @@ export class GrpcAuthService {
         return this.grpcService.auth.listMyLinkedIDPs(req, null).then(resp => resp.toObject());
     }
 
-    public addMyMultiFactorOTP(): Promise<AddMyMultiFactorOTPResponse.AsObject> {
-        return this.grpcService.auth.addMyMultiFactorOTP(
-            new AddMyMultiFactorOTPRequest(), null
+    public addMyMultiFactorOTP(): Promise<AddMyAuthFactorOTPResponse.AsObject> {
+        return this.grpcService.auth.addMyAuthFactorOTP(
+            new AddMyAuthFactorOTPRequest(), null
         ).then(resp => resp.toObject());
     }
 
-    public addMyMultiFactorU2F(): Promise<AddMyMultiFactorU2FResponse.AsObject> {
-        return this.grpcService.auth.addMyMultiFactorU2F(
-            new AddMyMultiFactorU2FRequest(), null
+    public addMyMultiFactorU2F(): Promise<AddMyAuthFactorU2FResponse.AsObject> {
+        return this.grpcService.auth.addMyAuthFactorU2F(
+            new AddMyAuthFactorU2FRequest(), null
         ).then(resp => resp.toObject());
     }
 
-    public removeMyMultiFactorU2F(tokenId: string): Promise<RemoveMyMultiFactorU2FResponse.AsObject> {
-        const req = new RemoveMyMultiFactorU2FRequest();
+    public removeMyMultiFactorU2F(tokenId: string): Promise<RemoveMyAuthFactorU2FResponse.AsObject> {
+        const req = new RemoveMyAuthFactorU2FRequest();
         req.setTokenId(tokenId);
-        return this.grpcService.auth.removeMyMultiFactorU2F(req, null).then(resp => resp.toObject());
+        return this.grpcService.auth.removeMyAuthFactorU2F(req, null).then(resp => resp.toObject());
     }
 
-    public verifyMyMultiFactorU2F(credential: string, tokenname: string): Promise<VerifyMyMultiFactorU2FResponse.AsObject> {
-        const req = new VerifyMyMultiFactorU2FRequest();
+    public verifyMyMultiFactorU2F(credential: string, tokenname: string): Promise<VerifyMyAuthFactorU2FResponse.AsObject> {
+        const req = new VerifyMyAuthFactorU2FRequest();
         const verification = new WebAuthNVerification();
         verification.setPublicKeyCredential(credential);
         verification.setTokenName(tokenname);
         req.setVerification(verification);
 
-        return this.grpcService.auth.verifyMyMultiFactorU2F(req, null).then(resp => resp.toObject());
+        return this.grpcService.auth.verifyMyAuthFactorU2F(req, null).then(resp => resp.toObject());
     }
 
     public listMyPasswordless(): Promise<ListMyPasswordlessResponse.AsObject> {
@@ -433,16 +433,16 @@ export class GrpcAuthService {
         ).then(resp => resp.toObject());
     }
 
-    public removeMyMultiFactorOTP(): Promise<RemoveMyMultiFactorOTPResponse.AsObject> {
-        return this.grpcService.auth.removeMyMultiFactorOTP(
-            new RemoveMyMultiFactorOTPRequest(), null
+    public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse.AsObject> {
+        return this.grpcService.auth.removeMyAuthFactorOTP(
+            new RemoveMyAuthFactorOTPRequest(), null
         ).then(resp => resp.toObject());
     }
 
-    public verifyMyMultiFactorOTP(code: string): Promise<VerifyMyMultiFactorOTPResponse.AsObject> {
-        const req = new VerifyMyMultiFactorOTPRequest();
+    public verifyMyMultiFactorOTP(code: string): Promise<VerifyMyAuthFactorOTPResponse.AsObject> {
+        const req = new VerifyMyAuthFactorOTPRequest();
         req.setCode(code);
-        return this.grpcService.auth.verifyMyMultiFactorOTP(req, null).then(resp => resp.toObject());
+        return this.grpcService.auth.verifyMyAuthFactorOTP(req, null).then(resp => resp.toObject());
     }
 
     public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse.AsObject> {

@@ -6,9 +6,9 @@ import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
-import { Gender } from 'src/app/proto/generated/admin_pb';
 import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -106,9 +106,8 @@ export class OrgCreateComponent {
         profile.setPreferredLanguage(this.preferredLanguage?.value);
 
         humanRequest.setProfile(this.firstName?.value);
-
         if (this.usePassword && this.password) {
-            createOrgRequest.setPassword(this.password?.value);
+            humanRequest.setPassword(this.password?.value);
         }
 
         this.adminService

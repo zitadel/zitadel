@@ -10,12 +10,9 @@
                         [ngStyle]="{'z-index': 100 - i}">
                         <div class="membership-avatar"
                             [ngStyle]="{'background-color': getColor(membership.memberType)}">
-                            <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_ORGANISATION"
-                                class="las la-archway"></i>
-                            <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_PROJECT"
-                                class="icon las la-layer-group"></i>
-                            <i *ngIf="membership.memberType == MemberType.MEMBERTYPE_PROJECT_GRANT"
-                                class="icon las la-layer-group"></i>
+                            <i *ngIf="membership.orgId" class="las la-archway"></i>
+                            <i *ngIf="membership.projectId && !membership.grantId" class="icon las la-layer-group"></i>
+                            <i *ngIf="membership.projectId && membership.grantId" class="icon las la-layer-group"></i>
 
                             <span>{{membership.displayName}}</span>
                         </div>
