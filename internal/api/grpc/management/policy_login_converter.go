@@ -29,9 +29,9 @@ func updateLoginPolicyToDomain(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *domai
 
 func ListLoginPolicyIDPsRequestToModel(req *mgmt_pb.ListLoginPolicyIDPsRequest) *model.IDPProviderSearchRequest {
 	return &model.IDPProviderSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		// SortingColumn: model.IDPProviderSearchKey, //TODO: not in proto
 		// Queries: []*model.IDPProviderSearchQuery, //TODO: not in proto
 	}

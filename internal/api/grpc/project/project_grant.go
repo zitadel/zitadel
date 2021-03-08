@@ -17,10 +17,10 @@ func ProjectGrantQueriesToModel(queries []*project.ProjectGrantQuery) []*proj_mo
 
 func ProjectGrantQueryToModel(query *project.ProjectGrantQuery) *proj_model.ProjectGrantViewSearchQuery {
 	switch q := query.Query.(type) {
-	case *proj_pb.ProjectGrantQuery_ProjectName:
-		return ProjectGrantNameToProjectQuery(q.ProjectName)
-	case *proj_pb.ProjectGrantQuery_RoleKey:
-		return ProjectGrantRoleToProjectQuery(q.RoleKey)
+	case *proj_pb.ProjectGrantQuery_ProjectNameQuery:
+		return ProjectGrantNameToProjectQuery(q.ProjectNameQuery)
+	case *proj_pb.ProjectGrantQuery_RoleKeyQuery:
+		return ProjectGrantRoleToProjectQuery(q.RoleKeyQuery)
 	default:
 		return nil
 	}

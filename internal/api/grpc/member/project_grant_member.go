@@ -42,14 +42,14 @@ func MemberQueriesToProjectGrantMember(queries []*member_pb.SearchQuery) []*proj
 
 func MemberQueryToProjectGrantMember(query *member_pb.SearchQuery) *proj_model.ProjectGrantMemberSearchQuery {
 	switch q := query.Query.(type) {
-	case *member_pb.SearchQuery_Email:
-		return EmailQueryToProjectGrantMemberQuery(q.Email)
-	case *member_pb.SearchQuery_FirstName:
-		return FirstNameQueryToProjectGrantMemberQuery(q.FirstName)
-	case *member_pb.SearchQuery_LastName:
-		return LastNameQueryToProjectGrantMemberQuery(q.LastName)
-	case *member_pb.SearchQuery_UserId:
-		return UserIDQueryToProjectGrantMemberQuery(q.UserId)
+	case *member_pb.SearchQuery_EmailQuery:
+		return EmailQueryToProjectGrantMemberQuery(q.EmailQuery)
+	case *member_pb.SearchQuery_FirstNameQuery:
+		return FirstNameQueryToProjectGrantMemberQuery(q.FirstNameQuery)
+	case *member_pb.SearchQuery_LastNameQuery:
+		return LastNameQueryToProjectGrantMemberQuery(q.LastNameQuery)
+	case *member_pb.SearchQuery_UserIdQuery:
+		return UserIDQueryToProjectGrantMemberQuery(q.UserIdQuery)
 	default:
 		return nil
 	}

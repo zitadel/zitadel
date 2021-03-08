@@ -73,8 +73,8 @@ func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *mgmt_pb.ListLogin
 		return nil, err
 	}
 	return &mgmt_pb.ListLoginPolicyIDPsResponse{
-		Result:   idp.ExternalIDPViewsToLoginPolicyLinkPb(res.Result),
-		MetaData: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
+		Result:  idp.ExternalIDPViewsToLoginPolicyLinkPb(res.Result),
+		Details: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
 	}, nil
 }
 
@@ -113,13 +113,13 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *mgmt_pb.
 	}
 	return &mgmt_pb.ListLoginPolicySecondFactorsResponse{
 		//TODO: missing values from res
-		MetaData: object.ToListDetails(result.TotalResult, 0, time.Time{}),
-		Result:   policy_grpc.ModelSecondFactorTypesToPb(result.Result),
+		Details: object.ToListDetails(result.TotalResult, 0, time.Time{}),
+		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Result),
 	}, nil
 }
 
 func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.AddSecondFactorToLoginPolicyRequest) (*mgmt_pb.AddSecondFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.SecondFactor))
+	_, objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.
 }
 
 func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *mgmt_pb.RemoveSecondFactorFromLoginPolicyRequest) (*mgmt_pb.RemoveSecondFactorFromLoginPolicyResponse, error) {
-	objectDetails, err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.SecondFactor))
+	objectDetails, err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -145,13 +145,13 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *mgmt_pb.L
 	}
 	return &mgmt_pb.ListLoginPolicyMultiFactorsResponse{
 		//TODO: additional values
-		MetaData: object.ToListDetails(res.TotalResult, 0, time.Time{}),
-		Result:   policy_grpc.ModelMultiFactorTypesToPb(res.Result),
+		Details: object.ToListDetails(res.TotalResult, 0, time.Time{}),
+		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Result),
 	}, nil
 }
 
 func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.AddMultiFactorToLoginPolicyRequest) (*mgmt_pb.AddMultiFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.MultiFactor))
+	_, objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.A
 }
 
 func (s *Server) RemoveMultiFactorFromLoginPolicy(ctx context.Context, req *mgmt_pb.RemoveMultiFactorFromLoginPolicyRequest) (*mgmt_pb.RemoveMultiFactorFromLoginPolicyResponse, error) {
-	objectDetails, err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.MultiFactor))
+	objectDetails, err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}

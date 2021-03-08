@@ -42,7 +42,7 @@ func AppOIDCConfigToPb(app *proj_model.ApplicationView) *app_pb.App_OidcConfig {
 			RedirectUris:             app.OIDCRedirectUris,
 			ResponseTypes:            OIDCResponseTypesFromModel(app.OIDCResponseTypes),
 			GrantTypes:               OIDCGrantTypesFromModel(app.OIDCGrantTypes),
-			ApplicationType:          OIDCApplicationTypeToPb(domain.OIDCApplicationType(app.OIDCApplicationType)),
+			AppType:                  OIDCApplicationTypeToPb(domain.OIDCApplicationType(app.OIDCApplicationType)),
 			ClientId:                 app.OIDCClientID,
 			AuthMethodType:           OIDCAuthMethodTypeToPb(domain.OIDCAuthMethodType(app.OIDCAuthMethodType)),
 			PostLogoutRedirectUris:   app.OIDCPostLogoutRedirectUris,
@@ -149,23 +149,23 @@ func OIDCGrantTypesToDomain(grantTypes []app_pb.OIDCGrantType) []domain.OIDCGran
 func OIDCApplicationTypeToPb(appType domain.OIDCApplicationType) app_pb.OIDCAppType {
 	switch appType {
 	case domain.OIDCApplicationTypeWeb:
-		return app_pb.OIDCAppType_OIDC_APPLICATION_TYPE_WEB
+		return app_pb.OIDCAppType_OIDC_APP_TYPE_WEB
 	case domain.OIDCApplicationTypeUserAgent:
-		return app_pb.OIDCAppType_OIDC_APPLICATION_TYPE_USER_AGENT
+		return app_pb.OIDCAppType_OIDC_APP_TYPE_USER_AGENT
 	case domain.OIDCApplicationTypeNative:
-		return app_pb.OIDCAppType_OIDC_APPLICATION_TYPE_NATIVE
+		return app_pb.OIDCAppType_OIDC_APP_TYPE_NATIVE
 	default:
-		return app_pb.OIDCAppType_OIDC_APPLICATION_TYPE_WEB
+		return app_pb.OIDCAppType_OIDC_APP_TYPE_WEB
 	}
 }
 
 func OIDCApplicationTypeToDomain(appType app_pb.OIDCAppType) domain.OIDCApplicationType {
 	switch appType {
-	case app_pb.OIDCAppType_OIDC_APPLICATION_TYPE_WEB:
+	case app_pb.OIDCAppType_OIDC_APP_TYPE_WEB:
 		return domain.OIDCApplicationTypeWeb
-	case app_pb.OIDCAppType_OIDC_APPLICATION_TYPE_USER_AGENT:
+	case app_pb.OIDCAppType_OIDC_APP_TYPE_USER_AGENT:
 		return domain.OIDCApplicationTypeUserAgent
-	case app_pb.OIDCAppType_OIDC_APPLICATION_TYPE_NATIVE:
+	case app_pb.OIDCAppType_OIDC_APP_TYPE_NATIVE:
 		return domain.OIDCApplicationTypeNative
 	}
 	return domain.OIDCApplicationTypeWeb
@@ -283,8 +283,8 @@ func AppQueriesToModel(queries []*app_pb.AppQuery) (_ []*proj_model.ApplicationS
 
 func AppQueryToModel(query *app_pb.AppQuery) (*proj_model.ApplicationSearchQuery, error) {
 	switch q := query.Query.(type) {
-	case *app_pb.AppQuery_Name:
-		return AppQueryNameToModel(q.Name), nil
+	case *app_pb.AppQuery_NameQuery:
+		return AppQueryNameToModel(q.NameQuery), nil
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "APP-Add46", "List.Query.Invalid")
 	}

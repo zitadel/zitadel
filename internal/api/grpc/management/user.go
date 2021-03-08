@@ -11,8 +11,6 @@ import (
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -45,7 +43,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	}
 	return &mgmt_pb.ListUsersResponse{
 		Result: user_grpc.UsersToPb(res.Result),
-		MetaData: obj_grpc.ToListDetails(
+		Details: obj_grpc.ToListDetails(
 			res.TotalResult,
 			res.Sequence,
 			res.Timestamp,
@@ -322,32 +320,32 @@ func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mg
 	}, nil
 }
 
-func (s *Server) ListHumanMultiFactors(ctx context.Context, req *mgmt_pb.ListHumanMultiFactorsRequest) (*mgmt_pb.ListHumanMultiFactorsResponse, error) {
+func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHumanAuthFactorsRequest) (*mgmt_pb.ListHumanAuthFactorsResponse, error) {
 	mfas, err := s.user.UserMFAs(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ListHumanMultiFactorsResponse{
-		Result: user_grpc.MultiFactorsToPb(mfas),
+	return &mgmt_pb.ListHumanAuthFactorsResponse{
+		Result: user_grpc.AuthFactorsToPb(mfas),
 	}, nil
 }
 
-func (s *Server) RemoveHumanMultiFactorOTP(ctx context.Context, req *mgmt_pb.RemoveHumanMultiFactorOTPRequest) (*mgmt_pb.RemoveHumanMultiFactorOTPResponse, error) {
+func (s *Server) RemoveHumanAuthFactorOTP(ctx context.Context, req *mgmt_pb.RemoveHumanAuthFactorOTPRequest) (*mgmt_pb.RemoveHumanAuthFactorOTPResponse, error) {
 	objectDetails, err := s.command.HumanRemoveOTP(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.RemoveHumanMultiFactorOTPResponse{
+	return &mgmt_pb.RemoveHumanAuthFactorOTPResponse{
 		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
-func (s *Server) RemoveHumanMultiFactorU2F(ctx context.Context, req *mgmt_pb.RemoveHumanMultiFactorU2FRequest) (*mgmt_pb.RemoveHumanMultiFactorU2FResponse, error) {
+func (s *Server) RemoveHumanAuthFactorU2F(ctx context.Context, req *mgmt_pb.RemoveHumanAuthFactorU2FRequest) (*mgmt_pb.RemoveHumanAuthFactorU2FResponse, error) {
 	objectDetails, err := s.command.HumanRemoveU2F(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.RemoveHumanMultiFactorU2FResponse{
+	return &mgmt_pb.RemoveHumanAuthFactorU2FResponse{
 		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
 }
@@ -403,7 +401,7 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 	}
 	return &mgmt_pb.ListMachineKeysResponse{
 		Result: authn.KeyViewsToPb(result.Result),
-		MetaData: obj_grpc.ToListDetails(
+		Details: obj_grpc.ToListDetails(
 			result.TotalResult,
 			result.Sequence,
 			result.Timestamp,
@@ -441,39 +439,28 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 	}, nil
 }
 
-func (s *Server) ListUserIDPs(ctx context.Context, req *mgmt_pb.ListUserIDPsRequest) (*mgmt_pb.ListUserIDPsResponse, error) {
-	res, err := s.user.SearchExternalIDPs(ctx, ListUserIDPsRequestToModel(req))
+func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*mgmt_pb.ListHumanLinkedIDPsResponse, error) {
+	res, err := s.user.SearchExternalIDPs(ctx, ListHumanLinkedIDPsRequestToModel(req))
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ListUserIDPsResponse{
+	return &mgmt_pb.ListHumanLinkedIDPsResponse{
 		Result: idp_grpc.IDPsToUserLinkPb(res.Result),
-		MetaData: obj_grpc.ToListDetails(
+		Details: obj_grpc.ToListDetails(
 			res.TotalResult,
 			res.Sequence,
 			res.Timestamp,
 		),
 	}, nil
 }
-func (s *Server) RemoveUserIDP(ctx context.Context, req *mgmt_pb.RemoveUserIDPRequest) (*mgmt_pb.RemoveUserIDPResponse, error) {
-	objectDetails, err := s.command.RemoveHumanExternalIDP(ctx, RemoveUserIDPRequestToDomain(ctx, req))
+func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) (*mgmt_pb.RemoveHumanLinkedIDPResponse, error) {
+	objectDetails, err := s.command.RemoveHumanExternalIDP(ctx, RemoveHumanLinkedIDPRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.RemoveUserIDPResponse{
+	return &mgmt_pb.RemoveHumanLinkedIDPResponse{
 		Details: obj_grpc.DomainToDetailsPb(objectDetails),
 	}, nil
-}
-
-func RemoveUserIDPRequestToDomain(ctx context.Context, req *mgmt_pb.RemoveUserIDPRequest) *domain.ExternalIDP {
-	return &domain.ExternalIDP{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID:   req.UserId,
-			ResourceOwner: authz.GetCtxData(ctx).OrgID,
-		},
-		IDPConfigID:    req.IdpId,
-		ExternalUserID: req.LinkedUserId,
-	}
 }
 
 func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*mgmt_pb.ListUserMembershipsResponse, error) {
@@ -487,7 +474,7 @@ func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserM
 	}
 	return &mgmt_pb.ListUserMembershipsResponse{
 		Result: user_grpc.MembershipsToMembershipsPb(response.Result),
-		MetaData: obj_grpc.ToListDetails(
+		Details: obj_grpc.ToListDetails(
 			response.TotalResult,
 			response.Sequence,
 			response.Timestamp,

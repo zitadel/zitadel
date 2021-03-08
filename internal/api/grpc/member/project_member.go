@@ -42,14 +42,14 @@ func MemberQueriesToProjectMember(queries []*member_pb.SearchQuery) []*proj_mode
 
 func MemberQueryToProjectMember(query *member_pb.SearchQuery) *proj_model.ProjectMemberSearchQuery {
 	switch q := query.Query.(type) {
-	case *member_pb.SearchQuery_Email:
-		return EmailQueryToProjectMemberQuery(q.Email)
-	case *member_pb.SearchQuery_FirstName:
-		return FirstNameQueryToProjectMemberQuery(q.FirstName)
-	case *member_pb.SearchQuery_LastName:
-		return LastNameQueryToProjectMemberQuery(q.LastName)
-	case *member_pb.SearchQuery_UserId:
-		return UserIDQueryToProjectMemberQuery(q.UserId)
+	case *member_pb.SearchQuery_EmailQuery:
+		return EmailQueryToProjectMemberQuery(q.EmailQuery)
+	case *member_pb.SearchQuery_FirstNameQuery:
+		return FirstNameQueryToProjectMemberQuery(q.FirstNameQuery)
+	case *member_pb.SearchQuery_LastNameQuery:
+		return LastNameQueryToProjectMemberQuery(q.LastNameQuery)
+	case *member_pb.SearchQuery_UserIdQuery:
+		return UserIDQueryToProjectMemberQuery(q.UserIdQuery)
 	default:
 		return nil
 	}

@@ -22,14 +22,14 @@ func MembershipQueriesToModel(queries []*user_pb.MembershipQuery) (_ []*user_mod
 
 func MembershipQueryToModel(query *user_pb.MembershipQuery) ([]*user_model.UserMembershipSearchQuery, error) {
 	switch q := query.Query.(type) {
-	case *user_pb.MembershipQuery_Org:
-		return MembershipOrgQueryToModel(q.Org), nil
-	case *user_pb.MembershipQuery_Project:
-		return MembershipProjectQueryToModel(q.Project), nil
-	case *user_pb.MembershipQuery_ProjectGrant:
-		return MembershipProjectGrantQueryToModel(q.ProjectGrant), nil
-	case *user_pb.MembershipQuery_Iam:
-		return MembershipIAMQueryToModel(q.Iam), nil
+	case *user_pb.MembershipQuery_OrgQuery:
+		return MembershipOrgQueryToModel(q.OrgQuery), nil
+	case *user_pb.MembershipQuery_ProjectQuery:
+		return MembershipProjectQueryToModel(q.ProjectQuery), nil
+	case *user_pb.MembershipQuery_ProjectGrantQuery:
+		return MembershipProjectGrantQueryToModel(q.ProjectGrantQuery), nil
+	case *user_pb.MembershipQuery_IamQuery:
+		return MembershipIAMQueryToModel(q.IamQuery), nil
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "USER-dsg3z", "List.Query.Invalid")
 	}

@@ -10,8 +10,8 @@ import (
 
 func ListMyLinkedIDPsRequestToModel(req *auth_pb.ListMyLinkedIDPsRequest) *model.ExternalIDPSearchRequest {
 	return &model.ExternalIDPSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
 	}
 }
 

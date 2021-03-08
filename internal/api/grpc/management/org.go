@@ -98,7 +98,7 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 	}
 	return &mgmt_pb.ListOrgDomainsResponse{
 		Result: org_grpc.DomainsToPb(domains.Result),
-		MetaData: object.ToListDetails(
+		Details: object.ToListDetails(
 			domains.TotalResult,
 			domains.Sequence,
 			domains.Timestamp,
@@ -190,7 +190,7 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
 		Result: member_grpc.OrgMembersToPb(members.Result),
-		MetaData: object.ToListDetails(
+		Details: object.ToListDetails(
 			members.TotalResult,
 			members.Sequence,
 			members.Timestamp,
@@ -201,9 +201,9 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 func ListOrgMembersRequestToModel(req *mgmt_pb.ListOrgMembersRequest) (*org_model.OrgMemberSearchRequest, error) {
 	queries := member_grpc.MemberQueriesToOrgMember(req.Queries)
 	return &org_model.OrgMemberSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

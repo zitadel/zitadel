@@ -17,9 +17,9 @@ func ListProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*pr
 		Value:  req.ProjectId,
 	})
 	return &proj_model.ProjectGrantViewSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
@@ -53,9 +53,9 @@ func ListProjectGrantMembersRequestToModel(req *mgmt_pb.ListProjectGrantMembersR
 		Value:  req.ProjectId,
 	})
 	return &proj_model.ProjectGrantMemberSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}

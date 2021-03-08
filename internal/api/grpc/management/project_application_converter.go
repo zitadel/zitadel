@@ -23,9 +23,9 @@ func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*proj_model.Applicati
 		Value:  req.ProjectId,
 	})
 	return &proj_model.ApplicationSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
@@ -101,7 +101,7 @@ func UpdateAPIAppConfigRequestToDomain(app *mgmt_pb.UpdateAPIAppConfigRequest) *
 	}
 }
 
-func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAPIClientKeyRequest) *domain.ApplicationKey {
+func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAppKeyRequest) *domain.ApplicationKey {
 	expirationDate := time.Time{}
 	if key.ExpirationDate != nil {
 		expirationDate = key.ExpirationDate.AsTime()
@@ -117,7 +117,7 @@ func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAPIClientKeyRequest) *domain
 	}
 }
 
-func ListAPIClientKeysRequestToModel(req *mgmt_pb.ListAPIClientKeysRequest) (*key_model.AuthNKeySearchRequest, error) {
+func ListAPIClientKeysRequestToModel(req *mgmt_pb.ListAppKeysRequest) (*key_model.AuthNKeySearchRequest, error) {
 	queries := make([]*key_model.AuthNKeySearchQuery, 2)
 	queries = append(queries, &key_model.AuthNKeySearchQuery{
 		Key:    key_model.AuthNKeyObjectID,
@@ -125,9 +125,9 @@ func ListAPIClientKeysRequestToModel(req *mgmt_pb.ListAPIClientKeysRequest) (*ke
 		Value:  req.AppId,
 	})
 	return &key_model.AuthNKeySearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

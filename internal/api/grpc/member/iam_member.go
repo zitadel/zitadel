@@ -42,14 +42,14 @@ func MemberQueriesToIAMMember(queries []*member_pb.SearchQuery) []*iam_model.IAM
 
 func MemberQueryToIAMMember(query *member_pb.SearchQuery) *iam_model.IAMMemberSearchQuery {
 	switch q := query.Query.(type) {
-	case *member_pb.SearchQuery_Email:
-		return EmailQueryToIAMMemberQuery(q.Email)
-	case *member_pb.SearchQuery_FirstName:
-		return FirstNameQueryToIAMMemberQuery(q.FirstName)
-	case *member_pb.SearchQuery_LastName:
-		return LastNameQueryToIAMMemberQuery(q.LastName)
-	case *member_pb.SearchQuery_UserId:
-		return UserIDQueryToIAMMemberQuery(q.UserId)
+	case *member_pb.SearchQuery_EmailQuery:
+		return EmailQueryToIAMMemberQuery(q.EmailQuery)
+	case *member_pb.SearchQuery_FirstNameQuery:
+		return FirstNameQueryToIAMMemberQuery(q.FirstNameQuery)
+	case *member_pb.SearchQuery_LastNameQuery:
+		return LastNameQueryToIAMMemberQuery(q.LastNameQuery)
+	case *member_pb.SearchQuery_UserIdQuery:
+		return UserIDQueryToIAMMemberQuery(q.UserIdQuery)
 	default:
 		return nil
 	}

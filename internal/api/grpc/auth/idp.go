@@ -15,7 +15,7 @@ func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinked
 	}
 	return &auth_pb.ListMyLinkedIDPsResponse{
 		Result: idp_grpc.IDPsToUserLinkPb(idps.Result),
-		MetaData: object.ToListDetails(
+		Details: object.ToListDetails(
 			idps.TotalResult,
 			idps.Sequence,
 			idps.Timestamp,

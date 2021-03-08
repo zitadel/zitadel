@@ -12,7 +12,7 @@ import (
 func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMemberRolesRequest) (*admin_pb.ListIAMMemberRolesResponse, error) {
 	roles := s.iam.GetIAMMemberRoles()
 	return &admin_pb.ListIAMMemberRolesResponse{
-		MetaData: object.ToListDetails(uint64(len(roles)), 0, time.Now()),
+		Details: object.ToListDetails(uint64(len(roles)), 0, time.Now()),
 	}, nil
 }
 
@@ -22,8 +22,8 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMember
 		return nil, err
 	}
 	return &admin_pb.ListIAMMembersResponse{
-		MetaData: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
-		Result:   member.IAMMembersToPb(res.Result),
+		Details: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
+		Result:  member.IAMMembersToPb(res.Result),
 	}, nil
 }
 

@@ -136,26 +136,26 @@ func GenderToPb(gender model.Gender) user_pb.Gender {
 	}
 }
 
-func MultiFactorsToPb(mfas []*model.MultiFactor) []*user_pb.MultiFactor {
-	factors := make([]*user_pb.MultiFactor, len(mfas))
+func AuthFactorsToPb(mfas []*model.MultiFactor) []*user_pb.AuthFactor {
+	factors := make([]*user_pb.AuthFactor, len(mfas))
 	for i, mfa := range mfas {
-		factors[i] = MultiFactorToPb(mfa)
+		factors[i] = AuthFactorToPb(mfa)
 	}
 	return factors
 }
 
-func MultiFactorToPb(mfa *model.MultiFactor) *user_pb.MultiFactor {
-	factor := &user_pb.MultiFactor{
+func AuthFactorToPb(mfa *model.MultiFactor) *user_pb.AuthFactor {
+	factor := &user_pb.AuthFactor{
 		State: MFAStateToPb(mfa.State),
 	}
 	switch mfa.Type {
 	case model.MFATypeOTP:
-		factor.Type = &user_pb.MultiFactor_Otp{
-			Otp: &user_pb.MultiFactorOTP{},
+		factor.Type = &user_pb.AuthFactor_Otp{
+			Otp: &user_pb.AuthFactorOTP{},
 		}
 	case model.MFATypeU2F:
-		factor.Type = &user_pb.MultiFactor_U2F{
-			U2F: &user_pb.MultiFactorU2F{
+		factor.Type = &user_pb.AuthFactor_U2F{
+			U2F: &user_pb.AuthFactorU2F{
 				Id:   mfa.ID,
 				Name: mfa.Attribute,
 			},
@@ -164,14 +164,14 @@ func MultiFactorToPb(mfa *model.MultiFactor) *user_pb.MultiFactor {
 	return factor
 }
 
-func MFAStateToPb(state model.MFAState) user_pb.MultiFactorState {
+func MFAStateToPb(state model.MFAState) user_pb.AuthFactorState {
 	switch state {
 	case model.MFAStateNotReady:
-		return user_pb.MultiFactorState_MULTI_FACTOR_STATE_NOT_READY
+		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY
 	case model.MFAStateReady:
-		return user_pb.MultiFactorState_MULTI_FACTOR_STATE_READY
+		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_READY
 	default:
-		return user_pb.MultiFactorState_MULTI_FACTOR_STATE_UNSPECIFIED
+		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
 	}
 }
 

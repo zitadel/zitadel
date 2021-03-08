@@ -32,7 +32,7 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 	}
 	return &mgmt_pb.ListAppsResponse{
 		Result: project_grpc.AppsToPb(domains.Result),
-		MetaData: object_grpc.ToListDetails(
+		Details: object_grpc.ToListDetails(
 			domains.TotalResult,
 			domains.Sequence,
 			domains.Timestamp,
@@ -176,17 +176,17 @@ func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.Reg
 	}, nil
 }
 
-func (s *Server) GetAPIClientKey(ctx context.Context, req *mgmt_pb.GetAPIClientKeyRequest) (*mgmt_pb.GetAPIClientKeyResponse, error) {
+func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (*mgmt_pb.GetAppKeyResponse, error) {
 	key, err := s.project.GetClientKey(ctx, req.ProjectId, req.AppId, req.KeyId)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetAPIClientKeyResponse{
+	return &mgmt_pb.GetAppKeyResponse{
 		Key: authn_grpc.KeyToPb(key),
 	}, nil
 }
 
-func (s *Server) ListAPIClientKeys(ctx context.Context, req *mgmt_pb.ListAPIClientKeysRequest) (*mgmt_pb.ListAPIClientKeysResponse, error) {
+func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*mgmt_pb.ListAppKeysResponse, error) {
 	queries, err := ListAPIClientKeysRequestToModel(req)
 	if err != nil {
 		return nil, err
@@ -195,7 +195,7 @@ func (s *Server) ListAPIClientKeys(ctx context.Context, req *mgmt_pb.ListAPIClie
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ListAPIClientKeysResponse{
+	return &mgmt_pb.ListAppKeysResponse{
 		Result: authn_grpc.KeyViewsToPb(domains.Result),
 		Details: object_grpc.ToListDetails(
 			domains.TotalResult,
@@ -205,7 +205,7 @@ func (s *Server) ListAPIClientKeys(ctx context.Context, req *mgmt_pb.ListAPIClie
 	}, nil
 }
 
-func (s *Server) AddAPIClientKey(ctx context.Context, req *mgmt_pb.AddAPIClientKeyRequest) (*mgmt_pb.AddAPIClientKeyResponse, error) {
+func (s *Server) AddAppKey(ctx context.Context, req *mgmt_pb.AddAppKeyRequest) (*mgmt_pb.AddAppKeyResponse, error) {
 	key, err := s.command.AddApplicationKey(ctx, AddAPIClientKeyRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -214,19 +214,19 @@ func (s *Server) AddAPIClientKey(ctx context.Context, req *mgmt_pb.AddAPIClientK
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.AddAPIClientKeyResponse{
+	return &mgmt_pb.AddAppKeyResponse{
 		Id:         key.KeyID,
 		Details:    object_grpc.ToDetailsPb(key.Sequence, key.ChangeDate, key.ResourceOwner),
 		KeyDetails: keyDetails,
 	}, nil
 }
 
-func (s *Server) RemoveAPIClientKey(ctx context.Context, req *mgmt_pb.RemoveAPIClientKeyRequest) (*mgmt_pb.RemoveAPIClientKeyResponse, error) {
+func (s *Server) RemoveAppKey(ctx context.Context, req *mgmt_pb.RemoveAppKeyRequest) (*mgmt_pb.RemoveAppKeyResponse, error) {
 	details, err := s.command.RemoveApplicationKey(ctx, req.ProjectId, req.AppId, req.KeyId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.RemoveAPIClientKeyResponse{
+	return &mgmt_pb.RemoveAppKeyResponse{
 		Details: object_grpc.DomainToDetailsPb(details),
 	}, nil
 }

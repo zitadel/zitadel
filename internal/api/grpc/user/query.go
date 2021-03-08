@@ -17,22 +17,22 @@ func UserQueriesToModel(queries []*user_pb.SearchQuery) []*user_model.UserSearch
 
 func UserQueryToModel(query *user_pb.SearchQuery) *user_model.UserSearchQuery {
 	switch q := query.Query.(type) {
-	case *user_pb.SearchQuery_UserName:
-		return UserNameQueryToModel(q.UserName)
-	case *user_pb.SearchQuery_FirstName:
-		return FirstNameQueryToModel(q.FirstName)
-	case *user_pb.SearchQuery_LastName:
-		return LastNameQueryToModel(q.LastName)
-	case *user_pb.SearchQuery_NickName:
-		return NickNameQueryToModel(q.NickName)
-	case *user_pb.SearchQuery_DisplayName:
-		return DisplayNameQueryToModel(q.DisplayName)
-	case *user_pb.SearchQuery_Email:
-		return EmailQueryToModel(q.Email)
-	case *user_pb.SearchQuery_State:
-		return StateQueryToModel(q.State)
-	case *user_pb.SearchQuery_Type:
-		return TypeQueryToModel(q.Type)
+	case *user_pb.SearchQuery_UserNameQuery:
+		return UserNameQueryToModel(q.UserNameQuery)
+	case *user_pb.SearchQuery_FirstNameQuery:
+		return FirstNameQueryToModel(q.FirstNameQuery)
+	case *user_pb.SearchQuery_LastNameQuery:
+		return LastNameQueryToModel(q.LastNameQuery)
+	case *user_pb.SearchQuery_NickNameQuery:
+		return NickNameQueryToModel(q.NickNameQuery)
+	case *user_pb.SearchQuery_DisplayNameQuery:
+		return DisplayNameQueryToModel(q.DisplayNameQuery)
+	case *user_pb.SearchQuery_EmailQuery:
+		return EmailQueryToModel(q.EmailQuery)
+	case *user_pb.SearchQuery_StateQuery:
+		return StateQueryToModel(q.StateQuery)
+	case *user_pb.SearchQuery_TypeQuery:
+		return TypeQueryToModel(q.TypeQuery)
 	case *user_pb.SearchQuery_ResourceOwner:
 		return ResourceOwnerQueryToModel(q.ResourceOwner)
 	default:

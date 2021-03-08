@@ -42,7 +42,7 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	}
 	return &mgmt_pb.ListProjectsResponse{
 		Result: project_grpc.ProjectsToPb(domains.Result),
-		MetaData: object_grpc.ToListDetails(
+		Details: object_grpc.ToListDetails(
 			domains.TotalResult,
 			domains.Sequence,
 			domains.Timestamp,
@@ -61,7 +61,7 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	}
 	return &mgmt_pb.ListGrantedProjectsResponse{
 		Result: project_grpc.GrantedProjectsToPb(domains.Result),
-		MetaData: object_grpc.ToListDetails(
+		Details: object_grpc.ToListDetails(
 			domains.TotalResult,
 			domains.Sequence,
 			domains.Timestamp,
@@ -154,7 +154,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	}
 	return &mgmt_pb.ListProjectRolesResponse{
 		Result: project_grpc.RolesToPb(roles.Result),
-		MetaData: object_grpc.ToListDetails(
+		Details: object_grpc.ToListDetails(
 			roles.TotalResult,
 			roles.Sequence,
 			roles.Timestamp,
@@ -237,7 +237,7 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
 		Result: member_grpc.ProjectMembersToPb(domains.Result),
-		MetaData: object_grpc.ToListDetails(
+		Details: object_grpc.ToListDetails(
 			domains.TotalResult,
 			domains.Sequence,
 			domains.Timestamp,

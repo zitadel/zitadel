@@ -84,8 +84,8 @@ func ProjectQueriesToModel(queries []*proj_pb.ProjectQuery) (_ []*proj_model.Pro
 
 func ProjectQueryToModel(query *proj_pb.ProjectQuery) (*proj_model.ProjectViewSearchQuery, error) {
 	switch q := query.Query.(type) {
-	case *proj_pb.ProjectQuery_Name:
-		return ProjectQueryNameToModel(q.Name), nil
+	case *proj_pb.ProjectQuery_NameQuery:
+		return ProjectQueryNameToModel(q.NameQuery), nil
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
 	}
@@ -112,8 +112,8 @@ func GrantedProjectQueriesToModel(queries []*proj_pb.ProjectQuery) (_ []*proj_mo
 
 func GrantedProjectQueryToModel(query *proj_pb.ProjectQuery) (*proj_model.ProjectGrantViewSearchQuery, error) {
 	switch q := query.Query.(type) {
-	case *proj_pb.ProjectQuery_Name:
-		return GrantedProjectQueryNameToModel(q.Name), nil
+	case *proj_pb.ProjectQuery_NameQuery:
+		return GrantedProjectQueryNameToModel(q.NameQuery), nil
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
 	}
@@ -140,10 +140,10 @@ func RoleQueriesToModel(queries []*proj_pb.RoleQuery) (_ []*proj_model.ProjectRo
 
 func RoleQueryToModel(query *proj_pb.RoleQuery) (*proj_model.ProjectRoleSearchQuery, error) {
 	switch q := query.Query.(type) {
-	case *proj_pb.RoleQuery_Key:
-		return RoleQueryKeyToModel(q.Key), nil
-	case *proj_pb.RoleQuery_DisplayName:
-		return RoleQueryDisplayNameToModel(q.DisplayName), nil
+	case *proj_pb.RoleQuery_KeyQuery:
+		return RoleQueryKeyToModel(q.KeyQuery), nil
+	case *proj_pb.RoleQuery_DisplayNameQuery:
+		return RoleQueryDisplayNameToModel(q.DisplayNameQuery), nil
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
 	}

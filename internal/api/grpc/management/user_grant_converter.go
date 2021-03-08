@@ -12,9 +12,9 @@ import (
 
 func ListUserGrantsRequestToModel(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) *model.UserGrantSearchRequest {
 	request := &model.UserGrantSearchRequest{
-		Offset:  req.MetaData.Offset,
-		Limit:   uint64(req.MetaData.Limit),
-		Asc:     req.MetaData.Asc,
+		Offset:  req.Query.Offset,
+		Limit:   uint64(req.Query.Limit),
+		Asc:     req.Query.Asc,
 		Queries: user_grpc.UserGrantQueriesToModel(req.Queries),
 	}
 	request.Queries = append(request.Queries, &model.UserGrantSearchQuery{

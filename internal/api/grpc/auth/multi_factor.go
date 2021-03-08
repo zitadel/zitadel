@@ -10,23 +10,23 @@ import (
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 
-func (s *Server) ListMyMultiFactors(ctx context.Context, _ *auth_pb.ListMyMultiFactorsRequest) (*auth_pb.ListMyMultiFactorsResponse, error) {
+func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFactorsRequest) (*auth_pb.ListMyAuthFactorsResponse, error) {
 	mfas, err := s.repo.MyUserMFAs(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.ListMyMultiFactorsResponse{
-		Result: user_grpc.MultiFactorsToPb(mfas),
+	return &auth_pb.ListMyAuthFactorsResponse{
+		Result: user_grpc.AuthFactorsToPb(mfas),
 	}, nil
 }
 
-func (s *Server) AddMyMultiFactorOTP(ctx context.Context, _ *auth_pb.AddMyMultiFactorOTPRequest) (*auth_pb.AddMyMultiFactorOTPResponse, error) {
+func (s *Server) AddMyAuthFactorOTP(ctx context.Context, _ *auth_pb.AddMyAuthFactorOTPRequest) (*auth_pb.AddMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.AddMyMultiFactorOTPResponse{
+	return &auth_pb.AddMyAuthFactorOTPResponse{
 		Url:    otp.Url,
 		Secret: otp.SecretString,
 		Details: object.ToDetailsPb(
@@ -37,35 +37,35 @@ func (s *Server) AddMyMultiFactorOTP(ctx context.Context, _ *auth_pb.AddMyMultiF
 	}, nil
 }
 
-func (s *Server) VerifyMyMultiFactorOTP(ctx context.Context, req *auth_pb.VerifyMyMultiFactorOTPRequest) (*auth_pb.VerifyMyMultiFactorOTPResponse, error) {
+func (s *Server) VerifyMyAuthFactorOTP(ctx context.Context, req *auth_pb.VerifyMyAuthFactorOTPRequest) (*auth_pb.VerifyMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	objectDetails, err := s.command.HumanCheckMFAOTPSetup(ctx, ctxData.UserID, req.Code, "", ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.VerifyMyMultiFactorOTPResponse{
+	return &auth_pb.VerifyMyAuthFactorOTPResponse{
 		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
-func (s *Server) RemoveMyMultiFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyMultiFactorOTPRequest) (*auth_pb.RemoveMyMultiFactorOTPResponse, error) {
+func (s *Server) RemoveMyAuthFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyAuthFactorOTPRequest) (*auth_pb.RemoveMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	objectDetails, err := s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.RemoveMyMultiFactorOTPResponse{
+	return &auth_pb.RemoveMyAuthFactorOTPResponse{
 		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
-func (s *Server) AddMyMultiFactorU2F(ctx context.Context, _ *auth_pb.AddMyMultiFactorU2FRequest) (*auth_pb.AddMyMultiFactorU2FResponse, error) {
+func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFactorU2FRequest) (*auth_pb.AddMyAuthFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	u2f, err := s.command.HumanAddU2FSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.AddMyMultiFactorU2FResponse{
+	return &auth_pb.AddMyAuthFactorU2FResponse{
 		Key: &user_pb.WebAuthNKey{
 			Id:        u2f.WebAuthNTokenID,
 			PublicKey: u2f.CredentialCreationData,
@@ -78,24 +78,24 @@ func (s *Server) AddMyMultiFactorU2F(ctx context.Context, _ *auth_pb.AddMyMultiF
 	}, nil
 }
 
-func (s *Server) VerifyMyMultiFactorU2F(ctx context.Context, req *auth_pb.VerifyMyMultiFactorU2FRequest) (*auth_pb.VerifyMyMultiFactorU2FResponse, error) {
+func (s *Server) VerifyMyAuthFactorU2F(ctx context.Context, req *auth_pb.VerifyMyAuthFactorU2FRequest) (*auth_pb.VerifyMyAuthFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, ctxData.UserID, ctxData.OrgID, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.VerifyMyMultiFactorU2FResponse{
+	return &auth_pb.VerifyMyAuthFactorU2FResponse{
 		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }
 
-func (s *Server) RemoveMyMultiFactorU2F(ctx context.Context, req *auth_pb.RemoveMyMultiFactorU2FRequest) (*auth_pb.RemoveMyMultiFactorU2FResponse, error) {
+func (s *Server) RemoveMyAuthFactorU2F(ctx context.Context, req *auth_pb.RemoveMyAuthFactorU2FRequest) (*auth_pb.RemoveMyAuthFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	objectDetails, err := s.command.HumanRemovePasswordless(ctx, ctxData.UserID, req.TokenId, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.RemoveMyMultiFactorU2FResponse{
+	return &auth_pb.RemoveMyAuthFactorU2FResponse{
 		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }

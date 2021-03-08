@@ -87,9 +87,9 @@ func ListProjectsRequestToModel(req *mgmt_pb.ListProjectsRequest) (*proj_model.P
 		return nil, err
 	}
 	return &proj_model.ProjectViewSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
@@ -101,9 +101,9 @@ func ListGrantedProjectsRequestToModel(req *mgmt_pb.ListGrantedProjectsRequest) 
 		return nil, err
 	}
 	return &proj_model.ProjectGrantViewSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
@@ -119,9 +119,9 @@ func ListProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*proj
 		Value:  req.ProjectId,
 	})
 	return &proj_model.ProjectRoleSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
@@ -135,9 +135,9 @@ func ListProjectMembersRequestToModel(req *mgmt_pb.ListProjectMembersRequest) (*
 		Value:  req.ProjectId,
 	})
 	return &proj_model.ProjectMemberSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

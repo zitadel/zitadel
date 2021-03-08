@@ -17,9 +17,9 @@ func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*org_mode
 		return nil, err
 	}
 	return &org_model.OrgDomainSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

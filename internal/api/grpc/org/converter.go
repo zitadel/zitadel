@@ -22,13 +22,13 @@ func OrgQueriesToModel(queries []*org_pb.OrgQuery) (_ []*org_model.OrgSearchQuer
 
 func OrgQueryToModel(query *org_pb.OrgQuery) (*org_model.OrgSearchQuery, error) {
 	switch q := query.Query.(type) {
-	case *org_pb.OrgQuery_Domain:
+	case *org_pb.OrgQuery_DomainQuery:
 		return &org_model.OrgSearchQuery{
 			Key:    org_model.OrgSearchKeyOrgDomain,
-			Method: object.TextMethodToModel(q.Domain.Method),
-			Value:  q.Domain.Domain,
+			Method: object.TextMethodToModel(q.DomainQuery.Method),
+			Value:  q.DomainQuery.Domain,
 		}, nil
-	case *org_pb.OrgQuery_Name:
+	case *org_pb.OrgQuery_NameQuery:
 		//TODO: implement name in backend
 		return nil, errors.ThrowUnimplemented(nil, "ADMIN-KGXnX", "name query not implemented")
 	default:
@@ -82,9 +82,9 @@ func OrgToPb(org *grant_model.Org) *org_pb.Org {
 func OrgStateToPb(state org_model.OrgState) org_pb.OrgState {
 	switch state {
 	case org_model.OrgStateActive:
-		return org_pb.OrgState_ORG_STATE_ACTIVATE
+		return org_pb.OrgState_ORG_STATE_ACTIVE
 	case org_model.OrgStateInactive:
-		return org_pb.OrgState_ORG_STATE_INACTIVATE
+		return org_pb.OrgState_ORG_STATE_INACTIVE
 	default:
 		return org_pb.OrgState_ORG_STATE_UNSPECIFIED
 	}
@@ -103,8 +103,8 @@ func DomainQueriesToModel(queries []*org_pb.DomainSearchQuery) (_ []*org_model.O
 
 func DomainQueryToModel(query *org_pb.DomainSearchQuery) (*org_model.OrgDomainSearchQuery, error) {
 	switch q := query.Query.(type) {
-	case *org_pb.DomainSearchQuery_DomainName:
-		return DomainNameQueryToModel(q.DomainName)
+	case *org_pb.DomainSearchQuery_DomainNameQuery:
+		return DomainNameQueryToModel(q.DomainNameQuery)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
 	}

@@ -23,9 +23,9 @@ func UpdateIAMMemberToDomain(req *admin_pb.UpdateIAMMemberRequest) *domain.Membe
 
 func ListIAMMemberRequestToModel(req *admin_pb.ListIAMMembersRequest) *model.IAMMemberSearchRequest {
 	return &model.IAMMemberSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		// SortingColumn: model.IAMMemberSearchKey, //TOOD: not implemented in proto
 		Queries: member_grpc.MemberQueriesToIAMMember(req.Queries),
 	}

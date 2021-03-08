@@ -42,14 +42,14 @@ func MemberQueriesToOrgMember(queries []*member_pb.SearchQuery) []*org_model.Org
 
 func MemberQueryToOrgMember(query *member_pb.SearchQuery) *org_model.OrgMemberSearchQuery {
 	switch q := query.Query.(type) {
-	case *member_pb.SearchQuery_Email:
-		return EmailQueryToOrgMemberQuery(q.Email)
-	case *member_pb.SearchQuery_FirstName:
-		return FirstNameQueryToOrgMemberQuery(q.FirstName)
-	case *member_pb.SearchQuery_LastName:
-		return LastNameQueryToOrgMemberQuery(q.LastName)
-	case *member_pb.SearchQuery_UserId:
-		return UserIDQueryToOrgMemberQuery(q.UserId)
+	case *member_pb.SearchQuery_EmailQuery:
+		return EmailQueryToOrgMemberQuery(q.EmailQuery)
+	case *member_pb.SearchQuery_FirstNameQuery:
+		return FirstNameQueryToOrgMemberQuery(q.FirstNameQuery)
+	case *member_pb.SearchQuery_LastNameQuery:
+		return LastNameQueryToOrgMemberQuery(q.LastNameQuery)
+	case *member_pb.SearchQuery_UserIdQuery:
+		return UserIDQueryToOrgMemberQuery(q.UserIdQuery)
 	default:
 		return nil
 	}

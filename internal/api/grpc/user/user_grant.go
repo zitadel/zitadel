@@ -49,32 +49,32 @@ func UserGrantQueriesToModel(queries []*user_pb.UserGrantQuery) []*usr_grant_mod
 
 func UserGrantQueryToModel(query *user_pb.UserGrantQuery) *usr_grant_model.UserGrantSearchQuery {
 	switch q := query.Query.(type) {
-	case *user_pb.UserGrantQuery_DisplayName:
-		return UserGrantDisplayNameQueryToModel(q.DisplayName)
-	case *user_pb.UserGrantQuery_Email:
-		return UserGrantEmailQueryToModel(q.Email)
-	case *user_pb.UserGrantQuery_FirstName:
-		return UserGrantFirstNameQueryToModel(q.FirstName)
-	case *user_pb.UserGrantQuery_LastName:
-		return UserGrantLastNameQueryToModel(q.LastName)
-	case *user_pb.UserGrantQuery_OrgDomain:
-		return UserGrantOrgDomainQueryToModel(q.OrgDomain)
-	case *user_pb.UserGrantQuery_OrgName:
-		return UserGrantOrgNameQueryToModel(q.OrgName)
-	case *user_pb.UserGrantQuery_ProjectGrantId:
-		return UserGrantProjectGrantIDQueryToModel(q.ProjectGrantId)
-	case *user_pb.UserGrantQuery_ProjectId:
-		return UserGrantProjectIDQueryToModel(q.ProjectId)
-	case *user_pb.UserGrantQuery_ProjectName:
-		return UserGrantProjectNameQueryToModel(q.ProjectName)
-	case *user_pb.UserGrantQuery_RoleKey:
-		return UserGrantRoleKeyQueryToModel(q.RoleKey)
-	case *user_pb.UserGrantQuery_UserId:
-		return UserGrantUserIDQueryToModel(q.UserId)
-	case *user_pb.UserGrantQuery_UserName:
-		return UserGrantUserNameQueryToModel(q.UserName)
-	case *user_pb.UserGrantQuery_WithGranted:
-		return UserGrantWithGrantedQueryToModel(q.WithGranted)
+	case *user_pb.UserGrantQuery_DisplayNameQuery:
+		return UserGrantDisplayNameQueryToModel(q.DisplayNameQuery)
+	case *user_pb.UserGrantQuery_EmailQuery:
+		return UserGrantEmailQueryToModel(q.EmailQuery)
+	case *user_pb.UserGrantQuery_FirstNameQuery:
+		return UserGrantFirstNameQueryToModel(q.FirstNameQuery)
+	case *user_pb.UserGrantQuery_LastNameQuery:
+		return UserGrantLastNameQueryToModel(q.LastNameQuery)
+	case *user_pb.UserGrantQuery_OrgDomainQuery:
+		return UserGrantOrgDomainQueryToModel(q.OrgDomainQuery)
+	case *user_pb.UserGrantQuery_OrgNameQuery:
+		return UserGrantOrgNameQueryToModel(q.OrgNameQuery)
+	case *user_pb.UserGrantQuery_ProjectGrantIdQuery:
+		return UserGrantProjectGrantIDQueryToModel(q.ProjectGrantIdQuery)
+	case *user_pb.UserGrantQuery_ProjectIdQuery:
+		return UserGrantProjectIDQueryToModel(q.ProjectIdQuery)
+	case *user_pb.UserGrantQuery_ProjectNameQuery:
+		return UserGrantProjectNameQueryToModel(q.ProjectNameQuery)
+	case *user_pb.UserGrantQuery_RoleKeyQuery:
+		return UserGrantRoleKeyQueryToModel(q.RoleKeyQuery)
+	case *user_pb.UserGrantQuery_UserIdQuery:
+		return UserGrantUserIDQueryToModel(q.UserIdQuery)
+	case *user_pb.UserGrantQuery_UserNameQuery:
+		return UserGrantUserNameQueryToModel(q.UserNameQuery)
+	case *user_pb.UserGrantQuery_WithGrantedQuery:
+		return UserGrantWithGrantedQueryToModel(q.WithGrantedQuery)
 	default:
 		return nil
 	}

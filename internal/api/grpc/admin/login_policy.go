@@ -41,8 +41,8 @@ func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *admin_pb.ListLogi
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicyIDPsResponse{
-		Result:   idp.ExternalIDPViewsToLoginPolicyLinkPb(res.Result),
-		MetaData: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
+		Result:  idp.ExternalIDPViewsToLoginPolicyLinkPb(res.Result),
+		Details: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
 	}, nil
 }
 
@@ -81,8 +81,8 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *admin_pb
 	}
 	return &admin_pb.ListLoginPolicySecondFactorsResponse{
 		//TODO: missing values from res
-		MetaData: object.ToListDetails(result.TotalResult, 0, time.Time{}),
-		Result:   policy.ModelSecondFactorTypesToPb(result.Result),
+		Details: object.ToListDetails(result.TotalResult, 0, time.Time{}),
+		Result:  policy.ModelSecondFactorTypesToPb(result.Result),
 	}, nil
 }
 
@@ -113,8 +113,8 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.
 	}
 	return &admin_pb.ListLoginPolicyMultiFactorsResponse{
 		//TODO: additional values
-		MetaData: object.ToListDetails(res.TotalResult, 0, time.Time{}),
-		Result:   policy.ModelMultiFactorTypesToPb(res.Result),
+		Details: object.ToListDetails(res.TotalResult, 0, time.Time{}),
+		Result:  policy.ModelMultiFactorTypesToPb(res.Result),
 	}, nil
 }
 

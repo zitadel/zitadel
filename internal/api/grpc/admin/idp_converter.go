@@ -31,7 +31,7 @@ func addOIDCIDPRequestToDomainOIDCIDPConfig(req *admin_pb.AddOIDCIDPRequest) *do
 
 func updateIDPToDomain(req *admin_pb.UpdateIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		IDPConfigID: req.Id,
+		IDPConfigID: req.IdpId,
 		Name:        req.Name,
 		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
 	}
@@ -51,9 +51,9 @@ func updateOIDCConfigToDomain(req *admin_pb.UpdateIDPOIDCConfigRequest) *domain.
 
 func listIDPsToModel(req *admin_pb.ListIDPsRequest) *iam_model.IDPConfigSearchRequest {
 	return &iam_model.IDPConfigSearchRequest{
-		Offset:        req.MetaData.Offset,
-		Limit:         uint64(req.MetaData.Limit),
-		Asc:           req.MetaData.Asc,
+		Offset:        req.Query.Offset,
+		Limit:         uint64(req.Query.Limit),
+		Asc:           req.Query.Asc,
 		SortingColumn: idp_grpc.FieldNameToModel(req.SortingColumn),
 		Queries:       idpQueriesToModel(req.Queries),
 	}
@@ -70,10 +70,10 @@ func idpQueriesToModel(queries []*admin_pb.IDPQuery) []*iam_model.IDPConfigSearc
 
 func idpQueryToModel(query *admin_pb.IDPQuery) *iam_model.IDPConfigSearchQuery {
 	switch q := query.Query.(type) {
-	case *admin_pb.IDPQuery_IdpName:
-		return idp_grpc.IDPNameQueryToModel(q.IdpName)
-	case *admin_pb.IDPQuery_IdpId:
-		return idp_grpc.IDPIDQueryToModel(q.IdpId)
+	case *admin_pb.IDPQuery_IdpNameQuery:
+		return idp_grpc.IDPNameQueryToModel(q.IdpNameQuery)
+	case *admin_pb.IDPQuery_IdpIdQuery:
+		return idp_grpc.IDPIDQueryToModel(q.IdpIdQuery)
 	default:
 		return nil
 	}

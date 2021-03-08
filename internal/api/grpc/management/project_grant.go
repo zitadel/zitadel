@@ -31,7 +31,7 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 	}
 	return &mgmt_pb.ListProjectGrantsResponse{
 		Result: proj_grpc.GrantedProjectsToPb(domains.Result),
-		MetaData: object_grpc.ToListDetails(
+		Details: object_grpc.ToListDetails(
 			domains.TotalResult,
 			domains.Sequence,
 			domains.Timestamp,
@@ -117,7 +117,7 @@ func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListP
 	}
 	return &mgmt_pb.ListProjectGrantMembersResponse{
 		Result: member_grpc.ProjectGrantMembersToPb(response.Result),
-		MetaData: object_grpc.ToListDetails(
+		Details: object_grpc.ToListDetails(
 			response.TotalResult,
 			response.Sequence,
 			response.Timestamp,

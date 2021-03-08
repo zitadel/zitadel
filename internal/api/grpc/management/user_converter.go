@@ -29,9 +29,9 @@ func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest)
 	})
 
 	return &user_model.UserSearchRequest{
-		Offset:  req.MetaData.Offset,
-		Limit:   uint64(req.MetaData.Limit),
-		Asc:     req.MetaData.Asc,
+		Offset:  req.Query.Offset,
+		Limit:   uint64(req.Query.Limit),
+		Asc:     req.Query.Asc,
 		Queries: user_grpc.UserQueriesToModel(req.Queries),
 	}
 }
@@ -127,9 +127,9 @@ func UpdateMachineRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateMachin
 
 func ListMachineKeysRequestToModel(req *mgmt_pb.ListMachineKeysRequest) *key_model.AuthNKeySearchRequest {
 	return &key_model.AuthNKeySearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		Queries: []*key_model.AuthNKeySearchQuery{
 			{
 				Key:    key_model.AuthNKeyObjectType,
@@ -161,10 +161,21 @@ func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.Mac
 	}
 }
 
-func ListUserIDPsRequestToModel(req *mgmt_pb.ListUserIDPsRequest) *user_model.ExternalIDPSearchRequest {
+func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) *domain.ExternalIDP {
+	return &domain.ExternalIDP{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		},
+		IDPConfigID:    req.IdpId,
+		ExternalUserID: req.LinkedUserId,
+	}
+}
+
+func ListHumanLinkedIDPsRequestToModel(req *mgmt_pb.ListHumanLinkedIDPsRequest) *user_model.ExternalIDPSearchRequest {
 	return &user_model.ExternalIDPSearchRequest{
-		Limit:   uint64(req.MetaData.Limit),
-		Offset:  req.MetaData.Offset,
+		Limit:   uint64(req.Query.Limit),
+		Offset:  req.Query.Offset,
 		Queries: []*user_model.ExternalIDPSearchQuery{{Key: user_model.ExternalIDPSearchKeyUserID, Method: domain.SearchMethodEquals, Value: req.UserId}},
 	}
 }
@@ -180,9 +191,9 @@ func ListUserMembershipsRequestToModel(req *mgmt_pb.ListUserMembershipsRequest) 
 		Value:  req.UserId,
 	})
 	return &user_model.UserMembershipSearchRequest{
-		Offset: req.MetaData.Offset,
-		Limit:  uint64(req.MetaData.Limit),
-		Asc:    req.MetaData.Asc,
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

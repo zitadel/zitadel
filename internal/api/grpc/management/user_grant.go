@@ -27,7 +27,7 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 	}
 	return &mgmt_pb.ListUserGrantResponse{
 		Result: user.UserGrantsToPb(res.Result),
-		MetaData: obj_grpc.ToListDetails(
+		Details: obj_grpc.ToListDetails(
 			res.TotalResult,
 			res.Sequence,
 			res.Timestamp,

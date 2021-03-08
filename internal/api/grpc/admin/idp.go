@@ -22,8 +22,8 @@ func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*
 		return nil, err
 	}
 	return &admin_pb.ListIDPsResponse{
-		Result:   idp_grpc.IDPViewsToPb(resp.Result),
-		MetaData: object_pb.ToListDetails(resp.TotalResult, resp.Sequence, resp.Timestamp),
+		Result:  idp_grpc.IDPViewsToPb(resp.Result),
+		Details: object_pb.ToListDetails(resp.TotalResult, resp.Sequence, resp.Timestamp),
 	}, nil
 }
 
@@ -57,7 +57,7 @@ func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) 
 }
 
 func (s *Server) DeactivateIDP(ctx context.Context, req *admin_pb.DeactivateIDPRequest) (*admin_pb.DeactivateIDPResponse, error) {
-	objectDetails, err := s.command.DeactivateDefaultIDPConfig(ctx, req.Id)
+	objectDetails, err := s.command.DeactivateDefaultIDPConfig(ctx, req.IdpId)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (s *Server) DeactivateIDP(ctx context.Context, req *admin_pb.DeactivateIDPR
 }
 
 func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPRequest) (*admin_pb.ReactivateIDPResponse, error) {
-	objectDetails, err := s.command.ReactivateDefaultIDPConfig(ctx, req.Id)
+	objectDetails, err := s.command.ReactivateDefaultIDPConfig(ctx, req.IdpId)
 	if err != nil {
 		return nil, err
 	}
@@ -73,15 +73,15 @@ func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPR
 }
 
 func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) (*admin_pb.RemoveIDPResponse, error) {
-	idpProviders, err := s.iam.IDPProvidersByIDPConfigID(ctx, req.Id)
+	idpProviders, err := s.iam.IDPProvidersByIDPConfigID(ctx, req.IdpId)
 	if err != nil {
 		return nil, err
 	}
-	externalIDPs, err := s.iam.ExternalIDPsByIDPConfigID(ctx, req.Id)
+	externalIDPs, err := s.iam.ExternalIDPsByIDPConfigID(ctx, req.IdpId)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, req.Id, idpProviderViewsToDomain(idpProviders), externalIDPViewsToDomain(externalIDPs)...)
+	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, req.IdpId, idpProviderViewsToDomain(idpProviders), externalIDPViewsToDomain(externalIDPs)...)
 	if err != nil {
 		return nil, err
 	}

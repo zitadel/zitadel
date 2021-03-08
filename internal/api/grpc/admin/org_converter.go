@@ -13,9 +13,9 @@ func listOrgRequestToModel(req *admin.ListOrgsRequest) (*model.OrgSearchRequest,
 		return nil, err
 	}
 	return &model.OrgSearchRequest{
-		Offset:  req.MetaData.Offset,
-		Limit:   uint64(req.MetaData.Limit),
-		Asc:     req.MetaData.Asc,
+		Offset:  req.Query.Offset,
+		Limit:   uint64(req.Query.Limit),
+		Asc:     req.Query.Asc,
 		Queries: queries,
 	}, nil
 }
