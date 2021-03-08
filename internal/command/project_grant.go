@@ -31,7 +31,7 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGra
 	projectAgg := ProjectAggregateFromWriteModel(&addedGrant.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(
 		ctx,
-		project.NewGrantAddedEvent(ctx, projectAgg, grant.GrantID, grant.GrantedOrgID, grant.AggregateID, grant.RoleKeys))
+		project.NewGrantAddedEvent(ctx, projectAgg, grant.GrantID, grant.GrantedOrgID, grant.RoleKeys))
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 }
 
 func (c *Commands) removeRoleFromProjectGrant(ctx context.Context, projectAgg *eventstore.Aggregate, projectID, projectGrantID, roleKey string, cascade bool) (_ eventstore.EventPusher, _ *ProjectGrantWriteModel, err error) {
-	existingProjectGrant, err := c.projectGrantWriteModelByID(ctx, projectID, projectGrantID, "")
+	existingProjectGrant, err := c.projectGrantWriteModelByID(ctx, projectGrantID, projectID, "")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -194,7 +194,7 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	}
 	events := make([]eventstore.EventPusher, 0)
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
-	events = append(events, project.NewGrantRemovedEvent(ctx, projectAgg, grantID, existingGrant.GrantedOrgID, projectID))
+	events = append(events, project.NewGrantRemovedEvent(ctx, projectAgg, grantID, existingGrant.GrantedOrgID))
 
 	for _, userGrantID := range cascadeUserGrantIDs {
 		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true)
