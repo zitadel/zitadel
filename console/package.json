@@ -32,7 +32,7 @@
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
     "google-proto-files": "^2.4.0",
-    "google-protobuf": "^3.13.0",
+    "google-protobuf": "^3.15.5",
     "grpc": "^1.24.5",
     "grpc-web": "^1.2.1",
     "moment": "^2.29.1",
