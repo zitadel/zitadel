@@ -124,7 +124,7 @@ func (c *Commands) removeRoleFromProjectGrant(ctx context.Context, projectAgg *e
 
 func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string) (details *domain.ObjectDetails, err error) {
 	if grantID == "" || projectID == "" {
-		return details, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-p0s4V", "Errors.IDMissing")
+		return details, caos_errs.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
@@ -152,7 +152,7 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 
 func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string) (details *domain.ObjectDetails, err error) {
 	if grantID == "" || projectID == "" {
-		return details, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-p0s4V", "Errors.IDMissing")
+		return details, caos_errs.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
@@ -179,11 +179,11 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 
 func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string, cascadeUserGrantIDs ...string) (details *domain.ObjectDetails, err error) {
 	if grantID == "" || projectID == "" {
-		return details, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-1m9fJ", "Errors.IDMissing")
+		return details, caos_errs.ThrowInvalidArgument(nil, "PROJECT-1m9fJ", "Errors.IDMissing")
 	}
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
-		return details, err
+		return details, caos_errs.ThrowPreconditionFailed(err, "PROJECT-6mf9s", "Errors.Project.NotFound")
 	}
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
 	if err != nil {

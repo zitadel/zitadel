@@ -43,7 +43,7 @@ func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore
 	}
 
 	events = []eventstore.EventPusher{
-		project.NewApplicationAddedEvent(ctx, projectAgg, apiAppApp.AppID, apiAppApp.AppName, resourceOwner),
+		project.NewApplicationAddedEvent(ctx, projectAgg, apiAppApp.AppID, apiAppApp.AppName),
 	}
 
 	var stringPw string

@@ -733,3 +733,664 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		})
 	}
 }
+
+func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		projectID     string
+		grantID       string
+		resourceOwner string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "missing projectid, invalid error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "missing grantid, invalid error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "project not existing, precondition failed error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "projectgrant not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "projectgrant already deactivated, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+						eventFromEventPusher(project.NewGrantDeactivateEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+						)),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "projectgrant deactivate, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(project.NewGrantDeactivateEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+							)),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.DeactivateProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		projectID     string
+		grantID       string
+		resourceOwner string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "missing projectid, invalid error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "missing grantid, invalid error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "project not existing, precondition failed error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "projectgrant not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "projectgrant not inactive, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "projectgrant reactivate, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+						eventFromEventPusher(project.NewGrantDeactivateEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+						)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(project.NewGrantReactivatedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+							)),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.ReactivateProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_RemoveProjectGrant(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx                 context.Context
+		projectID           string
+		grantID             string
+		resourceOwner       string
+		cascadeUserGrantIDs []string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "missing projectid, invalid error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "missing grantid, invalid error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "project not existing, precondition failed error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "projectgrant not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "projectgrant remove, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(project.NewGrantRemovedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"grantedorg1",
+							)),
+						},
+						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectGrantUniqueConstraint("grantedorg1", "project1")),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				grantID:       "projectgrant1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "projectgrant remove, cascading usergrant not found, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(project.NewGrantRemovedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"grantedorg1",
+							)),
+						},
+						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectGrantUniqueConstraint("grantedorg1", "project1")),
+					),
+				),
+			},
+			args: args{
+				ctx:                 context.Background(),
+				projectID:           "project1",
+				grantID:             "projectgrant1",
+				resourceOwner:       "org1",
+				cascadeUserGrantIDs: []string{"usergrant1"},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "projectgrant remove with cascading usergrants, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+					expectFilter(
+						eventFromEventPusher(usergrant.NewUserGrantAddedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"projectgrant1",
+							[]string{"key1"}))),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(project.NewGrantRemovedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"grantedorg1",
+							)),
+							eventFromEventPusher(usergrant.NewUserGrantCascadeRemovedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"projectgrant1",
+							)),
+						},
+						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectGrantUniqueConstraint("grantedorg1", "project1")),
+						uniqueConstraintsFromEventConstraint(usergrant.NewRemoveUserGrantUniqueConstraint("org1", "user1", "project1", "projectgrant1")),
+					),
+				),
+			},
+			args: args{
+				ctx:                 context.Background(),
+				projectID:           "project1",
+				grantID:             "projectgrant1",
+				resourceOwner:       "org1",
+				cascadeUserGrantIDs: []string{"usergrant1"},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.RemoveProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner, tt.args.cascadeUserGrantIDs...)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
