@@ -179,7 +179,10 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 	case es_model.APIConfigChanged:
 		return a.SetData(event)
 	case es_model.ProjectChanged:
-		return a.SetData(event)
+		project := &es_model.Project{}
+		project.SetData(event)
+		a.ProjectRoleAssertion = project.ProjectRoleAssertion
+		a.ProjectRoleCheck = project.ProjectRoleAssertion
 	case es_model.ApplicationDeactivated:
 		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:
