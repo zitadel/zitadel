@@ -110,7 +110,7 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
 	})
-	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
+	return o.repo.AuthorizeClientIDSecret(ctx, id, secret)
 }
 
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.UserInfoSetter, tokenID, subject, origin string) (err error) {

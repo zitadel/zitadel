@@ -197,7 +197,7 @@ Errors:
       OIDCAuthMethodNoSecret: Gewählte OIDC Auth Method benötigt kein Secret
       APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
       AuthMethodNoPrivateKeyJWT: Gewählte Auth Method benötigt keinen Key
-      OIDCSecretInvalid: Client Secret ist ungültig
+      ClientSecretInvalid: Client Secret ist ungültig
     RequiredFieldsMissing: Benötigte Felder fehlen
     Grant:
       AlreadyExists: Projekt Grant existiert bereits
@@ -584,12 +584,20 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret Validierung erfolgreich
             failed: OIDC Client Secret Validierung fehlgeschlagen
+        key:
+          added: Applikations Schlüssel hinzugefügt
+          removed: Applikations Schlüssel entfernt
       config:
         oidc:
           added: OIDC Konfiguration hinzugefügt
           changed: OIDC Konfiguration geändert
           secret:
             changed: OIDC Client Secret geändert
+        api:
+          added: API Konfiguration hinzugefügt
+          changed: API Konfiguration geändert
+          secret:
+            changed: API Client Secret geändert
   policy:
     password:
       complexity:

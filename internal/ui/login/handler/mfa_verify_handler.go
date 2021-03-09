@@ -13,8 +13,9 @@ const (
 )
 
 type mfaVerifyFormData struct {
-	MFAType model.MFAType `schema:"mfaType"`
-	Code    string        `schema:"code"`
+	MFAType          model.MFAType `schema:"mfaType"`
+	Code             string        `schema:"code"`
+	SelectedProvider model.MFAType `schema:"provider"`
 }
 
 func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
@@ -24,13 +25,22 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	step, ok := authReq.PossibleSteps[0].(*model.MFAVerificationStep)
+	if !ok {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	if data.Code == "" {
+		l.renderMFAVerifySelected(w, r, authReq, step, data.SelectedProvider, nil)
+		return
+	}
 	if data.MFAType == model.MFATypeOTP {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Code, userAgentID, domain.BrowserInfoFromRequest(r))
-	}
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
+		if err != nil {
+			l.renderMFAVerifySelected(w, r, authReq, step, model.MFATypeOTP, err)
+			return
+		}
 	}
 	l.renderNextStep(w, r, authReq)
 }
