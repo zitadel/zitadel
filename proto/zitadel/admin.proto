@@ -21,10 +21,16 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/admin";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
-        title: "admin service";
+        title: "Administrator API for ZITADEL";
+        // description: "This API provides all functions to administrate ZITADEL.\n"
         version: "1.0";
         contact:{
-            url: "https://github.com/caos/zitadel/api/admin" //TODO: should be swagger path
+            name: "file an issue",
+            url: "https://github.com/caos/zitadel" //TODO: should be swagger path
+        };
+        license: {
+            name: "Apache 2.0",
+            url: "https://github.com/caos/zitadel/blob/master/LICENSE"
         };
     };
 
@@ -37,7 +43,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     produces: "application/grpc";
 };
 
-
+//This API provides all functions to administrate ZITADEL.
+//test multi line
+// - asdf
+// - jklö
 service AdminService {
     rpc Healthz(HealthzRequest) returns (HealthzResponse) {
         option (google.api.http) = {
