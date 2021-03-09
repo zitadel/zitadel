@@ -11,8 +11,8 @@
 	<li><a href={external}><slot></slot></a></li>
 {:else}
     {#if prefetch}
-	    <li class:active="{`${$current}` === segment || active }"><a rel="prefetch" sapper:prefetch href={segment}><i class="bars las la-bars"></i><slot></slot></a></li>
+	    <li class:active="{`${$current}` === segment || active }"><a sapper:prefetch href={segment}><i class="bars las la-bars"></i><slot></slot></a></li>
     {:else}
-    	<li class:active="{`${$current}` === segment || active }"><a rel="prefetch"  href={segment}><i class="bars las la-bars"></i><slot></slot></a></li>
+    	<li class:active="{`${$current}` === segment || active }"><a sapper:prefetch href={segment}><i class="bars las la-bars"></i><slot></slot></a></li>
     {/if}
 {/if}
