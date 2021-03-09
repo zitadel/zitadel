@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/operator/database"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	"github.com/caos/zitadel/operator/zitadel"
-	"runtime/debug"
 	"time"
 
 	"github.com/caos/orbos/mntr"
@@ -45,8 +44,8 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			monitor.WithFields(map[string]interface{}{
 				"took": time.Since(started),
 			}).Info("Iteration done")
-			debug.FreeOSMemory()
 
+			time.Sleep(time.Second * 10)
 			takeoffChan <- struct{}{}
 		}()
 	}
@@ -130,6 +129,7 @@ func Database(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 				"took": time.Since(started),
 			}).Info("Iteration done")
 
+			time.Sleep(time.Second * 10)
 			takeoffChan <- struct{}{}
 		}()
 	}
