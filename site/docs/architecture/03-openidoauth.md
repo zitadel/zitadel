@@ -51,7 +51,7 @@ Optional parameters
 | login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`                                |
 | max_age       | Seconds since the last active successful authentication of the user                                                                      | 
 | nonce         | Random string value to associate the client session with the ID Token and for replay attacks mitigation.                                 | 
-| prompt        | If the Auth Server prompts the user for (re)authentication. <br>`no prompt`: the user will have to choose a session if more than one session exists<br>`none`: user must be authenticated without interaction, an error is returned otherwise <br>`login`: user must reauthenticate / provide a user name <br>`select_account`: user is prompted to select one of the existing sessions or create a new one |
+| prompt        | If the Auth Server prompts the user for (re)authentication. <br>no prompt: the user will have to choose a session if more than one session exists<br>`none`: user must be authenticated without interaction, an error is returned otherwise <br>`login`: user must reauthenticate / provide a user name <br>`select_account`: user is prompted to select one of the existing sessions or create a new one |
 | state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well. |
 
 Successful Code Response
