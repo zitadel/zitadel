@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 

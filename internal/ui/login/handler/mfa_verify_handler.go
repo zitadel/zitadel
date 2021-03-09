@@ -1,11 +1,9 @@
 package handler
 
 import (
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	"net/http"
-
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
@@ -13,9 +11,9 @@ const (
 )
 
 type mfaVerifyFormData struct {
-	MFAType          model.MFAType `schema:"mfaType"`
-	Code             string        `schema:"code"`
-	SelectedProvider model.MFAType `schema:"provider"`
+	MFAType          domain.MFAType `schema:"mfaType"`
+	Code             string         `schema:"code"`
+	SelectedProvider domain.MFAType `schema:"provider"`
 }
 
 func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +23,7 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	step, ok := authReq.PossibleSteps[0].(*model.MFAVerificationStep)
+	step, ok := authReq.PossibleSteps[0].(*domain.MFAVerificationStep)
 	if !ok {
 		l.renderError(w, r, authReq, err)
 		return
@@ -34,11 +32,11 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 		l.renderMFAVerifySelected(w, r, authReq, step, data.SelectedProvider, nil)
 		return
 	}
-	if data.MFAType == model.MFATypeOTP {
+	if data.MFAType == domain.MFATypeOTP {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Code, userAgentID, domain.BrowserInfoFromRequest(r))
 		if err != nil {
-			l.renderMFAVerifySelected(w, r, authReq, step, model.MFATypeOTP, err)
+			l.renderMFAVerifySelected(w, r, authReq, step, domain.MFATypeOTP, err)
 			return
 		}
 	}

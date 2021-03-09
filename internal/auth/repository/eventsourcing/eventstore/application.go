@@ -31,5 +31,5 @@ func (a *ApplicationRepo) AuthorizeClientIDSecret(ctx context.Context, clientID,
 	if err != nil {
 		return err
 	}
-	return a.Commands.VerifyClientSecret(ctx, app.ProjectID, app.ID, secret)
+	return a.Commands.VerifyOIDCClientSecret(ctx, app.ProjectID, app.ID, secret)
 }

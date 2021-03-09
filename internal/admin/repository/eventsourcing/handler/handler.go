@@ -57,9 +57,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			defaults,
-			repos.IamEvents,
-			repos.OrgEvents),
+			defaults),
 		newMailTemplate(
 			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
 		newMailText(

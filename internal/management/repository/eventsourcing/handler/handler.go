@@ -49,9 +49,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newOrgDomain(
 			handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount, es}),
 		newUserMembership(
-			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es},
-			repos.OrgEvents,
-			repos.ProjectEvents),
+			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
 		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount, es}),
 		newIDPConfig(
