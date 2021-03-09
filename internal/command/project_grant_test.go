@@ -249,217 +249,217 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "invalid projectgrant, error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//		),
-		//	},
-		//	args: args{
-		//		ctx: context.Background(),
-		//		projectGrant: &domain.ProjectGrant{
-		//			ObjectRoot: models.ObjectRoot{
-		//				AggregateID: "project1",
-		//			},
-		//		},
-		//		resourceOwner: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsErrorInvalidArgument,
-		//	},
-		//},
-		//{
-		//	name: "projectgrant not existing, not found error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx: context.Background(),
-		//		projectGrant: &domain.ProjectGrant{
-		//			ObjectRoot: models.ObjectRoot{
-		//				AggregateID: "project1",
-		//			},
-		//			GrantID: "projectgrant1",
-		//			GrantedOrgID: "grantedorg1",
-		//			RoleKeys:     []string{"key1"},
-		//		},
-		//		resourceOwner: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsNotFound,
-		//	},
-		//},
-		//{
-		//	name: "project not existing, precondition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
-		//					&project.NewAggregate("project1", "org1").Aggregate,
-		//					"projectgrant1",
-		//					"grantedorg1",
-		//					[]string{"key1"},
-		//				)),
-		//			),
-		//			expectFilter(),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx: context.Background(),
-		//		projectGrant: &domain.ProjectGrant{
-		//			ObjectRoot: models.ObjectRoot{
-		//				AggregateID: "project1",
-		//			},
-		//			GrantID: "projectgrant1",
-		//			GrantedOrgID:    "grantedorg1",
-		//		},
-		//		resourceOwner: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
-		//{
-		//	name: "granted org not existing, precondition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
-		//					&project.NewAggregate("project1", "org1").Aggregate,
-		//					"projectgrant1",
-		//					"grantedorg1",
-		//					[]string{"key1"},
-		//				)),
-		//			),
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					project.NewProjectAddedEvent(context.Background(),
-		//						&project.NewAggregate("project1", "org1").Aggregate,
-		//						"projectname1",
-		//					),
-		//				),
-		//			),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx: context.Background(),
-		//		projectGrant: &domain.ProjectGrant{
-		//			ObjectRoot: models.ObjectRoot{
-		//				AggregateID: "project1",
-		//			},
-		//			GrantID: "projectgrant1",
-		//			GrantedOrgID:    "grantedorg1",
-		//		},
-		//		resourceOwner: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
-		//{
-		//	name: "project roles not existing, precondition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
-		//					&project.NewAggregate("project1", "org1").Aggregate,
-		//					"projectgrant1",
-		//					"grantedorg1",
-		//					[]string{"key1"},
-		//				)),
-		//			),
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					project.NewProjectAddedEvent(context.Background(),
-		//						&project.NewAggregate("project1", "org1").Aggregate,
-		//						"projectname1",
-		//					),
-		//				),
-		//				eventFromEventPusher(
-		//					org.NewOrgAddedEvent(context.Background(),
-		//						&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
-		//						"granted org",
-		//					),
-		//				),
-		//			),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx: context.Background(),
-		//		projectGrant: &domain.ProjectGrant{
-		//			ObjectRoot: models.ObjectRoot{
-		//				AggregateID: "project1",
-		//			},
-		//			GrantID: "projectgrant1",
-		//			GrantedOrgID: "grantedorg1",
-		//			RoleKeys:     []string{"key1"},
-		//		},
-		//		resourceOwner: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
-		//{
-		//	name: "projectgrant not changed, precondition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
-		//					&project.NewAggregate("project1", "org1").Aggregate,
-		//					"projectgrant1",
-		//					"grantedorg1",
-		//					[]string{"key1"},
-		//				)),
-		//			),
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					project.NewProjectAddedEvent(context.Background(),
-		//						&project.NewAggregate("project1", "org1").Aggregate,
-		//						"projectname1",
-		//					),
-		//				),
-		//				eventFromEventPusher(
-		//					org.NewOrgAddedEvent(context.Background(),
-		//						&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
-		//						"granted org",
-		//					),
-		//				),
-		//				eventFromEventPusher(
-		//					project.NewRoleAddedEvent(context.Background(),
-		//						&project.NewAggregate("project1", "org1").Aggregate,
-		//						"key1",
-		//						"key",
-		//						"",
-		//					),
-		//				),
-		//			),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx: context.Background(),
-		//		projectGrant: &domain.ProjectGrant{
-		//			ObjectRoot: models.ObjectRoot{
-		//				AggregateID: "project1",
-		//			},
-		//			GrantID: "projectgrant1",
-		//			GrantedOrgID: "grantedorg1",
-		//			RoleKeys:     []string{"key1"},
-		//		},
-		//		resourceOwner: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
+		{
+			name: "invalid projectgrant, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &domain.ProjectGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "projectgrant not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &domain.ProjectGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					GrantID:      "projectgrant1",
+					GrantedOrgID: "grantedorg1",
+					RoleKeys:     []string{"key1"},
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "project not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &domain.ProjectGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					GrantID:      "projectgrant1",
+					GrantedOrgID: "grantedorg1",
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "granted org not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &domain.ProjectGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					GrantID:      "projectgrant1",
+					GrantedOrgID: "grantedorg1",
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "project roles not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
+								"granted org",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &domain.ProjectGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					GrantID:      "projectgrant1",
+					GrantedOrgID: "grantedorg1",
+					RoleKeys:     []string{"key1"},
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "projectgrant not changed, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
+								"granted org",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"key1",
+								"key",
+								"",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &domain.ProjectGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					GrantID:      "projectgrant1",
+					GrantedOrgID: "grantedorg1",
+					RoleKeys:     []string{"key1"},
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
 		{
 			name: "projectgrant only added roles, ok",
 			fields: fields{
