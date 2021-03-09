@@ -54,13 +54,13 @@ func (k *KeyRepository) GetSigningKey(ctx context.Context, keyCh chan<- jose.Sig
 			case key := <-k.KeyChan:
 				refreshed, err := k.refreshSigningKey(ctx, key, keyCh, algorithm)
 				logging.Log("KEY-asd5g").OnError(err).Error("could not refresh signing key on key channel push")
-				k.setRenewTimer(renewTimer, refreshed)
+				renewTimer = time.After(k.getRenewTimer(refreshed))
 			case <-renewTimer:
 				key, err := k.latestSigningKey()
 				logging.Log("KEY-DAfh4").OnError(err).Error("could not check for latest signing key")
 				refreshed, err := k.refreshSigningKey(ctx, key, keyCh, algorithm)
 				logging.Log("KEY-DAfh4").OnError(err).Error("could not refresh signing key when ensuring key")
-				k.setRenewTimer(renewTimer, refreshed)
+				renewTimer = time.After(k.getRenewTimer(refreshed))
 			}
 		}
 	}()
@@ -78,12 +78,13 @@ func (k *KeyRepository) GetKeySet(ctx context.Context) (*jose.JSONWebKeySet, err
 	return &jose.JSONWebKeySet{Keys: webKeys}, nil
 }
 
-func (k *KeyRepository) setRenewTimer(timer <-chan time.Time, refreshed bool) {
+func (k *KeyRepository) getRenewTimer(refreshed bool) time.Duration {
 	duration := k.SigningKeyRotationCheck
 	if refreshed {
 		duration = k.currentKeyExpiration.Sub(time.Now().Add(k.SigningKeyGracefulPeriod + k.SigningKeyRotationCheck*2))
 	}
-	timer = time.After(duration)
+	logging.LogWithFields("EVENT-dK432", "in", duration).Info("next signing key check")
+	return duration
 }
 
 func (k *KeyRepository) latestSigningKey() (shortRefresh *model.KeyView, err error) {
@@ -115,20 +116,24 @@ func (k *KeyRepository) ensureIsLatestKey(ctx context.Context) (bool, error) {
 func (k *KeyRepository) refreshSigningKey(ctx context.Context, key *model.KeyView, keyCh chan<- jose.SigningKey, algorithm string) (refreshed bool, err error) {
 	if key == nil {
 		if k.currentKeyExpiration.Before(time.Now().UTC()) {
+			logging.Log("EVENT-ADg26").Info("unset current signing key")
 			keyCh <- jose.SigningKey{}
 		}
 		if ok, err := k.ensureIsLatestKey(ctx); !ok && err == nil {
 			return false, err
 		}
+		logging.Log("EVENT-sdz53").Info("lock and generate signing key pair")
 		err = k.lockAndGenerateSigningKeyPair(ctx, algorithm)
 		logging.Log("EVENT-B4d21").OnError(err).Warn("could not create signing key")
 		return false, err
 	}
 
 	if k.currentKeyID == key.ID {
+		logging.Log("EVENT-Abb3e").Info("no new signing key")
 		return false, nil
 	}
 	if ok, err := k.ensureIsLatestKey(ctx); !ok && err == nil {
+		logging.Log("EVENT-HJd92").Info("signing key in view is not latest key")
 		return false, err
 	}
 	signingKey, err := model.SigningKeyFromKeyView(key, k.KeyAlgorithm)
@@ -144,6 +149,7 @@ func (k *KeyRepository) refreshSigningKey(ctx context.Context, key *model.KeyVie
 			Key:   signingKey.Key,
 		},
 	}
+	logging.LogWithFields("EVENT-dsg54", "keyID", signingKey.ID).Info("refreshed signing key")
 	return true, nil
 }
 

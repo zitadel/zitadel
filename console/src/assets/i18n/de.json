@@ -1080,6 +1080,9 @@
             }
         },
         "API": {
+            "INFO": {
+                "CLIENTID":"Client Id"
+            },
             "REGENERATESECRET": "Client Secret neu generieren",
             "SELECTION":{
                 "TITLE":"API",

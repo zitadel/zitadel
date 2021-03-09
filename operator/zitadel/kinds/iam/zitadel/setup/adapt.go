@@ -17,11 +17,11 @@ import (
 )
 
 const (
-	jobNamePrefix               = "zitadel-setup-"
-	containerName               = "zitadel"
-	rootSecret                  = "client-root"
-	dbSecrets                   = "db-secrets"
-	timeout       time.Duration = 300
+	jobNamePrefix = "zitadel-setup-"
+	containerName = "zitadel"
+	rootSecret    = "client-root"
+	dbSecrets     = "db-secrets"
+	timeout       = 300 * time.Second
 )
 
 func AdaptFunc(
