@@ -29,21 +29,21 @@ func (p *ProjectGrant) IsValid() bool {
 	return p.GrantedOrgID != ""
 }
 
-func GetRemovedRoles(existingRoles, newRoles []string) []string {
-	removed := make([]string, 0)
-	for _, role := range existingRoles {
-		if !containsKey(newRoles, role) {
-			removed = append(removed, role)
-		}
-	}
-	return removed
-}
-
-func containsKey(roles []string, key string) bool {
-	for _, role := range roles {
-		if role == key {
+func (g *ProjectGrant) HasInvalidRoles(validRoles []string) bool {
+	for _, roleKey := range g.RoleKeys {
+		if !containsRoleKey(roleKey, validRoles) {
 			return true
 		}
 	}
 	return false
+}
+
+func GetRemovedRoles(existingRoles, newRoles []string) []string {
+	removed := make([]string, 0)
+	for _, role := range existingRoles {
+		if !containsRoleKey(role, newRoles) {
+			removed = append(removed, role)
+		}
+	}
+	return removed
 }
