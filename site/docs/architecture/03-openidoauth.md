@@ -51,7 +51,7 @@ Optional parameters
 | login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`                                |
 | max_age       | Seconds since the last active successful authentication of the user                                                                      | 
 | nonce         | Random string value to associate the client session with the ID Token and for replay attacks mitigation.                                 | 
-| prompt        | If the Auth Server prompts the user for (re)authentication. <br>no prompt: the user will have to choose a session if more than one session exists<br>`none`: user must be authenticated without interaction, an error is returned otherwise <br>`login`: user must reauthenticate / provide a user name <br>`select_account`: user is prompted to select one of the existing sessions or create a new one |
+| prompt        | If the Auth Server prompts the user for (re)authentication. <br>`no prompt`: the user will have to choose a session if more than one session exists<br>`none`: user must be authenticated without interaction, an error is returned otherwise <br>`login`: user must reauthenticate / provide a user name <br>`select_account`: user is prompted to select one of the existing sessions or create a new one |
 | state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well. |
 
 Successful Code Response
@@ -95,7 +95,7 @@ Required request Parameters
 | Parameter     | Description                                                                                                   |
 |---------------|---------------------------------------------------------------------------------------------------------------|
 | code          | Code that was issued from the authorization request.                                                          |
-| grant_type    | must be `authorization_code`                                                                                  |
+| grant_type    | Must be `authorization_code`                                                                                  |
 | redirect_uri  | Callback uri where the code was be sent to. Must match exactly the redirect_uri of the authorization request. |
 
 Depending on your authorization method you will have to provide additional parameters or headers:
@@ -128,7 +128,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 | Parameter             | Description                                                                                                     |
 |-----------------------|-----------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](#Using JWTs for Client Authentication) |
-| client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
+| client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
 
 ##### JWT Profile Grant
 
@@ -138,7 +138,7 @@ Required request Parameters
 
 | Parameter  | Description                                                                                                                   |
 |------------|-------------------------------------------------------------------------------------------------------------------------------|
-| grant_type | must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                         |
+| grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                         |
 | assertion  | JWT built and signed according to [Using JWTs for Client Authentication](#Using JWTs for Client Authentication)               |
 | scope      | [Scopes](architecture#Scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile` |
 
@@ -312,7 +312,7 @@ ZITADEL reserves some claims to assert certain data.
 
 #### Client Secret Basic
 
-When using client_secret_basic on token or introspection endpoints, provide an`Authorization` header with a Basic auth value in the following form:
+When using `client_secret_basic` on token or introspection endpoints, provide an`Authorization` header with a Basic auth value in the following form:
 
 ```markdown
 Authorization: "Basic " + base64( formUrlEncode(client_id) + ":" + formUrlEncode(client_secret) )
@@ -323,7 +323,7 @@ Given the client_id `78366401571920522@amce` and client_secret `veryweaksecret!`
 
 #### JWT with Private Key
 
-When using private_key_jwt for token or introspection endpoints, provide a JWT as assertion generated with the following structure and signed with a downloaded key:
+When using `private_key_jwt` for token or introspection endpoints, provide a JWT as assertion generated with the following structure and signed with a downloaded key:
 
 ---
 
