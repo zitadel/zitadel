@@ -169,7 +169,7 @@ Errors:
     GrantNotExists: Project grant doesn't exist
     GrantHasNotExistingRole: One role doesn't exist on project
     UserIDMisisng: User ID missing
-    OIDCSecretInvalid: Client Secret is invalid
+    ClientSecretInvalid: Client Secret is invalid
   IAM:
     MemberInvalid: Member is invalid
     MemberAlreadyExisting: Member already exists
@@ -511,12 +511,20 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret check succeeded
             failed: OIDC Client Secret check failed
+        key:
+          added: Application key added
+          removed: Application key removed
       config:
         oidc:
           added: OIDC Configuration added
           changed: OIDC Configuration changed
           secret:
             changed: OIDC secret changed
+        api:
+          added: API Configuration added
+          changed: API Configuration changed
+          secret:
+            changed: API secret changed
   policy:
     password:
       complexity:
