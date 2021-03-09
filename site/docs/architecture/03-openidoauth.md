@@ -27,9 +27,166 @@ For example with [zitadel.ch](https://zitadel.ch), issuer.zitadel.ch would be th
 
 > The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
 
+Required request Parameters
+
+| Parameter     | Description                                                                                                                                       |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| client_id     | The id of your client as shown in Console.                                                                                                        |
+| redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
+| response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
+| scope         | `openid` is required, see [Scopes](architecture#Scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`         |
+
+Required parameters for PKCE (see PKCE guide for more information)
+
+| Parameter             | Description                                           |
+|-----------------------|-------------------------------------------------------|
+| code_challenge        | The SHA-256 value of the generated code_verifier      | 
+| code_challenge_method | Method used to generate the challenge, must be `S256` |
+
+Optional parameters
+
+| Parameter     | Description                                                                                                                              |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| id_token_hint | Valid `id_token` (of an existing session) used to identity the subject. Should be provided when using prompt `none`.                     | 
+| login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`                                |
+| max_age       | Seconds since the last active successful authentication of the user                                                                      | 
+| nonce         | Random string value to associate the client session with the ID Token and for replay attacks mitigation.                                 | 
+| prompt        | If the Auth Server prompts the user for (re)authentication. <br>no prompt: the user will have to choose a session if more than one session exists<br>`none`: user must be authenticated without interaction, an error is returned otherwise <br>`login`: user must reauthenticate / provide a user name <br>`select_account`: user is prompted to select one of the existing sessions or create a new one |
+| state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well. |
+
+Successful Code Response
+
+| Property | Description                                                                   |
+|----------|-------------------------------------------------------------------------------| 
+| code     | Opaque string which will be necessary to request tokens on the token endpoint |
+| state    | Unmodified `state` parameter from the request                                 |
+
+Successful Implicit Response
+
+| Property     | Description                                                 |
+|--------------|-------------------------------------------------------------| 
+| access_token | Only returned if `response_type` included `token`           |
+| expires_in   | Number of second until the expiration of the `access_token` |
+| id_token     | Only returned if `response_type` included `id_token`        |
+| token_type   | Type of the `access_token`. Value is always `Bearer`        |
+
+Error Response
+
+Regardless of the authorization flow chosen, if an error occurs the following response will be returned to the redirect_uri.
+
+> If the redirect_uri is not provided, was not registered or anything other prevents the auth server form returning the response to the client,
+the error will be display directly to the user on the auth server
+
+
+| Property          | Description                                                          |
+|-------------------|----------------------------------------------------------------------| 
+| error             | An OAuth / OIDC error_type                                           |
+| error_description | Description of the error type or additional information of the error |
+| state             | Unmodified `state` parameter from the request                        |
+
 #### token_endpoint
 
 [https://api.zitadel.ch/oauth/v2/token](https://api.zitadel.ch/oauth/v2/token)
+
+##### Authorization Code Grant (Code Exchange)
+
+Required request Parameters
+
+| Parameter     | Description                                                                                                   |
+|---------------|---------------------------------------------------------------------------------------------------------------|
+| code          | Code that was issued from the authorization request.                                                          |
+| grant_type    | Must be `authorization_code`                                                                                  |
+| redirect_uri  | Callback uri where the code was be sent to. Must match exactly the redirect_uri of the authorization request. |
+
+Depending on your authorization method you will have to provide additional parameters or headers:
+
+When using `client_secret_basic`
+
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](architecture#Client_Secret_Basic) on how to build it correctly.
+
+When using `client_secret_post`
+
+Send your `client_id` and `client_secret` as parameters in the body:
+
+| Parameter     | Description                      |
+|---------------|----------------------------------|
+| client_id     | client_id of the application     |
+| client_secret | client_secret of the application |
+
+When using `none` (PKCE)
+
+Send your code_verifier for us to recompute the code_challenge of the authorization request.
+
+| Parameter     | Description                                                  |
+|---------------|--------------------------------------------------------------|
+| code_verifier | code_verifier previously used to generate the code_challenge |
+
+When using `private_key_jwt`
+
+Send a client assertion as JWT for us to validate the signature against the registered public key.
+
+| Parameter             | Description                                                                                                     |
+|-----------------------|-----------------------------------------------------------------------------------------------------------------|
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](#Using JWTs for Client Authentication) |
+| client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
+
+##### JWT Profile Grant
+
+---
+
+Required request Parameters
+
+| Parameter  | Description                                                                                                                   |
+|------------|-------------------------------------------------------------------------------------------------------------------------------|
+| grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                         |
+| assertion  | JWT built and signed according to [Using JWTs for Client Authentication](#Using JWTs for Client Authentication)               |
+| scope      | [Scopes](architecture#Scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile` |
+
+```BASH
+curl --request POST \
+  --url https://api.zitadel.ch/oauth/v2/token \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data grant_type=authorization_code \
+  --data code=DKLvnksjndjsflkdjlkfgjslow... \
+  --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
+  --data client_assertion=eyJhbGciOiJSUzI1Ni...
+```
+
+
+#### introspection_endpoint
+
+[https://api.zitadel.ch/oauth/v2/introspection](https://api.zitadel.ch/oauth/v2/introspection)
+
+
+| Parameter | Description     |
+|-----------|-----------------|
+| token     | An access token |
+
+Depending on your authorization method you will have to provide additional parameters or headers:
+
+When using `client_secret_basic`
+
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](architecture#Client_Secret_Basic) on how to build it correctly.
+
+---
+
+When using `private_key_jwt`
+
+Send a client assertion as JWT for us to validate the signature against the registered public key.
+
+| Parameter             | Description                                                                                                 |
+|-----------------------|-------------------------------------------------------------------------------------------------------------|
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](architecture#JWT_with_Private_Key) |
+| client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                            |
+
+```BASH
+curl --request POST \
+  --url https://api.zitadel.ch/oauth/v2/token \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
+  --data client_assertion=eyJhbGciOiJSUzI1Ni... \
+  --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
+```
 
 #### userinfo_endpoint
 
@@ -86,30 +243,31 @@ In addition to the standard compliant scopes we utilize the following scopes.
 ZITADEL asserts claims on different places according to the corresponding specifications or project and clients settings.
 Please check below the matrix for an overview where which scope is asserted.
 
-| Claims                                          | Userinfo           | ID Token                               | Access Token                             |
-|:------------------------------------------------|:-------------------|----------------------------------------|------------------------------------------|
-| acr                                             | Yes                | Yes                                    | No                                       |
-| address                                         | Yes when requested | Yes only when response type `id_token` | No                                       |
-| amr                                             | Yes                | Yes                                    | No                                       |
-| aud                                             | No                 | Yes                                    | Yes when JWT                             |
-| auth_time                                       | Yes                | Yes                                    | No                                       |
-| azp                                             | No                 | Yes                                    | Yes when JWT                             |
-| email                                           | Yes when requested | Yes only when response type `id_token` | No                                       |
-| email_verified                                  | Yes when requested | Yes only when response type `id_token` | No                                       |
-| exp                                             | No                 | Yes                                    | Yes when JWT                             |
-| family_name                                     | Yes when requested | Yes when requested                     | No                                       |
-| gender                                          | Yes when requested | Yes when requested                     | No                                       |
-| given_name                                      | Yes when requested | Yes when requested                     | No                                       |
-| iat                                             | No                 | Yes                                    | Yes when JWT                             |
-| iss                                             | No                 | Yes                                    | Yes when JWT                             |
-| locale                                          | Yes when requested | Yes when requested                     | No                                       |
-| name                                            | Yes when requested | Yes when requested                     | No                                       |
-| nonce                                           | No                 | Yes                                    | No                                       |
-| phone                                           | Yes when requested | Yes only when response type `id_token` | No                                       |
-| preferred_username                              | Yes when requested | Yes                                    | No                                       |
-| sub                                             | Yes                | Yes                                    | Yes when JWT                             |
-| urn:zitadel:iam:org:domain:primary:{domainname} | Yes when requested | Yes when requested                     | Yes when JWT and requested               |
-| urn:zitadel:iam:org:project:roles:{rolename}    | Yes when requested | Yes when requested or configured       | Yes when JWT and requested or configured |
+| Claims                                          | Userinfo       | Introspection  | ID Token                                    | Access Token                         |
+|:------------------------------------------------|:---------------|----------------|---------------------------------------------|--------------------------------------|
+| acr                                             | No             | No             | Yes                                         | No                                   |
+| address                                         | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| amr                                             | No             | No             | Yes                                         | No                                   |
+| aud                                             | No             | No             | Yes                                         | When JWT                             |
+| auth_time                                       | No             | No             | Yes                                         | No                                   |
+| azp                                             | No             | No             | Yes                                         | When JWT                             |
+| email                                           | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| email_verified                                  | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| exp                                             | No             | No             | Yes                                         | When JWT                             |
+| family_name                                     | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| gender                                          | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| given_name                                      | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| iat                                             | No             | No             | Yes                                         | When JWT                             |
+| iss                                             | No             | No             | Yes                                         | When JWT                             |
+| locale                                          | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| name                                            | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| nonce                                           | No             | No             | Yes                                         | No                                   |
+| phone                                           | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| phone_verified                                  | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| preferred_username (username when Introspect )  | When requested | When requested | Yes                                         | No                                   |
+| sub                                             | Yes            | Yes            | Yes                                         | When JWT                             |
+| urn:zitadel:iam:org:domain:primary:{domainname} | When requested | When requested | When requested                              | When JWT and requested               |
+| urn:zitadel:iam:org:project:roles:{rolename}    | When requested | When requested | When requested or configured                | When JWT and requested or configured |
 
 #### Standard Claims
 
@@ -150,6 +308,76 @@ ZITADEL reserves some claims to assert certain data.
 | urn:zitadel:iam:org:project:roles:{rolename}    | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role. |
 | urn:zitadel:iam:roles:{rolename}                | TBA                                                                                                  | TBA                                                                                                                                                                                |
 
+### Auth Methods
+
+#### Client Secret Basic
+
+When using `client_secret_basic` on token or introspection endpoints, provide an`Authorization` header with a Basic auth value in the following form:
+
+```markdown
+Authorization: "Basic " + base64( formUrlEncode(client_id) + ":" + formUrlEncode(client_secret) )
+```
+
+Given the client_id `78366401571920522@amce` and client_secret `veryweaksecret!`, this would result in the following `Authorization` header:
+`Basic NzgzNjY0MDE1NzE5MjA1MjIlNDBhbWNlOnZlcnl3ZWFrc2VjcmV0JTIx`
+
+#### JWT with Private Key
+
+When using `private_key_jwt` for token or introspection endpoints, provide a JWT as assertion generated with the following structure and signed with a downloaded key:
+
+---
+
+Key JSON
+
+| Key      | Example                                                             | Description                                                                    |
+|:---------|:--------------------------------------------------------------------|:-------------------------------------------------------------------------------|
+| type     | `"application"`                                                     | The type of account, right now only application is valid                       |
+| keyId    | `"81693565968962154"`                                               | This is unique ID of the key                                                   |
+| key      | `"-----BEGIN RSA PRIVATE KEY-----...-----END RSA PRIVATE KEY-----"` | The private key generated by ZITADEL, this can not be regenerated!             |
+| clientId | `78366401571920522@acme`                                            | The client_id of the application, this is the same as the subject from tokens  |
+| appId    | `78366403256846242`                                                 | The id of the application (just for completeness, not used for JWT)            |
+
+```JSON
+{
+	"type": "serviceaccount",
+	"keyId": "81693565968962154",
+	"key": "-----BEGIN RSA PRIVATE KEY-----...-----END RSA PRIVATE KEY-----",
+	"clientId": "78366401571920522@acme",
+	"appId": "78366403256846242"
+}
+```
+
+---
+
+JWT
+
+| Claim | Example                       | Description                                                                                                     |
+|:------|:------------------------------|:----------------------------------------------------------------------------------------------------------------|
+| aud   | `"https://issuer.zitadel.ch"` | String or Array of intended audiences MUST include ZITADEL's issuing domain                                     |
+| exp   | `1605183582`                  | Unix timestamp of the expiry, MUST NOT be longer than 1h                                                        |
+| iat   | `1605179982`                  | Unix timestamp of the creation singing time of the JWT                                                          |
+| iss   | `"78366401571920522@acme"`    | String which represents the requesting party (owner of the key), normally the `clientID` from the json key file |
+| sub   | `"78366401571920522@acme"`    | The subject ID of the application, normally the `clientID` from the json key file                               |
+
+```JSON
+{
+	"iss": "78366401571920522@acme",
+	"sub": "78366401571920522@acme",
+	"aud": "https://issuer.zitadel.ch",
+	"exp": 1605183582,
+	"iat": 1605179982
+}
+```
+
+> To identify your key, it is necessary that you provide a JWT with a `kid` header claim representing your keyId from the Key JSON:
+> ```json
+> {
+> 	"alg": "RS256",
+> 	"kid": "81693565968962154"
+> }
+> ```
+
+
 ### Grant Types
 
 For a list of supported or unsupported `Grant Types` please have a look at the table below.
@@ -161,7 +389,7 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 | Client Credentials                                    | yes                 |
 | Device Authorization                                  | under consideration |
 | Implicit                                              | yes                 |
-| JSON Web Token (JWT) Profile                          | partially           |
+| JSON Web Token (JWT) Profile                          | yes                 |
 | Refresh Token                                         | work in progress    |
 | Resource Owner Password Credentials                   | no                  |
 | Security Assertion Markup Language (SAML) 2.0 Profile | no                  |
@@ -197,7 +425,7 @@ Our service user work with the JWT profile to authenticate them against ZITADEL.
 
 1. Create or use an existing service user
 2. Create a new key and download it
-3. Generate a JWT with the structure below and sing it with the downloaded key
+3. Generate a JWT with the structure below and sign it with the downloaded key
 4. Send the JWT Base64 encoded to ZITADEL's token endpoint
 5. Use the received access token
 
@@ -243,29 +471,23 @@ JWT
 }
 ```
 
+> To identify your key, it is necessary that you provide a JWT with a `kid` header claim representing your keyId from the Key JSON:
+> ```json
+> {
+> 	"alg": "RS256",
+> 	"kid": "81693565968772648"
+> }
+> ```
+
 ---
 
-Access Token Request
-
-| Parameter    | Example                                                                     | Description                                   |
-|:-------------|:----------------------------------------------------------------------------|:----------------------------------------------|
-| Content-Type | `application/x-www-form-urlencoded`                                         |                                               |
-| grant_type   | `urn:ietf:params:oauth:grant-type:jwt-bearer`                               | Using JWTs as Authorization Grants            |
-| assertion    | `eyJhbGciOiJSUzI1Ni...`                                                     | The base64 encoded JWT created above          |
-| scope        | `openid profile email urn:zitadel:iam:org:project:id:69234237810729019:aud` | Scopes you would like to request from ZITADEL |
-
-```BASH
-curl --request POST \
-  --url https://api.zitadel.ch/oauth/v2/token \
-  --header 'Content-Type: application/x-www-form-urlencoded' \
-  --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
-  --data assertion=eyJhbGciOiJSUzI1Ni...
-  --data scope=openid profile email address
-```
+See [JWT Profile Grant on Token Endpoint](architecture#token_endpoint) for usage.
 
 ##### Using JWTs for Client Authentication
 
-> Not yet supported
+See how to build a [JWT for client authentication](architecture/#JWT_with_Private_Key) from the downloaded key.
+
+Find out how to use it on the [token endpoint](architecture#token_endpoint) or the [introspection endpoint](architecture#introspection_endpoint).
 
 #### Token Exchange
 
