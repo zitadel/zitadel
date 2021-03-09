@@ -257,7 +257,7 @@ func (c *Commands) removeUserGrant(ctx context.Context, grantID, resourceOwner s
 		}
 	}
 
-	removeUserGrant := NewUserGrantWriteModel(grantID, resourceOwner)
+	removeUserGrant := NewUserGrantWriteModel(grantID, existingUserGrant.ResourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&removeUserGrant.WriteModel)
 	if cascade {
 		return usergrant.NewUserGrantCascadeRemovedEvent(

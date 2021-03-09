@@ -8,8 +8,8 @@ import (
 )
 
 func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (*domain.ObjectDetails, error) {
-	if appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
+	if projectID == "" || appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
 	}
 
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appChange.GetAppID(), resourceOwner)
@@ -25,7 +25,7 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(
 		ctx,
-		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName(), projectID))
+		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName()))
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, projectID))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name))
 	if err != nil {
 		return nil, err
 	}

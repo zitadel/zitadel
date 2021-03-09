@@ -36,9 +36,8 @@ func NewRemoveApplicationUniqueConstraint(name, projectID string) *eventstore.Ev
 type ApplicationAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID     string `json:"appId,omitempty"`
-	Name      string `json:"name,omitempty"`
-	projectID string
+	AppID string `json:"appId,omitempty"`
+	Name  string `json:"name,omitempty"`
 }
 
 func (e *ApplicationAddedEvent) Data() interface{} {
@@ -46,15 +45,14 @@ func (e *ApplicationAddedEvent) Data() interface{} {
 }
 
 func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.projectID)}
+	return []*eventstore.EventUniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID)}
 }
 
 func NewApplicationAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID,
-	name,
-	projectID string,
+	name string,
 ) *ApplicationAddedEvent {
 	return &ApplicationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -62,9 +60,8 @@ func NewApplicationAddedEvent(
 			aggregate,
 			ApplicationAddedType,
 		),
-		AppID:     appID,
-		Name:      name,
-		projectID: projectID,
+		AppID: appID,
+		Name:  name,
 	}
 }
 
@@ -84,10 +81,9 @@ func ApplicationAddedEventMapper(event *repository.Event) (eventstore.EventReade
 type ApplicationChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID     string `json:"appId,omitempty"`
-	Name      string `json:"name,omitempty"`
-	oldName   string
-	projectID string
+	AppID   string `json:"appId,omitempty"`
+	Name    string `json:"name,omitempty"`
+	oldName string
 }
 
 func (e *ApplicationChangedEvent) Data() interface{} {
@@ -96,8 +92,8 @@ func (e *ApplicationChangedEvent) Data() interface{} {
 
 func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{
-		NewRemoveApplicationUniqueConstraint(e.oldName, e.projectID),
-		NewAddApplicationUniqueConstraint(e.Name, e.projectID),
+		NewRemoveApplicationUniqueConstraint(e.oldName, e.Aggregate().ID),
+		NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID),
 	}
 }
 
@@ -106,8 +102,7 @@ func NewApplicationChangedEvent(
 	aggregate *eventstore.Aggregate,
 	appID,
 	oldName,
-	newName,
-	projectID string,
+	newName string,
 ) *ApplicationChangedEvent {
 	return &ApplicationChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -115,10 +110,9 @@ func NewApplicationChangedEvent(
 			aggregate,
 			ApplicationChangedType,
 		),
-		AppID:     appID,
-		Name:      newName,
-		oldName:   oldName,
-		projectID: projectID,
+		AppID:   appID,
+		Name:    newName,
+		oldName: oldName,
 	}
 }
 
@@ -222,9 +216,8 @@ func ApplicationReactivatedEventMapper(event *repository.Event) (eventstore.Even
 type ApplicationRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID     string `json:"appId,omitempty"`
-	name      string
-	projectID string
+	AppID string `json:"appId,omitempty"`
+	name  string
 }
 
 func (e *ApplicationRemovedEvent) Data() interface{} {
@@ -232,15 +225,14 @@ func (e *ApplicationRemovedEvent) Data() interface{} {
 }
 
 func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.projectID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
 }
 
 func NewApplicationRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID,
-	name,
-	projectID string,
+	name string,
 ) *ApplicationRemovedEvent {
 	return &ApplicationRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -248,9 +240,8 @@ func NewApplicationRemovedEvent(
 			aggregate,
 			ApplicationRemovedType,
 		),
-		AppID:     appID,
-		name:      name,
-		projectID: projectID,
+		AppID: appID,
+		name:  name,
 	}
 }
 

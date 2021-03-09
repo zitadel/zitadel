@@ -49,7 +49,7 @@ func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstor
 	}
 
 	events = []eventstore.EventPusher{
-		project.NewApplicationAddedEvent(ctx, projectAgg, oidcApp.AppID, oidcApp.AppName, resourceOwner),
+		project.NewApplicationAddedEvent(ctx, projectAgg, oidcApp.AppID, oidcApp.AppName),
 	}
 
 	var stringPw string
