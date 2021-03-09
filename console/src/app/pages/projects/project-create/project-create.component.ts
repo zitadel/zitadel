@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Project, ProjectCreateRequest } from 'src/app/proto/generated/management_pb';
+import { AddProjectRequest, AddProjectResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -11,7 +11,7 @@ import { ToastService } from 'src/app/services/toast.service';
     styleUrls: ['./project-create.component.scss'],
 })
 export class ProjectCreateComponent implements OnInit {
-    public project: ProjectCreateRequest.AsObject = new ProjectCreateRequest().toObject();
+    public project: AddProjectRequest.AsObject = new AddProjectRequest().toObject();
 
     constructor(
         private router: Router,
@@ -26,9 +26,9 @@ export class ProjectCreateComponent implements OnInit {
 
     public saveProject(): void {
         this.mgmtService
-            .CreateProject(this.project)
-            .then((data: Project) => {
-                this.router.navigate(['projects', data.getId()]);
+            .addProject(this.project)
+            .then((resp: AddProjectResponse.AsObject) => {
+                this.router.navigate(['projects', resp.id]);
             })
             .catch(error => {
                 this.toast.showError(error);

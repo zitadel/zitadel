@@ -3,7 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { FailedEvent } from 'src/app/proto/generated/admin_pb';
+import { FailedEvent } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -32,13 +32,9 @@ export class FailedEventsComponent implements AfterViewInit {
 
     public loadEvents(): void {
         this.loadingSubject.next(true);
-        from(this.adminService.GetFailedEvents()).pipe(
+        from(this.adminService.listFailedEvents()).pipe(
             map(resp => {
-                const response = resp.toObject();
-                // if (response.viewTimestamp) {
-                //     this.viewTimestamp = response.viewTimestamp;
-                // }
-                return response.failedEventsList;
+                return resp?.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -49,7 +45,7 @@ export class FailedEventsComponent implements AfterViewInit {
     }
 
     public cancelEvent(viewname: string, db: string, seq: number): void {
-        this.adminService.RemoveFailedEvent(viewname, db, seq).then(() => {
+        this.adminService.removeFailedEvent(viewname, db, seq).then(() => {
             this.toast.showInfo('IAM.FAILEDEVENTS.DELETESUCCESS', true);
         });
     }

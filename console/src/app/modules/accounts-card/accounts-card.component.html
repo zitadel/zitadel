@@ -1,24 +1,27 @@
 <div class="card" appOutsideClick (clickOutside)="closeCard($event)">
-    <app-avatar *ngIf="profile && (profile.displayName || (profile.firstName && profile.lastName))" class="avatar"
-        [name]="profile.displayName ? profile.displayName : (profile.firstName + ' '+ profile.lastName)" [size]="80">
+    <app-avatar
+        *ngIf="user.human?.profile && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
+        class="avatar"
+        [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
+        [size]="80">
     </app-avatar>
 
-    <span class="u-name">{{profile.displayName ? profile.displayName : profile.preferredLoginName}}</span>
-    <span class="u-email">{{profile?.preferredLoginName}}</span>
+    <span class="u-name">{{user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A'}}</span>
+    <span class="u-email">{{user.human?.profile?.preferredLoginName}}</span>
     <span class="iamuser" *ngIf="iamuser">IAM USER</span>
 
     <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
     <div class="l-accounts">
         <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
-        <a class="row" *ngFor="let user of users" (click)="selectAccount(user.loginName)">
-            <app-avatar *ngIf="user && user.displayName" class="small-avatar"
-                [name]="user.displayName ? user.displayName : ''" [size]="32">
+        <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
+            <app-avatar *ngIf="session && session.displayName" class="small-avatar"
+                [name]="session.displayName ? session.displayName : ''" [size]="32">
             </app-avatar>
 
             <div class="col">
-                <span class="user-title">{{user.displayName ? user.displayName : user.userName}} </span>
-                <span class="loginname">{{user.loginName}}</span>
-                <span class="email">{{'USER.STATE.'+user.authState | translate}}</span>
+                <span class="user-title">{{session.displayName ? session.displayName : session.userName}} </span>
+                <span class="loginname">{{session.loginName}}</span>
+                <span class="email">{{'USER.STATE.'+session.authState | translate}}</span>
             </div>
             <span class="fill-space"></span>
             <mat-icon>keyboard_arrow_right</mat-icon>

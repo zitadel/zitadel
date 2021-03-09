@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AuthNKeyType, MachineKeyType } from 'src/app/proto/generated/management_pb';
+import { KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
 
 export enum AddKeyDialogType {
     MACHINE = "MACHINE",
@@ -15,21 +15,16 @@ export enum AddKeyDialogType {
 })
 export class AddKeyDialogComponent {
     public startDate: Date = new Date();
-    types: MachineKeyType[] | AuthNKeyType[] = [];
-    public type!: MachineKeyType | AuthNKeyType;
+    types: KeyType[] = [];
+    public type!: KeyType;
     public dateControl: FormControl = new FormControl('', []);
 
     constructor(
         public dialogRef: MatDialogRef<AddKeyDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
-        if (data.type = AddKeyDialogType.MACHINE) {
-            this.types = [MachineKeyType.MACHINEKEY_JSON];
-            this.type = MachineKeyType.MACHINEKEY_JSON;
-        } else if (data.type = AddKeyDialogType.AUTHNKEY) {
-            this.types = [AuthNKeyType.AUTHNKEY_JSON];
-            this.type = AuthNKeyType.AUTHNKEY_JSON;
-        }
+        this.types = [KeyType.KEY_TYPE_JSON];
+        this.type = KeyType.KEY_TYPE_JSON;
         const today = new Date();
         this.startDate.setDate(today.getDate() + 1);
     }

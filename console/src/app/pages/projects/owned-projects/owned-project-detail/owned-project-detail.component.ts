@@ -1,4 +1,3 @@
-import { SelectionModel } from '@angular/cdk/collections';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -9,22 +8,14 @@ import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { ProjectType } from 'src/app/modules/project-members/project-members.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import {
-    Application,
-    ApplicationSearchResponse,
-    ProjectMember,
-    ProjectMemberSearchResponse,
-    ProjectMemberView,
-    ProjectRole,
-    ProjectRoleSearchResponse,
-    ProjectState,
-    ProjectType,
-    ProjectView,
-    UserGrantSearchKey,
-    UserView,
-} from 'src/app/proto/generated/management_pb';
+import { App } from 'src/app/proto/generated/zitadel/app_pb';
+import { ListAppsResponse, UpdateProjectRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -36,22 +27,11 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
-    public project!: ProjectView.AsObject;
-
-    public pageSizeRoles: number = 10;
-    public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
-    public roleResult!: ProjectRoleSearchResponse.AsObject;
-    public roleColumns: string[] = ['name', 'displayname', 'group', 'actions'];
-
-    public pageSizeMembers: number = 10;
-    public projectDataSource: MatTableDataSource<ProjectMember.AsObject> = new MatTableDataSource<ProjectMember.AsObject>();
-    public memberResult!: ProjectMemberSearchResponse.AsObject;
-    public memberColumns: string[] = ['firstname', 'lastname', 'username', 'email', 'roles'];
-    public selection: SelectionModel<ProjectMember.AsObject> = new SelectionModel<ProjectMember.AsObject>(true, []);
+    public project!: Project.AsObject;
 
     public pageSizeApps: number = 10;
-    public appsDataSource: MatTableDataSource<Application.AsObject> = new MatTableDataSource<Application.AsObject>();
-    public appsResult!: ApplicationSearchResponse.AsObject;
+    public appsDataSource: MatTableDataSource<App.AsObject> = new MatTableDataSource<App.AsObject>();
+    public appsResult!: ListAppsResponse.AsObject;
     public appsColumns: string[] = ['name'];
 
     public ProjectState: any = ProjectState;
@@ -64,13 +44,12 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
     public isZitadel: boolean = false;
 
-    public userGrantSearchKey: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID;
     public UserGrantContext: any = UserGrantContext;
 
     // members
     public totalMemberResult: number = 0;
-    public membersSubject: BehaviorSubject<ProjectMemberView.AsObject[]>
-        = new BehaviorSubject<ProjectMemberView.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<Member.AsObject[]>
+        = new BehaviorSubject<Member.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public refreshChanges$: EventEmitter<void> = new EventEmitter();
@@ -96,12 +75,14 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     private async getData({ id }: Params): Promise<void> {
         this.projectId = id;
 
-        this.mgmtService.GetIam().then(iam => {
-            this.isZitadel = iam.toObject().iamProjectId === this.projectId;
+        this.mgmtService.getIAM().then(iam => {
+            this.isZitadel = iam.iamProjectId === this.projectId;
         });
 
-        this.mgmtService.GetProjectById(id).then(proj => {
-            this.project = proj.toObject();
+        this.mgmtService.getProjectByID(id).then(resp => {
+            if (resp.project) {
+                this.project = resp.project;
+            }
         }).catch(error => {
             console.error(error);
             this.toast.showError(error);
@@ -112,10 +93,12 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
     public loadMembers(): void {
         this.loadingSubject.next(true);
-        from(this.mgmtService.SearchProjectMembers(this.projectId, 100, 0)).pipe(
+        from(this.mgmtService.listProjectMembers(this.projectId, 100, 0)).pipe(
             map(resp => {
-                this.totalMemberResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
+                if (resp.details?.totalResult) {
+                    this.totalMemberResult = resp.details?.totalResult;
+                }
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -125,7 +108,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public changeState(newState: ProjectState): void {
-        if (newState === ProjectState.PROJECTSTATE_ACTIVE) {
+        if (newState === ProjectState.PROJECT_STATE_ACTIVE) {
             const dialogRef = this.dialog.open(WarnDialogComponent, {
                 data: {
                     confirmKey: 'ACTIONS.REACTIVATE',
@@ -137,9 +120,9 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             });
             dialogRef.afterClosed().subscribe(resp => {
                 if (resp) {
-                    this.mgmtService.ReactivateProject(this.projectId).then(() => {
+                    this.mgmtService.reactivateProject(this.projectId).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
-                        this.project.state = ProjectState.PROJECTSTATE_ACTIVE;
+                        this.project.state = ProjectState.PROJECT_STATE_ACTIVE;
                         this.refreshChanges$.emit();
                     }).catch(error => {
                         this.toast.showError(error);
@@ -147,7 +130,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
                 }
             });
 
-        } else if (newState === ProjectState.PROJECTSTATE_INACTIVE) {
+        } else if (newState === ProjectState.PROJECT_STATE_INACTIVE) {
             const dialogRef = this.dialog.open(WarnDialogComponent, {
                 data: {
                     confirmKey: 'ACTIONS.DEACTIVATE',
@@ -159,9 +142,9 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             });
             dialogRef.afterClosed().subscribe(resp => {
                 if (resp) {
-                    this.mgmtService.DeactivateProject(this.projectId).then(() => {
+                    this.mgmtService.deactivateProject(this.projectId).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
-                        this.project.state = ProjectState.PROJECTSTATE_INACTIVE;
+                        this.project.state = ProjectState.PROJECT_STATE_INACTIVE;
                         this.refreshChanges$.emit();
                     }).catch(error => {
                         this.toast.showError(error);
@@ -183,7 +166,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         });
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.mgmtService.RemoveProject(this.projectId).then(() => {
+                this.mgmtService.removeProject(this.projectId).then(() => {
                     this.toast.showInfo('PROJECT.TOAST.DELETED', true);
                     const params: Params = {
                         'deferredReload': true,
@@ -197,7 +180,13 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public saveProject(): void {
-        this.mgmtService.UpdateProject(this.project.projectId, this.project).then(() => {
+        const req = new UpdateProjectRequest();
+        req.setId(this.project.id);
+        req.setName(this.project.name);
+        req.setProjectRoleAssertion(this.project.projectRoleAssertion);
+        req.setProjectRoleCheck(this.project.projectRoleCheck);
+
+        this.mgmtService.updateProject(req).then(() => {
             this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
             this.refreshChanges$.emit();
         }).catch(error => {
@@ -218,19 +207,19 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
                 creationType: CreationType.PROJECT_OWNED,
-                projectId: this.project.projectId,
+                projectId: this.project.id,
             },
             width: '400px',
         });
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: UserView.AsObject[] = resp.users;
+                const users: User.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
                     users.forEach(user => {
-                        return this.mgmtService.AddProjectMember(this.projectId, user.id, roles)
+                        return this.mgmtService.addProjectMember(this.projectId, user.id, roles)
                             .then(() => {
                                 this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                                 setTimeout(() => {
@@ -246,6 +235,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public showDetail(): void {
-        this.router.navigate(['projects', this.project.projectId, 'members']);
+        this.router.navigate(['projects', this.project.id, 'members']);
     }
 }

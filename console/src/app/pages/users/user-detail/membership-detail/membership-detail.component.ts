@@ -6,7 +6,7 @@ import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { UserMembershipSearchResponse, UserMembershipView, UserView } from 'src/app/proto/generated/management_pb';
+import { Membership, User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -19,13 +19,13 @@ import { MembershipDetailDataSource } from './membership-detail-datasource';
     styleUrls: ['./membership-detail.component.scss'],
 })
 export class MembershipDetailComponent implements AfterViewInit {
-    public user!: UserView.AsObject;
+    public user!: User.AsObject;
 
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<UserMembershipView.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<Membership.AsObject>;
     public dataSource!: MembershipDetailDataSource;
-    public selection: SelectionModel<UserMembershipView.AsObject>
-        = new SelectionModel<UserMembershipView.AsObject>(true, []);
+    public selection: SelectionModel<Membership.AsObject>
+        = new SelectionModel<Membership.AsObject>(true, []);
 
     public memberRoleOptions: string[] = [];
 
@@ -33,7 +33,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     public displayedColumns: string[] = ['select', 'memberType', 'displayName', 'creationDate', 'changeDate', 'roles'];
 
     public loading: boolean = false;
-    public memberships!: UserMembershipSearchResponse.AsObject;
+    public memberships!: Membership.AsObject[];
 
     constructor(
         activatedRoute: ActivatedRoute,
@@ -45,14 +45,16 @@ export class MembershipDetailComponent implements AfterViewInit {
         activatedRoute.params.subscribe(data => {
             const { id } = data;
             if (id) {
-                this.mgmtService.GetUserByID(id).then(user => {
-                    this.user = user.toObject();
-                    this.dataSource = new MembershipDetailDataSource(this.mgmtService);
-                    this.dataSource.loadMemberships(
-                        this.user.id,
-                        0,
-                        50,
-                    );
+                this.mgmtService.getUserByID(id).then(resp => {
+                    if (resp.user) {
+                        this.user = resp.user;
+                        this.dataSource = new MembershipDetailDataSource(this.mgmtService);
+                        this.dataSource.loadMemberships(
+                            this.user.id,
+                            0,
+                            50,
+                        );
+                    }
                 }).catch(err => {
                     console.error(err);
                 });
@@ -117,19 +119,19 @@ export class MembershipDetailComponent implements AfterViewInit {
     }
 
     public async loadManager(userId: string): Promise<void> {
-        this.mgmtService.SearchUserMemberships(userId, 100, 0, []).then(response => {
-            this.memberships = response.toObject();
+        this.mgmtService.listUserMemberships(userId, 100, 0, []).then(response => {
+            this.memberships = response.resultList;
             this.loading = false;
         });
     }
 
     public createIamMember(response: any): void {
-        const users: UserView.AsObject[] = response.users;
+        const users: User.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
             Promise.all(users.map(user => {
-                return this.adminService.AddIamMember(user.id, roles);
+                return this.adminService.addIAMMember(user.id, roles);
             })).then(() => {
                 this.toast.showInfo('IAM.TOAST.MEMBERADDED', true);
                 setTimeout(() => {
@@ -142,12 +144,12 @@ export class MembershipDetailComponent implements AfterViewInit {
     }
 
     private createOrgMember(response: any): void {
-        const users: UserView.AsObject[] = response.users;
+        const users: User.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
             Promise.all(users.map(user => {
-                return this.mgmtService.AddMyOrgMember(user.id, roles);
+                return this.mgmtService.addOrgMember(user.id, roles);
             })).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                 setTimeout(() => {
@@ -160,12 +162,12 @@ export class MembershipDetailComponent implements AfterViewInit {
     }
 
     private createGrantedProjectMember(response: any): void {
-        const users: UserView.AsObject[] = response.users;
+        const users: User.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.mgmtService.AddProjectGrantMember(
+                return this.mgmtService.addProjectGrantMember(
                     response.projectId,
                     response.grantId,
                     user.id,
@@ -183,12 +185,12 @@ export class MembershipDetailComponent implements AfterViewInit {
     }
 
     private createOwnedProjectMember(response: any): void {
-        const users: UserView.AsObject[] = response.users;
+        const users: User.AsObject[] = response.users;
         const roles: string[] = response.roles;
 
         if (users && users.length && roles && roles.length) {
             users.forEach(user => {
-                return this.mgmtService.AddProjectMember(response.projectId, user.id, roles)
+                return this.mgmtService.addProjectMember(response.projectId, user.id, roles)
                     .then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                         setTimeout(() => {

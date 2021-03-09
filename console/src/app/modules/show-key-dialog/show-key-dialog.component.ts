@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
-import { AddMachineKeyResponse } from 'src/app/proto/generated/management_pb';
+import { AddMachineKeyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 
 @Component({
     selector: 'app-show-key-dialog',
@@ -9,19 +9,19 @@ import { AddMachineKeyResponse } from 'src/app/proto/generated/management_pb';
     styleUrls: ['./show-key-dialog.component.scss'],
 })
 export class ShowKeyDialogComponent {
-    public addedKey!: AddMachineKeyResponse.AsObject;
+    public keyResponse!: AddMachineKeyResponse.AsObject;
 
     constructor(
         public dialogRef: MatDialogRef<ShowKeyDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
-        this.addedKey = data.key;
+        this.keyResponse = data.key;
     }
 
     public saveFile(): void {
-        const json = atob(this.addedKey.keyDetails.toString());
+        const json = atob(this.keyResponse.keyDetails.toString());
         const blob = new Blob([json], { type: 'text/plain;charset=utf-8' });
-        saveAs(blob, `${this.addedKey.id}.json`);
+        saveAs(blob, `${this.keyResponse.keyId}.json`);
     }
 
     public closeDialog(): void {

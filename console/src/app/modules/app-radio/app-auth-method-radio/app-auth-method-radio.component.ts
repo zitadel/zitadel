@@ -1,5 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { APIAuthMethodType, OIDCAuthMethodType, OIDCGrantType, OIDCResponseType } from 'src/app/proto/generated/management_pb';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+    APIAuthMethodType,
+    OIDCAuthMethodType,
+    OIDCGrantType,
+    OIDCResponseType,
+} from 'src/app/proto/generated/zitadel/app_pb';
 
 export interface RadioItemAuthType {
     key: string;

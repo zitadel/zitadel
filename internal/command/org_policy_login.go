@@ -66,18 +66,25 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
 }
 
-func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	existingPolicy := NewOrgLoginPolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "Org-GHB37", "Errors.Org.LoginPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-GHB37", "Errors.Org.LoginPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LoginPolicyWriteModel.WriteModel), nil
 }
 
 func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
@@ -102,21 +109,28 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) error {
+func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) (*domain.ObjectDetails, error) {
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
 	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if idpModel.State == domain.IdentityProviderStateUnspecified || idpModel.State == domain.IdentityProviderStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "Org-39fjs", "Errors.Org.LoginPolicy.IDP.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-39fjs", "Errors.Org.LoginPolicy.IDP.NotExisting")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
 	events := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false, cascadeExternalIDPs...)
 
-	_, err = c.eventstore.PushEvents(ctx, events...)
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(idpModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&idpModel.WriteModel), nil
 }
 
 func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.ExternalIDP) []eventstore.EventPusher {
@@ -128,7 +142,7 @@ func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg 
 	}
 
 	for _, idp := range cascadeExternalIDPs {
-		event, err := c.removeHumanExternalIDP(ctx, idp, true)
+		event, _, err := c.removeHumanExternalIDP(ctx, idp, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-n8RRf", "userid", idp.AggregateID, "idpconfigid", idp.IDPConfigID).WithError(err).Warn("could not cascade remove external idp")
 			continue

@@ -6,8 +6,13 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
-import { MyProjectOrgSearchKey, MyProjectOrgSearchQuery, Org, SearchMethod } from 'src/app/proto/generated/auth_pb';
+import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
+import { Org, OrgNameQuery, OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+
+enum OrgListSearchKey {
+    NAME = "NAME",
+}
 
 @Component({
     selector: 'app-org-list',
@@ -18,7 +23,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
     ],
 })
 export class OrgListComponent implements AfterViewInit {
-    public orgSearchKey: MyProjectOrgSearchKey | undefined = undefined;
+    public orgSearchKey: OrgListSearchKey | undefined = undefined;
 
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatSort) sort!: MatSort;
@@ -29,7 +34,7 @@ export class OrgListComponent implements AfterViewInit {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public activeOrg!: Org.AsObject;
-    public MyProjectOrgSearchKey: any = MyProjectOrgSearchKey;
+    public OrgListSearchKey: any = OrgListSearchKey;
 
     constructor(
         private authService: GrpcAuthService,
@@ -37,7 +42,7 @@ export class OrgListComponent implements AfterViewInit {
     ) {
         this.loadOrgs(10, 0);
 
-        this.authService.GetActiveOrg().then(org => this.activeOrg = org);
+        this.authService.getActiveOrg().then(org => this.activeOrg = org);
     }
 
     public ngAfterViewInit(): void {
@@ -48,15 +53,16 @@ export class OrgListComponent implements AfterViewInit {
         this.loadingSubject.next(true);
         let query;
         if (filter) {
-            query = new MyProjectOrgSearchQuery();
-            query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
-            query.setKey(MyProjectOrgSearchKey.MYPROJECTORGSEARCHKEY_ORG_NAME);
-            query.setValue(filter);
+            const query = new OrgQuery();
+            const orgNameQuery = new OrgNameQuery();
+            orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+            orgNameQuery.setName(filter);
+            query.setNameQuery(orgNameQuery);
         }
 
-        from(this.authService.SearchMyProjectOrgs(limit, offset, query ? [query] : undefined)).pipe(
+        from(this.authService.listMyProjectOrgs(limit, offset, query ? [query] : undefined)).pipe(
             map(resp => {
-                return resp.toObject().resultList;
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -75,7 +81,7 @@ export class OrgListComponent implements AfterViewInit {
         this.loadOrgs(this.paginator.length, this.paginator.pageSize * this.paginator.pageIndex);
     }
 
-    public setFilter(key: MyProjectOrgSearchKey): void {
+    public setFilter(key: OrgListSearchKey): void {
         setTimeout(() => {
             if (this.filter) {
                 (this.filter as any).nativeElement.focus();

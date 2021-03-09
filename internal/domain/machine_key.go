@@ -1,8 +1,10 @@
 package domain
 
 import (
+	"encoding/json"
 	"time"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
@@ -30,6 +32,27 @@ func (key *MachineKey) expirationDate() time.Time {
 
 func (key *MachineKey) setExpirationDate(expiration time.Time) {
 	key.ExpirationDate = expiration
+}
+
+func (key *MachineKey) Detail() ([]byte, error) {
+	if key.Type == AuthNKeyTypeJSON {
+		return key.MarshalJSON()
+	}
+	return nil, errors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
+}
+
+func (key *MachineKey) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Type   string `json:"type"`
+		KeyID  string `json:"keyId"`
+		Key    string `json:"key"`
+		UserID string `json:"userId"`
+	}{
+		Type:   "serviceaccount",
+		KeyID:  key.KeyID,
+		Key:    string(key.PrivateKey),
+		UserID: key.AggregateID,
+	})
 }
 
 type MachineKeyState int32

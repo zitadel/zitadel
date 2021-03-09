@@ -3,22 +3,29 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/pkg/grpc/admin"
-	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/caos/zitadel/internal/api/grpc/object"
+	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
+	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func (s *Server) GetDefaultLabelPolicy(ctx context.Context, _ *empty.Empty) (*admin.DefaultLabelPolicyView, error) {
-	result, err := s.iam.GetDefaultLabelPolicy(ctx)
+func (s *Server) GetLabelPolicy(ctx context.Context, req *admin_pb.GetLabelPolicyRequest) (*admin_pb.GetLabelPolicyResponse, error) {
+	policy, err := s.iam.GetDefaultLabelPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return labelPolicyViewFromModel(result), nil
+	return &admin_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
 }
 
-func (s *Server) UpdateDefaultLabelPolicy(ctx context.Context, policy *admin.DefaultLabelPolicyUpdate) (*admin.DefaultLabelPolicy, error) {
-	result, err := s.command.ChangeDefaultLabelPolicy(ctx, labelPolicyToDomain(policy))
+func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabelPolicyRequest) (*admin_pb.UpdateLabelPolicyResponse, error) {
+	policy, err := s.command.ChangeDefaultLabelPolicy(ctx, updateLabelPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}
-	return labelPolicyFromDomain(result), nil
+	return &admin_pb.UpdateLabelPolicyResponse{
+		Details: object.ToDetailsPb(
+			policy.Sequence,
+			policy.ChangeDate,
+			policy.ResourceOwner,
+		),
+	}, nil
 }

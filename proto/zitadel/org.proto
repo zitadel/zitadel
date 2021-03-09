@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+
+package zitadel.org.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/org";
+
+message Org {
+    string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    OrgState state = 3;
+    string name = 4;
+    string primary_domain = 5;
+}
+
+enum OrgState {
+    ORG_STATE_UNSPECIFIED = 0;
+    ORG_STATE_ACTIVE = 1;
+    ORG_STATE_INACTIVE = 2;
+}
+
+message Domain {
+    string org_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    string domain_name = 3;
+    bool is_verified = 4;
+    bool is_primary = 5;
+    DomainValidationType validation_type = 6;
+}
+
+enum DomainValidationType {
+    DOMAIN_VALIDATION_TYPE_UNSPECIFIED = 0;
+    DOMAIN_VALIDATION_TYPE_HTTP = 1;
+    DOMAIN_VALIDATION_TYPE_DNS = 2;
+}
+
+message OrgQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        OrgNameQuery name_query = 1;
+        OrgDomainQuery domain_query = 2;
+    }
+}
+
+message OrgNameQuery {
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message OrgDomainQuery {
+    string domain = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+enum OrgFieldName {
+    ORG_FIELD_NAME_UNSPECIFIED = 0;
+    ORG_FIELD_NAME_NAME = 1;
+}
+
+message DomainSearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        DomainNameQuery domain_name_query = 1;
+    }
+}
+
+message DomainNameQuery {
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}

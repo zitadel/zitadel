@@ -54,59 +54,72 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone) (*
 	return writeModelToPhone(existingPhone), nil
 }
 
-func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceowner string) error {
+func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceowner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Km9ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Km9ds", "Errors.User.UserIDMissing")
 	}
 	if code == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-wMe9f", "Errors.User.Code.Empty")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-wMe9f", "Errors.User.Code.Empty")
 	}
 
 	existingCode, err := c.phoneWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !existingCode.State.Exists() {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-Rsj8c", "Errors.User.Code.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Rsj8c", "Errors.User.Code.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.phoneVerificationCode)
 	if err == nil {
-		_, err = c.eventstore.PushEvents(ctx, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
-		return err
+		pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
+		if err != nil {
+			return nil, err
+		}
+		err = AppendAndReduce(existingCode, pushedEvents...)
+		if err != nil {
+			return nil, err
+		}
+		return writeModelToObjectDetails(&existingCode.WriteModel), nil
 	}
 	_, err = c.eventstore.PushEvents(ctx, user.NewHumanPhoneVerificationFailedEvent(ctx, userAgg))
-
 	logging.LogWithFields("COMMAND-5M9ds", "userID", userAgg.ID).OnError(err).Error("NewHumanPhoneVerificationFailedEvent push failed")
-	return caos_errs.ThrowInvalidArgument(err, "COMMAND-sM0cs", "Errors.User.Code.Invalid")
+	return nil, caos_errs.ThrowInvalidArgument(err, "COMMAND-sM0cs", "Errors.User.Code.Invalid")
 }
 
-func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceowner string) error {
+func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceowner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 
 	existingPhone, err := c.phoneWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !existingPhone.State.Exists() {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-2b7Hf", "Errors.User.Phone.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2b7Hf", "Errors.User.Phone.NotFound")
 	}
 	if existingPhone.IsPhoneVerified {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sf", "Errors.User.Phone.AlreadyVerified")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sf", "Errors.User.Phone.AlreadyVerified")
 	}
 
 	phoneCode, err := domain.NewPhoneCode(c.phoneVerificationCode)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPhone, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPhone.WriteModel), nil
 }
 
 func (c *Commands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
@@ -123,22 +136,29 @@ func (c *Commands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, us
 	return err
 }
 
-func (c *Commands) RemoveHumanPhone(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) RemoveHumanPhone(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.UserIDMissing")
 	}
 
 	existingPhone, err := c.phoneWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !existingPhone.State.Exists() {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-p6rsc", "Errors.User.Phone.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-p6rsc", "Errors.User.Phone.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, user.NewHumanPhoneRemovedEvent(ctx, userAgg))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanPhoneRemovedEvent(ctx, userAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPhone, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPhone.WriteModel), nil
 }
 
 func (c *Commands) phoneWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPhoneWriteModel, err error) {

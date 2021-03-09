@@ -1,0 +1,669 @@
+syntax = "proto3";
+
+import "zitadel/user.proto";
+import "zitadel/org.proto";
+import "zitadel/change.proto";
+import "zitadel/object.proto";
+import "zitadel/options.proto";
+import "zitadel/policy.proto";
+import "zitadel/idp.proto";
+import "validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.auth.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/auth";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "auth service";
+        version: "1.0";
+        contact:{
+            url: "https://github.com/caos/zitadel/api/auth" //TODO: should be swagger path
+        };
+    };
+
+    schemes: HTTPS;
+
+    consumes: "application/json";
+    consumes: "application/grpc";
+
+    produces: "application/json";
+    produces: "application/grpc";
+};
+
+
+service AuthService {
+    rpc Healthz(HealthzRequest) returns (HealthzResponse) {
+        option (google.api.http) = {
+            get: "/healthz"
+        };
+    }
+    
+    rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
+        option (google.api.http) = {
+            get: "/users/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
+        option (google.api.http) = {
+            post: "/users/me/changes/_search"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
+        option (google.api.http) = {
+            post: "/users/me/sessions/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc UpdateMyUserName(UpdateMyUserNameRequest) returns (UpdateMyUserNameResponse) {
+        option (google.api.http) = {
+            put: "/users/me/username"
+            body: "*"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc GetMyPasswordComplexityPolicy(GetMyPasswordComplexityPolicyRequest) returns (GetMyPasswordComplexityPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/passwords/complexity"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc UpdateMyPassword(UpdateMyPasswordRequest) returns (UpdateMyPasswordResponse) {
+        option (google.api.http) = {
+            put: "/users/me/password"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc GetMyProfile(GetMyProfileRequest) returns (GetMyProfileResponse) {
+        option (google.api.http) = {
+            get: "/users/me/profile"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc UpdateMyProfile(UpdateMyProfileRequest) returns (UpdateMyProfileResponse) {
+        option (google.api.http) = {
+            put: "/users/me/profile"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc GetMyEmail(GetMyEmailRequest) returns (GetMyEmailResponse) {
+        option (google.api.http) = {
+            get: "/users/me/email"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc SetMyEmail(SetMyEmailRequest) returns (SetMyEmailResponse) {
+        option (google.api.http) = {
+            put: "/users/me/email"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyEmail(VerifyMyEmailRequest) returns (VerifyMyEmailResponse) {
+        option (google.api.http) = {
+            post: "/users/me/email/_verify"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ResendMyEmailVerification(ResendMyEmailVerificationRequest) returns (ResendMyEmailVerificationResponse) {
+        option (google.api.http) = {
+            post: "/users/me/email/_resend_verification"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc GetMyPhone(GetMyPhoneRequest) returns (GetMyPhoneResponse) {
+        option (google.api.http) = {
+            get: "/users/me/phone"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc SetMyPhone(SetMyPhoneRequest) returns (SetMyPhoneResponse) {
+        option (google.api.http) = {
+            put: "/users/me/phone"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyPhone(VerifyMyPhoneRequest) returns (VerifyMyPhoneResponse) {
+        option (google.api.http) = {
+            post: "/users/me/phone/_verify"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ResendMyPhoneVerification(ResendMyPhoneVerificationRequest) returns (ResendMyPhoneVerificationResponse) {
+        option (google.api.http) = {
+            post: "/users/me/phone/_resend_verification"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyPhone(RemoveMyPhoneRequest) returns (RemoveMyPhoneResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/phone"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyLinkedIDPs(ListMyLinkedIDPsRequest) returns (ListMyLinkedIDPsResponse) {
+        option (google.api.http) = {
+            post: "/users/me/idps/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyLinkedIDP(RemoveMyLinkedIDPRequest) returns (RemoveMyLinkedIDPResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/idps/{idp_id}/{linked_user_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyAuthFactors(ListMyAuthFactorsRequest) returns (ListMyAuthFactorsResponse) {
+        option (google.api.http) = {
+            post: "/users/me/auth_factors/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc AddMyAuthFactorOTP(AddMyAuthFactorOTPRequest) returns (AddMyAuthFactorOTPResponse) {
+        option (google.api.http) = {
+            post: "/users/me/auth_factors/otp"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyAuthFactorOTP(VerifyMyAuthFactorOTPRequest) returns (VerifyMyAuthFactorOTPResponse) {
+        option (google.api.http) = {
+            post: "/users/me/auth_factors/otp/_verify"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyAuthFactorOTP(RemoveMyAuthFactorOTPRequest) returns (RemoveMyAuthFactorOTPResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/auth_factors/otp"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc AddMyAuthFactorU2F(AddMyAuthFactorU2FRequest) returns (AddMyAuthFactorU2FResponse) {
+        option (google.api.http) = {
+            post: "/users/me/auth_factors/u2f"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyAuthFactorU2F(VerifyMyAuthFactorU2FRequest) returns (VerifyMyAuthFactorU2FResponse) {
+        option (google.api.http) = {
+            post: "/users/me/auth_factors/u2f/_verify"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyAuthFactorU2F(RemoveMyAuthFactorU2FRequest) returns (RemoveMyAuthFactorU2FResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/auth_factors/u2f/{token_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyPasswordless(ListMyPasswordlessRequest) returns (ListMyPasswordlessResponse) {
+        option (google.api.http) = {
+            post: "/users/me/passwordless/_search"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc AddMyPasswordless(AddMyPasswordlessRequest) returns (AddMyPasswordlessResponse) {
+        option (google.api.http) = {
+            post: "/users/me/passwordless"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc VerifyMyPasswordless(VerifyMyPasswordlessRequest) returns (VerifyMyPasswordlessResponse) {
+        option (google.api.http) = {
+            post: "/users/me/passwordless/_verify"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc RemoveMyPasswordless(RemoveMyPasswordlessRequest) returns (RemoveMyPasswordlessResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/passwordless/{token_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
+        option (google.api.http) = {
+            post: "/usergrants/me/_search"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyProjectOrgs(ListMyProjectOrgsRequest) returns (ListMyProjectOrgsResponse) {
+        option (google.api.http) = {
+            post: "/global/projectorgs/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
+        option (google.api.http) = {
+            post: "/permissions/zitadel/me/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    rpc ListMyProjectPermissions(ListMyProjectPermissionsRequest) returns (ListMyProjectPermissionsResponse) {
+        option (google.api.http) = {
+            post: "/permissions/me/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+}
+
+message HealthzRequest {}
+
+message HealthzResponse {}
+
+//GetMyUserRequest is an empty request
+// the request parameters are read from the token-header
+message GetMyUserRequest {}
+
+message GetMyUserResponse {
+    zitadel.user.v1.User user = 1;
+    google.protobuf.Timestamp last_login = 2;
+}
+
+message ListMyUserChangesRequest {
+    zitadel.v1.ListQuery query = 1;
+}
+
+message ListMyUserChangesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.change.v1.Change result = 2;
+}
+
+message ListMyUserSessionsRequest {}
+
+message ListMyUserSessionsResponse {
+    repeated zitadel.user.v1.Session result = 1;
+}
+
+message UpdateMyUserNameRequest {
+    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateMyUserNameResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetMyPasswordComplexityPolicyRequest {}
+
+message GetMyPasswordComplexityPolicyResponse {
+    zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
+}
+
+message UpdateMyPasswordRequest {
+    string old_password = 1 [(validate.rules).string = {min_len: 1, max_bytes: 70}];
+    string new_password = 2 [(validate.rules).string = {min_len: 1, max_bytes: 70}];
+}
+
+message UpdateMyPasswordResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetMyProfileRequest {}
+
+message GetMyProfileResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    zitadel.user.v1.Profile profile = 2;
+}
+
+message UpdateMyProfileRequest {
+    string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+    string display_name = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
+    zitadel.user.v1.Gender gender = 6;
+}
+
+message UpdateMyProfileResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetMyEmailRequest {}
+
+message GetMyEmailResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    zitadel.user.v1.Email email = 2;
+}
+
+message SetMyEmailRequest {
+    string email = 1 [(validate.rules).string.email = true]; //TODO: check if no value is allowed
+}
+
+message SetMyEmailResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message VerifyMyEmailRequest {
+    string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message VerifyMyEmailResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResendMyEmailVerificationRequest {}
+
+message ResendMyEmailVerificationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetMyPhoneRequest {}
+
+message GetMyPhoneResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    zitadel.user.v1.Phone phone = 2;
+}
+
+message SetMyPhoneRequest {
+    string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
+}
+
+message SetMyPhoneResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message VerifyMyPhoneRequest {
+    string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message VerifyMyPhoneResponse {}
+
+message ResendMyPhoneVerificationRequest {}
+
+message ResendMyPhoneVerificationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveMyPhoneRequest {}
+
+message RemoveMyPhoneResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListMyLinkedIDPsRequest {
+    zitadel.v1.ListQuery query = 1;
+    //PLANNED: queries for idp name and login name
+}
+
+message ListMyLinkedIDPsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.idp.v1.IDPUserLink result = 2;
+}
+
+message RemoveMyLinkedIDPRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string linked_user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMyLinkedIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListMyAuthFactorsRequest {}
+
+message ListMyAuthFactorsResponse {
+    repeated zitadel.user.v1.AuthFactor result = 1;
+}
+
+message AddMyAuthFactorU2FRequest {}
+
+message AddMyAuthFactorU2FResponse {
+    zitadel.user.v1.WebAuthNKey key = 1;
+    zitadel.v1.ObjectDetails details = 2;
+}
+
+message AddMyAuthFactorOTPRequest {}
+
+message AddMyAuthFactorOTPResponse {
+    string url = 1;
+    string secret = 2;
+    zitadel.v1.ObjectDetails details = 3;
+}
+
+message VerifyMyAuthFactorOTPRequest {
+    string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message VerifyMyAuthFactorOTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message VerifyMyAuthFactorU2FRequest {
+    zitadel.user.v1.WebAuthNVerification verification = 1 [(validate.rules).message.required = true];
+}
+
+message VerifyMyAuthFactorU2FResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveMyAuthFactorOTPRequest {}
+
+message RemoveMyAuthFactorOTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveMyAuthFactorU2FRequest {
+    string token_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMyAuthFactorU2FResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListMyPasswordlessRequest {}
+
+message ListMyPasswordlessResponse {
+    repeated zitadel.user.v1.WebAuthNToken result = 1; 
+}
+
+message AddMyPasswordlessRequest {}
+
+message AddMyPasswordlessResponse {
+    zitadel.user.v1.WebAuthNKey key = 1;
+    zitadel.v1.ObjectDetails details = 2;
+}
+
+message VerifyMyPasswordlessRequest {
+    zitadel.user.v1.WebAuthNVerification verification = 1 [(validate.rules).message.required = true];
+}
+
+message VerifyMyPasswordlessResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveMyPasswordlessRequest {
+    string token_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMyPasswordlessResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListMyUserGrantsRequest {
+    zitadel.v1.ListQuery query = 1;
+}
+
+message ListMyUserGrantsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated UserGrant result = 2;
+}
+
+message UserGrant {
+    string org_id = 1;
+    string project_id = 2;
+    string user_id = 3;
+    repeated string roles = 4;
+    string org_name = 5;
+    string grant_id = 6;
+}
+
+message ListMyProjectOrgsRequest {
+    zitadel.v1.ListQuery query = 1;
+    repeated zitadel.org.v1.OrgQuery queries = 2;
+}
+
+message ListMyProjectOrgsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.org.v1.Org result = 2;
+}
+
+message ListMyZitadelPermissionsRequest {}
+
+message ListMyZitadelPermissionsResponse {
+    repeated string result = 1;
+}
+
+message ListMyProjectPermissionsRequest {}
+
+message ListMyProjectPermissionsResponse {
+    repeated string result = 1;
+}

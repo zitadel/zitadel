@@ -11,20 +11,20 @@ import (
 )
 
 //ResendInitialMail resend inital mail and changes email if provided
-func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourceOwner string) (err error) {
+func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourceOwner string) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
 	}
 
 	existingCode, err := c.getHumanInitWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9df", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2M9df", "Errors.User.NotFound")
 	}
 	if existingCode.UserState != domain.UserStateInitial {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.AlreadyInitialised")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.AlreadyInitialised")
 	}
 	var events []eventstore.EventPusher
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
@@ -34,11 +34,18 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourc
 	}
 	initCode, err := domain.NewInitUserCode(c.initializeUserCode)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	events = append(events, user.NewHumanInitialCodeAddedEvent(ctx, userAgg, initCode.Code, initCode.Expiry))
-	_, err = c.eventstore.PushEvents(ctx, events...)
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingCode, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingCode.WriteModel), nil
 }
 
 func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, passwordString string) error {

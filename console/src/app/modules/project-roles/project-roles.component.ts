@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectRole } from 'src/app/proto/generated/management_pb';
+import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -22,10 +22,10 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     @Input() public disabled: boolean = false;
     @Input() public actionsVisible: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<ProjectRole.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<Role.AsObject>;
     public dataSource!: ProjectRolesDataSource;
-    public selection: SelectionModel<ProjectRole.AsObject> = new SelectionModel<ProjectRole.AsObject>(true, []);
-    @Output() public changedSelection: EventEmitter<Array<ProjectRole.AsObject>> = new EventEmitter();
+    public selection: SelectionModel<Role.AsObject> = new SelectionModel<Role.AsObject>(true, []);
+    @Output() public changedSelection: EventEmitter<Array<Role.AsObject>> = new EventEmitter();
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
@@ -51,7 +51,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     }
 
     public selectAllOfGroup(group: string): void {
-        const groupRoles: ProjectRole.AsObject[] = this.dataSource.rolesSubject.getValue()
+        const groupRoles: Role.AsObject[] = this.dataSource.rolesSubject.getValue()
             .filter(role => role.group === group);
         this.selection.select(...groupRoles);
     }
@@ -73,7 +73,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     public masterToggle(): void {
         this.isAllSelected() ?
             this.selection.clear() :
-            this.dataSource.rolesSubject.value.forEach((row: ProjectRole.AsObject) => this.selection.select(row));
+            this.dataSource.rolesSubject.value.forEach((row: Role.AsObject) => this.selection.select(row));
     }
 
     public deleteSelectedRoles(): Promise<any> {
@@ -83,7 +83,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         });
 
         return Promise.all(this.selection.selected.map(role => {
-            return this.mgmtService.RemoveProjectRole(role.projectId, role.key);
+            return this.mgmtService.removeProjectRole(this.projectId, role.key);
         })).then(() => {
             this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
             indexes.forEach(index => {
@@ -98,9 +98,9 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         });
     }
 
-    public removeRole(role: ProjectRole.AsObject, index: number): void {
+    public removeRole(role: Role.AsObject, index: number): void {
         this.mgmtService
-            .RemoveProjectRole(role.projectId, role.key)
+            .removeProjectRole(this.projectId, role.key)
             .then(() => {
                 this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
                 this.dataSource.rolesSubject.value.splice(index, 1);
@@ -111,7 +111,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
             });
     }
 
-    public openDetailDialog(role: ProjectRole.AsObject): void {
+    public openDetailDialog(role: Role.AsObject): void {
         this.dialog.open(ProjectRoleDetailComponent, {
             data: {
                 role,

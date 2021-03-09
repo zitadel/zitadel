@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { IamMemberView } from 'src/app/proto/generated/admin_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { AdminService } from 'src/app/services/admin.service';
 
 /**
@@ -10,10 +10,10 @@ import { AdminService } from 'src/app/services/admin.service';
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class IamMembersDataSource extends DataSource<IamMemberView.AsObject> {
+export class IamMembersDataSource extends DataSource<Member.AsObject> {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
-    public membersSubject: BehaviorSubject<IamMemberView.AsObject[]> = new BehaviorSubject<IamMemberView.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -27,14 +27,13 @@ export class IamMembersDataSource extends DataSource<IamMemberView.AsObject> {
 
         this.loadingSubject.next(true);
 
-        from(this.adminService.SearchIamMembers(pageSize, offset)).pipe(
+        from(this.adminService.listIAMMembers(pageSize, offset)).pipe(
             map(resp => {
-                const response = resp.toObject();
-                this.totalResult = response.totalResult;
-                if (response.viewTimestamp) {
-                    this.viewTimestamp = response.viewTimestamp;
+                this.totalResult = resp.details?.totalResult || 0;
+                if (resp.details?.viewTimestamp) {
+                    this.viewTimestamp = resp.details?.viewTimestamp;
                 }
-                return response.resultList;
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -49,7 +48,7 @@ export class IamMembersDataSource extends DataSource<IamMemberView.AsObject> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<IamMemberView.AsObject[]> {
+    public connect(): Observable<Member.AsObject[]> {
         return this.membersSubject.asObservable();
     }
 

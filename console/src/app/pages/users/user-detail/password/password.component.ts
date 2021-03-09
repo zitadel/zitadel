@@ -3,7 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
+import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -50,8 +50,10 @@ export class PasswordComponent implements OnDestroy {
             }
 
             const validators: Validators[] = [Validators.required];
-            this.authService.GetMyPasswordComplexityPolicy().then(complexity => {
-                this.policy = complexity.toObject();
+            this.authService.getMyPasswordComplexityPolicy().then(resp => {
+                if (resp.policy) {
+                    this.policy = resp.policy;
+                }
                 if (this.policy.minLength) {
                     validators.push(Validators.minLength(this.policy.minLength));
                 }
@@ -96,7 +98,7 @@ export class PasswordComponent implements OnDestroy {
 
     public setInitialPassword(userId: string): void {
         if (this.passwordForm.valid && this.password && this.password.value) {
-            this.mgmtUserService.SetInitialPassword(userId, this.password.value).then((data: any) => {
+            this.mgmtUserService.setHumanInitialPassword(userId, this.password.value).then((data: any) => {
                 this.toast.showInfo('USER.TOAST.INITIALPASSWORDSET', true);
                 window.history.back();
             }).catch(error => {
@@ -109,7 +111,7 @@ export class PasswordComponent implements OnDestroy {
         if (this.passwordForm.valid && this.currentPassword &&
             this.currentPassword.value &&
             this.newPassword && this.newPassword.value && this.newPassword.valid) {
-            this.authService.ChangeMyPassword(this.currentPassword.value, this.newPassword.value)
+            this.authService.updateMyPassword(this.currentPassword.value, this.newPassword.value)
                 .then((data: any) => {
                     this.toast.showInfo('USER.TOAST.PASSWORDCHANGED', true);
                     window.history.back();

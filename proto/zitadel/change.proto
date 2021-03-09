@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "zitadel/message.proto";
+
+package zitadel.change.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/change";
+
+message Change {
+    google.protobuf.Timestamp change_date = 1;
+    zitadel.v1.LocalizedMessage event_type = 2;
+    uint64 sequence = 3;
+    string editor_id = 4;
+    string editor_display_name = 5;
+    string resource_owner_id = 6;
+}

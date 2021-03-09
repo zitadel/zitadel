@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { ProjectMember } from 'src/app/proto/generated/management_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 /**
@@ -10,11 +10,11 @@ import { ManagementService } from 'src/app/services/mgmt.service';
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsObject> {
+export class ProjectGrantMembersDataSource extends DataSource<Member.AsObject> {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
 
-    public membersSubject: BehaviorSubject<ProjectMember.AsObject[]> = new BehaviorSubject<ProjectMember.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -28,15 +28,14 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
 
         this.loadingSubject.next(true);
 
-        from(this.mgmtService.SearchProjectGrantMembers(projectId,
+        from(this.mgmtService.listProjectGrantMembers(projectId,
             grantId, pageSize, offset)).pipe(
                 map(resp => {
-                    const response = resp.toObject();
-                    this.totalResult = response.totalResult;
-                    if (response.viewTimestamp) {
-                        this.viewTimestamp = response.viewTimestamp;
+                    this.totalResult = resp.details?.totalResult || 0;
+                    if (resp.details?.viewTimestamp) {
+                        this.viewTimestamp = resp.details?.viewTimestamp;
                     }
-                    return response.resultList;
+                    return resp.resultList;
                 }),
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false)),
@@ -51,7 +50,7 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<ProjectMember.AsObject[]> {
+    public connect(): Observable<Member.AsObject[]> {
         return this.membersSubject.asObservable();
     }
 

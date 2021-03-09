@@ -2,28 +2,9 @@ import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { CreateMachineRequest } from 'src/app/proto/generated/admin_pb';
-import { UserResponse } from 'src/app/proto/generated/management_pb';
+import { AddMachineUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
-function noEmailValidator(c: AbstractControl): any {
-    const EMAIL_REGEXP: RegExp = /^((?!@).)*$/gm;
-    if (!c.parent || !c) {
-        return;
-    }
-    const username = c.parent.get('userName');
-
-    if (!username) {
-        return;
-    }
-
-    return EMAIL_REGEXP.test(username.value) ? null : {
-        noEmailValidator: {
-            valid: false,
-        },
-    };
-}
 
 @Component({
     selector: 'app-user-create-machine',
@@ -31,7 +12,7 @@ function noEmailValidator(c: AbstractControl): any {
     styleUrls: ['./user-create-machine.component.scss'],
 })
 export class UserCreateMachineComponent implements OnDestroy {
-    public user: CreateMachineRequest.AsObject = new CreateMachineRequest().toObject();
+    public user: AddMachineUserRequest.AsObject = new AddMachineUserRequest().toObject();
     public userForm!: FormGroup;
 
     private sub: Subscription = new Subscription();
@@ -64,16 +45,17 @@ export class UserCreateMachineComponent implements OnDestroy {
 
         this.loading = true;
 
-        const machineReq = new CreateMachineRequest();
+        const machineReq = new AddMachineUserRequest();
         machineReq.setDescription(this.description?.value);
         machineReq.setName(this.name?.value);
+        machineReq.setUserName(this.userName?.value);
 
         this.userService
-            .CreateUserMachine(this.userName?.value, machineReq)
-            .then((data: UserResponse) => {
+            .addMachineUser(machineReq)
+            .then((data) => {
                 this.loading = false;
                 this.toast.showInfo('USER.TOAST.CREATED', true);
-                const id = data.getId();
+                const id = data.userId;
                 if (id) {
                     this.router.navigate(['users', id]);
                 }

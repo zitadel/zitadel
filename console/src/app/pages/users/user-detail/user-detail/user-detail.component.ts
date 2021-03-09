@@ -7,17 +7,8 @@ import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import {
-    Gender,
-    MachineResponse,
-    MachineView,
-    NotificationType,
-    UserEmail,
-    UserPhone,
-    UserProfile,
-    UserState,
-    UserView,
-} from 'src/app/proto/generated/management_pb';
+import { SendHumanResetPasswordNotificationRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -35,7 +26,7 @@ export enum EditDialogType {
     styleUrls: ['./user-detail.component.scss'],
 })
 export class UserDetailComponent implements OnInit {
-    public user!: UserView.AsObject;
+    public user!: User.AsObject;
     public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
 
@@ -63,8 +54,10 @@ export class UserDetailComponent implements OnInit {
         this.refreshChanges$.emit();
         this.route.params.pipe(take(1)).subscribe(params => {
             const { id } = params;
-            this.mgmtUserService.GetUserByID(id).then(user => {
-                this.user = user.toObject();
+            this.mgmtUserService.getUserByID(id).then(resp => {
+                if (resp.user) {
+                    this.user = resp.user;
+                }
             }).catch(err => {
                 console.error(err);
             });
@@ -76,15 +69,15 @@ export class UserDetailComponent implements OnInit {
     }
 
     public changeState(newState: UserState): void {
-        if (newState === UserState.USERSTATE_ACTIVE) {
-            this.mgmtUserService.ReactivateUser(this.user.id).then(() => {
+        if (newState === UserState.USER_STATE_ACTIVE) {
+            this.mgmtUserService.reactivateUser(this.user.id).then(() => {
                 this.toast.showInfo('USER.TOAST.REACTIVATED', true);
                 this.user.state = newState;
             }).catch(error => {
                 this.toast.showError(error);
             });
-        } else if (newState === UserState.USERSTATE_INACTIVE) {
-            this.mgmtUserService.DeactivateUser(this.user.id).then(() => {
+        } else if (newState === UserState.USER_STATE_INACTIVE) {
+            this.mgmtUserService.deactivateUser(this.user.id).then(() => {
                 this.toast.showInfo('USER.TOAST.DEACTIVATED', true);
                 this.user.state = newState;
             }).catch(error => {
@@ -93,25 +86,19 @@ export class UserDetailComponent implements OnInit {
         }
     }
 
-    public saveProfile(profileData: UserProfile.AsObject): void {
+    public saveProfile(profileData: Profile.AsObject): void {
         if (this.user.human) {
-            this.user.human.firstName = profileData.firstName;
-            this.user.human.lastName = profileData.lastName;
-            this.user.human.nickName = profileData.nickName;
-            this.user.human.displayName = profileData.displayName;
-            this.user.human.gender = profileData.gender;
-            this.user.human.preferredLanguage = profileData.preferredLanguage;
+            this.user.human.profile = profileData;
             this.mgmtUserService
-                .SaveUserProfile(
+                .updateHumanProfile(
                     this.user.id,
-                    this.user.human.firstName,
-                    this.user.human.lastName,
-                    this.user.human.nickName,
-                    this.user.human.preferredLanguage,
-                    this.user.human.gender)
-                .then((data: UserProfile) => {
+                    this.user.human.profile.firstName,
+                    this.user.human.profile.lastName,
+                    this.user.human.profile.nickName,
+                    this.user.human.profile.preferredLanguage,
+                    this.user.human.profile.gender)
+                .then(() => {
                     this.toast.showInfo('USER.TOAST.SAVED', true);
-                    this.user = Object.assign(this.user, data.toObject());
                     this.refreshChanges$.emit();
                 })
                 .catch(error => {
@@ -120,18 +107,17 @@ export class UserDetailComponent implements OnInit {
         }
     }
 
-    public saveMachine(machineData: MachineView.AsObject): void {
+    public saveMachine(machineData: Machine.AsObject): void {
         if (this.user.machine) {
             this.user.machine.name = machineData.name;
             this.user.machine.description = machineData.description;
 
             this.mgmtUserService
-                .UpdateUserMachine(
+                .updateMachine(
                     this.user.id,
                     this.user.machine.description)
-                .then((data: MachineResponse) => {
+                .then(() => {
                     this.toast.showInfo('USER.TOAST.SAVED', true);
-                    this.user = Object.assign(this.user, data.toObject());
                     this.refreshChanges$.emit();
                 })
                 .catch(error => {
@@ -141,7 +127,7 @@ export class UserDetailComponent implements OnInit {
     }
 
     public resendEmailVerification(): void {
-        this.mgmtUserService.ResendEmailVerification(this.user.id).then(() => {
+        this.mgmtUserService.resendHumanEmailVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
             this.refreshChanges$.emit();
         }).catch(error => {
@@ -150,7 +136,7 @@ export class UserDetailComponent implements OnInit {
     }
 
     public resendPhoneVerification(): void {
-        this.mgmtUserService.ResendPhoneVerification(this.user.id).then(() => {
+        this.mgmtUserService.resendHumanPhoneVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
             this.refreshChanges$.emit();
         }).catch(error => {
@@ -159,10 +145,10 @@ export class UserDetailComponent implements OnInit {
     }
 
     public deletePhone(): void {
-        this.mgmtUserService.RemoveUserPhone(this.user.id).then(() => {
+        this.mgmtUserService.removeHumanPhone(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
             if (this.user.human) {
-                this.user.human.phone = '';
+                this.user.human.phone = new Phone().setPhone('').toObject();
                 this.refreshUser();
             }
         }).catch(error => {
@@ -172,10 +158,10 @@ export class UserDetailComponent implements OnInit {
 
     public saveEmail(email: string): void {
         if (this.user.id && email) {
-            this.mgmtUserService.SaveUserEmail(this.user.id, email).then((data: UserEmail) => {
+            this.mgmtUserService.updateHumanEmail(this.user.id, email).then(() => {
                 this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
                 if (this.user.human) {
-                    this.user.human.email = data.toObject().email;
+                    this.user.human.email = new Email().setEmail(email).toObject();
                     this.refreshUser();
                 }
             }).catch(error => {
@@ -187,10 +173,10 @@ export class UserDetailComponent implements OnInit {
     public savePhone(phone: string): void {
         if (this.user.id && phone) {
             this.mgmtUserService
-                .SaveUserPhone(this.user.id, phone).then((data: UserPhone) => {
+                .updateHumanPhone(this.user.id, phone).then(() => {
                     this.toast.showInfo('USER.TOAST.PHONESAVED', true);
                     if (this.user.human) {
-                        this.user.human.phone = data.toObject().phone;
+                        this.user.human.phone = new Phone().setPhone(phone).toObject();
                         this.refreshUser();
                     }
                 }).catch(error => {
@@ -204,7 +190,7 @@ export class UserDetailComponent implements OnInit {
     }
 
     public sendSetPasswordNotification(): void {
-        this.mgmtUserService.SendSetPasswordNotification(this.user.id, NotificationType.NOTIFICATIONTYPE_EMAIL)
+        this.mgmtUserService.sendHumanResetPasswordNotification(this.user.id, SendHumanResetPasswordNotificationRequest.Type.TYPE_EMAIL)
             .then(() => {
                 this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
                 this.refreshChanges$.emit();
@@ -226,7 +212,7 @@ export class UserDetailComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.mgmtUserService.DeleteUser(this.user.id).then(() => {
+                this.mgmtUserService.removeUser(this.user.id).then(() => {
                     const params: Params = {
                         'deferredReload': true,
                     };
@@ -246,7 +232,7 @@ export class UserDetailComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp.send && this.user.id) {
-                this.mgmtUserService.ResendInitialMail(this.user.id, resp.email ?? '').then(() => {
+                this.mgmtUserService.resendHumanInitialization(this.user.id, resp.email ?? '').then(() => {
                     this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
                     this.refreshChanges$.emit();
                 }).catch(error => {

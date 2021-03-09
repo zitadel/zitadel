@@ -1,41 +1,33 @@
 package auth
 
 import (
-	"context"
-
-	"github.com/golang/protobuf/ptypes/empty"
-
-	"github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/caos/zitadel/internal/usergrant/model"
+	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
 
-func (s *Server) SearchMyUserGrant(ctx context.Context, in *auth.UserGrantSearchRequest) (*auth.UserGrantSearchResponse, error) {
-	response, err := s.repo.SearchMyUserGrants(ctx, userGrantSearchRequestsToModel(in))
-	if err != nil {
-		return nil, err
+func ListMyUserGrantsRequestToModel(req *auth_pb.ListMyUserGrantsRequest) *model.UserGrantSearchRequest {
+	return &model.UserGrantSearchRequest{
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
 	}
-	return userGrantSearchResponseFromModel(response), nil
 }
 
-func (s *Server) SearchMyProjectOrgs(ctx context.Context, in *auth.MyProjectOrgSearchRequest) (*auth.MyProjectOrgSearchResponse, error) {
-	response, err := s.repo.SearchMyProjectOrgs(ctx, myProjectOrgSearchRequestRequestsToModel(in))
-	if err != nil {
-		return nil, err
+func UserGrantsToPb(grants []*model.UserGrantView) []*auth_pb.UserGrant {
+	userGrants := make([]*auth_pb.UserGrant, len(grants))
+	for i, grant := range grants {
+		userGrants[i] = UserGrantToPb(grant)
 	}
-	return projectOrgSearchResponseFromModel(response), nil
+	return userGrants
 }
 
-func (s *Server) GetMyZitadelPermissions(ctx context.Context, _ *empty.Empty) (*auth.MyPermissions, error) {
-	perms, err := s.repo.SearchMyZitadelPermissions(ctx)
-	if err != nil {
-		return nil, err
+func UserGrantToPb(grant *model.UserGrantView) *auth_pb.UserGrant {
+	return &auth_pb.UserGrant{
+		GrantId:   grant.ID,
+		OrgId:     grant.ResourceOwner,
+		OrgName:   grant.OrgName,
+		ProjectId: grant.ProjectID,
+		UserId:    grant.UserID,
+		Roles:     grant.RoleKeys,
 	}
-	return &auth.MyPermissions{Permissions: perms}, nil
-}
-
-func (s *Server) GetMyProjectPermissions(ctx context.Context, _ *empty.Empty) (*auth.MyPermissions, error) {
-	perms, err := s.repo.SearchMyProjectPermissions(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &auth.MyPermissions{Permissions: perms}, nil
 }

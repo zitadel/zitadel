@@ -3,15 +3,16 @@ package management
 import (
 	"context"
 
-	"github.com/golang/protobuf/ptypes/empty"
-
-	"github.com/caos/zitadel/pkg/grpc/management"
+	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func (s *Server) GetIam(ctx context.Context, _ *empty.Empty) (*management.Iam, error) {
+func (s *Server) GetIAM(ctx context.Context, req *mgmt_pb.GetIAMRequest) (*mgmt_pb.GetIAMResponse, error) {
 	iam, err := s.project.GetIAMByID(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return iamFromModel(iam), nil
+	return &mgmt_pb.GetIAMResponse{
+		GlobalOrgId:  iam.GlobalOrgID,
+		IamProjectId: iam.IAMProjectID,
+	}, nil
 }

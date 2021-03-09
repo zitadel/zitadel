@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+
+package zitadel.idp.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
+
+message IDP {
+    string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    IDPState state = 3;
+    string name = 4;
+    IDPStylingType styling_type = 5;
+    IDPOwnerType owner = 6;
+    oneof config {
+        OIDCConfig oidc_config = 7;
+    }
+}
+
+message IDPUserLink {
+    string user_id = 1;
+    string idp_id = 2;
+    string idp_name = 3;
+    string provided_user_id = 4;
+    string provided_user_name = 5;
+    IDPType idp_type = 6;
+}
+
+message IDPLoginPolicyLink {
+    string idp_id = 1;
+    string idp_name = 2;
+    IDPType idp_type = 3;
+}
+
+enum IDPState {
+    IDP_STATE_UNSPECIFIED = 0;
+    IDP_STATE_ACTIVE = 1;
+    IDP_STATE_INACTIVE = 2;
+}
+
+enum IDPStylingType {
+    STYLING_TYPE_UNSPECIFIED = 0;
+    STYLING_TYPE_GOOGLE = 1;
+}
+
+enum IDPType {
+    IDP_TYPE_UNSPECIFIED = 0;
+    IDP_TYPE_OIDC = 1;
+    //PLANNED: IDP_TYPE_SAML
+}
+
+enum IDPOwnerType {
+    IDP_OWNER_TYPE_UNSPECIFIED = 0;
+    IDP_OWNER_TYPE_SYSTEM = 1;
+    IDP_OWNER_TYPE_ORG = 2;
+}
+
+message OIDCConfig {
+    string client_id = 1;
+    string issuer = 2;
+    repeated string scopes = 3;
+    OIDCMappingField display_name_mapping = 4;
+    OIDCMappingField username_mapping = 5;
+}
+
+enum OIDCMappingField {
+    OIDC_MAPPING_FIELD_UNSPECIFIED = 0;
+    OIDC_MAPPING_FIELD_PREFERRED_USERNAME = 1;
+    OIDC_MAPPING_FIELD_EMAIL = 2;
+}
+
+message IDPIDQuery {
+    string id = 1 [(validate.rules).string = {max_len: 200}];
+}
+
+message IDPNameQuery {
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message IDPOwnerTypeQuery {
+    IDPOwnerType owner_type = 1 [(validate.rules).enum = {defined_only: true}];
+}
+
+enum IDPFieldName {
+    IDP_FIELD_NAME_UNSPECIFIED = 0;
+    IDP_FIELD_NAME_NAME = 1;
+}

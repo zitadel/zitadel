@@ -106,29 +106,28 @@
                 {{ 'APP.OIDC.DEVMODE' | translate }}
             </mat-slide-toggle>
 
-            <cnsl-info-section class="step-description"
-                *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+            <cnsl-info-section class="step-description" *ngIf="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
                 <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
             </cnsl-info-section>
 
             <cnsl-info-section class="step-description"
-                *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
+                *ngIf="OIDCAppType?.value == OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value == OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}
             </cnsl-info-section>
 
             <div style="margin: .5rem" class="divider"></div>
-            <cnsl-redirect-uris *ngIf="applicationType?.value !== undefined" class="redirect-section"
-                [canWrite]="canWrite" [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
+            <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
+                [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
                 (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
                 title="{{ 'APP.OIDC.REDIRECT' | translate }}"
-                [isNative]="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+                [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
             </cnsl-redirect-uris>
 
-            <cnsl-redirect-uris *ngIf="applicationType?.value !== undefined" class="redirect-section"
-                [canWrite]="canWrite" [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $event"
+            <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
+                [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $event"
                 [urisList]="postLogoutRedirectUrisList" [getValues]="requestRedirectValuesSubject$"
                 title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
-                [isNative]="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+                [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
             </cnsl-redirect-uris>
         </div>
 
@@ -262,7 +261,7 @@
             <div class="meta-row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
                 <span *ngIf="app && app.state !== undefined"
-                    [ngClass]="{'active': app.state === AppState.APPSTATE_ACTIVE, 'inactive': app.state === AppState.APPSTATE_INACTIVE}"
+                    [ngClass]="{'active': app.state === AppState.APP_STATE_ACTIVE, 'inactive': app.state === AppState.APP_STATE_INACTIVE}"
                     class="state">{{'APP.PAGES.DETAIL.STATE.'+app.state | translate}}</span>
             </div>
         </div>

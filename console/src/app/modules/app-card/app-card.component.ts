@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { OIDCApplicationType } from 'src/app/proto/generated/management_pb';
+import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 
 @Component({
     selector: 'cnsl-app-card',
@@ -8,7 +8,7 @@ import { OIDCApplicationType } from 'src/app/proto/generated/management_pb';
 })
 export class AppCardComponent {
     @Input() public outline: boolean = false;
-    @Input() public type!: OIDCApplicationType;
+    @Input() public type!: OIDCAppType;
     @Input() public isApiApp: boolean = false;
-    public OIDCApplicationType: any = OIDCApplicationType;
+    public OIDCApplicationType: any = OIDCAppType;
 }

@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { Type } from 'src/app/proto/generated/zitadel/user_pb';
 
-import { UserListComponent, UserType } from './user-list.component';
+import { UserListComponent } from './user-list.component';
 
 
 const routes: Routes = [
@@ -10,7 +11,7 @@ const routes: Routes = [
         component: UserListComponent,
         data: {
             animation: 'HomePage',
-            type: UserType.HUMAN,
+            type: Type.TYPE_HUMAN,
         },
     },
     {
@@ -18,7 +19,7 @@ const routes: Routes = [
         component: UserListComponent,
         data: {
             animation: 'HomePage',
-            type: UserType.MACHINE,
+            type: Type.TYPE_MACHINE,
         },
     },
 ];

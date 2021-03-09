@@ -1,9 +1,9 @@
 <app-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
     [dataSize]="dataSource?.totalResult" [selection]="selection">
-    <cnsl-form-field @appearfade *ngIf="userGrantSearchKey != undefined" actions class="filtername">
+    <cnsl-form-field @appearfade *ngIf="userGrantListSearchKey != undefined" actions class="filtername">
         <input cnslInput (keyup)="applyFilter($event)"
-            [placeholder]="('USER.TABLE.FILTER.' + userGrantSearchKey.toString()) | translate" #input>
+            [placeholder]="('USER.TABLE.FILTER.' + userGrantListSearchKey.toString()) | translate" #input>
     </cnsl-form-field>
 
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button actions
@@ -40,7 +40,7 @@
             <ng-container matColumnDef="user">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_DISPLAY_NAME}"></template>
+                        [ngTemplateOutletContext]="{key: UserGrantListSearchKey.DISPLAY_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let grant">
                     {{grant?.displayName}}</td>
@@ -49,7 +49,7 @@
             <ng-container matColumnDef="org">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORGDOMAIN' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_ORG_NAME}"></template>
+                        [ngTemplateOutletContext]="{key: UserGrantListSearchKey.ORG_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let grant">
                     {{grant.orgName}} </td>
@@ -58,7 +58,7 @@
             <ng-container matColumnDef="projectId">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.PROJECTNAME' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_NAME}"></template>
+                        [ngTemplateOutletContext]="{key: UserGrantListSearchKey.PROJECT_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let grant">
                     {{grant.projectName}} </td>
@@ -82,7 +82,7 @@
                 <th mat-header-cell *matHeaderCellDef class="role-data">
                     {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserGrantSearchKey.USERGRANTSEARCHKEY_ROLE_KEY}"></template>
+                        [ngTemplateOutletContext]="{key: UserGrantListSearchKey.ROLE_KEY}"></template>
                 </th>
                 <td mat-cell *matCellDef="let grant; let i = index" class="role-data">
                     <ng-container
@@ -161,7 +161,7 @@
 
 <ng-template #templateRef let-key="key">
     <button class="search-button" mat-icon-button (click)="setFilter(key)">
-        <mat-icon class="icon" *ngIf="this.userGrantSearchKey != key">search</mat-icon>
-        <mat-icon class="icon" *ngIf="this.userGrantSearchKey == key">search_off</mat-icon>
+        <mat-icon class="icon" *ngIf="this.userGrantListSearchKey != key">search</mat-icon>
+        <mat-icon class="icon" *ngIf="this.userGrantListSearchKey == key">search_off</mat-icon>
     </button>
 </ng-template>

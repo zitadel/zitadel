@@ -54,7 +54,7 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	if err = l.command.HumanVerifyU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, data.Name, userAgentID, credData); err != nil {
+	if _, err = l.command.HumanVerifyU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, data.Name, userAgentID, credData); err != nil {
 		l.renderRegisterU2F(w, r, authReq, err)
 		return
 	}

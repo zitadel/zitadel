@@ -15,7 +15,8 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { SearchMethod, UserSearchKey, UserSearchQuery, UserView } from 'src/app/proto/generated/management_pb';
+import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
+import { SearchQuery, User, UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -39,15 +40,15 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
     public globalLoginNameControl: FormControl = new FormControl();
 
     public loginNames: string[] = [];
-    @Input() public users: Array<UserView.AsObject> = [];
-    public filteredUsers: Array<UserView.AsObject> = [];
+    @Input() public users: Array<User.AsObject> = [];
+    public filteredUsers: Array<User.AsObject> = [];
     public isLoading: boolean = false;
     @Input() public target: UserTarget = UserTarget.SELF;
     public hint: string = '';
     public UserTarget: any = UserTarget;
     @ViewChild('usernameInput') public usernameInput!: ElementRef<HTMLInputElement>;
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
-    @Output() public selectionChanged: EventEmitter<UserView.AsObject | UserView.AsObject[]> = new EventEmitter();
+    @Output() public selectionChanged: EventEmitter<User.AsObject | User.AsObject[]> = new EventEmitter();
     @Input() public singleOutput: boolean = false;
 
     private unsubscribed$: Subject<void> = new Subject();
@@ -71,14 +72,15 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
             takeUntil(this.unsubscribed$),
             tap(() => this.isLoading = true),
             switchMap(value => {
-                const query = new UserSearchQuery();
-                query.setKey(UserSearchKey.USERSEARCHKEY_USER_NAME);
-                query.setValue(value);
-                query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
+                const query = new SearchQuery();
+                const unQuery = new UserNameQuery();
+                unQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+                query.setUserNameQuery(value);
+
                 if (this.target === UserTarget.SELF) {
-                    return from(this.userService.SearchUsers(10, 0, [query]));
+                    return from(this.userService.listUsers(10, 0, [query]));
                 } else {
-                    return of(); // from(this.userService.GetUserByEmailGlobal(value));
+                    return of();
                 }
             }),
         ).subscribe((userresp: any) => {
@@ -89,7 +91,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         });
     }
 
-    public displayFn(user?: UserView.AsObject): string | undefined {
+    public displayFn(user?: User.AsObject): string | undefined {
         return user ? `${user.preferredLoginName}` : undefined;
     }
 
@@ -119,7 +121,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         }
     }
 
-    public remove(user: UserView.AsObject): void {
+    public remove(user: User.AsObject): void {
         const index = this.users.indexOf(user);
 
         if (index >= 0) {
@@ -163,12 +165,12 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
     }
 
     public getGlobalUser(): void {
-        this.userService.GetUserByLoginNameGlobal(this.globalLoginNameControl.value).then(user => {
-            if (this.singleOutput) {
-                this.users = [user.toObject()];
+        this.userService.getUserByLoginNameGlobal(this.globalLoginNameControl.value).then(resp => {
+            if (this.singleOutput && resp.user) {
+                this.users = [resp.user];
                 this.selectionChanged.emit(this.users[0]);
-            } else {
-                this.users.push(user.toObject());
+            } else if (resp.user) {
+                this.users.push(resp.user);
                 this.selectionChanged.emit(this.users);
             }
         }).catch(error => {

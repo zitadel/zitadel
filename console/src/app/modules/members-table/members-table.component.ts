@@ -7,12 +7,10 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { IamMembersDataSource } from 'src/app/pages/iam/iam-members/iam-members-datasource';
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
-import { IamMemberView } from 'src/app/proto/generated/admin_pb';
-import { OrgMemberView, ProjectMemberView } from 'src/app/proto/generated/management_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
 
-type View = OrgMemberView.AsObject | ProjectMemberView.AsObject | IamMemberView.AsObject;
 type MemberDatasource = OrgMembersDataSource | ProjectMembersDataSource | IamMembersDataSource;
 
 @Component({
@@ -25,15 +23,15 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     @Input() public canDelete: boolean = false;
     @Input() public canWrite: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<View>;
+    @ViewChild(MatTable) public table!: MatTable<Member>;
     @Input() public dataSource!: MemberDatasource;
     public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
     @Input() public memberRoleOptions: string[] = [];
     @Input() public factoryLoadFunc!: Function;
     @Input() public refreshTrigger!: Observable<void>;
-    @Output() public updateRoles: EventEmitter<{ member: View, change: MatSelectChange; }> = new EventEmitter();
+    @Output() public updateRoles: EventEmitter<{ member: Member, change: MatSelectChange; }> = new EventEmitter();
     @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
-    @Output() public deleteMember: EventEmitter<View> = new EventEmitter();
+    @Output() public deleteMember: EventEmitter<Member> = new EventEmitter();
 
     private destroyed: Subject<void> = new Subject();
 

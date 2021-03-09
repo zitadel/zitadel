@@ -1,9 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-import { MultiFactorType as AdminMultiFactorType } from 'src/app/proto/generated/admin_pb';
-import { MultiFactorType as MgmtMultiFactorType } from 'src/app/proto/generated/management_pb';
-
 enum LoginMethodComponentType {
     MultiFactor = 1,
     SecondFactor = 2,
@@ -16,11 +13,10 @@ enum LoginMethodComponentType {
 })
 export class DialogAddTypeComponent {
     public LoginMethodComponentType: any = LoginMethodComponentType;
-    public newMfaType!: AdminMultiFactorType | MgmtMultiFactorType;
-    public availableMfaTypes: Array<AdminMultiFactorType | MgmtMultiFactorType> = [];
+    // public availableMfaTypes: Array<AdminMultiFactorType | MgmtMultiFactorType> = [];
     constructor(public dialogRef: MatDialogRef<DialogAddTypeComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any) {
-        this.availableMfaTypes = data.types;
+        // this.availableMfaTypes = data.types;
     }
 
     public closeDialog(): void {
@@ -28,6 +24,6 @@ export class DialogAddTypeComponent {
     }
 
     public closeDialogWithCode(): void {
-        this.dialogRef.close(this.newMfaType);
+        // this.dialogRef.close(this.newMfaType);
     }
 }

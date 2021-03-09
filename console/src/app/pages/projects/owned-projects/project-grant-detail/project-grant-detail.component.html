@@ -10,7 +10,7 @@
             <div class="row">
                 <span class="first">{{'PROJECT.GRANT.DETAIL.RESOURCEOWNER' | translate}}</span>
                 <span class="fill-space"></span>
-                <span>{{grant?.resourceOwnerName}}</span>
+                <span>{{grant?.details?.resourceOwner}}</span>
             </div>
         </div>
 
@@ -25,9 +25,9 @@
         </div>
     </div>
 
-    <cnsl-form-field class="formfield" appearance="outline" *ngIf="grant && grant.roleKeysList">
+    <cnsl-form-field class="formfield" appearance="outline" *ngIf="grant && grant.grantedRoleKeysList">
         <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
-        <mat-select [(ngModel)]="grant.roleKeysList" multiple (selectionChange)="updateRoles($event)">
+        <mat-select [(ngModel)]="grant.grantedRoleKeysList" multiple (selectionChange)="updateRoles($event)">
             <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
                 {{role.key}}
             </mat-option>
@@ -39,17 +39,17 @@
     <h1 class="h1">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h1>
     <p class="desc">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
 
-    <app-members-table *ngIf="grant" style="width: 100%;" [dataSource]="dataSource" [canWrite]="['project.grant.member.write','project.grant.member.write:' + grant.id] | hasRole | async"
+    <app-members-table *ngIf="grant" style="width: 100%;" [dataSource]="dataSource" [canWrite]="['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async"
         [memberRoleOptions]="memberRoleOptions" (updateRoles)="updateMemberRoles($event.member, $event.change)"
         [factoryLoadFunc]="changePageFactory" (changedSelection)="selection = $event" [refreshTrigger]="changePage">
         <button selectactions (click)="removeProjectMemberSelection()"
-            [disabled]="(['project.grant.member.delete','project.grant.member.delete:' + grant.id] | hasRole | async) == false"
+            [disabled]="(['project.grant.member.delete','project.grant.member.delete:' + grant.grantId] | hasRole | async) == false"
             matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="del-button" color="warn" mat-raised-button>
             <i class="las la-trash"></i>
             {{'ACTIONS.SELECTIONDELETE' | translate}}
         </button>
         <a writeactions color="primary"
-            [disabled]="(['project.grant.member.write','project.grant.member.write:' + grant.id] | hasRole | async) == false"
+            [disabled]="(['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async) == false"
             (click)="openAddMember()" color="primary" mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>

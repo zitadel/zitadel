@@ -4,7 +4,7 @@
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{user.human ? user.human?.displayName : user.machine?.name}}</h1>
+            <h1>{{user.human ? user.human?.profile?.displayName : user.machine?.name}}</h1>
 
             <ng-template appHasRole [appHasRole]="['user.delete$', 'user.delete:'+user?.id]">
                 <button mat-icon-button color="warn" matTooltip="{{'USER.PAGES.DELETE' | translate}}"

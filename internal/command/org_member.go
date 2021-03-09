@@ -77,18 +77,25 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (
 	return memberWriteModelToMember(&existingMember.MemberWriteModel), nil
 }
 
-func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) error {
+func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*domain.ObjectDetails, error) {
 	m, err := c.orgMemberWriteModelByID(ctx, orgID, userID)
 	if err != nil && !errors.IsNotFound(err) {
-		return err
+		return nil, err
 	}
 	if errors.IsNotFound(err) {
-		return nil
+		return nil, nil
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewMemberRemovedEvent(ctx, orgAgg, userID))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewMemberRemovedEvent(ctx, orgAgg, userID))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(m, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&m.WriteModel), nil
 }
 
 func (c *Commands) orgMemberWriteModelByID(ctx context.Context, orgID, userID string) (member *OrgMemberWriteModel, err error) {

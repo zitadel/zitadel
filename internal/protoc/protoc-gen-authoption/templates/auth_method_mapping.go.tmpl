@@ -20,7 +20,7 @@ const {{$s.Name}}_MethodPrefix = "{{$.File.Package}}.{{$s.Name}}"
 
 var {{$s.Name}}_AuthMethods = authz.MethodMapping {
     {{ range $m := $s.Method}}
-        {{ $mAuthOpt := option $m.Options "caos.zitadel.utils.v1.auth_option" }}
+        {{ $mAuthOpt := option $m.Options "zitadel.v1.auth_option" }}
         {{ if and $mAuthOpt $mAuthOpt.Permission }}
             "/{{$.File.Package}}.{{$s.Name}}/{{.Name}}": authz.Option{
                 Permission: "{{$mAuthOpt.Permission}}",

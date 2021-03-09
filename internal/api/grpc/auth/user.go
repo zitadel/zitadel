@@ -2,240 +2,97 @@ package auth
 
 import (
 	"context"
-
-	"github.com/golang/protobuf/ptypes/empty"
+	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/caos/zitadel/internal/api/grpc/change"
+	"github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/api/grpc/org"
+	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
 
-func (s *Server) GetMyUser(ctx context.Context, _ *empty.Empty) (*auth.UserView, error) {
+func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*auth_pb.GetMyUserResponse, error) {
 	user, err := s.repo.MyUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return userViewFromModel(user), nil
+	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user)}, nil
 }
 
-func (s *Server) GetMyUserProfile(ctx context.Context, _ *empty.Empty) (*auth.UserProfileView, error) {
-	profile, err := s.repo.MyProfile(ctx)
+func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
+	changes, err := s.repo.MyUserChanges(ctx, req.Query.Offset, uint64(req.Query.Limit), req.Query.Asc)
 	if err != nil {
 		return nil, err
 	}
-	return profileViewFromModel(profile), nil
+	return &auth_pb.ListMyUserChangesResponse{
+		Result: change.UserChangesToPb(changes.Changes),
+	}, nil
 }
 
-func (s *Server) GetMyUserEmail(ctx context.Context, _ *empty.Empty) (*auth.UserEmailView, error) {
-	email, err := s.repo.MyEmail(ctx)
+func (s *Server) ListMyUserSessions(ctx context.Context, req *auth_pb.ListMyUserSessionsRequest) (*auth_pb.ListMyUserSessionsResponse, error) {
+	userSessions, err := s.repo.GetMyUserSessions(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return emailViewFromModel(email), nil
+	return &auth_pb.ListMyUserSessionsResponse{
+		Result: user_grpc.UserSessionsToPb(userSessions),
+	}, nil
 }
 
-func (s *Server) GetMyUserPhone(ctx context.Context, _ *empty.Empty) (*auth.UserPhoneView, error) {
-	phone, err := s.repo.MyPhone(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return phoneViewFromModel(phone), nil
-}
-
-func (s *Server) RemoveMyUserPhone(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
+func (s *Server) UpdateMyUserName(ctx context.Context, req *auth_pb.UpdateMyUserNameRequest) (*auth_pb.UpdateMyUserNameResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.RemoveHumanPhone(ctx, ctxData.UserID, ctxData.ResourceOwner)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) GetMyUserAddress(ctx context.Context, _ *empty.Empty) (*auth.UserAddressView, error) {
-	address, err := s.repo.MyAddress(ctx)
+	objectDetails, err := s.command.ChangeUsername(ctx, ctxData.ResourceOwner, ctxData.UserID, req.UserName)
 	if err != nil {
 		return nil, err
 	}
-	return addressViewFromModel(address), nil
+	return &auth_pb.UpdateMyUserNameResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
 }
 
-func (s *Server) GetMyMfas(ctx context.Context, _ *empty.Empty) (*auth.MultiFactors, error) {
-	mfas, err := s.repo.MyUserMFAs(ctx)
+func ctxToObjectRoot(ctx context.Context) models.ObjectRoot {
+	ctxData := authz.GetCtxData(ctx)
+	return models.ObjectRoot{
+		AggregateID:   ctxData.UserID,
+		ResourceOwner: ctxData.ResourceOwner,
+	}
+}
+
+func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGrantsRequest) (*auth_pb.ListMyUserGrantsResponse, error) {
+	res, err := s.repo.SearchMyUserGrants(ctx, ListMyUserGrantsRequestToModel(req))
 	if err != nil {
 		return nil, err
 	}
-	return &auth.MultiFactors{Mfas: mfasFromModel(mfas)}, nil
+	return &auth_pb.ListMyUserGrantsResponse{
+		Result: UserGrantsToPb(res.Result),
+		Details: object.ToListDetails(
+			res.TotalResult,
+			res.Sequence,
+			res.Timestamp,
+		),
+	}, nil
 }
 
-func (s *Server) UpdateMyUserProfile(ctx context.Context, request *auth.UpdateUserProfileRequest) (*auth.UserProfile, error) {
-	profile, err := s.command.ChangeHumanProfile(ctx, updateProfileToDomain(ctx, request))
+func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProjectOrgsRequest) (*auth_pb.ListMyProjectOrgsResponse, error) {
+	res, err := s.repo.SearchMyProjectOrgs(ctx, ListMyProjectOrgsRequestToModel(req))
 	if err != nil {
 		return nil, err
 	}
-	return profileFromDomain(profile), nil
+	return &auth_pb.ListMyProjectOrgsResponse{
+		//TODO: not all details
+		Details: object.ToListDetails(res.TotalResult, 0, time.Time{}),
+		Result:  org.OrgsToPb(res.Result),
+	}, nil
 }
 
-func (s *Server) ChangeMyUserName(ctx context.Context, request *auth.ChangeUserNameRequest) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	return &empty.Empty{}, s.command.ChangeUsername(ctx, ctxData.ResourceOwner, ctxData.UserID, request.UserName)
-}
-
-func (s *Server) ChangeMyUserEmail(ctx context.Context, request *auth.UpdateUserEmailRequest) (*auth.UserEmail, error) {
-	email, err := s.command.ChangeHumanEmail(ctx, updateEmailToDomain(ctx, request))
-	if err != nil {
-		return nil, err
+func ListMyProjectOrgsRequestToModel(req *auth_pb.ListMyProjectOrgsRequest) *grant_model.UserGrantSearchRequest {
+	return &grant_model.UserGrantSearchRequest{
+		Offset: req.Query.Offset,
+		Limit:  uint64(req.Query.Limit),
+		Asc:    req.Query.Asc,
+		// Queries: queries,//TODO:user grant queries missing in proto
 	}
-	return emailFromDomain(email), nil
-}
-
-func (s *Server) VerifyMyUserEmail(ctx context.Context, request *auth.VerifyMyUserEmailRequest) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, request.Code, ctxData.OrgID)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) ResendMyEmailVerificationMail(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.CreateHumanEmailVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) ChangeMyUserPhone(ctx context.Context, request *auth.UpdateUserPhoneRequest) (*auth.UserPhone, error) {
-	phone, err := s.command.ChangeHumanPhone(ctx, updatePhoneToDomain(ctx, request))
-	if err != nil {
-		return nil, err
-	}
-	return phoneFromDomain(phone), nil
-}
-
-func (s *Server) VerifyMyUserPhone(ctx context.Context, request *auth.VerifyUserPhoneRequest) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, request.Code, ctxData.ResourceOwner)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) ResendMyPhoneVerificationCode(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.CreateHumanPhoneVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) UpdateMyUserAddress(ctx context.Context, request *auth.UpdateUserAddressRequest) (*auth.UserAddress, error) {
-	address, err := s.command.ChangeHumanAddress(ctx, updateAddressToDomain(ctx, request))
-	if err != nil {
-		return nil, err
-	}
-	return addressFromDomain(address), nil
-}
-
-func (s *Server) ChangeMyPassword(ctx context.Context, request *auth.PasswordChange) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.ChangePassword(ctx, ctxData.OrgID, ctxData.UserID, request.OldPassword, request.NewPassword, "")
-	return &empty.Empty{}, err
-}
-
-func (s *Server) SearchMyExternalIDPs(ctx context.Context, request *auth.ExternalIDPSearchRequest) (*auth.ExternalIDPSearchResponse, error) {
-	externalIDP, err := s.repo.SearchMyExternalIDPs(ctx, externalIDPSearchRequestToModel(request))
-	if err != nil {
-		return nil, err
-	}
-	return externalIDPSearchResponseFromModel(externalIDP), nil
-}
-
-func (s *Server) RemoveMyExternalIDP(ctx context.Context, request *auth.ExternalIDPRemoveRequest) (*empty.Empty, error) {
-	err := s.command.RemoveHumanExternalIDP(ctx, externalIDPRemoveToDomain(ctx, request))
-	return &empty.Empty{}, err
-}
-
-func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*auth.PasswordComplexityPolicy, error) {
-	policy, err := s.repo.GetMyPasswordComplexityPolicy(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return passwordComplexityPolicyFromModel(policy), nil
-}
-
-func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *auth.MfaOtpResponse, err error) {
-	ctxData := authz.GetCtxData(ctx)
-	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.OrgID)
-	if err != nil {
-		return nil, err
-	}
-	return otpFromDomain(otp), nil
-}
-
-func (s *Server) VerifyMfaOTP(ctx context.Context, request *auth.VerifyMfaOtp) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanCheckMFAOTPSetup(ctx, ctxData.UserID, request.Code, "", ctxData.ResourceOwner)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {
-	ctxData := authz.GetCtxData(ctx)
-	err = s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.OrgID)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) AddMyMfaU2F(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
-	ctxData := authz.GetCtxData(ctx)
-	u2f, err := s.command.HumanAddU2FSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
-	if err != nil {
-		return nil, err
-	}
-	return verifyWebAuthNFromDomain(u2f), err
-}
-
-func (s *Server) VerifyMyMfaU2F(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanVerifyU2FSetup(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) RemoveMyMfaU2F(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanRemoveU2F(ctx, ctxData.UserID, id.Id, ctxData.OrgID)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) GetMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNTokens, err error) {
-	tokens, err := s.repo.GetMyPasswordless(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return webAuthNTokensFromModel(tokens), err
-}
-
-func (s *Server) AddMyPasswordless(ctx context.Context, _ *empty.Empty) (_ *auth.WebAuthNResponse, err error) {
-	ctxData := authz.GetCtxData(ctx)
-	u2f, err := s.command.HumanAddPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
-	if err != nil {
-		return nil, err
-	}
-	return verifyWebAuthNFromDomain(u2f), err
-}
-
-func (s *Server) VerifyMyPasswordless(ctx context.Context, request *auth.VerifyWebAuthN) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanHumanPasswordlessSetup(ctx, ctxData.UserID, ctxData.OrgID, request.TokenName, "", request.PublicKeyCredential)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) RemoveMyPasswordless(ctx context.Context, id *auth.WebAuthNTokenID) (*empty.Empty, error) {
-	ctxData := authz.GetCtxData(ctx)
-	err := s.command.HumanRemovePasswordless(ctx, ctxData.UserID, id.Id, ctxData.ResourceOwner)
-	return &empty.Empty{}, err
-}
-
-func (s *Server) GetMyUserChanges(ctx context.Context, request *auth.ChangesRequest) (*auth.Changes, error) {
-	changes, err := s.repo.MyUserChanges(ctx, request.SequenceOffset, request.Limit, request.Asc)
-	if err != nil {
-		return nil, err
-	}
-	return userChangesToResponse(changes, request.GetSequenceOffset(), request.GetLimit()), nil
-}
-
-func (s *Server) SearchMyUserMemberships(ctx context.Context, in *auth.UserMembershipSearchRequest) (*auth.UserMembershipSearchResponse, error) {
-	request := userMembershipSearchRequestsToModel(in)
-	request.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
-	response, err := s.repo.SearchMyUserMemberships(ctx, request)
-	if err != nil {
-		return nil, err
-	}
-	return userMembershipSearchResponseFromModel(response), nil
 }

@@ -1,26 +1,18 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { PolicyGridType } from 'src/app/modules/policy-grid/policy-grid.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import {
-    Org,
-    OrgDomainView,
-    OrgMember,
-    OrgMemberSearchResponse,
-    OrgMemberView,
-    OrgState,
-    UserView,
-} from 'src/app/proto/generated/management_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { Domain, Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -33,28 +25,22 @@ import { DomainVerificationComponent } from './domain-verification/domain-verifi
     templateUrl: './org-detail.component.html',
     styleUrls: ['./org-detail.component.scss'],
 })
-export class OrgDetailComponent implements OnInit, OnDestroy {
+export class OrgDetailComponent implements OnInit {
     public org!: Org.AsObject;
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
-    public dataSource: MatTableDataSource<OrgMember.AsObject> = new MatTableDataSource<OrgMember.AsObject>();
-    public memberResult!: OrgMemberSearchResponse.AsObject;
-    public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
-    public selection: SelectionModel<OrgMember.AsObject> = new SelectionModel<OrgMember.AsObject>(true, []);
     public OrgState: any = OrgState;
     public ChangeType: any = ChangeType;
 
-    private subscription: Subscription = new Subscription();
-
-    public domains: OrgDomainView.AsObject[] = [];
+    public domains: Domain.AsObject[] = [];
     public primaryDomain: string = '';
 
     // members
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public totalMemberResult: number = 0;
-    public membersSubject: BehaviorSubject<OrgMemberView.AsObject[]>
-        = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<Member.AsObject[]>
+        = new BehaviorSubject<Member.AsObject[]>([]);
     public PolicyGridType: any = PolicyGridType;
 
     constructor(
@@ -69,13 +55,11 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         this.getData();
     }
 
-    public ngOnDestroy(): void {
-        this.subscription.unsubscribe();
-    }
-
     private async getData(): Promise<void> {
-        this.mgmtService.GetMyOrg().then((org: Org) => {
-            this.org = org.toObject();
+        this.mgmtService.getMyOrg().then((resp) => {
+            if (resp.org) {
+                this.org = resp.org;
+            }
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -84,14 +68,14 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
 
     public loadDomains(): void {
-        this.mgmtService.SearchMyOrgDomains().then(result => {
-            this.domains = result.toObject().resultList;
-            this.primaryDomain = this.domains.find(domain => domain.primary)?.domain ?? '';
+        this.mgmtService.listOrgDomains().then(result => {
+            this.domains = result.resultList;
+            this.primaryDomain = this.domains.find(domain => domain.isPrimary)?.domainName ?? '';
         });
     }
 
-    public setPrimary(domain: OrgDomainView.AsObject): void {
-        this.mgmtService.setMyPrimaryOrgDomain(domain.domain).then(() => {
+    public setPrimary(domain: Domain.AsObject): void {
+        this.mgmtService.setPrimaryOrgDomain(domain.domainName).then(() => {
             this.toast.showInfo('ORG.TOAST.SETPRIMARY', true);
             this.loadDomains();
         }).catch((error) => {
@@ -100,14 +84,14 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
 
     public changeState(event: MatButtonToggleChange | any): void {
-        if (event.value === OrgState.ORGSTATE_ACTIVE) {
-            this.mgmtService.ReactivateMyOrg().then(() => {
+        if (event.value === OrgState.ORG_STATE_ACTIVE) {
+            this.mgmtService.reactivateOrg().then(() => {
                 this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
             }).catch((error) => {
                 this.toast.showError(error);
             });
-        } else if (event.value === OrgState.ORGSTATE_INACTIVE) {
-            this.mgmtService.DeactivateMyOrg().then(() => {
+        } else if (event.value === OrgState.ORG_STATE_INACTIVE) {
+            this.mgmtService.deactivateOrg().then(() => {
                 this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
             }).catch((error) => {
                 this.toast.showError(error);
@@ -123,21 +107,11 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.mgmtService.AddMyOrgDomain(resp).then(domain => {
-                    const newDomain = domain;
+                this.mgmtService.addOrgDomain(resp).then(resp => {
+                    const newDomain = resp;
 
-                    const newDomainView = new OrgDomainView();
-                    newDomainView.setChangeDate(newDomain.getChangeDate());
-                    newDomainView.setCreationDate(newDomain.getCreationDate());
-                    newDomainView.setDomain(newDomain.getDomain());
-                    newDomainView.setOrgId(newDomain.getOrgId());
-                    newDomainView.setPrimary(newDomain.getPrimary());
-                    newDomainView.setSequence(newDomain.getSequence());
-                    newDomainView.setVerified(newDomain.getVerified());
-
-                    this.domains.push(newDomainView.toObject());
-
-                    this.verifyDomain(newDomainView.toObject());
+                    // TODO send domainname only 
+                    // this.verifyDomain(newDomainView.toObject());
                     this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
                 });
             }
@@ -157,9 +131,9 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.mgmtService.RemoveMyOrgDomain(domain).then(() => {
+                this.mgmtService.removeOrgDomain(domain).then(() => {
                     this.toast.showInfo('ORG.TOAST.DOMAINREMOVED', true);
-                    const index = this.domains.findIndex(d => d.domain === domain);
+                    const index = this.domains.findIndex(d => d.domainName === domain);
                     if (index > -1) {
                         this.domains.splice(index, 1);
                     }
@@ -180,12 +154,12 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: UserView.AsObject[] = resp.users;
+                const users: User.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.mgmtService.AddMyOrgMember(user.id, roles);
+                        return this.mgmtService.addOrgMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                         setTimeout(() => {
@@ -203,7 +177,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         this.router.navigate(['org/members']);
     }
 
-    public verifyDomain(domain: OrgDomainView.AsObject): void {
+    public verifyDomain(domain: Domain.AsObject): void {
         const dialogRef = this.dialog.open(DomainVerificationComponent, {
             data: {
                 domain: domain,
@@ -220,10 +194,12 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
     public loadMembers(): void {
         this.loadingSubject.next(true);
-        from(this.mgmtService.SearchMyOrgMembers(100, 0)).pipe(
+        from(this.mgmtService.listOrgMembers(100, 0)).pipe(
             map(resp => {
-                this.totalMemberResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
+                if (resp.details?.totalResult) {
+                    this.totalMemberResult = resp.details?.totalResult;
+                }
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),

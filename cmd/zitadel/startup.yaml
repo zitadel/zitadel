@@ -36,9 +36,9 @@ Queries:
   Eventstore:
     User: 'queries'
     Password: $CR_QUERIES_PASSWORD
-      SSL:
-        Cert: $CR_QUERIES_CERT
-        Key: $CR_QUERIES_KEY
+    SSL:
+      Cert: $CR_QUERIES_CERT
+      Key: $CR_QUERIES_KEY
 
 AuthZ:
   Repository:

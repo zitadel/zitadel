@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+
+package zitadel.member.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/member";
+
+message Member {
+    string user_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    repeated string roles = 3;
+    string preferred_login_name = 4;
+    string email = 5;
+    string first_name = 6;
+    string last_name = 7;
+    string display_name = 8;
+}
+
+message SearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        FirstNameQuery first_name_query = 1;
+        LastNameQuery last_name_query = 2;
+        EmailQuery email_query = 3;
+        UserIDQuery user_id_query = 4;
+    }
+}
+
+message FirstNameQuery {
+    string first_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message LastNameQuery {
+    string last_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message EmailQuery {
+    string email = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserIDQuery {
+    string user_id = 1 [(validate.rules).string = {max_len: 200}];
+}

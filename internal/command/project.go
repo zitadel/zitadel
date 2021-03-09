@@ -105,59 +105,73 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 	return projectWriteModelToProject(existingProject), nil
 }
 
-func (c *Commands) DeactivateProject(ctx context.Context, projectID string, resourceOwner string) error {
+func (c *Commands) DeactivateProject(ctx context.Context, projectID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || resourceOwner == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-88iF0", "Errors.Project.ProjectIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-88iF0", "Errors.Project.ProjectIDMissing")
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-112M9", "Errors.Project.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-112M9", "Errors.Project.NotFound")
 	}
 	if existingProject.State != domain.ProjectStateActive {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-mki55", "Errors.Project.NotActive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-mki55", "Errors.Project.NotActive")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingProject, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingProject.WriteModel), nil
 }
 
-func (c *Commands) ReactivateProject(ctx context.Context, projectID string, resourceOwner string) error {
+func (c *Commands) ReactivateProject(ctx context.Context, projectID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || resourceOwner == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.ProjectIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.ProjectIDMissing")
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 	if existingProject.State != domain.ProjectStateInactive {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInctive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInctive")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingProject, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingProject.WriteModel), nil
 }
 
-func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingUserGrantIDs ...string) error {
+func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingUserGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if projectID == "" || resourceOwner == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-66hM9", "Errors.Project.ProjectIDMissing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-66hM9", "Errors.Project.ProjectIDMissing")
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
 	events := []eventstore.EventPusher{
@@ -165,7 +179,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 	}
 
 	for _, grantID := range cascadingUserGrantIDs {
-		event, err := c.removeUserGrant(ctx, grantID, "", true)
+		event, _, err := c.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
@@ -173,8 +187,15 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 		events = append(events, event)
 	}
 
-	_, err = c.eventstore.PushEvents(ctx, events...)
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingProject, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingProject.WriteModel), nil
 }
 
 func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectWriteModel, error) {

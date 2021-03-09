@@ -5,10 +5,10 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { IdpSearchResponse as AdminIdpSearchResponse, IdpState, IdpStylingType, IdpView as AdminIdpView } from 'src/app/proto/generated/admin_pb';
-import { IdpProviderType, IdpView as MgmtIdpView } from 'src/app/proto/generated/management_pb';
+import { ListIDPsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import { IDP, IDPOwnerType, IDPState, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { ListOrgIDPsResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -26,20 +26,20 @@ export class IdpTableComponent implements OnInit {
     @Input() service!: AdminService | ManagementService;
     @Input() disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    public dataSource: MatTableDataSource<AdminIdpView.AsObject | MgmtIdpView.AsObject>
-        = new MatTableDataSource<AdminIdpView.AsObject | MgmtIdpView.AsObject>();
-    public selection: SelectionModel<AdminIdpView.AsObject | MgmtIdpView.AsObject>
-        = new SelectionModel<AdminIdpView.AsObject | MgmtIdpView.AsObject>(true, []);
-    public idpResult!: AdminIdpSearchResponse.AsObject;
+    public dataSource: MatTableDataSource<IDP.AsObject>
+        = new MatTableDataSource<IDP.AsObject>();
+    public selection: SelectionModel<IDP.AsObject>
+        = new SelectionModel<IDP.AsObject>(true, []);
+    public idpResult!: ListIDPsResponse.AsObject | ListOrgIDPsResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
-    public IdpProviderType: any = IdpProviderType;
-    public IdpState: any = IdpState;
-    public IdpStylingType: any = IdpStylingType;
+    public IDPOwnerType: any = IDPOwnerType;
+    public IDPState: any = IDPState;
+    public IdpStylingType: any = IDPStylingType;
     @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'dates', 'state'];
 
-    @Output() public changedSelection: EventEmitter<Array<AdminIdpView.AsObject | MgmtIdpView.AsObject>>
+    @Output() public changedSelection: EventEmitter<Array<IDP.AsObject>>
         = new EventEmitter();
 
     constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {
@@ -77,8 +77,12 @@ export class IdpTableComponent implements OnInit {
     }
 
     public deactivateSelectedIdps(): void {
-        const map: Promise<Empty>[] = this.selection.selected.map(value => {
-            return this.service.DeactivateIdpConfig(value.id);
+        const map: Promise<any>[] = this.selection.selected.map(value => {
+            if (this.serviceType === PolicyComponentServiceType.MGMT) {
+                return (this.service as ManagementService).deactivateOrgIDP(value.id);
+            } else {
+                return (this.service as AdminService).deactivateIDP(value.id);
+            }
         });
         Promise.all(map).then(() => {
             this.selection.clear();
@@ -90,8 +94,12 @@ export class IdpTableComponent implements OnInit {
     }
 
     public reactivateSelectedIdps(): void {
-        const map: Promise<Empty>[] = this.selection.selected.map(value => {
-            return this.service.ReactivateIdpConfig(value.id);
+        const map: Promise<any>[] = this.selection.selected.map(value => {
+            if (this.serviceType === PolicyComponentServiceType.MGMT) {
+                return (this.service as ManagementService).reactivateOrgIDP(value.id);
+            } else {
+                return (this.service as AdminService).reactivateIDP(value.id);
+            }
         });
         Promise.all(map).then(() => {
             this.selection.clear();
@@ -116,9 +124,12 @@ export class IdpTableComponent implements OnInit {
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
                 this.selection.clear();
-
                 Promise.all(this.selection.selected.map(value => {
-                    return this.service.RemoveIdpConfig(value.id);
+                    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+                        return (this.service as ManagementService).removeOrgIDP(value.id);
+                    } else {
+                        return (this.service as AdminService).removeIDP(value.id);
+                    }
                 })).then(() => {
                     this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
                     this.refreshPage();
@@ -127,7 +138,7 @@ export class IdpTableComponent implements OnInit {
         });
     }
 
-    public removeIdp(idp: AdminIdpView.AsObject | MgmtIdpView.AsObject): void {
+    public removeIdp(idp: IDP.AsObject): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -140,12 +151,21 @@ export class IdpTableComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.service.RemoveIdpConfig(idp.id).then(() => {
-                    this.toast.showInfo('IDP.TOAST.REMOVED', true);
-                    setTimeout(() => {
-                        this.refreshPage();
-                    }, 1000);
-                });
+                if (this.serviceType === PolicyComponentServiceType.MGMT) {
+                    (this.service as ManagementService).removeOrgIDP(idp.id).then(() => {
+                        this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                        setTimeout(() => {
+                            this.refreshPage();
+                        }, 1000);
+                    });
+                } else {
+                    (this.service as AdminService).removeIDP(idp.id).then(() => {
+                        this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                        setTimeout(() => {
+                            this.refreshPage();
+                        }, 1000);
+                    });
+                }
             }
         });
     }
@@ -153,14 +173,26 @@ export class IdpTableComponent implements OnInit {
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
 
-        this.service.SearchIdps(limit, offset).then(resp => {
-            this.idpResult = resp.toObject();
-            this.dataSource.data = this.idpResult.resultList;
-            this.loadingSubject.next(false);
-        }).catch(error => {
-            this.toast.showError(error);
-            this.loadingSubject.next(false);
-        });
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            (this.service as ManagementService).listOrgIDPs(limit, offset).then(resp => {
+                this.idpResult = resp;
+                this.dataSource.data = resp.resultList;
+                this.loadingSubject.next(false);
+            }).catch(error => {
+                this.toast.showError(error);
+                this.loadingSubject.next(false);
+            });
+        } else {
+            (this.service as AdminService).listIDPs(limit, offset).then(resp => {
+                this.idpResult = resp;
+                this.dataSource.data = resp.resultList;
+                this.loadingSubject.next(false);
+            }).catch(error => {
+                this.toast.showError(error);
+                this.loadingSubject.next(false);
+            });
+        }
+
     }
 
     public refreshPage(): void {
@@ -175,14 +207,14 @@ export class IdpTableComponent implements OnInit {
         }
     }
 
-    public routerLinkForRow(row: MgmtIdpView.AsObject | AdminIdpView.AsObject): any {
+    public routerLinkForRow(row: IDP.AsObject): any {
         if (row.id) {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
-                    switch ((row as MgmtIdpView.AsObject).providerType) {
-                        case IdpProviderType.IDPPROVIDERTYPE_SYSTEM:
+                    switch (row.owner) {
+                        case IDPOwnerType.IDP_OWNER_TYPE_SYSTEM:
                             return ['/iam', 'idp', row.id];
-                        case IdpProviderType.IDPPROVIDERTYPE_ORG:
+                        case IDPOwnerType.IDP_OWNER_TYPE_ORG:
                             return ['/org', 'idp', row.id];
                     }
                     break;

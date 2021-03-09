@@ -2,7 +2,8 @@ import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Org, ProjectRole } from 'src/app/proto/generated/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -42,13 +43,15 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
 
     public searchOrg(domain: string): void {
         this.mgmtService.getOrgByDomainGlobal(domain).then((ret) => {
-            const tmp = ret.toObject();
-            this.authService.GetActiveOrg().then((org) => {
-                if (tmp !== org) {
-                    this.org = tmp;
-                }
-            });
-            this.org = ret.toObject();
+            if (ret.org) {
+                const tmp = ret.org;
+                this.authService.getActiveOrg().then((org) => {
+                    if (tmp !== org) {
+                        this.org = tmp;
+                    }
+                });
+                this.org = ret.org;
+            }
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -60,8 +63,8 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
 
     public addGrant(): void {
         this.mgmtService
-            .CreateProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
-            .then((data) => {
+            .addProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
+            .then(() => {
                 this.close();
             })
             .catch(error => {
@@ -69,7 +72,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
             });
     }
 
-    public selectRoles(roles: ProjectRole.AsObject[]): void {
+    public selectRoles(roles: Role.AsObject[]): void {
         this.rolesKeyList = roles.map(role => role.key);
     }
 

@@ -4,8 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { MFAState, WebAuthNToken } from 'src/app/proto/generated/auth_pb';
-import { UserView } from 'src/app/proto/generated/management_pb';
+import { AuthFactorState, User, WebAuthNToken } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -25,7 +24,7 @@ export interface WebAuthNOptions {
     styleUrls: ['./passwordless.component.scss'],
 })
 export class PasswordlessComponent implements OnInit, OnDestroy {
-    @Input() private user!: UserView.AsObject;
+    @Input() private user!: User.AsObject;
     public displayedColumns: string[] = ['name', 'state', 'actions'];
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -34,7 +33,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
     @ViewChild(MatSort) public sort!: MatSort;
     public dataSource!: MatTableDataSource<WebAuthNToken.AsObject>;
 
-    public MFAState: any = MFAState;
+    public AuthFactorState: any = AuthFactorState;
     public error: string = '';
 
     constructor(private service: ManagementService,
@@ -50,8 +49,8 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
     }
 
     public getPasswordless(): void {
-        this.service.GetPasswordless(this.user.id).then(passwordless => {
-            this.dataSource = new MatTableDataSource(passwordless.toObject().tokensList);
+        this.service.listHumanPasswordless(this.user.id).then(passwordless => {
+            this.dataSource = new MatTableDataSource(passwordless.resultList);
             this.dataSource.sort = this.sort;
         }).catch(error => {
             this.error = error.message;
@@ -71,7 +70,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp && id) {
-                this.service.RemovePasswordless(id, this.user.id).then(() => {
+                this.service.removeHumanPasswordless(id, this.user.id).then(() => {
                     this.toast.showInfo('USER.TOAST.PASSWORDLESSREMOVED', true);
                     this.getPasswordless();
                 }).catch(error => {

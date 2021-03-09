@@ -1,16 +1,15 @@
 package management
 
 import (
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/query"
-	"google.golang.org/grpc"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/management/repository"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/management"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -20,6 +19,7 @@ const (
 var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
+	management.UnimplementedManagementServiceServer
 	command        *command.Commands
 	query          *query.Queries
 	project        repository.ProjectRepository

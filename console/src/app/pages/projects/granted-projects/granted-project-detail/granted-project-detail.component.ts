@@ -1,29 +1,17 @@
-import { SelectionModel } from '@angular/cdk/collections';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { ProjectType } from 'src/app/modules/project-members/project-members.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
-import {
-    Application,
-    ApplicationSearchResponse,
-    ProjectGrantView,
-    ProjectMember,
-    ProjectMemberSearchResponse,
-    ProjectMemberView,
-    ProjectRole,
-    ProjectRoleSearchResponse,
-    ProjectState,
-    ProjectType,
-    UserGrantSearchKey,
-    UserView,
-} from 'src/app/proto/generated/management_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { GrantedProject, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -35,41 +23,22 @@ import { ToastService } from 'src/app/services/toast.service';
 export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public grantId: string = '';
-    public project!: ProjectGrantView.AsObject;
-
-    public pageSizeRoles: number = 10;
-    public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
-    public roleResult!: ProjectRoleSearchResponse.AsObject;
-    public roleColumns: string[] = ['name', 'displayname', 'group', 'actions'];
-
-    public pageSizeMembers: number = 10;
-    public projectDataSource: MatTableDataSource<ProjectMember.AsObject> = new MatTableDataSource<ProjectMember.AsObject>();
-    public memberResult!: ProjectMemberSearchResponse.AsObject;
-    public memberColumns: string[] = ['firstname', 'lastname', 'username', 'email', 'roles'];
-    public selection: SelectionModel<ProjectMember.AsObject> = new SelectionModel<ProjectMember.AsObject>(true, []);
-
-    public pageSizeApps: number = 10;
-    public appsDataSource: MatTableDataSource<Application.AsObject> = new MatTableDataSource<Application.AsObject>();
-    public appsResult!: ApplicationSearchResponse.AsObject;
-    public appsColumns: string[] = ['name'];
+    public project!: GrantedProject.AsObject;
 
     public ProjectState: any = ProjectState;
     public ProjectType: any = ProjectType;
     public ChangeType: any = ChangeType;
 
-    public grid: boolean = true;
     private subscription?: Subscription;
-    public editstate: boolean = false;
 
     public isZitadel: boolean = false;
 
     UserGrantContext: any = UserGrantContext;
-    public userGrantSearchKey: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID;
 
     // members
     public totalMemberResult: number = 0;
-    public membersSubject: BehaviorSubject<ProjectMemberView.AsObject[]>
-        = new BehaviorSubject<ProjectMemberView.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<Member.AsObject[]>
+        = new BehaviorSubject<Member.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -96,13 +65,15 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         this.projectId = id;
         this.grantId = grantId;
 
-        this.mgmtService.GetIam().then(iam => {
-            this.isZitadel = iam.toObject().iamProjectId === this.projectId;
+        this.mgmtService.getIAM().then(iam => {
+            this.isZitadel = iam.iamProjectId === this.projectId;
         });
 
         if (this.projectId && this.grantId) {
-            this.mgmtService.GetGrantedProjectByID(this.projectId, this.grantId).then(proj => {
-                this.project = proj.toObject();
+            this.mgmtService.getGrantedProjectByID(this.projectId, this.grantId).then(proj => {
+                if (proj.grantedProject) {
+                    this.project = proj.grantedProject;
+                }
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -113,11 +84,13 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
     public loadMembers(): void {
         this.loadingSubject.next(true);
-        from(this.mgmtService.SearchProjectGrantMembers(this.projectId,
+        from(this.mgmtService.listProjectGrantMembers(this.projectId,
             this.grantId, 100, 0)).pipe(
                 map(resp => {
-                    this.totalMemberResult = resp.toObject().totalResult;
-                    return resp.toObject().resultList;
+                    if (resp.details?.totalResult) {
+                        this.totalMemberResult = resp.details.totalResult;
+                    }
+                    return resp.resultList;
                 }),
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false)),
@@ -140,12 +113,12 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: UserView.AsObject[] = resp.users;
+                const users: User.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
                     users.forEach(user => {
-                        return this.mgmtService.AddProjectGrantMember(
+                        return this.mgmtService.addProjectGrantMember(
                             this.projectId,
                             this.grantId,
                             user.id,

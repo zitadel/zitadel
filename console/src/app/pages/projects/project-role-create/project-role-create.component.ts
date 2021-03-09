@@ -4,7 +4,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ProjectRoleAdd } from 'src/app/proto/generated/management_pb';
+import { BulkAddProjectRolesRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -84,16 +84,15 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
     }
 
     public addRole(): void {
-        const rolesToAdd: ProjectRoleAdd[] = this.formArray.value.map((element: any) => {
-            const role = new ProjectRoleAdd();
+        const rolesToAdd: BulkAddProjectRolesRequest.Role[] = this.formArray.value.map((element: any) => {
+            const role = new BulkAddProjectRolesRequest.Role;
             role.setKey(element.key);
             role.setDisplayName(element.displayName);
             role.setGroup(element.group);
-            role.setId(this.projectId);
             return role;
         });
 
-        this.mgmtService.BulkAddProjectRole(this.projectId, rolesToAdd).then(() => {
+        this.mgmtService.bulkAddProjectRoles(this.projectId, rolesToAdd).then(() => {
             this.router.navigate(['projects', this.projectId]);
         }).catch(error => {
             this.toast.showError(error);

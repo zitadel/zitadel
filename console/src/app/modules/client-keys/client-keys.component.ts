@@ -7,12 +7,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AuthNKeyType, ClientKeySearchResponse, ClientKeyView, MachineKeySearchResponse, MachineKeyType, MachineKeyView } from 'src/app/proto/generated/management_pb';
-import { ManagementService } from 'src/app/services/mgmt.service';
-import { ToastService } from 'src/app/services/toast.service';
-
 import { AddKeyDialogComponent, AddKeyDialogType } from 'src/app/modules/add-key-dialog/add-key-dialog.component';
 import { ShowKeyDialogComponent } from 'src/app/modules/show-key-dialog/show-key-dialog.component';
+import { Key, KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
+import { ListAppKeysResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-client-keys',
@@ -24,14 +24,14 @@ export class ClientKeysComponent implements OnInit {
     @Input() appId!: string;
 
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    public dataSource: MatTableDataSource<ClientKeyView.AsObject> = new MatTableDataSource<ClientKeyView.AsObject>();
-    public selection: SelectionModel<ClientKeyView.AsObject> = new SelectionModel<ClientKeyView.AsObject>(true, []);
-    public keyResult!: MachineKeySearchResponse.AsObject | ClientKeySearchResponse.AsObject;
+    public dataSource: MatTableDataSource<Key.AsObject> = new MatTableDataSource<Key.AsObject>();
+    public selection: SelectionModel<Key.AsObject> = new SelectionModel<Key.AsObject>(true, []);
+    public keyResult!: ListAppKeysResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     @Input() public displayedColumns: string[] = ['select', 'id', 'type', 'creationDate', 'expirationDate'];
 
-    @Output() public changedSelection: EventEmitter<Array<ClientKeyView.AsObject>> = new EventEmitter();
+    @Output() public changedSelection: EventEmitter<Array<Key.AsObject>> = new EventEmitter();
 
     constructor(public translate: TranslateService, private mgmtService: ManagementService, private dialog: MatDialog,
         private toast: ToastService) {
@@ -64,7 +64,7 @@ export class ClientKeysComponent implements OnInit {
 
     public deleteSelectedKeys(): void {
         const mappedDeletions = this.selection.selected.map(value => {
-            return this.mgmtService.DeleteClientKey(value.id, this.projectId, this.appId);
+            return this.mgmtService.removeAppKey(this.projectId, this.appId, value.id);
         });
         Promise.all(mappedDeletions).then(() => {
             this.selection.clear();
@@ -83,7 +83,7 @@ export class ClientKeysComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const type: AuthNKeyType = resp.type;
+                const type: KeyType = resp.type;
 
                 let date: Timestamp | undefined;
 
@@ -99,7 +99,7 @@ export class ClientKeysComponent implements OnInit {
                 }
 
                 if (type) {
-                    return this.mgmtService.addClientKey(this.projectId, this.appId, type, date).then((response) => {
+                    return this.mgmtService.addAppKey(this.projectId, this.appId, type, date ? date : undefined).then((response) => {
                         if (response) {
                             setTimeout(() => {
                                 this.refreshPage();
@@ -107,7 +107,7 @@ export class ClientKeysComponent implements OnInit {
 
                             this.dialog.open(ShowKeyDialogComponent, {
                                 data: {
-                                    key: response.toObject(),
+                                    key: response,
                                     type: AddKeyDialogType.AUTHNKEY
                                 },
                                 width: '400px',
@@ -124,8 +124,8 @@ export class ClientKeysComponent implements OnInit {
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
         if (this.projectId && this.appId) {
-            this.mgmtService.SearchClientKeys(this.projectId, this.appId, limit, offset).then(resp => {
-                this.keyResult = resp.toObject();
+            this.mgmtService.listAppKeys(this.projectId, this.appId, limit, offset).then(resp => {
+                this.keyResult = resp;
                 this.dataSource.data = this.keyResult.resultList;
                 this.loadingSubject.next(false);
             }).catch((error: any) => {

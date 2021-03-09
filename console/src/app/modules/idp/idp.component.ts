@@ -6,18 +6,9 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-import {
-    IdpStylingType as adminIdpStylingType,
-    IdpUpdate as AdminIdpConfigUpdate,
-    OidcIdpConfigUpdate as AdminOidcIdpConfigUpdate,
-    OIDCMappingField as adminMappingFields,
-} from 'src/app/proto/generated/admin_pb';
-import {
-    IdpStylingType as mgmtIdpStylingType,
-    IdpUpdate as MgmtIdpConfigUpdate,
-    OidcIdpConfigUpdate as MgmtOidcIdpConfigUpdate,
-    OIDCMappingField as mgmtMappingFields,
-} from 'src/app/proto/generated/management_pb';
+import { UpdateIDPOIDCConfigRequest, UpdateIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { IDPStylingType, OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
+import { UpdateOrgIDPOIDCConfigRequest, UpdateOrgIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -30,8 +21,8 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
     styleUrls: ['./idp.component.scss'],
 })
 export class IdpComponent implements OnInit, OnDestroy {
-    public mappingFields: mgmtMappingFields[] | adminMappingFields[] = [];
-    public styleFields: mgmtIdpStylingType[] | adminIdpStylingType[] = [];
+    public mappingFields: OIDCMappingField[] = [];
+    public styleFields: IDPStylingType[] = [];
 
     public showIdSecretSection: boolean = false;
     public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
@@ -70,35 +61,46 @@ export class IdpComponent implements OnInit, OnDestroy {
             switch (this.serviceType) {
                 case PolicyComponentServiceType.MGMT:
                     this.service = this.injector.get(ManagementService as Type<ManagementService>);
-                    this.mappingFields = [
-                        mgmtMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
-                        mgmtMappingFields.OIDCMAPPINGFIELD_EMAIL];
-                    this.styleFields = [
-                        mgmtIdpStylingType.IDPSTYLINGTYPE_UNSPECIFIED,
-                        mgmtIdpStylingType.IDPSTYLINGTYPE_GOOGLE];
+
                     break;
                 case PolicyComponentServiceType.ADMIN:
                     this.service = this.injector.get(AdminService as Type<AdminService>);
-                    this.mappingFields = [
-                        adminMappingFields.OIDCMAPPINGFIELD_PREFERRED_USERNAME,
-                        adminMappingFields.OIDCMAPPINGFIELD_EMAIL];
-                    this.styleFields = [
-                        adminIdpStylingType.IDPSTYLINGTYPE_UNSPECIFIED,
-                        adminIdpStylingType.IDPSTYLINGTYPE_GOOGLE];
+
                     break;
             }
+
+            this.mappingFields = [
+                OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+                OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL];
+            this.styleFields = [
+                IDPStylingType.STYLING_TYPE_UNSPECIFIED,
+                IDPStylingType.STYLING_TYPE_GOOGLE];
 
             return this.route.params.pipe(take(1));
         })).subscribe((params) => {
             const { id } = params;
             if (id) {
-                this.service.IdpByID(id).then(idp => {
-                    const idpObject = idp.toObject();
-                    this.idpForm.patchValue(idpObject);
-                    if (idpObject.oidcConfig) {
-                        this.oidcConfigForm.patchValue(idpObject.oidcConfig);
-                    }
-                });
+                if (this.serviceType == PolicyComponentServiceType.MGMT) {
+                    (this.service as ManagementService).getOrgIDPByID(id).then(resp => {
+                        if (resp.idp) {
+                            const idpObject = resp.idp;
+                            this.idpForm.patchValue(idpObject);
+                            if (idpObject.oidcConfig) {
+                                this.oidcConfigForm.patchValue(idpObject.oidcConfig);
+                            }
+                        }
+                    });
+                } else if (this.serviceType == PolicyComponentServiceType.ADMIN) {
+                    (this.service as AdminService).getIDPByID(id).then(resp => {
+                        if (resp.idp) {
+                            const idpObject = resp.idp;
+                            this.idpForm.patchValue(idpObject);
+                            if (idpObject.oidcConfig) {
+                                this.oidcConfigForm.patchValue(idpObject.oidcConfig);
+                            }
+                        }
+                    });
+                }
             }
         });
     }
@@ -116,55 +118,71 @@ export class IdpComponent implements OnInit, OnDestroy {
     }
 
     public updateIdp(): void {
-        let req: AdminIdpConfigUpdate | MgmtIdpConfigUpdate;
+        if (this.serviceType == PolicyComponentServiceType.MGMT) {
+            const req = new UpdateOrgIDPRequest();
 
-        switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-                req = new MgmtIdpConfigUpdate();
-                break;
-            case PolicyComponentServiceType.ADMIN:
-                req = new AdminIdpConfigUpdate();
-                break;
+            req.setIdpId(this.id?.value);
+            req.setName(this.name?.value);
+            req.setStylingType(this.stylingType?.value);
+
+            (this.service as ManagementService).updateOrgIDP(req).then(() => {
+                this.toast.showInfo('IDP.TOAST.SAVED', true);
+                // this.router.navigate(['idp', ]);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+        } else if (this.serviceType == PolicyComponentServiceType.ADMIN) {
+            const req = new UpdateIDPRequest();
+
+            req.setIdpId(this.id?.value);
+            req.setName(this.name?.value);
+            req.setStylingType(this.stylingType?.value);
+
+            (this.service as AdminService).updateIDP(req).then(() => {
+                this.toast.showInfo('IDP.TOAST.SAVED', true);
+                // this.router.navigate(['idp', ]);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
         }
-
-        req.setId(this.id?.value);
-        req.setName(this.name?.value);
-        req.setStylingType(this.stylingType?.value);
-
-        this.service.UpdateIdp(req).then((idp) => {
-            this.toast.showInfo('IDP.TOAST.SAVED', true);
-            // this.router.navigate(['idp', ]);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
     }
 
     public updateOidcConfig(): void {
-        let req: AdminOidcIdpConfigUpdate | MgmtOidcIdpConfigUpdate;
+        if (this.serviceType == PolicyComponentServiceType.MGMT) {
+            const req = new UpdateOrgIDPOIDCConfigRequest();
 
-        switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-                req = new MgmtOidcIdpConfigUpdate();
-                break;
-            case PolicyComponentServiceType.ADMIN:
-                req = new AdminOidcIdpConfigUpdate();
-                break;
+            req.setIdpId(this.id?.value);
+            req.setClientId(this.clientId?.value);
+            req.setClientSecret(this.clientSecret?.value);
+            req.setIssuer(this.issuer?.value);
+            req.setScopesList(this.scopesList?.value);
+            req.setUsernameMapping(this.usernameMapping?.value);
+            req.setDisplayNameMapping(this.idpDisplayNameMapping?.value);
+
+            (this.service as ManagementService).updateOrgIDPOIDCConfig(req).then((oidcConfig) => {
+                this.toast.showInfo('IDP.TOAST.SAVED', true);
+                // this.router.navigate(['idp', ]);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+        } else if (this.serviceType == PolicyComponentServiceType.ADMIN) {
+            const req = new UpdateIDPOIDCConfigRequest();
+
+            req.setIdpId(this.id?.value);
+            req.setClientId(this.clientId?.value);
+            req.setClientSecret(this.clientSecret?.value);
+            req.setIssuer(this.issuer?.value);
+            req.setScopesList(this.scopesList?.value);
+            req.setUsernameMapping(this.usernameMapping?.value);
+            req.setDisplayNameMapping(this.idpDisplayNameMapping?.value);
+
+            (this.service as AdminService).updateIDPOIDCConfig(req).then((oidcConfig) => {
+                this.toast.showInfo('IDP.TOAST.SAVED', true);
+                // this.router.navigate(['idp', ]);
+            }).catch(error => {
+                this.toast.showError(error);
+            });
         }
-
-        req.setIdpId(this.id?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setScopesList(this.scopesList?.value);
-        req.setUsernameMapping(this.usernameMapping?.value);
-        req.setIdpDisplayNameMapping(this.idpDisplayNameMapping?.value);
-
-        this.service.UpdateOidcIdpConfig(req).then((oidcConfig) => {
-            this.toast.showInfo('IDP.TOAST.SAVED', true);
-            // this.router.navigate(['idp', ]);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
     }
 
     public close(): void {

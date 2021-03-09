@@ -5,12 +5,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
-import {
-    ProjectRole,
-    ProjectRoleSearchKey,
-    ProjectRoleSearchQuery,
-    SearchMethod,
-} from 'src/app/proto/generated/management_pb';
+import { Role, RoleDisplayNameQuery, RoleQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 
@@ -26,14 +21,14 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
     public separatorKeysCodes: number[] = [ENTER, COMMA];
     public myControl: FormControl = new FormControl();
     public names: string[] = [];
-    public roles: Array<ProjectRole.AsObject> = [];
-    public filteredRoles: Array<ProjectRole.AsObject> = [];
+    public roles: Array<Role.AsObject> = [];
+    public filteredRoles: Array<Role.AsObject> = [];
     public isLoading: boolean = false;
     @ViewChild('nameInput') public nameInput!: ElementRef<HTMLInputElement>;
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Input() public projectId: string = '';
     @Input() public singleOutput: boolean = false;
-    @Output() public selectionChanged: EventEmitter<ProjectRole.AsObject[] | ProjectRole.AsObject> = new EventEmitter();
+    @Output() public selectionChanged: EventEmitter<Role.AsObject[] | Role.AsObject> = new EventEmitter();
 
     private unsubscribed$: Subject<void> = new Subject();
     constructor(private mgmtService: ManagementService) {
@@ -43,15 +38,21 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
                 debounceTime(200),
                 tap(() => this.isLoading = true),
                 switchMap(value => {
-                    const query = new ProjectRoleSearchQuery();
-                    query.setKey(ProjectRoleSearchKey.PROJECTROLESEARCHKEY_DISPLAY_NAME);
-                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
-                    query.setValue(value);
-                    return from(this.mgmtService.SearchProjectRoles(this.projectId, 10, 0, [query]));
+                    const query = new RoleQuery();
+
+                    // const key = new RoleKeyQuery();
+                    // key.setKey(key)
+                    // query.setKey(key)
+
+                    const dQuery = new RoleDisplayNameQuery();
+                    dQuery.setDisplayName(value);
+                    query.setDisplayNameQuery(dQuery);
+
+                    return from(this.mgmtService.listProjectRoles(this.projectId, 10, 0, [query]));
                 }),
-            ).subscribe((roles) => {
+            ).subscribe((resp) => {
                 this.isLoading = false;
-                this.filteredRoles = roles.toObject().resultList;
+                this.filteredRoles = resp.resultList;
             }, error => {
                 this.isLoading = false;
             });
@@ -61,7 +62,7 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
         this.unsubscribed$.next();
     }
 
-    public displayFn(project?: ProjectRole.AsObject): string | undefined {
+    public displayFn(project?: Role.AsObject): string | undefined {
         return project ? `${project.displayName}` : undefined;
     }
 
@@ -91,7 +92,7 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
         }
     }
 
-    public remove(role: ProjectRole.AsObject): void {
+    public remove(role: Role.AsObject): void {
         const index = this.roles.indexOf(role);
 
         if (index >= 0) {

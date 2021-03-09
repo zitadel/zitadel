@@ -74,15 +74,22 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *domain.
 	return memberWriteModelToProjectGrantMember(existingMember), nil
 }
 
-func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, userID, grantID, resourceOwner string) error {
+func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, userID, grantID, resourceOwner string) (*domain.ObjectDetails, error) {
 	m, err := c.projectGrantMemberWriteModelByID(ctx, projectID, userID, grantID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, project.NewProjectGrantMemberRemovedEvent(ctx, projectAgg, projectID, userID, grantID))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectGrantMemberRemovedEvent(ctx, projectAgg, projectID, userID, grantID))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(m, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&m.WriteModel), nil
 }
 
 func (c *Commands) projectGrantMemberWriteModelByID(ctx context.Context, projectID, userID, grantID string) (member *ProjectGrantMemberWriteModel, err error) {

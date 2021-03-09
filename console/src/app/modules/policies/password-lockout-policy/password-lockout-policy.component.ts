@@ -3,8 +3,13 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { DefaultPasswordLockoutPolicyView } from 'src/app/proto/generated/admin_pb';
-import { PasswordLockoutPolicyView } from 'src/app/proto/generated/management_pb';
+import {
+    GetPasswordLockoutPolicyResponse as AdminGetPasswordLockoutPolicyResponse,
+} from 'src/app/proto/generated/zitadel/admin_pb';
+import {
+    GetPasswordLockoutPolicyResponse as MgmtGetPasswordLockoutPolicyResponse,
+} from 'src/app/proto/generated/zitadel/management_pb';
+import { PasswordLockoutPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -22,7 +27,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
 
     public lockoutForm!: FormGroup;
-    public lockoutData!: PasswordLockoutPolicyView.AsObject;
+    public lockoutData!: PasswordLockoutPolicy.AsObject;
     private sub: Subscription = new Subscription();
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
@@ -54,25 +59,25 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
     }
 
     private fetchData(): void {
-        this.getData().then(data => {
-            if (data) {
-                this.lockoutData = data.toObject() as PasswordLockoutPolicyView.AsObject;
+        this.getData().then(resp => {
+            if (resp.policy) {
+                this.lockoutData = resp.policy;
             }
         });
     }
 
-    private getData(): Promise<PasswordLockoutPolicyView | DefaultPasswordLockoutPolicyView> {
+    private getData(): Promise<AdminGetPasswordLockoutPolicyResponse.AsObject | MgmtGetPasswordLockoutPolicyResponse.AsObject> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                return (this.service as ManagementService).GetPasswordLockoutPolicy();
+                return (this.service as ManagementService).getPasswordLockoutPolicy();
             case PolicyComponentServiceType.ADMIN:
-                return (this.service as AdminService).GetDefaultPasswordLockoutPolicy();
+                return (this.service as AdminService).getPasswordLockoutPolicy();
         }
     }
 
     public removePolicy(): void {
         if (this.service instanceof ManagementService) {
-            this.service.RemovePasswordLockoutPolicy().then(() => {
+            this.service.resetPasswordLockoutPolicyToDefault().then(() => {
                 this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
                 this.fetchData();
             }).catch(error => {
@@ -96,7 +101,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
     public savePolicy(): void {
         let promise: Promise<any>;
         if (this.service instanceof AdminService) {
-            promise = this.service.UpdateDefaultPasswordLockoutPolicy(
+            promise = this.service.updatePasswordLockoutPolicy(
                 this.lockoutData.maxAttempts,
                 this.lockoutData.showLockoutFailure,
             ).then(() => {
@@ -105,8 +110,8 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                 this.toast.showError(error);
             });
         } else {
-            if ((this.lockoutData as PasswordLockoutPolicyView.AsObject).pb_default) {
-                promise = this.service.CreatePasswordLockoutPolicy(
+            if ((this.lockoutData as PasswordLockoutPolicy.AsObject).isDefault) {
+                promise = this.service.addCustomPasswordLockoutPolicy(
                     this.lockoutData.maxAttempts,
                     this.lockoutData.showLockoutFailure,
                 ).then(() => {
@@ -115,7 +120,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
                     this.toast.showError(error);
                 });
             } else {
-                promise = this.service.UpdatePasswordLockoutPolicy(
+                promise = this.service.updateCustomPasswordLockoutPolicy(
                     this.lockoutData.maxAttempts,
                     this.lockoutData.showLockoutFailure,
                 ).then(() => {
@@ -129,7 +134,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
     public get isDefault(): boolean {
         if (this.lockoutData && this.serviceType === PolicyComponentServiceType.MGMT) {
-            return (this.lockoutData as PasswordLockoutPolicyView.AsObject).pb_default;
+            return (this.lockoutData as PasswordLockoutPolicy.AsObject).isDefault;
         } else {
             return false;
         }

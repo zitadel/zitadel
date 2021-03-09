@@ -2,14 +2,14 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { UserMembershipView } from 'src/app/proto/generated/management_pb';
+import { Membership } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
-export class MembershipDetailDataSource extends DataSource<UserMembershipView.AsObject> {
+export class MembershipDetailDataSource extends DataSource<Membership.AsObject> {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
-    public membersSubject: BehaviorSubject<UserMembershipView.AsObject[]>
-        = new BehaviorSubject<UserMembershipView.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<Membership.AsObject[]>
+        = new BehaviorSubject<Membership.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -21,14 +21,13 @@ export class MembershipDetailDataSource extends DataSource<UserMembershipView.As
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        from(this.mgmtUserService.SearchUserMemberships(userId, pageSize, offset)).pipe(
+        from(this.mgmtUserService.listUserMemberships(userId, pageSize, offset)).pipe(
             map(resp => {
-                const response = resp.toObject();
-                this.totalResult = response.totalResult;
-                if (response.viewTimestamp) {
-                    this.viewTimestamp = response.viewTimestamp;
+                this.totalResult = resp.details?.totalResult || 0;
+                if (resp.details?.viewTimestamp) {
+                    this.viewTimestamp = resp.details.viewTimestamp;
                 }
-                return response.resultList;
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -43,7 +42,7 @@ export class MembershipDetailDataSource extends DataSource<UserMembershipView.As
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<UserMembershipView.AsObject[]> {
+    public connect(): Observable<Membership.AsObject[]> {
         return this.membersSubject.asObservable();
     }
 

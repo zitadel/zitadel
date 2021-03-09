@@ -1,11 +1,18 @@
+import { KeyValue } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, scan, take, takeUntil, tap } from 'rxjs/operators';
-import { Change, Changes } from 'src/app/proto/generated/management_pb';
+import { ListMyUserChangesResponse } from 'src/app/proto/generated/zitadel/auth_pb';
+import { Change } from 'src/app/proto/generated/zitadel/change_pb';
+import {
+    ListAppChangesResponse,
+    ListOrgChangesResponse,
+    ListProjectChangesResponse,
+    ListUserChangesResponse,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { KeyValue } from '@angular/common';
 
 export enum ChangeType {
     MYUSER = 'myuser',
@@ -27,6 +34,8 @@ export interface MappedChange {
     }>;
 }
 
+type ListChanges = ListMyUserChangesResponse.AsObject | ListUserChangesResponse.AsObject | ListProjectChangesResponse.AsObject | ListOrgChangesResponse.AsObject | ListAppChangesResponse.AsObject;
+
 @Component({
     selector: 'app-changes',
     templateUrl: './changes.component.html',
@@ -46,7 +55,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
 
     loading: Observable<boolean> = this._loading.asObservable();
     public data!: Observable<MappedChange[]>;
-    public changes!: Changes.AsObject;
+    public changes!: ListChanges;
     private destroyed$: Subject<void> = new Subject();
     constructor(private mgmtUserService: ManagementService, private authUserService: GrpcAuthService) {
 
@@ -73,17 +82,17 @@ export class ChangesComponent implements OnInit, OnDestroy {
     }
 
     public init(): void {
-        let first: Promise<Changes>;
+        let first: Promise<ListChanges>;
         switch (this.changeType) {
-            case ChangeType.MYUSER: first = this.authUserService.GetMyUserChanges(20, 0);
+            case ChangeType.MYUSER: first = this.authUserService.listMyUserChanges(20, 0);
                 break;
-            case ChangeType.USER: first = this.mgmtUserService.UserChanges(this.id, 20, 0);
+            case ChangeType.USER: first = this.mgmtUserService.listUserChanges(this.id, 20, 0);
                 break;
-            case ChangeType.PROJECT: first = this.mgmtUserService.ProjectChanges(this.id, 20, 0);
+            case ChangeType.PROJECT: first = this.mgmtUserService.listProjectChanges(this.id, 20, 0);
                 break;
-            case ChangeType.ORG: first = this.mgmtUserService.OrgChanges(this.id, 20, 0);
+            case ChangeType.ORG: first = this.mgmtUserService.listOrgChanges(20, 0);
                 break;
-            case ChangeType.APP: first = this.mgmtUserService.ApplicationChanges(this.id, this.secId, 20, 0);
+            case ChangeType.APP: first = this.mgmtUserService.listAppChanges(this.id, this.secId, 20, 0);
                 break;
         }
 
@@ -100,18 +109,18 @@ export class ChangesComponent implements OnInit, OnDestroy {
         const cursor = this.getCursor();
         console.log('cursor' + cursor);
 
-        let more: Promise<Changes>;
+        let more: Promise<ListChanges>;
 
         switch (this.changeType) {
-            case ChangeType.MYUSER: more = this.authUserService.GetMyUserChanges(20, cursor);
+            case ChangeType.MYUSER: more = this.authUserService.listMyUserChanges(20, cursor);
                 break;
-            case ChangeType.USER: more = this.mgmtUserService.UserChanges(this.id, 20, cursor);
+            case ChangeType.USER: more = this.mgmtUserService.listUserChanges(this.id, 20, cursor);
                 break;
-            case ChangeType.PROJECT: more = this.mgmtUserService.ProjectChanges(this.id, 20, cursor);
+            case ChangeType.PROJECT: more = this.mgmtUserService.listProjectChanges(this.id, 20, cursor);
                 break;
-            case ChangeType.ORG: more = this.mgmtUserService.OrgChanges(this.id, 20, cursor);
+            case ChangeType.ORG: more = this.mgmtUserService.listOrgChanges(20, cursor);
                 break;
-            case ChangeType.APP: more = this.mgmtUserService.ApplicationChanges(this.id, this.secId, 20, cursor);
+            case ChangeType.APP: more = this.mgmtUserService.listAppChanges(this.id, this.secId, 20, cursor);
                 break;
         }
 
@@ -131,7 +140,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
     }
 
     // Maps the snapshot to usable format the updates source
-    private mapAndUpdate(col: Promise<Changes>): any {
+    private mapAndUpdate(col: Promise<ListChanges>): any {
         if (this._done.value || this._loading.value) { return; }
 
         // Map snapshot with doc ref (needed for cursor)
@@ -141,8 +150,8 @@ export class ChangesComponent implements OnInit, OnDestroy {
 
             return from(col).pipe(
                 take(1),
-                tap((res: Changes) => {
-                    const values = res.toObject().changesList;
+                tap((res: ListChanges) => {
+                    const values = res.resultList;
                     const mapped = this.mapChanges(values);
                     // update source with new values, done loading
                     // this._data.next(values);
@@ -173,19 +182,19 @@ export class ChangesComponent implements OnInit, OnDestroy {
                 if (index) {
                     if (splitted[index]) {
                         const userData: any = {
-                            editor: change.editor,
+                            editor: change.editorDisplayName,
                             editorId: change.editorId,
-                            editorName: change.editor,
+                            editorName: change.editorDisplayName,
 
                             dates: [change.changeDate],
-                            data: [change.data],
+                            // data: [change.data],
                             eventTypes: [change.eventType],
                             sequences: [change.sequence],
                         };
                         const lastIndex = splitted[index].length - 1;
-                        if (lastIndex > -1 && splitted[index][lastIndex].editor === change.editor) {
+                        if (lastIndex > -1 && splitted[index][lastIndex].editor === change.editorDisplayName) {
                             splitted[index][lastIndex].dates.push(change.changeDate);
-                            splitted[index][lastIndex].data.push(change.data);
+                            // splitted[index][lastIndex].data.push(change.data);
                             splitted[index][lastIndex].eventTypes.push(change.eventType);
                             splitted[index][lastIndex].sequences.push(change.sequence);
                         } else {
@@ -194,12 +203,12 @@ export class ChangesComponent implements OnInit, OnDestroy {
                     } else {
                         splitted[index] = [
                             {
-                                editor: change.editor,
+                                editor: change.editorDisplayName,
                                 editorId: change.editorId,
-                                editorName: change.editor,
+                                editorName: change.editorDisplayName,
 
                                 dates: [change.changeDate],
-                                data: [change.data],
+                                // data: [change.data],
                                 eventTypes: [change.eventType],
                                 sequences: [change.sequence],
                             }

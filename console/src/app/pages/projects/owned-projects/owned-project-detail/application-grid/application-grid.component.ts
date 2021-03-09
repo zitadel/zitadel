@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { Application, OIDCApplicationType, OIDCResponseType } from 'src/app/proto/generated/management_pb';
+import { App, OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
+
 import { NATIVE_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../../../apps/authtypes';
 
 @Component({
@@ -14,10 +15,10 @@ export class ApplicationGridComponent implements OnInit {
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
     @Output() public changeView: EventEmitter<void> = new EventEmitter();
-    public appsSubject: BehaviorSubject<Application.AsObject[]> = new BehaviorSubject<Application.AsObject[]>([]);
+    public appsSubject: BehaviorSubject<App.AsObject[]> = new BehaviorSubject<App.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    public OIDCApplicationType: any = OIDCApplicationType;
+    public OIDCApplicationType: any = OIDCAppType;
 
     public NATIVE_TYPE: any = NATIVE_TYPE;
     public WEB_TYPE: any = WEB_TYPE;
@@ -30,14 +31,14 @@ export class ApplicationGridComponent implements OnInit {
     }
 
     public loadApps(): void {
-        from(this.mgmtService.SearchApplications(this.projectId, 100, 0)).pipe(
+        from(this.mgmtService.listApps(this.projectId, 100, 0)).pipe(
             map(resp => {
-                return resp.toObject().resultList;
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe((apps) => {
-            this.appsSubject.next(apps as Application.AsObject[]);
+            this.appsSubject.next(apps as App.AsObject[]);
         });
     }
 

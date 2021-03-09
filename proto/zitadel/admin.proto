@@ -1,0 +1,987 @@
+syntax = "proto3";
+
+import "zitadel/idp.proto";
+import "zitadel/user.proto";
+import "zitadel/object.proto";
+import "zitadel/options.proto";
+import "zitadel/org.proto";
+import "zitadel/policy.proto";
+import "zitadel/member.proto";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "validate/validate.proto";
+
+package zitadel.admin.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/admin";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "admin service";
+        version: "1.0";
+        contact:{
+            url: "https://github.com/caos/zitadel/api/admin" //TODO: should be swagger path
+        };
+    };
+
+    schemes: HTTPS;
+
+    consumes: "application/json";
+    consumes: "application/grpc";
+
+    produces: "application/json";
+    produces: "application/grpc";
+};
+
+
+service AdminService {
+    rpc Healthz(HealthzRequest) returns (HealthzResponse) {
+        option (google.api.http) = {
+            get: "/healthz"
+        };
+    }
+    
+    rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
+        option (google.api.http) = {
+            get: "/orgs/_is_unique"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
+        option (google.api.http) = {
+            get: "/orgs/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
+        option (google.api.http) = {
+            post: "/orgs/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
+        option (google.api.http) = {
+            post: "/orgs/_setup"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write"
+        };
+    }
+
+    rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
+        option (google.api.http) = {
+            get: "/idps/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.read"
+        };
+    }
+
+    rpc ListIDPs(ListIDPsRequest) returns (ListIDPsResponse) {
+        option (google.api.http) = {
+            post: "/idps/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.read"
+        };
+    }
+
+    rpc AddOIDCIDP(AddOIDCIDPRequest) returns (AddOIDCIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps/oidc"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc DeactivateIDP(DeactivateIDPRequest) returns (DeactivateIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps/{idp_id}/_deactivate"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc ReactivateIDP(ReactivateIDPRequest) returns (ReactivateIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps/{idp_id}/_reactivate"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc RemoveIDP(RemoveIDPRequest) returns (RemoveIDPResponse) {
+        option (google.api.http) = {
+            delete: "/idps/{idp_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateIDPOIDCConfig(UpdateIDPOIDCConfigRequest) returns (UpdateIDPOIDCConfigResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}/oidc_config"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/orgiam"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateOrgIAMPolicy(UpdateOrgIAMPolicyRequest) returns (UpdateOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/orgiam"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetCustomOrgIAMPolicy(GetCustomOrgIAMPolicyRequest) returns (GetCustomOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/{org_id}/policies/orgiam"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc AddCustomOrgIAMPolicy(AddCustomOrgIAMPolicyRequest) returns (AddCustomOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/{org_id}/policies/orgiam"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc UpdateCustomOrgIAMPolicy(UpdateCustomOrgIAMPolicyRequest) returns (UpdateCustomOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            put: "/orgs/{org_id}/policies/orgiam"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc ResetCustomOrgIAMPolicyToDefault(ResetCustomOrgIAMPolicyToDefaultRequest) returns (ResetCustomOrgIAMPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/{org_id}/policies/orgiam"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
+    rpc GetLabelPolicy(GetLabelPolicyRequest) returns (GetLabelPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdateLabelPolicy(UpdateLabelPolicyRequest) returns (UpdateLabelPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/label"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/login"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+    
+    rpc UpdateLoginPolicy(UpdateLoginPolicyRequest) returns (UpdateLoginPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/login"
+            body: "*"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc ListLoginPolicyIDPs(ListLoginPolicyIDPsRequest) returns (ListLoginPolicyIDPsResponse) {
+        option (google.api.http) = {
+            post: "/policies/login/idps/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc AddIDPToLoginPolicy(AddIDPToLoginPolicyRequest) returns (AddIDPToLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/login/idps"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc RemoveIDPFromLoginPolicy(RemoveIDPFromLoginPolicyRequest) returns (RemoveIDPFromLoginPolicyResponse) {
+        option (google.api.http) = {
+            delete: "/policies/login/idps/{idp_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc ListLoginPolicySecondFactors(ListLoginPolicySecondFactorsRequest) returns (ListLoginPolicySecondFactorsResponse) {
+        option (google.api.http) = {
+            post: "/policies/login/second_factors/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc AddSecondFactorToLoginPolicy(AddSecondFactorToLoginPolicyRequest) returns (AddSecondFactorToLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/login/second_factors"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc RemoveSecondFactorFromLoginPolicy(RemoveSecondFactorFromLoginPolicyRequest) returns (RemoveSecondFactorFromLoginPolicyResponse) {
+        option (google.api.http) = {
+            delete: "/policies/login/second_factors/{type}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
+        option (google.api.http) = {
+            post: "/policies/login/multi_factors/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/login/multi_factors"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
+        option (google.api.http) = {
+            delete: "/policies/login/multi_factors/{type}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetPasswordComplexityPolicy(GetPasswordComplexityPolicyRequest) returns (GetPasswordComplexityPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/password/complexity"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc UpdatePasswordComplexityPolicy(UpdatePasswordComplexityPolicyRequest) returns (UpdatePasswordComplexityPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/password/complexity"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetPasswordAgePolicy(GetPasswordAgePolicyRequest) returns (GetPasswordAgePolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/password/age"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+    
+    rpc UpdatePasswordAgePolicy(UpdatePasswordAgePolicyRequest) returns (UpdatePasswordAgePolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/password/age"
+            body: "*"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc GetPasswordLockoutPolicy(GetPasswordLockoutPolicyRequest) returns (GetPasswordLockoutPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/password/lockout"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+    
+    rpc UpdatePasswordLockoutPolicy(UpdatePasswordLockoutPolicyRequest) returns (UpdatePasswordLockoutPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/password/lockout"
+            body: "*"
+        };
+    
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc ListIAMMemberRoles(ListIAMMemberRolesRequest) returns (ListIAMMemberRolesResponse) {
+        option (google.api.http) = {
+            post: "/members/roles/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.member.read"
+        };
+    }
+
+    rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
+        option (google.api.http) = {
+            post: "/members/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.member.read"
+        };
+    }
+
+    rpc AddIAMMember(AddIAMMemberRequest) returns (AddIAMMemberResponse) {
+        option (google.api.http) = {
+            post: "/members"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.member.write"
+        };
+    }
+
+    rpc UpdateIAMMember(UpdateIAMMemberRequest) returns (UpdateIAMMemberResponse) {
+        option (google.api.http) = {
+            put: "/members/{user_id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.member.write"
+        };
+    }
+
+    rpc RemoveIAMMember(RemoveIAMMemberRequest) returns (RemoveIAMMemberResponse) {
+        option (google.api.http) = {
+            delete: "/members/{user_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.member.delete"
+        };
+    }
+
+    rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
+        option (google.api.http) = {
+            post: "/views/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc ClearView(ClearViewRequest) returns (ClearViewResponse) {
+        option (google.api.http) = {
+            post: "/views/{database}/{view_name}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write"
+        };
+    }
+
+    rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
+        option (google.api.http) = {
+            post: "/failedevents/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
+        option (google.api.http) = {
+            delete: "/failedevents/{database}/{view_name}/{failed_sequence}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write"
+        };
+    }
+}
+
+message HealthzRequest {}
+
+message HealthzResponse {}
+
+message IsOrgUniqueRequest {
+    string name = 1 [(validate.rules).string.min_len = 1];
+    string domain = 2 [(validate.rules).string.min_len = 1];
+}
+
+message IsOrgUniqueResponse {
+    bool is_unique = 1;
+}
+
+message GetOrgByIDRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetOrgByIDResponse {
+    zitadel.org.v1.Org org = 1;
+}
+
+message ListOrgsRequest {
+    zitadel.v1.ListQuery query = 1;
+    zitadel.org.v1.OrgFieldName sorting_column = 2;
+    repeated zitadel.org.v1.OrgQuery queries = 3;
+}
+
+message ListOrgsResponse {
+    zitadel.v1.ListDetails details = 1;
+    zitadel.org.v1.OrgFieldName sorting_column = 2;
+    repeated zitadel.org.v1.Org result = 3;
+}
+
+message SetUpOrgRequest {
+    message Org {
+        string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string domain = 2;
+    }
+    message Human {
+        message Profile {
+            string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+            string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+            string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+            string display_name = 4 [(validate.rules).string = {max_len: 200}];
+            string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
+            zitadel.user.v1.Gender gender = 6;
+        }
+        message Email {
+            string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
+            bool is_email_verified = 2;
+        }
+        message Phone {
+            // has to be a global number
+            string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
+            bool is_phone_verified = 2;
+        }
+    
+        string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        
+        Profile profile = 2 [(validate.rules).message.required = true];
+        Email email = 3 [(validate.rules).message.required = true];
+        Phone phone = 4;
+        string password = 5 [(validate.rules).string = {min_len: 1, max_len: 72}];
+    }
+    Org org = 1 [(validate.rules).message.required = true];
+    oneof user {
+        option (validate.required) = true;
+
+        Human human = 2;
+    }
+}
+
+message SetUpOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string org_id = 2;
+    string user_id = 3;
+}
+
+message GetIDPByIDRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetIDPByIDResponse {
+    zitadel.idp.v1.IDP idp = 1;
+}
+
+message ListIDPsRequest {
+    zitadel.v1.ListQuery query = 1;
+    zitadel.idp.v1.IDPFieldName sorting_column = 2;
+    repeated IDPQuery queries = 3;
+}
+
+message IDPQuery {
+    oneof query {
+        zitadel.idp.v1.IDPIDQuery idp_id_query = 1;
+        zitadel.idp.v1.IDPNameQuery idp_name_query = 2;
+    }
+}
+
+message ListIDPsResponse {
+    zitadel.v1.ListDetails details = 1;
+    zitadel.idp.v1.IDPFieldName sorting_column = 2;
+    repeated zitadel.idp.v1.IDP result = 3;
+}
+
+message AddOIDCIDPRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [(validate.rules).enum = {defined_only: true}];
+
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 6;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 7 [(validate.rules).enum = {defined_only: true}];
+    zitadel.idp.v1.OIDCMappingField username_mapping = 8 [(validate.rules).enum = {defined_only: true}];
+}
+
+message AddOIDCIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string idp_id = 2;
+}
+
+message UpdateIDPRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.IDPStylingType styling_type = 3 [(validate.rules).enum = {defined_only: true}];
+}
+
+message UpdateIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeactivateIDPRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeactivateIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ReactivateIDPRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ReactivateIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveIDPRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateIDPOIDCConfigRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 5;
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 6 [(validate.rules).enum = {defined_only: true}];
+    zitadel.idp.v1.OIDCMappingField username_mapping = 7 [(validate.rules).enum = {defined_only: true}];
+}
+
+message UpdateIDPOIDCConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetOrgIAMPolicyRequest {}
+
+message GetOrgIAMPolicyResponse {
+    zitadel.policy.v1.OrgIAMPolicy policy = 1;
+}
+
+message UpdateOrgIAMPolicyRequest {
+    bool user_login_must_be_domain = 1;
+}
+
+message UpdateOrgIAMPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetCustomOrgIAMPolicyRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomOrgIAMPolicyResponse {
+    zitadel.policy.v1.OrgIAMPolicy policy = 1;
+    bool is_default = 2;
+}
+
+message AddCustomOrgIAMPolicyRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool user_login_must_be_domain = 2;
+}
+
+message AddCustomOrgIAMPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateCustomOrgIAMPolicyRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool user_login_must_be_domain = 2;
+}
+
+message UpdateCustomOrgIAMPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomOrgIAMPolicyToDefaultRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomOrgIAMPolicyToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetLabelPolicyRequest {}
+
+message GetLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
+}
+
+message UpdateLabelPolicyRequest {
+    string primary_color = 1 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
+}
+
+message UpdateLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetLoginPolicyRequest {}
+
+message GetLoginPolicyResponse {
+    zitadel.policy.v1.LoginPolicy policy = 1;
+}
+
+message UpdateLoginPolicyRequest {
+    bool allow_username_password = 1;
+    bool allow_register = 2;
+    bool allow_external_idp = 3;
+    bool force_mfa = 4;
+    zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
+}
+
+message UpdateLoginPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListLoginPolicyIDPsRequest {
+    zitadel.v1.ListQuery query = 1;
+}
+
+message ListLoginPolicyIDPsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.idp.v1.IDPLoginPolicyLink result = 2;
+}
+
+message AddIDPToLoginPolicyRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddIDPToLoginPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveIDPFromLoginPolicyRequest {
+    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveIDPFromLoginPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListLoginPolicySecondFactorsRequest {}
+
+message ListLoginPolicySecondFactorsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.policy.v1.SecondFactorType result = 2;
+}
+
+message AddSecondFactorToLoginPolicyRequest {
+    zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message AddSecondFactorToLoginPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveSecondFactorFromLoginPolicyRequest {
+    zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message RemoveSecondFactorFromLoginPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListLoginPolicyMultiFactorsRequest {}
+
+message ListLoginPolicyMultiFactorsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.policy.v1.MultiFactorType result = 2;
+}
+
+message AddMultiFactorToLoginPolicyRequest {
+    zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message AddMultiFactorToLoginPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveMultiFactorFromLoginPolicyRequest {
+    zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message RemoveMultiFactorFromLoginPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetPasswordComplexityPolicyRequest {}
+
+message GetPasswordComplexityPolicyResponse {
+    zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
+}
+
+message UpdatePasswordComplexityPolicyRequest {
+    uint32 min_length = 1;
+    bool has_uppercase = 2;
+    bool has_lowercase = 3;
+    bool has_number = 4;
+    bool has_symbol = 5;
+}
+
+message UpdatePasswordComplexityPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetPasswordAgePolicyRequest {}
+
+message GetPasswordAgePolicyResponse {
+    zitadel.policy.v1.PasswordAgePolicy policy = 1;
+}
+
+message UpdatePasswordAgePolicyRequest {
+    uint32 max_age_days = 1;
+    uint32 expire_warn_days = 2;
+}
+
+message UpdatePasswordAgePolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetPasswordLockoutPolicyRequest {}
+
+message GetPasswordLockoutPolicyResponse {
+    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
+}
+
+message UpdatePasswordLockoutPolicyRequest {
+    uint32 max_attempts = 1;
+    bool show_lockout_failure = 2;
+}
+
+message UpdatePasswordLockoutPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddIAMMemberRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string roles = 2;
+}
+
+message AddIAMMemberResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateIAMMemberRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string roles = 2;
+}
+
+message UpdateIAMMemberResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveIAMMemberRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveIAMMemberResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListIAMMemberRolesRequest {}
+
+message ListIAMMemberRolesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated string roles = 2;
+}
+
+message ListIAMMembersRequest {
+    zitadel.v1.ListQuery query = 1;
+    repeated zitadel.member.v1.SearchQuery queries = 2;
+}
+
+message ListIAMMembersResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.member.v1.Member result = 2;
+}
+
+message ListViewsRequest {}
+
+message ListViewsResponse {
+    //TODO: search
+    repeated View result = 1;
+}
+
+message ClearViewRequest {
+    string database = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string view_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ClearViewResponse {}
+
+message ListFailedEventsRequest {}
+
+message ListFailedEventsResponse {
+    //TODO: search
+    repeated FailedEvent result = 1;
+}
+
+message RemoveFailedEventRequest {
+    string database = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string view_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    uint64 failed_sequence = 3;
+}
+
+message RemoveFailedEventResponse {}
+
+message View {
+    string database = 1;
+    string view_name = 2;
+    uint64 processed_sequence = 3;
+    google.protobuf.Timestamp event_timestamp = 4;
+    google.protobuf.Timestamp last_successful_spooler_run = 5;
+}
+
+message FailedEvent {
+    string database = 1;
+    string view_name = 2;
+    uint64 failed_sequence = 3;
+    uint64 failure_count = 4;
+    string error_message = 5;
+}

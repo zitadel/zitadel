@@ -1,0 +1,356 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+
+package zitadel.user.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/user";
+
+message User {
+    string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    UserState state = 3;
+    string user_name = 4;
+    repeated string login_names = 5;
+    string preferred_login_name = 6;
+    oneof type {
+        Human human = 7;
+        Machine machine = 8;
+    }
+}
+
+enum UserState {
+    USER_STATE_UNSPECIFIED = 0;
+    USER_STATE_ACTIVE = 1;
+    USER_STATE_INACTIVE = 2;
+    USER_STATE_DELETED = 3;
+    USER_STATE_LOCKED = 4;
+    USER_STATE_SUSPEND = 5;
+    USER_STATE_INITIAL = 6;
+}
+
+message Human {
+    Profile profile = 1;
+    Email email = 2;
+    Phone phone = 3;
+    Address address = 4;
+}
+
+message Machine {
+    string name = 1;
+    string description = 2;
+}
+
+message Profile {
+    string first_name = 1;
+    string last_name = 2;
+    string nick_name = 3;
+    string display_name = 4;
+    string preferred_language = 5;
+    Gender gender = 6;
+}
+
+message Email {
+    string email = 1;
+    bool is_email_verified = 2;
+}
+
+message Phone {
+    string phone = 1;
+    bool is_phone_verified = 2;
+}
+
+message Address {
+    string country = 1;
+    string locality = 2;
+    string postal_code = 3;
+    string region = 4;
+    string street_address = 5;
+}
+
+enum Gender {
+    GENDER_UNSPECIFIED = 0;
+    GENDER_FEMALE = 1;
+    GENDER_MALE = 2;
+    GENDER_DIVERSE = 3;
+}
+
+message SearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        UserNameQuery user_name_query = 1;
+        FirstNameQuery first_name_query = 2;
+        LastNameQuery last_name_query = 3;
+        NickNameQuery nick_name_query = 4;
+        DisplayNameQuery display_name_query = 5;
+        EmailQuery email_query = 6;
+        StateQuery state_query = 7;
+        TypeQuery type_query = 8;
+    }
+}
+
+message UserNameQuery {
+    string user_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message FirstNameQuery {
+    string first_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message LastNameQuery {
+    string last_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message NickNameQuery {
+    string nick_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message DisplayNameQuery {
+    string display_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message EmailQuery {
+    string email_address = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+//UserStateQuery is always equals
+message StateQuery {
+    UserState state = 1 [(validate.rules).enum.defined_only = true];
+}
+
+//UserTypeQuery is always equals
+message TypeQuery {
+    Type type = 1 [(validate.rules).enum.defined_only = true];
+}
+
+enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_HUMAN = 1;
+    TYPE_MACHINE = 2;
+}
+
+enum UserFieldName {
+    USER_FIELD_NAME_UNSPECIFIED = 0;
+    USER_FIELD_NAME_USER_NAME = 1;
+    USER_FIELD_NAME_FIRST_NAME = 2;
+    USER_FIELD_NAME_LAST_NAME = 3;
+    USER_FIELD_NAME_NICK_NAME = 4;
+    USER_FIELD_NAME_DISPLAY_NAME = 5;
+    USER_FIELD_NAME_EMAIL = 6;
+    USER_FIELD_NAME_STATE = 7;
+    USER_FIELD_NAME_TYPE = 8;
+}
+
+message AuthFactor {
+    AuthFactorState state = 1;
+    oneof type {
+        AuthFactorOTP otp = 2;
+        AuthFactorU2F u2f = 3;
+    }
+}
+
+enum AuthFactorState {
+    AUTH_FACTOR_STATE_UNSPECIFIED = 0;
+    AUTH_FACTOR_STATE_NOT_READY = 1;
+    AUTH_FACTOR_STATE_READY = 2;
+    AUTH_FACTOR_STATE_REMOVED = 3;
+}
+
+message AuthFactorOTP {}
+
+message AuthFactorU2F {
+    string id = 1;
+    string name = 2;
+}
+
+message WebAuthNKey {
+    string id = 1;
+    bytes public_key = 2;
+}
+
+message WebAuthNVerification {
+    bytes public_key_credential = 1 [(validate.rules).bytes.min_len = 50]; //TODO: define correct min and max len
+    string token_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message WebAuthNToken {
+    string id = 1;
+    AuthFactorState state = 2;
+    string name = 3;
+}
+
+message Membership {
+    string user_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    repeated string roles = 3;
+    string display_name = 4;
+    oneof type {
+        bool iam = 5;
+        string org_id = 6;
+        string project_id = 7;
+        string project_grant_id = 8;
+    }
+}
+
+message MembershipQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        MembershipOrgQuery org_query = 1;
+        MembershipProjectQuery project_query = 2;
+        MembershipProjectGrantQuery project_grant_query = 3;
+        MembershipIAMQuery iam_query = 4;
+    }
+}
+
+message MembershipOrgQuery {
+    string org_id = 1 [(validate.rules).string = {max_len: 200}];
+}
+
+message MembershipProjectQuery {
+    string project_id = 1 [(validate.rules).string = {max_len: 200}];
+}
+
+message MembershipProjectGrantQuery {
+    string project_grant_id = 1 [(validate.rules).string = {max_len: 200}];
+}
+
+message MembershipIAMQuery {
+    bool iam = 1;
+}
+
+message Session {
+    string session_id = 1;
+    string agent_id = 2;
+    SessionState auth_state = 3;
+    string user_id = 4;
+    string user_name = 5;
+    string login_name = 7;
+    string display_name = 8;
+    zitadel.v1.ObjectDetails details = 9;
+}
+
+enum SessionState {
+    SESSION_STATE_UNSPECIFIED = 0;
+    SESSION_STATE_ACTIVE = 1;
+    SESSION_STATE_TERMINATED = 2;
+}
+
+message UserGrant {
+    string grant_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    repeated string role_keys = 3;
+    UserGrantState state = 4;
+    
+    string user_id = 5;
+    string user_name = 6;
+    string first_name = 7;
+    string last_name = 8;
+    string email = 9;
+    string display_name = 10;
+    
+    string org_id = 11;
+    string org_name = 12;
+    string org_domain = 13;
+    
+    string project_id = 14;
+    string project_name = 15;
+}
+
+enum UserGrantState {
+    USER_GRANT_STATE_UNSPECIFIED = 0;
+    USER_GRANT_STATE_ACTIVE = 1;
+    USER_GRANT_STATE_INACTIVE = 2;
+}
+
+message UserGrantQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        UserGrantProjectIDQuery project_id_query = 1;
+        UserGrantUserIDQuery user_id_query = 2;
+        UserGrantWithGrantedQuery with_granted_query = 3;
+        UserGrantRoleKeyQuery role_key_query = 4;
+        UserGrantProjectGrantIDQuery project_grant_id_query = 5;
+        UserGrantUserNameQuery user_name_query = 6;
+        UserGrantFirstNameQuery first_name_query = 7;
+        UserGrantLastNameQuery last_name_query = 8;
+        UserGrantEmailQuery email_query = 9;
+        UserGrantOrgNameQuery org_name_query = 10;
+        UserGrantOrgDomainQuery org_domain_query = 11;
+        UserGrantProjectNameQuery project_name_query = 12;
+        UserGrantDisplayNameQuery display_name_query = 13;
+    }
+}
+
+message UserGrantProjectIDQuery {
+    string project_id = 1 [(validate.rules).string = {max_len: 200}];
+}
+
+message UserGrantUserIDQuery {
+    string user_id = 1 [(validate.rules).string = {max_len: 200}];
+}
+
+message UserGrantWithGrantedQuery {
+    bool with_granted = 1;
+}
+
+message UserGrantRoleKeyQuery {
+    string role_key = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantProjectGrantIDQuery {
+    string project_grant_id = 1 [(validate.rules).string = {max_len: 200}];
+}
+
+message UserGrantUserNameQuery {
+    string user_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantFirstNameQuery {
+    string first_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantLastNameQuery {
+    string last_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantEmailQuery {
+    string email = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantOrgNameQuery {
+    string org_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantOrgDomainQuery {
+    string org_domain = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserGrantProjectNameQuery {
+    string project_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+//TODO: needed as you can search first and last name?
+message UserGrantDisplayNameQuery {
+    string display_name = 1;
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+//PLANNED: login name query

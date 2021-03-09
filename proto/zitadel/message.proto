@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package zitadel.v1;
+
+option go_package = "github.com/caos/zitadel/pkg/grpc/message";
+
+message ErrorDetail {
+    string id = 1;
+    string message = 2;
+}
+
+message LocalizedMessage {
+    string key = 1;
+    string localized_message = 2;
+}

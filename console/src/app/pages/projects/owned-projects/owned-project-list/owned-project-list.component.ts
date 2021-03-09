@@ -10,7 +10,7 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { ProjectView } from 'src/app/proto/generated/management_pb';
+import { Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -42,14 +42,14 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
 
-    public dataSource: MatTableDataSource<ProjectView.AsObject> =
-        new MatTableDataSource<ProjectView.AsObject>();
+    public dataSource: MatTableDataSource<Project.AsObject> =
+        new MatTableDataSource<Project.AsObject>();
 
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
 
-    public ownedProjectList: ProjectView.AsObject[] = [];
+    public ownedProjectList: Project.AsObject[] = [];
     public displayedColumns: string[] = ['select', 'name', 'state', 'creationDate', 'changeDate', 'actions'];
-    public selection: SelectionModel<ProjectView.AsObject> = new SelectionModel<ProjectView.AsObject>(true, []);
+    public selection: SelectionModel<Project.AsObject> = new SelectionModel<Project.AsObject>(true, []);
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -66,8 +66,8 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         private toast: ToastService,
         private dialog: MatDialog,
     ) {
-        this.mgmtService.GetIam().then(iam => {
-            this.zitadelProjectId = iam.toObject().iamProjectId;
+        this.mgmtService.getIAM().then(iam => {
+            this.zitadelProjectId = iam.iamProjectId;
         });
     }
 
@@ -108,15 +108,16 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
 
     private async getData(limit?: number, offset?: number): Promise<void> {
         this.loadingSubject.next(true);
-        this.mgmtService.SearchProjects(limit, offset).then(res => {
-            const response = res.toObject();
-            this.ownedProjectList = response.resultList;
-            this.totalResult = response.totalResult;
+        this.mgmtService.listProjects(limit, offset).then(resp => {
+            this.ownedProjectList = resp.resultList;
+            if (resp.details?.totalResult) {
+                this.totalResult = resp.details.totalResult;
+            }
             if (this.totalResult > 10) {
                 this.grid = false;
             }
-            if (response.viewTimestamp) {
-                this.viewTimestamp = response.viewTimestamp;
+            if (resp.details?.viewTimestamp) {
+                this.viewTimestamp = resp.details?.viewTimestamp;
             }
             this.dataSource.data = this.ownedProjectList;
             this.loadingSubject.next(false);
@@ -131,7 +132,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
 
     public reactivateSelectedProjects(): void {
         const promises = this.selection.selected.map(project => {
-            this.mgmtService.ReactivateProject(project.projectId);
+            this.mgmtService.reactivateProject(project.id);
         });
 
         Promise.all(promises).then(() => {
@@ -144,7 +145,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
 
     public deactivateSelectedProjects(): void {
         const promises = this.selection.selected.map(project => {
-            this.mgmtService.DeactivateProject(project.projectId);
+            this.mgmtService.deactivateProject(project.id);
         });
 
         Promise.all(promises).then(() => {
@@ -159,7 +160,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
     }
 
-    public deleteProject(item: ProjectView.AsObject): void {
+    public deleteProject(item: Project.AsObject): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.DELETE',
@@ -171,8 +172,8 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         });
 
         dialogRef.afterClosed().subscribe(resp => {
-            if (this.zitadelProjectId && resp && item.projectId !== this.zitadelProjectId) {
-                this.mgmtService.RemoveProject(item.projectId).then(() => {
+            if (this.zitadelProjectId && resp && item.id !== this.zitadelProjectId) {
+                this.mgmtService.removeProject(item.id).then(() => {
                     this.toast.showInfo('PROJECT.TOAST.DELETED', true);
                     setTimeout(() => {
                         this.refreshPage();

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package zitadel.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/object";
+
+message ObjectDetails {
+    //sequence represents the order of events. It's always upcounting
+    //
+    // on read: the sequence of the last event reduced by the projection
+    //
+    // on manipulation: the timestamp of the event(s) added by the manipulation
+    uint64 sequence = 1;
+    //creation_date is the timestamp where the first operation on the object was made
+    //
+    // on read: the timestamp of the first event of the object
+    //
+    // on create: the timestamp of the event(s) added by the manipulation
+    google.protobuf.Timestamp creation_date = 2;
+    //change_date is the timestamp when the object was changed
+    //
+    // on read: the timestamp of the last event reduced by the projection
+    //
+    // on manipulation: the
+    google.protobuf.Timestamp change_date = 3;
+    //resource_owner is the organisation an object belongs to
+    string resource_owner = 4;
+}
+
+message ListQuery {
+    uint64 offset = 1;
+    uint32 limit = 2;
+    bool asc = 3;
+}
+
+message ListDetails {
+    uint64 total_result = 1;
+    uint64 processed_sequence = 2;
+    google.protobuf.Timestamp view_timestamp = 3;
+}
+
+enum TextQueryMethod {
+    TEXT_QUERY_METHOD_EQUALS = 0;
+    TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE = 1;
+    TEXT_QUERY_METHOD_STARTS_WITH = 2;
+    TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE = 3;
+    TEXT_QUERY_METHOD_CONTAINS = 4;
+    TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE = 5;
+    TEXT_QUERY_METHOD_ENDS_WITH = 6;
+    TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE = 7;
+}

@@ -1,105 +1,137 @@
-#######################
-## By default we build the prod enviroment
+ARG GO_VERSION=1.15.8
+ARG NODE_VERSION=15.8.0
 ARG ENV=prod
 
 #######################
-## This step downloads the protofiles, protoc and protoc-gen-grpc-web for later use
+## This step sets up the folder structure,
+## initalices go mods,
+## downloads the protofiles, 
+## protoc and protoc-gen-grpc-web for later use
 #######################
-FROM alpine as base
-RUN apk add tar curl
-WORKDIR /.tmp
-RUN wget -O protoc https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-x86_64.zip \
-    && unzip protoc \
-    && wget -O bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64 \
-    && chmod +x bin/protoc-gen-grpc-web
-RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1/validate/validate.proto --create-dirs -o validate/validate.proto  \
-    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o protoc-gen-swagger/options/annotations.proto \
-    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto --create-dirs -o protoc-gen-swagger/options/openapiv2.proto \
-    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto --create-dirs -o google/api/annotations.proto \
-    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto --create-dirs -o google/api/http.proto \
-    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/empty.proto --create-dirs -o google/protobuf/empty.proto \
-    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/timestamp.proto --create-dirs -o google/protobuf/timestamp.proto \
-    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/descriptor.proto --create-dirs -o google/protobuf/descriptor.proto \
-    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/duration.proto --create-dirs -o google/protobuf/duration.proto \
-    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/any.proto --create-dirs -o google/protobuf/any.proto \
-    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/struct.proto --create-dirs -o google/protobuf/struct.proto
+FROM alpine AS base
+ARG PROTOC_VERSION=3.14.0
+ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-x86_64.zip
+ARG GRPC_WEB_VERSION=1.2.1
+ARG GRPC_WEB=protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64
 
-COPY pkg/grpc/admin/proto/admin.proto admin/proto/admin.proto
-COPY pkg/grpc/auth/proto/auth.proto auth/proto/auth.proto
-COPY pkg/grpc/management/proto/management.proto management/proto/management.proto
-COPY pkg/grpc/message/proto/message.proto message/proto/message.proto
-COPY internal/protoc/protoc-gen-authoption/authoption/options.proto authoption/options.proto
+
+RUN apk add tar curl
+WORKDIR /proto
+
+#protoc
+RUN curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/$PROTOC_ZIP \
+    && unzip -o $PROTOC_ZIP -d /usr/local bin/protoc \
+    && unzip -o $PROTOC_ZIP -d /proto include/* \
+    && rm -f $PROTOC_ZIP
+
+#grpc web
+RUN curl -OL https://github.com/grpc/grpc-web/releases/download/${GRPC_WEB_VERSION}/${GRPC_WEB} \
+    && mv ${GRPC_WEB} /usr/local/bin/protoc-gen-grpc-web \
+    && chmod +x /usr/local/bin/protoc-gen-grpc-web
+
+#proto dependencies
+RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1/validate/validate.proto --create-dirs -o include/validate/validate.proto  \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v2.2.0/protoc-gen-openapiv2/options/annotations.proto --create-dirs -o include/protoc-gen-openapiv2/options/annotations.proto \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v2.2.0/protoc-gen-openapiv2/options/openapiv2.proto --create-dirs -o include/protoc-gen-openapiv2/options/openapiv2.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto --create-dirs -o include/google/api/annotations.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto --create-dirs -o include/google/api/http.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/field_behavior.proto --create-dirs -o include/google/api/field_behavior.proto
+
+#zitadel protos
+COPY /proto/ include/.
+
 
 #######################
 ## With this step we prepare all node_modules, this helps caching the build
 ## Speed up this step by mounting your local node_modules directory
 #######################
-FROM node:15 as npm-base
-WORKDIR console
+FROM node:${NODE_VERSION} as npm-base
+WORKDIR /console
+
 COPY console/package.json console/package-lock.json ./
-RUN npm install \
-    && mkdir .tmp
+RUN npm install
+
 COPY console .
-COPY --from=base /.tmp/bin /usr/local/bin/
-COPY --from=base /.tmp .tmp/protos/
+COPY --from=base /proto /proto
+COPY --from=base /usr/local/bin /usr/local/bin/.
 COPY build/console build/console/
 RUN build/console/generate-grpc.sh
 
-FROM scratch as npm-copy
-COPY --from=npm-base /console/src/app/proto/generated .
 
+#######################
+## copy for local dev
+#######################
+FROM scratch as npm-copy
+COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
+
+
+#######################
 ## anular dev build
+#######################
 FROM npm-base as dev-angular-build
 RUN npm install -g @angular/cli
 
+
+#######################
 ## anular prod build
+#######################
 FROM npm-base as prod-angular-build
 RUN npm run prodbuild
 
+
 #######################
-## Go base build
+## Go dependencies
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
-FROM golang:1.15 as go-base
-WORKDIR src/github.com/caos/zitadel/
-COPY go.mod go.sum ./
+FROM golang:${GO_VERSION} as go-dep
+RUN mkdir -p src/github.com/caos/zitadel
+COPY . src/github.com/caos/zitadel/
+WORKDIR /go/src/github.com/caos/zitadel/
+
 RUN go mod download
-COPY --from=base /.tmp .tmp/protos/
-COPY --from=base /.tmp/bin /usr/local/bin/
-COPY internal/protoc/protoc-base internal/protoc/protoc-base/
-COPY internal/protoc/protoc-gen-authoption internal/protoc/protoc-gen-authoption/
+RUN ./tools/install.sh
 
-RUN go install \
-    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
-    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
-    github.com/golang/protobuf/protoc-gen-go \
-    github.com/envoyproxy/protoc-gen-validate
-
-RUN go get -u github.com/go-bindata/go-bindata/...
-
-RUN go-bindata ./internal/protoc/protoc-gen-authoption/templates \
-    && go install ./internal/protoc/protoc-gen-authoption
-    
-COPY build/zitadel build/zitadel/
+#######################
+## Go base build
+#######################
+FROM go-dep as go-base
+COPY --from=base /proto /proto
+COPY --from=base /usr/local/bin /usr/local/bin/.
 RUN build/zitadel/generate-grpc.sh
 
-FROM scratch as go-copy
-COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
 
+#######################
+## copy for local dev
+#######################
+FROM scratch as go-copy
+COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/grpc ./pkg/grpc
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go ./internal/protoc/protoc-gen-authoption/authoption/options.pb.go
+
+
+#######################
 ## Go test
+#######################
 FROM go-base as go-test
 COPY . .
-#Migrations for cockroach-secure
+
+# Migrations for cockroach-secure
 RUN go install github.com/rakyll/statik
 RUN ./build/operator/prebuild.sh ./migrations
 
 RUN go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
 
-## Go test
+
+#######################
+## Go test results
+#######################
 FROM scratch as go-codecov
 COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 
+
+#######################
 ## Go prod build
+#######################
 FROM go-test as prod-go-build
 COPY --from=prod-angular-build console/dist/console console/dist/console/
 RUN go get github.com/rakyll/statik \
@@ -109,9 +141,13 @@ RUN go get github.com/rakyll/statik \
     && ./build/zitadel/generate-static.sh
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-amd64 cmd/zitadel/main.go
 
+
+#######################
 ## Go dev build
+#######################
 FROM go-base as dev-go-build
 RUN go get github.com/go-delve/delve/cmd/dlv
+
 
 #######################
 ## Final Production Image
@@ -123,7 +159,10 @@ COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-amd64 /a
 RUN chmod a+x /app/zitadel
 RUN ls -la /
 
+
+#######################
 ## Scratch Image
+#######################
 FROM  scratch as final
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs

@@ -5,9 +5,8 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { merge, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Application } from 'src/app/proto/generated/management_pb';
+import { App } from 'src/app/proto/generated/zitadel/app_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 import { ProjectApplicationsDataSource } from './applications-datasource';
 
@@ -22,13 +21,13 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
     @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatSort) public sort!: MatSort;
-    @ViewChild(MatTable) public table!: MatTable<Application.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<App.AsObject>;
     public dataSource!: ProjectApplicationsDataSource;
-    public selection: SelectionModel<Application.AsObject> = new SelectionModel<Application.AsObject>(true, []);
+    public selection: SelectionModel<App.AsObject> = new SelectionModel<App.AsObject>(true, []);
 
     public displayedColumns: string[] = ['select', 'name', 'type'];
 
-    constructor(private mgmtService: ManagementService, private toast: ToastService) { }
+    constructor(private mgmtService: ManagementService) { }
 
     public ngOnInit(): void {
         this.dataSource = new ProjectApplicationsDataSource(this.mgmtService);
@@ -60,7 +59,7 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
     public masterToggle(): void {
         this.isAllSelected() ?
             this.selection.clear() :
-            this.dataSource.appsSubject.value.forEach((row: Application.AsObject) => this.selection.select(row));
+            this.dataSource.appsSubject.value.forEach((row: App.AsObject) => this.selection.select(row));
     }
 
     public refreshPage(): void {

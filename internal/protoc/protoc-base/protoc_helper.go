@@ -22,7 +22,7 @@ type ProtocGenerator interface {
 }
 
 func (f GeneratorFunc) Generate(target string, registry *descriptor.Registry, file *descriptor.File) (string, string, error) {
-	return f(target, registry, file)
+	return f(target, registry, file) //TODO: in my opinion we should use file.GoPkg here analog https://github.com/grpc-ecosystem/grpc-gateway/blob/0cc2680a4990244dcc7602bad34fef935310c0e8/protoc-gen-grpc-gateway/internal/gengateway/generator.go#L111
 }
 
 func parseReq(r io.Reader) (*plugin.CodeGeneratorRequest, error) {

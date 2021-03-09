@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { ProjectGrantView } from 'src/app/proto/generated/management_pb';
+import { GrantedProject } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -39,13 +39,13 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
 
-    public dataSource: MatTableDataSource<ProjectGrantView.AsObject> =
-        new MatTableDataSource<ProjectGrantView.AsObject>();
+    public dataSource: MatTableDataSource<GrantedProject.AsObject> =
+        new MatTableDataSource<GrantedProject.AsObject>();
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
 
-    public grantedProjectList: ProjectGrantView.AsObject[] = [];
+    public grantedProjectList: GrantedProject.AsObject[] = [];
     public displayedColumns: string[] = ['select', 'name', 'resourceOwnerName', 'state', 'creationDate', 'changeDate'];
-    public selection: SelectionModel<ProjectGrantView.AsObject> = new SelectionModel<ProjectGrantView.AsObject>(true, []);
+    public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -89,12 +89,13 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
 
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
-        this.mgmtService.SearchGrantedProjects(limit, offset).then(res => {
-            const response = res.toObject();
-            this.grantedProjectList = response.resultList;
-            this.totalResult = response.totalResult;
-            if (response.viewTimestamp) {
-                this.viewTimestamp = response.viewTimestamp;
+        this.mgmtService.listGrantedProjects(limit, offset).then(resp => {
+            this.grantedProjectList = resp.resultList;
+            if (resp.details?.totalResult) {
+                this.totalResult = resp.details.totalResult;
+            }
+            if (resp.details?.viewTimestamp) {
+                this.viewTimestamp = resp.details?.viewTimestamp;
             }
             if (this.totalResult > 5) {
                 this.grid = false;

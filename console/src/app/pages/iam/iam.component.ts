@@ -6,7 +6,8 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { PolicyGridType } from 'src/app/modules/policy-grid/policy-grid.component';
-import { OrgMemberView, UserView } from 'src/app/proto/generated/management_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -20,8 +21,8 @@ export class IamComponent {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public totalMemberResult: number = 0;
-    public membersSubject: BehaviorSubject<OrgMemberView.AsObject[]>
-        = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<Member.AsObject[]>
+        = new BehaviorSubject<Member.AsObject[]>([]);
 
     public PolicyGridType: any = PolicyGridType;
 
@@ -32,10 +33,12 @@ export class IamComponent {
 
     public loadMembers(): void {
         this.loadingSubject.next(true);
-        from(this.adminService.SearchIamMembers(100, 0)).pipe(
+        from(this.adminService.listIAMMembers(100, 0)).pipe(
             map(resp => {
-                this.totalMemberResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
+                if (resp.details?.totalResult) {
+                    this.totalMemberResult = resp.details.totalResult;
+                }
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -54,12 +57,12 @@ export class IamComponent {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: UserView.AsObject[] = resp.users;
+                const users: User.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.adminService.AddIamMember(user.id, roles);
+                        return this.adminService.addIAMMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('IAM.TOAST.MEMBERADDED');
                         setTimeout(() => {

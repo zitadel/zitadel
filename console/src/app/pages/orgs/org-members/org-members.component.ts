@@ -3,7 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { Org, OrgMemberView, UserView } from 'src/app/proto/generated/management_pb';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -23,17 +25,19 @@ export class OrgMembersComponent {
     public memberRoleOptions: string[] = [];
     public changePageFactory!: Function;
     public changePage: EventEmitter<void> = new EventEmitter();
-    public selection: Array<OrgMemberView.AsObject> = [];
+    public selection: Array<Member.AsObject> = [];
 
     constructor(
         private mgmtService: ManagementService,
         private dialog: MatDialog,
         private toast: ToastService,
     ) {
-        this.mgmtService.GetMyOrg().then(org => {
-            this.org = org.toObject();
-            this.dataSource = new OrgMembersDataSource(this.mgmtService);
-            this.dataSource.loadMembers(0, this.INITIALPAGESIZE);
+        this.mgmtService.getMyOrg().then(resp => {
+            if (resp.org) {
+                this.org = resp.org;
+                this.dataSource = new OrgMembersDataSource(this.mgmtService);
+                this.dataSource.loadMembers(0, this.INITIALPAGESIZE);
+            }
         });
 
         this.getRoleOptions();
@@ -47,15 +51,15 @@ export class OrgMembersComponent {
     }
 
     public getRoleOptions(): void {
-        this.mgmtService.GetOrgMemberRoles().then(resp => {
-            this.memberRoleOptions = resp.toObject().rolesList;
+        this.mgmtService.listOrgMemberRoles().then(resp => {
+            this.memberRoleOptions = resp.resultList;
         }).catch(error => {
             this.toast.showError(error);
         });
     }
 
-    updateRoles(member: OrgMemberView.AsObject, selectionChange: MatSelectChange): void {
-        this.mgmtService.ChangeMyOrgMember(member.userId, selectionChange.value)
+    updateRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
+        this.mgmtService.updateOrgMember(member.userId, selectionChange.value)
             .then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
             }).catch(error => {
@@ -65,7 +69,7 @@ export class OrgMembersComponent {
 
     public removeOrgMemberSelection(): void {
         Promise.all(this.selection.map(member => {
-            return this.mgmtService.RemoveMyOrgMember(member.userId).then(() => {
+            return this.mgmtService.removeOrgMember(member.userId).then(() => {
                 this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
             }).catch(error => {
                 this.toast.showError(error);
@@ -77,8 +81,8 @@ export class OrgMembersComponent {
         });
     }
 
-    public removeOrgMember(member: OrgMemberView.AsObject): void {
-        this.mgmtService.RemoveMyOrgMember(member.userId).then(() => {
+    public removeOrgMember(member: Member.AsObject): void {
+        this.mgmtService.removeOrgMember(member.userId).then(() => {
             this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
 
             setTimeout(() => {
@@ -99,12 +103,12 @@ export class OrgMembersComponent {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                const users: UserView.AsObject[] = resp.users;
+                const users: User.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.mgmtService.AddMyOrgMember(user.id, roles);
+                        return this.mgmtService.addOrgMember(user.id, roles);
                     })).then(() => {
                         this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                         setTimeout(() => {

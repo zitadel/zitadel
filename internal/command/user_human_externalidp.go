@@ -44,32 +44,39 @@ func (c *Commands) addHumanExternalIDP(ctx context.Context, humanAgg *eventstore
 	return user.NewHumanExternalIDPAddedEvent(ctx, humanAgg, externalIDP.IDPConfigID, externalIDP.DisplayName, externalIDP.ExternalUserID), nil
 }
 
-func (c *Commands) RemoveHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP) error {
-	event, err := c.removeHumanExternalIDP(ctx, externalIDP, false)
+func (c *Commands) RemoveHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP) (*domain.ObjectDetails, error) {
+	event, externalIDPWriteModel, err := c.removeHumanExternalIDP(ctx, externalIDP, false)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_, err = c.eventstore.PushEvents(ctx, event)
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(externalIDPWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&externalIDPWriteModel.WriteModel), nil
 }
 
-func (c *Commands) removeHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP, cascade bool) (eventstore.EventPusher, error) {
+func (c *Commands) removeHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP, cascade bool) (eventstore.EventPusher, *HumanExternalIDPWriteModel, error) {
 	if externalIDP.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.IDMissing")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.IDMissing")
 	}
 
 	existingExternalIDP, err := c.externalIDPWriteModelByID(ctx, externalIDP.AggregateID, externalIDP.IDPConfigID, externalIDP.ExternalUserID, externalIDP.ResourceOwner)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if existingExternalIDP.State == domain.ExternalIDPStateUnspecified || existingExternalIDP.State == domain.ExternalIDPStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-1M9xR", "Errors.User.ExternalIDP.NotFound")
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1M9xR", "Errors.User.ExternalIDP.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingExternalIDP.WriteModel)
 	if cascade {
-		return user.NewHumanExternalIDPCascadeRemovedEvent(ctx, userAgg, externalIDP.IDPConfigID, externalIDP.ExternalUserID), nil
+		return user.NewHumanExternalIDPCascadeRemovedEvent(ctx, userAgg, externalIDP.IDPConfigID, externalIDP.ExternalUserID), existingExternalIDP, nil
 	}
-	return user.NewHumanExternalIDPRemovedEvent(ctx, userAgg, externalIDP.IDPConfigID, externalIDP.ExternalUserID), nil
+	return user.NewHumanExternalIDPRemovedEvent(ctx, userAgg, externalIDP.IDPConfigID, externalIDP.ExternalUserID), existingExternalIDP, nil
 }
 
 func (c *Commands) HumanExternalLoginChecked(ctx context.Context, orgID, userID string, authRequest *domain.AuthRequest) (err error) {

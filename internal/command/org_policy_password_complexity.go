@@ -85,16 +85,23 @@ func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceO
 	return writeModelToPasswordComplexityPolicy(&existingPolicy.PasswordComplexityPolicyWriteModel), nil
 }
 
-func (c *Commands) RemovePasswordComplexityPolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemovePasswordComplexityPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	existingPolicy := NewOrgPasswordComplexityPolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "ORG-ADgs2", "Errors.Org.PasswordComplexityPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-ADgs2", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewPasswordComplexityPolicyRemovedEvent(ctx, orgAgg))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewPasswordComplexityPolicyRemovedEvent(ctx, orgAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel), nil
 }

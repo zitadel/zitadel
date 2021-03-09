@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { View } from 'src/app/proto/generated/admin_pb';
+import { View } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -35,9 +35,9 @@ export class IamViewsComponent implements AfterViewInit {
 
     public loadViews(): void {
         this.loadingSubject.next(true);
-        from(this.adminService.GetViews()).pipe(
+        from(this.adminService.listViews()).pipe(
             map(resp => {
-                return resp.toObject().viewsList;
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -61,7 +61,7 @@ export class IamViewsComponent implements AfterViewInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.adminService.ClearView(viewname, db).then(() => {
+                this.adminService.clearView(viewname, db).then(() => {
                     this.toast.showInfo('IAM.VIEWS.CLEARED', true);
                     this.loadViews();
                 }).catch(error => {

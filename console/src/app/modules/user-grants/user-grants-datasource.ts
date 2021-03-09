@@ -2,14 +2,14 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
+import { ListUserGrantResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import {
-    SearchMethod,
     UserGrant,
-    UserGrantSearchKey,
-    UserGrantSearchQuery,
-    UserGrantSearchResponse,
-    UserGrantView,
-} from 'src/app/proto/generated/management_pb';
+    UserGrantProjectGrantIDQuery,
+    UserGrantProjectIDQuery,
+    UserGrantQuery,
+    UserGrantUserIDQuery,
+} from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum UserGrantContext {
@@ -23,7 +23,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
 
-    public grantsSubject: BehaviorSubject<UserGrantView.AsObject[]> = new BehaviorSubject<UserGrantView.AsObject[]>([]);
+    public grantsSubject: BehaviorSubject<UserGrant.AsObject[]> = new BehaviorSubject<UserGrant.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -40,40 +40,44 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
             grantId?: string;
             userId?: string;
         },
-        queries?: UserGrantSearchQuery[],
+        queries?: UserGrantQuery[],
     ): void {
         switch (context) {
             case UserGrantContext.USER:
                 if (data && data.userId) {
                     this.loadingSubject.next(true);
-                    const userfilter = new UserGrantSearchQuery();
-                    userfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID);
-                    userfilter.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-                    userfilter.setValue(data.userId);
+
+                    const userfilter = new UserGrantQuery();
+                    const ugUiq = new UserGrantUserIDQuery();
+                    ugUiq.setUserId(data.userId);
+                    userfilter.setUserIdQuery(ugUiq);
+
                     if (queries) {
                         queries.push(userfilter);
                     } else {
                         queries = [userfilter];
                     }
 
-                    const promise = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
+                    const promise = this.userService.listUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise);
                 }
                 break;
             case UserGrantContext.OWNED_PROJECT:
                 if (data && data.projectId) {
                     this.loadingSubject.next(true);
-                    const projectfilter = new UserGrantSearchQuery();
-                    projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
-                    projectfilter.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-                    projectfilter.setValue(data.projectId);
+
+                    const projectfilter = new UserGrantQuery();
+                    const ugPfq = new UserGrantProjectIDQuery();
+                    ugPfq.setProjectId(data.projectId);
+                    projectfilter.setProjectIdQuery(ugPfq);
+
                     if (queries) {
                         queries.push(projectfilter);
                     } else {
                         queries = [projectfilter];
                     }
 
-                    const promise1 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
+                    const promise1 = this.userService.listUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise1);
                 }
                 break;
@@ -81,43 +85,45 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                 if (data && data.grantId && data.projectId) {
                     this.loadingSubject.next(true);
 
-                    const grantquery: UserGrantSearchQuery = new UserGrantSearchQuery();
-                    grantquery.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_GRANT_ID);
-                    grantquery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-                    grantquery.setValue(data.grantId);
+                    const grantfilter = new UserGrantQuery();
 
-                    const projectfilter = new UserGrantSearchQuery();
-                    projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
-                    projectfilter.setValue(data.projectId);
+                    const uggiq = new UserGrantProjectGrantIDQuery();
+                    uggiq.setProjectGrantId(data.grantId);
+                    grantfilter.setProjectGrantIdQuery(uggiq);
+
+                    const projectfilter = new UserGrantQuery();
+                    const ugPfq = new UserGrantProjectIDQuery();
+                    ugPfq.setProjectId(data.projectId);
+                    projectfilter.setProjectIdQuery(ugPfq);
 
                     if (queries) {
-                        queries.push(projectfilter);
-                        queries.push(grantquery);
+                        queries.push(grantfilter);
                     } else {
-                        queries = [projectfilter, grantquery];
+                        queries = [grantfilter];
                     }
 
-                    const promise2 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries);
+                    const promise2 = this.userService.listUserGrants(pageSize, pageSize * pageIndex, queries);
                     this.loadResponse(promise2);
                 }
                 break;
             default:
                 this.loadingSubject.next(true);
-                const promise3 = this.userService.SearchUserGrants(pageSize, pageSize * pageIndex, queries ?? []);
+                const promise3 = this.userService.listUserGrants(pageSize, pageSize * pageIndex, queries ?? []);
                 this.loadResponse(promise3);
                 break;
         }
     }
 
-    private loadResponse(promise: Promise<UserGrantSearchResponse>): void {
+    private loadResponse(promise: Promise<ListUserGrantResponse.AsObject>): void {
         from(promise).pipe(
             map(resp => {
-                const response = resp.toObject();
-                this.totalResult = response.totalResult;
-                if (response.viewTimestamp) {
-                    this.viewTimestamp = response.viewTimestamp;
+                if (resp.details?.totalResult) {
+                    this.totalResult = resp.details.totalResult;
                 }
-                return response.resultList;
+                if (resp.details?.viewTimestamp) {
+                    this.viewTimestamp = resp.details.viewTimestamp;
+                }
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
@@ -132,7 +138,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<UserGrantView.AsObject[]> {
+    public connect(): Observable<UserGrant.AsObject[]> {
         return this.grantsSubject.asObservable();
     }
 

@@ -1,4 +1,5 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -8,31 +9,28 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import {
-    APIApplicationCreate,
     APIAuthMethodType,
-    Application,
-    OIDCApplicationCreate,
-    OIDCApplicationType,
+    App,
+    OIDCAppType,
     OIDCAuthMethodType,
-    OIDCConfig,
     OIDCGrantType,
     OIDCResponseType,
-} from 'src/app/proto/generated/management_pb';
+} from 'src/app/proto/generated/zitadel/app_pb';
+import { AddAPIAppRequest, AddOIDCAppRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-    WEB_TYPE,
-    NATIVE_TYPE,
-    USER_AGENT_TYPE,
-    API_TYPE,
-    RadioItemAppType,
-    AppCreateType
-} from '../authtypes';
-
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
-import { CODE_METHOD, getPartialConfigFromAuthMethod, IMPLICIT_METHOD, BASIC_AUTH_METHOD, PKCE_METHOD, PK_JWT_METHOD, POST_METHOD } from '../authmethods';
-import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import {
+    BASIC_AUTH_METHOD,
+    CODE_METHOD,
+    getPartialConfigFromAuthMethod,
+    IMPLICIT_METHOD,
+    PK_JWT_METHOD,
+    PKCE_METHOD,
+    POST_METHOD,
+} from '../authmethods';
+import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
 
 
 @Component({
@@ -47,19 +45,19 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public loading: boolean = false;
 
-    public oidcApp: OIDCApplicationCreate.AsObject = new OIDCApplicationCreate().toObject();
-    public apiApp: APIApplicationCreate.AsObject = new APIApplicationCreate().toObject();
+    public oidcAppRequest: AddOIDCAppRequest.AsObject = new AddOIDCAppRequest().toObject();
+    public apiAppRequest: AddAPIAppRequest.AsObject = new AddAPIAppRequest().toObject();
 
     public oidcResponseTypes: { type: OIDCResponseType, checked: boolean; disabled: boolean; }[] = [
-        { type: OIDCResponseType.OIDCRESPONSETYPE_CODE, checked: false, disabled: false },
-        { type: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN, checked: false, disabled: false },
-        { type: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN, checked: false, disabled: false },
+        { type: OIDCResponseType.OIDC_RESPONSE_TYPE_CODE, checked: false, disabled: false },
+        { type: OIDCResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN, checked: false, disabled: false },
+        { type: OIDCResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN, checked: false, disabled: false },
     ];
 
-    public oidcAppTypes: OIDCApplicationType[] = [
-        OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
-        OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE,
-        OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
+    public oidcAppTypes: OIDCAppType[] = [
+        OIDCAppType.OIDC_APP_TYPE_WEB,
+        OIDCAppType.OIDC_APP_TYPE_NATIVE,
+        OIDCAppType.OIDC_APP_TYPE_USER_AGENT,
     ];
     public appTypes: any = [
         WEB_TYPE,
@@ -77,9 +75,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     // set to oidc first
     public authMethodTypes: { type: OIDCAuthMethodType | APIAuthMethodType, checked: boolean, disabled: boolean; api?: boolean; oidc?: boolean; }[] = [
-        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, checked: false, disabled: false, oidc: true },
-        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE, checked: false, disabled: false, oidc: true },
-        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST, checked: false, disabled: false, oidc: true },
+        { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC, checked: false, disabled: false, oidc: true },
+        { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE, checked: false, disabled: false, oidc: true },
+        { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST, checked: false, disabled: false, oidc: true },
     ];
 
     // stepper
@@ -90,7 +88,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     public form!: FormGroup;
 
     public AppCreateType: any = AppCreateType;
-    public OIDCApplicationType: any = OIDCApplicationType;
+    public OIDCAppType: any = OIDCAppType;
     public OIDCGrantType: any = OIDCGrantType;
     public OIDCAuthMethodType: any = OIDCAuthMethodType;
 
@@ -99,8 +97,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         checked: boolean,
         disabled: boolean,
     }[] = [
-            { type: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
-            { type: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT, checked: false, disabled: true },
+            { type: OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
+            { type: OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT, checked: false, disabled: true },
             // { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false, disabled: true },
             // TODO show when implemented
         ];
@@ -134,28 +132,28 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
         this.firstFormGroup.valueChanges.subscribe(value => {
             if (this.firstFormGroup.valid) {
-                this.oidcApp.name = this.name?.value;
-                this.apiApp.name = this.name?.value;
+                this.oidcAppRequest.name = this.name?.value;
+                this.apiAppRequest.name = this.name?.value;
 
                 if (this.isStepperOIDC) {
-                    const oidcAppType = (this.appType?.value as RadioItemAppType).oidcApplicationType;
+                    const oidcAppType = (this.appType?.value as RadioItemAppType).oidcAppType;
                     if (oidcAppType !== undefined) {
-                        this.oidcApp.applicationType = oidcAppType;
+                        this.oidcAppRequest.appType = oidcAppType;
                     }
 
-                    switch (this.oidcApp.applicationType) {
-                        case OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE:
+                    switch (this.oidcAppRequest.appType) {
+                        case OIDCAppType.OIDC_APP_TYPE_NATIVE:
                             this.authMethods = [
                                 PKCE_METHOD,
                             ];
 
                             // automatically set to PKCE and skip step
-                            this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
-                            this.oidcApp.grantTypesList = [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
-                            this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+                            this.oidcAppRequest.responseTypesList = [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE];
+                            this.oidcAppRequest.grantTypesList = [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE];
+                            this.oidcAppRequest.authMethodType = OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
 
                             break;
-                        case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
+                        case OIDCAppType.OIDC_APP_TYPE_WEB:
                             // PK_JWT_METHOD.recommended = false;
                             this.authMethods = [
                                 PKCE_METHOD,
@@ -166,7 +164,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
                             this.authMethod?.setValue(PKCE_METHOD.key);
                             break;
-                        case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
+                        case OIDCAppType.OIDC_APP_TYPE_USER_AGENT:
                             this.authMethods = [
                                 PKCE_METHOD,
                                 IMPLICIT_METHOD,
@@ -194,11 +192,11 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             const partialConfig = getPartialConfigFromAuthMethod(form.authMethod);
 
             if (this.isStepperOIDC && partialConfig && partialConfig.oidc) {
-                this.oidcApp.responseTypesList = partialConfig.oidc?.responseTypesList ?? [];
-                this.oidcApp.grantTypesList = partialConfig.oidc?.grantTypesList ?? [];
-                this.oidcApp.authMethodType = partialConfig.oidc?.authMethodType ?? OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+                this.oidcAppRequest.responseTypesList = partialConfig.oidc?.responseTypesList ?? [];
+                this.oidcAppRequest.grantTypesList = partialConfig.oidc?.grantTypesList ?? [];
+                this.oidcAppRequest.authMethodType = partialConfig.oidc?.authMethodType ?? OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
             } else if (this.isStepperAPI && partialConfig && partialConfig.api) {
-                this.apiApp.authMethodType = partialConfig.api?.authMethodType ?? APIAuthMethodType.APIAUTHMETHODTYPE_BASIC;
+                this.apiAppRequest.authMethodType = partialConfig.api?.authMethodType ?? APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC;
             }
         });
     }
@@ -216,18 +214,18 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.form.valueChanges.pipe(
             takeUntil(this.destroyed$),
             debounceTime(150)).subscribe(() => {
-                this.oidcApp.name = this.formname?.value;
-                this.apiApp.name = this.formname?.value;
+                this.oidcAppRequest.name = this.formname?.value;
+                this.apiAppRequest.name = this.formname?.value;
 
-                this.oidcApp.responseTypesList = this.formresponseTypesList?.value;
-                this.oidcApp.grantTypesList = this.formgrantTypesList?.value;
+                this.oidcAppRequest.responseTypesList = this.formresponseTypesList?.value;
+                this.oidcAppRequest.grantTypesList = this.formgrantTypesList?.value;
 
-                this.oidcApp.authMethodType = this.formauthMethodType?.value;
-                this.apiApp.authMethodType = this.formauthMethodType?.value;
+                this.oidcAppRequest.authMethodType = this.formauthMethodType?.value;
+                this.apiAppRequest.authMethodType = this.formauthMethodType?.value;
 
-                const oidcAppType = (this.formappType?.value as RadioItemAppType).oidcApplicationType;
+                const oidcAppType = (this.formappType?.value as RadioItemAppType).oidcAppType;
                 if (oidcAppType !== undefined) {
-                    this.oidcApp.applicationType = oidcAppType;
+                    this.oidcAppRequest.appType = oidcAppType;
                 }
             });
 
@@ -245,20 +243,20 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             this.form.addControl('responseTypesList', responseTypesControl);
 
             this.authMethodTypes = [
-                { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, checked: false, disabled: false, oidc: true },
-                { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE, checked: false, disabled: false, oidc: true },
-                { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST, checked: false, disabled: false, oidc: true },
+                { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC, checked: false, disabled: false, oidc: true },
+                { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE, checked: false, disabled: false, oidc: true },
+                { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST, checked: false, disabled: false, oidc: true },
             ];
-            this.authMethod?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC);
+            this.authMethod?.setValue(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC);
         } else if (this.isDevAPI) {
             this.form.removeControl('grantTypesList');
             this.form.removeControl('responseTypesList');
 
             this.authMethodTypes = [
-                { type: APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT, checked: false, disabled: false, api: true },
-                { type: APIAuthMethodType.APIAUTHMETHODTYPE_BASIC, checked: false, disabled: false, api: true },
+                { type: APIAuthMethodType.API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT, checked: false, disabled: false, api: true },
+                { type: APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC, checked: false, disabled: false, api: true },
             ];
-            this.authMethod?.setValue(APIAuthMethodType.APIAUTHMETHODTYPE_PRIVATE_KEY_JWT);
+            this.authMethod?.setValue(APIAuthMethodType.API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT);
         }
         this.form.updateValueAndValidity();
     }
@@ -271,8 +269,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     private async getData({ projectid }: Params): Promise<void> {
         this.projectId = projectid;
-        this.oidcApp.projectId = projectid;
-        this.apiApp.projectId = projectid;
+        this.oidcAppRequest.projectId = projectid;
+        this.apiAppRequest.projectId = projectid;
     }
 
     public close(): void {
@@ -288,15 +286,14 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
             this.loading = true;
             this.mgmtService
-                .CreateOIDCApp(this.oidcApp)
-                .then((data: Application) => {
+                .addOIDCApp(this.oidcAppRequest)
+                .then((resp) => {
                     this.loading = false;
-                    const response = data.toObject();
-                    if (response.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
-                        this.showSavedDialog(response);
-                    } else {
-                        this.router.navigate(['projects', this.projectId, 'apps', response.id]);
-                    }
+                    // if (resp.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
+                    // this.showSavedDialog(resp);
+                    // } else {
+                    //     this.router.navigate(['projects', this.projectId, 'apps', response.id]);
+                    // }
                 })
                 .catch(error => {
                     this.loading = false;
@@ -305,15 +302,15 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         } else if (appAPICheck) {
             this.loading = true;
             this.mgmtService
-                .CreateAPIApplication(this.apiApp)
-                .then((data: Application) => {
+                .addAPIApp(this.apiAppRequest)
+                .then((resp) => {
                     this.loading = false;
-                    const response = data.toObject();
-                    if (response.apiConfig?.authMethodType == APIAuthMethodType.APIAUTHMETHODTYPE_BASIC) {
-                        this.showSavedDialog(response);
-                    } else {
-                        this.router.navigate(['projects', this.projectId, 'apps', response.id]);
-                    }
+                    // const response = resp.toObject();
+                    // if (response.apiConfig?.authMethodType == APIAuthMethodType.APIAUTHMETHODTYPE_BASIC) {
+                    // this.showSavedDialog(resp);
+                    // } else {
+                    //     this.router.navigate(['projects', this.projectId, 'apps', response.id]);
+                    // }
                 })
                 .catch(error => {
                     this.loading = false;
@@ -322,7 +319,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         }
     }
 
-    public showSavedDialog(app: Application.AsObject): void {
+    public showSavedDialog(app: App.AsObject): void {
         if (app.oidcConfig?.clientSecret !== undefined) {
             const dialogRef = this.dialog.open(AppSecretDialogComponent, {
                 data: app.oidcConfig,

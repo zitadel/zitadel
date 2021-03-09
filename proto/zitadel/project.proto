@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+
+package zitadel.project.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/project";
+
+message Project {
+    string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    string name = 3;
+    ProjectState state = 4;
+    // describes if roles of user should be added in token
+    bool project_role_assertion = 5;
+    // ZITADEL checks if the user has at least one on this project
+    bool project_role_check = 6;
+}
+
+message GrantedProject {
+    string grant_id = 1;
+    string granted_org_id = 2;
+    string granted_org_name = 3;
+    repeated string granted_role_keys = 4;
+    ProjectGrantState state = 5;
+    
+    string project_id = 6;
+    string project_name = 7;
+    string project_owner_id = 8;
+    string project_owner_name = 9;
+
+    zitadel.v1.ObjectDetails details = 10;
+}
+
+enum ProjectState {
+    PROJECT_STATE_UNSPECIFIED = 0;
+    PROJECT_STATE_ACTIVE = 1;
+    PROJECT_STATE_INACTIVE = 2;
+}
+
+enum ProjectGrantState {
+    PROJECT_GRANT_STATE_UNSPECIFIED = 0;
+    PROJECT_GRANT_STATE_ACTIVE = 1;
+    PROJECT_GRANT_STATE_INACTIVE = 2;
+}
+
+message ProjectQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        ProjectNameQuery name_query = 1;
+    }
+}
+
+message ProjectNameQuery {
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message Role {
+    string key = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    string display_name = 3;
+    string group = 4;
+}
+
+message RoleQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        RoleKeyQuery key_query = 1;
+        RoleDisplayNameQuery display_name_query = 2;
+    }
+}
+
+message RoleKeyQuery {
+    string key = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message RoleDisplayNameQuery {
+    string display_name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message ProjectGrantQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        GrantProjectNameQuery project_name_query = 1;
+        GrantRoleKeyQuery role_key_query = 2;
+    }
+}
+
+message GrantProjectNameQuery {
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message GrantRoleKeyQuery {
+    string role_key = 1 [(validate.rules).string = {max_len: 200}];
+    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}

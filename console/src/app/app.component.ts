@@ -12,13 +12,9 @@ import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
-import {
-    MyProjectOrgSearchKey,
-    MyProjectOrgSearchQuery,
-    Org,
-    SearchMethod,
-    UserProfileView,
-} from './proto/generated/auth_pb';
+import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
+import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
+import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
@@ -50,7 +46,7 @@ export class AppComponent implements OnDestroy {
     public showAccount: boolean = false;
     public org!: Org.AsObject;
     public orgs$: Observable<Org.AsObject[]> = of([]);
-    public profile!: UserProfileView.AsObject;
+    public user!: User.AsObject;
     public isDarkTheme: Observable<boolean> = of(true);
 
     public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -183,7 +179,7 @@ export class AppComponent implements OnDestroy {
 
         this.authSub = this.authenticationService.authenticationChanged.subscribe((authenticated) => {
             if (authenticated) {
-                this.authService.GetActiveOrg().then(org => {
+                this.authService.getActiveOrg().then(org => {
                     this.org = org;
                 });
             }
@@ -224,16 +220,17 @@ export class AppComponent implements OnDestroy {
     public loadOrgs(filter?: string): void {
         let query;
         if (filter) {
-            query = new MyProjectOrgSearchQuery();
-            query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
-            query.setKey(MyProjectOrgSearchKey.MYPROJECTORGSEARCHKEY_ORG_NAME);
-            query.setValue(filter);
+            query = new OrgQuery();
+            const orgNameQuery = new OrgNameQuery();
+            orgNameQuery.setName(filter);
+            orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+            query.setNameQuery(orgNameQuery);
         }
 
         this.orgLoading$.next(true);
-        this.orgs$ = from(this.authService.SearchMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
+        this.orgs$ = from(this.authService.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
             map(resp => {
-                return resp.toObject().resultList;
+                return resp.resultList;
             }),
             catchError(() => of([])),
             finalize(() => {
@@ -264,12 +261,15 @@ export class AppComponent implements OnDestroy {
         this.translate.setDefaultLang('en');
 
         this.authService.user.subscribe(userprofile => {
-            this.profile = userprofile;
-            const cropped = navigator.language.split('-')[0] ?? 'en';
-            const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
-            const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : fallbackLang;
-            this.translate.use(lang);
-            this.document.documentElement.lang = lang;
+            if (userprofile) {
+                this.user = userprofile;
+                const cropped = navigator.language.split('-')[0] ?? 'en';
+                const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
+
+                const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de/) ? userprofile.human.profile?.preferredLanguage : fallbackLang;
+                this.translate.use(lang);
+                this.document.documentElement.lang = lang;
+            }
         });
     }
 
@@ -284,9 +284,8 @@ export class AppComponent implements OnDestroy {
     private getProjectCount(): void {
         this.authService.isAllowed(['project.read']).subscribe((allowed) => {
             if (allowed) {
-                this.mgmtService.SearchProjects(0, 0);
-
-                this.mgmtService.SearchGrantedProjects(0, 0);
+                this.mgmtService.listProjects(0, 0);
+                this.mgmtService.listGrantedProjects(0, 0);
             }
         });
     }
