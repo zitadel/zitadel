@@ -8,6 +8,6 @@ RUN npm install
 
 RUN npx sapper export --legacy
 
-FROM scratch as final
+# FROM scratch as final
 
-COPY --from=builder /site/__sapper__/export .
+# COPY --from=builder /site/__sapper__/export .
