@@ -13,17 +13,13 @@ import (
 
 func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGrant, resourceOwner string) (_ *domain.ProjectGrant, err error) {
 	if !grant.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-Bff2g", "Errors.Project.Grant.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Project.Grant.Invalid")
+	}
+	err = c.checkProjectGrantPreCondition(ctx, grant)
+	if err != nil {
+		return nil, err
 	}
 	grant.GrantID, err = c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	err = c.checkProjectExists(ctx, grant.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	err = c.checkOrgExists(ctx, grant.GrantedOrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,13 +40,14 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGra
 
 func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.ProjectGrant, resourceOwner string, cascadeUserGrantIDs ...string) (_ *domain.ProjectGrant, err error) {
 	if grant.GrantID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-1j83s", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-1j83s", "Errors.IDMissing")
 	}
-	err = c.checkProjectExists(ctx, grant.AggregateID, resourceOwner)
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grant.GrantID, grant.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	existingGrant, err := c.projectGrantWriteModelByID(ctx, grant.GrantID, grant.AggregateID, resourceOwner)
+	grant.GrantedOrgID = existingGrant.GrantedOrgID
+	err = c.checkProjectGrantPreCondition(ctx, grant)
 	if err != nil {
 		return nil, err
 	}
@@ -230,4 +227,22 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, proj
 	}
 
 	return writeModel, nil
+}
+
+func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGrant *domain.ProjectGrant) error {
+	preConditions := NewProjectGrantPreConditionReadModel(projectGrant.AggregateID, projectGrant.GrantedOrgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	if err != nil {
+		return err
+	}
+	if !preConditions.ProjectExists {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
+	}
+	if !preConditions.GrantedOrgExists {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
+	}
+	if projectGrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
+	}
+	return nil
 }

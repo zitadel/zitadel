@@ -33,12 +33,3 @@ func (g *UserGrant) HasInvalidRoles(validRoles []string) bool {
 	}
 	return false
 }
-
-func containsRoleKey(roleKey string, validRoles []string) bool {
-	for _, validRole := range validRoles {
-		if roleKey == validRole {
-			return true
-		}
-	}
-	return false
-}
