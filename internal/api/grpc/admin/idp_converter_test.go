@@ -94,7 +94,7 @@ func Test_updateIDPToDomain(t *testing.T) {
 			name: "all fields filled",
 			args: args{
 				req: &admin_pb.UpdateIDPRequest{
-					Id:          "13523",
+					IdpId:       "13523",
 					Name:        "new name",
 					StylingType: idp.IDPStylingType_STYLING_TYPE_GOOGLE,
 				},
