@@ -48,7 +48,7 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1
     && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/field_behavior.proto --create-dirs -o include/google/api/field_behavior.proto
 
 #zitadel protos
-COPY /proto/ include/.
+COPY proto/ include/.
 
 
 #######################
@@ -115,6 +115,7 @@ RUN build/zitadel/generate-grpc.sh
 #######################
 FROM scratch as go-copy
 COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/grpc ./pkg/grpc
+COPY --from=go-base /go/src/github.com/caos/zitadel/openapi/v2/zitadel ./openapi/v2/zitadel
 COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
 COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go ./internal/protoc/protoc-gen-authoption/authoption/options.pb.go
 
