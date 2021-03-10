@@ -41,24 +41,24 @@ type OIDCApp struct {
 	State AppState
 }
 
-func (h OIDCApp) GetApplicationName() string {
-	return h.AppName
+func (c *OIDCApp) GetApplicationName() string {
+	return c.AppName
 }
 
-func (h OIDCApp) GetState() AppState {
-	return h.State
+func (c *OIDCApp) GetState() AppState {
+	return c.State
 }
 
-func (h OIDCApp) setClientID(clientID string) {
-	h.ClientID = clientID
+func (c *OIDCApp) setClientID(clientID string) {
+	c.ClientID = clientID
 }
 
-func (h OIDCApp) setClientSecret(clientSecret *crypto.CryptoValue) {
-	h.ClientSecret = clientSecret
+func (c *OIDCApp) setClientSecret(clientSecret *crypto.CryptoValue) {
+	c.ClientSecret = clientSecret
 }
 
-func (h OIDCApp) requiresClientSecret() bool {
-	return h.AuthMethodType == OIDCAuthMethodTypeBasic || h.AuthMethodType == OIDCAuthMethodTypePost
+func (c *OIDCApp) requiresClientSecret() bool {
+	return c.AuthMethodType == OIDCAuthMethodTypeBasic || c.AuthMethodType == OIDCAuthMethodTypePost
 }
 
 type OIDCVersion int32
