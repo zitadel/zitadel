@@ -150,6 +150,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"selectedGender": func(g int32) bool {
 			return false
 		},
+		"hasUsernamePasswordLogin": func() bool {
+			return false
+		},
 		"hasExternalLogin": func() bool {
 			return false
 		},

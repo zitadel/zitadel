@@ -12,7 +12,6 @@ import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
 import { CnslLinks } from '../../links/links.component';
 import {
     IAM_LABEL_LINK,

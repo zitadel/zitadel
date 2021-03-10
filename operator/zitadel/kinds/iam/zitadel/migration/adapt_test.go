@@ -91,6 +91,11 @@ func TestMigration_AdaptFunc(t *testing.T) {
 		Spec: batchv1.JobSpec{
 			Completions: helpers.PointerInt32(1),
 			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: map[string]string{
+						"migrationhash": getHash(allScripts),
+					},
+				},
 				Spec: corev1.PodSpec{
 					NodeSelector:    nodeselector,
 					Tolerations:     tolerations,

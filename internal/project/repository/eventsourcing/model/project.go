@@ -168,7 +168,7 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 }
 
 func (p *Project) AppendAddProjectEvent(event *es_models.Event) error {
-	p.setData(event)
+	p.SetData(event)
 	p.State = int32(model.ProjectStateActive)
 	return nil
 }
@@ -188,7 +188,7 @@ func (p *Project) appendRemovedEvent() error {
 	return nil
 }
 
-func (p *Project) setData(event *es_models.Event) error {
+func (p *Project) SetData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, p); err != nil {
 		logging.Log("EVEN-lo9sr").WithError(err).Error("could not unmarshal event data")
 		return err
