@@ -6,9 +6,6 @@ import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { CnslLinks } from '../../links/links.component';
-import { IAM_COMPLEXITY_LINK, IAM_LABEL_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK } from '../../policy-grid/policy-links';
-
-import { CnslLinks } from '../../links/links.component';
 import { IAM_COMPLEXITY_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK } from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 

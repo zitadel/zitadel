@@ -11,9 +11,6 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { CnslLinks } from '../../links/links.component';
-import { IAM_COMPLEXITY_LINK, IAM_LABEL_LINK, IAM_LOGIN_POLICY_LINK, ORG_LOGIN_POLICY_LINK, ORG_COMPLEXITY_LINK } from '../../policy-grid/policy-links';
-
-import { CnslLinks } from '../../links/links.component';
 import {
     IAM_COMPLEXITY_LINK,
     IAM_LABEL_LINK,
