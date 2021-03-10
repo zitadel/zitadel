@@ -41,24 +41,24 @@ type OIDCApp struct {
 	State AppState
 }
 
-func (h OIDCApp) GetApplicationName() string {
-	return h.AppName
+func (a *OIDCApp) GetApplicationName() string {
+	return a.AppName
 }
 
-func (h OIDCApp) GetState() AppState {
-	return h.State
+func (a *OIDCApp) GetState() AppState {
+	return a.State
 }
 
-func (h OIDCApp) setClientID(clientID string) {
-	h.ClientID = clientID
+func (a *OIDCApp) setClientID(clientID string) {
+	a.ClientID = clientID
 }
 
-func (h OIDCApp) setClientSecret(clientSecret *crypto.CryptoValue) {
-	h.ClientSecret = clientSecret
+func (a *OIDCApp) setClientSecret(clientSecret *crypto.CryptoValue) {
+	a.ClientSecret = clientSecret
 }
 
-func (h OIDCApp) requiresClientSecret() bool {
-	return h.AuthMethodType == OIDCAuthMethodTypeBasic || h.AuthMethodType == OIDCAuthMethodTypePost
+func (a *OIDCApp) requiresClientSecret() bool {
+	return a.AuthMethodType == OIDCAuthMethodTypeBasic || a.AuthMethodType == OIDCAuthMethodTypePost
 }
 
 type OIDCVersion int32
@@ -112,10 +112,10 @@ const (
 	OIDCTokenTypeJWT
 )
 
-func (c *OIDCApp) IsValid() bool {
-	grantTypes := c.getRequiredGrantTypes()
+func (a *OIDCApp) IsValid() bool {
+	grantTypes := a.getRequiredGrantTypes()
 	for _, grantType := range grantTypes {
-		ok := containsOIDCGrantType(c.GrantTypes, grantType)
+		ok := containsOIDCGrantType(a.GrantTypes, grantType)
 		if !ok {
 			return false
 		}
@@ -123,10 +123,10 @@ func (c *OIDCApp) IsValid() bool {
 	return true
 }
 
-func (c *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
+func (a *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
 	grantTypes := make([]OIDCGrantType, 0)
 	implicit := false
-	for _, r := range c.ResponseTypes {
+	for _, r := range a.ResponseTypes {
 		switch r {
 		case OIDCResponseTypeCode:
 			grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
@@ -149,8 +149,8 @@ func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) 
 	return false
 }
 
-func (c *OIDCApp) FillCompliance() {
-	c.Compliance = GetOIDCCompliance(c.OIDCVersion, c.ApplicationType, c.GrantTypes, c.ResponseTypes, c.AuthMethodType, c.RedirectUris)
+func (a *OIDCApp) FillCompliance() {
+	a.Compliance = GetOIDCCompliance(a.OIDCVersion, a.ApplicationType, a.GrantTypes, a.ResponseTypes, a.AuthMethodType, a.RedirectUris)
 }
 
 func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTypes []OIDCGrantType, responseTypes []OIDCResponseType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
