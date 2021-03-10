@@ -103,7 +103,7 @@ func AdaptFunc(
 				labels.MustForName(componentLabels, MgmtMName),
 				true,
 				apiDomain,
-				"/zitadel.api.v1.ManagementService/",
+				"/zitadel.management.v1.ManagementService/",
 				"",
 				grpcURL,
 				30000,
