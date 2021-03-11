@@ -10,6 +10,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/authn"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -20,6 +21,7 @@ import (
 )
 
 func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest) *user_model.UserSearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	req.Queries = append(req.Queries, &user_pb.SearchQuery{
 		Query: &user_pb.SearchQuery_ResourceOwner{
 			ResourceOwner: &user_pb.ResourceOwnerQuery{
@@ -29,9 +31,9 @@ func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest)
 	})
 
 	return &user_model.UserSearchRequest{
-		Offset:  req.Query.Offset,
-		Limit:   uint64(req.Query.Limit),
-		Asc:     req.Query.Asc,
+		Offset:  offset,
+		Limit:   limit,
+		Asc:     asc,
 		Queries: user_grpc.UserQueriesToModel(req.Queries),
 	}
 }
@@ -126,10 +128,11 @@ func UpdateMachineRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateMachin
 }
 
 func ListMachineKeysRequestToModel(req *mgmt_pb.ListMachineKeysRequest) *key_model.AuthNKeySearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	return &key_model.AuthNKeySearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		Queries: []*key_model.AuthNKeySearchQuery{
 			{
 				Key:    key_model.AuthNKeyObjectType,
@@ -173,14 +176,17 @@ func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.Remov
 }
 
 func ListHumanLinkedIDPsRequestToModel(req *mgmt_pb.ListHumanLinkedIDPsRequest) *user_model.ExternalIDPSearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	return &user_model.ExternalIDPSearchRequest{
-		Limit:   uint64(req.Query.Limit),
-		Offset:  req.Query.Offset,
+		Offset:  offset,
+		Limit:   limit,
+		Asc:     asc,
 		Queries: []*user_model.ExternalIDPSearchQuery{{Key: user_model.ExternalIDPSearchKeyUserID, Method: domain.SearchMethodEquals, Value: req.UserId}},
 	}
 }
 
 func ListUserMembershipsRequestToModel(req *mgmt_pb.ListUserMembershipsRequest) (*user_model.UserMembershipSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := user_grpc.MembershipQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -191,9 +197,9 @@ func ListUserMembershipsRequestToModel(req *mgmt_pb.ListUserMembershipsRequest) 
 		Value:  req.UserId,
 	})
 	return &user_model.UserMembershipSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

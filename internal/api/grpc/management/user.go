@@ -52,7 +52,8 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 }
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
-	res, err := s.user.UserChanges(ctx, req.UserId, req.Query.Offset, uint64(req.Query.Limit), req.Query.Asc)
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	res, err := s.user.UserChanges(ctx, req.UserId, offset, limit, asc)
 	if err != nil {
 		return nil, err
 	}

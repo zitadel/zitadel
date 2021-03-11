@@ -32,7 +32,8 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgBy
 }
 
 func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChangesRequest) (*mgmt_pb.ListOrgChangesResponse, error) {
-	response, err := s.org.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, req.Query.Offset, uint64(req.Query.Limit), req.Query.Asc)
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	response, err := s.org.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, offset, limit, asc)
 	if err != nil {
 		return nil, err
 	}
@@ -199,11 +200,12 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 }
 
 func ListOrgMembersRequestToModel(req *mgmt_pb.ListOrgMembersRequest) (*org_model.OrgMemberSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries := member_grpc.MemberQueriesToOrgMember(req.Queries)
 	return &org_model.OrgMemberSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

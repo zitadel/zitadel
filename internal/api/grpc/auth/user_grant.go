@@ -1,15 +1,17 @@
 package auth
 
 import (
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/usergrant/model"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
 
 func ListMyUserGrantsRequestToModel(req *auth_pb.ListMyUserGrantsRequest) *model.UserGrantSearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	return &model.UserGrantSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 	}
 }
 

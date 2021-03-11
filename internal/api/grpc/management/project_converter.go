@@ -2,6 +2,7 @@ package management
 
 import (
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	proj_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -82,33 +83,36 @@ func UpdateProjectMemberRequestToDomain(req *mgmt_pb.UpdateProjectMemberRequest)
 }
 
 func ListProjectsRequestToModel(req *mgmt_pb.ListProjectsRequest) (*proj_model.ProjectViewSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := proj_grpc.ProjectQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
 	return &proj_model.ProjectViewSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
 }
 
 func ListGrantedProjectsRequestToModel(req *mgmt_pb.ListGrantedProjectsRequest) (*proj_model.ProjectGrantViewSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := proj_grpc.GrantedProjectQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
 	return &proj_model.ProjectGrantViewSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
 }
 func ListProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*proj_model.ProjectRoleSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := proj_grpc.RoleQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -119,15 +123,16 @@ func ListProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*proj
 		Value:  req.ProjectId,
 	})
 	return &proj_model.ProjectRoleSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
 }
 
 func ListProjectMembersRequestToModel(req *mgmt_pb.ListProjectMembersRequest) (*proj_model.ProjectMemberSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries := member_grpc.MemberQueriesToProjectMember(req.Queries)
 	queries = append(queries, &proj_model.ProjectMemberSearchQuery{
 		Key:    proj_model.ProjectMemberSearchKeyProjectID,
@@ -135,9 +140,9 @@ func ListProjectMembersRequestToModel(req *mgmt_pb.ListProjectMembersRequest) (*
 		Value:  req.ProjectId,
 	})
 	return &proj_model.ProjectMemberSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
