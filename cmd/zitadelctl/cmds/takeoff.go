@@ -13,6 +13,7 @@ import (
 	"github.com/caos/zitadel/operator/api"
 	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	"github.com/spf13/cobra"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
 func TakeoffCommand(getRv GetRootValues) *cobra.Command {
