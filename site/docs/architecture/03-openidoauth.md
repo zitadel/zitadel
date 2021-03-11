@@ -155,7 +155,7 @@ curl --request POST \
 
 #### introspection_endpoint
 
-[https://api.zitadel.ch/oauth/v2/introspection](https://api.zitadel.ch/oauth/v2/introspection)
+[https://api.zitadel.ch/oauth/v2/introspect](https://api.zitadel.ch/oauth/v2/introspect)
 
 
 | Parameter | Description     |
@@ -181,7 +181,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 
 ```BASH
 curl --request POST \
-  --url https://api.zitadel.ch/oauth/v2/token \
+  --url https://api.zitadel.ch/oauth/v2/introspect \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
   --data client_assertion=eyJhbGciOiJSUzI1Ni... \
@@ -339,7 +339,7 @@ Key JSON
 
 ```JSON
 {
-	"type": "serviceaccount",
+	"type": "application",
 	"keyId": "81693565968962154",
 	"key": "-----BEGIN RSA PRIVATE KEY-----...-----END RSA PRIVATE KEY-----",
 	"clientId": "78366401571920522@acme",
