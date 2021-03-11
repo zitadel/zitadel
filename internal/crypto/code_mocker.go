@@ -46,14 +46,15 @@ func CreateMockHashAlg(ctrl *gomock.Controller) HashAlgorithm {
 	return mCrypto
 }
 
-func createMockCrypto(t *testing.T) Crypto {
+func CreateMockCrypto(t *testing.T) Crypto {
 	mCrypto := NewMockCrypto(gomock.NewController(t))
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("crypto")
 	return mCrypto
 }
 
-func createMockGenerator(t *testing.T, crypto Crypto) Generator {
+func CreateMockGenerator(t *testing.T, crypto Crypto) Generator {
 	mGenerator := NewMockGenerator(gomock.NewController(t))
 	mGenerator.EXPECT().Alg().AnyTimes().Return(crypto)
+	mGenerator.EXPECT().Length().AnyTimes().Return(8)
 	return mGenerator
 }

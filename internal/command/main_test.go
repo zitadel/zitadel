@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/repository/mock"
@@ -11,6 +12,7 @@ import (
 	proj_repo "github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/repository/usergrant"
+	"github.com/golang/mock/gomock"
 	"testing"
 	"time"
 )
@@ -159,4 +161,16 @@ func uniqueConstraintsFromEventConstraint(constraint *eventstore.EventUniqueCons
 		UniqueField:  constraint.UniqueField,
 		ErrorMessage: constraint.ErrorMessage,
 		Action:       repository.UniqueConstraintAction(constraint.Action)}
+}
+
+func GetMockSecretGenerator(t *testing.T) crypto.Generator {
+	ctrl := gomock.NewController(t)
+	alg := crypto.CreateMockEncryptionAlg(ctrl)
+	generator := crypto.NewMockGenerator(ctrl)
+	generator.EXPECT().Length().Return(uint(1)).AnyTimes()
+	generator.EXPECT().Runes().Return([]rune("aa")).AnyTimes()
+	generator.EXPECT().Alg().Return(alg).AnyTimes()
+	generator.EXPECT().Expiry().Return(time.Hour * 1).AnyTimes()
+
+	return generator
 }

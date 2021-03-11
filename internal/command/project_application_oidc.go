@@ -14,9 +14,12 @@ import (
 )
 
 func (c *Commands) AddOIDCApplication(ctx context.Context, application *domain.OIDCApp, resourceOwner string) (_ *domain.OIDCApp, err error) {
+	if application == nil || application.AggregateID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Application.Invalid")
+	}
 	project, err := c.getProjectByID(ctx, application.AggregateID, resourceOwner)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(err, "PROJECT-3m9ss", "Errors.Project.NotFound")
 	}
 	addedApplication := NewOIDCApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
@@ -41,7 +44,7 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, application *domain.O
 
 func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, oidcApp *domain.OIDCApp, resourceOwner string) (events []eventstore.EventPusher, stringPW string, err error) {
 	if !oidcApp.IsValid() {
-		return nil, "", caos_errs.ThrowPreconditionFailed(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
+		return nil, "", caos_errs.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
 	oidcApp.AppID, err = c.idGenerator.Next()
 	if err != nil {
