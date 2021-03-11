@@ -87,8 +87,8 @@ func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstor
 }
 
 func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
-	if !oidc.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m900", "Errors.Project.App.OIDCConfigInvalid")
+	if !oidc.IsValid() || oidc.AppID == "" || oidc.AggregateID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5m9fs", "Errors.Project.App.OIDCConfigInvalid")
 	}
 
 	existingOIDC, err := c.getOIDCAppWriteModel(ctx, oidc.AggregateID, oidc.AppID, resourceOwner)
@@ -139,7 +139,7 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 
 func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.OIDCApp, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-99i83", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
 	}
 
 	existingOIDC, err := c.getOIDCAppWriteModel(ctx, projectID, appID, resourceOwner)
