@@ -113,6 +113,9 @@ const (
 )
 
 func (a *OIDCApp) IsValid() bool {
+	if a.AppName == "" {
+		return false
+	}
 	grantTypes := a.getRequiredGrantTypes()
 	for _, grantType := range grantTypes {
 		ok := containsOIDCGrantType(a.GrantTypes, grantType)
