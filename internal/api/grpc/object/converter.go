@@ -64,3 +64,10 @@ func TextMethodToModel(method object_pb.TextQueryMethod) domain.SearchMethod {
 		return -1
 	}
 }
+
+func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc bool) {
+	if query == nil {
+		return
+	}
+	return query.Offset, uint64(query.Limit), query.Asc
+}

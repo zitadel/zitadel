@@ -2,6 +2,7 @@ package admin
 
 import (
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -50,10 +51,11 @@ func updateOIDCConfigToDomain(req *admin_pb.UpdateIDPOIDCConfigRequest) *domain.
 }
 
 func listIDPsToModel(req *admin_pb.ListIDPsRequest) *iam_model.IDPConfigSearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	return &iam_model.IDPConfigSearchRequest{
-		Offset:        req.Query.Offset,
-		Limit:         uint64(req.Query.Limit),
-		Asc:           req.Query.Asc,
+		Offset:        offset,
+		Limit:         limit,
+		Asc:           asc,
 		SortingColumn: idp_grpc.FieldNameToModel(req.SortingColumn),
 		Queries:       idpQueriesToModel(req.Queries),
 	}

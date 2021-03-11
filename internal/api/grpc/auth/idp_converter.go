@@ -3,15 +3,18 @@ package auth
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/user/model"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
 
 func ListMyLinkedIDPsRequestToModel(req *auth_pb.ListMyLinkedIDPsRequest) *model.ExternalIDPSearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	return &model.ExternalIDPSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 	}
 }
 

@@ -41,7 +41,8 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 }
 
 func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChangesRequest) (*mgmt_pb.ListAppChangesResponse, error) {
-	res, err := s.project.ApplicationChanges(ctx, req.ProjectId, req.AppId, req.Query.Offset, uint64(req.Query.Limit), req.Query.Asc)
+	offset, limit, asc := object_grpc.ListQueryToModel(req.Query)
+	res, err := s.project.ApplicationChanges(ctx, req.ProjectId, req.AppId, offset, limit, asc)
 	if err != nil {
 		return nil, err
 	}
