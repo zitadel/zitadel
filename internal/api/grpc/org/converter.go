@@ -49,8 +49,9 @@ func OrgViewToPb(org *org_model.OrgView) *org_pb.Org {
 		Id:    org.ID,
 		State: OrgStateToPb(org.State),
 		Name:  org.Name,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			org.Sequence,
+			org.CreationDate,
 			org.ChangeDate,
 			org.ResourceOwner,
 		),
@@ -133,8 +134,9 @@ func DomainToPb(domain *org_model.OrgDomainView) *org_pb.Domain {
 		IsVerified:     domain.Verified,
 		IsPrimary:      domain.Primary,
 		ValidationType: DomainValidationTypeFromModel(domain.ValidationType),
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			0,
+			domain.CreationDate,
 			domain.ChangeDate,
 			"",
 		),

@@ -24,8 +24,9 @@ func IAMMemberToPb(m *iam_model.IAMMemberView) *member_pb.Member {
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
 		DisplayName: m.DisplayName,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			m.Sequence,
+			m.CreationDate,
 			m.ChangeDate,
 			"m.ResourceOwner", //TODO: not returnd
 		),

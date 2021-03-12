@@ -22,7 +22,7 @@ func AppsToPb(apps []*proj_model.ApplicationView) []*app_pb.App {
 func AppToPb(app *proj_model.ApplicationView) *app_pb.App {
 	return &app_pb.App{
 		Id:      app.ID,
-		Details: object_grpc.ToDetailsPb(app.Sequence, app.CreationDate, "app.ResourceOwner"), //TODO: RO
+		Details: object_grpc.ToViewDetailsPb(app.Sequence, app.CreationDate, app.ChangeDate, "app.ResourceOwner"), //TODO: RO
 		State:   AppStateToPb(app.State),
 		Name:    app.Name,
 		Config:  AppConfigToPb(app),

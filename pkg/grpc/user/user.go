@@ -10,4 +10,6 @@ type ResourceOwnerQuery struct {
 	OrgID string
 }
 
+type UserType = isUser_Type
+
 type MembershipType = isMembership_Type

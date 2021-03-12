@@ -26,9 +26,10 @@ func KeyViewToPb(key *key_model.AuthNKeyView) *authn.Key {
 		Id:             key.ID,
 		Type:           authn.KeyType_KEY_TYPE_JSON,
 		ExpirationDate: expDate,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			key.Sequence,
-			key.CreationDate,    //TODO: details
+			key.CreationDate,
+			key.CreationDate,
 			"key.ResourceOwner", //TODO: details
 		),
 	}
@@ -42,9 +43,10 @@ func KeyToPb(key *key_model.AuthNKeyView) *authn.Key {
 		Id:             key.ID,
 		Type:           KeyTypeToPb(key.Type),
 		ExpirationDate: expDate,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			key.Sequence,
-			key.CreationDate,    //TODO: not very pretty
+			key.CreationDate,
+			key.CreationDate,
 			"key.ResourceOwner", //TODO: details
 		),
 	}
