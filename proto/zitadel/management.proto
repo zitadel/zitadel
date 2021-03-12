@@ -12,6 +12,7 @@ import "zitadel/policy.proto";
 import "zitadel/message.proto";
 import "zitadel/change.proto";
 import "zitadel/auth_n_key.proto";
+import "zitadel/features.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -1327,6 +1328,16 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.delete"
+        };
+    }
+
+    rpc GetFeatures(GetFeaturesRequest) returns (GetFeaturesResponse) {
+        option (google.api.http) = {
+            get: "/features"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "features.read"
         };
     }
 
@@ -2867,6 +2878,12 @@ message BulkRemoveUserGrantResponse {
     }
 
     repeated RemovedUserGrant result = 1;
+}
+
+message GetFeaturesRequest {}
+
+message GetFeaturesResponse {
+    zitadel.features.v1.Features features = 1;
 }
 
 message GetOrgIAMPolicyRequest {}

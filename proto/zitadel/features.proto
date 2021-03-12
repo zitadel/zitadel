@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+package zitadel.features.v1;
+
+option go_package = "github.com/caos/zitadel/pkg/grpc/features";
+
+message Features {
+  zitadel.v1.ObjectDetails details = 1;
+  FeatureTier tier = 2;
+  bool is_default = 3;
+
+  google.protobuf.Duration audit_log_retention = 4;
+  bool login_policy_username_login = 5;
+  bool login_policy_registration = 6;
+  bool login_policy_idp = 7;
+  bool login_policy_factors = 8;
+  bool login_policy_passwordless = 9;
+}
+
+message FeatureTier {
+  string name = 1;
+  string description = 2;
+  TierStatus status = 3;
+  string status_info = 4;
+}
+
+
+enum TierStatus {
+  TIER_STATUS_ACTIVE = 0;
+  TIER_STATUS_ACTION_REQUIRED = 1;
+  TIER_STATUS_CANCELED = 2;
+}
