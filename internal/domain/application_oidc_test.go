@@ -3,6 +3,7 @@ package domain
 import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"testing"
+	"time"
 )
 
 func TestApplicationValid(t *testing.T) {
@@ -14,6 +15,33 @@ func TestApplicationValid(t *testing.T) {
 		args   args
 		result bool
 	}{
+		{
+			name: "no app name",
+			args: args{
+				app: &OIDCApp{
+					ObjectRoot:    models.ObjectRoot{AggregateID: "AggregateID"},
+					AppID:         "AppID",
+					AppName:       "",
+					ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode},
+					GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				},
+			},
+			result: false,
+		},
+		{
+			name: "invalid clock skew",
+			args: args{
+				app: &OIDCApp{
+					ObjectRoot:    models.ObjectRoot{AggregateID: "AggregateID"},
+					AppID:         "AppID",
+					AppName:       "AppName",
+					ClockSkew:     time.Minute * 1,
+					ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode},
+					GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				},
+			},
+			result: false,
+		},
 		{
 			name: "valid oidc application: responsetype code",
 			args: args{

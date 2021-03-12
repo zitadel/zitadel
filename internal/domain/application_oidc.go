@@ -113,7 +113,7 @@ const (
 )
 
 func (a *OIDCApp) IsValid() bool {
-	if a.AppName == "" {
+	if a.AppName == "" || a.ClockSkew > time.Second*5 {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
