@@ -58,9 +58,10 @@
             <a class="doc-link" href="https://docs.zitadel.ch" mat-stroked-button target="_blank">{{'MENU.DOCUMENTATION'
                 | translate}}</a>
             <div (clickOutside)="closeAccountCard()" class="icon-container">
-                <app-avatar *ngIf="user && (user.displayName || (user.firstName && user.lastName))"
+                <app-avatar *ngIf="user && (user.human?.displayName || (user.human?.firstName && user.human?.lastName))"
                     class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"
-                    [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)" [size]="38">
+                    [name]="user.human.displayName ? user.human.displayName : (user.human.firstName + ' '+ user.human.lastName)"
+                    [size]="38">
                 </app-avatar>
                 <app-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount"
                     (close)="showAccount = false" [user]="user" [iamuser]="iamuser$ | async">
