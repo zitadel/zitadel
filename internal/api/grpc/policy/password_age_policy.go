@@ -14,7 +14,7 @@ func ModelPasswordAgePolicyToPb(policy *model.PasswordAgePolicyView) *policy_pb.
 			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
-			"", //TODO: uueli
+			"", //TODO: resourceowner
 		),
 	}
 }
