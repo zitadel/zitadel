@@ -10,10 +10,11 @@ func ModelLabelPolicyToPb(policy *model.LabelPolicyView) *policy_pb.LabelPolicy 
 	return &policy_pb.LabelPolicy{
 		PrimaryColor:   policy.PrimaryColor,
 		SecondaryColor: policy.SecondaryColor,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			policy.Sequence,
+			policy.CreationDate,
 			policy.ChangeDate,
-			"policy.ResourceOwner", //TODO: für da haui öppert
+			"", //TODO: resourceowner
 		),
 	}
 }

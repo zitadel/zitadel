@@ -24,10 +24,11 @@ func ProjectGrantMemberToPb(m *proj_model.ProjectGrantMemberView) *member_pb.Mem
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
 		DisplayName: m.DisplayName,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			m.Sequence,
+			m.CreationDate,
 			m.ChangeDate,
-			"m.ResourceOwner", //TODO: not returnd
+			"", //TODO: not returnd
 		),
 	}
 }

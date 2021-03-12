@@ -10,10 +10,11 @@ func OrgIAMPolicyToPb(policy *model.OrgIAMPolicyView) *policy_pb.OrgIAMPolicy {
 	return &policy_pb.OrgIAMPolicy{
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
 		IsDefault:             policy.Default,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			policy.Sequence,
+			policy.CreationDate,
 			policy.ChangeDate,
-			"policy.ResourceOwner", //TODO: resource owner
+			"", //TODO: resource owner
 		),
 	}
 }

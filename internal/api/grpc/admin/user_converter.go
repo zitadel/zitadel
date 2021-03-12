@@ -40,6 +40,9 @@ func setUpOrgHumanEmailToDomain(email *admin_grpc.SetUpOrgRequest_Human_Email) *
 }
 
 func setUpOrgHumanPhoneToDomain(phone *admin_grpc.SetUpOrgRequest_Human_Phone) *domain.Phone {
+	if phone == nil {
+		return nil
+	}
 	return &domain.Phone{
 		PhoneNumber:     phone.Phone,
 		IsPhoneVerified: phone.IsPhoneVerified,
