@@ -19,7 +19,6 @@ func (c *Commands) AddOrgMember(ctx context.Context, member *domain.Member) (*do
 	if err != nil {
 		return nil, err
 	}
-
 	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
 	if err != nil {
 		return nil, err
@@ -33,13 +32,16 @@ func (c *Commands) AddOrgMember(ctx context.Context, member *domain.Member) (*do
 
 func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregate, addedMember *OrgMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-W8m4l", "Errors.Org.MemberInvalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-W8m4l", "Errors.Org.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-3m9fs", "Errors.Org.MemberInvalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3m9fs", "Errors.Org.MemberInvalid")
 	}
-
-	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err := c.checkUserExists(ctx, addedMember.UserID, "")
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "ORG-9cmsd", "Errors.User.NotFound")
+	}
+	err = c.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}
@@ -53,10 +55,10 @@ func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregat
 //ChangeOrgMember updates an existing member
 func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-LiaZi", "Errors.Org.MemberInvalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-LiaZi", "Errors.Org.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-m9fG8", "Errors.Org.MemberInvalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-m9fG8", "Errors.Org.MemberInvalid")
 	}
 
 	existingMember, err := c.orgMemberWriteModelByID(ctx, member.AggregateID, member.UserID)

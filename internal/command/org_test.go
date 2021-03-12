@@ -122,6 +122,22 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
 					expectFilterOrgMemberNotFound(),
 					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "id", "internal"),
 						[]*repository.Event{
@@ -191,6 +207,22 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
 					expectFilterOrgMemberNotFound(),
 					expectPushFailed(caos_errs.ThrowInternal(nil, "id", "internal"),
 						[]*repository.Event{
@@ -244,6 +276,22 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilterOrgDomainNotFound(),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
