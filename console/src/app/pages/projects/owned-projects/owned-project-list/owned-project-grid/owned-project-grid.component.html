@@ -10,19 +10,19 @@
     <p class="n-items" *ngIf="!loading && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' | translate}}</p>
 
     <div class="item card" *ngFor="let item of selection.selected; index as i"
-        (click)="navigateToProject(item.projectId, $event)"
-        [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
+        (click)="navigateToProject(item.id, $event)"
+        [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
         <div class="text-part">
             <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
-                        item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-            }}</span>
+                item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                }}</span>
             <span class="name" *ngIf="item.name">{{ item.name }}</span>
 
             <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{
-                        item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-            }}</span>
+                item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                }}</span>
             <span class="fill-space"></span>
         </div>
 
@@ -34,20 +34,19 @@
 <div class="container">
     <p class="n-items" *ngIf="!loading && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
 
-    <div class="item card" *ngFor="let item of notPinned; index as i"
-        (click)="navigateToProject(item.projectId, $event)"
-        [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
+    <div class="item card" *ngFor="let item of notPinned; index as i" (click)="navigateToProject(item.id, $event)"
+        [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
         <div class="text-part">
-            <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+            <span *ngIf="item.details?.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
-                        item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-            }}</span>
+                item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                }}</span>
             <span class="name" *ngIf="item.name">{{ item.name }}</span>
 
-            <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
+            <span *ngIf="item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{
-                        item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-            }}</span>
+                item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                }}</span>
             <span class="fill-space"></span>
         </div>
 
@@ -66,7 +65,7 @@
 </div>
 
 <ng-template #deleteButton let-key="key">
-    <button *ngIf="key.projectId !== zitadelProjectId" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn"
+    <button *ngIf="key.id !== zitadelProjectId" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn"
         (click)="deleteProject($event, key)" class="delete-button" mat-icon-button>
         <i class="las la-trash"></i>
     </button>

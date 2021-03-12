@@ -119,8 +119,8 @@ export class UserCreateComponent implements OnDestroy {
         humanReq.setUserName(this.userName?.value);
         humanReq.setProfile(profileReq);
 
-        humanReq.setEmail(this.email?.value);
-        humanReq.setPhone(this.phone?.value);
+        humanReq.setEmail(new AddHumanUserRequest.Email().setEmail(this.email?.value));
+        humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(this.phone?.value));
 
         this.mgmtService
             .addHumanUser(humanReq)

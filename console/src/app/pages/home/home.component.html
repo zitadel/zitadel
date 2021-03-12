@@ -1,5 +1,6 @@
 <div class="wrapper max-width-container">
     <div class="header" *ngIf="(authService.user | async) || {} as user">
+        {{user | json}}
         <app-avatar [routerLink]="['/users/me']" *ngIf="user && (user.displayName || (user.firstName && user.lastName))"
             class="avatar" [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)"
             [size]="100">

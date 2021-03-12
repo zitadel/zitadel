@@ -38,6 +38,7 @@ export class ApplicationGridComponent implements OnInit {
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe((apps) => {
+            console.log(apps);
             this.appsSubject.next(apps as App.AsObject[]);
         });
     }
