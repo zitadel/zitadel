@@ -28,7 +28,7 @@ func IAMMemberToPb(m *iam_model.IAMMemberView) *member_pb.Member {
 			m.Sequence,
 			m.CreationDate,
 			m.ChangeDate,
-			"m.ResourceOwner", //TODO: not returnd
+			"", //TODO: not returnd
 		),
 	}
 }

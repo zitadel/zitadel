@@ -28,7 +28,7 @@ func ModelIDPViewToPb(idp *iam_model.IDPConfigView) *idp_pb.IDP {
 			idp.Sequence,
 			idp.CreationDate,
 			idp.ChangeDate,
-			"idp.ResourceOwner", //TODO: backend
+			"", //TODO: backend
 		),
 	}
 }
@@ -40,7 +40,7 @@ func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
 		Name:        idp.Name,
 		StylingType: IDPStylingTypeToPb(idp.StylingType),
 		Config:      IDPViewToConfigPb(idp),
-		Details:     obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, "idp.ResourceOwner"), //TODO: resource owner in view
+		Details:     obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, ""), //TODO: resource owner in view
 	}
 	return mapped
 }

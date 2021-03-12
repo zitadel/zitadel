@@ -14,7 +14,7 @@ func ModelPasswordLockoutPolicyToPb(policy *model.PasswordLockoutPolicyView) *po
 			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
-			"policy.ResourceOwner", //TODO: uuueli
+			"", //TODO: uuueli
 		),
 	}
 }

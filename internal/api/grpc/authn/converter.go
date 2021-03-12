@@ -30,7 +30,7 @@ func KeyViewToPb(key *key_model.AuthNKeyView) *authn.Key {
 			key.Sequence,
 			key.CreationDate,
 			key.CreationDate,
-			"key.ResourceOwner", //TODO: details
+			"", //TODO: details
 		),
 	}
 }
@@ -47,7 +47,7 @@ func KeyToPb(key *key_model.AuthNKeyView) *authn.Key {
 			key.Sequence,
 			key.CreationDate,
 			key.CreationDate,
-			"key.ResourceOwner", //TODO: details
+			"", //TODO: details
 		),
 	}
 }

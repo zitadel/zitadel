@@ -14,7 +14,7 @@ func ModelLabelPolicyToPb(policy *model.LabelPolicyView) *policy_pb.LabelPolicy 
 			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
-			"policy.ResourceOwner", //TODO: für da haui öppert
+			"", //TODO: für da haui öppert
 		),
 	}
 }

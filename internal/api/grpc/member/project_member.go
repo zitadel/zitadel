@@ -28,7 +28,7 @@ func ProjectMemberToPb(m *proj_model.ProjectMemberView) *member_pb.Member {
 			m.Sequence,
 			m.CreationDate,
 			m.ChangeDate,
-			"m.ResourceOwner", //TODO: not returnd
+			"", //TODO: not returnd
 		),
 	}
 }

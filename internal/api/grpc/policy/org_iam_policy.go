@@ -14,7 +14,7 @@ func OrgIAMPolicyToPb(policy *model.OrgIAMPolicyView) *policy_pb.OrgIAMPolicy {
 			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
-			"policy.ResourceOwner", //TODO: resource owner
+			"", //TODO: resource owner
 		),
 	}
 }

@@ -17,7 +17,7 @@ func ModelPasswordComplexityPolicyToPb(policy *model.PasswordComplexityPolicyVie
 			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
-			"policy.ResourceOwner", //TODO: ro
+			"", //TODO: ro
 		),
 	}
 }
