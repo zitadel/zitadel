@@ -32,9 +32,10 @@
                 <td mat-cell *matCellDef="let user" class="selection">
                     <mat-checkbox [disabled]="disabled" color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(user) : null" [checked]="selection.isSelected(user)">
+
                         <app-avatar
-                            *ngIf="user[type] && user[type].displayName && user[type]?.firstName && user[type]?.lastName; else cog"
-                            class="avatar" [name]="user[type].displayName" [size]="32">
+                            *ngIf="user.human && user.human.profile.displayName && user.human?.profile.firstName && user.human?.profile.lastName; else cog"
+                            class="avatar" [name]="user.human.profile.displayName" [size]="32">
                         </app-avatar>
                         <ng-template #cog>
                             <div class="sa-icon">
@@ -45,28 +46,6 @@
                 </td>
             </ng-container>
 
-            <ng-container matColumnDef="firstname">
-                <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.FIRST_NAME}">
-                    {{ 'USER.PROFILE.FIRSTNAME' | translate }}
-                    <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserListSearchKey.FIRST_NAME}"></template>
-                </th>
-                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[type]?.firstName}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="lastname">
-                <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.LAST_NAME}">
-                    {{ 'USER.PROFILE.LASTNAME' | translate }}
-                    <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserListSearchKey.LAST_NAME}"></template>
-                </th>
-                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[type]?.lastName}} </td>
-            </ng-container>
-
             <ng-container matColumnDef="displayName">
                 <th mat-header-cell *matHeaderCellDef
                     [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.USERSEARCHKEY_DISPLAY_NAME}">
@@ -75,7 +54,8 @@
                         [ngTemplateOutletContext]="{key: UserListSearchKey.USERSEARCHKEY_DISPLAY_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[type]?.displayName}} </td>
+                    {{user.human?.profile?.displayName}}
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="name">
@@ -83,13 +63,17 @@
                     {{ 'USER.MACHINE.NAME' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[type]?.name}} </td>
+                    <span *ngIf="user.human?.name">{{user.human?.name}}</span>
+                    <span *ngIf="user.machine?.name">{{user.machine?.name}}</span>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="description">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.DESCRIPTION' | translate }} </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[type]?.description}} </td>
+                    <span *ngIf="user.human?.description">{{user.human?.description}}</span>
+                    <span *ngIf="user.machine?.description">{{user.machine?.description}}</span>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="username">
@@ -111,15 +95,17 @@
                         [ngTemplateOutletContext]="{key: UserListSearchKey.EMAIL}"></template>
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user[type]?.email}} </td>
+                    <span *ngIf="user.human?.email?.email">{{user.human?.email.email}}</span>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.DATA.STATE' | translate }} </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
                     <span class="state"
-                        [ngClass]="{'active': user.state === UserState.USERSTATE_ACTIVE, 'inactive': user.state === UserState.USERSTATE_INACTIVE}">{{
-                        'USER.DATA.STATE'+user.state | translate }}</span>
+                        [ngClass]="{'active': user.state === UserState.USER_STATE_ACTIVE, 'inactive': user.state === UserState.USER_STATE_INACTIVE}">
+                        {{ 'USER.DATA.STATE'+user.state | translate }}
+                    </span>
                 </td>
             </ng-container>
 

@@ -45,7 +45,7 @@
 
             <span *ngIf="item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{
-                item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
                 }}</span>
             <span class="fill-space"></span>
         </div>

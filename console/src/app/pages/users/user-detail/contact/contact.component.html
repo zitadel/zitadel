@@ -18,10 +18,10 @@
     <div class="method-row">
         <div class="left">
             <span class="label">{{ 'USER.EMAIL' | translate }}</span>
-            <span class="name">{{human?.email}}</span>
-            <span *ngIf="human?.profile.email.isEmailVerified" class="contact-state verified">{{'USER.EMAILVERIFIED' |
+            <span class="name">{{human?.email?.email}}</span>
+            <span *ngIf="human?.email?.isEmailVerified" class="contact-state verified">{{'USER.EMAILVERIFIED' |
                 translate}}</span>
-            <div *ngIf="!human?.profile.email.isEmailVerified" class="block">
+            <div *ngIf="!human?.email.isEmailVerified" class="block">
                 <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
                 <ng-container *ngIf="human?.email">
@@ -45,10 +45,10 @@
     <div class="method-row">
         <div class="left">
             <span class="label">{{ 'USER.PHONE' | translate }}</span>
-            <span class="name">{{human?.phone ? human.phone : ('USER.PHONEEMPTY' | translate)}}</span>
-            <span *ngIf="human?.profile.phone.isPhoneVerified" class="contact-state verified">{{'USER.PHONEVERIFIED' |
+            <span class="name">{{human?.phone?.phone ? human.phone?.phone : ('USER.PHONEEMPTY' | translate)}}</span>
+            <span *ngIf="human?.phone.isPhoneVerified" class="contact-state verified">{{'USER.PHONEVERIFIED' |
                 translate}}</span>
-            <div *ngIf="!human?.profile.phone.isPhoneVerified" class="block">
+            <div *ngIf="!human?.phone.isPhoneVerified" class="block">
                 <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
                 <ng-container *ngIf="human?.phone">
