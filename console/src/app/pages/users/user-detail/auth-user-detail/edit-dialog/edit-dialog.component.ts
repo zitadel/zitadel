@@ -11,6 +11,7 @@ export class EditDialogComponent {
     constructor(public dialogRef: MatDialogRef<EditDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any) {
         this.value = data.value;
+        console.log(this.value);
     }
 
     closeDialog(email: string = ''): void {

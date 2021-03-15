@@ -169,7 +169,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                         labelKey: 'ACTIONS.NEWVALUE',
                         titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
-                        value: this.user.human?.phone,
+                        value: this.user.human?.phone?.phone,
                     },
                     width: '400px',
                 });
@@ -188,7 +188,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                         labelKey: 'ACTIONS.NEWVALUE',
                         titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
-                        value: this.user.human?.email,
+                        value: this.user.human?.email?.email,
                     },
                     width: '400px',
                 });

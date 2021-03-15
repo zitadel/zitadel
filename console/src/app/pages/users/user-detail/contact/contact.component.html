@@ -48,10 +48,10 @@
             <span class="name">{{human?.phone?.phone ? human.phone?.phone : ('USER.PHONEEMPTY' | translate)}}</span>
             <span *ngIf="human?.phone.isPhoneVerified" class="contact-state verified">{{'USER.PHONEVERIFIED' |
                 translate}}</span>
-            <div *ngIf="!human?.phone.isPhoneVerified" class="block">
+            <div *ngIf="human.phone?.phone && !human?.phone.isPhoneVerified" class="block">
                 <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
-                <ng-container *ngIf="human?.phone">
+                <ng-container *ngIf="human?.phone?.phone">
                     <a *ngIf="!disablePhoneCode && canWrite" class="verify"
                         matTooltip="{{'USER.LOGINMETHODS.ENTERCODE_DESC' | translate}}"
                         (click)="enterCode()">{{'USER.LOGINMETHODS.ENTERCODE' | translate}}</a>
@@ -64,7 +64,7 @@
         </div>
 
         <div class="right">
-            <button matTooltip="{{'ACTIONS.DELETE' | translate}}" *ngIf="human && human.phone" color="warn"
+            <button matTooltip="{{'ACTIONS.DELETE' | translate}}" *ngIf="human && human.phone?.phone" color="warn"
                 (click)="emitDeletePhone()" mat-icon-button>
                 <i class="las la-trash"></i>
             </button>

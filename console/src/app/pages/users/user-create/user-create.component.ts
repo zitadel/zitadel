@@ -1,7 +1,9 @@
 import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import parsePhoneNumber from 'libphonenumber-js';
+import { Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
@@ -37,7 +39,7 @@ export class UserCreateComponent implements OnDestroy {
     public languages: string[] = ['de', 'en'];
     public userForm!: FormGroup;
     public envSuffixLabel: string = '';
-    private sub: Subscription = new Subscription();
+    private destroyed$: Subject<void> = new Subject();
 
     public userLoginMustBeDomain: boolean = false;
     public loading: boolean = false;
@@ -92,15 +94,23 @@ export class UserCreateComponent implements OnDestroy {
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
             nickName: [''],
-            gender: [Gender.GENDER_UNSPECIFIED],
+            gender: [],
             preferredLanguage: [''],
             phone: [''],
         });
 
-    }
-
-    public logsuff(): void {
-        console.log((this.suffix.nativeElement as HTMLElement), (this.suffix.nativeElement as HTMLElement).offsetWidth);
+        this.userForm.controls['phone'].valueChanges.pipe(
+            takeUntil(this.destroyed$),
+            debounceTime(300)).subscribe(value => {
+                const phoneNumber = parsePhoneNumber(value ?? '', 'CH');
+                if (phoneNumber) {
+                    const formmatted = phoneNumber.formatInternational();
+                    const country = phoneNumber.country;
+                    if (this.phone && country && this.phone.value && this.phone.value !== formmatted) {
+                        this.phone.setValue(formmatted);
+                    }
+                }
+            });
     }
 
     public createUser(): void {
@@ -120,7 +130,10 @@ export class UserCreateComponent implements OnDestroy {
         humanReq.setProfile(profileReq);
 
         humanReq.setEmail(new AddHumanUserRequest.Email().setEmail(this.email?.value));
-        humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(this.phone?.value));
+
+        if (this.phone && this.phone.value) {
+            humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(this.phone.value));
+        }
 
         this.mgmtService
             .addHumanUser(humanReq)
@@ -136,7 +149,8 @@ export class UserCreateComponent implements OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.sub.unsubscribe();
+        this.destroyed$.next();
+        this.destroyed$.complete();
     }
 
     public get email(): AbstractControl | null {
