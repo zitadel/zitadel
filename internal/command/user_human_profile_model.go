@@ -52,11 +52,11 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 			wm.Gender = e.Gender
 			wm.UserState = domain.UserStateActive
 		case *user.HumanProfileChangedEvent:
-			if e.FirstName != "" {
-				wm.FirstName = e.FirstName
+			if e.FirstName != nil {
+				wm.FirstName = *e.FirstName
 			}
-			if e.LastName != "" {
-				wm.LastName = e.LastName
+			if e.LastName != nil {
+				wm.LastName = *e.LastName
 			}
 			if e.NickName != nil {
 				wm.NickName = *e.NickName
@@ -89,39 +89,41 @@ func (wm *HumanProfileWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *HumanProfileWriteModel) NewChangedEvent(
 	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	firstName,
 	lastName,
 	nickName,
 	displayName string,
 	preferredLanguage language.Tag,
 	gender domain.Gender,
-) (*user.HumanProfileChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := user.NewHumanProfileChangedEvent(ctx, UserAggregateFromWriteModel(&wm.WriteModel))
+) (*user.HumanProfileChangedEvent, bool, error) {
+	changes := make([]user.ProfileChanges, 0)
+	var err error
+
 	if wm.FirstName != firstName {
-		hasChanged = true
-		changedEvent.FirstName = firstName
+		changes = append(changes, user.ChangeFirstName(firstName))
 	}
 	if wm.LastName != lastName {
-		hasChanged = true
-		changedEvent.LastName = lastName
+		changes = append(changes, user.ChangeLastName(lastName))
 	}
 	if wm.NickName != nickName {
-		hasChanged = true
-		changedEvent.NickName = &nickName
+		changes = append(changes, user.ChangeNickName(nickName))
 	}
 	if wm.DisplayName != displayName {
-		hasChanged = true
-		changedEvent.DisplayName = &displayName
+		changes = append(changes, user.ChangeDisplayName(displayName))
 	}
 	if wm.PreferredLanguage != preferredLanguage {
-		hasChanged = true
-		changedEvent.PreferredLanguage = &preferredLanguage
+		changes = append(changes, user.ChangePreferredLanguage(preferredLanguage))
 	}
-	if gender.Valid() && wm.Gender != gender {
-		hasChanged = true
-		changedEvent.Gender = &gender
+	if wm.Gender != gender {
+		changes = append(changes, user.ChangeGender(gender))
 	}
-
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false, nil
+	}
+	changeEvent, err := user.NewHumanProfileChangedEvent(ctx, aggregate, changes)
+	if err != nil {
+		return nil, false, err
+	}
+	return changeEvent, true, nil
 }

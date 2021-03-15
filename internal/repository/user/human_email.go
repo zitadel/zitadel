@@ -34,13 +34,14 @@ func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailChangedEvent {
+func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress string) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanEmailChangedType,
 		),
+		EmailAddress: emailAddress,
 	}
 }
 

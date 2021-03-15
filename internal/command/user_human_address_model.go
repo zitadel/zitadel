@@ -2,9 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
@@ -87,28 +87,31 @@ func (wm *HumanAddressWriteModel) NewChangedEvent(
 	postalCode,
 	region,
 	streetAddress string,
-) (*user.HumanAddressChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := user.NewHumanAddressChangedEvent(ctx, aggregate)
+) (*user.HumanAddressChangedEvent, bool, error) {
+	changes := make([]user.AddressChanges, 0)
+	var err error
+
 	if wm.Country != country {
-		hasChanged = true
-		changedEvent.Country = &country
+		changes = append(changes, user.ChangeCountry(country))
 	}
 	if wm.Locality != locality {
-		hasChanged = true
-		changedEvent.Locality = &locality
+		changes = append(changes, user.ChangeLocality(locality))
 	}
 	if wm.PostalCode != postalCode {
-		hasChanged = true
-		changedEvent.PostalCode = &postalCode
+		changes = append(changes, user.ChangePostalCode(postalCode))
 	}
 	if wm.Region != region {
-		hasChanged = true
-		changedEvent.Region = &region
+		changes = append(changes, user.ChangeRegion(region))
 	}
 	if wm.StreetAddress != streetAddress {
-		hasChanged = true
-		changedEvent.StreetAddress = &streetAddress
+		changes = append(changes, user.ChangeStreetAddress(streetAddress))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false, nil
+	}
+	changeEvent, err := user.NewAddressChangedEvent(ctx, aggregate, changes)
+	if err != nil {
+		return nil, false, err
+	}
+	return changeEvent, true, nil
 }

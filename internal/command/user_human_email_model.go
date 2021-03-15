@@ -82,11 +82,8 @@ func (wm *HumanEmailWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	email string,
 ) (*user.HumanEmailChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := user.NewHumanEmailChangedEvent(ctx, aggregate)
-	if wm.Email != email {
-		hasChanged = true
-		changedEvent.EmailAddress = email
+	if wm.Email == email {
+		return nil, false
 	}
-	return changedEvent, hasChanged
+	return user.NewHumanEmailChangedEvent(ctx, aggregate, email), true
 }

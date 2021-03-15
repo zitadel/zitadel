@@ -13,7 +13,7 @@ import (
 
 func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*domain.Email, error) {
 	if !email.IsValid() || email.AggregateID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
 	}
 
 	existingEmail, err := c.emailWriteModel(ctx, email.AggregateID, email.ResourceOwner)
@@ -21,7 +21,7 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*
 		return nil, err
 	}
 	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 	changedEvent, hasChanged := existingEmail.NewChangedEvent(ctx, userAgg, email.EmailAddress)
