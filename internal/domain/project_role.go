@@ -27,3 +27,12 @@ func NewProjectRole(projectID, key string) *ProjectRole {
 func (p *ProjectRole) IsValid() bool {
 	return p.AggregateID != "" && p.Key != ""
 }
+
+func containsRoleKey(roleKey string, validRoles []string) bool {
+	for _, validRole := range validRoles {
+		if roleKey == validRole {
+			return true
+		}
+	}
+	return false
+}

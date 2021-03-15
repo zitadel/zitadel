@@ -28,11 +28,14 @@ func (c *Commands) AddDefaultLoginPolicy(ctx context.Context, policy *domain.Log
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
 	if err != nil {
 		return nil, err
 	}
-
+	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToLoginPolicy(&addedPolicy.LoginPolicyWriteModel), nil
 }
 

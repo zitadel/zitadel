@@ -11,3 +11,7 @@ type LabelPolicy struct {
 	PrimaryColor   string
 	SecondaryColor string
 }
+
+func (p *LabelPolicy) IsValid() bool {
+	return p.PrimaryColor != "" && p.SecondaryColor != ""
+}

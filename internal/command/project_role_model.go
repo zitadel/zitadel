@@ -101,7 +101,6 @@ func (wm *ProjectRoleWriteModel) NewProjectRoleChangedEvent(
 ) (*project.RoleChangedEvent, bool, error) {
 	changes := make([]project.RoleChanges, 0)
 	var err error
-	changes = append(changes, project.ChangeKey(key))
 
 	if wm.DisplayName != displayName {
 		changes = append(changes, project.ChangeDisplayName(displayName))
@@ -112,7 +111,7 @@ func (wm *ProjectRoleWriteModel) NewProjectRoleChangedEvent(
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := project.NewRoleChangedEvent(ctx, aggregate, changes)
+	changeEvent, err := project.NewRoleChangedEvent(ctx, aggregate, key, changes)
 	if err != nil {
 		return nil, false, err
 	}
