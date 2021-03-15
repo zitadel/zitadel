@@ -231,12 +231,14 @@ Errors:
       NotChanged: Default Login Policy has not been changed
       NotExisting: Default Login Policy not existig
       AlreadyExists: Default Login Policy already exists
-      IdpProviderAlreadyExisting: Idp Provider already existing
-      IdpProviderNotExisting: Idp Provider not existing
       MFA:
         AlreadyExists: Multifactor already exists
         NotExisting: Multifactor not existing
         Unspecified: Multifactor invalid
+      IDP:
+        AlreadyExists: Identity provider already exists
+        NotExisting: Identity provider doesn't exist
+        Invalid: Identity Provider invalid
       IDPConfig:
         AlreadyExists: Identity Provider Configuration already exists
         NotExisting: Identity Provider Configuration doesn't exist

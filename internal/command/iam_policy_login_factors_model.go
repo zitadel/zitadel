@@ -10,13 +10,14 @@ type IAMSecondFactorWriteModel struct {
 	SecondFactorWriteModel
 }
 
-func NewIAMSecondFactorWriteModel() *IAMSecondFactorWriteModel {
+func NewIAMSecondFactorWriteModel(factorType domain.SecondFactorType) *IAMSecondFactorWriteModel {
 	return &IAMSecondFactorWriteModel{
 		SecondFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   domain.IAMID,
 				ResourceOwner: domain.IAMID,
 			},
+			MFAType: factorType,
 		},
 	}
 }
@@ -25,15 +26,19 @@ func (wm *IAMSecondFactorWriteModel) AppendEvents(events ...eventstore.EventRead
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.LoginPolicySecondFactorAddedEvent:
-			wm.WriteModel.AppendEvents(&e.SecondFactorAddedEvent)
+			if wm.MFAType == e.MFAType {
+				wm.WriteModel.AppendEvents(&e.SecondFactorAddedEvent)
+			}
 		case *iam.LoginPolicySecondFactorRemovedEvent:
-			wm.WriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
+			if wm.MFAType == e.MFAType {
+				wm.WriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
+			}
 		}
 	}
 }
 
 func (wm *IAMSecondFactorWriteModel) Reduce() error {
-	return wm.WriteModel.Reduce()
+	return wm.SecondFactorWriteModel.Reduce()
 }
 
 func (wm *IAMSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -49,13 +54,14 @@ type IAMMultiFactorWriteModel struct {
 	MultiFactoryWriteModel
 }
 
-func NewIAMMultiFactorWriteModel() *IAMMultiFactorWriteModel {
+func NewIAMMultiFactorWriteModel(factorType domain.MultiFactorType) *IAMMultiFactorWriteModel {
 	return &IAMMultiFactorWriteModel{
 		MultiFactoryWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   domain.IAMID,
 				ResourceOwner: domain.IAMID,
 			},
+			MFAType: factorType,
 		},
 	}
 }
@@ -64,15 +70,19 @@ func (wm *IAMMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReade
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.LoginPolicyMultiFactorAddedEvent:
-			wm.WriteModel.AppendEvents(&e.MultiFactorAddedEvent)
+			if wm.MFAType == e.MFAType {
+				wm.WriteModel.AppendEvents(&e.MultiFactorAddedEvent)
+			}
 		case *iam.LoginPolicyMultiFactorRemovedEvent:
-			wm.WriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
+			if wm.MFAType == e.MFAType {
+				wm.WriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
+			}
 		}
 	}
 }
 
 func (wm *IAMMultiFactorWriteModel) Reduce() error {
-	return wm.WriteModel.Reduce()
+	return wm.MultiFactoryWriteModel.Reduce()
 }
 
 func (wm *IAMMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {

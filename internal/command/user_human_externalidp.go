@@ -61,7 +61,7 @@ func (c *Commands) RemoveHumanExternalIDP(ctx context.Context, externalIDP *doma
 }
 
 func (c *Commands) removeHumanExternalIDP(ctx context.Context, externalIDP *domain.ExternalIDP, cascade bool) (eventstore.EventPusher, *HumanExternalIDPWriteModel, error) {
-	if externalIDP.IsValid() {
+	if !externalIDP.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.IDMissing")
 	}
 

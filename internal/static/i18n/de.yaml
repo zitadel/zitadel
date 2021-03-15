@@ -225,14 +225,12 @@ Errors:
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
     LoginPolicyInvalid: Login Policy ist ungültig
     LoginPolicyNotExisting: Login Policy nicht vorhanden
-    IdpProviderInvalid: Idp Provider ist ungültig
+    IdpProviderInvalid:
     LoginPolicy:
       NotFound: Default Login Policy konnte nicht gefunden
       NotChanged: Default Login Policy wurde nicht verändert
       NotExisting: Default Login Policy existiert nicht
       AlreadyExists: Default Login Policy existiert bereits
-      IdpProviderAlreadyExisting: Idp Provider existiert bereits
-      IdpProviderNotExisting: Idp Provider existiert nicht
       MFA:
         AlreadyExists: Multifaktor existiert bereits
         NotExisting: Multifaktor existiert nicht
@@ -240,6 +238,7 @@ Errors:
       IDP:
         AlreadyExists: Identitäts Provider existiert bereits
         NotExisting: Identitäts Provider existiert nicht
+        Invalid: Idp Provider ist ungültig
       IDPConfig:
         AlreadyExists: Identitäts Provider Konfiguration existiert bereits
         NotExisting: Identitäts Provider Konfiguration existiert nicht
