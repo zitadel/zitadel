@@ -28,7 +28,7 @@ type Commands struct {
 	iamDomain    string
 	zitadelRoles []authz.RoleMapping
 
-	idpConfigSecretCrypto crypto.Crypto
+	idpConfigSecretCrypto crypto.EncryptionAlgorithm
 
 	userPasswordAlg             crypto.HashAlgorithm
 	initializeUserCode          crypto.Generator

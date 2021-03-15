@@ -23,7 +23,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 	}
 	addedConfig := NewIAMIDPConfigWriteModel(idpConfigID)
 
-	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
+	clientSecret, err := crypto.Encrypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +63,9 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 }
 
 func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
+	if config.IDPConfigID == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "IAM-4m9gs", "Errors.IDMissing")
+	}
 	existingIDP, err := c.iamIDPConfigWriteModelByID(ctx, config.IDPConfigID)
 	if err != nil {
 		return nil, err
