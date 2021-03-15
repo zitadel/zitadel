@@ -43,6 +43,20 @@ func TestApplicationValid(t *testing.T) {
 			result: false,
 		},
 		{
+			name: "invalid clock skew minus",
+			args: args{
+				app: &OIDCApp{
+					ObjectRoot:    models.ObjectRoot{AggregateID: "AggregateID"},
+					AppID:         "AppID",
+					AppName:       "AppName",
+					ClockSkew:     time.Minute * -1,
+					ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode},
+					GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				},
+			},
+			result: false,
+		},
+		{
 			name: "valid oidc application: responsetype code",
 			args: args{
 				app: &OIDCApp{

@@ -98,6 +98,7 @@ func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 func NewRoleChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	key string,
 	changes []RoleChanges,
 ) (*RoleChangedEvent, error) {
 	if len(changes) == 0 {
@@ -109,6 +110,7 @@ func NewRoleChangedEvent(
 			aggregate,
 			RoleChangedType,
 		),
+		Key: key,
 	}
 	for _, change := range changes {
 		change(changeEvent)

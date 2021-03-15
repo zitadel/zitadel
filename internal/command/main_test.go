@@ -17,14 +17,6 @@ import (
 	"time"
 )
 
-//func newEventstore(events ...eventstore.EventPusher) *eventstore.Eventstore {
-//	return eventstore.NewEventstore(
-//		&testRepo{
-//			events: eventPusherToEvents(events...),
-//		},
-//	)
-//}
-
 type expect func(mockRepository *mock.MockRepository)
 
 func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
