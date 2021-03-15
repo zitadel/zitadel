@@ -57,8 +57,8 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	aggregate *eventstore.Aggregate,
 	tierName,
 	tierDescription string,
-	tierStatus domain.TierStatus,
-	tierStatusDescription string,
+	tierState domain.TierState,
+	tierStateDescription string,
 	loginPolicyFactors,
 	loginPolicyIDP,
 	loginPolicyPasswordless,
@@ -74,11 +74,11 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	if tierDescription != "" && wm.TierDescription != tierDescription {
 		changes = append(changes, features.ChangeTierDescription(tierDescription))
 	}
-	if wm.TierStatus != tierStatus {
-		changes = append(changes, features.ChangeTierStatus(tierStatus))
+	if wm.TierState != tierState {
+		changes = append(changes, features.ChangeTierState(tierState))
 	}
-	if tierStatusDescription != "" && wm.TierStatusDescription != tierStatusDescription {
-		changes = append(changes, features.ChangeTierStatusDescription(tierStatusDescription))
+	if tierStateDescription != "" && wm.TierStateDescription != tierStateDescription {
+		changes = append(changes, features.ChangeTierStateDescription(tierStateDescription))
 	}
 	if wm.LoginPolicyFactors != loginPolicyFactors {
 		changes = append(changes, features.ChangeLoginPolicyFactors(loginPolicyFactors))

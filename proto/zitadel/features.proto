@@ -24,13 +24,13 @@ message Features {
 message FeatureTier {
   string name = 1;
   string description = 2;
-  TierStatus status = 3;
+  TierState state = 3;
   string status_info = 4;
 }
 
 
-enum TierStatus {
-  TIER_STATUS_ACTIVE = 0;
-  TIER_STATUS_ACTION_REQUIRED = 1;
-  TIER_STATUS_CANCELED = 2;
+enum TierState {
+  TIER_STATE_ACTIVE = 0;
+  TIER_STATE_ACTION_REQUIRED = 1;
+  TIER_STATE_CANCELED = 2;
 }

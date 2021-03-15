@@ -2,26 +2,26 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"strings"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	usr_view "github.com/caos/zitadel/internal/user/repository/view"
-
 	"github.com/caos/logging"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
+	features_view_model "github.com/caos/zitadel/internal/features/repository/view/model"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -111,6 +111,36 @@ func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) erro
 	return err
 }
 
+func (repo *TokenVerifierRepo) CheckOrgFeatures(ctx context.Context, orgID, requiredFeature string) error {
+	features, err := repo.View.FeaturesByAggregateID(orgID)
+	if errors.IsNotFound(err) {
+		return repo.checkDefaultFeatures(ctx, requiredFeature)
+	}
+	if err != nil {
+		return err
+	}
+	return checkFeature(features, requiredFeature)
+}
+
+func checkFeature(features *features_view_model.FeaturesView, requiredFeature string) error {
+	if requiredFeature == "login_policy.factors" && features.LoginPolicyFactors {
+		return nil
+	}
+	if requiredFeature == "login_policy.idp" && features.LoginPolicyIDP {
+		return nil
+	}
+	if requiredFeature == "login_policy.factors" && features.LoginPolicyPasswordless {
+		return nil
+	}
+	if requiredFeature == "login_policy.registration" && features.LoginPolicyRegistration {
+		return nil
+	}
+	if requiredFeature == "login_policy.username_login" && features.LoginPolicyUsernameLogin {
+		return nil
+	}
+	return caos_errs.ThrowPermissionDenied(nil, "AUTH-B31sf", "no matching features found")
+}
+
 func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -149,4 +179,37 @@ func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, err
 		return nil, err
 	}
 	return iam_es_model.IAMToModel(iam), nil
+}
+
+func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, feature string) error {
+	features, viewErr := repo.View.FeaturesByAggregateID(domain.IAMID)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return viewErr
+	}
+	if errors.IsNotFound(viewErr) {
+		features = new(features_view_model.FeaturesView)
+	}
+	events, esErr := repo.getIAMEvents(ctx, features.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return caos_errs.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.Org.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
+		return nil
+	}
+	featuresCopy := *features
+	for _, event := range events {
+		if err := featuresCopy.AppendEvent(event); err != nil {
+			return nil
+		}
+	}
+	return nil
+}
+
+func (repo *TokenVerifierRepo) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Eventstore.FilterEvents(ctx, query)
 }

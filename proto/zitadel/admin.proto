@@ -179,7 +179,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.feature.read"
+            permission: "iam.features.read"
         };
     }
 
@@ -190,38 +190,38 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.feature.write"
+            permission: "iam.features.write"
         };
     }
 
     rpc GetOrgFeatures(GetOrgFeaturesRequest) returns (GetOrgFeaturesResponse) {
         option(google.api.http) = {
-            get: "/org/{org_id}/features"
+            get: "/orgs/{org_id}/features"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.feature.read"
+            permission: "iam.features.read"
         };
     }
 
     rpc SetOrgFeatures(SetOrgFeaturesRequest) returns (SetOrgFeaturesResponse) {
         option(google.api.http) = {
-            put: "/org/{org_id}/features"
+            put: "/orgs/{org_id}/features"
             body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.feature.write"
+            permission: "iam.features.write"
         };
     }
 
     rpc ResetOrgFeatures(ResetOrgFeaturesRequest) returns (ResetOrgFeaturesResponse) {
         option(google.api.http) = {
-            delete: "/org/{org_id}/features"
+            delete: "/orgs/{org_id}/features"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.feature.write"
+            permission: "iam.features.write"
         };
     }
 
@@ -785,8 +785,8 @@ message SetOrgFeaturesRequest {
     string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string tier_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string description = 3 [(validate.rules).string = {max_len: 200}];
-    zitadel.features.v1.TierStatus status = 4;
-    string status_description = 5 [(validate.rules).string = {max_len: 200}];
+    zitadel.features.v1.TierState state = 4;
+    string state_description = 5 [(validate.rules).string = {max_len: 200}];
 
     google.protobuf.Duration audit_log_retention = 6;
     bool login_policy_username_login = 7;

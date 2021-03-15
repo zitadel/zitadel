@@ -2,20 +2,20 @@ package admin
 
 import (
 	"context"
+
 	features_grpc "github.com/caos/zitadel/internal/api/grpc/features"
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func (s *Server) GetDefaultFeatures(ctx context.Context, req *admin_pb.GetDefaultFeaturesRequest) (*admin_pb.GetDefaultFeaturesResponse, error) {
-	var features *domain.Features
-	var err error
+func (s *Server) GetDefaultFeatures(ctx context.Context, _ *admin_pb.GetDefaultFeaturesRequest) (*admin_pb.GetDefaultFeaturesResponse, error) {
+	features, err := s.features.GetDefaultFeatures(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.GetDefaultFeaturesResponse{
-		Features: features_grpc.FeaturesToPb(features),
+		Features: features_grpc.FeaturesFromModel(features),
 	}, nil
 }
 
@@ -30,13 +30,12 @@ func (s *Server) SetDefaultFeatures(ctx context.Context, req *admin_pb.SetDefaul
 }
 
 func (s *Server) GetOrgFeatures(ctx context.Context, req *admin_pb.GetOrgFeaturesRequest) (*admin_pb.GetOrgFeaturesResponse, error) {
-	var features *domain.Features
-	var err error
+	features, err := s.features.GetOrgFeatures(ctx, req.OrgId)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.GetOrgFeaturesResponse{
-		Features: features_grpc.FeaturesToPb(features),
+		Features: features_grpc.FeaturesFromModel(features),
 	}, nil
 }
 
@@ -76,8 +75,8 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 	return &domain.Features{
 		TierName:                 req.TierName,
 		TierDescription:          req.Description,
-		TierStatus:               features_grpc.TierStatusToDomain(req.Status),
-		TierStatusDescription:    req.StatusDescription,
+		TierState:                features_grpc.TierStateToDomain(req.State),
+		TierStateDescription:     req.StateDescription,
 		LoginPolicyFactors:       req.LoginPolicyFactors,
 		LoginPolicyIDP:           req.LoginPolicyIdp,
 		LoginPolicyPasswordless:  req.LoginPolicyPasswordless,

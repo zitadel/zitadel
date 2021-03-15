@@ -4,6 +4,8 @@ InternalAuthZ:
       Permissions:
         - "iam.read"
         - "iam.write"
+        - "iam.features.read"
+        - "iam.features.write"
         - "iam.policy.read"
         - "iam.policy.write"
         - "iam.policy.delete"
@@ -31,6 +33,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "features.read"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -56,6 +59,7 @@ InternalAuthZ:
     - Role: 'IAM_OWNER_VIEWER'
       Permissions:
         - "iam.read"
+        - "iam.features.read"
         - "iam.policy.read"
         - "iam.member.read"
         - "iam.idp.read"
@@ -66,6 +70,7 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+        - "features.read"
         - "policy.read"
         - "project.read"
         - "project.member.read"
@@ -93,6 +98,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "features.read"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -123,6 +129,7 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+        - "features.read"
         - "policy.read"
         - "project.read"
         - "project.member.read"

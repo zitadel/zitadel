@@ -13,8 +13,8 @@ type FeaturesWriteModel struct {
 
 	TierName                 string
 	TierDescription          string
-	TierStatus               domain.TierStatus
-	TierStatusDescription    string
+	TierState                domain.TierState
+	TierStateDescription     string
 	LoginPolicyFactors       bool
 	LoginPolicyIDP           bool
 	LoginPolicyPasswordless  bool
@@ -32,11 +32,11 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			if e.TierDescription != nil {
 				wm.TierDescription = *e.TierDescription
 			}
-			if e.TierStatus != nil {
-				wm.TierStatus = *e.TierStatus
+			if e.TierState != nil {
+				wm.TierState = *e.TierState
 			}
-			if e.TierStatusDescription != nil {
-				wm.TierStatusDescription = *e.TierStatusDescription
+			if e.TierStateDescription != nil {
+				wm.TierStateDescription = *e.TierStateDescription
 			}
 			if e.LoginPolicyFactors != nil {
 				wm.LoginPolicyFactors = *e.LoginPolicyFactors

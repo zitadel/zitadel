@@ -45,7 +45,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     schemes: HTTPS;
     consumes: "application/json";
     produces: "application/json";
-    
+
     consumes: "application/grpc";
     produces: "application/grpc";
 
@@ -232,7 +232,7 @@ service ManagementService {
         option (google.api.http) = {
             get: "/users/{user_id}/username"
         };
-        
+
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
@@ -282,7 +282,7 @@ service ManagementService {
 
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/_resend_initialization" 
+            post: "/users/{user_id}/_resend_initialization"
             body: "*"
         };
 
@@ -300,7 +300,7 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
-    }  
+    }
 
     rpc GetHumanPhone(GetHumanPhoneRequest) returns (GetHumanPhoneResponse) {
         option (google.api.http) = {
@@ -1379,6 +1379,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "login_policy.factors"
         };
     }
 
@@ -1453,6 +1454,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "login_policy.factors"
         };
     }
 

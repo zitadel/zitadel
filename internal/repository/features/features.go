@@ -2,6 +2,7 @@ package features
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -19,8 +20,8 @@ type FeaturesSetEvent struct {
 
 	TierName                 *string
 	TierDescription          *string
-	TierStatus               *domain.TierStatus
-	TierStatusDescription    *string
+	TierState                *domain.TierState
+	TierStateDescription     *string
 	LoginPolicyFactors       *bool
 	LoginPolicyIDP           *bool
 	LoginPolicyPasswordless  *bool
@@ -66,15 +67,15 @@ func ChangeTierDescription(tierDescription string) func(event *FeaturesSetEvent)
 	}
 }
 
-func ChangeTierStatus(tierStatus domain.TierStatus) func(event *FeaturesSetEvent) {
+func ChangeTierState(tierState domain.TierState) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
-		e.TierStatus = &tierStatus
+		e.TierState = &tierState
 	}
 }
 
-func ChangeTierStatusDescription(statusDescription string) func(event *FeaturesSetEvent) {
+func ChangeTierStateDescription(statusDescription string) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
-		e.TierStatusDescription = &statusDescription
+		e.TierStateDescription = &statusDescription
 	}
 }
 

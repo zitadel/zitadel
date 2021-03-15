@@ -105,19 +105,19 @@ func startZitadel(configPaths []string) {
 	ctx := context.Background()
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
 	if err != nil {
-		return
+		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for commands")
 	}
 	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ)
 	if err != nil {
-		return
+		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start commands")
 	}
 	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
 	if err != nil {
-		return
+		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	}
 	queries, err := query.StartQueries(esQueries, conf.SystemDefaults)
 	if err != nil {
-		return
+		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start queries")
 	}
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
