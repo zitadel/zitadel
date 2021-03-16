@@ -50,17 +50,21 @@ func RootCommand(version string) (*cobra.Command, GetRootValues) {
 	cmd := &cobra.Command{
 		Use:   "zitadelctl [flags]",
 		Short: "Interact with your IAM orbs",
-		Long: `zitadelctl launches zitadel and simplifies common tasks such as updating your kubeconfig.
+		Long: `zitadelctl launches zitadel and simplifies common tasks such as deploying operators or reading and writing secrets.
 Participate in our community on https://github.com/caos/orbos
 and visit our website at https://caos.ch`,
-		Example: `$ mkdir -p ~/.orb
+		Example: `$ # For being able to use the --gitops flag, you need to create an orbconfig and add an SSH deploy key to your github project 
+$ # Create an ssh key pair
+$ ssh-keygen -b 2048 -t rsa -f ~/.ssh/myorbrepo -q -N ""
+$ # Create the orbconfig
+$ mkdir -p ~/.orb
 $ cat > ~/.orb/myorb << EOF
 > url: git@github.com:me/my-orb.git
-> masterkey: "$(gopass my-secrets/orbs/myorb/masterkey)"
+> masterkey: "$(openssl rand -base64 21)"
 > repokey: |
 > $(cat ~/.ssh/myorbrepo | sed s/^/\ \ /g)
 > EOF
-$ orbctl -f ~/.orb/myorb [command]
+$ zitadelctl -f ~/.orb/myorb [command]
 `,
 	}
 
