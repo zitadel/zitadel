@@ -44,7 +44,7 @@ func (c *Commands) ChangeDefaultOrgIAMPolicy(ctx context.Context, policy *domain
 	if err != nil {
 		return nil, err
 	}
-	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+	if !existingPolicy.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-0Pl0d", "Errors.IAM.OrgIAMPolicy.NotFound")
 	}
 
@@ -69,6 +69,9 @@ func (c *Commands) getDefaultOrgIAMPolicy(ctx context.Context) (*domain.OrgIAMPo
 	policyWriteModel, err := c.defaultOrgIAMPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if !policyWriteModel.State.Exists() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3n8fs", "Errors.IAM.OrgIAMPolicy.NotFound")
 	}
 	policy := writeModelToOrgIAMPolicy(policyWriteModel)
 	policy.Default = true
