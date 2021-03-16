@@ -2,17 +2,34 @@ syntax = "proto3";
 
 import "zitadel/object.proto";
 import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.org.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/org";
 
 message Org {
-    string id = 1;
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
-    OrgState state = 3;
-    string name = 4;
-    string primary_domain = 5;
+    OrgState state = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ORG_STATE_ACTIVE\"";
+        }
+    ];
+    string name = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"CAOS AG\"";
+        }
+    ];
+    string primary_domain = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"caos.ch\"";
+        }
+    ];
 }
 
 enum OrgState {
@@ -22,12 +39,33 @@ enum OrgState {
 }
 
 message Domain {
-    string org_id = 1;
+    string org_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
-    string domain_name = 3;
-    bool is_verified = 4;
-    bool is_primary = 5;
-    DomainValidationType validation_type = 6;
+    string domain_name = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"caos.ch\"";
+        }
+    ];
+    bool is_verified = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the domain is verified"
+        }
+    ];
+    bool is_primary = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the domain is the primary domain"
+        }
+    ];
+    DomainValidationType validation_type = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines how the domain was validated"
+            example: "DOMAIN_VALIDATION_TYPE_HTTP"
+        }
+    ];
 }
 
 enum DomainValidationType {
@@ -46,13 +84,33 @@ message OrgQuery {
 }
 
 message OrgNameQuery {
-    string name = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"caos ag\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE\"";
+        }
+    ];
 }
 
 message OrgDomainQuery {
-    string domain = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string domain = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"CAOS.C\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE\"";
+        }
+    ];
 }
 
 enum OrgFieldName {
@@ -69,6 +127,16 @@ message DomainSearchQuery {
 }
 
 message DomainNameQuery {
-    string name = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"caos.ch\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+        }
+    ];
 }

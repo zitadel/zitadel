@@ -2,36 +2,100 @@ syntax = "proto3";
 
 import "zitadel/object.proto";
 import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.idp.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
 
 message IDP {
-    string id = 1;
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
-    IDPState state = 3;
-    string name = 4;
-    IDPStylingType styling_type = 5;
-    IDPOwnerType owner = 6;
+    IDPState state = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"IDP_TYPE_OIDC\"";
+        }
+    ];
+    string name = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+        }
+    ];
+    IDPStylingType styling_type = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"STYLING_TYPE_GOOGLE\"";
+        }
+    ];
+    IDPOwnerType owner = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"IDP_OWNER_TYPE_ORG\"";
+        }
+    ];
     oneof config {
         OIDCConfig oidc_config = 7;
     }
 }
 
 message IDPUserLink {
-    string user_id = 1;
-    string idp_id = 2;
-    string idp_name = 3;
-    string provided_user_id = 4;
-    string provided_user_name = 5;
-    IDPType idp_type = 6;
+    string user_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            description: "the id of the user"
+        }
+    ];
+    string idp_id = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            description: "the id of the identity provider";
+        }
+    ];
+    string idp_name = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+            description: "the name of the identity provider";
+        }
+    ];
+    string provided_user_id = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"as-12-df-89\"";
+            description: "the id of the user provided by the identity provider";
+        }
+    ];
+    string provided_user_name = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi.long-neck@gmail.com\"";
+            description: "the id of the identity provider";
+        }
+    ];
+    IDPType idp_type = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"IDP_TYPE_OIDC\"";
+        }
+    ];
 }
 
 message IDPLoginPolicyLink {
-    string idp_id = 1;
-    string idp_name = 2;
-    IDPType idp_type = 3;
+    string idp_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            description: "the id of the identity provider"
+        }
+    ];
+    string idp_name = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+            description: "the name of the identity provider"
+        }
+    ];
+    IDPType idp_type = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"IDP_TYPE_OIDC\"";
+        }
+    ];
 }
 
 enum IDPState {
@@ -58,11 +122,36 @@ enum IDPOwnerType {
 }
 
 message OIDCConfig {
-    string client_id = 1;
-    string issuer = 2;
-    repeated string scopes = 3;
-    OIDCMappingField display_name_mapping = 4;
-    OIDCMappingField username_mapping = 5;
+    string client_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""; //TODO: better example?
+            description: "the id of the client"; //TODO: how to describe?
+        }
+    ];
+    string issuer = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.ch\""; //TODO: better example?
+            description: "the oidc issuer"; //TODO: how to describe?
+        }
+    ];
+    repeated string scopes = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"profile\", \"email\"]"; //TODO: better example?
+            description: "the scopes requested";
+        }
+    ];
+    OIDCMappingField display_name_mapping = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"OIDC_MAPPING_FIELD_PREFERRED_USERNAME\"";
+            description: "definition which field is mapped to the display name of the user";
+        }
+    ];
+    OIDCMappingField username_mapping = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"OIDC_MAPPING_FIELD_EMAIL\"";
+            description: "definition which field is mapped to the email of the user";
+        }
+    ];
 }
 
 enum OIDCMappingField {
@@ -72,16 +161,36 @@ enum OIDCMappingField {
 }
 
 message IDPIDQuery {
-    string id = 1 [(validate.rules).string = {max_len: 200}];
+    string id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
 }
 
 message IDPNameQuery {
-    string name = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+        }
+    ];
 }
 
 message IDPOwnerTypeQuery {
-    IDPOwnerType owner_type = 1 [(validate.rules).enum = {defined_only: true}];
+    IDPOwnerType owner_type = 1 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"IDP_OWNER_TYPE_ORG\"";
+        }
+    ];
 }
 
 enum IDPFieldName {

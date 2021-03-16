@@ -2,16 +2,40 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 import "zitadel/message.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.change.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/change";
 
 message Change {
-    google.protobuf.Timestamp change_date = 1;
+    google.protobuf.Timestamp change_date = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the creation date of an event";
+        }
+    ];
     zitadel.v1.LocalizedMessage event_type = 2;
-    uint64 sequence = 3;
-    string editor_id = 4;
-    string editor_display_name = 5;
-    string resource_owner_id = 6;
+    uint64 sequence = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2\"";
+        }
+    ];
+    string editor_id = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the id of the user who created the event";
+            example: "\"69629023906488334\"";
+        }
+    ];
+    string editor_display_name = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the display name of the editor";
+            example: "\"Gigi Giraffe\"";
+        }
+    ];
+    string resource_owner_id = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the organisation the event belongs to";
+            example: "\"69629023906488334\"";
+        }
+    ];
 }

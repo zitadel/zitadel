@@ -2,20 +2,55 @@ syntax = "proto3";
 
 import "zitadel/object.proto";
 import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.member.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/member";
 
 message Member {
-    string user_id = 1;
+    string user_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
-    repeated string roles = 3;
-    string preferred_login_name = 4;
-    string email = 5;
-    string first_name = 6;
-    string last_name = 7;
-    string display_name = 8;
+    repeated string roles = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"role.super.man\"]";
+            description: "the role keys granted to the user"
+        }
+    ];
+    string preferred_login_name = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi@caos.ch\"";
+            description: "preferred login name of the user"
+        }
+    ];
+    string email = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi@caos.ch\"";
+            description: "preferred login name of the user"
+        }
+    ];
+    string first_name = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Gigi\"";
+            description: "first name of the user"
+        }
+    ];
+    string last_name = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Giraffe\"";
+            description: "last name of the user"
+        }
+    ];
+    string display_name = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "display name of the user"
+            example: "\"Gigi Giraffe\"";
+        }
+    ];
 }
 
 message SearchQuery {
@@ -30,20 +65,61 @@ message SearchQuery {
 }
 
 message FirstNameQuery {
-    string first_name = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string first_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"Gigi\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+        }
+    ];
 }
 
 message LastNameQuery {
-    string last_name = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string last_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"Giraffe\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+        }
+    ];
 }
 
 message EmailQuery {
-    string email = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string email = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
+            max_length: 200;
+            example: "\"gigi@caos.ch\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+        }
+    ];
 }
 
 message UserIDQuery {
-    string user_id = 1 [(validate.rules).string = {max_len: 200}];
+    string user_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the id of the user"
+            max_length: 200;
+            example: "\"69629023906488334\"";
+        }
+    ];
 }

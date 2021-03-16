@@ -2,16 +2,29 @@ syntax = "proto3";
 
 import "zitadel/object.proto";
 import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.project.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/project";
 
 message Project {
-    string id = 1;
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
-    string name = 3;
-    ProjectState state = 4;
+    string name = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\""
+        }
+    ];
+    ProjectState state = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"PROJECT_STATE_ACTIVE\""
+        }
+    ];
     // describes if roles of user should be added in token
     bool project_role_assertion = 5;
     // ZITADEL checks if the user has at least one on this project
@@ -19,16 +32,52 @@ message Project {
 }
 
 message GrantedProject {
-    string grant_id = 1;
-    string granted_org_id = 2;
-    string granted_org_name = 3;
-    repeated string granted_role_keys = 4;
-    ProjectGrantState state = 5;
+    string grant_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    string granted_org_id = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    string granted_org_name = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Some Organisation\""
+        }
+    ];
+    repeated string granted_role_keys = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"role.super.man\"]"
+        }
+    ];
+    ProjectGrantState state = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"PROJECT_GRANT_STATE_ACTIVE\""
+        }
+    ];
     
-    string project_id = 6;
-    string project_name = 7;
-    string project_owner_id = 8;
-    string project_owner_name = 9;
+    string project_id = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    string project_name = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\""
+        }
+    ];
+    string project_owner_id = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    string project_owner_name = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"CAOS AG\""
+        }
+    ];
 
     zitadel.v1.ObjectDetails details = 10;
 }
@@ -54,15 +103,37 @@ message ProjectQuery {
 }
 
 message ProjectNameQuery {
-    string name = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+        }
+    ];
 }
 
 message Role {
-    string key = 1;
+    string key = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"role.super.man\""
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
-    string display_name = 3;
-    string group = 4;
+    string display_name = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Super man\""
+        }
+    ];
+    string group = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"people\""
+        }
+    ];
 }
 
 message RoleQuery {
@@ -75,13 +146,33 @@ message RoleQuery {
 }
 
 message RoleKeyQuery {
-    string key = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string key = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"role.super.man\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+        }
+    ];
 }
 
 message RoleDisplayNameQuery {
-    string display_name = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string display_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"SUPER\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE\""
+        }
+    ];
 }
 
 message ProjectGrantQuery {
@@ -94,11 +185,31 @@ message ProjectGrantQuery {
 }
 
 message GrantProjectNameQuery {
-    string name = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+        }
+    ];
 }
 
 message GrantRoleKeyQuery {
-    string role_key = 1 [(validate.rules).string = {max_len: 200}];
-    zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+    string role_key = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"role.super.man\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+        }
+    ];
 }
