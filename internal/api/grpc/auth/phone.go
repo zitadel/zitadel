@@ -16,8 +16,9 @@ func (s *Server) GetMyPhone(ctx context.Context, _ *auth_pb.GetMyPhoneRequest) (
 	}
 	return &auth_pb.GetMyPhoneResponse{
 		Phone: user.ModelPhoneToPb(phone),
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			phone.Sequence,
+			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),

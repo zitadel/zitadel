@@ -100,7 +100,18 @@ func TypeQueryToModel(q *user_pb.TypeQuery) *user_model.UserSearchQuery {
 	return &user_model.UserSearchQuery{
 		Key:    user_model.UserSearchKeyType,
 		Method: domain.SearchMethodEquals,
-		Value:  q.Type,
+		Value:  UserTypeToModel(q.Type),
+	}
+}
+
+func UserTypeToModel(t user_pb.Type) string {
+	switch t {
+	case user_pb.Type_TYPE_HUMAN:
+		return "human"
+	case user_pb.Type_TYPE_MACHINE:
+		return "machine"
+	default:
+		return ""
 	}
 }
 

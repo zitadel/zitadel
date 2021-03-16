@@ -10,10 +10,11 @@ func ModelPasswordAgePolicyToPb(policy *model.PasswordAgePolicyView) *policy_pb.
 	return &policy_pb.PasswordAgePolicy{
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			policy.Sequence,
+			policy.CreationDate,
 			policy.ChangeDate,
-			"policy.ResourceOwner", //TODO: uueli
+			"", //TODO: resourceowner
 		),
 	}
 }

@@ -2,10 +2,6 @@ package command
 
 import (
 	"context"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -13,7 +9,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/policy"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {

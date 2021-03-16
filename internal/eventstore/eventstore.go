@@ -60,7 +60,7 @@ func (es *Eventstore) PushEvents(ctx context.Context, pushEvents ...EventPusher)
 func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
 	events = make([]*repository.Event, len(pushEvents))
 	for i, event := range pushEvents {
-		data, err := eventData(event)
+		data, err := EventData(event)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -196,10 +196,6 @@ func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func
 }
 
 func EventData(event EventPusher) ([]byte, error) {
-	return eventData(event)
-}
-
-func eventData(event EventPusher) ([]byte, error) {
 	switch data := event.Data().(type) {
 	case nil:
 		return nil, nil

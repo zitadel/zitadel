@@ -1043,8 +1043,8 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 func newRoleChangedEvent(ctx context.Context, projectID, resourceOwner, key, displayName, group string) *project.RoleChangedEvent {
 	event, _ := project.NewRoleChangedEvent(ctx,
 		&project.NewAggregate(projectID, resourceOwner).Aggregate,
+		key,
 		[]project.RoleChanges{
-			project.ChangeKey(key),
 			project.ChangeDisplayName(displayName),
 			project.ChangeGroup(group),
 		},

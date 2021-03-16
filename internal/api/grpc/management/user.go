@@ -181,8 +181,9 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 	}
 	return &mgmt_pb.GetHumanProfileResponse{
 		Profile: user_grpc.ProfileToPb(profile),
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ToViewDetailsPb(
 			profile.Sequence,
+			profile.CreationDate,
 			profile.ChangeDate,
 			profile.ResourceOwner,
 		),
@@ -210,8 +211,9 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 	}
 	return &mgmt_pb.GetHumanEmailResponse{
 		Email: user_grpc.EmailToPb(email),
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ToViewDetailsPb(
 			email.Sequence,
+			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
@@ -259,8 +261,9 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 	}
 	return &mgmt_pb.GetHumanPhoneResponse{
 		Phone: user_grpc.PhoneToPb(phone),
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ToViewDetailsPb(
 			phone.Sequence,
+			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),
