@@ -66,7 +66,7 @@ $ cat > ~/.orb/myorb << EOF
 > repokey: |
 > $(cat ~/.ssh/myorbrepo | sed s/^/\ \ /g)
 > EOF
-$ zitadelctl -f ~/.orb/myorb [command]
+$ zitadelctl --gitops -f ~/.orb/myorb [command]
 `,
 	}
 
