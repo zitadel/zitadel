@@ -19,17 +19,17 @@ const (
 type FeaturesSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TierName                 *string               `json:"tier_name,omitempty"`
-	TierDescription          *string               `json:"tier_description,omitempty"`
+	TierName                 *string               `json:"tierName,omitempty"`
+	TierDescription          *string               `json:"tierDescription,omitempty"`
 	State                    *domain.FeaturesState `json:"state,omitempty"`
-	StateDescription         *string               `json:"state_description,omitempty"`
-	AuditLogRetention        *time.Duration        `json:"audit_log_retention,omitempty"`
-	LoginPolicyFactors       *bool                 `json:"login_policy_factors,omitempty"`
-	LoginPolicyIDP           *bool                 `json:"login_policy_idp,omitempty"`
-	LoginPolicyPasswordless  *bool                 `json:"login_policy_passwordless,omitempty"`
-	LoginPolicyRegistration  *bool                 `json:"login_policy_registration,omitempty"`
-	LoginPolicyUsernameLogin *bool                 `json:"login_policy_username_login,omitempty"`
-	PasswordComplexityPolicy *bool                 `json:"password_complexity_policy,omitempty"`
+	StateDescription         *string               `json:"stateDescription,omitempty"`
+	AuditLogRetention        *time.Duration        `json:"auditLogRetention,omitempty"`
+	LoginPolicyFactors       *bool                 `json:"loginPolicyFactors,omitempty"`
+	LoginPolicyIDP           *bool                 `json:"loginPolicyIDP,omitempty"`
+	LoginPolicyPasswordless  *bool                 `json:"loginPolicyPasswordless,omitempty"`
+	LoginPolicyRegistration  *bool                 `json:"loginPolicyRegistration,omitempty"`
+	LoginPolicyUsernameLogin *bool                 `json:"loginPolicyUsername_login,omitempty"`
+	PasswordComplexityPolicy *bool                 `json:"passwordComplexityPolicy,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
