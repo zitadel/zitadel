@@ -67,6 +67,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newOrgIAMPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
 		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
+		newFeatures(handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 	}
 }
 
