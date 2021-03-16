@@ -26,15 +26,17 @@ type FeaturesView struct {
 	Sequence     uint64    `json:"-" gorm:"column:sequence"`
 	Default      bool      `json:"-" gorm:"column:default_features"`
 
-	TierName                 string `json:"tierName" gorm:"column:tier_name"`
-	TierDescription          string `json:"tierDescription" gorm:"column:tier_description"`
-	TierState                int32  `json:"tierState" gorm:"column:tier_state"`
-	TierStateDescription     string `json:"tierStateDescription" gorm:"column:tier_state_description"`
-	LoginPolicyFactors       bool   `json:"loginPolicyFactors" gorm:"column:login_policy_factors"`
-	LoginPolicyIDP           bool   `json:"loginPolicyIDP" gorm:"column:login_policy_idp"`
-	LoginPolicyPasswordless  bool   `json:"loginPolicyPasswordless" gorm:"column:login_policy_passwordless"`
-	LoginPolicyRegistration  bool   `json:"loginPolicyRegistration" gorm:"column:login_policy_registration"`
-	LoginPolicyUsernameLogin bool   `json:"loginPolicyUsernameLogin" gorm:"column:login_policy_username_login"`
+	TierName                 string        `json:"tierName" gorm:"column:tier_name"`
+	TierDescription          string        `json:"tierDescription" gorm:"column:tier_description"`
+	State                    int32         `json:"state" gorm:"column:state"`
+	StateDescription         string        `json:"stateDescription" gorm:"column:state_description"`
+	AuditLogRetention        time.Duration `json:"audit_log_retention" gorm:"column:audit_log_retention"`
+	LoginPolicyFactors       bool          `json:"loginPolicyFactors" gorm:"column:login_policy_factors"`
+	LoginPolicyIDP           bool          `json:"loginPolicyIDP" gorm:"column:login_policy_idp"`
+	LoginPolicyPasswordless  bool          `json:"loginPolicyPasswordless" gorm:"column:login_policy_passwordless"`
+	LoginPolicyRegistration  bool          `json:"loginPolicyRegistration" gorm:"column:login_policy_registration"`
+	LoginPolicyUsernameLogin bool          `json:"loginPolicyUsernameLogin" gorm:"column:login_policy_username_login"`
+	PasswordComplexityPolicy bool          `json:"passwordComplexityPolicy" gorm:"column:password_complexity_policy"`
 }
 
 func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
@@ -46,13 +48,15 @@ func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
 		Default:                  features.Default,
 		TierName:                 features.TierName,
 		TierDescription:          features.TierDescription,
-		TierState:                domain.TierState(features.TierState),
-		TierStateDescription:     features.TierStateDescription,
+		State:                    domain.FeaturesState(features.State),
+		StateDescription:         features.StateDescription,
+		AuditLogRetention:        features.AuditLogRetention,
 		LoginPolicyFactors:       features.LoginPolicyFactors,
 		LoginPolicyIDP:           features.LoginPolicyIDP,
 		LoginPolicyPasswordless:  features.LoginPolicyPasswordless,
 		LoginPolicyRegistration:  features.LoginPolicyRegistration,
 		LoginPolicyUsernameLogin: features.LoginPolicyUsernameLogin,
+		PasswordComplexityPolicy: features.PasswordComplexityPolicy,
 	}
 }
 

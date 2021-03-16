@@ -2,6 +2,7 @@ package features
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -18,15 +19,17 @@ const (
 type FeaturesSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TierName                 *string
-	TierDescription          *string
-	TierState                *domain.TierState
-	TierStateDescription     *string
-	LoginPolicyFactors       *bool
-	LoginPolicyIDP           *bool
-	LoginPolicyPasswordless  *bool
-	LoginPolicyRegistration  *bool
-	LoginPolicyUsernameLogin *bool
+	TierName                 *string               `json:"tier_name,omitempty"`
+	TierDescription          *string               `json:"tier_description,omitempty"`
+	State                    *domain.FeaturesState `json:"state,omitempty"`
+	StateDescription         *string               `json:"state_description,omitempty"`
+	AuditLogRetention        *time.Duration        `json:"audit_log_retention,omitempty"`
+	LoginPolicyFactors       *bool                 `json:"login_policy_factors,omitempty"`
+	LoginPolicyIDP           *bool                 `json:"login_policy_idp,omitempty"`
+	LoginPolicyPasswordless  *bool                 `json:"login_policy_passwordless,omitempty"`
+	LoginPolicyRegistration  *bool                 `json:"login_policy_registration,omitempty"`
+	LoginPolicyUsernameLogin *bool                 `json:"login_policy_username_login,omitempty"`
+	PasswordComplexityPolicy *bool                 `json:"password_complexity_policy,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -67,15 +70,21 @@ func ChangeTierDescription(tierDescription string) func(event *FeaturesSetEvent)
 	}
 }
 
-func ChangeTierState(tierState domain.TierState) func(event *FeaturesSetEvent) {
+func ChangeState(State domain.FeaturesState) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
-		e.TierState = &tierState
+		e.State = &State
 	}
 }
 
-func ChangeTierStateDescription(statusDescription string) func(event *FeaturesSetEvent) {
+func ChangeStateDescription(statusDescription string) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
-		e.TierStateDescription = &statusDescription
+		e.StateDescription = &statusDescription
+	}
+}
+
+func ChangeAuditLogRetention(retention time.Duration) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.AuditLogRetention = &retention
 	}
 }
 
@@ -106,6 +115,12 @@ func ChangeLoginPolicyRegistration(loginPolicyRegistration bool) func(event *Fea
 func ChangeLoginPolicyUsernameLogin(loginPolicyUsernameLogin bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
 		e.LoginPolicyUsernameLogin = &loginPolicyUsernameLogin
+	}
+}
+
+func ChangePasswordComplexityPolicy(passwordComplexityPolicy bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.PasswordComplexityPolicy = &passwordComplexityPolicy
 	}
 }
 

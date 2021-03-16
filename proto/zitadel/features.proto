@@ -19,18 +19,19 @@ message Features {
   bool login_policy_idp = 7;
   bool login_policy_factors = 8;
   bool login_policy_passwordless = 9;
+  bool password_complexity_policy = 10;
 }
 
 message FeatureTier {
   string name = 1;
   string description = 2;
-  TierState state = 3;
+  FeaturesState state = 3;
   string status_info = 4;
 }
 
 
-enum TierState {
-  TIER_STATE_ACTIVE = 0;
-  TIER_STATE_ACTION_REQUIRED = 1;
-  TIER_STATE_CANCELED = 2;
+enum FeaturesState {
+  FEATURES_STATE_ACTIVE = 0;
+  FEATURES_STATE_ACTION_REQUIRED = 1;
+  FEATURES_STATE_CANCELED = 2;
 }

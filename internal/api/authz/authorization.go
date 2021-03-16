@@ -24,9 +24,9 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 	}
 
 	if requiredAuthOption.Feature != "" {
-		err = checkOrgFeatures(ctx, verifier, requiredAuthOption.Feature, ctxData)
+		err = CheckOrgFeatures(ctx, verifier, ctxData.OrgID, requiredAuthOption.Feature)
 		if err != nil {
-			return nil, errors.ThrowPermissionDenied(err, "AUTH-N2wna", "No matching feature found")
+			return nil, err
 		}
 	}
 
@@ -56,8 +56,8 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 	}, nil
 }
 
-func checkOrgFeatures(ctx context.Context, t *TokenVerifier, requiredFeature string, ctxData CtxData) error {
-	return t.authZRepo.CheckOrgFeatures(ctx, ctxData.OrgID, requiredFeature)
+func CheckOrgFeatures(ctx context.Context, t *TokenVerifier, orgID string, requiredFeatures ...string) error {
+	return t.authZRepo.CheckOrgFeatures(ctx, orgID, requiredFeatures...)
 }
 
 func checkUserPermissions(req interface{}, userPerms []string, authOpt Option) error {

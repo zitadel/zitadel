@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/features"
@@ -57,13 +59,15 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	aggregate *eventstore.Aggregate,
 	tierName,
 	tierDescription string,
-	tierState domain.TierState,
-	tierStateDescription string,
+	state domain.FeaturesState,
+	stateDescription string,
+	auditLogRetention time.Duration,
 	loginPolicyFactors,
 	loginPolicyIDP,
 	loginPolicyPasswordless,
 	loginPolicyRegistration,
-	loginPolicyUsernameLogin bool,
+	loginPolicyUsernameLogin,
+	passwordComplexityPolicy bool,
 ) (*org.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -74,11 +78,14 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	if tierDescription != "" && wm.TierDescription != tierDescription {
 		changes = append(changes, features.ChangeTierDescription(tierDescription))
 	}
-	if wm.TierState != tierState {
-		changes = append(changes, features.ChangeTierState(tierState))
+	if wm.State != state {
+		changes = append(changes, features.ChangeState(state))
 	}
-	if tierStateDescription != "" && wm.TierStateDescription != tierStateDescription {
-		changes = append(changes, features.ChangeTierStateDescription(tierStateDescription))
+	if stateDescription != "" && wm.StateDescription != stateDescription {
+		changes = append(changes, features.ChangeStateDescription(stateDescription))
+	}
+	if auditLogRetention != 0 && wm.AuditLogRetention != auditLogRetention {
+		changes = append(changes, features.ChangeAuditLogRetention(auditLogRetention))
 	}
 	if wm.LoginPolicyFactors != loginPolicyFactors {
 		changes = append(changes, features.ChangeLoginPolicyFactors(loginPolicyFactors))
@@ -94,6 +101,9 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.LoginPolicyUsernameLogin != loginPolicyUsernameLogin {
 		changes = append(changes, features.ChangeLoginPolicyUsernameLogin(loginPolicyUsernameLogin))
+	}
+	if wm.PasswordComplexityPolicy != passwordComplexityPolicy {
+		changes = append(changes, features.ChangePasswordComplexityPolicy(passwordComplexityPolicy))
 	}
 
 	if len(changes) == 0 {

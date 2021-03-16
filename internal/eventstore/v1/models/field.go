@@ -10,4 +10,5 @@ const (
 	Field_EditorService
 	Field_EditorUser
 	Field_EventType
+	Field_CreationDate
 )

@@ -15,13 +15,38 @@ type FeaturesView struct {
 
 	TierName                 string
 	TierDescription          string
-	TierState                domain.TierState
-	TierStateDescription     string
+	State                    domain.FeaturesState
+	StateDescription         string
+	AuditLogRetention        time.Duration
 	LoginPolicyFactors       bool
 	LoginPolicyIDP           bool
 	LoginPolicyPasswordless  bool
 	LoginPolicyRegistration  bool
 	LoginPolicyUsernameLogin bool
+	PasswordComplexityPolicy bool
+}
+
+func (f *FeaturesView) FeatureList() []string {
+	list := make([]string, 0, 6)
+	if f.LoginPolicyFactors {
+		list = append(list, domain.FeatureLoginPolicyFactors)
+	}
+	if f.LoginPolicyIDP {
+		list = append(list, domain.FeatureLoginPolicyIDP)
+	}
+	if f.LoginPolicyPasswordless {
+		list = append(list, domain.FeatureLoginPolicyPasswordless)
+	}
+	if f.LoginPolicyRegistration {
+		list = append(list, domain.FeatureLoginPolicyRegistration)
+	}
+	if f.LoginPolicyUsernameLogin {
+		list = append(list, domain.FeatureLoginPolicyUsernameLogin)
+	}
+	if f.PasswordComplexityPolicy {
+		list = append(list, domain.FeaturePasswordComplexityPolicy)
+	}
+	return list
 }
 
 type FeaturesSearchRequest struct {
@@ -38,7 +63,6 @@ const (
 	FeaturesSearchKeyUnspecified FeaturesSearchKey = iota
 	FeaturesSearchKeyAggregateID
 	FeaturesSearchKeyDefault
-	FeaturesSearchKeyResourceOwner
 )
 
 type FeaturesSearchQuery struct {

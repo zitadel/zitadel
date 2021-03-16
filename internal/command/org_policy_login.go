@@ -2,7 +2,11 @@ package command
 
 import (
 	"context"
+	"reflect"
+
 	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -17,6 +21,11 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
+	}
+
+	err = c.checkLoginPolicyAllowed(ctx, resourceOwner, nil)
+	if err != nil {
+		return nil, err
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
@@ -49,6 +58,12 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "Org-M0sif", "Errors.Org.LoginPolicy.NotFound")
 	}
+
+	err = c.checkLoginPolicyAllowed(ctx, resourceOwner, policy)
+	if err != nil {
+		return nil, err
+	}
+
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.PasswordlessType)
 	if !hasChanged {
@@ -64,6 +79,30 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 		return nil, err
 	}
 	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
+}
+
+func (c *Commands) checkLoginPolicyAllowed(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) error {
+	defaultPolicy, err := c.getDefaultLoginPolicy(ctx)
+	if err != nil {
+		return err
+	}
+	requiredFeatures := make([]string, 0)
+	if defaultPolicy.ForceMFA != policy.ForceMFA || !reflect.DeepEqual(defaultPolicy.MultiFactors, policy.MultiFactors) || !reflect.DeepEqual(defaultPolicy.SecondFactors, policy.SecondFactors) {
+		requiredFeatures = append(requiredFeatures, domain.FeatureLoginPolicyFactors)
+	}
+	if defaultPolicy.AllowExternalIDP != policy.AllowExternalIDP || !reflect.DeepEqual(defaultPolicy.IDPProviders, policy.IDPProviders) {
+		requiredFeatures = append(requiredFeatures, domain.FeatureLoginPolicyIDP)
+	}
+	if defaultPolicy.AllowRegister != policy.AllowRegister {
+		requiredFeatures = append(requiredFeatures, domain.FeatureLoginPolicyRegistration)
+	}
+	if defaultPolicy.PasswordlessType != policy.PasswordlessType {
+		requiredFeatures = append(requiredFeatures, domain.FeatureLoginPolicyPasswordless)
+	}
+	if defaultPolicy.AllowUsernamePassword != policy.AllowUsernamePassword {
+		requiredFeatures = append(requiredFeatures, domain.FeatureLoginPolicyUsernameLogin)
+	}
+	return authz.CheckOrgFeatures(ctx, c.tokenVerifier, resourceOwner, requiredFeatures...)
 }
 
 func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {

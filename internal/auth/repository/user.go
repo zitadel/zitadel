@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	key_model "github.com/caos/zitadel/internal/key/model"
 
@@ -36,7 +37,7 @@ type myUserRepo interface {
 
 	GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNView, error)
 
-	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
+	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error)
 
 	SearchMyUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
 }

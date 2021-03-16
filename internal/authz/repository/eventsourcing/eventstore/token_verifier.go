@@ -111,34 +111,63 @@ func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) erro
 	return err
 }
 
-func (repo *TokenVerifierRepo) CheckOrgFeatures(ctx context.Context, orgID, requiredFeature string) error {
+func (repo *TokenVerifierRepo) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
 	features, err := repo.View.FeaturesByAggregateID(orgID)
-	if errors.IsNotFound(err) {
-		return repo.checkDefaultFeatures(ctx, requiredFeature)
+	if caos_errs.IsNotFound(err) {
+		return repo.checkDefaultFeatures(ctx, requiredFeatures...)
 	}
 	if err != nil {
 		return err
 	}
-	return checkFeature(features, requiredFeature)
+	return checkFeatures(features, requiredFeatures...)
 }
 
-func checkFeature(features *features_view_model.FeaturesView, requiredFeature string) error {
-	if requiredFeature == "login_policy.factors" && features.LoginPolicyFactors {
-		return nil
+func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures ...string) error {
+	for _, requiredFeature := range requiredFeatures {
+		if strings.HasPrefix(requiredFeature, domain.FeatureLoginPolicy) {
+			if err := checkLoginPolicyFeatures(features, requiredFeature); err != nil {
+				return err
+			}
+		}
+		if requiredFeature == domain.FeaturePasswordComplexityPolicy && !features.PasswordComplexityPolicy {
+			return MissingFeatureErr(requiredFeature)
+		}
 	}
-	if requiredFeature == "login_policy.idp" && features.LoginPolicyIDP {
-		return nil
+	return nil
+}
+
+func checkLoginPolicyFeatures(features *features_view_model.FeaturesView, requiredFeature string) error {
+	switch requiredFeature {
+	case domain.FeatureLoginPolicyFactors:
+		if !features.LoginPolicyFactors {
+			return MissingFeatureErr(requiredFeature)
+		}
+	case domain.FeatureLoginPolicyIDP:
+		if !features.LoginPolicyIDP {
+			return MissingFeatureErr(requiredFeature)
+		}
+	case domain.FeatureLoginPolicyPasswordless:
+		if !features.LoginPolicyPasswordless {
+			return MissingFeatureErr(requiredFeature)
+		}
+	case domain.FeatureLoginPolicyRegistration:
+		if !features.LoginPolicyRegistration {
+			return MissingFeatureErr(requiredFeature)
+		}
+	case domain.FeatureLoginPolicyUsernameLogin:
+		if !features.LoginPolicyUsernameLogin {
+			return MissingFeatureErr(requiredFeature)
+		}
+	default:
+		if !features.LoginPolicyFactors && !features.LoginPolicyIDP && !features.LoginPolicyPasswordless && !features.LoginPolicyRegistration && !features.LoginPolicyUsernameLogin {
+			return MissingFeatureErr(requiredFeature)
+		}
 	}
-	if requiredFeature == "login_policy.factors" && features.LoginPolicyPasswordless {
-		return nil
-	}
-	if requiredFeature == "login_policy.registration" && features.LoginPolicyRegistration {
-		return nil
-	}
-	if requiredFeature == "login_policy.username_login" && features.LoginPolicyUsernameLogin {
-		return nil
-	}
-	return caos_errs.ThrowPermissionDenied(nil, "AUTH-B31sf", "no matching features found")
+	return nil
+}
+
+func MissingFeatureErr(feature string) error {
+	return caos_errs.ThrowPermissionDeniedf(nil, "AUTH-Dvgsf", "missing feature %v", feature)
 }
 
 func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (_ string, err error) {
@@ -181,7 +210,7 @@ func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, err
 	return iam_es_model.IAMToModel(iam), nil
 }
 
-func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, feature string) error {
+func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, feature ...string) error {
 	features, viewErr := repo.View.FeaturesByAggregateID(domain.IAMID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return viewErr

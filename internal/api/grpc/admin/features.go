@@ -61,8 +61,9 @@ func (s *Server) ResetOrgFeatures(ctx context.Context, req *admin_pb.ResetOrgFea
 
 func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) *domain.Features {
 	return &domain.Features{
-		TierName:                 req.DefaultTierName,
+		TierName:                 req.TierName,
 		TierDescription:          req.Description,
+		AuditLogRetention:        req.AuditLogRetention.AsDuration(),
 		LoginPolicyFactors:       req.LoginPolicyFactors,
 		LoginPolicyIDP:           req.LoginPolicyIdp,
 		LoginPolicyPasswordless:  req.LoginPolicyPasswordless,
@@ -77,6 +78,7 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 		TierDescription:          req.Description,
 		TierState:                features_grpc.TierStateToDomain(req.State),
 		TierStateDescription:     req.StateDescription,
+		AuditLogRetention:        req.AuditLogRetention.AsDuration(),
 		LoginPolicyFactors:       req.LoginPolicyFactors,
 		LoginPolicyIDP:           req.LoginPolicyIdp,
 		LoginPolicyPasswordless:  req.LoginPolicyPasswordless,

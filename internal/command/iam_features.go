@@ -20,11 +20,13 @@ func (c *Commands) SetDefaultFeatures(ctx context.Context, features *domain.Feat
 		features.TierDescription,
 		features.TierState,
 		features.TierStateDescription,
+		features.AuditLogRetention,
 		features.LoginPolicyFactors,
 		features.LoginPolicyIDP,
 		features.LoginPolicyPasswordless,
 		features.LoginPolicyRegistration,
 		features.LoginPolicyUsernameLogin,
+		features.PasswordComplexityPolicy,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")

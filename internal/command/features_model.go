@@ -1,6 +1,8 @@
 package command
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/features"
@@ -9,17 +11,17 @@ import (
 type FeaturesWriteModel struct {
 	eventstore.WriteModel
 
-	State domain.FeaturesState
-
 	TierName                 string
 	TierDescription          string
-	TierState                domain.TierState
-	TierStateDescription     string
+	State                    domain.FeaturesState
+	StateDescription         string
+	AuditLogRetention        time.Duration
 	LoginPolicyFactors       bool
 	LoginPolicyIDP           bool
 	LoginPolicyPasswordless  bool
 	LoginPolicyRegistration  bool
 	LoginPolicyUsernameLogin bool
+	PasswordComplexityPolicy bool
 }
 
 func (wm *FeaturesWriteModel) Reduce() error {
@@ -32,11 +34,15 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			if e.TierDescription != nil {
 				wm.TierDescription = *e.TierDescription
 			}
-			if e.TierState != nil {
-				wm.TierState = *e.TierState
+			wm.State = domain.FeaturesStateActive
+			if e.State != nil {
+				wm.State = *e.State
 			}
-			if e.TierStateDescription != nil {
-				wm.TierStateDescription = *e.TierStateDescription
+			if e.StateDescription != nil {
+				wm.StateDescription = *e.StateDescription
+			}
+			if e.AuditLogRetention != nil {
+				wm.AuditLogRetention = *e.AuditLogRetention
 			}
 			if e.LoginPolicyFactors != nil {
 				wm.LoginPolicyFactors = *e.LoginPolicyFactors
@@ -52,6 +58,9 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			}
 			if e.LoginPolicyUsernameLogin != nil {
 				wm.LoginPolicyUsernameLogin = *e.LoginPolicyUsernameLogin
+			}
+			if e.PasswordComplexityPolicy != nil {
+				wm.PasswordComplexityPolicy = *e.PasswordComplexityPolicy
 			}
 		case *features.FeaturesRemovedEvent:
 			wm.State = domain.FeaturesStateRemoved

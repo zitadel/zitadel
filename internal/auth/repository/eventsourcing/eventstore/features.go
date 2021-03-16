@@ -5,8 +5,7 @@ import (
 
 	"github.com/caos/logging"
 
-	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
+	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
@@ -19,10 +18,7 @@ import (
 type FeaturesRepo struct {
 	Eventstore v1.Eventstore
 
-	View *admin_view.View
-
-	SearchLimit    uint64
-	SystemDefaults systemdefaults.SystemDefaults
+	View *auth_view.View
 }
 
 func (repo *FeaturesRepo) GetDefaultFeatures(ctx context.Context) (*features_model.FeaturesView, error) {

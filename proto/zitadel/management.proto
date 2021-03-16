@@ -1379,7 +1379,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "login_policy.factors"
+            feature: "login_policy"
         };
     }
 
@@ -1391,6 +1391,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "login_policy"
         };
     }
 
@@ -1423,6 +1424,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "login_policy.idp"
         };
     }
 
@@ -1433,6 +1435,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "login_policy.idp"
         };
     }
 
@@ -1465,6 +1468,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "login_policy.factors"
         };
     }
 
@@ -1486,6 +1490,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "login_policy.factors"
         };
     }
 
@@ -1496,6 +1501,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "login_policy.factors"
         };
     }
 
@@ -1527,6 +1533,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "password_complexity_policy"
         };
     }
 
@@ -1538,6 +1545,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "password_complexity_policy"
         };
     }
 
@@ -1684,6 +1692,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+            feature: "login_policy.idp"
         };
     }
 
@@ -1695,6 +1704,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+            feature: "login_policy.idp"
         };
     }
 
@@ -1706,6 +1716,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+            feature: "login_policy.idp"
         };
     }
 
@@ -1716,6 +1727,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+            feature: "login_policy.idp"
         };
     }
 
@@ -1727,6 +1739,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+            feature: "login_policy.idp"
         };
     }
 
@@ -1738,6 +1751,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+            feature: "login_policy.idp"
         };
     }
 }
