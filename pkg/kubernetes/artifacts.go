@@ -39,6 +39,10 @@ func EnsureZitadelOperatorArtifacts(
 		return nil
 	}
 
+	if err := kubernetes.EnsureCaosSystemNamespace(monitor, client); err != nil {
+		return err
+	}
+
 	if err := client.ApplyServiceAccount(&core.ServiceAccount{
 		ObjectMeta: mach.ObjectMeta{
 			Name:      nameLabels.Name(),
@@ -338,6 +342,10 @@ func EnsureDatabaseArtifacts(
 
 	if version == "" {
 		return nil
+	}
+
+	if err := kubernetes.EnsureCaosSystemNamespace(monitor, client); err != nil {
+		return err
 	}
 
 	nameLabels := toNameLabels(apiLabels, "database-operator")
