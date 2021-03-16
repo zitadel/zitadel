@@ -59,8 +59,10 @@ $ ssh-keygen -b 2048 -t rsa -f ~/.ssh/myorbrepo -q -N ""
 $ # Create the orbconfig
 $ mkdir -p ~/.orb
 $ cat > ~/.orb/myorb << EOF
+> # this is the ssh URL to your git repository
 > url: git@github.com:me/my-orb.git
-> masterkey: "$(openssl rand -base64 21)"
+> masterkey: "$(openssl rand -base64 21)" # used for encrypting and decrypting secrets
+> # the repokey is used to connect to your git repository
 > repokey: |
 > $(cat ~/.ssh/myorbrepo | sed s/^/\ \ /g)
 > EOF
