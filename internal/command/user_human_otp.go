@@ -12,22 +12,22 @@ import (
 
 func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string) (*domain.OTP, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
 	human, err := c.getHuman(ctx, userID, resourceowner)
 	if err != nil {
 		logging.Log("COMMAND-DAqe1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get human for loginname")
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-MM9fs", "Errors.User.NotFound")
 	}
 	org, err := c.getOrg(ctx, human.ResourceOwner)
 	if err != nil {
 		logging.Log("COMMAND-Cm0ds").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org for loginname")
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-55M9f", "Errors.Org.NotFound")
 	}
 	orgPolicy, err := c.getOrgIAMPolicy(ctx, org.AggregateID)
 	if err != nil {
 		logging.Log("COMMAND-y5zv9").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org policy for loginname")
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.OrgIAM.NotFound")
 	}
 	otpWriteModel, err := c.otpWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
@@ -114,7 +114,7 @@ func (c *Commands) HumanCheckMFAOTP(ctx context.Context, userID, code, resourceo
 
 func (c *Commands) HumanRemoveOTP(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
 
 	existingOTP, err := c.otpWriteModelByID(ctx, userID, resourceOwner)
