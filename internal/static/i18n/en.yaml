@@ -241,7 +241,6 @@ Errors:
         Invalid: Identity Provider invalid
       IDPConfig:
         AlreadyExists: Identity Provider Configuration already exists
-        NotExisting: Identity Provider Configuration doesn't exist
         NotInactive: Identity Provider Configuration not inactive
         NotActive: Identity Provider Configuration not active
     LabelPolicy:
@@ -297,6 +296,7 @@ Errors:
     AlreadyExists: Member already exists
   IDPConfig:
     AlreadyExists: IDP Configuration with this name already exists
+    NotExisting: Identity Provider Configuration doesn't exist
   Changes:
     NotFound: No history found
   Token:

@@ -11,7 +11,7 @@ type ExternalIDP struct {
 }
 
 func (idp *ExternalIDP) IsValid() bool {
-	return idp.AggregateID != "" && idp.IDPConfigID != "" && idp.ExternalUserID != ""
+	return idp.IDPConfigID != "" && idp.ExternalUserID != ""
 }
 
 type ExternalIDPState int32

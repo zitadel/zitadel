@@ -241,7 +241,6 @@ Errors:
         Invalid: Idp Provider ist ungültig
       IDPConfig:
         AlreadyExists: Identitäts Provider Konfiguration existiert bereits
-        NotExisting: Identitäts Provider Konfiguration existiert nicht
         NotInactive: Identitäts Provider Konfiguration nicht inaktive
         NotActive: Identitäts Provider Konfiguration nicht aktive
     LabelPolicy:
@@ -297,6 +296,7 @@ Errors:
     AlreadyExists: Member existiert bereits
   IDPConfig:
     AlreadyExists: IDP Konfiguration mit diesem Name existiert bereits
+    NotExisting: Identitäts Provider Konfiguration existiert nicht
   Changes:
     NotFound: Es konnte kein Änderungsverlauf gefunden werden
   Token:

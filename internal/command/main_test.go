@@ -155,6 +155,12 @@ func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
 	}
 }
 
+func eventFromEventPusherWithCreationDateNow(event eventstore.EventPusher) *repository.Event {
+	e := eventFromEventPusher(event)
+	e.CreationDate = time.Now()
+	return e
+}
+
 func uniqueConstraintsFromEventConstraint(constraint *eventstore.EventUniqueConstraint) *repository.UniqueConstraint {
 	return &repository.UniqueConstraint{
 		UniqueType:   constraint.UniqueType,

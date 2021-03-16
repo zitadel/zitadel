@@ -71,7 +71,7 @@ func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.ID
 		return nil, err
 	}
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.IDPConfig.NotExisting")
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
@@ -136,7 +136,7 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 		return nil, err
 	}
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M0xy", "Errors.IAM.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M0xy", "Errors.IDPConfig.NotExisting")
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
@@ -171,7 +171,7 @@ func (c *Commands) getIAMIDPConfigByID(ctx context.Context, idpID string) (*doma
 		return nil, err
 	}
 	if !config.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.IDPConfig.NotExisting")
 	}
 	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
 }

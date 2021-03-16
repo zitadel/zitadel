@@ -17,18 +17,18 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func TestCommandSide_ChangeHumanEmail(t *testing.T) {
+func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		secretGenerator crypto.Generator
 	}
 	type args struct {
 		ctx           context.Context
-		email         *domain.Email
+		email         *domain.Phone
 		resourceOwner string
 	}
 	type res struct {
-		want *domain.Email
+		want *domain.Phone
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -38,7 +38,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "invalid email, invalid argument error",
+			name: "invalid phone, invalid argument error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -46,7 +46,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				email: &domain.Email{
+				email: &domain.Phone{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
@@ -67,11 +67,11 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				email: &domain.Email{
+				email: &domain.Phone{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
-					EmailAddress: "email@test.com",
+					PhoneNumber: "0711234567",
 				},
 				resourceOwner: "org1",
 			},
@@ -80,7 +80,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			},
 		},
 		{
-			name: "email not changed, precondition error",
+			name: "phone not changed, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -97,6 +97,12 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 								domain.GenderUnspecified,
 								"email@test.ch",
 								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+41711234567",
 							),
 						),
 					),
@@ -104,11 +110,11 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				email: &domain.Email{
+				email: &domain.Phone{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
-					EmailAddress: "email@test.ch",
+					PhoneNumber: "0711234567",
 				},
 				resourceOwner: "org1",
 			},
@@ -117,7 +123,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			},
 		},
 		{
-			name: "verified email changed, ok",
+			name: "verified phone changed, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -136,17 +142,23 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+41711234567",
+							),
+						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanEmailChangedEvent(context.Background(),
+								user.NewHumanPhoneChangedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
-									"email-changed@test.ch",
+									"+41719876543",
 								),
 							),
 							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
+								user.NewHumanPhoneVerifiedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 								),
 							),
@@ -156,28 +168,28 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				email: &domain.Email{
+				email: &domain.Phone{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
-					EmailAddress:    "email-changed@test.ch",
-					IsEmailVerified: true,
+					PhoneNumber:     "0719876543",
+					IsPhoneVerified: true,
 				},
 				resourceOwner: "org1",
 			},
 			res: res{
-				want: &domain.Email{
+				want: &domain.Phone{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "user1",
 						ResourceOwner: "org1",
 					},
-					EmailAddress:    "email-changed@test.ch",
-					IsEmailVerified: true,
+					PhoneNumber:     "+41719876543",
+					IsPhoneVerified: true,
 				},
 			},
 		},
 		{
-			name: "email changed with code, ok",
+			name: "phone changed with code, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -200,13 +212,13 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanEmailChangedEvent(context.Background(),
+								user.NewHumanPhoneChangedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
-									"email-changed@test.ch",
+									"+41711234567",
 								),
 							),
 							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEvent(context.Background(),
+								user.NewHumanPhoneCodeAddedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
@@ -224,21 +236,21 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				email: &domain.Email{
+				email: &domain.Phone{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
-					EmailAddress: "email-changed@test.ch",
+					PhoneNumber: "0711234567",
 				},
 				resourceOwner: "org1",
 			},
 			res: res{
-				want: &domain.Email{
+				want: &domain.Phone{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "user1",
 						ResourceOwner: "org1",
 					},
-					EmailAddress: "email-changed@test.ch",
+					PhoneNumber: "+41711234567",
 				},
 			},
 		},
@@ -247,9 +259,9 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:            tt.fields.eventstore,
-				emailVerificationCode: tt.fields.secretGenerator,
+				phoneVerificationCode: tt.fields.secretGenerator,
 			}
-			got, err := r.ChangeHumanEmail(tt.args.ctx, tt.args.email)
+			got, err := r.ChangeHumanPhone(tt.args.ctx, tt.args.email)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -263,7 +275,7 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 	}
 }
 
-func TestCommandSide_VerifyHumanEmail(t *testing.T) {
+func TestCommandSide_VerifyHumanPhone(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		secretGenerator crypto.Generator
@@ -331,11 +343,11 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
-			name: "code not existing, precondition error",
+			name: "code not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -388,7 +400,13 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEvent(context.Background(),
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+411234567",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -403,7 +421,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanEmailVerificationFailedEvent(context.Background(),
+								user.NewHumanPhoneVerificationFailedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 								),
 							),
@@ -442,8 +460,14 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+411234567",
+							),
+						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanEmailCodeAddedEvent(context.Background(),
+							user.NewHumanPhoneCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -458,7 +482,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
+								user.NewHumanPhoneVerifiedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 								),
 							),
@@ -484,9 +508,9 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:            tt.fields.eventstore,
-				emailVerificationCode: tt.fields.secretGenerator,
+				phoneVerificationCode: tt.fields.secretGenerator,
 			}
-			got, err := r.VerifyHumanEmail(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner)
+			got, err := r.VerifyHumanPhone(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -500,7 +524,7 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 	}
 }
 
-func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
+func TestCommandSide_CreateVerificationCodeHumanPhone(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		secretGenerator crypto.Generator
@@ -549,43 +573,11 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
-			},
-		},
-		{
-			name: "user not initialized, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
-			},
-			res: res{
 				err: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
-			name: "email already verified, precondition error",
+			name: "phone already verified, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -605,7 +597,13 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailVerifiedEvent(context.Background(),
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+411234567",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneVerifiedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
@@ -642,21 +640,16 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailVerifiedEvent(context.Background(),
+							user.NewHumanPhoneChangedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanEmailChangedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"email2@test.ch",
+								"+411234567",
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEvent(context.Background(),
+								user.NewHumanPhoneCodeAddedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
@@ -688,9 +681,9 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:            tt.fields.eventstore,
-				emailVerificationCode: tt.fields.secretGenerator,
+				phoneVerificationCode: tt.fields.secretGenerator,
 			}
-			got, err := r.CreateHumanEmailVerificationCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			got, err := r.CreateHumanPhoneVerificationCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -704,7 +697,7 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 	}
 }
 
-func TestCommandSide_EmailVerificationCodeSent(t *testing.T) {
+func TestCommandSide_PhoneVerificationCodeSent(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -751,7 +744,7 @@ func TestCommandSide_EmailVerificationCodeSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -775,21 +768,16 @@ func TestCommandSide_EmailVerificationCodeSent(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailVerifiedEvent(context.Background(),
+							user.NewHumanPhoneChangedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanEmailChangedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"email2@test.ch",
+								"+411234567",
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanEmailCodeSentEvent(context.Background(),
+								user.NewHumanPhoneCodeSentEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 								),
 							),
@@ -810,12 +798,164 @@ func TestCommandSide_EmailVerificationCodeSent(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.HumanEmailVerificationCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
+			err := r.HumanPhoneVerificationCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestCommandSide_RemoveHumanPhone(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		userID        string
+		resourceOwner string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "phone not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "remove phone, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+411234567",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPhoneRemovedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.RemoveHumanPhone(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
 			}
 		})
 	}

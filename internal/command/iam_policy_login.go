@@ -90,7 +90,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 	}
 	_, err := c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "IAM-m8fsd", "Errors.IAM.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "IAM-m8fsd", "Errors.IDPConfig.NotExisting")
 	}
 	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.IDPConfigID)
 	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
