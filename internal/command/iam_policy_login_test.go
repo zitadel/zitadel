@@ -9,6 +9,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/caos/zitadel/internal/repository/user"
+
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
