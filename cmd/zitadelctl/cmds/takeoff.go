@@ -73,6 +73,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			&kubeconfigStr,
 			rv.Version,
 			rv.Gitops || gitOpsZitadel,
+			orbConfig,
 		); err != nil {
 			monitor.Error(err)
 		}
@@ -83,6 +84,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			&kubeconfigStr,
 			rv.Version,
 			rv.Gitops || gitOpsDatabase,
+			orbConfig,
 		); err != nil {
 			monitor.Error(err)
 		}
@@ -91,7 +93,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	return cmd
 }
 
-func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, version string, gitops bool) error {
+func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, version string, gitops bool, orbcfg *orb.Orb) error {
 	if gitops {
 		found, err := api.ExistsZitadelYml(gitClient)
 		if err != nil {
@@ -117,6 +119,14 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 				spec := desired.Spec
 				spec.GitOps = gitops
 
+				if err := kubernetes.EnsureCaosSystemNamespace(monitor, k8sClient); err != nil {
+					return err
+				}
+
+				if err := kubernetes.EnsureOrbconfigSecret(monitor, k8sClient, orbcfg); err != nil {
+					return err
+				}
+
 				// at takeoff the artifacts have to be applied
 				spec.SelfReconciling = true
 				if err := orbzit.Reconcile(monitor, spec)(k8sClient); err != nil {
@@ -135,6 +145,10 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 				GitOps:          gitops,
 			}
 
+			if err := kubernetes.EnsureCaosSystemNamespace(monitor, k8sClient); err != nil {
+				return err
+			}
+
 			if err := orbzit.Reconcile(monitor, spec)(k8sClient); err != nil {
 				return err
 			}
@@ -146,7 +160,7 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 	return nil
 }
 
-func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, version string, gitops bool) error {
+func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, version string, gitops bool, orbcfg *orb.Orb) error {
 	if gitops {
 		found, err := api.ExistsDatabaseYml(gitClient)
 		if err != nil {
@@ -166,9 +180,17 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 				}
 				spec := desired.Spec
 				spec.GitOps = gitops
-
 				// at takeoff the artifacts have to be applied
 				spec.SelfReconciling = true
+
+				if err := kubernetes.EnsureCaosSystemNamespace(monitor, k8sClient); err != nil {
+					return err
+				}
+
+				if err := kubernetes.EnsureOrbconfigSecret(monitor, k8sClient, orbcfg); err != nil {
+					return err
+				}
+
 				if err := orbdb.Reconcile(
 					monitor,
 					spec)(k8sClient); err != nil {
@@ -187,6 +209,10 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *str
 				Version:         version,
 				SelfReconciling: true,
 				GitOps:          gitops,
+			}
+
+			if err := kubernetes.EnsureCaosSystemNamespace(monitor, k8sClient); err != nil {
+				return err
 			}
 
 			if err := orbdb.Reconcile(
