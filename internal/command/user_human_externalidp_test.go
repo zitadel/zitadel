@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -441,6 +442,140 @@ func TestCommandSide_RemoveExternalIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_ExternalLoginCheck(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx         context.Context
+		orgID       string
+		userID      string
+		authRequest *domain.AuthRequest
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user removed, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanExternalIDPAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"config1",
+								"name",
+								"externaluser1",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserRemovedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "external login check, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanExternalIDPCheckSucceededEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&user.AuthRequestInfo{
+										ID:                  "request1",
+										UserAgentID:         "useragent1",
+										SelectedIDPConfigID: "config1",
+									},
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				authRequest: &domain.AuthRequest{
+					ID:                  "request1",
+					AgentID:             "useragent1",
+					SelectedIDPConfigID: "config1",
+				},
+			},
+			res: res{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			err := r.HumanExternalLoginChecked(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.authRequest)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}

@@ -87,7 +87,7 @@ func (c *Commands) removeHumanExternalIDP(ctx context.Context, externalIDP *doma
 
 func (c *Commands) HumanExternalLoginChecked(ctx context.Context, orgID, userID string, authRequest *domain.AuthRequest) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-5n8sM", "Errors.IDMissing")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-5n8sM", "Errors.IDMissing")
 	}
 
 	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
@@ -95,7 +95,7 @@ func (c *Commands) HumanExternalLoginChecked(ctx context.Context, orgID, userID 
 		return err
 	}
 	if existingHuman.UserState == domain.UserStateUnspecified || existingHuman.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-dn88J", "Errors.User.NotFound")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dn88J", "Errors.User.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
