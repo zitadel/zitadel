@@ -8,9 +8,7 @@ import { AuthFactor, AuthFactorState } from 'src/app/proto/generated/zitadel/use
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { _base64ToArrayBuffer } from '../../u2f-util';
-import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
-import { DialogU2FComponent, U2FComponentDestination } from '../dialog-u2f/dialog-u2f.component';
+import { AuthFactorDialogComponent } from '../auth-factor-dialog/auth-factor-dialog.component';
 
 export interface WebAuthNOptions {
     challenge: string;
@@ -55,61 +53,75 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
         this.loadingSubject.complete();
     }
 
-    public addOTP(): void {
-        this.service.addMyMultiFactorOTP().then((otpresp) => {
-            const otp = otpresp;
-            const dialogRef = this.dialog.open(DialogOtpComponent, {
-                data: otp.url,
-                width: '400px',
-            });
-
-            dialogRef.afterClosed().subscribe((code) => {
-                if (code) {
-                    this.service.verifyMyMultiFactorOTP(code).then(() => {
-                        this.getMFAs();
-                    });
-                }
-            });
-        }, error => {
-            this.toast.showError(error);
+    public addAuthFactor(): void {
+        const dialogRef = this.dialog.open(AuthFactorDialogComponent, {
+            width: '400px',
         });
-    }
 
-    public addU2F(): void {
-        this.service.addMyMultiFactorU2F().then((u2fresp) => {
-            const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
-
-            if (credOptions.publicKey?.challenge) {
-                credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
-                credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
-                if (credOptions.publicKey.excludeCredentials) {
-                    credOptions.publicKey.excludeCredentials.map(cred => {
-                        cred.id = _base64ToArrayBuffer(cred.id as any);
-                        return cred;
-                    });
-                }
-                console.log(credOptions);
-                const dialogRef = this.dialog.open(DialogU2FComponent, {
-                    width: '400px',
-                    data: {
-                        credOptions,
-                        type: U2FComponentDestination.MFA,
-                    },
-                });
-
-                dialogRef.afterClosed().subscribe(done => {
-                    if (done) {
-                        this.getMFAs();
-                    } else {
-                        this.getMFAs();
-                    }
+        dialogRef.afterClosed().subscribe((code) => {
+            if (code) {
+                this.service.verifyMyMultiFactorOTP(code).then(() => {
+                    this.getMFAs();
                 });
             }
-
-        }, error => {
-            this.toast.showError(error);
         });
     }
+
+    // public addOTP(): void {
+    //     this.service.addMyMultiFactorOTP().then((otpresp) => {
+    //         const otp = otpresp;
+    //         const dialogRef = this.dialog.open(DialogOtpComponent, {
+    //             data: otp.url,
+    //             width: '400px',
+    //         });
+
+    //         dialogRef.afterClosed().subscribe((code) => {
+    //             if (code) {
+    //                 this.service.verifyMyMultiFactorOTP(code).then(() => {
+    //                     this.getMFAs();
+    //                 });
+    //             }
+    //         });
+    //     }, error => {
+    //         this.toast.showError(error);
+    //     });
+    // }
+
+    // public addU2F(): void {
+    //     this.service.addMyMultiFactorU2F().then((u2fresp) => {
+    //         const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
+
+    //         if (credOptions.publicKey?.challenge) {
+    //             credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
+    //             credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
+    //             if (credOptions.publicKey.excludeCredentials) {
+    //                 credOptions.publicKey.excludeCredentials.map(cred => {
+    //                     cred.id = _base64ToArrayBuffer(cred.id as any);
+    //                     return cred;
+    //                 });
+    //             }
+    //             console.log(credOptions);
+    //             const dialogRef = this.dialog.open(DialogU2FComponent, {
+    //                 width: '400px',
+    //                 data: {
+    //                     credOptions,
+    //                     type: U2FComponentDestination.MFA,
+    //                 },
+    //             });
+
+    //             dialogRef.afterClosed().subscribe(done => {
+    //                 if (done) {
+    //                     this.getMFAs();
+    //                 } else {
+    //                     this.getMFAs();
+    //                 }
+    //             });
+    //         }
+
+    //     }, error => {
+    //         this.toast.showError(error);
+    //     });
+    // }
 
     public getMFAs(): void {
         this.service.listMyMultiFactors().then(mfas => {

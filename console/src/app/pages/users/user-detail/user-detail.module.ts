@@ -19,6 +19,7 @@ import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -29,11 +30,11 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
-import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.component';
 import { DialogU2FComponent } from './auth-user-detail/dialog-u2f/dialog-u2f.component';
 import { EditDialogComponent } from './auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from './auth-user-detail/resend-email-dialog/resend-email-dialog.component';
@@ -48,13 +49,11 @@ import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
-import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.module';
 
 @NgModule({
     declarations: [
         AuthUserDetailComponent,
         UserDetailComponent,
-        DialogOtpComponent,
         EditDialogComponent,
         AuthUserMfaComponent,
         AuthPasswordlessComponent,
@@ -68,6 +67,7 @@ import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.mod
         ContactComponent,
         ResendEmailDialogComponent,
         DialogU2FComponent,
+        AuthFactorDialogComponent,
     ],
     imports: [
         UserDetailRoutingModule,

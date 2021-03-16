@@ -1,0 +1,50 @@
+<h1 mat-dialog-title>
+    <span class="title">{{'USER.CODEDIALOG.TITLE' | translate}} {{data?.number}}</span>
+</h1>
+<p class="desc">{{'USER.CODEDIALOG.DESCRIPTION' | translate}}</p>
+<div mat-dialog-content>
+    <div class="type-selection">
+        <button class="otp" (click)="selectType(AuthFactorType.OTP)">
+            <mat-icon class="icon" svgIcon="mdi_radar"></mat-icon>
+            <span>{{'USER.MFA.OTP' | translate}}</span>
+        </button>
+        <button class="u2f" (click)="selectType(AuthFactorType.U2F)">
+            <i class="las la-fingerprint"></i>
+            <span>{{'USER.MFA.U2F' | translate}}</span>
+        </button>
+    </div>
+
+    <div class="otp" *ngIf="selectedType == AuthFactorType.OTP">
+        <p>{{'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate}}</p>
+        <div class="qrcode-wrapper">
+            <qrcode *ngIf="otpurl" class="qrcode" [qrdata]="otpurl" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
+        </div>
+
+        <cnsl-form-field class="form-field" label="Access Code" required="true">
+            <cnsl-label>Code</cnsl-label>
+            <input cnslInput [(ngModel)]="otpcode" />
+        </cnsl-form-field>
+    </div>
+
+    <div class="u2f" *ngIf="selectedType == AuthFactorType.U2F">
+        <p>{{'USER.MFA.U2F_DIALOG_DESCRIPTION' | translate}}</p>
+
+        <cnsl-form-field class="form-field" label="Name" required="true">
+            <cnsl-label>{{'USER.MFA.U2F_NAME' | translate}}</cnsl-label>
+            <input cnslInput [(ngModel)]="u2fname" required (keydown.enter)="u2fname ? submitU2F() : null" />
+        </cnsl-form-field>
+
+        <mat-spinner diameter="30" *ngIf="u2fLoading"></mat-spinner>
+
+        <p class="error">{{u2fError}}</p>
+    </div>
+</div>
+<div mat-dialog-actions class="action">
+    <button cdkFocusInitial color="primary" mat-button class="ok-button" (click)="closeDialog()">
+        {{'ACTIONS.CLOSE' | translate}}
+    </button>
+
+    <button cdkFocusInitial color="primary" mat-raised-button class="ok-button" (click)="submitAuth()">
+        {{'ACTIONS.CREATE' | translate}}
+    </button>
+</div>
