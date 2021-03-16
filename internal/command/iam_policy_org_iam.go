@@ -71,7 +71,7 @@ func (c *Commands) getDefaultOrgIAMPolicy(ctx context.Context) (*domain.OrgIAMPo
 		return nil, err
 	}
 	if !policyWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3n8fs", "Errors.IAM.OrgIAMPolicy.NotFound")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3n8fs", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
 	policy := writeModelToOrgIAMPolicy(policyWriteModel)
 	policy.Default = true

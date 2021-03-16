@@ -18,12 +18,7 @@ type Human struct {
 	*Email
 	*Phone
 	*Address
-	ExternalIDPs       []*ExternalIDP
-	OTP                *OTP
-	U2FTokens          []*WebAuthNToken
-	PasswordlessTokens []*WebAuthNToken
-	U2FLogins          []*WebAuthNLogin
-	PasswordlessLogins []*WebAuthNLogin
+	ExternalIDPs []*ExternalIDP
 }
 
 func (h Human) GetUsername() string {
@@ -57,7 +52,7 @@ func (f Gender) Valid() bool {
 }
 
 func (u *Human) IsValid() bool {
-	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
+	return u.Profile != nil && u.Profile.IsValid() && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
 }
 
 func (u *Human) CheckOrgIAMPolicy(policy *OrgIAMPolicy) error {

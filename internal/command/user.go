@@ -286,6 +286,9 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 }
 
 func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-5m0fs", "Errors.IDMissing")
+	}
 	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err
