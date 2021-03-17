@@ -8,6 +8,7 @@ import (
 
 func ModelPasswordComplexityPolicyToPb(policy *model.PasswordComplexityPolicyView) *policy_pb.PasswordComplexityPolicy {
 	return &policy_pb.PasswordComplexityPolicy{
+		IsDefault:    policy.Default,
 		MinLength:    policy.MinLength,
 		HasUppercase: policy.HasUppercase,
 		HasLowercase: policy.HasLowercase,

@@ -8,6 +8,7 @@ import (
 
 func ModelPasswordLockoutPolicyToPb(policy *model.PasswordLockoutPolicyView) *policy_pb.PasswordLockoutPolicy {
 	return &policy_pb.PasswordLockoutPolicy{
+		IsDefault:          policy.Default,
 		MaxAttempts:        policy.MaxAttempts,
 		ShowLockoutFailure: policy.ShowLockOutFailures,
 		Details: object.ToViewDetailsPb(
