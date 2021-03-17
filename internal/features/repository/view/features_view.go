@@ -46,9 +46,3 @@ func PutFeaturesList(db *gorm.DB, table string, featuresList ...*view_model.Feat
 	}
 	return save(db, f...)
 }
-
-//
-//func DeleteOrg(db *gorm.DB, table, orgID string) error {
-//	delete := repository.PrepareDeleteByKey(table, model.OrgSearchKey(org_model.OrgSearchKeyOrgID), orgID)
-//	return delete(db)
-//}

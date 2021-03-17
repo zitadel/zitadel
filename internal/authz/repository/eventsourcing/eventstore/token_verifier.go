@@ -210,7 +210,7 @@ func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, err
 	return iam_es_model.IAMToModel(iam), nil
 }
 
-func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, feature ...string) error {
+func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, requiredFeatures ...string) error {
 	features, viewErr := repo.View.FeaturesByAggregateID(domain.IAMID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return viewErr
@@ -220,19 +220,19 @@ func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, feature
 	}
 	events, esErr := repo.getIAMEvents(ctx, features.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return caos_errs.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.Org.NotFound")
+		return checkFeatures(features, requiredFeatures...)
 	}
 	if esErr != nil {
 		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return nil
+		return esErr
 	}
 	featuresCopy := *features
 	for _, event := range events {
 		if err := featuresCopy.AppendEvent(event); err != nil {
-			return nil
+			return checkFeatures(features, requiredFeatures...)
 		}
 	}
-	return nil
+	return checkFeatures(&featuresCopy, requiredFeatures...)
 }
 
 func (repo *TokenVerifierRepo) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
