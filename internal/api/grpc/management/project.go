@@ -84,7 +84,7 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 
 func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest) (*mgmt_pb.AddProjectResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	project, err := s.command.AddProject(ctx, ProjectCreateToDomain(req), ctxData.ResourceOwner, ctxData.UserID)
+	project, err := s.command.AddProject(ctx, ProjectCreateToDomain(req), ctxData.OrgID, ctxData.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest)
 }
 
 func (s *Server) UpdateProject(ctx context.Context, req *mgmt_pb.UpdateProjectRequest) (*mgmt_pb.UpdateProjectResponse, error) {
-	project, err := s.command.ChangeProject(ctx, ProjectUpdateToDomain(req), authz.GetCtxData(ctx).ResourceOwner)
+	project, err := s.command.ChangeProject(ctx, ProjectUpdateToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (s *Server) UpdateProject(ctx context.Context, req *mgmt_pb.UpdateProjectRe
 }
 
 func (s *Server) DeactivateProject(ctx context.Context, req *mgmt_pb.DeactivateProjectRequest) (*mgmt_pb.DeactivateProjectResponse, error) {
-	details, err := s.command.DeactivateProject(ctx, req.Id, authz.GetCtxData(ctx).ResourceOwner)
+	details, err := s.command.DeactivateProject(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (s *Server) DeactivateProject(ctx context.Context, req *mgmt_pb.DeactivateP
 }
 
 func (s *Server) ReactivateProject(ctx context.Context, req *mgmt_pb.ReactivateProjectRequest) (*mgmt_pb.ReactivateProjectResponse, error) {
-	details, err := s.command.ReactivateProject(ctx, req.Id, authz.GetCtxData(ctx).ResourceOwner)
+	details, err := s.command.ReactivateProject(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +222,7 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 	}, nil
 }
 
-func (s *Server) ListProjectMemberRoles(ctx context.Context, req *mgmt_pb.ListProjectMemberRolesRequest) (*mgmt_pb.ListProjectMemberRolesResponse, error) {
+func (s *Server) ListProjectMemberRoles(ctx context.Context, _ *mgmt_pb.ListProjectMemberRolesRequest) (*mgmt_pb.ListProjectMemberRolesResponse, error) {
 	roles, err := s.project.GetProjectMemberRoles(ctx)
 	if err != nil {
 		return nil, err
