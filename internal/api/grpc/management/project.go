@@ -36,16 +36,17 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchProjects(ctx, queries)
+	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	projects, err := s.project.SearchProjects(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectsResponse{
-		Result: project_grpc.ProjectsToPb(domains.Result),
+		Result: project_grpc.ProjectsToPb(projects.Result),
 		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
+			projects.TotalResult,
+			projects.Sequence,
+			projects.Timestamp,
 		),
 	}, nil
 }
@@ -55,16 +56,17 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchGrantedProjects(ctx, queries)
+	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	projects, err := s.project.SearchGrantedProjects(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListGrantedProjectsResponse{
-		Result: project_grpc.GrantedProjectsToPb(domains.Result),
+		Result: project_grpc.GrantedProjectsToPb(projects.Result),
 		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
+			projects.TotalResult,
+			projects.Sequence,
+			projects.Timestamp,
 		),
 	}, nil
 }
@@ -149,6 +151,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	if err != nil {
 		return nil, err
 	}
+	queries.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	roles, err := s.project.SearchProjectRoles(ctx, req.ProjectId, queries)
 	if err != nil {
 		return nil, err
@@ -232,16 +235,17 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchProjectMembers(ctx, queries)
+	queries.AppendProjectQuery(req.ProjectId)
+	members, err := s.project.SearchProjectMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
-		Result: member_grpc.ProjectMembersToPb(domains.Result),
+		Result: member_grpc.ProjectMembersToPb(members.Result),
 		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
+			members.TotalResult,
+			members.Sequence,
+			members.Timestamp,
 		),
 	}, nil
 }
