@@ -253,6 +253,7 @@ export class UserDetailComponent implements OnInit {
                         titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
                         value: this.user.human?.phone?.phone,
+                        type: EditDialogType.PHONE,
                     },
                     width: '400px',
                 });
@@ -272,6 +273,7 @@ export class UserDetailComponent implements OnInit {
                         titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
                         value: this.user.human?.email?.email,
+                        type: EditDialogType.EMAIL,
                     },
                     width: '400px',
                 });
