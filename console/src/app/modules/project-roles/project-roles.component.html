@@ -52,7 +52,8 @@
             <ng-container matColumnDef="creationDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.CREATIONDATE' | translate }} </th>
                 <td (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
-                    <span>{{role.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                    <span *ngIf="role?.details?.creationDate">{{role.details.creationDate | timestampToDate |
+                        localizedDate: 'dd. MMM, HH:mm' }}</span>
                 </td>
             </ng-container>
 
