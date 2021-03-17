@@ -178,12 +178,16 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 }
 
 func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-MM9fs", "Errors.User.UserIDMissing")
+	}
+
 	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.NotFound")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
 	_, err = c.eventstore.PushEvents(ctx, user.NewHumanPasswordCodeSentEvent(ctx, userAgg))
@@ -194,8 +198,11 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-4Mfsf", "Errors.User.UserIDMissing")
+	}
 	if password == "" {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3n8fs", "Errors.User.Password.Empty")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3n8fs", "Errors.User.Password.Empty")
 	}
 
 	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)
@@ -203,11 +210,11 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		return err
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.NotFound")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 
 	if existingPassword.Secret == nil {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-3n77z", "Errors.User.Password.NotSet")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.Password.NotSet")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)

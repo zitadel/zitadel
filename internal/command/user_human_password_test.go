@@ -186,137 +186,137 @@ func TestCommandSide_SetPassword(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "userid missing, invalid argument error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:           context.Background(),
-		//		resourceOwner: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsErrorInvalidArgument,
-		//	},
-		//},
-		//{
-		//	name: "password missing, invalid argument error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:           context.Background(),
-		//		userID: "user1",
-		//		resourceOwner: "org1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsErrorInvalidArgument,
-		//	},
-		//},
-		//{
-		//	name: "user not existing, precondition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:           context.Background(),
-		//		userID:        "user1",
-		//		resourceOwner: "org1",
-		//		password: "password",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
-		//{
-		//	name: "code not existing, precondition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					user.NewHumanAddedEvent(context.Background(),
-		//						&user.NewAggregate("user1", "org1").Aggregate,
-		//						"username",
-		//						"firstname",
-		//						"lastname",
-		//						"nickname",
-		//						"displayname",
-		//						language.German,
-		//						domain.GenderUnspecified,
-		//						"email@test.ch",
-		//						true,
-		//					),
-		//				),
-		//			),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:           context.Background(),
-		//		userID:        "user1",
-		//		code:          "aa",
-		//		resourceOwner: "org1",
-		//		password: "string",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
-		//{
-		//	name: "invalid code, invalid argument error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					user.NewHumanAddedEvent(context.Background(),
-		//						&user.NewAggregate("user1", "org1").Aggregate,
-		//						"username",
-		//						"firstname",
-		//						"lastname",
-		//						"nickname",
-		//						"displayname",
-		//						language.German,
-		//						domain.GenderUnspecified,
-		//						"email@test.ch",
-		//						true,
-		//					),
-		//				),
-		//				eventFromEventPusher(
-		//					user.NewHumanPasswordCodeAddedEvent(context.Background(),
-		//						&user.NewAggregate("user1", "org1").Aggregate,
-		//						&crypto.CryptoValue{
-		//							CryptoType: crypto.TypeEncryption,
-		//							Algorithm:  "enc",
-		//							KeyID:      "id",
-		//							Crypted:    []byte("a"),
-		//						},
-		//						time.Hour*1,
-		//						domain.NotificationTypeEmail,
-		//					),
-		//				),
-		//			),
-		//		),
-		//		secretGenerator: GetMockSecretGenerator(t),
-		//	},
-		//	args: args{
-		//		ctx:           context.Background(),
-		//		userID:        "user1",
-		//		code:          "test",
-		//		resourceOwner: "org1",
-		//		password: "password",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "password missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "code not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				code:          "aa",
+				resourceOwner: "org1",
+				password:      "string",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid code, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+								domain.NotificationTypeEmail,
+							),
+						),
+					),
+				),
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				code:          "test",
+				resourceOwner: "org1",
+				password:      "password",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
 		{
 			name: "set password, ok",
 			fields: fields{
@@ -875,6 +875,373 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_PasswordCodeSent(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		userID        string
+		resourceOwner string
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "code sent, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+411234567",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPasswordCodeSentEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			err := r.PasswordCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestCommandSide_CheckPassword(t *testing.T) {
+	type fields struct {
+		eventstore      *eventstore.Eventstore
+		userPasswordAlg crypto.HashAlgorithm
+	}
+	type args struct {
+		ctx           context.Context
+		userID        string
+		resourceOwner string
+		password      string
+		authReq       *domain.AuthRequest
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				password:      "password",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "password missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing password empty, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				password:      "password",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "password not matching, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeHash,
+									Algorithm:  "hash",
+									KeyID:      "",
+									Crypted:    []byte("password"),
+								},
+								false,
+								"")),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPasswordCheckFailedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&user.AuthRequestInfo{
+										ID:          "request1",
+										UserAgentID: "agent1",
+									},
+								),
+							),
+						},
+					),
+				),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				password:      "password1",
+				resourceOwner: "org1",
+				authReq: &domain.AuthRequest{
+					ID:      "request1",
+					AgentID: "agent1",
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "check password, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeHash,
+									Algorithm:  "hash",
+									KeyID:      "",
+									Crypted:    []byte("password"),
+								},
+								false,
+								"")),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPasswordCheckSucceededEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&user.AuthRequestInfo{
+										ID:          "request1",
+										UserAgentID: "agent1",
+									},
+								),
+							),
+						},
+					),
+				),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				authReq: &domain.AuthRequest{
+					ID:      "request1",
+					AgentID: "agent1",
+				},
+			},
+			res: res{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:      tt.fields.eventstore,
+				userPasswordAlg: tt.fields.userPasswordAlg,
+			}
+			err := r.HumanCheckPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
