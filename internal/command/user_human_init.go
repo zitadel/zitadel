@@ -13,7 +13,7 @@ import (
 //ResendInitialMail resend inital mail and changes email if provided
 func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourceOwner string) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
 	}
 
 	existingCode, err := c.getHumanInitWriteModelByID(ctx, userID, resourceOwner)
@@ -50,10 +50,10 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourc
 
 func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, passwordString string) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
 	}
 	if code == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-44G8s", "Errors.User.Code.Empty")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-44G8s", "Errors.User.Code.Empty")
 	}
 
 	existingCode, err := c.getHumanInitWriteModelByID(ctx, userID, resourceOwner)
@@ -79,6 +79,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 	}
 	if passwordString != "" {
 		passwordWriteModel := NewHumanPasswordWriteModel(userID, existingCode.ResourceOwner)
+		passwordWriteModel.UserState = domain.UserStateActive
 		password := &domain.Password{
 			SecretString:   passwordString,
 			ChangeRequired: false,
@@ -89,12 +90,14 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 		}
 		events = append(events, passwordEvent)
 	}
-	events = append(events, user.NewHumanInitialCodeSentEvent(ctx, userAgg))
 	_, err = c.eventstore.PushEvents(ctx, events...)
 	return err
 }
 
 func (c *Commands) HumanInitCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M9fs", "Errors.IDMissing")
+	}
 	existingInitCode, err := c.getHumanInitWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err

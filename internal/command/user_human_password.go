@@ -14,10 +14,15 @@ import (
 func (c *Commands) SetOneTimePassword(ctx context.Context, orgID, userID, passwordString string) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
+	if userID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.IDMissing")
+	}
 	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
+	}
+	if !existingPassword.UserState.Exists() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0fs", "Errors.User.NotFound")
 	}
 	password := &domain.Password{
 		SecretString:   passwordString,
@@ -43,16 +48,22 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, code, passwor
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M9fs", "Errors.IDMissing")
+	}
+	if passwordString == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Mf0sd", "Errors.User.Password.Empty")
+	}
 	existingCode, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
 
 	if existingCode.Code == nil || existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
 	}
 
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.emailVerificationCode)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.passwordVerificationCode)
 	if err != nil {
 		return err
 	}
@@ -74,6 +85,12 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	if userID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.IDMissing")
+	}
+	if oldPassword == "" || newPassword == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty")
+	}
 	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
@@ -114,7 +131,7 @@ func (c *Commands) changePassword(ctx context.Context, userAgentID string, passw
 	defer func() { span.EndWithError(err) }()
 
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-G8dh3", "Errors.User.Email.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-G8dh3", "Errors.User.Password.NotFound")
 	}
 	if existingPassword.UserState == domain.UserStateInitial {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised")
@@ -130,12 +147,16 @@ func (c *Commands) changePassword(ctx context.Context, userAgentID string, passw
 }
 
 func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType) (objectDetails *domain.ObjectDetails, err error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-M00oL", "Errors.User.UserIDMissing")
+	}
+
 	existingHuman, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingHuman.UserState == domain.UserStateUnspecified || existingHuman.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Hj9ds", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Hj9ds", "Errors.User.NotFound")
 	}
 	if existingHuman.UserState == domain.UserStateInitial {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.NotInitialised")
