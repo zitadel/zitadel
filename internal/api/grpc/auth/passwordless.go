@@ -37,7 +37,7 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 
 func (s *Server) VerifyMyPasswordless(ctx context.Context, req *auth_pb.VerifyMyPasswordlessRequest) (*auth_pb.VerifyMyPasswordlessResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, ctxData.UserID, ctxData.OrgID, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
+	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
 	if err != nil {
 		return nil, err
 	}

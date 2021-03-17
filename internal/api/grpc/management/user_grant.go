@@ -21,6 +21,7 @@ func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrant
 
 func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*mgmt_pb.ListUserGrantResponse, error) {
 	r := ListUserGrantsRequestToModel(ctx, req)
+	r.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	res, err := s.usergrant.SearchUserGrants(ctx, r)
 	if err != nil {
 		return nil, err

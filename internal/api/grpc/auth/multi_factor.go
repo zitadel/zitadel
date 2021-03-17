@@ -22,7 +22,7 @@ func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFac
 
 func (s *Server) AddMyAuthFactorOTP(ctx context.Context, _ *auth_pb.AddMyAuthFactorOTPRequest) (*auth_pb.AddMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.OrgID)
+	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (s *Server) VerifyMyAuthFactorOTP(ctx context.Context, req *auth_pb.VerifyM
 
 func (s *Server) RemoveMyAuthFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyAuthFactorOTPRequest) (*auth_pb.RemoveMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.OrgID)
+	objectDetails, err := s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFac
 
 func (s *Server) VerifyMyAuthFactorU2F(ctx context.Context, req *auth_pb.VerifyMyAuthFactorU2FRequest) (*auth_pb.VerifyMyAuthFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, ctxData.UserID, ctxData.OrgID, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
+	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
 	if err != nil {
 		return nil, err
 	}

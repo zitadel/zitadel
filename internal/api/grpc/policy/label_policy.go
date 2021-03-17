@@ -8,6 +8,7 @@ import (
 
 func ModelLabelPolicyToPb(policy *model.LabelPolicyView) *policy_pb.LabelPolicy {
 	return &policy_pb.LabelPolicy{
+		IsDefault:      policy.Default,
 		PrimaryColor:   policy.PrimaryColor,
 		SecondaryColor: policy.SecondaryColor,
 		Details: object.ToViewDetailsPb(
