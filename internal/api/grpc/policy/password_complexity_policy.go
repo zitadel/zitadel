@@ -8,15 +8,17 @@ import (
 
 func ModelPasswordComplexityPolicyToPb(policy *model.PasswordComplexityPolicyView) *policy_pb.PasswordComplexityPolicy {
 	return &policy_pb.PasswordComplexityPolicy{
+		IsDefault:    policy.Default,
 		MinLength:    policy.MinLength,
 		HasUppercase: policy.HasUppercase,
 		HasLowercase: policy.HasLowercase,
 		HasNumber:    policy.HasNumber,
 		HasSymbol:    policy.HasSymbol,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			policy.Sequence,
+			policy.CreationDate,
 			policy.ChangeDate,
-			"policy.ResourceOwner", //TODO: ro
+			"", //TODO: ro
 		),
 	}
 }

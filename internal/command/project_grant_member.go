@@ -11,9 +11,12 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.ProjectGrantMember, resourceOwner string) (*domain.ProjectGrantMember, error) {
+func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.ProjectGrantMember) (*domain.ProjectGrantMember, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-8fi7G", "Errors.Project.Member.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-8fi7G", "Errors.Project.Grant.Member.Invalid")
+	}
+	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectGrantRolePrefix, c.zitadelRoles)) > 0 {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-m9gKK", "Errors.Project.Grant.Member.Invalid")
 	}
 	err := c.checkUserExists(ctx, member.UserID, "")
 	if err != nil {
@@ -25,12 +28,12 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.Pro
 		return nil, err
 	}
 	if addedMember.State == domain.MemberStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-16dVN", "Errors.Project.Member.AlreadyExists")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "PROJECT-16dVN", "Errors.Project.Member.AlreadyExists")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(
 		ctx,
-		project.NewProjectGrantMemberAddedEvent(ctx, projectAgg, member.AggregateID, member.UserID, member.GrantID, member.Roles...))
+		project.NewProjectGrantMemberAddedEvent(ctx, projectAgg, member.UserID, member.GrantID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
@@ -43,12 +46,12 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.Pro
 }
 
 //ChangeProjectGrantMember updates an existing member
-func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *domain.ProjectGrantMember, resourceOwner string) (*domain.ProjectGrantMember, error) {
+func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *domain.ProjectGrantMember) (*domain.ProjectGrantMember, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-109fs", "Errors.Project.Member.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-109fs", "Errors.Project.Member.Invalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectGrantRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-m0sDf", "Errors.Project.Member.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-m0sDf", "Errors.Project.Member.Invalid")
 	}
 
 	existingMember, err := c.projectGrantMemberWriteModelByID(ctx, member.AggregateID, member.UserID, member.GrantID)
@@ -74,14 +77,17 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *domain.
 	return memberWriteModelToProjectGrantMember(existingMember), nil
 }
 
-func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, userID, grantID, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, userID, grantID string) (*domain.ObjectDetails, error) {
+	if projectID == "" || userID == "" || grantID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-66mHd", "Errors.Project.Member.Invalid")
+	}
 	m, err := c.projectGrantMemberWriteModelByID(ctx, projectID, userID, grantID)
 	if err != nil {
 		return nil, err
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectGrantMemberRemovedEvent(ctx, projectAgg, projectID, userID, grantID))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectGrantMemberRemovedEvent(ctx, projectAgg, userID, grantID))
 	if err != nil {
 		return nil, err
 	}

@@ -350,13 +350,13 @@ func Test_eventData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := eventData(tt.args.event)
+			got, err := EventData(tt.args.event)
 			if (err != nil) != tt.res.wantErr {
-				t.Errorf("eventData() error = %v, wantErr %v", err, tt.res.wantErr)
+				t.Errorf("EventData() error = %v, wantErr %v", err, tt.res.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.res.jsonText) {
-				t.Errorf("eventData() = %v, want %v", string(got), string(tt.res.jsonText))
+				t.Errorf("EventData() = %v, want %v", string(got), string(tt.res.jsonText))
 			}
 		})
 	}

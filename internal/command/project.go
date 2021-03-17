@@ -27,7 +27,7 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 
 func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID string) (_ []eventstore.EventPusher, _ *ProjectWriteModel, err error) {
 	if !projectAdd.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
 	}
 	projectAdd.AggregateID, err = c.idGenerator.Next()
 	if err != nil {
@@ -74,8 +74,8 @@ func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOw
 }
 
 func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Project, resourceOwner string) (*domain.Project, error) {
-	if !projectChange.IsValid() && projectChange.AggregateID != "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
+	if !projectChange.IsValid() || projectChange.AggregateID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectChange.AggregateID, resourceOwner)
@@ -107,7 +107,7 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 
 func (c *Commands) DeactivateProject(ctx context.Context, projectID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-88iF0", "Errors.Project.ProjectIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-88iF0", "Errors.Project.ProjectIDMissing")
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
@@ -135,7 +135,7 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 
 func (c *Commands) ReactivateProject(ctx context.Context, projectID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.ProjectIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.ProjectIDMissing")
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
@@ -146,7 +146,7 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 	if existingProject.State != domain.ProjectStateInactive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInctive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInactive")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
@@ -163,7 +163,7 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 
 func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingUserGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if projectID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-66hM9", "Errors.Project.ProjectIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-66hM9", "Errors.Project.ProjectIDMissing")
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)

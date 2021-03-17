@@ -8,8 +8,8 @@ import (
 )
 
 func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (*domain.ObjectDetails, error) {
-	if appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
+	if projectID == "" || appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
 	}
 
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appChange.GetAppID(), resourceOwner)
@@ -25,7 +25,7 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(
 		ctx,
-		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName(), projectID))
+		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName()))
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 
 func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-88fi0", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-88fi0", "Errors.IDMissing")
 	}
 
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
@@ -65,7 +65,7 @@ func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, 
 
 func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-983dF", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-983dF", "Errors.IDMissing")
 	}
 
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
@@ -93,7 +93,7 @@ func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, 
 
 func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1b7Jf", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-1b7Jf", "Errors.IDMissing")
 	}
 
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
@@ -105,7 +105,7 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, projectID))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name))
 	if err != nil {
 		return nil, err
 	}

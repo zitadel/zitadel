@@ -23,11 +23,62 @@ func UserToPb(user *model.UserView) *user_pb.User {
 		UserName:           user.UserName,
 		LoginNames:         user.LoginNames,
 		PreferredLoginName: user.PreferredLoginName,
-		Details: object.ToDetailsPb(
+		Type:               UserTypeToPb(user),
+		Details: object.ToViewDetailsPb(
 			user.Sequence,
+			user.CreationDate,
 			user.ChangeDate,
 			user.ResourceOwner,
 		),
+	}
+}
+
+func UserTypeToPb(user *model.UserView) user_pb.UserType {
+	if user.HumanView != nil {
+		return &user_pb.User_Human{
+			Human: HumanToPb(user.HumanView),
+		}
+	}
+	if user.MachineView != nil {
+		return &user_pb.User_Machine{
+			Machine: MachineToPb(user.MachineView),
+		}
+	}
+	return nil
+}
+
+func HumanToPb(view *model.HumanView) *user_pb.Human {
+	return &user_pb.Human{
+		Profile: &user_pb.Profile{
+			FirstName:         view.FirstName,
+			LastName:          view.LastName,
+			NickName:          view.NickName,
+			DisplayName:       view.DisplayName,
+			PreferredLanguage: view.PreferredLanguage,
+			Gender:            GenderToPb(view.Gender),
+		},
+		Email: &user_pb.Email{
+			Email:           view.Email,
+			IsEmailVerified: view.IsEmailVerified,
+		},
+		Phone: &user_pb.Phone{
+			Phone:           view.Phone,
+			IsPhoneVerified: view.IsPhoneVerified,
+		},
+		Address: &user_pb.Address{ //TODO: remove?
+			Country:       view.Country,
+			Locality:      view.Locality,
+			PostalCode:    view.PostalCode,
+			Region:        view.Region,
+			StreetAddress: view.StreetAddress,
+		},
+	}
+}
+
+func MachineToPb(view *model.MachineView) *user_pb.Machine {
+	return &user_pb.Machine{
+		Name:        view.Name,
+		Description: view.Description,
 	}
 }
 

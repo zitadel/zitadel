@@ -16,8 +16,9 @@ func (s *Server) GetMyEmail(ctx context.Context, _ *auth_pb.GetMyEmailRequest) (
 	}
 	return &auth_pb.GetMyEmailResponse{
 		Email: user.ModelEmailToPb(email),
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			email.Sequence,
+			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
@@ -40,7 +41,7 @@ func (s *Server) SetMyEmail(ctx context.Context, req *auth_pb.SetMyEmailRequest)
 
 func (s *Server) VerifyMyEmail(ctx context.Context, req *auth_pb.VerifyMyEmailRequest) (*auth_pb.VerifyMyEmailResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, req.Code, ctxData.OrgID)
+	objectDetails, err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

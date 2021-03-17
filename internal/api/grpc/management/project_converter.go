@@ -117,11 +117,6 @@ func ListProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*proj
 	if err != nil {
 		return nil, err
 	}
-	queries = append(queries, &proj_model.ProjectRoleSearchQuery{
-		Key:    proj_model.ProjectRoleSearchKeyProjectID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.ProjectId,
-	})
 	return &proj_model.ProjectRoleSearchRequest{
 		Offset: offset,
 		Limit:  limit,
@@ -134,11 +129,6 @@ func ListProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*proj
 func ListProjectMembersRequestToModel(req *mgmt_pb.ListProjectMembersRequest) (*proj_model.ProjectMemberSearchRequest, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries := member_grpc.MemberQueriesToProjectMember(req.Queries)
-	queries = append(queries, &proj_model.ProjectMemberSearchQuery{
-		Key:    proj_model.ProjectMemberSearchKeyProjectID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.ProjectId,
-	})
 	return &proj_model.ProjectMemberSearchRequest{
 		Offset: offset,
 		Limit:  limit,

@@ -16,8 +16,9 @@ func (s *Server) GetMyPhone(ctx context.Context, _ *auth_pb.GetMyPhoneRequest) (
 	}
 	return &auth_pb.GetMyPhoneResponse{
 		Phone: user.ModelPhoneToPb(phone),
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			phone.Sequence,
+			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),
@@ -40,7 +41,7 @@ func (s *Server) SetMyPhone(ctx context.Context, req *auth_pb.SetMyPhoneRequest)
 
 func (s *Server) VerifyMyPhone(ctx context.Context, req *auth_pb.VerifyMyPhoneRequest) (*auth_pb.VerifyMyPhoneResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	_, err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.OrgID)
+	_, err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

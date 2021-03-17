@@ -24,3 +24,12 @@ const (
 func (u *UserGrant) IsValid() bool {
 	return u.ProjectID != "" && u.UserID != ""
 }
+
+func (g *UserGrant) HasInvalidRoles(validRoles []string) bool {
+	for _, roleKey := range g.RoleKeys {
+		if !containsRoleKey(roleKey, validRoles) {
+			return true
+		}
+	}
+	return false
+}

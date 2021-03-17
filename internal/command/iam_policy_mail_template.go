@@ -30,7 +30,7 @@ func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.Ma
 
 func (c *Commands) addDefaultMailTemplate(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMMailTemplateWriteModel, policy *domain.MailTemplate) (eventstore.EventPusher, error) {
 	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-fm9sd", "Errors.IAM.MailTemplate.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-fm9sd", "Errors.IAM.MailTemplate.Invalid")
 	}
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -45,7 +45,7 @@ func (c *Commands) addDefaultMailTemplate(ctx context.Context, iamAgg *eventstor
 
 func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
 	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4m9ds", "Errors.IAM.MailTemplate.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4m9ds", "Errors.IAM.MailTemplate.Invalid")
 	}
 	existingPolicy, err := c.defaultMailTemplateWriteModelByID(ctx)
 	if err != nil {
