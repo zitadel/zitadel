@@ -211,6 +211,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.mgmtService.getAppByID(projectid, id).then(app => {
                 if (app.app) {
                     this.app = app.app;
+                    console.log(this.app);
                     this.appNameForm.patchValue(this.app);
 
                     if (this.app.oidcConfig) {
@@ -300,6 +301,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
         const snackRef = this.snackbar.open(message, action, { duration: 5000, verticalPosition: 'top' });
         snackRef.onAction().subscribe(() => {
+            console.log(this.app);
             if (this.app.oidcConfig) {
                 this.saveOIDCApp();
             } else if (this.app.apiConfig) {
