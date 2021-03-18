@@ -121,7 +121,7 @@ func SetSecretPasswords(
 
 func TestConfiguration_Adapt(t *testing.T) {
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
-	dbClient := databasemock.NewMockClientInt(gomock.NewController(t))
+	dbClient := databasemock.NewMockClient(gomock.NewController(t))
 
 	monitor := mntr.Monitor{Fields: map[string]interface{}{"component": "configuration"}}
 	namespace := "test"
@@ -228,7 +228,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 
 func TestConfiguration_AdaptFull(t *testing.T) {
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
-	dbClient := databasemock.NewMockClientInt(gomock.NewController(t))
+	dbClient := databasemock.NewMockClient(gomock.NewController(t))
 
 	monitor := mntr.Monitor{Fields: map[string]interface{}{"component": "configuration"}}
 	namespace := "test2"
