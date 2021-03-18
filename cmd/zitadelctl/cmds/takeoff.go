@@ -1,9 +1,8 @@
 package cmds
 
 import (
-	"io/ioutil"
-
-	"github.com/caos/orbos/pkg/orb"
+	"github.com/caos/orbos/pkg/kubernetes/cli"
+	"sigs.k8s.io/yaml"
 
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 
@@ -44,33 +43,39 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 		orbConfig := rv.OrbConfig
 		gitClient := rv.GitClient
 
-		orbConfigIsIncompleteErr := orb.IsComplete(orbConfig)
-		if orbConfigIsIncompleteErr != nil && (rv.Gitops || gitOpsZitadel || gitOpsDatabase) {
-			return err
-		}
-		if orbConfigIsIncompleteErr == nil {
-			if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-				monitor.Error(err)
-				return nil
-			}
-
-			if err := gitClient.Clone(); err != nil {
-				monitor.Error(err)
-				return nil
-			}
-		}
-
-		value, err := ioutil.ReadFile(rv.Kubeconfig)
+		k8sClient, _, err := cli.Client(
+			monitor,
+			orbConfig,
+			gitClient,
+			rv.Kubeconfig,
+			gitOpsZitadel || gitOpsDatabase,
+		)
 		if err != nil {
-			// print help
 			return err
 		}
-		kubeconfigStr := string(value)
+
+		if err := kubernetes.EnsureCaosSystemNamespace(monitor, k8sClient); err != nil {
+			monitor.Info("failed to apply common resources into k8s-cluster")
+			return err
+		}
+
+		if gitOpsZitadel || gitOpsDatabase {
+
+			orbConfigBytes, err := yaml.Marshal(orbConfig)
+			if err != nil {
+				return err
+			}
+
+			if err := kubernetes.EnsureOrbconfigSecret(monitor, k8sClient, orbConfigBytes); err != nil {
+				monitor.Info("failed to apply configuration resources into k8s-cluster")
+				return err
+			}
+		}
 
 		if err := deployOperator(
 			monitor,
 			gitClient,
-			&kubeconfigStr,
+			k8sClient,
 			rv.Version,
 			rv.Gitops || gitOpsZitadel,
 		); err != nil {
@@ -80,7 +85,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 		if err := deployDatabase(
 			monitor,
 			gitClient,
-			&kubeconfigStr,
+			k8sClient,
 			rv.Version,
 			rv.Gitops || gitOpsDatabase,
 		); err != nil {
@@ -91,111 +96,84 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	return cmd
 }
 
-func deployOperator(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, version string, gitops bool) error {
+func deployOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kubernetes.ClientInt, version string, gitops bool) error {
 	if gitops {
 		found, err := api.ExistsZitadelYml(gitClient)
 		if err != nil {
 			return err
 		}
-		if !found {
-			monitor.Info("No ZITADEL operator deployed as no zitadel.yml present")
-			return nil
-		}
-
 		if found {
-			k8sClient := kubernetes.NewK8sClient(monitor, kubeconfig)
-
-			if k8sClient.Available() {
-				desiredTree, err := api.ReadZitadelYml(gitClient)
-				if err != nil {
-					return err
-				}
-				desired, err := orbzit.ParseDesiredV0(desiredTree)
-				if err != nil {
-					return err
-				}
-				spec := desired.Spec
-				spec.GitOps = gitops
-
-				// at takeoff the artifacts have to be applied
-				spec.SelfReconciling = true
-				if err := orbzit.Reconcile(monitor, spec)(k8sClient); err != nil {
-					return err
-				}
+			desiredTree, err := api.ReadZitadelYml(gitClient)
+			if err != nil {
+				return err
 			}
-		}
-	} else {
-		k8sClient := kubernetes.NewK8sClient(monitor, kubeconfig)
+			desired, err := orbzit.ParseDesiredV0(desiredTree)
+			if err != nil {
+				return err
+			}
+			spec := desired.Spec
+			spec.GitOps = gitops
 
-		if k8sClient.Available() {
 			// at takeoff the artifacts have to be applied
-			spec := &orbzit.Spec{
-				Version:         version,
-				SelfReconciling: true,
-				GitOps:          gitops,
-			}
-
+			spec.SelfReconciling = true
 			if err := orbzit.Reconcile(monitor, spec)(k8sClient); err != nil {
 				return err
 			}
-		} else {
-			monitor.Info("Failed to connect to k8s")
+		}
+	} else {
+		// at takeoff the artifacts have to be applied
+		spec := &orbzit.Spec{
+			Version:         version,
+			SelfReconciling: true,
+			GitOps:          gitops,
+		}
+
+		if err := orbzit.Reconcile(monitor, spec)(k8sClient); err != nil {
+			return err
 		}
 	}
 
 	return nil
 }
 
-func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, kubeconfig *string, version string, gitops bool) error {
+func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kubernetes.ClientInt, version string, gitops bool) error {
 	if gitops {
 		found, err := api.ExistsDatabaseYml(gitClient)
 		if err != nil {
 			return err
 		}
 		if found {
-			k8sClient := kubernetes.NewK8sClient(monitor, kubeconfig)
-
-			if k8sClient.Available() {
-				desiredTree, err := api.ReadDatabaseYml(gitClient)
-				if err != nil {
-					return err
-				}
-				desired, err := orbdb.ParseDesiredV0(desiredTree)
-				if err != nil {
-					return err
-				}
-				spec := desired.Spec
-				spec.GitOps = gitops
-
-				// at takeoff the artifacts have to be applied
-				spec.SelfReconciling = true
-				if err := orbdb.Reconcile(
-					monitor,
-					spec)(k8sClient); err != nil {
-					return err
-				}
-			} else {
-				monitor.Info("Failed to connect to k8s")
+			desiredTree, err := api.ReadDatabaseYml(gitClient)
+			if err != nil {
+				return err
 			}
-		}
-	} else {
-		k8sClient := kubernetes.NewK8sClient(monitor, kubeconfig)
+			desired, err := orbdb.ParseDesiredV0(desiredTree)
+			if err != nil {
+				return err
+			}
+			spec := desired.Spec
+			spec.GitOps = gitops
 
-		if k8sClient.Available() {
 			// at takeoff the artifacts have to be applied
-			spec := &orbdb.Spec{
-				Version:         version,
-				SelfReconciling: true,
-				GitOps:          gitops,
-			}
-
+			spec.SelfReconciling = true
 			if err := orbdb.Reconcile(
 				monitor,
 				spec)(k8sClient); err != nil {
 				return err
 			}
-		} else {
-			monitor.Info("Failed to connect to k8s")
+		}
+	} else {
+		// at takeoff the artifacts have to be applied
+		spec := &orbdb.Spec{
+			Version:         version,
+			SelfReconciling: true,
+			GitOps:          gitops,
+		}
+
+		if err := orbdb.Reconcile(
+			monitor,
+			spec)(k8sClient); err != nil {
+			return err
 		}
 	}
 	return nil

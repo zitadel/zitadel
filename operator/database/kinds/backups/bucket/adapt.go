@@ -33,15 +33,27 @@ func AdaptFunc(
 	version string,
 	features []string,
 ) operator.AdaptFunc {
-	return func(monitor mntr.Monitor, desired *tree.Tree, current *tree.Tree) (queryFunc operator.QueryFunc, destroyFunc operator.DestroyFunc, secrets map[string]*secretpkg.Secret, err error) {
+	return func(
+		monitor mntr.Monitor,
+		desired *tree.Tree,
+		current *tree.Tree,
+	) (
+		operator.QueryFunc,
+		operator.DestroyFunc,
+		map[string]*secretpkg.Secret,
+		map[string]*secretpkg.Existing,
+		error,
+	) {
 
 		internalMonitor := monitor.WithField("component", "backup")
 
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
+
+		secrets, existing := getSecretsMap(desiredKind)
 
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
 			internalMonitor.Verbose()
@@ -49,7 +61,7 @@ func AdaptFunc(
 
 		destroyS, err := secret.AdaptFuncToDestroy(namespace, secretName)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 
 		_, destroyB, err := backup.AdaptFunc(
@@ -70,7 +82,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 
 		_, destroyR, err := restore.AdaptFunc(
@@ -89,7 +101,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 
 		_, destroyC, err := clean.AdaptFunc(
@@ -106,7 +118,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -251,7 +263,8 @@ func AdaptFunc(
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-			getSecretsMap(desiredKind),
+			secrets,
+			existing,
 			nil
 	}
 }

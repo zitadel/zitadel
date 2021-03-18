@@ -4,10 +4,10 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/caos/zitadel/operator/crtlgitops"
 	"github.com/caos/zitadel/operator/helpers"
 
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/start"
 	"github.com/caos/zitadel/pkg/databases"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -96,7 +96,7 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 				return nil
 			}
 
-			if err := start.Restore(monitor, gitClient, orbConfig, k8sClient, backup, gitOpsMode, &version); err != nil {
+			if err := crtlgitops.Restore(monitor, gitClient, orbConfig, k8sClient, backup, gitOpsMode, &version); err != nil {
 				monitor.Error(err)
 			}
 			return nil

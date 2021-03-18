@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+
 	"github.com/caos/orbos/pkg/tree"
 	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -28,4 +29,18 @@ func UnmarshalUnstructuredSpec(unstruct *unstructured.Unstructured) (*tree.Tree,
 	}
 
 	return desired, nil
+}
+
+func MarshalToUnstructuredSpec(t *tree.Tree) (*unstructured.Unstructured, error) {
+	data, err := yaml.Marshal(t)
+	if err != nil {
+		return nil, err
+	}
+
+	unstruct := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"spec": make(map[string]interface{}),
+		},
+	}
+	return unstruct, yaml.Unmarshal(data, unstruct.Object["spec"])
 }

@@ -32,6 +32,7 @@ func AdaptFunc(
 		queryFunc operator.QueryFunc,
 		destroyFunc operator.DestroyFunc,
 		allSecrets map[string]*secret.Secret,
+		allExisting map[string]*secret.Existing,
 		err error,
 	) {
 		defer func() {
@@ -39,12 +40,13 @@ func AdaptFunc(
 		}()
 
 		allSecrets = make(map[string]*secret.Secret)
+		allExisting = make(map[string]*secret.Existing)
 
 		orbMonitor := monitor.WithField("kind", "orb")
 
 		desiredKind, err := ParseDesiredV0(desiredTree)
 		if err != nil {
-			return nil, nil, allSecrets, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
 		}
 		desiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
@@ -58,25 +60,18 @@ func AdaptFunc(
 			dbClientT, err := zitadeldb.NewGitOpsClient(monitor, orbconfig.URL, orbconfig.Repokey)
 			if err != nil {
 				monitor.Error(err)
-				return nil, nil, nil, err
+				return nil, nil, nil, nil, err
 			}
 			dbClient = dbClientT
 		} else {
-			if desiredKind.Spec.DatabaseCrd == nil ||
-				desiredKind.Spec.DatabaseCrd.Name == "" ||
-				desiredKind.Spec.DatabaseCrd.Namespace == "" {
-
-				return nil, nil, nil, errors.New("no defined database crd to use in spec.databasecrd")
-			}
-
-			dbClient = zitadeldb.NewCrdClient(monitor, desiredKind.Spec.DatabaseCrd.Namespace, desiredKind.Spec.DatabaseCrd.Name)
+			dbClient = zitadeldb.NewCrdClient(monitor)
 		}
 
 		operatorLabels := mustZITADELOperator(binaryVersion)
 
 		queryNS, err := namespace.AdaptFuncToEnsure(namespaceName)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, err
 		}
 		/*destroyNS, err := namespace.AdaptFuncToDestroy(namespaceName)
 		if err != nil {
@@ -84,7 +79,7 @@ func AdaptFunc(
 		}*/
 
 		iamCurrent := &tree.Tree{}
-		queryIAM, destroyIAM, zitadelSecrets, err := iam.GetQueryAndDestroyFuncs(
+		queryIAM, destroyIAM, zitadelSecrets, zitadelExisting, err := iam.GetQueryAndDestroyFuncs(
 			orbMonitor,
 			operatorLabels,
 			desiredKind.IAM,
@@ -98,9 +93,9 @@ func AdaptFunc(
 			features,
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, err
 		}
-		secret.AppendSecrets("", allSecrets, zitadelSecrets)
+		secret.AppendSecrets("", allSecrets, zitadelSecrets, allExisting, zitadelExisting)
 
 		destroyers := make([]operator.DestroyFunc, 0)
 		queriers := make([]operator.QueryFunc, 0)
@@ -138,6 +133,7 @@ func AdaptFunc(
 				return operator.DestroyersToDestroyFunc(monitor, destroyers)(k8sClient)
 			},
 			allSecrets,
+			allExisting,
 			nil
 	}
 }

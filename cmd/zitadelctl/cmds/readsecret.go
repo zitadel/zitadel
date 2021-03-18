@@ -3,8 +3,11 @@ package cmds
 import (
 	"os"
 
-	"github.com/caos/orbos/pkg/secret"
+	"github.com/caos/orbos/pkg/kubernetes/cli"
+
 	"github.com/caos/zitadel/operator/secrets"
+
+	"github.com/caos/orbos/pkg/secret"
 	"github.com/spf13/cobra"
 )
 
@@ -28,24 +31,21 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 			orbConfig := rv.OrbConfig
 			gitClient := rv.GitClient
 
-			if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-				return err
-			}
-
-			if err := gitClient.Clone(); err != nil {
-				return err
-			}
-
 			path := ""
 			if len(args) > 0 {
 				path = args[0]
 			}
 
+			k8sClient, _, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+			if err != nil && !rv.Gitops {
+				return err
+			}
+
 			value, err := secret.Read(
-				monitor,
-				gitClient,
+				k8sClient,
 				path,
-				secrets.GetAllSecretsFunc(orbConfig))
+				secrets.GetAllSecretsFunc(monitor, rv.Gitops, gitClient, k8sClient, orbConfig),
+			)
 			if err != nil {
 				monitor.Error(err)
 				return nil

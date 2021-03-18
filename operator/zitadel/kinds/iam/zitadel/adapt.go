@@ -40,18 +40,19 @@ func AdaptFunc(
 		operator.QueryFunc,
 		operator.DestroyFunc,
 		map[string]*secret.Secret,
+		map[string]*secret.Existing,
 		error,
 	) {
 
-		allSecrets := make(map[string]*secret.Secret)
 		internalMonitor := monitor.WithField("kind", "iam")
 
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, allSecrets, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
-		secret.AppendSecrets("", allSecrets, getSecretsMap(desiredKind))
+
+		allSecrets, allExisting := getSecretsMap(desiredKind)
 
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
 			internalMonitor.Verbose()
@@ -90,7 +91,7 @@ func AdaptFunc(
 			uiServiceName,
 			uint16(uiPort))
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, err
 		}
 
 		getQueryC, destroyC, getConfigurationHashes, err := configuration.AdaptFunc(
@@ -109,7 +110,7 @@ func AdaptFunc(
 			services.GetClientIDFunc(namespace, httpServiceName, httpPort),
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, err
 		}
 
 		queryDB, err := database.AdaptFunc(
@@ -117,7 +118,7 @@ func AdaptFunc(
 			dbClient,
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, err
 		}
 
 		queryM, destroyM, err := migration.AdaptFunc(
@@ -132,7 +133,7 @@ func AdaptFunc(
 			tolerations,
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, err
 		}
 
 		getQuerySetup, destroySetup, err := setup.AdaptFunc(
@@ -153,7 +154,7 @@ func AdaptFunc(
 			secretPasswordName,
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, err
 		}
 
 		queryD, destroyD, err := deployment.AdaptFunc(
@@ -180,7 +181,7 @@ func AdaptFunc(
 			setup.GetDoneFunc(monitor, namespace, action),
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, err
 		}
 
 		queryAmbassador, destroyAmbassador, err := ambassador.AdaptFunc(
@@ -193,7 +194,7 @@ func AdaptFunc(
 			desiredKind.Spec.Configuration.DNS,
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -288,6 +289,7 @@ func AdaptFunc(
 			},
 			operator.DestroyersToDestroyFunc(monitor, destroyers),
 			allSecrets,
+			allExisting,
 			nil
 	}
 }

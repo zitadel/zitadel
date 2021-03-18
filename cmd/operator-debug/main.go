@@ -6,8 +6,8 @@ import (
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/zitadel/operator/crtlgitops"
 	"github.com/caos/zitadel/operator/helpers"
-	"github.com/caos/zitadel/operator/start"
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := start.Operator(
+	if err := crtlgitops.Operator(
 		monitor,
 		helpers.PruneHome(*orbconfig),
 		kubernetes.NewK8sClient(monitor, strPtr(string(kc))),

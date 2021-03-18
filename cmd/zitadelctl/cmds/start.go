@@ -4,8 +4,8 @@ import (
 	"flag"
 
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/controller"
-	"github.com/caos/zitadel/operator/start"
+	"github.com/caos/zitadel/operator/crtlcrd"
+	"github.com/caos/zitadel/operator/crtlgitops"
 	"github.com/spf13/cobra"
 )
 
@@ -44,13 +44,13 @@ func StartOperator(getRv GetRootValues) *cobra.Command {
 			}
 
 			if k8sClient.Available() {
-				if err := start.Operator(monitor, orbConfig.Path, k8sClient, &version, gitOpsMode); err != nil {
+				if err := crtlgitops.Operator(monitor, orbConfig.Path, k8sClient, &version, gitOpsMode); err != nil {
 					monitor.Error(err)
 					return nil
 				}
 			}
 		} else {
-			if err := controller.Start(monitor, version, metricsAddr, controller.Zitadel); err != nil {
+			if err := crtlcrd.Start(monitor, version, metricsAddr, crtlcrd.Zitadel); err != nil {
 				return err
 			}
 		}
@@ -96,10 +96,10 @@ func StartDatabase(getRv GetRootValues) *cobra.Command {
 			}
 
 			if k8sClient.Available() {
-				return start.Database(monitor, orbConfig.Path, k8sClient, &version, gitOpsMode)
+				return crtlgitops.Database(monitor, orbConfig.Path, k8sClient, &version, gitOpsMode)
 			}
 		} else {
-			if err := controller.Start(monitor, version, metricsAddr, controller.Database); err != nil {
+			if err := crtlcrd.Start(monitor, version, metricsAddr, crtlcrd.Database); err != nil {
 				return err
 			}
 		}

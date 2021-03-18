@@ -6,9 +6,8 @@ import (
 
 	"github.com/caos/orbos/pkg/kubernetes"
 
-	"github.com/caos/zitadel/operator/start"
-
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/zitadel/operator/crtlgitops"
 	"github.com/caos/zitadel/operator/helpers"
 )
 
@@ -36,7 +35,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := start.Database(
+	if err := crtlgitops.Database(
 		monitor,
 		helpers.PruneHome(*orbconfig),
 		kubernetes.NewK8sClient(monitor, strPtr(string(kc))),

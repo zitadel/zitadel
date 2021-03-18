@@ -1,12 +1,12 @@
-package controller
+package crtlcrd
 
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	databasev1 "github.com/caos/zitadel/operator/api/database/v1"
 	zitadelv1 "github.com/caos/zitadel/operator/api/zitadel/v1"
-	"github.com/caos/zitadel/operator/controller/database"
-	"github.com/caos/zitadel/operator/controller/zitadel"
+	"github.com/caos/zitadel/operator/crtlcrd/database"
+	"github.com/caos/zitadel/operator/crtlcrd/zitadel"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
