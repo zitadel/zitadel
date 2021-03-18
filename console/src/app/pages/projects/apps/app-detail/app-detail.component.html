@@ -180,7 +180,7 @@
 
                     <cnsl-form-field appearance="outline" class="formfield">
                         <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
-                        <mat-select formControlName="applicationType">
+                        <mat-select formControlName="appType">
                             <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
                                 {{ 'APP.OIDC.APPTYPE.'+type | translate }}
                             </mat-option>
