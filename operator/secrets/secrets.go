@@ -74,7 +74,7 @@ func getAllSecrets(
 		func() (t *tree.Tree, err error) { return api.ReadZitadelYml(gitClient) },
 		func() (t *tree.Tree, err error) { return crdzit.ReadCrd(k8sClient) },
 		func(t *tree.Tree) (map[string]*secret.Secret, map[string]*secret.Existing, error) {
-			_, _, secrets, existing, err := orbzit.AdaptFunc(orb, "secret", nil, true, []string{})(monitor, t, &tree.Tree{})
+			_, _, secrets, existing, err := orbzit.AdaptFunc(orb, "secret", nil, gitops, []string{})(monitor, t, &tree.Tree{})
 			return secrets, existing, err
 		},
 	); err != nil {
@@ -92,7 +92,7 @@ func getAllSecrets(
 		func() (t *tree.Tree, err error) { return api.ReadDatabaseYml(gitClient) },
 		func() (t *tree.Tree, err error) { return crddb.ReadCrd(k8sClient) },
 		func(t *tree.Tree) (map[string]*secret.Secret, map[string]*secret.Existing, error) {
-			_, _, secrets, existing, err := orbdb.AdaptFunc("", nil, true, "database", "backup")(monitor, t, nil)
+			_, _, secrets, existing, err := orbdb.AdaptFunc("", nil, gitops, "database", "backup")(monitor, t, nil)
 			return secrets, existing, err
 		},
 	); err != nil {
