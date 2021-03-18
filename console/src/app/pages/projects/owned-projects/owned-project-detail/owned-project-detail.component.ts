@@ -8,7 +8,6 @@ import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
-import { ProjectType } from 'src/app/modules/project-members/project-members.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { App } from 'src/app/proto/generated/zitadel/app_pb';
@@ -35,7 +34,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public appsColumns: string[] = ['name'];
 
     public ProjectState: any = ProjectState;
-    public ProjectType: any = ProjectType;
     public ChangeType: any = ChangeType;
 
     public grid: boolean = true;

@@ -2,7 +2,6 @@ import { animate, animateChild, query, stagger, style, transition, trigger } fro
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProjectType } from 'src/app/modules/project-members/project-members.component';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrantedProject, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { StorageKey, StorageService } from 'src/app/services/storage.service';
@@ -41,7 +40,6 @@ export class GrantedProjectGridComponent implements OnChanges {
 
     public showNewProject: boolean = false;
     public ProjectState: any = ProjectState;
-    public ProjectType: any = ProjectType;
 
     constructor(private storage: StorageService, private router: Router) {
         this.selection.changed.subscribe(selection => {
