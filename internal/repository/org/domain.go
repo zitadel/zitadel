@@ -247,14 +247,15 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 	return []*eventstore.EventUniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
 }
 
-func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainRemovedEvent {
+func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string, verified bool) *DomainRemovedEvent {
 	return &DomainRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			OrgDomainRemovedEventType,
 		),
-		Domain: domain,
+		Domain:     domain,
+		isVerified: verified,
 	}
 }
 

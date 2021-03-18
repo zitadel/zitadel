@@ -39,7 +39,7 @@ type Commands struct {
 	machineKeySize              int
 	applicationKeySize          int
 	applicationSecretGenerator  crypto.Generator
-	domainVerificationAlg       *crypto.AESCrypto
+	domainVerificationAlg       crypto.EncryptionAlgorithm
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
 	multifactors                domain.MultifactorConfigs
