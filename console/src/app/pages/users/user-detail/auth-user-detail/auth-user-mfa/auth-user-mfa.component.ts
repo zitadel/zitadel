@@ -67,62 +67,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
         });
     }
 
-    // public addOTP(): void {
-    //     this.service.addMyMultiFactorOTP().then((otpresp) => {
-    //         const otp = otpresp;
-    //         const dialogRef = this.dialog.open(DialogOtpComponent, {
-    //             data: otp.url,
-    //             width: '400px',
-    //         });
-
-    //         dialogRef.afterClosed().subscribe((code) => {
-    //             if (code) {
-    //                 this.service.verifyMyMultiFactorOTP(code).then(() => {
-    //                     this.getMFAs();
-    //                 });
-    //             }
-    //         });
-    //     }, error => {
-    //         this.toast.showError(error);
-    //     });
-    // }
-
-    // public addU2F(): void {
-    //     this.service.addMyMultiFactorU2F().then((u2fresp) => {
-    //         const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
-
-    //         if (credOptions.publicKey?.challenge) {
-    //             credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
-    //             credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
-    //             if (credOptions.publicKey.excludeCredentials) {
-    //                 credOptions.publicKey.excludeCredentials.map(cred => {
-    //                     cred.id = _base64ToArrayBuffer(cred.id as any);
-    //                     return cred;
-    //                 });
-    //             }
-    //             console.log(credOptions);
-    //             const dialogRef = this.dialog.open(DialogU2FComponent, {
-    //                 width: '400px',
-    //                 data: {
-    //                     credOptions,
-    //                     type: U2FComponentDestination.MFA,
-    //                 },
-    //             });
-
-    //             dialogRef.afterClosed().subscribe(done => {
-    //                 if (done) {
-    //                     this.getMFAs();
-    //                 } else {
-    //                     this.getMFAs();
-    //                 }
-    //             });
-    //         }
-
-    //     }, error => {
-    //         this.toast.showError(error);
-    //     });
-    // }
-
     public getMFAs(): void {
         this.service.listMyMultiFactors().then(mfas => {
             const list = mfas.resultList;
