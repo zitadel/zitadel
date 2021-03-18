@@ -34,7 +34,7 @@ func (c *Commands) SetupStep12(ctx context.Context, step *Step12) error {
 		featuresEvent, err := c.setDefaultFeatures(ctx, featuresWriteModel, &domain.Features{
 			TierName:                 step.TierName,
 			TierDescription:          step.TierDescription,
-			TierState:                domain.FeaturesStateActive,
+			State:                    domain.FeaturesStateActive,
 			AuditLogRetention:        step.AuditLogRetention.Duration,
 			LoginPolicyFactors:       step.LoginPolicyFactors,
 			LoginPolicyIDP:           step.LoginPolicyIDP,

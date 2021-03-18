@@ -158,3 +158,19 @@ func writeModelToIDPProvider(wm *IdentityProviderWriteModel) *domain.IDPProvider
 		Type:        wm.IDPProviderType,
 	}
 }
+
+func writeModelToFeatures(wm *FeaturesWriteModel) *domain.Features {
+	return &domain.Features{
+		ObjectRoot:               writeModelToObjectRoot(wm.WriteModel),
+		TierName:                 wm.TierName,
+		TierDescription:          wm.TierDescription,
+		State:                    wm.State,
+		StateDescription:         wm.StateDescription,
+		AuditLogRetention:        wm.AuditLogRetention,
+		LoginPolicyFactors:       wm.LoginPolicyFactors,
+		LoginPolicyIDP:           wm.LoginPolicyIDP,
+		LoginPolicyPasswordless:  wm.LoginPolicyPasswordless,
+		LoginPolicyRegistration:  wm.LoginPolicyRegistration,
+		LoginPolicyUsernameLogin: wm.LoginPolicyUsernameLogin,
+	}
+}

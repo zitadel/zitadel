@@ -26,13 +26,13 @@ func (wm *SecondFactorWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-type MultiFactoryWriteModel struct {
+type MultiFactorWriteModel struct {
 	eventstore.WriteModel
 	MFAType domain.MultiFactorType
 	State   domain.FactorState
 }
 
-func (wm *MultiFactoryWriteModel) Reduce() error {
+func (wm *MultiFactorWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *policy.MultiFactorAddedEvent:

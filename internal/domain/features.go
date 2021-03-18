@@ -19,11 +19,11 @@ const (
 type Features struct {
 	es_models.ObjectRoot
 
-	TierName             string
-	TierDescription      string
-	TierState            FeaturesState
-	TierStateDescription string
-	IsDefault            bool
+	TierName         string
+	TierDescription  string
+	State            FeaturesState
+	StateDescription string
+	IsDefault        bool
 
 	AuditLogRetention        time.Duration
 	LoginPolicyFactors       bool
@@ -41,6 +41,7 @@ const (
 	FeaturesStateActive
 	FeaturesStateActionRequired
 	FeaturesStateCanceled
+	FeaturesStateGrandfathered
 	FeaturesStateRemoved
 
 	featuresStateCount

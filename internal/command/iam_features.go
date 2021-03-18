@@ -37,8 +37,8 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *IAM
 		IAMAggregateFromWriteModel(&existingFeatures.FeaturesWriteModel.WriteModel),
 		features.TierName,
 		features.TierDescription,
-		features.TierState,
-		features.TierStateDescription,
+		features.State,
+		features.StateDescription,
 		features.AuditLogRetention,
 		features.LoginPolicyFactors,
 		features.LoginPolicyIDP,
@@ -51,4 +51,13 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *IAM
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
 	}
 	return setEvent, nil
+}
+
+func (c *Commands) getDefaultFeatures(ctx context.Context) (*domain.Features, error) {
+	existingFeatures := NewIAMFeaturesWriteModel()
+	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
 }
