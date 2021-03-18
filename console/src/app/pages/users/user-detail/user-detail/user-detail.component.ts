@@ -87,6 +87,7 @@ export class UserDetailComponent implements OnInit {
     }
 
     public saveProfile(profileData: Profile.AsObject): void {
+        console.log(profileData);
         if (this.user.human) {
             this.user.human.profile = profileData;
             this.mgmtUserService

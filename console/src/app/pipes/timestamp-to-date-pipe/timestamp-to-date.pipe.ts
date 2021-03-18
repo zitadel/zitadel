@@ -11,7 +11,7 @@ export class TimestampToDatePipe implements PipeTransform {
     }
 
     private dateFromTimestamp(date: Timestamp.AsObject): any {
-        if (date?.seconds && date?.nanos) {
+        if (date?.seconds !== undefined && date?.nanos !== undefined) {
             const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000 / 1000);
             return ts;
         }
