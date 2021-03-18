@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable } from 'rxjs';
+import { finalize, map } from 'rxjs/operators';
 import { App, OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -30,7 +30,7 @@ export class ApplicationGridComponent implements OnInit {
                 console.log(resp.resultList);
                 return resp.resultList;
             }),
-            catchError(() => of([])),
+            // catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe((apps) => {
             console.log(apps);

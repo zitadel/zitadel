@@ -12,13 +12,8 @@ import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { EditDialogComponent } from '../auth-user-detail/edit-dialog/edit-dialog.component';
+import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
-
-export enum EditDialogType {
-    PHONE = 1,
-    EMAIL = 2,
-}
 
 @Component({
     selector: 'app-user-detail',

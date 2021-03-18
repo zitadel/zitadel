@@ -2,7 +2,10 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { parsePhoneNumber } from 'libphonenumber-js';
 
-import { EditDialogType } from '../../user-detail/user-detail.component';
+export enum EditDialogType {
+    PHONE = 1,
+    EMAIL = 2,
+}
 
 @Component({
     selector: 'app-edit-email-dialog',

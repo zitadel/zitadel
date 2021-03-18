@@ -8,8 +8,7 @@ import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/ge
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { EditDialogType } from '../user-detail/user-detail.component';
-import { EditDialogComponent } from './edit-dialog/edit-dialog.component';
+import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
 @Component({
     selector: 'app-auth-user-detail',
