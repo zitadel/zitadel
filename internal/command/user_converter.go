@@ -81,8 +81,10 @@ func writeModelToAddress(wm *HumanAddressWriteModel) *domain.Address {
 func writeModelToMachine(wm *MachineWriteModel) *domain.Machine {
 	return &domain.Machine{
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
+		Username:    wm.UserName,
 		Name:        wm.Name,
 		Description: wm.Description,
+		State:       wm.UserState,
 	}
 }
 

@@ -96,14 +96,14 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	human.AggregateID = userID
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-33M9f", "Errors.Org.OrgIAMPolicy.NotFound")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Org.OrgIAMPolicy.NotFound")
 	}
 	if err := human.CheckOrgIAMPolicy(orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}
 	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
 	}
 	human.SetNamesAsDisplayname()
 	if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, !selfregister); err != nil {

@@ -10,6 +10,9 @@ import (
 )
 
 func (c *Commands) AddOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4Jfsf", "Errors.ResourceOwnerMissing")
+	}
 	addedPolicy := NewORGOrgIAMPolicyWriteModel(resourceOwner)
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
 	event, err := c.addOrgIAMPolicy(ctx, orgAgg, addedPolicy, policy)
@@ -39,6 +42,9 @@ func (c *Commands) addOrgIAMPolicy(ctx context.Context, orgAgg *eventstore.Aggre
 }
 
 func (c *Commands) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5H8fs", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy, err := c.orgIAMPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -65,6 +71,9 @@ func (c *Commands) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner string,
 }
 
 func (c *Commands) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
+	if orgID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "Org-3H8fs", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy, err := c.orgIAMPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return err

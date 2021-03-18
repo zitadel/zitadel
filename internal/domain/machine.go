@@ -20,5 +20,5 @@ func (m Machine) GetState() UserState {
 }
 
 func (sa *Machine) IsValid() bool {
-	return sa.Name != ""
+	return sa.Name != "" && sa.Username != ""
 }

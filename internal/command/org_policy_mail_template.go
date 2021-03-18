@@ -9,6 +9,9 @@ import (
 )
 
 func (c *Commands) AddMailTemplate(ctx context.Context, resourceOwner string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M8dfs", "Errors.ResourceOwnerMissing")
+	}
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3m9fs", "Errors.Org.MailTemplate.Invalid")
 	}
@@ -34,6 +37,9 @@ func (c *Commands) AddMailTemplate(ctx context.Context, resourceOwner string, po
 }
 
 func (c *Commands) ChangeMailTemplate(ctx context.Context, resourceOwner string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M9fFs", "Errors.ResourceOwnerMissing")
+	}
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-9f9ds", "Errors.Org.MailTemplate.Invalid")
 	}
@@ -64,6 +70,9 @@ func (c *Commands) ChangeMailTemplate(ctx context.Context, resourceOwner string,
 }
 
 func (c *Commands) RemoveMailTemplate(ctx context.Context, orgID string) error {
+	if orgID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "Org-5Jgis", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy := NewOrgMailTemplateWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {

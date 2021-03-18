@@ -3,6 +3,7 @@ Errors:
   NoChangesFound: Keine Änderungen gefunden
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   IDMissing: ID fehlt
+  ResourceOwnerMissing: Organisation fehlt
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     AlreadyExists: Benutzer existierts bereits
