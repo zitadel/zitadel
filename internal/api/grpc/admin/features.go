@@ -76,7 +76,7 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 	return &domain.Features{
 		TierName:                 req.TierName,
 		TierDescription:          req.Description,
-		State:                    features_grpc.TierStateToDomain(req.State),
+		State:                    features_grpc.FeaturesStateToDomain(req.State),
 		StateDescription:         req.StateDescription,
 		AuditLogRetention:        req.AuditLogRetention.AsDuration(),
 		LoginPolicyFactors:       req.LoginPolicyFactors,

@@ -28,12 +28,12 @@ func FeatureTierToPb(name, description string, status domain.FeaturesState, stat
 	return &features_pb.FeatureTier{
 		Name:        name,
 		Description: description,
-		State:       TierStateToPb(status),
+		State:       FeaturesStateToPb(status),
 		StatusInfo:  statusDescription,
 	}
 }
 
-func TierStateToPb(status domain.FeaturesState) features_pb.FeaturesState {
+func FeaturesStateToPb(status domain.FeaturesState) features_pb.FeaturesState {
 	switch status {
 	case domain.FeaturesStateActive:
 		return features_pb.FeaturesState_FEATURES_STATE_ACTIVE
@@ -48,7 +48,7 @@ func TierStateToPb(status domain.FeaturesState) features_pb.FeaturesState {
 	}
 }
 
-func TierStateToDomain(status features_pb.FeaturesState) domain.FeaturesState {
+func FeaturesStateToDomain(status features_pb.FeaturesState) domain.FeaturesState {
 	switch status {
 	case features_pb.FeaturesState_FEATURES_STATE_ACTIVE:
 		return domain.FeaturesStateActive
