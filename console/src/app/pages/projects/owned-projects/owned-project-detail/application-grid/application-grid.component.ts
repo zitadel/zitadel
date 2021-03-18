@@ -1,10 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable } from 'rxjs';
+import { finalize, map } from 'rxjs/operators';
 import { App, OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
-
-import { NATIVE_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../../../apps/authtypes';
 
 @Component({
     selector: 'app-application-grid',
@@ -18,11 +16,7 @@ export class ApplicationGridComponent implements OnInit {
     public appsSubject: BehaviorSubject<App.AsObject[]> = new BehaviorSubject<App.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    public OIDCApplicationType: any = OIDCAppType;
-
-    public NATIVE_TYPE: any = NATIVE_TYPE;
-    public WEB_TYPE: any = WEB_TYPE;
-    public USER_AGENT_TYPE: any = USER_AGENT_TYPE;
+    public OIDCAppType: any = OIDCAppType;
 
     constructor(private mgmtService: ManagementService) { }
 
@@ -33,11 +27,13 @@ export class ApplicationGridComponent implements OnInit {
     public loadApps(): void {
         from(this.mgmtService.listApps(this.projectId, 100, 0)).pipe(
             map(resp => {
+                console.log(resp.resultList);
                 return resp.resultList;
             }),
-            catchError(() => of([])),
+            // catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe((apps) => {
+            console.log(apps);
             this.appsSubject.next(apps as App.AsObject[]);
         });
     }

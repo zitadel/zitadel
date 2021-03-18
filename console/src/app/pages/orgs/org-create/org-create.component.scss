@@ -110,6 +110,17 @@ h1 {
         margin: 0 .5rem;
       }
     }
+
+    .pwd-form {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      .pwd {
+        flex: 1;
+        margin: 0 .5rem;
+      }
+    }
   }
 }
 

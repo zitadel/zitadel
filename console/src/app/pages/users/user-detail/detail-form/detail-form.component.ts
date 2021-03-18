@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Gender, User } from 'src/app/proto/generated/zitadel/user_pb';
+import { Gender, Human, User } from 'src/app/proto/generated/zitadel/user_pb';
 
 
 @Component({
@@ -11,7 +11,7 @@ import { Gender, User } from 'src/app/proto/generated/zitadel/user_pb';
 })
 export class DetailFormComponent implements OnDestroy, OnChanges {
     @Input() public username!: string;
-    @Input() public user!: User;
+    @Input() public user!: Human.AsObject;
     @Input() public disabled: boolean = false;
     @Input() public genders: Gender[] = [];
     @Input() public languages: string[] = ['de', 'en'];
@@ -47,7 +47,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
             preferredLanguage: [{ value: '', disabled: this.disabled }],
         });
 
-        this.profileForm.patchValue({ userName: this.username, ...this.user });
+        this.profileForm.patchValue({ userName: this.username, ...this.user.profile });
 
         if (this.preferredLanguage) {
             this.sub = this.preferredLanguage.valueChanges.subscribe(value => {

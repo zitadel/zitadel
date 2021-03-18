@@ -41,7 +41,7 @@ func (s *Server) SetMyPhone(ctx context.Context, req *auth_pb.SetMyPhoneRequest)
 
 func (s *Server) VerifyMyPhone(ctx context.Context, req *auth_pb.VerifyMyPhoneRequest) (*auth_pb.VerifyMyPhoneResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	_, err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.OrgID)
+	_, err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

@@ -8,6 +8,7 @@ import (
 
 func ModelPasswordAgePolicyToPb(policy *model.PasswordAgePolicyView) *policy_pb.PasswordAgePolicy {
 	return &policy_pb.PasswordAgePolicy{
+		IsDefault:      policy.Default,
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
 		Details: object.ToViewDetailsPb(

@@ -25,6 +25,7 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 	if err != nil {
 		return nil, err
 	}
+	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	domains, err := s.project.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err

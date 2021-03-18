@@ -1556,7 +1556,6 @@ export class ManagementService {
         if (offset) {
             query.setOffset(offset);
         }
-
         req.setQuery(query);
         if (queryList) {
             req.setQueriesList(queryList);

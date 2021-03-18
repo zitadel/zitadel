@@ -171,7 +171,7 @@ Errors:
     Invalid: Project is invalid
     NotActive: Project is not active
     NotInactive: Project is not deactivated
-    NotFound: Porject not found
+    NotFound: Project not found
     UserIDMissing: User ID missing
     Member:
       NotFound: Project member not found

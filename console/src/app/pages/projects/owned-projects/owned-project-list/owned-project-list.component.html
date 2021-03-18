@@ -41,16 +41,16 @@
 
                 <ng-container matColumnDef="state">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.STATE' | translate }} </th>
-                    <td mat-cell *matCellDef="let project"><span
-                            *ngIf="project.state">{{'PROJECT.STATE.'+project.state | translate}}</span></td>
+                    <td mat-cell *matCellDef="let project"><span *ngIf="project.state">{{'PROJECT.STATE.'+project.state
+                            | translate}}</span></td>
                 </ng-container>
 
 
                 <ng-container matColumnDef="creationDate">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CREATIONDATE' | translate }} </th>
                     <td mat-cell *matCellDef="let project">
-                        <span
-                            *ngIf="project.creationDate">{{project.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
+                        <span *ngIf="project.details.creationDate">{{project.details.creationDate | timestampToDate |
+                            localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
                     </td>
                 </ng-container>
 
@@ -58,8 +58,8 @@
                 <ng-container matColumnDef="changeDate">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CHANGEDATE' | translate }} </th>
                     <td mat-cell *matCellDef="let project">
-                        <span
-                            *ngIf="project.changeDate">{{project.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
+                        <span *ngIf="project.details.changeDate">{{project.details.changeDate | timestampToDate |
+                            localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
                     </td>
                 </ng-container>
 

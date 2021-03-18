@@ -39,14 +39,10 @@
         </table>
     </app-refresh-table>
     <div class="add-row">
-        <button class="button" *ngIf="otpAvailable" (click)="addOTP()" mat-stroked-button color="primary"
+        <button class="button" *ngIf="otpAvailable" (click)="addAuthFactor()" mat-raised-button color="primary"
             matTooltip="{{'ACTIONS.NEW' | translate}}">
-            <mat-icon class="icon" svgIcon="mdi_radar"></mat-icon>{{'USER.MFA.OTP' | translate}}
-        </button>
-        <button class="button" (click)="addU2F()" mat-stroked-button color="primary"
-            matTooltip="{{'ACTIONS.NEW' | translate}}">
-            <i class="las la-fingerprint"></i>
-            {{'USER.MFA.U2F' | translate}}
+            <mat-icon class="icon">add</mat-icon>
+            {{'USER.MFA.OTP' | translate}}
         </button>
     </div>
     <div class="table-wrapper">

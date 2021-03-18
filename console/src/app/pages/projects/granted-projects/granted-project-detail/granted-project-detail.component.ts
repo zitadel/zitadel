@@ -7,7 +7,6 @@ import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
-import { ProjectType } from 'src/app/modules/project-members/project-members.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
@@ -26,7 +25,6 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     public project!: GrantedProject.AsObject;
 
     public ProjectState: any = ProjectState;
-    public ProjectType: any = ProjectType;
     public ChangeType: any = ChangeType;
 
     private subscription?: Subscription;

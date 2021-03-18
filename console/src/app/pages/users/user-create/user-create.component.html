@@ -19,7 +19,7 @@
                 <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}*</cnsl-label>
                 <input cnslInput formControlName="userName" required
                     [ngStyle]="{'padding-right': suffixPadding ? suffixPadding : '10px'}" />
-                <span #suffix *ngIf="envSuffixLabel" cnslSuffix (click)="logsuff()">{{envSuffixLabel}}</span>
+                <span #suffix *ngIf="envSuffixLabel" cnslSuffix>{{envSuffixLabel}}</span>
 
                 <span cnsl-error *ngIf="userName?.invalid && userName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
@@ -88,8 +88,8 @@
             </cnsl-form-field>
         </div>
         <div class="btn-container">
-            <button color="primary" [disabled]="userForm.invalid" type="submit"
-                mat-raised-button>{{ 'ACTIONS.CREATE' | translate }}</button>
+            <button color="primary" [disabled]="userForm.invalid" type="submit" mat-raised-button>{{ 'ACTIONS.CREATE' |
+                translate }}</button>
         </div>
     </form>
 </app-detail-layout>

@@ -50,11 +50,17 @@ func UpdateProjectGrantRequestToDomain(req *mgmt_pb.UpdateProjectGrantRequest) *
 func ListProjectGrantMembersRequestToModel(req *mgmt_pb.ListProjectGrantMembersRequest) *proj_model.ProjectGrantMemberSearchRequest {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries := member_grpc.MemberQueriesToProjectGrantMember(req.Queries)
-	queries = append(queries, &proj_model.ProjectGrantMemberSearchQuery{
-		Key:    proj_model.ProjectGrantMemberSearchKeyProjectID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.ProjectId,
-	})
+	queries = append(queries,
+		&proj_model.ProjectGrantMemberSearchQuery{
+			Key:    proj_model.ProjectGrantMemberSearchKeyProjectID,
+			Method: domain.SearchMethodEquals,
+			Value:  req.ProjectId,
+		},
+		&proj_model.ProjectGrantMemberSearchQuery{
+			Key:    proj_model.ProjectGrantMemberSearchKeyGrantID,
+			Method: domain.SearchMethodEquals,
+			Value:  req.GrantId,
+		})
 	return &proj_model.ProjectGrantMemberSearchRequest{
 		Offset: offset,
 		Limit:  limit,
