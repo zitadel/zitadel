@@ -1,13 +1,17 @@
 <div class="wrapper max-width-container">
     <div class="header" *ngIf="(authService.user | async) || {} as user">
-        <app-avatar [routerLink]="['/users/me']" *ngIf="user && (user.displayName || (user.firstName && user.lastName))"
-            class="avatar" [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)"
+        <app-avatar [routerLink]="['/users/me']"
+            *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
+            class="avatar"
+            [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
             [size]="100">
         </app-avatar>
-        <h3 *ngIf="(user.displayName || user.firstName || user.lastName); else loader">
+        <h3
+            *ngIf="user && (user.human?.profile?.displayName || user.human?.profile?.firstName || user.human?.profile?.lastName); else loader">
             {{'HOME.WELCOME' | translate}},
-            {{user?.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)}}</h3>
-        <p>{{user?.userName}}</p>
+            {{user?.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + '
+            '+ user.human?.profile?.lastName)}}</h3>
+        <p>{{user?.human?.profile?.userName}}</p>
 
         <p class="wlc_stnce">{{'HOME.WELCOMESENTENCE' | translate}}</p>
         <ng-template #loader>

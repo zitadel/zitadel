@@ -126,6 +126,7 @@ export class MachineKeysComponent implements OnInit {
         if (this.userId) {
             this.mgmtService.listMachineKeys(this.userId, limit, offset).then(resp => {
                 this.keyResult = resp;
+                console.log(resp);
                 if (resp.resultList) {
                     this.dataSource.data = resp.resultList;
                 }

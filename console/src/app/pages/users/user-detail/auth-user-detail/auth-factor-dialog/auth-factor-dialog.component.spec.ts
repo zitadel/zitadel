@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { OwnedProjectListComponent } from './owned-project-list.component';
+import { AuthFactorDialogComponent } from './auth-factor-dialog.component';
 
-describe('OwnedProjectListComponent', () => {
-    let component: OwnedProjectListComponent;
-    let fixture: ComponentFixture<OwnedProjectListComponent>;
+describe('CodeDialogComponent', () => {
+    let component: AuthFactorDialogComponent;
+    let fixture: ComponentFixture<AuthFactorDialogComponent>;
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [OwnedProjectListComponent],
+            declarations: [AuthFactorDialogComponent],
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(OwnedProjectListComponent);
+        fixture = TestBed.createComponent(AuthFactorDialogComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

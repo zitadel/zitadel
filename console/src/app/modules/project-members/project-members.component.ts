@@ -11,12 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CreationType, MemberCreateDialogComponent } from '../add-member-dialog/member-create-dialog.component';
-import { ProjectMembersDataSource } from './project-members-datasource';
-
-export enum ProjectType {
-    PROJECTTYPE_OWNED = "OWNED",
-    PROJECTTYPE_GRANTED = "GRANTED"
-}
+import { ProjectMembersDataSource, ProjectType } from './project-members-datasource';
 
 @Component({
     selector: 'app-project-members',

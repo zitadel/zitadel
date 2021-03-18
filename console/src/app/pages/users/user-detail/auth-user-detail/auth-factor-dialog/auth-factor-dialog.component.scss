@@ -1,0 +1,35 @@
+.type-selection {
+    display: flex;
+    margin: 0 -0.5rem;
+
+    .otp,
+    .u2f {
+        flex: 1;
+        min-height: 100px;
+        border-radius: .5rem;
+        border: 1px solid var(--grey);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+        margin: .5rem;
+    }
+}
+
+.formfield {
+  width: 100%;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: .5rem;
+  }
+
+  button {
+    border-radius: .5rem;
+  }
+}
