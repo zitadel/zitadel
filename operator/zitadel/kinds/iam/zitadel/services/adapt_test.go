@@ -155,11 +155,11 @@ func TestServices_AdaptEnsure1(t *testing.T) {
 		podSelectorLabels,
 		namespace,
 		grpcServiceName,
-		grpcPort,
+		uint16(grpcPort),
 		httpServiceName,
-		httpPort,
+		uint16(httpPort),
 		uiServiceName,
-		uiPort,
+		uint16(uiPort),
 	)
 
 	assert.NilError(t, err)
@@ -207,11 +207,11 @@ func TestServices_AdaptEnsure2(t *testing.T) {
 		podSelectorLabels,
 		namespace,
 		grpcServiceName,
-		grpcPort,
+		uint16(grpcPort),
 		httpServiceName,
-		httpPort,
+		uint16(httpPort),
 		uiServiceName,
-		uiPort)
+		uint16(uiPort))
 
 	assert.NilError(t, err)
 	ensure, err := query(client, nil)
@@ -258,11 +258,11 @@ func TestServices_AdaptEnsure3(t *testing.T) {
 		podSelectorLabels,
 		namespace,
 		grpcServiceName,
-		grpcPort,
+		uint16(grpcPort),
 		httpServiceName,
-		httpPort,
+		uint16(httpPort),
 		uiServiceName,
-		uiPort)
+		uint16(uiPort))
 
 	assert.NilError(t, err)
 	ensure, err := query(client, nil)
@@ -309,11 +309,11 @@ func TestServices_AdaptDestroy1(t *testing.T) {
 		podSelectorLabels,
 		namespace,
 		grpcServiceName,
-		grpcPort,
+		uint16(grpcPort),
 		httpServiceName,
-		httpPort,
+		uint16(httpPort),
 		uiServiceName,
-		uiPort)
+		uint16(uiPort))
 
 	assert.NilError(t, err)
 	assert.NilError(t, destroy(client))
@@ -358,11 +358,11 @@ func TestServices_AdaptDestroy2(t *testing.T) {
 		podSelectorLabels,
 		namespace,
 		grpcServiceName,
-		grpcPort,
+		uint16(grpcPort),
 		httpServiceName,
-		httpPort,
+		uint16(httpPort),
 		uiServiceName,
-		uiPort)
+		uint16(uiPort))
 
 	assert.NilError(t, err)
 	assert.NilError(t, destroy(client))
@@ -407,11 +407,11 @@ func TestServices_AdaptDestroy3(t *testing.T) {
 		podSelectorLabels,
 		namespace,
 		grpcServiceName,
-		grpcPort,
+		uint16(grpcPort),
 		httpServiceName,
-		httpPort,
+		uint16(httpPort),
 		uiServiceName,
-		uiPort)
+		uint16(uiPort))
 
 	assert.NilError(t, err)
 	assert.NilError(t, destroy(client))

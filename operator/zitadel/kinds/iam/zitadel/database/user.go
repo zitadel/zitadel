@@ -37,8 +37,6 @@ func (c *CrdClient) DeleteUser(monitor mntr.Monitor, user string, k8sClient kube
 		monitor,
 		user,
 		k8sClient,
-		c.Namespace,
-		c.Name,
 	)
 }
 
@@ -47,8 +45,6 @@ func (c *CrdClient) AddUser(monitor mntr.Monitor, user string, k8sClient kuberne
 		monitor,
 		user,
 		k8sClient,
-		c.Namespace,
-		c.Name,
 	)
 }
 
@@ -56,7 +52,5 @@ func (c *CrdClient) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientI
 	return databases.CrdListUsers(
 		monitor,
 		k8sClient,
-		c.Namespace,
-		c.Name,
 	)
 }

@@ -2,7 +2,7 @@ package cmds
 
 import (
 	"context"
-	"flag"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/orb"
@@ -11,13 +11,14 @@ import (
 )
 
 type RootValues struct {
-	Ctx         context.Context
-	Version     string
-	Monitor     mntr.Monitor
-	OrbConfig   *orb.Orb
-	GitClient   *git.Client
-	MetricsAddr string
-	ErrFunc     errFunc
+	Ctx        context.Context
+	Monitor    mntr.Monitor
+	Version    string
+	Gitops     bool
+	OrbConfig  *orb.Orb
+	GitClient  *git.Client
+	Kubeconfig string
+	ErrFunc    errFunc
 }
 
 type GetRootValues func() (*RootValues, error)
@@ -27,11 +28,25 @@ type errFunc func(err error) error
 func RootCommand(version string) (*cobra.Command, GetRootValues) {
 
 	var (
-		verbose       bool
+		ctx     = context.Background()
+		monitor = mntr.Monitor{
+			OnInfo:   mntr.LogMessage,
+			OnChange: mntr.LogMessage,
+			OnError:  mntr.LogError,
+		}
+		rv = &RootValues{
+			Ctx:     ctx,
+			Version: version,
+			ErrFunc: func(err error) error {
+				if err != nil {
+					monitor.Error(err)
+				}
+				return nil
+			},
+		}
 		orbConfigPath string
-		metricsAddr   string
+		verbose       bool
 	)
-
 	cmd := &cobra.Command{
 		Use:   "zitadelctl [flags]",
 		Short: "Interact with your IAM orbs",
@@ -50,44 +65,31 @@ $ orbctl -f ~/.orb/myorb [command]
 	}
 
 	flags := cmd.PersistentFlags()
+	flags.BoolVar(&rv.Gitops, "gitops", false, "Run orbctl in gitops mode. Not specifying this flag is only supported for BOOM and Networking Operator")
 	flags.StringVarP(&orbConfigPath, "orbconfig", "f", "~/.orb/config", "Path to the file containing the orbs git repo URL, deploy key and the master key for encrypting and decrypting secrets")
+	flags.StringVarP(&rv.Kubeconfig, "kubeconfig", "k", "~/.kube/config", "Path to the kubeconfig file to the cluster orbctl should target")
 	flags.BoolVar(&verbose, "verbose", false, "Print debug levelled logs")
-	flag.StringVar(&metricsAddr, "metrics-addr", "", "The address the metric endpoint binds to.")
 
 	return cmd, func() (*RootValues, error) {
-
-		monitor := mntr.Monitor{
-			OnInfo:   mntr.LogMessage,
-			OnChange: mntr.LogMessage,
-			OnError:  mntr.LogError,
-		}
 
 		if verbose {
 			monitor = monitor.Verbose()
 		}
 
-		prunedPath := helpers.PruneHome(orbConfigPath)
-		orbConfig, err := orb.ParseOrbConfig(prunedPath)
-		if err != nil {
-			orbConfig = &orb.Orb{Path: prunedPath}
-			return nil, err
+		rv.Monitor = monitor
+		rv.Kubeconfig = helpers.PruneHome(rv.Kubeconfig)
+		rv.GitClient = git.New(ctx, monitor, "orbos", "orbos@caos.ch")
+
+		if rv.Gitops {
+			prunedPath := helpers.PruneHome(orbConfigPath)
+			orbConfig, err := orb.ParseOrbConfig(prunedPath)
+			if err != nil {
+				orbConfig = &orb.Orb{Path: prunedPath}
+				return nil, err
+			}
+			rv.OrbConfig = orbConfig
 		}
 
-		ctx := context.Background()
-
-		return &RootValues{
-			Version:     version,
-			Ctx:         ctx,
-			Monitor:     monitor,
-			OrbConfig:   orbConfig,
-			GitClient:   git.New(ctx, monitor, "orbos", "orbos@caos.ch"),
-			MetricsAddr: metricsAddr,
-			ErrFunc: func(err error) error {
-				if err != nil {
-					monitor.Error(err)
-				}
-				return nil
-			},
-		}, nil
+		return rv, nil
 	}
 }

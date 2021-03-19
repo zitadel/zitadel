@@ -1,11 +1,12 @@
 package cmds
 
 import (
+	"io/ioutil"
+
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator/api"
-	"github.com/caos/zitadel/operator/start"
+	"github.com/caos/zitadel/operator/crtlgitops"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 )
 
 func BackupCommand(getRv GetRootValues) *cobra.Command {
@@ -60,7 +61,7 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 
 			k8sClient := kubernetes.NewK8sClient(monitor, &kubeconfigStr)
 			if k8sClient.Available() {
-				if err := start.Backup(
+				if err := crtlgitops.Backup(
 					monitor,
 					orbConfig.Path,
 					k8sClient,

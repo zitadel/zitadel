@@ -1,12 +1,12 @@
-package controller
+package crtlcrd
 
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	databasev1 "github.com/caos/zitadel/operator/api/database/v1"
 	zitadelv1 "github.com/caos/zitadel/operator/api/zitadel/v1"
-	"github.com/caos/zitadel/operator/controller/database"
-	"github.com/caos/zitadel/operator/controller/zitadel"
+	"github.com/caos/zitadel/operator/crtlcrd/database"
+	"github.com/caos/zitadel/operator/crtlcrd/zitadel"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -42,11 +42,13 @@ func Start(monitor mntr.Monitor, version, metricsAddr string, features ...string
 		return errors.Wrap(err, "unable to start manager")
 	}
 
+	k8sClient := kubernetes.NewK8sClientWithConfig(monitor, cfg)
+
 	for _, feature := range features {
 		switch feature {
 		case Database:
 			if err = (&database.Reconciler{
-				ClientInt: kubernetes.NewK8sClientWithConfig(monitor, cfg),
+				ClientInt: k8sClient,
 				Monitor:   monitor,
 				Scheme:    mgr.GetScheme(),
 				Version:   version,
@@ -55,7 +57,7 @@ func Start(monitor mntr.Monitor, version, metricsAddr string, features ...string
 			}
 		case Zitadel:
 			if err = (&zitadel.Reconciler{
-				ClientInt: kubernetes.NewK8sClientWithConfig(monitor, cfg),
+				ClientInt: k8sClient,
 				Monitor:   monitor,
 				Scheme:    mgr.GetScheme(),
 				Version:   version,

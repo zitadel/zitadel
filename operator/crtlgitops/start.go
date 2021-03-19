@@ -1,12 +1,13 @@
-package start
+package crtlgitops
 
 import (
 	"context"
+	"runtime/debug"
+	"time"
+
 	"github.com/caos/zitadel/operator/database"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	"github.com/caos/zitadel/operator/zitadel"
-	"runtime/debug"
-	"time"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"

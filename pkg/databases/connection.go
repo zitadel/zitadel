@@ -14,10 +14,8 @@ import (
 func CrdGetConnectionInfo(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
-	namespace string,
-	name string,
 ) (string, string, error) {
-	desired, err := database.ReadCrd(k8sClient, namespace, name)
+	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
 		return "", "", err
 	}
@@ -46,7 +44,7 @@ func getConnectionInfo(
 ) (string, string, error) {
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
+	query, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
 	if err != nil {
 		return "", "", err
 	}

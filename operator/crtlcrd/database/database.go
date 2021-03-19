@@ -1,13 +1,14 @@
-package zitadel
+package database
 
 import (
 	"context"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api/zitadel"
-	v1 "github.com/caos/zitadel/operator/api/zitadel/v1"
-	orbz "github.com/caos/zitadel/operator/zitadel/kinds/orb"
+	"github.com/caos/zitadel/operator/api/database"
+	v1 "github.com/caos/zitadel/operator/api/database/v1"
+	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -21,13 +22,17 @@ type Reconciler struct {
 
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	internalMonitor := r.Monitor.WithFields(map[string]interface{}{
-		"kind":      "zitadel",
+		"kind":      "database",
 		"namespace": req.NamespacedName,
 	})
 
-	desired, err := zitadel.ReadCrd(r.ClientInt, req.Namespace, req.Name)
+	desired, err := database.ReadCrd(r.ClientInt)
+	if err != nil {
+		internalMonitor.Error(err)
+		return ctrl.Result{}, err
+	}
 
-	query, _, _, err := orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"})(internalMonitor, desired, &tree.Tree{})
+	query, _, _, _, err := orbdb.AdaptFunc("", &r.Version, false, "database")(internalMonitor, desired, &tree.Tree{})
 	if err != nil {
 		internalMonitor.Error(err)
 		return ctrl.Result{}, err
@@ -49,6 +54,6 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 
 func (r *Reconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&v1.Zitadel{}).
+		For(&v1.Database{}).
 		Complete(r)
 }

@@ -14,10 +14,8 @@ import (
 func CrdListUsers(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
-	namespace string,
-	name string,
 ) ([]string, error) {
-	desired, err := database.ReadCrd(k8sClient, namespace, name)
+	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
 		monitor.Error(err)
 		return nil, err
@@ -47,7 +45,7 @@ func listUsers(
 ) ([]string, error) {
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
+	query, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
 	if err != nil {
 		return nil, err
 	}
@@ -81,10 +79,8 @@ func CrdAddUser(
 	monitor mntr.Monitor,
 	user string,
 	k8sClient kubernetes.ClientInt,
-	namespace string,
-	name string,
 ) error {
-	desired, err := database.ReadCrd(k8sClient, namespace, name)
+	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
 		monitor.Error(err)
 		return err
@@ -114,7 +110,7 @@ func addUser(
 ) error {
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
+	query, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
 	if err != nil {
 		return err
 	}
@@ -159,10 +155,8 @@ func CrdDeleteUser(
 	monitor mntr.Monitor,
 	user string,
 	k8sClient kubernetes.ClientInt,
-	namespace string,
-	name string,
 ) error {
-	desired, err := database.ReadCrd(k8sClient, namespace, name)
+	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
 		monitor.Error(err)
 		return err
@@ -179,7 +173,7 @@ func deleteUser(
 ) error {
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
+	query, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
 	if err != nil {
 		return err
 	}

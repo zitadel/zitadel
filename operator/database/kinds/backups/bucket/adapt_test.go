@@ -1,6 +1,8 @@
 package bucket
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
@@ -13,7 +15,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
-	"testing"
 )
 
 func TestBucket_Secrets(t *testing.T) {
@@ -60,7 +61,7 @@ func TestBucket_Secrets(t *testing.T) {
 		"serviceaccountjson": saJson,
 	}
 
-	_, _, secrets, err := AdaptFunc(
+	_, _, secrets, existing, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,
@@ -78,6 +79,7 @@ func TestBucket_Secrets(t *testing.T) {
 	assert.NoError(t, err)
 	for key, value := range allSecrets {
 		assert.Contains(t, secrets, key)
+		assert.Contains(t, existing, key)
 		assert.Equal(t, value, secrets[key].Value)
 	}
 }
@@ -131,7 +133,7 @@ func TestBucket_AdaptBackup(t *testing.T) {
 
 	SetBackup(client, namespace, k8sLabels, saJson)
 
-	query, _, _, err := AdaptFunc(
+	query, _, _, _, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,
@@ -205,7 +207,7 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 
 	SetInstantBackup(client, namespace, backupName, k8sLabels, saJson)
 
-	query, _, _, err := AdaptFunc(
+	query, _, _, _, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,
@@ -280,7 +282,7 @@ func TestBucket_AdaptRestore(t *testing.T) {
 
 	SetRestore(client, namespace, backupName, k8sLabels, saJson)
 
-	query, _, _, err := AdaptFunc(
+	query, _, _, _, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,
@@ -355,7 +357,7 @@ func TestBucket_AdaptClean(t *testing.T) {
 
 	SetClean(client, namespace, backupName, k8sLabels, saJson)
 
-	query, _, _, err := AdaptFunc(
+	query, _, _, _, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,
