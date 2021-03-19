@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	key_model "github.com/caos/zitadel/internal/key/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 
 	"github.com/caos/zitadel/internal/user/model"
@@ -43,7 +44,7 @@ type UserRepository interface {
 
 	UserByID(ctx context.Context, userID string) (*model.UserView, error)
 
-	MachineKeyByID(ctx context.Context, keyID string) (*model.MachineKeyView, error)
+	MachineKeyByID(ctx context.Context, keyID string) (*key_model.AuthNKeyView, error)
 }
 
 type myUserRepo interface {
@@ -89,4 +90,6 @@ type myUserRepo interface {
 	ChangeMyUsername(ctx context.Context, username string) error
 
 	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
+
+	SearchMyUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
 }

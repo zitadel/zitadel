@@ -1,8 +1,7 @@
 <script>
 	import { afterUpdate } from 'svelte';
 	import Icon from './Icon.svelte';
-    import CodeTable from './CodeTable.svelte';
-	export let dir = '';
+    export let dir = '';
 	export let sections = [];
 	export let active_section = null;
 	export let show_contents;

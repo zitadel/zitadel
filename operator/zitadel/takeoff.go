@@ -2,6 +2,7 @@ package zitadel
 
 import (
 	"errors"
+
 	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
@@ -10,7 +11,12 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 )
 
-func Takeoff(monitor mntr.Monitor, gitClient *git.Client, adapt operator.AdaptFunc, k8sClient *kubernetes.Client) func() error {
+func Takeoff(
+	monitor mntr.Monitor,
+	gitClient *git.Client,
+	adapt operator.AdaptFunc,
+	k8sClient *kubernetes.Client,
+) func() error {
 	return func() error {
 		internalMonitor := monitor.WithField("operator", "zitadel")
 		internalMonitor.Info("Takeoff")
@@ -26,7 +32,7 @@ func Takeoff(monitor mntr.Monitor, gitClient *git.Client, adapt operator.AdaptFu
 			return err
 		}
 
-		query, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
+		query, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
 		if err != nil {
 			internalMonitor.Error(err)
 			return err

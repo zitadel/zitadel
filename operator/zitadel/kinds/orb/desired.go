@@ -22,13 +22,7 @@ type Spec struct {
 	GitOps          bool                `json:"gitops,omitempty" yaml:"gitops,omitempty"`
 	//Use this registry to pull the zitadel operator image from
 	//@default: ghcr.io
-	CustomImageRegistry string       `json:"customImageRegistry,omitempty" yaml:"customImageRegistry,omitempty"`
-	DatabaseCrd         *DatabaseCrd `json:"databaseCrd,omitempty" yaml:"databaseCrd,omitempty"`
-}
-
-type DatabaseCrd struct {
-	Name      string `json:"name,omitempty" yaml:"name,omitempty"`
-	Namespace string `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	CustomImageRegistry string `json:"customImageRegistry,omitempty" yaml:"customImageRegistry,omitempty"`
 }
 
 func ParseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {

@@ -24,7 +24,7 @@ func Restore(
 	}
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc(name, nil, false, "restore")(monitor, desired, current)
+	query, _, _, _, err := orbdb.AdaptFunc(name, nil, false, "restore")(monitor, desired, current)
 	if err != nil {
 		monitor.Error(err)
 		return err

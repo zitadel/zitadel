@@ -28,6 +28,7 @@ func GetQueryAndDestroyFuncs(
 	operator.QueryFunc,
 	operator.DestroyFunc,
 	map[string]*secret.Secret,
+	map[string]*secret.Existing,
 	error,
 ) {
 	switch desiredTree.Common.Kind {
@@ -50,7 +51,7 @@ func GetQueryAndDestroyFuncs(
 			features,
 		)(monitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
 	}
 }
 

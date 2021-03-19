@@ -2,7 +2,9 @@ package model
 
 import (
 	"encoding/json"
+
 	"github.com/caos/logging"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 )
@@ -14,6 +16,7 @@ type Application struct {
 	Name       string      `json:"name,omitempty"`
 	Type       int32       `json:"appType,omitempty"`
 	OIDCConfig *OIDCConfig `json:"-"`
+	APIConfig  *APIConfig  `json:"-"`
 }
 
 type ApplicationID struct {
@@ -66,6 +69,9 @@ func AppFromModel(app *model.Application) *Application {
 	if app.OIDCConfig != nil {
 		converted.OIDCConfig = OIDCConfigFromModel(app.OIDCConfig)
 	}
+	if app.APIConfig != nil {
+		converted.APIConfig = APIConfigFromModel(app.APIConfig)
+	}
 	return converted
 }
 
@@ -79,6 +85,9 @@ func AppToModel(app *Application) *model.Application {
 	}
 	if app.OIDCConfig != nil {
 		converted.OIDCConfig = OIDCConfigToModel(app.OIDCConfig)
+	}
+	if app.APIConfig != nil {
+		converted.APIConfig = APIConfigToModel(app.APIConfig)
 	}
 	return converted
 }
@@ -101,7 +110,7 @@ func (p *Project) appendChangeAppEvent(event *es_models.Event) error {
 		return err
 	}
 	if i, a := GetApplication(p.Applications, app.AppID); a != nil {
-		p.Applications[i].setData(event)
+		return p.Applications[i].setData(event)
 	}
 	return nil
 }

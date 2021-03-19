@@ -2,8 +2,11 @@ package cmds
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/caos/orbos/pkg/kubernetes/cli"
 
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/secrets"
@@ -50,28 +53,25 @@ orbctl writesecret mygceprovider.google_application_credentials_value --value "$
 			return nil
 		}
 
-		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-			monitor.Error(err)
-			return nil
-		}
-
-		if err := gitClient.Clone(); err != nil {
-			monitor.Error(err)
-			return nil
-		}
-
 		path := ""
 		if len(args) > 0 {
 			path = args[0]
 		}
 
+		k8sClient, _, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+		if err != nil && !rv.Gitops {
+			return err
+		}
+
 		if err := secret.Write(
 			monitor,
-			gitClient,
+			k8sClient,
 			path,
 			s,
-			secrets.GetAllSecretsFunc(orbConfig),
-			secrets.PushFunc(),
+			"zitadelctl",
+			fmt.Sprintf(rv.Version),
+			secrets.GetAllSecretsFunc(monitor, rv.Gitops, gitClient, k8sClient, orbConfig),
+			secrets.PushFunc(monitor, rv.Gitops, gitClient, k8sClient),
 		); err != nil {
 			monitor.Error(err)
 		}

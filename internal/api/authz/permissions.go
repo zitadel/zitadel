@@ -2,7 +2,6 @@ package authz
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -16,41 +15,43 @@ func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPer
 	}
 
 	ctx = context.WithValue(ctx, dataKey, ctxData)
-	grant, err := t.ResolveGrant(ctx)
+	memberships, err := t.SearchMyMemberships(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
-	if grant == nil {
+	if len(memberships) == 0 {
 		return requestedPermissions, nil, nil
 	}
-	requestedPermissions, allPermissions = mapGrantToPermissions(requiredPerm, grant, authConfig)
+	requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, memberships, authConfig)
 	return requestedPermissions, allPermissions, nil
 }
 
-func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig Config) (requestPermissions, allPermissions []string) {
+func mapMembershipsToPermissions(requiredPerm string, memberships []*Membership, authConfig Config) (requestPermissions, allPermissions []string) {
 	requestPermissions = make([]string, 0)
 	allPermissions = make([]string, 0)
-	for _, role := range grant.Roles {
-		requestPermissions, allPermissions = mapRoleToPerm(requiredPerm, role, authConfig, requestPermissions, allPermissions)
+	for _, membership := range memberships {
+		requestPermissions, allPermissions = mapMembershipToPerm(requiredPerm, membership, authConfig, requestPermissions, allPermissions)
 	}
 
 	return requestPermissions, allPermissions
 }
 
-func mapRoleToPerm(requiredPerm, actualRole string, authConfig Config, requestPermissions, allPermissions []string) ([]string, []string) {
-	roleName, roleContextID := SplitPermission(actualRole)
-	perms := authConfig.getPermissionsFromRole(roleName)
+func mapMembershipToPerm(requiredPerm string, membership *Membership, authConfig Config, requestPermissions, allPermissions []string) ([]string, []string) {
+	roleNames, roleContextID := roleWithContext(membership)
+	for _, roleName := range roleNames {
+		perms := authConfig.getPermissionsFromRole(roleName)
 
-	for _, p := range perms {
-		permWithCtx := addRoleContextIDToPerm(p, roleContextID)
-		if !ExistsPerm(allPermissions, permWithCtx) {
-			allPermissions = append(allPermissions, permWithCtx)
-		}
+		for _, p := range perms {
+			permWithCtx := addRoleContextIDToPerm(p, roleContextID)
+			if !ExistsPerm(allPermissions, permWithCtx) {
+				allPermissions = append(allPermissions, permWithCtx)
+			}
 
-		p, _ = SplitPermission(p)
-		if p == requiredPerm {
-			if !ExistsPerm(requestPermissions, permWithCtx) {
-				requestPermissions = append(requestPermissions, permWithCtx)
+			p, _ = SplitPermission(p)
+			if p == requiredPerm {
+				if !ExistsPerm(requestPermissions, permWithCtx) {
+					requestPermissions = append(requestPermissions, permWithCtx)
+				}
 			}
 		}
 	}
@@ -71,4 +72,11 @@ func ExistsPerm(existingPermissions []string, perm string) bool {
 		}
 	}
 	return false
+}
+
+func roleWithContext(membership *Membership) (roles []string, ctxID string) {
+	if membership.MemberType == MemberTypeProject || membership.MemberType == MemberTypeProjectGrant {
+		return membership.Roles, membership.ObjectID
+	}
+	return membership.Roles, ""
 }

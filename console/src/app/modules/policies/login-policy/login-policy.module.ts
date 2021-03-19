@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -15,6 +16,8 @@ import { IdpTableModule } from 'src/app/modules/idp-table/idp-table.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MfaTableModule } from 'src/app/modules/mfa-table/mfa-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
+import { InfoSectionModule } from '../../info-section/info-section.module';
+import { LinksModule } from '../../links/links.module';
 
 import { AddIdpDialogModule } from './add-idp-dialog/add-idp-dialog.module';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
@@ -25,6 +28,7 @@ import { LoginPolicyComponent } from './login-policy.component';
     imports: [
         LoginPolicyRoutingModule,
         CommonModule,
+        InfoSectionModule,
         FormsModule,
         CardModule,
         InputModule,
@@ -41,6 +45,8 @@ import { LoginPolicyComponent } from './login-policy.component';
         MfaTableModule,
         MatProgressSpinnerModule,
         MatSelectModule,
+        MatRippleModule,
+        LinksModule,
     ],
 })
 export class LoginPolicyModule { }

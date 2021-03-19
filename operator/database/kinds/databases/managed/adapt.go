@@ -1,9 +1,10 @@
 package managed
 
 import (
-	"github.com/caos/zitadel/operator"
 	"strconv"
 	"strings"
+
+	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/pkg/labels"
 
@@ -51,6 +52,7 @@ func AdaptFunc(
 	operator.QueryFunc,
 	operator.DestroyFunc,
 	map[string]*secret.Secret,
+	map[string]*secret.Existing,
 	error,
 ) {
 
@@ -62,14 +64,19 @@ func AdaptFunc(
 		operator.QueryFunc,
 		operator.DestroyFunc,
 		map[string]*secret.Secret,
+		map[string]*secret.Existing,
 		error,
 	) {
-		internalMonitor := monitor.WithField("kind", "cockroachdb")
-		allSecrets := map[string]*secret.Secret{}
+
+		var (
+			internalMonitor = monitor.WithField("kind", "cockroachdb")
+			allSecrets      = make(map[string]*secret.Secret)
+			allExisting     = make(map[string]*secret.Existing)
+		)
 
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
 
@@ -92,15 +99,15 @@ func AdaptFunc(
 
 		queryCert, destroyCert, addUser, deleteUser, listUsers, err := certificate.AdaptFunc(internalMonitor, namespace, componentLabels, desiredKind.Spec.ClusterDns, isFeatureDatabase)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		addRoot, err := addUser("root")
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		destroyRoot, err := deleteUser("root")
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 
 		queryRBAC, destroyRBAC, err := rbac.AdaptFunc(internalMonitor, namespace, labels.MustForName(componentLabels, serviceAccountName))
@@ -126,7 +133,7 @@ func AdaptFunc(
 			desiredKind.Spec.Resources,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 
 		queryS, destroyS, err := services.AdaptFunc(
@@ -147,12 +154,12 @@ func AdaptFunc(
 
 		queryPDB, err := pdb.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, pdbName), cockroachSelector, "1")
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 
 		destroyPDB, err := pdb.AdaptFuncToDestroy(namespace, pdbName)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 
 		currentDB := &Current{
@@ -203,7 +210,7 @@ func AdaptFunc(
 			for backupName, desiredBackup := range desiredKind.Spec.Backups {
 				currentBackup := &tree.Tree{}
 				if timestamp == "" || !oneBackup || (timestamp != "" && strings.HasPrefix(timestamp, backupName)) {
-					queryB, destroyB, secrets, err := backups.GetQueryAndDestroyFuncs(
+					queryB, destroyB, secrets, existing, err := backups.GetQueryAndDestroyFuncs(
 						internalMonitor,
 						desiredBackup,
 						currentBackup,
@@ -218,10 +225,10 @@ func AdaptFunc(
 						features,
 					)
 					if err != nil {
-						return nil, nil, nil, err
+						return nil, nil, nil, nil, err
 					}
 
-					secret.AppendSecrets(backupName, allSecrets, secrets)
+					secret.AppendSecrets(backupName, allSecrets, secrets, allExisting, existing)
 					destroyers = append(destroyers, destroyB)
 					queriers = append(queriers, queryB)
 				}
@@ -251,6 +258,7 @@ func AdaptFunc(
 			},
 			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 			allSecrets,
+			allExisting,
 			nil
 	}
 }

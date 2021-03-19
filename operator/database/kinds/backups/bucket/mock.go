@@ -35,7 +35,7 @@ func SetInstantBackup(
 		},
 		StringData: map[string]string{secretKey: saJson},
 		Type:       "Opaque",
-	}).Times(1).Return(nil)
+	}).MinTimes(1).MaxTimes(1).Return(nil)
 
 	k8sClient.EXPECT().ApplyJob(gomock.Any()).Times(1).Return(nil)
 	k8sClient.EXPECT().GetJob(namespace, backup.GetJobName(backupName)).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, backup.GetJobName(backupName)))
@@ -57,7 +57,7 @@ func SetBackup(
 		},
 		StringData: map[string]string{secretKey: saJson},
 		Type:       "Opaque",
-	}).Times(1).Return(nil)
+	}).MinTimes(1).MaxTimes(1).Return(nil)
 	k8sClient.EXPECT().ApplyCronJob(gomock.Any()).Times(1).Return(nil)
 }
 
@@ -99,7 +99,7 @@ func SetRestore(
 		},
 		StringData: map[string]string{secretKey: saJson},
 		Type:       "Opaque",
-	}).Times(1).Return(nil)
+	}).MinTimes(1).MaxTimes(1).Return(nil)
 
 	k8sClient.EXPECT().ApplyJob(gomock.Any()).Times(1).Return(nil)
 	k8sClient.EXPECT().GetJob(namespace, restore.GetJobName(backupName)).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, restore.GetJobName(backupName)))

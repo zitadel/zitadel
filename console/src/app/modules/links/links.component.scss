@@ -1,0 +1,59 @@
+.next-steps {    
+    margin-top: 1rem;
+    h5 {
+        text-transform: uppercase;
+        font-size: 14px;
+        color: var(--grey);
+    }
+
+    .row {
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: .5rem;
+
+        .step {
+            min-width: 220px;
+            max-width: 280px;
+            padding: 1rem;
+            margin: 0 .5rem;
+            border: 1px solid var(--grey);
+            border-radius: .5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+            flex: 1;
+
+            h6 {
+                font-size: 1rem;
+                text-align: center;
+                margin: 0 0 1rem 0;
+            }
+
+            p {
+                font-size: 14px;
+                text-align: center;
+                color: var(--grey);
+            }
+
+            .fill-space {
+                flex: 1;
+            }
+
+            button {
+                display: block;
+                margin: auto;
+            }
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+        
+    }
+}

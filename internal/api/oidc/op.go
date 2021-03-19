@@ -2,8 +2,9 @@ package oidc
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"time"
+
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
@@ -32,11 +33,12 @@ type StorageConfig struct {
 }
 
 type EndpointConfig struct {
-	Auth       *Endpoint
-	Token      *Endpoint
-	Userinfo   *Endpoint
-	EndSession *Endpoint
-	Keys       *Endpoint
+	Auth          *Endpoint
+	Token         *Endpoint
+	Introspection *Endpoint
+	Userinfo      *Endpoint
+	EndSession    *Endpoint
+	Keys          *Endpoint
 }
 
 type Endpoint struct {
@@ -70,10 +72,10 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Re
 		),
 		op.WithCustomAuthEndpoint(op.NewEndpointWithURL(config.Endpoints.Auth.Path, config.Endpoints.Auth.URL)),
 		op.WithCustomTokenEndpoint(op.NewEndpointWithURL(config.Endpoints.Token.Path, config.Endpoints.Token.URL)),
+		op.WithCustomIntrospectionEndpoint(op.NewEndpointWithURL(config.Endpoints.Introspection.Path, config.Endpoints.Introspection.URL)),
 		op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(config.Endpoints.Userinfo.Path, config.Endpoints.Userinfo.URL)),
 		op.WithCustomEndSessionEndpoint(op.NewEndpointWithURL(config.Endpoints.EndSession.Path, config.Endpoints.EndSession.URL)),
 		op.WithCustomKeysEndpoint(op.NewEndpointWithURL(config.Endpoints.Keys.Path, config.Endpoints.Keys.URL)),
-		op.WithRetry(3, time.Duration(30*time.Second)),
 	)
 	logging.Log("OIDC-asf13").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create provider")
 	return provider

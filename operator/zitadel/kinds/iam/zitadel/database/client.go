@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -56,16 +57,12 @@ func (c *GitOpsClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kuberne
 }
 
 type CrdClient struct {
-	Monitor   mntr.Monitor
-	Name      string
-	Namespace string
+	Monitor mntr.Monitor
 }
 
-func NewCrdClient(monitor mntr.Monitor, crdnamespace string, crdname string) *CrdClient {
+func NewCrdClient(monitor mntr.Monitor) *CrdClient {
 	return &CrdClient{
-		Monitor:   monitor,
-		Name:      crdname,
-		Namespace: crdnamespace,
+		Monitor: monitor,
 	}
 }
 
@@ -73,7 +70,5 @@ func (c *CrdClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes
 	return databases.CrdGetConnectionInfo(
 		monitor,
 		k8sClient,
-		c.Namespace,
-		c.Name,
 	)
 }

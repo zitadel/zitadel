@@ -116,17 +116,25 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.ApplicationAdded:
 		err = view.SetData(event)
+		if err != nil {
+			return err
+		}
 	case es_model.ApplicationChanged,
 		es_model.OIDCConfigAdded,
 		es_model.OIDCConfigChanged,
+		es_model.APIConfigAdded,
+		es_model.APIConfigChanged,
 		es_model.ApplicationDeactivated,
 		es_model.ApplicationReactivated:
-		err := view.SetData(event)
+		err = view.SetData(event)
 		if err != nil {
 			return err
 		}
 	case es_model.ApplicationRemoved:
-		return view.SetData(event)
+		err = view.SetData(event)
+		if err != nil {
+			return err
+		}
 	case es_model.ProjectChanged:
 		return a.AppendEvent(event)
 	case es_model.ProjectRemoved:
@@ -156,16 +164,25 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
-	case es_model.OIDCConfigChanged,
-		es_model.ApplicationChanged:
+	case es_model.APIConfigAdded:
+		a.IsOIDC = false
+		return a.SetData(event)
+	case es_model.ApplicationChanged:
+		return a.SetData(event)
+	case es_model.OIDCConfigChanged:
 		err = a.SetData(event)
 		if err != nil {
 			return err
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
-	case es_model.ProjectChanged:
+	case es_model.APIConfigChanged:
 		return a.SetData(event)
+	case es_model.ProjectChanged:
+		project := &es_model.Project{}
+		project.SetData(event)
+		a.ProjectRoleAssertion = project.ProjectRoleAssertion
+		a.ProjectRoleCheck = project.ProjectRoleAssertion
 	case es_model.ApplicationDeactivated:
 		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:

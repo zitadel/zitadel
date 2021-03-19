@@ -1,31 +1,18 @@
-<style>
-    a {
-        display: flex;
-        align-items: center;
-        color: white;
-        text-decoration: none;
-        border: none;
-        padding: 0;
-        font-size: 14px;
-    }
-
-    a:hover {
-        text-decoration: none;
-        border: none;
-        padding: 0;
-    }
-</style>
-
 <script>
-	import { getContext } from 'svelte';
-	export let segment = null;
+    import { getContext } from 'svelte';
+    export let segment = null;
+    export let active = false;
     export let external = null;
-    export let title = '';
+    export let prefetch = false;
     const current = getContext('nav');
 </script>
 
 {#if external}
-	<a href={external}><slot></slot></a>
+	<li><a href={external}><slot></slot></a></li>
 {:else}
-	<a rel="prefetch" alt="{title}" href={segment}><slot></slot></a>
+    {#if prefetch}
+	    <li class:active="{`${$current}` === segment || active }"><a sapper:prefetch href={segment}><i class="bars las la-bars"></i><slot></slot></a></li>
+    {:else}
+    	<li class:active="{`${$current}` === segment || active }"><a sapper:prefetch href={segment}><i class="bars las la-bars"></i><slot></slot></a></li>
+    {/if}
 {/if}

@@ -2,6 +2,7 @@ package iam
 
 import (
 	"fmt"
+
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 
 	"github.com/caos/orbos/mntr"
@@ -30,6 +31,7 @@ func GetQueryAndDestroyFuncs(
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
 	secrets map[string]*secret.Secret,
+	existing map[string]*secret.Existing,
 	err error,
 ) {
 
@@ -44,6 +46,6 @@ func GetQueryAndDestroyFuncs(
 		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version)
 		return zitadel.AdaptFunc(apiLabels, nodeselector, tolerations, dbClient, namespace, action, version, features)(monitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
 	}
 }

@@ -23,7 +23,7 @@ func (a *ApplicationRepo) ApplicationByClientID(ctx context.Context, clientID st
 	return proj_view_model.ApplicationViewToModel(app), nil
 }
 
-func (a *ApplicationRepo) AuthorizeOIDCApplication(ctx context.Context, clientID, secret string) (err error) {
+func (a *ApplicationRepo) AuthorizeClientIDSecret(ctx context.Context, clientID, secret string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -31,5 +31,5 @@ func (a *ApplicationRepo) AuthorizeOIDCApplication(ctx context.Context, clientID
 	if err != nil {
 		return err
 	}
-	return a.ProjectEvents.VerifyOIDCClientSecret(ctx, app.ProjectID, app.ID, secret)
+	return a.ProjectEvents.VerifyClientSecret(ctx, app.ProjectID, app.ID, secret)
 }

@@ -17,7 +17,7 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-    {{if .LoginPolicy.AllowUsernamePassword }}
+    {{if hasUsernamePasswordLogin }}
     <div class="fields">
         <label class="lgn-label" for="loginName">{{t "Login.Loginname"}}</label>
             <input class="lgn-input lgn-suffix-input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}"

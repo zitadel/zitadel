@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/user/model"
 )
 
@@ -40,8 +41,8 @@ type UserRepository interface {
 	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
 	RemoveExternalIDP(ctx context.Context, externalIDP *model.ExternalIDP) error
 
-	SearchMachineKeys(ctx context.Context, request *model.MachineKeySearchRequest) (*model.MachineKeySearchResponse, error)
-	GetMachineKey(ctx context.Context, userID, keyID string) (*model.MachineKeyView, error)
+	SearchMachineKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error)
+	GetMachineKey(ctx context.Context, userID, keyID string) (*key_model.AuthNKeyView, error)
 	ChangeMachine(ctx context.Context, machine *model.Machine) (*model.Machine, error)
 	AddMachineKey(ctx context.Context, key *model.MachineKey) (*model.MachineKey, error)
 	RemoveMachineKey(ctx context.Context, userID, keyID string) error
