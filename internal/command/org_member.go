@@ -13,8 +13,15 @@ import (
 )
 
 func (c *Commands) AddOrgMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+	if member.UserID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-u8fkf", "Errors.Org.MemberInvalid")
+	}
 	addedMember := NewOrgMemberWriteModel(member.AggregateID, member.UserID)
 	orgAgg := OrgAggregateFromWriteModel(&addedMember.WriteModel)
+	err := c.checkUserExists(ctx, addedMember.UserID, "")
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-2H8ds", "Errors.User.NotFound")
+	}
 	event, err := c.addOrgMember(ctx, orgAgg, addedMember, member)
 	if err != nil {
 		return nil, err
@@ -35,13 +42,9 @@ func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregat
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-W8m4l", "Errors.Org.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3m9fs", "Errors.Org.MemberInvalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 	}
-	err := c.checkUserExists(ctx, addedMember.UserID, "")
-	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "ORG-9cmsd", "Errors.User.NotFound")
-	}
-	err = c.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}

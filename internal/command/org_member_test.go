@@ -58,10 +58,48 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 			},
 		},
 		{
+			name: "user not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				member: &domain.Member{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "org1",
+					},
+					UserID: "user1",
+					Roles:  []string{domain.RoleOrgOwner},
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "invalid roles, error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
 				),
 			},
 			args: args{
@@ -76,33 +114,6 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "user not existing, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-				zitadelRoles: []authz.RoleMapping{
-					{
-						Role: domain.RoleOrgOwner,
-					},
-				},
-			},
-			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
-					UserID: "user1",
-					Roles:  []string{domain.RoleOrgOwner},
-				},
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{

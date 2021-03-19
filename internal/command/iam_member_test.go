@@ -51,10 +51,45 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 			},
 		},
 		{
+			name: "user not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				member: &domain.Member{
+					UserID: "user1",
+					Roles:  []string{"IAM_OWNER"},
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "invalid roles, error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
 				),
 			},
 			args: args{
@@ -66,30 +101,6 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "user not existing, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-				zitadelRoles: []authz.RoleMapping{
-					{
-						Role: "IAM_OWNER",
-					},
-				},
-			},
-			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					UserID: "user1",
-					Roles:  []string{"IAM_OWNER"},
-				},
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
