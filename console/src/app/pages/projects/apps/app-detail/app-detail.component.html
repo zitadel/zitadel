@@ -6,7 +6,7 @@
             </a>
             <div class="title-col">
                 <h1>{{app?.name}}</h1>
-                <span *ngIf="app?.oidcConfig">{{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.applicationType |
+                <span *ngIf="app?.oidcConfig">{{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.appType |
                     translate}}</span>
                 <span *ngIf="app?.apiConfig">API</span>
             </div>
