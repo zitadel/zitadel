@@ -2810,7 +2810,7 @@ message ListUserGrantResponse {
 message AddUserGrantRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string project_grant_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_grant_id = 3 [(validate.rules).string = {max_len: 200}];
     repeated string role_keys = 4;
 }
 
