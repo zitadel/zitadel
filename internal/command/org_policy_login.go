@@ -103,12 +103,14 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-9nf88", "Errors.Org.LoginPolicy.IDP.")
 	}
-	_, err := c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
-	if err != nil {
+	var err error
+	if idpProvider.Type == domain.IdentityProviderTypeOrg {
+		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
+	} else {
 		_, err = c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
-		if err != nil {
-			return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")
-		}
+	}
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")
 	}
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
 	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)

@@ -28,6 +28,13 @@ func TestEmailValid(t *testing.T) {
 			result: false,
 		},
 		{
+			name: "nothing after @, invalid",
+			args: args{
+				email: &Email{EmailAddress: "testemail@"},
+			},
+			result: false,
+		},
+		{
 			name: "email, valid",
 			args: args{
 				email: &Email{EmailAddress: "testemail@gmail.com"},
@@ -38,6 +45,13 @@ func TestEmailValid(t *testing.T) {
 			name: "email, valid",
 			args: args{
 				email: &Email{EmailAddress: "test.email@gmail.com"},
+			},
+			result: true,
+		},
+		{
+			name: "email, valid",
+			args: args{
+				email: &Email{EmailAddress: "test/email@gmail.com"},
 			},
 			result: true,
 		},

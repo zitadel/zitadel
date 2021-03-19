@@ -488,7 +488,6 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectFilter(),
 				),
 			},
 			args: args{

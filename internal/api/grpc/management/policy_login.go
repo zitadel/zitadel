@@ -79,7 +79,7 @@ func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *mgmt_pb.ListLogin
 }
 
 func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *mgmt_pb.AddIDPToLoginPolicyRequest) (*mgmt_pb.AddIDPToLoginPolicyResponse, error) {
-	idp, err := s.command.AddIDPProviderToLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, &domain.IDPProvider{IDPConfigID: req.IdpId}) //TODO: old way was to also add type but this doesnt make sense in my point of view
+	idp, err := s.command.AddIDPProviderToLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, &domain.IDPProvider{IDPConfigID: req.IdpId, Type: idp.IDPProviderTypeFromPb(req.OwnerType)})
 	if err != nil {
 		return nil, err
 	}
