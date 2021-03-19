@@ -2922,6 +2922,7 @@ message ListLoginPolicyIDPsResponse {
 
 message AddIDPToLoginPolicyRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.IDPOwnerType ownerType = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message AddIDPToLoginPolicyResponse {

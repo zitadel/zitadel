@@ -28,7 +28,7 @@ type Commands struct {
 	iamDomain    string
 	zitadelRoles []authz.RoleMapping
 
-	idpConfigSecretCrypto crypto.Crypto
+	idpConfigSecretCrypto crypto.EncryptionAlgorithm
 
 	userPasswordAlg             crypto.HashAlgorithm
 	initializeUserCode          crypto.Generator
@@ -39,7 +39,7 @@ type Commands struct {
 	machineKeySize              int
 	applicationKeySize          int
 	applicationSecretGenerator  crypto.Generator
-	domainVerificationAlg       *crypto.AESCrypto
+	domainVerificationAlg       crypto.EncryptionAlgorithm
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
 	multifactors                domain.MultifactorConfigs

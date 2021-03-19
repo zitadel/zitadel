@@ -10,6 +10,9 @@ import (
 )
 
 func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Fn8ds", "Errors.ResourceOwnerMissing")
+	}
 	addedPolicy := NewOrgLoginPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -41,6 +44,9 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 }
 
 func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy := NewOrgLoginPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
@@ -67,6 +73,9 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 }
 
 func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-55Mg9", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy := NewOrgLoginPolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
@@ -88,8 +97,23 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 }
 
 func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
+	}
+	if !idpProvider.IsValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-9nf88", "Errors.Org.LoginPolicy.IDP.")
+	}
+	var err error
+	if idpProvider.Type == domain.IdentityProviderTypeOrg {
+		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
+	} else {
+		_, err = c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
+	}
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")
+	}
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
-	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +134,12 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 }
 
 func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
+	}
+	if !idpProvider.IsValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-66m9s", "Errors.Org.LoginPolicy.IDP.Invalid")
+	}
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
 	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
@@ -153,7 +183,13 @@ func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg 
 }
 
 func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) (domain.SecondFactorType, error) {
-	secondFactorModel := NewOrgSecondFactorWriteModel(orgID)
+	if orgID == "" {
+		return domain.SecondFactorTypeUnspecified, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
+	}
+	if !secondFactor.Valid() {
+		return domain.SecondFactorTypeUnspecified, caos_errs.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
+	}
+	secondFactorModel := NewOrgSecondFactorWriteModel(orgID, secondFactor)
 	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return domain.SecondFactorTypeUnspecified, err
@@ -173,7 +209,13 @@ func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFacto
 }
 
 func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) error {
-	secondFactorModel := NewOrgSecondFactorWriteModel(orgID)
+	if orgID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "Org-fM0gs", "Errors.ResourceOwnerMissing")
+	}
+	if !secondFactor.Valid() {
+		return caos_errs.ThrowInvalidArgument(nil, "Org-55n8s", "Errors.Org.LoginPolicy.MFA.Unspecified")
+	}
+	secondFactorModel := NewOrgSecondFactorWriteModel(orgID, secondFactor)
 	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return err
@@ -188,7 +230,13 @@ func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, second
 }
 
 func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) (domain.MultiFactorType, error) {
-	multiFactorModel := NewOrgMultiFactorWriteModel(orgID)
+	if orgID == "" {
+		return domain.MultiFactorTypeUnspecified, caos_errs.ThrowInvalidArgument(nil, "Org-M0fsf", "Errors.ResourceOwnerMissing")
+	}
+	if !multiFactor.Valid() {
+		return domain.MultiFactorTypeUnspecified, caos_errs.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
+	}
+	multiFactorModel := NewOrgMultiFactorWriteModel(orgID, multiFactor)
 	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, err
@@ -207,7 +255,13 @@ func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor 
 }
 
 func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) error {
-	multiFactorModel := NewOrgMultiFactorWriteModel(orgID)
+	if orgID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "Org-M0fsf", "Errors.ResourceOwnerMissing")
+	}
+	if !multiFactor.Valid() {
+		return caos_errs.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
+	}
+	multiFactorModel := NewOrgMultiFactorWriteModel(orgID, multiFactor)
 	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return err

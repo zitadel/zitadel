@@ -86,16 +86,22 @@ func (wm *MachineWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	name,
 	description string,
-) (*user.MachineChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := user.NewMachineChangedEvent(ctx, aggregate)
+) (*user.MachineChangedEvent, bool, error) {
+	changes := make([]user.MachineChanges, 0)
+	var err error
+
 	if wm.Name != name {
-		hasChanged = true
-		changedEvent.Name = &name
+		changes = append(changes, user.ChangeName(name))
 	}
 	if wm.Description != description {
-		hasChanged = true
-		changedEvent.Description = &description
+		changes = append(changes, user.ChangeDescription(description))
 	}
-	return changedEvent, hasChanged
+	if len(changes) == 0 {
+		return nil, false, nil
+	}
+	changeEvent, err := user.NewMachineChangedEvent(ctx, aggregate, changes)
+	if err != nil {
+		return nil, false, err
+	}
+	return changeEvent, true, nil
 }

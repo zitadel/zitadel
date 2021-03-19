@@ -14,15 +14,15 @@ import (
 
 func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone) (*domain.Phone, error) {
 	if !phone.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.Phone.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6M0ds", "Errors.Phone.Invalid")
 	}
 
 	existingPhone, err := c.phoneWriteModelByID(ctx, phone.AggregateID, phone.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	if !existingPhone.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-aM9cs", "Errors.User.Phone.NotFound")
+	if !existingPhone.UserState.Exists() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0fs", "Errors.User.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
@@ -56,17 +56,20 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone) (*
 
 func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceowner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Km9ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Km9ds", "Errors.User.UserIDMissing")
 	}
 	if code == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-wMe9f", "Errors.User.Code.Empty")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-wMe9f", "Errors.User.Code.Empty")
 	}
 
 	existingCode, err := c.phoneWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}
-	if !existingCode.State.Exists() {
+	if !existingCode.UserState.Exists() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Rsj8c", "Errors.User.NotFound")
+	}
+	if !existingCode.State.Exists() || existingCode.Code == nil {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Rsj8c", "Errors.User.Code.NotFound")
 	}
 
@@ -90,7 +93,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 
 func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceowner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 
 	existingPhone, err := c.phoneWriteModelByID(ctx, userID, resourceowner)
@@ -98,6 +101,9 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 		return nil, err
 	}
 
+	if !existingPhone.UserState.Exists() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.NotFound")
+	}
 	if !existingPhone.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2b7Hf", "Errors.User.Phone.NotFound")
 	}
@@ -123,9 +129,16 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 }
 
 func (c *Commands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3m9Fs", "Errors.User.UserIDMissing")
+	}
+
 	existingPhone, err := c.phoneWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err
+	}
+	if !existingPhone.UserState.Exists() {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9fs", "Errors.User.NotFound")
 	}
 	if !existingPhone.State.Exists() {
 		return caos_errs.ThrowNotFound(nil, "COMMAND-66n8J", "Errors.User.Phone.NotFound")
@@ -138,12 +151,15 @@ func (c *Commands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, us
 
 func (c *Commands) RemoveHumanPhone(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6M0ds", "Errors.User.UserIDMissing")
 	}
 
 	existingPhone, err := c.phoneWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
+	}
+	if !existingPhone.UserState.Exists() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9fs", "Errors.User.NotFound")
 	}
 	if !existingPhone.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-p6rsc", "Errors.User.Phone.NotFound")

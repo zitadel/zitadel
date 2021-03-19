@@ -70,6 +70,7 @@ func writeModelToMailText(wm *MailTextWriteModel) *domain.MailText {
 		Greeting:     wm.Greeting,
 		Text:         wm.Text,
 		ButtonText:   wm.ButtonText,
+		State:        wm.State,
 	}
 }
 

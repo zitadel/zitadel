@@ -17,7 +17,7 @@ import (
 
 func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName string) (*domain.ObjectDetails, error) {
 	if orgID == "" || userID == "" || userName == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2N9fs", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2N9fs", "Errors.IDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
@@ -35,7 +35,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.OrgIAM.NotExisting")
 	}
 
 	if err := CheckOrgIAMPolicyForUserName(userName, orgIAMPolicy); err != nil {
@@ -57,7 +57,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 
 func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0gDf", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-m0gDf", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -85,7 +85,7 @@ func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner str
 
 func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9ds", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -113,7 +113,7 @@ func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner str
 
 func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -141,7 +141,7 @@ func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) (
 
 func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M0dse", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-M0dse", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -169,7 +169,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 
 func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -182,7 +182,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.OrgIAM.NotExisting")
 	}
 	var events []eventstore.EventPusher
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
@@ -210,7 +210,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 
 func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
 	if orgID == "" || userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-55n8M", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-55n8M", "Errors.IDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
@@ -286,6 +286,9 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 }
 
 func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-5m0fs", "Errors.IDMissing")
+	}
 	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err

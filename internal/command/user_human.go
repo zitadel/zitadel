@@ -40,7 +40,7 @@ func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Hum
 }
 
 func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human) ([]eventstore.EventPusher, *HumanWriteModel, error) {
-	if !human.IsValid() {
+	if orgID == "" || !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
 	return c.createHuman(ctx, orgID, human, nil, false)
@@ -82,8 +82,8 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 }
 
 func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) ([]eventstore.EventPusher, *HumanWriteModel, error) {
-	if !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-9dk45", "Errors.User.Invalid")
+	if orgID == "" || !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-9dk45", "Errors.User.Invalid")
 	}
 	return c.createHuman(ctx, orgID, human, externalIDP, true)
 }
@@ -96,17 +96,17 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	human.AggregateID = userID
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
-		return nil, nil, err
-	}
-	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
-	if err != nil {
-		return nil, nil, err
+		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Org.OrgIAMPolicy.NotFound")
 	}
 	if err := human.CheckOrgIAMPolicy(orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}
+	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
+	if err != nil {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
+	}
 	human.SetNamesAsDisplayname()
-	if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, true); err != nil {
+	if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, !selfregister); err != nil {
 		return nil, nil, err
 	}
 	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
@@ -155,7 +155,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 
 func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner string) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2xpX9", "Errors.User.UserIDMissing")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-2xpX9", "Errors.User.UserIDMissing")
 	}
 
 	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, resourceowner)
@@ -236,10 +236,13 @@ func createRegisterHumanEvent(ctx context.Context, aggregate *eventstore.Aggrega
 
 func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []string) error {
 	if agentID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
-	events := make([]eventstore.EventPusher, len(userIDs))
-	for i, userID := range userIDs {
+	if len(userIDs) == 0 {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-M0od3", "Errors.User.UserIDMissing")
+	}
+	events := make([]eventstore.EventPusher, 0)
+	for _, userID := range userIDs {
 		existingUser, err := c.getHumanWriteModelByID(ctx, userID, "")
 		if err != nil {
 			return err
@@ -247,12 +250,14 @@ func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []
 		if !isUserStateExists(existingUser.UserState) {
 			continue
 		}
-		events[i] = user.NewHumanSignedOutEvent(
+		events = append(events, user.NewHumanSignedOutEvent(
 			ctx,
 			UserAggregateFromWriteModel(&existingUser.WriteModel),
-			agentID)
+			agentID))
 	}
-
+	if len(events) == 0 {
+		return nil
+	}
 	_, err := c.eventstore.PushEvents(ctx, events...)
 	return err
 }

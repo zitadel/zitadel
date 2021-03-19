@@ -221,6 +221,17 @@ func ModelIDPProviderTypeToPb(typ iam_model.IDPProviderType) idp_pb.IDPOwnerType
 	}
 }
 
+func IDPProviderTypeFromPb(typ idp_pb.IDPOwnerType) domain.IdentityProviderType {
+	switch typ {
+	case idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG:
+		return domain.IdentityProviderTypeOrg
+	case idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM:
+		return domain.IdentityProviderTypeSystem
+	default:
+		return domain.IdentityProviderTypeOrg
+	}
+}
+
 func IDPIDQueryToModel(query *idp_pb.IDPIDQuery) *iam_model.IDPConfigSearchQuery {
 	return &iam_model.IDPConfigSearchQuery{
 		Key:    iam_model.IDPConfigSearchKeyIdpConfigID, //TODO: whats the difference between idpconfigid and aggregateid search key?
