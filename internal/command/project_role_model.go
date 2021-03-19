@@ -108,7 +108,7 @@ func (wm *ProjectRoleWriteModel) NewProjectRoleChangedEvent(
 	if wm.Group != group {
 		changes = append(changes, project.ChangeGroup(group))
 	}
-	if len(changes) == 1 {
+	if len(changes) == 0 {
 		return nil, false, nil
 	}
 	changeEvent, err := project.NewRoleChangedEvent(ctx, aggregate, key, changes)

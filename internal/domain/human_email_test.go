@@ -34,6 +34,20 @@ func TestEmailValid(t *testing.T) {
 			},
 			result: true,
 		},
+		{
+			name: "email, valid",
+			args: args{
+				email: &Email{EmailAddress: "test.email@gmail.com"},
+			},
+			result: true,
+		},
+		{
+			name: "email, valid",
+			args: args{
+				email: &Email{EmailAddress: "test/email@gmail.com"},
+			},
+			result: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
