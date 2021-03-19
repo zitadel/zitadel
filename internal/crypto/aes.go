@@ -92,6 +92,10 @@ func EncryptAES(plainText []byte, key string) ([]byte, error) {
 		return nil, err
 	}
 
+	maxSize := 64 * 1024 * 1024
+	if len(plainText) > maxSize {
+		return nil, errors.ThrowPreconditionFailedf(nil, "CRYPT-AGg4t3", "data too large, max bytes: %v", maxSize)
+	}
 	cipherText := make([]byte, aes.BlockSize+len(plainText))
 	iv := cipherText[:aes.BlockSize]
 	if _, err = io.ReadFull(rand.Reader, iv); err != nil {
