@@ -13,8 +13,15 @@ import (
 )
 
 func (c *Commands) AddIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+	if member.UserID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-Mf83b", "Errors.IAM.MemberInvalid")
+	}
 	addedMember := NewIAMMemberWriteModel(member.UserID)
 	iamAgg := IAMAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
+	err := c.checkUserExists(ctx, addedMember.UserID, "")
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "IAM-5N9vs", "Errors.User.NotFound")
+	}
 	event, err := c.addIAMMember(ctx, iamAgg, addedMember, member)
 	if err != nil {
 		return nil, err
@@ -38,11 +45,7 @@ func (c *Commands) addIAMMember(ctx context.Context, iamAgg *eventstore.Aggregat
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4m0fS", "Errors.IAM.MemberInvalid")
 	}
-	err := c.checkUserExists(ctx, addedMember.UserID, "")
-	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "IAM-5N9vs", "Errors.User.NotFound")
-	}
-	err = c.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}

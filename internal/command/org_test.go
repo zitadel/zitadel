@@ -2,6 +2,11 @@ package command
 
 import (
 	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -13,9 +18,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/text/language"
-	"testing"
 )
 
 func TestCommandSide_AddOrg(t *testing.T) {
@@ -122,22 +124,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username1",
-								"firstname1",
-								"lastname1",
-								"nickname1",
-								"displayname1",
-								language.German,
-								domain.GenderMale,
-								"email1",
-								true,
-							),
-						),
-					),
 					expectFilterOrgMemberNotFound(),
 					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "id", "internal"),
 						[]*repository.Event{
@@ -207,22 +193,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username1",
-								"firstname1",
-								"lastname1",
-								"nickname1",
-								"displayname1",
-								language.German,
-								domain.GenderMale,
-								"email1",
-								true,
-							),
-						),
-					),
 					expectFilterOrgMemberNotFound(),
 					expectPushFailed(caos_errs.ThrowInternal(nil, "id", "internal"),
 						[]*repository.Event{
@@ -276,22 +246,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilterOrgDomainNotFound(),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username1",
-								"firstname1",
-								"lastname1",
-								"nickname1",
-								"displayname1",
-								language.German,
-								domain.GenderMale,
-								"email1",
-								true,
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),

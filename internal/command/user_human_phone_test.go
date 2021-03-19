@@ -261,7 +261,7 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 				eventstore:            tt.fields.eventstore,
 				phoneVerificationCode: tt.fields.secretGenerator,
 			}
-			got, err := r.ChangeHumanPhone(tt.args.ctx, tt.args.email)
+			got, err := r.ChangeHumanPhone(tt.args.ctx, tt.args.email, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

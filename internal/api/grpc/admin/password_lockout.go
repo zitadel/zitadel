@@ -22,7 +22,7 @@ func (s *Server) UpdatePasswordLockoutPolicy(ctx context.Context, req *admin_pb.
 		return nil, err
 	}
 	return &admin_pb.UpdatePasswordLockoutPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,

@@ -29,6 +29,6 @@ func (s *Server) RemoveMyLinkedIDP(ctx context.Context, req *auth_pb.RemoveMyLin
 		return nil, err
 	}
 	return &auth_pb.RemoveMyLinkedIDPResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

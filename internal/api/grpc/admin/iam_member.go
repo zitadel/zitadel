@@ -33,7 +33,7 @@ func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberReq
 		return nil, err
 	}
 	return &admin_pb.AddIAMMemberResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -47,7 +47,7 @@ func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMem
 		return nil, err
 	}
 	return &admin_pb.UpdateIAMMemberResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -61,6 +61,6 @@ func (s *Server) RemoveIAMMember(ctx context.Context, req *admin_pb.RemoveIAMMem
 		return nil, err
 	}
 	return &admin_pb.RemoveIAMMemberResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

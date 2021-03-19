@@ -43,7 +43,7 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 	}
 	return &mgmt_pb.AddUserGrantResponse{
 		UserGrantId: grant.AggregateID,
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.AddToDetailsPb(
 			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
@@ -57,7 +57,7 @@ func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGra
 		return nil, err
 	}
 	return &mgmt_pb.UpdateUserGrantResponse{
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ChangeToDetailsPb(
 			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
@@ -71,7 +71,7 @@ func (s *Server) DeactivateUserGrant(ctx context.Context, req *mgmt_pb.Deactivat
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateUserGrantResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -81,7 +81,7 @@ func (s *Server) ReactivateUserGrant(ctx context.Context, req *mgmt_pb.Reactivat
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateUserGrantResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -91,7 +91,7 @@ func (s *Server) RemoveUserGrant(ctx context.Context, req *mgmt_pb.RemoveUserGra
 		return nil, err
 	}
 	return &mgmt_pb.RemoveUserGrantResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 

@@ -36,7 +36,7 @@ func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRe
 	}
 	return &mgmt_pb.AddOrgOIDCIDPResponse{
 		IdpId: config.AggregateID,
-		Details: object_pb.ToDetailsPb(
+		Details: object_pb.AddToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
@@ -48,14 +48,14 @@ func (s *Server) DeactivateOrgIDP(ctx context.Context, req *mgmt_pb.DeactivateOr
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.DeactivateOrgIDPResponse{Details: object_pb.DomainToDetailsPb(objectDetails)}, nil
+	return &mgmt_pb.DeactivateOrgIDPResponse{Details: object_pb.DomainToChangeDetailsPb(objectDetails)}, nil
 }
 func (s *Server) ReactivateOrgIDP(ctx context.Context, req *mgmt_pb.ReactivateOrgIDPRequest) (*mgmt_pb.ReactivateOrgIDPResponse, error) {
 	objectDetails, err := s.command.ReactivateDefaultIDPConfig(ctx, req.IdpId)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ReactivateOrgIDPResponse{Details: object_pb.DomainToDetailsPb(objectDetails)}, nil
+	return &mgmt_pb.ReactivateOrgIDPResponse{Details: object_pb.DomainToChangeDetailsPb(objectDetails)}, nil
 }
 func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequest) (*mgmt_pb.RemoveOrgIDPResponse, error) {
 	idpProviders, err := s.org.GetIDPProvidersByIDPConfigID(ctx, authz.GetCtxData(ctx).OrgID, req.IdpId)
@@ -78,7 +78,7 @@ func (s *Server) UpdateOrgIDP(ctx context.Context, req *mgmt_pb.UpdateOrgIDPRequ
 		return nil, err
 	}
 	return &mgmt_pb.UpdateOrgIDPResponse{
-		Details: object_pb.ToDetailsPb(
+		Details: object_pb.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,

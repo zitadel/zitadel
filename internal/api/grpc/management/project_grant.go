@@ -47,7 +47,7 @@ func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGra
 	}
 	return &mgmt_pb.AddProjectGrantResponse{
 		GrantId: grant.GrantID,
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.AddToDetailsPb(
 			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
@@ -65,7 +65,7 @@ func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProj
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectGrantResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
@@ -79,7 +79,7 @@ func (s *Server) DeactivateProjectGrant(ctx context.Context, req *mgmt_pb.Deacti
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateProjectGrantResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -89,7 +89,7 @@ func (s *Server) ReactivateProjectGrant(ctx context.Context, req *mgmt_pb.Reacti
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateProjectGrantResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -99,7 +99,7 @@ func (s *Server) RemoveProjectGrant(ctx context.Context, req *mgmt_pb.RemoveProj
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectGrantResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -132,7 +132,7 @@ func (s *Server) AddProjectGrantMember(ctx context.Context, req *mgmt_pb.AddProj
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectGrantMemberResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.AddToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -146,7 +146,7 @@ func (s *Server) UpdateProjectGrantMember(ctx context.Context, req *mgmt_pb.Upda
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectGrantMemberResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -160,6 +160,6 @@ func (s *Server) RemoveProjectGrantMember(ctx context.Context, req *mgmt_pb.Remo
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectGrantMemberResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }

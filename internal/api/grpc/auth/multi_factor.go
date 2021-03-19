@@ -29,7 +29,7 @@ func (s *Server) AddMyAuthFactorOTP(ctx context.Context, _ *auth_pb.AddMyAuthFac
 	return &auth_pb.AddMyAuthFactorOTPResponse{
 		Url:    otp.Url,
 		Secret: otp.SecretString,
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			otp.Sequence,
 			otp.ChangeDate,
 			otp.ResourceOwner,
@@ -44,7 +44,7 @@ func (s *Server) VerifyMyAuthFactorOTP(ctx context.Context, req *auth_pb.VerifyM
 		return nil, err
 	}
 	return &auth_pb.VerifyMyAuthFactorOTPResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -55,7 +55,7 @@ func (s *Server) RemoveMyAuthFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyA
 		return nil, err
 	}
 	return &auth_pb.RemoveMyAuthFactorOTPResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -70,7 +70,7 @@ func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFac
 			Id:        u2f.WebAuthNTokenID,
 			PublicKey: u2f.CredentialCreationData,
 		},
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			u2f.Sequence,
 			u2f.ChangeDate,
 			u2f.ResourceOwner,
@@ -85,7 +85,7 @@ func (s *Server) VerifyMyAuthFactorU2F(ctx context.Context, req *auth_pb.VerifyM
 		return nil, err
 	}
 	return &auth_pb.VerifyMyAuthFactorU2FResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -96,6 +96,6 @@ func (s *Server) RemoveMyAuthFactorU2F(ctx context.Context, req *auth_pb.RemoveM
 		return nil, err
 	}
 	return &auth_pb.RemoveMyAuthFactorU2FResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

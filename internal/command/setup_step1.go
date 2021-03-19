@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -23,9 +24,10 @@ const (
 	OIDCApplicationTypeNative      = "NATIVE"
 	OIDCApplicationTypeUserAgent   = "USER_AGENT"
 	OIDCApplicationTypeWeb         = "WEB"
-	OIDCAuthMethodTypeNone         = "NONE"
-	OIDCAuthMethodTypeBasic        = "BASIC"
-	OIDCAuthMethodTypePost         = "POST"
+	AuthMethodTypeNone             = "NONE"
+	AuthMethodTypeBasic            = "BASIC"
+	AuthMethodTypePost             = "POST"
+	AuthMethodTypePrivateKeyJWT    = "PRIVATE_KEY_JWT"
 )
 
 type Step1 struct {
@@ -70,6 +72,7 @@ type Project struct {
 	Users    []User
 	Members  []string
 	OIDCApps []OIDCApp
+	APIs     []API
 }
 
 type OIDCApp struct {
@@ -81,6 +84,11 @@ type OIDCApp struct {
 	AuthMethodType         string
 	PostLogoutRedirectUris []string
 	DevMode                bool
+}
+
+type API struct {
+	Name           string
+	AuthMethodType string
 }
 
 func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
@@ -101,6 +109,13 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 	logging.Log("SETUP-sd2hj").Info("default login policy set up")
 	//create orgs
 	for _, organisation := range step1.Orgs {
+		orgIAMPolicy := &domain.OrgIAMPolicy{UserLoginMustBeDomain: true}
+		if organisation.OrgIamPolicy {
+			orgIAMPolicy.UserLoginMustBeDomain = false
+		}
+		pwPolicy := &domain.PasswordComplexityPolicy{
+			MinLength: 1,
+		}
 		orgAgg, _, humanWriteModel, _, setUpOrgEvents, err := c.setUpOrg(ctx,
 			&domain.Org{
 				Name:    organisation.Name,
@@ -119,7 +134,7 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 					EmailAddress:    organisation.Owner.Email,
 					IsEmailVerified: true,
 				},
-			})
+			}, orgIAMPolicy, pwPolicy)
 		if err != nil {
 			return err
 		}
@@ -127,7 +142,7 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 		logging.LogWithFields("SETUP-Gdsfg", "id", orgAgg.ID, "name", organisation.Name).Info("org set up")
 
 		if organisation.OrgIamPolicy {
-			orgIAMPolicyEvent, err := c.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID), &domain.OrgIAMPolicy{UserLoginMustBeDomain: false})
+			orgIAMPolicyEvent, err := c.addOrgIAMPolicy(ctx, orgAgg, NewORGOrgIAMPolicyWriteModel(orgAgg.ID), orgIAMPolicy)
 			if err != nil {
 				return err
 			}
@@ -165,7 +180,14 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 			}
 			//create applications
 			for _, app := range proj.OIDCApps {
-				applicationEvents, err := setUpApplication(ctx, c, projectWriteModel, project, app, orgAgg.ID)
+				applicationEvents, err := setUpOIDCApplication(ctx, c, projectWriteModel, project, app, orgAgg.ID)
+				if err != nil {
+					return err
+				}
+				events = append(events, applicationEvents...)
+			}
+			for _, app := range proj.APIs {
+				applicationEvents, err := setUpAPI(ctx, c, projectWriteModel, project, app, orgAgg.ID)
 				if err != nil {
 					return err
 				}
@@ -183,7 +205,7 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 	return nil
 }
 
-func setUpApplication(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, oidcApp OIDCApp, resourceOwner string) ([]eventstore.EventPusher, error) {
+func setUpOIDCApplication(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, oidcApp OIDCApp, resourceOwner string) ([]eventstore.EventPusher, error) {
 	app := &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectWriteModel.AggregateID,
@@ -203,6 +225,24 @@ func setUpApplication(ctx context.Context, r *Commands, projectWriteModel *Proje
 		return nil, err
 	}
 	logging.LogWithFields("SETUP-Edgw4", "name", app.AppName, "clientID", app.ClientID).Info("application set up")
+	return events, nil
+}
+
+func setUpAPI(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, apiApp API, resourceOwner string) ([]eventstore.EventPusher, error) {
+	app := &domain.APIApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projectWriteModel.AggregateID,
+		},
+		AppName:        apiApp.Name,
+		AuthMethodType: getAPIAuthMethod(apiApp.AuthMethodType),
+	}
+
+	projectAgg := ProjectAggregateFromWriteModel(&projectWriteModel.WriteModel)
+	events, _, err := r.addAPIApplication(ctx, projectAgg, project, app, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	logging.LogWithFields("SETUP-Dbgsf", "name", app.AppName, "clientID", app.ClientID).Info("application set up")
 	return events, nil
 }
 
@@ -260,12 +300,24 @@ func getOIDCApplicationType(appType string) domain.OIDCApplicationType {
 
 func getOIDCAuthMethod(authMethod string) domain.OIDCAuthMethodType {
 	switch authMethod {
-	case OIDCAuthMethodTypeNone:
+	case AuthMethodTypeNone:
 		return domain.OIDCAuthMethodTypeNone
-	case OIDCAuthMethodTypeBasic:
+	case AuthMethodTypeBasic:
 		return domain.OIDCAuthMethodTypeBasic
-	case OIDCAuthMethodTypePost:
+	case AuthMethodTypePost:
 		return domain.OIDCAuthMethodTypePost
+	case AuthMethodTypePrivateKeyJWT:
+		return domain.OIDCAuthMethodTypePrivateKeyJWT
 	}
 	return domain.OIDCAuthMethodTypeBasic
+}
+
+func getAPIAuthMethod(authMethod string) domain.APIAuthMethodType {
+	switch authMethod {
+	case AuthMethodTypeBasic:
+		return domain.APIAuthMethodTypeBasic
+	case AuthMethodTypePrivateKeyJWT:
+		return domain.APIAuthMethodTypePrivateKeyJWT
+	}
+	return domain.APIAuthMethodTypePrivateKeyJWT
 }

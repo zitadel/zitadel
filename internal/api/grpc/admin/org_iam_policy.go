@@ -32,7 +32,7 @@ func (s *Server) AddCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.AddCus
 		return nil, err
 	}
 	return &admin_pb.AddCustomOrgIAMPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
@@ -46,7 +46,7 @@ func (s *Server) UpdateOrgIAMPolicy(ctx context.Context, req *admin_pb.UpdateOrg
 		return nil, err
 	}
 	return &admin_pb.UpdateOrgIAMPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
@@ -60,7 +60,7 @@ func (s *Server) UpdateCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.Upd
 		return nil, err
 	}
 	return &admin_pb.UpdateCustomOrgIAMPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,

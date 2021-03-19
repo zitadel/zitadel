@@ -10,10 +10,18 @@ import (
 	object_pb "github.com/caos/zitadel/pkg/grpc/object"
 )
 
-func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
+func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
 	return &object_pb.ObjectDetails{
 		Sequence:      objectDetail.Sequence,
-		ChangeDate:    timestamppb.New(objectDetail.ChangeDate),
+		ChangeDate:    timestamppb.New(objectDetail.EventDate),
+		ResourceOwner: objectDetail.ResourceOwner,
+	}
+}
+
+func DomainToAddDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
+	return &object_pb.ObjectDetails{
+		Sequence:      objectDetail.Sequence,
+		CreationDate:  timestamppb.New(objectDetail.EventDate),
 		ResourceOwner: objectDetail.ResourceOwner,
 	}
 }
@@ -32,7 +40,7 @@ func ToViewDetailsPb(
 	}
 }
 
-func ToDetailsPb(
+func ChangeToDetailsPb(
 	sequence uint64,
 	changeDate time.Time,
 	resourceOwner string,
@@ -40,6 +48,18 @@ func ToDetailsPb(
 	return &object_pb.ObjectDetails{
 		Sequence:      sequence,
 		ChangeDate:    timestamppb.New(changeDate),
+		ResourceOwner: resourceOwner,
+	}
+}
+
+func AddToDetailsPb(
+	sequence uint64,
+	creationDate time.Time,
+	resourceOwner string,
+) *object_pb.ObjectDetails {
+	return &object_pb.ObjectDetails{
+		Sequence:      sequence,
+		CreationDate:  timestamppb.New(creationDate),
 		ResourceOwner: resourceOwner,
 	}
 }
