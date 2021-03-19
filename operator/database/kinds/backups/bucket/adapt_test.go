@@ -61,7 +61,7 @@ func TestBucket_Secrets(t *testing.T) {
 		"serviceaccountjson": saJson,
 	}
 
-	_, _, secrets, existing, err := AdaptFunc(
+	_, _, secrets, existing, _, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,
@@ -133,7 +133,7 @@ func TestBucket_AdaptBackup(t *testing.T) {
 
 	SetBackup(client, namespace, k8sLabels, saJson)
 
-	query, _, _, _, err := AdaptFunc(
+	query, _, _, _, _, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,
@@ -207,7 +207,7 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 
 	SetInstantBackup(client, namespace, backupName, k8sLabels, saJson)
 
-	query, _, _, _, err := AdaptFunc(
+	query, _, _, _, _, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,
@@ -282,7 +282,7 @@ func TestBucket_AdaptRestore(t *testing.T) {
 
 	SetRestore(client, namespace, backupName, k8sLabels, saJson)
 
-	query, _, _, _, err := AdaptFunc(
+	query, _, _, _, _, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,
@@ -357,7 +357,7 @@ func TestBucket_AdaptClean(t *testing.T) {
 
 	SetClean(client, namespace, backupName, k8sLabels, saJson)
 
-	query, _, _, _, err := AdaptFunc(
+	query, _, _, _, _, err := AdaptFunc(
 		backupName,
 		namespace,
 		componentLabels,

@@ -35,6 +35,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 		destroyFunc operator.DestroyFunc,
 		secrets map[string]*secret.Secret,
 		existing map[string]*secret.Existing,
+		migrate bool,
 		err error,
 	) {
 		defer func() {
@@ -45,7 +46,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 
 		desiredKind, err := ParseDesiredV0(orbDesiredTree)
 		if err != nil {
-			return nil, nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, migrate, errors.Wrap(err, "parsing desired state failed")
 		}
 		orbDesiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
@@ -56,7 +57,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 
 		queryNS, err := namespace.AdaptFuncToEnsure(NamespaceStr)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, migrate, err
 		}
 		/*destroyNS, err := namespace.AdaptFuncToDestroy(NamespaceStr)
 		if err != nil {
@@ -67,7 +68,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 
 		operatorLabels := mustDatabaseOperator(binaryVersion)
 
-		queryDB, destroyDB, secrets, existing, err := databases.GetQueryAndDestroyFuncs(
+		queryDB, destroyDB, secrets, existing, migrate, err := databases.GetQueryAndDestroyFuncs(
 			orbMonitor,
 			desiredKind.Database,
 			databaseCurrent,
@@ -80,7 +81,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 			features,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, migrate, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -124,6 +125,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 			},
 			secrets,
 			existing,
+			migrate,
 			nil
 	}
 }

@@ -18,6 +18,7 @@ func AdaptFunc() func(
 	operator.DestroyFunc,
 	map[string]*secret.Secret,
 	map[string]*secret.Existing,
+	bool,
 	error,
 ) {
 	return func(
@@ -29,11 +30,12 @@ func AdaptFunc() func(
 		operator.DestroyFunc,
 		map[string]*secret.Secret,
 		map[string]*secret.Existing,
+		bool,
 		error,
 	) {
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
 
@@ -57,6 +59,7 @@ func AdaptFunc() func(
 			},
 			make(map[string]*secret.Secret),
 			make(map[string]*secret.Existing),
+			false,
 			nil
 	}
 }

@@ -42,6 +42,7 @@ func AdaptFunc(
 		operator.DestroyFunc,
 		map[string]*secretpkg.Secret,
 		map[string]*secretpkg.Existing,
+		bool,
 		error,
 	) {
 
@@ -49,7 +50,7 @@ func AdaptFunc(
 
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
 
@@ -61,7 +62,7 @@ func AdaptFunc(
 
 		destroyS, err := secret.AdaptFuncToDestroy(namespace, secretName)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		_, destroyB, err := backup.AdaptFunc(
@@ -82,7 +83,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		_, destroyR, err := restore.AdaptFunc(
@@ -101,7 +102,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		_, destroyC, err := clean.AdaptFunc(
@@ -118,7 +119,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -265,6 +266,7 @@ func AdaptFunc(
 			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 			secrets,
 			existing,
+			false,
 			nil
 	}
 }

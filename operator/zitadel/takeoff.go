@@ -32,7 +32,7 @@ func Takeoff(
 			return err
 		}
 
-		query, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
+		query, _, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
 		if err != nil {
 			internalMonitor.Error(err)
 			return err

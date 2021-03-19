@@ -33,6 +33,7 @@ func AdaptFunc(
 		destroyFunc operator.DestroyFunc,
 		allSecrets map[string]*secret.Secret,
 		allExisting map[string]*secret.Existing,
+		migrate bool,
 		err error,
 	) {
 		defer func() {
@@ -46,7 +47,7 @@ func AdaptFunc(
 
 		desiredKind, err := ParseDesiredV0(desiredTree)
 		if err != nil {
-			return nil, nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
@@ -60,7 +61,7 @@ func AdaptFunc(
 			dbClientT, err := zitadeldb.NewGitOpsClient(monitor, orbconfig.URL, orbconfig.Repokey)
 			if err != nil {
 				monitor.Error(err)
-				return nil, nil, nil, nil, err
+				return nil, nil, nil, nil, false, err
 			}
 			dbClient = dbClientT
 		} else {
@@ -71,7 +72,7 @@ func AdaptFunc(
 
 		queryNS, err := namespace.AdaptFuncToEnsure(namespaceName)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
 		/*destroyNS, err := namespace.AdaptFuncToDestroy(namespaceName)
 		if err != nil {
@@ -79,7 +80,7 @@ func AdaptFunc(
 		}*/
 
 		iamCurrent := &tree.Tree{}
-		queryIAM, destroyIAM, zitadelSecrets, zitadelExisting, err := iam.GetQueryAndDestroyFuncs(
+		queryIAM, destroyIAM, zitadelSecrets, zitadelExisting, migrateIAM, err := iam.GetQueryAndDestroyFuncs(
 			orbMonitor,
 			operatorLabels,
 			desiredKind.IAM,
@@ -93,8 +94,9 @@ func AdaptFunc(
 			features,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
+		migrate = migrate || migrateIAM
 		secret.AppendSecrets("", allSecrets, zitadelSecrets, allExisting, zitadelExisting)
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -134,6 +136,7 @@ func AdaptFunc(
 			},
 			allSecrets,
 			allExisting,
+			migrate,
 			nil
 	}
 }

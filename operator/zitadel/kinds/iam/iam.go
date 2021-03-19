@@ -32,6 +32,7 @@ func GetQueryAndDestroyFuncs(
 	destroy operator.DestroyFunc,
 	secrets map[string]*secret.Secret,
 	existing map[string]*secret.Existing,
+	migrate bool,
 	err error,
 ) {
 
@@ -46,6 +47,6 @@ func GetQueryAndDestroyFuncs(
 		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version)
 		return zitadel.AdaptFunc(apiLabels, nodeselector, tolerations, dbClient, namespace, action, version, features)(monitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, nil, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, false, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
 	}
 }

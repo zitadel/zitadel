@@ -32,7 +32,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		return ctrl.Result{}, err
 	}
 
-	query, _, _, _, err := orbdb.AdaptFunc("", &r.Version, false, "database")(internalMonitor, desired, &tree.Tree{})
+	query, _, _, _, _, err := orbdb.AdaptFunc("", &r.Version, false, "database")(internalMonitor, desired, &tree.Tree{})
 	if err != nil {
 		internalMonitor.Error(err)
 		return ctrl.Result{}, err
