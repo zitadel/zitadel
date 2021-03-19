@@ -12,12 +12,12 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone) (*domain.Phone, error) {
+func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, resourceOwner string) (*domain.Phone, error) {
 	if !phone.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6M0ds", "Errors.Phone.Invalid")
 	}
 
-	existingPhone, err := c.phoneWriteModelByID(ctx, phone.AggregateID, phone.ResourceOwner)
+	existingPhone, err := c.phoneWriteModelByID(ctx, phone.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

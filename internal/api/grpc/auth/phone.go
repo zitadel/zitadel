@@ -26,7 +26,7 @@ func (s *Server) GetMyPhone(ctx context.Context, _ *auth_pb.GetMyPhoneRequest) (
 }
 
 func (s *Server) SetMyPhone(ctx context.Context, req *auth_pb.SetMyPhoneRequest) (*auth_pb.SetMyPhoneResponse, error) {
-	phone, err := s.command.ChangeHumanPhone(ctx, UpdateMyPhoneToDomain(ctx, req))
+	phone, err := s.command.ChangeHumanPhone(ctx, UpdateMyPhoneToDomain(ctx, req), authz.GetCtxData(ctx).ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
