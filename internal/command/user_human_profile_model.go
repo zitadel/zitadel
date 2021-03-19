@@ -100,10 +100,10 @@ func (wm *HumanProfileWriteModel) NewChangedEvent(
 	changes := make([]user.ProfileChanges, 0)
 	var err error
 
-	if wm.FirstName != "" {
+	if wm.FirstName != firstName {
 		changes = append(changes, user.ChangeFirstName(firstName))
 	}
-	if wm.LastName != "" {
+	if wm.LastName != lastName {
 		changes = append(changes, user.ChangeLastName(lastName))
 	}
 	if wm.NickName != nickName {
