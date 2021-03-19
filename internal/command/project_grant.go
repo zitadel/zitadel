@@ -13,7 +13,7 @@ import (
 
 func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGrant, resourceOwner string) (_ *domain.ProjectGrant, err error) {
 	if !grant.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Project.Grant.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-3b8fs", "Errors.Project.Grant.Invalid")
 	}
 	err = c.checkProjectGrantPreCondition(ctx, grant)
 	if err != nil {

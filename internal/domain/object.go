@@ -4,6 +4,6 @@ import "time"
 
 type ObjectDetails struct {
 	Sequence      uint64
-	ChangeDate    time.Time
+	EventDate     time.Time
 	ResourceOwner string
 }

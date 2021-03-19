@@ -31,7 +31,7 @@ func (s *Server) SetMyPhone(ctx context.Context, req *auth_pb.SetMyPhoneRequest)
 		return nil, err
 	}
 	return &auth_pb.SetMyPhoneResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			phone.Sequence,
 			phone.ChangeDate,
 			phone.ResourceOwner,
@@ -48,7 +48,7 @@ func (s *Server) VerifyMyPhone(ctx context.Context, req *auth_pb.VerifyMyPhoneRe
 
 	//TODO: response from business
 	return &auth_pb.VerifyMyPhoneResponse{
-		//Details: object.DomainToDetailsPb(objectDetails),
+		//Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -59,7 +59,7 @@ func (s *Server) ResendMyPhoneVerification(ctx context.Context, _ *auth_pb.Resen
 		return nil, err
 	}
 	return &auth_pb.ResendMyPhoneVerificationResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -70,6 +70,6 @@ func (s *Server) RemoveMyPhone(ctx context.Context, _ *auth_pb.RemoveMyPhoneRequ
 		return nil, err
 	}
 	return &auth_pb.RemoveMyPhoneResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

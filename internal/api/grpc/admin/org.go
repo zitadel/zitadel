@@ -42,6 +42,6 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 		return nil, err
 	}
 	return &admin_pb.SetUpOrgResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToAddDetailsPb(objectDetails),
 	}, nil
 }

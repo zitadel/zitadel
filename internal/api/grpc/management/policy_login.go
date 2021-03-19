@@ -35,7 +35,7 @@ func (s *Server) AddCustomLoginPolicy(ctx context.Context, req *mgmt_pb.AddCusto
 		return nil, err
 	}
 	return &mgmt_pb.AddCustomLoginPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
@@ -49,7 +49,7 @@ func (s *Server) UpdateCustomLoginPolicy(ctx context.Context, req *mgmt_pb.Updat
 		return nil, err
 	}
 	return &mgmt_pb.UpdateCustomLoginPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
@@ -63,7 +63,7 @@ func (s *Server) ResetLoginPolicyToDefault(ctx context.Context, req *mgmt_pb.Res
 		return nil, err
 	}
 	return &mgmt_pb.ResetLoginPolicyToDefaultResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -84,7 +84,7 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *mgmt_pb.AddIDPToL
 		return nil, err
 	}
 	return &mgmt_pb.AddIDPToLoginPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			idp.Sequence,
 			idp.ChangeDate,
 			idp.ResourceOwner,
@@ -102,7 +102,7 @@ func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *mgmt_pb.Remo
 		return nil, err
 	}
 	return &mgmt_pb.RemoveIDPFromLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -124,7 +124,7 @@ func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.
 		return nil, err
 	}
 	return &mgmt_pb.AddSecondFactorToLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToAddDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -134,7 +134,7 @@ func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *mgm
 		return nil, err
 	}
 	return &mgmt_pb.RemoveSecondFactorFromLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -156,7 +156,7 @@ func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.A
 		return nil, err
 	}
 	return &mgmt_pb.AddMultiFactorToLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToAddDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -166,6 +166,6 @@ func (s *Server) RemoveMultiFactorFromLoginPolicy(ctx context.Context, req *mgmt
 		return nil, err
 	}
 	return &mgmt_pb.RemoveMultiFactorFromLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

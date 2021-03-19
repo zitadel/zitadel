@@ -71,10 +71,10 @@ func OrgToPb(org *grant_model.Org) *org_pb.Org {
 		Id:   org.OrgID,
 		Name: org.OrgName,
 		// State: OrgStateToPb(org.State), //TODO: not provided
-		// Details: object.ToDetailsPb(//TODO: not provided
+		// Details: object.ChangeToDetailsPb(//TODO: not provided
 		// 	org.Sequence,//TODO: not provided
 		// 	org.CreationDate,//TODO: not provided
-		// 	org.ChangeDate,//TODO: not provided
+		// 	org.EventDate,//TODO: not provided
 		// 	org.ResourceOwner,//TODO: not provided
 		// ),//TODO: not provided
 	}

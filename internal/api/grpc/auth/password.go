@@ -15,6 +15,6 @@ func (s *Server) UpdateMyPassword(ctx context.Context, req *auth_pb.UpdateMyPass
 		return nil, err
 	}
 	return &auth_pb.UpdateMyPasswordResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

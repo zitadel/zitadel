@@ -50,7 +50,7 @@ func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_
 	}
 	return &mgmt_pb.AddOrgResponse{
 		Id: org.AggregateID,
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			org.Sequence,
 			org.ChangeDate,
 			org.ResourceOwner,
@@ -64,7 +64,7 @@ func (s *Server) DeactivateOrg(ctx context.Context, req *mgmt_pb.DeactivateOrgRe
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateOrgResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -74,7 +74,7 @@ func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRe
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateOrgResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, err
 }
 
@@ -113,7 +113,7 @@ func (s *Server) AddOrgDomain(ctx context.Context, req *mgmt_pb.AddOrgDomainRequ
 		return nil, err
 	}
 	return &mgmt_pb.AddOrgDomainResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			domain.Sequence,
 			domain.ChangeDate,
 			domain.ResourceOwner,
@@ -127,7 +127,7 @@ func (s *Server) RemoveOrgDomain(ctx context.Context, req *mgmt_pb.RemoveOrgDoma
 		return nil, err
 	}
 	return &mgmt_pb.RemoveOrgDomainResponse{
-		Details: object.DomainToDetailsPb(details),
+		Details: object.DomainToChangeDetailsPb(details),
 	}, err
 }
 
@@ -159,7 +159,7 @@ func (s *Server) ValidateOrgDomain(ctx context.Context, req *mgmt_pb.ValidateOrg
 		return nil, err
 	}
 	return &mgmt_pb.ValidateOrgDomainResponse{
-		Details: object.DomainToDetailsPb(details),
+		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -169,7 +169,7 @@ func (s *Server) SetPrimaryOrgDomain(ctx context.Context, req *mgmt_pb.SetPrimar
 		return nil, err
 	}
 	return &mgmt_pb.SetPrimaryOrgDomainResponse{
-		Details: object.DomainToDetailsPb(details),
+		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -217,7 +217,7 @@ func (s *Server) AddOrgMember(ctx context.Context, req *mgmt_pb.AddOrgMemberRequ
 		return nil, err
 	}
 	return &mgmt_pb.AddOrgMemberResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			addedMember.Sequence,
 			addedMember.ChangeDate,
 			addedMember.ResourceOwner,
@@ -231,7 +231,7 @@ func (s *Server) UpdateOrgMember(ctx context.Context, req *mgmt_pb.UpdateOrgMemb
 		return nil, err
 	}
 	return &mgmt_pb.UpdateOrgMemberResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			changedMember.Sequence,
 			changedMember.ChangeDate,
 			changedMember.ResourceOwner,
@@ -245,6 +245,6 @@ func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemb
 		return nil, err
 	}
 	return &mgmt_pb.RemoveOrgMemberResponse{
-		Details: object.DomainToDetailsPb(details),
+		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
 }

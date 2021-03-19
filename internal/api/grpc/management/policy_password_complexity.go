@@ -30,7 +30,7 @@ func (s *Server) AddCustomPasswordComplexityPolicy(ctx context.Context, req *mgm
 		return nil, err
 	}
 	return &mgmt_pb.AddCustomPasswordComplexityPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
@@ -44,7 +44,7 @@ func (s *Server) UpdateCustomPasswordComplexityPolicy(ctx context.Context, req *
 		return nil, err
 	}
 	return &mgmt_pb.UpdateCustomPasswordComplexityPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
@@ -58,6 +58,6 @@ func (s *Server) ResetPasswordComplexityPolicyToDefault(ctx context.Context, req
 		return nil, err
 	}
 	return &mgmt_pb.ResetPasswordComplexityPolicyToDefaultResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

@@ -58,7 +58,7 @@ func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest)
 	}
 	return &mgmt_pb.AddOIDCAppResponse{
 		AppId:              app.AppID,
-		Details:            object_grpc.ToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
+		Details:            object_grpc.AddToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
 		ClientId:           app.ClientID,
 		ClientSecret:       app.ClientSecretString,
 		NoneCompliant:      app.Compliance.NoneCompliant,
@@ -73,7 +73,7 @@ func (s *Server) AddAPIApp(ctx context.Context, req *mgmt_pb.AddAPIAppRequest) (
 	}
 	return &mgmt_pb.AddAPIAppResponse{
 		AppId:        app.AppID,
-		Details:      object_grpc.ToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
+		Details:      object_grpc.AddToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
 		ClientId:     app.ClientID,
 		ClientSecret: app.ClientSecretString,
 	}, nil
@@ -85,7 +85,7 @@ func (s *Server) UpdateApp(ctx context.Context, req *mgmt_pb.UpdateAppRequest) (
 		return nil, err
 	}
 	return &mgmt_pb.UpdateAppResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -95,7 +95,7 @@ func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOID
 		return nil, err
 	}
 	return &mgmt_pb.UpdateOIDCAppConfigResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
@@ -109,7 +109,7 @@ func (s *Server) UpdateAPIAppConfig(ctx context.Context, req *mgmt_pb.UpdateAPIA
 		return nil, err
 	}
 	return &mgmt_pb.UpdateAPIAppConfigResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
@@ -123,7 +123,7 @@ func (s *Server) DeactivateApp(ctx context.Context, req *mgmt_pb.DeactivateAppRe
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateAppResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -133,7 +133,7 @@ func (s *Server) ReactivateApp(ctx context.Context, req *mgmt_pb.ReactivateAppRe
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateAppResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -143,7 +143,7 @@ func (s *Server) RemoveApp(ctx context.Context, req *mgmt_pb.RemoveAppRequest) (
 		return nil, err
 	}
 	return &mgmt_pb.RemoveAppResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -154,7 +154,7 @@ func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, req *mgmt_pb.Re
 	}
 	return &mgmt_pb.RegenerateOIDCClientSecretResponse{
 		ClientSecret: config.ClientSecretString,
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
@@ -169,7 +169,7 @@ func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.Reg
 	}
 	return &mgmt_pb.RegenerateAPIClientSecretResponse{
 		ClientSecret: config.ClientSecretString,
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
@@ -217,7 +217,7 @@ func (s *Server) AddAppKey(ctx context.Context, req *mgmt_pb.AddAppKeyRequest) (
 	}
 	return &mgmt_pb.AddAppKeyResponse{
 		Id:         key.KeyID,
-		Details:    object_grpc.ToDetailsPb(key.Sequence, key.ChangeDate, key.ResourceOwner),
+		Details:    object_grpc.AddToDetailsPb(key.Sequence, key.ChangeDate, key.ResourceOwner),
 		KeyDetails: keyDetails,
 	}, nil
 }
@@ -228,6 +228,6 @@ func (s *Server) RemoveAppKey(ctx context.Context, req *mgmt_pb.RemoveAppKeyRequ
 		return nil, err
 	}
 	return &mgmt_pb.RemoveAppKeyResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
