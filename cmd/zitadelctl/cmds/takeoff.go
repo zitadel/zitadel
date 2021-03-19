@@ -2,7 +2,7 @@ package cmds
 
 import (
 	"github.com/caos/orbos/pkg/kubernetes/cli"
-	"sigs.k8s.io/yaml"
+	"github.com/ghodss/yaml"
 
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 
@@ -103,6 +103,7 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 			return err
 		}
 		if found {
+
 			desiredTree, err := api.ReadZitadelYml(gitClient)
 			if err != nil {
 				return err
