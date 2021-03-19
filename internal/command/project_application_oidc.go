@@ -43,7 +43,7 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, application *domain.O
 }
 
 func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, oidcApp *domain.OIDCApp, resourceOwner string) (events []eventstore.EventPusher, stringPW string, err error) {
-	if !oidcApp.IsValid() {
+	if oidcApp.AppName == "" || !oidcApp.IsValid() {
 		return nil, "", caos_errs.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
 	oidcApp.AppID, err = c.idGenerator.Next()

@@ -2,6 +2,11 @@ package command
 
 import (
 	"context"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -11,9 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	id_mock "github.com/caos/zitadel/internal/id/mock"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func TestCommandSide_AddOIDCApplication(t *testing.T) {
@@ -285,8 +287,9 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 						AggregateID: "project1",
 					},
 					AppID:          "",
-					AppName:        "app",
 					AuthMethodType: domain.OIDCAuthMethodTypePost,
+					GrantTypes:     []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes:  []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 				},
 				resourceOwner: "org1",
 			},
@@ -308,8 +311,9 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 						AggregateID: "",
 					},
 					AppID:          "appid",
-					AppName:        "app",
 					AuthMethodType: domain.OIDCAuthMethodTypePost,
+					GrantTypes:     []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes:  []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 				},
 				resourceOwner: "org1",
 			},
@@ -331,8 +335,10 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					AppID:   "app1",
-					AppName: "app",
+					AppID:          "app1",
+					AuthMethodType: domain.OIDCAuthMethodTypePost,
+					GrantTypes:     []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes:  []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 				},
 				resourceOwner: "org1",
 			},
