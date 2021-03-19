@@ -76,6 +76,8 @@ func idpQueryToModel(query *mgmt_pb.IDPQuery) *iam_model.IDPConfigSearchQuery {
 		return idp_grpc.IDPNameQueryToModel(q.IdpNameQuery)
 	case *mgmt_pb.IDPQuery_IdpIdQuery:
 		return idp_grpc.IDPIDQueryToModel(q.IdpIdQuery)
+	case *mgmt_pb.IDPQuery_OwnerTypeQuery:
+		return idp_grpc.IDPOwnerTypeQueryToModel(q.OwnerTypeQuery)
 	default:
 		return nil
 	}
