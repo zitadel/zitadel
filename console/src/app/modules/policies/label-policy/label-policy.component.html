@@ -1,4 +1,4 @@
-<app-detail-layout [backRouterLink]="['/iam']" [title]="'POLICY.LABEL.TITLE' | translate"
+<app-detail-layout [backRouterLink]="['/iam/policies']" [title]="'POLICY.LABEL.TITLE' | translate"
     [description]="'POLICY.LABEL.DESCRIPTION' | translate">
 
     <div class="content" *ngIf="labelData">
@@ -14,7 +14,9 @@
     </div>
 
     <div class="btn-container">
-        <button (click)="savePolicy()" color="primary" type="submit"
-            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+        <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
+            }}</button>
     </div>
+
+    <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
 </app-detail-layout>

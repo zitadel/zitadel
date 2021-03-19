@@ -9,6 +9,12 @@
   margin: 0 -.5rem;
 
   .mfa {
+    background-color: #6a506e;
+    color: white;
+  }
+
+  .mfa,
+  .new-mfa {
     border: 1px solid var(--grey);
     border-radius: .5rem;
     display: grid;
@@ -23,10 +29,13 @@
 
     .rm {
       position: absolute;
-      top: 0;
-      left: 0;
+      display: none;
+      top: -2px;
+      left: -2px;
       transform: translateX(-50%) translateY(-50%);
       cursor: pointer;
+      color: #f44336;
+      transition: all .2s ease;
 
       &[disabled] {
         display: none;
@@ -35,7 +44,9 @@
 
     &:not(.disabled) {
       &:hover {
-        background-color: #ffffff10;
+        .rm {
+            display: block;
+        }
       }
     }
   }

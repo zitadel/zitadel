@@ -29,11 +29,13 @@ func SetReturnResourceVersion(
 	ret := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"metadata": map[string]interface{}{
+				"annotations":     map[string]interface{}{},
+				"labels":          map[string]interface{}{},
 				"resourceVersion": resourceVersion,
 			},
 		},
 	}
-	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).Return(ret, nil)
+	k8sClient.EXPECT().GetNamespacedCRDResource(group, version, kind, namespace, name).MinTimes(1).MaxTimes(1).Return(ret, nil)
 }
 
 func SetMappingsUI(
@@ -43,12 +45,12 @@ func SetMappingsUI(
 	group := "getambassador.io"
 	version := "v2"
 	kind := "Mapping"
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ui.AccountsName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ui.AccountsName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ui.AccountsName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ui.ConsoleName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ui.ConsoleName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ui.ConsoleName, gomock.Any()).MinTimes(1).MaxTimes(1)
 }
 
 func SetMappingsHTTP(
@@ -58,22 +60,22 @@ func SetMappingsHTTP(
 	group := "getambassador.io"
 	version := "v2"
 	kind := "Mapping"
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.AdminRName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.AdminRName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.AdminRName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.AuthorizeName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.AuthorizeName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.AuthorizeName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.AuthRName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.AuthRName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.AuthRName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.EndsessionName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.EndsessionName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.EndsessionName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.IssuerName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.IssuerName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.IssuerName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.MgmtName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.MgmtName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.MgmtName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.OauthName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.OauthName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.OauthName, gomock.Any()).MinTimes(1).MaxTimes(1)
 }
 
 func SetMappingsGRPC(
@@ -83,14 +85,14 @@ func SetMappingsGRPC(
 	group := "getambassador.io"
 	version := "v2"
 	kind := "Mapping"
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, grpc.AdminMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, grpc.AdminMName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, grpc.AdminMName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, grpc.AuthMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, grpc.AuthMName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, grpc.AuthMName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, grpc.MgmtMName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, grpc.MgmtMName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, grpc.MgmtMName, gomock.Any()).MinTimes(1).MaxTimes(1)
 }
 
 func SetHosts(
@@ -100,16 +102,16 @@ func SetHosts(
 	group := "getambassador.io"
 	version := "v2"
 	kind := "Host"
-	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").Times(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, hosts.AccountsHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, hosts.AccountsHostName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, hosts.AccountsHostName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, hosts.ApiHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, hosts.ApiHostName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, hosts.ApiHostName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, hosts.ConsoleHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, hosts.ConsoleHostName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, hosts.ConsoleHostName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, hosts.IssuerHostName, "")
-	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, hosts.IssuerHostName, gomock.Any()).Times(1)
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, hosts.IssuerHostName, gomock.Any()).MinTimes(1).MaxTimes(1)
 
 }
 

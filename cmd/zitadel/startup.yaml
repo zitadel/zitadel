@@ -17,6 +17,7 @@ Metrics:
     MeterName: 'github.com/caos/zitadel'
 
 AuthZ:
+  Domain: $ZITADEL_DEFAULT_DOMAIN
   Repository:
     Eventstore:
       ServiceName: 'AuthZ'
@@ -106,7 +107,8 @@ Auth:
     PublicKeyLifetime: 30h
     EncryptionConfig:
       EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
-    SigningKeyRotation: 10s
+    SigningKeyRotationCheck: 10s
+    SigningKeyGracefulPeriod: 10m
 
 Admin:
   SearchLimit: 1000
@@ -193,6 +195,7 @@ API:
       Issuer: $ZITADEL_ISSUER
       DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
       CodeMethodS256: true
+      AuthMethodPrivateKeyJWT: true
     StorageConfig:
       DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
       DefaultAccessTokenLifetime: 12h
@@ -214,6 +217,9 @@ API:
       Token:
         Path: 'token'
         URL: '$ZITADEL_OAUTH/token'
+      Introspection:
+        Path: 'introspect'
+        URL: '$ZITADEL_OAUTH/introspect'
       EndSession:
         Path: 'endsession'
         URL: '$ZITADEL_AUTHORIZE/endsession'

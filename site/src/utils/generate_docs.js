@@ -20,18 +20,16 @@ const block_types = [
     'tablecell'
 ];
 
-export default function generate_docs(dirpath, dir, lang) {
+export default function generate_docs(dirpath, dir) {
     const make_slug = make_session_slug_processor({
         separator: SLUG_SEPARATOR,
         preserve_unicode: SLUG_PRESERVE_UNICODE
     });
 
-    console.log('using language: ' + lang);
-
     return fs
         .readdirSync(`${dirpath}${dir}`)
         .filter((file) => {
-            return file[0] !== '.' && path.extname(file) === '.md' && file.endsWith(`.${lang}.md`);
+            return file[0] !== '.' && path.extname(file) === '.md' && file.endsWith(`.md`);
         })
         .map((file) => {
             const markdown = fs.readFileSync(`${dirpath}${dir}/${file}`, 'utf-8');
@@ -45,7 +43,7 @@ export default function generate_docs(dirpath, dir, lang) {
 
             renderer.link = link_renderer;
 
-            renderer.hr = (str) => {
+            renderer.hr = () => {
                 block_open = true;
 
                 return '<div class="side-by-side"><div class="copy">';
@@ -65,7 +63,9 @@ export default function generate_docs(dirpath, dir, lang) {
             };
 
             renderer.code = (source, lang) => {
-                source = source.replace(/^ +/gm, (match) => match.split('    ').join('\t'));
+                source = source.replace(/^ +/gm, match =>
+                    match.split('    ').join('\t')
+                );
 
                 const lines = source.split('\n');
 
@@ -90,6 +90,11 @@ export default function generate_docs(dirpath, dir, lang) {
 
                 const plang = langs[lang];
                 const { value: highlighted } = hljs.highlight(lang, source);
+                // const highlighted = PrismJS.highlight(
+                // 	source,
+                // 	PrismJS.languages[plang],
+                // 	lang
+                // );
 
                 const html = `<div class='${class_name}'>${prefix}<pre class='language-${plang}'><code>${highlighted}</code></pre></div>`;
 
@@ -101,16 +106,17 @@ export default function generate_docs(dirpath, dir, lang) {
                 return html;
             };
 
-            // const slugger = new marked.Slugger();
             renderer.heading = (text, level, rawtext) => {
                 const slug = level <= 4 && make_slug(rawtext);
 
                 if (level === 3 || level === 4) {
-                    const title = text.replace(/<\/?code>/g, '').replace(/\.(\w+)(\((.+)?\))?/, (m, $1, $2, $3) => {
-                        if ($3) return `.${$1}(...)`;
-                        if ($2) return `.${$1}()`;
-                        return `.${$1}`;
-                    });
+                    const title = text
+                        .replace(/<\/?code>/g, '')
+                        .replace(/\.(\w+)(\((.+)?\))?/, (m, $1, $2, $3) => {
+                            if ($3) return `.${$1}(...)`;
+                            if ($2) return `.${$1}()`;
+                            return `.${$1}`;
+                        });
 
                     subsections.push({ slug, title, level });
                 }
@@ -118,12 +124,12 @@ export default function generate_docs(dirpath, dir, lang) {
                 return `
 					<h${level}>
 						<span id="${slug}" class="offset-anchor" ${level > 4 ? 'data-scrollignore' : ''}></span>
-						<a href="${dir}#${slug}" class="anchor" aria-hidden="true"> <i class="las la-link"></i> </a>
+						<a href="${dir}#${slug}" class="anchor" aria-hidden="true"><i class="las la-link"></i></a>
 						${text}
 					</h${level}>`;
             };
 
-            block_types.forEach((type) => {
+            block_types.forEach(type => {
                 const fn = renderer[type];
                 renderer[type] = function () {
                     return fn.apply(this, arguments);

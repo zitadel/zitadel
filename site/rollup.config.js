@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-named-as-default
 import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
@@ -13,20 +14,10 @@ const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 const legacy = !!process.env.SAPPER_LEGACY_BUILD;
 
-const onwarn = (warning, onwarn) => {
-    if (
-        (warning.code === 'CIRCULAR_DEPENDENCY' &&
-            /[/\\]@sapper[/\\]/.test(warning.message))
-    ) {
-        return;
-    }
-
-    if (warning.code === 'THIS_IS_UNDEFINED') {
-        return;
-    }
-
+const onwarn = (warning, onwarn) =>
+    (warning.code === 'MISSING_EXPORT' && /'preload'/.test(warning.message)) ||
+    (warning.code === 'CIRCULAR_DEPENDENCY' && /[/\\]@sapper[/\\]/.test(warning.message)) ||
     onwarn(warning);
-};
 
 export default {
     client: {
@@ -38,9 +29,10 @@ export default {
                 'process.env.NODE_ENV': JSON.stringify(mode)
             }),
             svelte({
-                dev,
-                hydratable: true,
-                emitCss: true
+                compilerOptions: {
+                    dev,
+                    hydratable: true
+                }
             }),
             resolve({
                 browser: true,
@@ -68,11 +60,11 @@ export default {
             !dev && terser({
                 module: true
             }),
-
             json()
         ],
+
         preserveEntrySignatures: false,
-        onwarn,
+        onwarn
     },
 
     server: {
@@ -84,8 +76,12 @@ export default {
                 'process.env.NODE_ENV': JSON.stringify(mode)
             }),
             svelte({
-                generate: 'ssr',
-                dev
+                compilerOptions: {
+                    dev,
+                    generate: 'ssr',
+                    hydratable: true
+                },
+                emitCss: false
             }),
             resolve({
                 dedupe: ['svelte']
@@ -96,8 +92,9 @@ export default {
         external: Object.keys(pkg.dependencies).concat(
             require('module').builtinModules || Object.keys(process.binding('natives'))
         ),
+
         preserveEntrySignatures: 'strict',
-        onwarn,
+        onwarn
     },
 
     serviceworker: {
@@ -110,9 +107,11 @@ export default {
                 'process.env.NODE_ENV': JSON.stringify(mode)
             }),
             commonjs(),
+            // json(),
             !dev && terser()
         ],
+
         preserveEntrySignatures: false,
-        onwarn,
-    },
+        onwarn
+    }
 };

@@ -4,10 +4,12 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/key/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/key/repository/view/model"
@@ -20,11 +22,13 @@ const (
 type Key struct {
 	handler
 	subscription *eventstore.Subscription
+	keyChan      chan<- *model.KeyView
 }
 
-func newKey(handler handler) *Key {
+func newKey(handler handler, keyChan chan<- *model.KeyView) *Key {
 	h := &Key{
 		handler: handler,
+		keyChan: keyChan,
 	}
 
 	h.subscribe()
@@ -75,7 +79,12 @@ func (k *Key) Reduce(event *models.Event) error {
 		if privateKey.Expiry.Before(time.Now()) && publicKey.Expiry.Before(time.Now()) {
 			return k.view.ProcessedKeySequence(event)
 		}
-		return k.view.PutKeys(privateKey, publicKey, event)
+		err = k.view.PutKeys(privateKey, publicKey, event)
+		if err != nil {
+			return err
+		}
+		k.keyChan <- view_model.KeyViewToModel(privateKey)
+		return nil
 	default:
 		return k.view.ProcessedKeySequence(event)
 	}

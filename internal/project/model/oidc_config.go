@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/id"
+	key_model "github.com/caos/zitadel/internal/key/model"
 )
 
 const (
@@ -40,6 +41,7 @@ type OIDCConfig struct {
 	IDTokenRoleAssertion     bool
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
+	ClientKeys               []*ClientKey
 }
 
 type OIDCVersion int32
@@ -78,6 +80,7 @@ const (
 	OIDCAuthMethodTypeBasic OIDCAuthMethodType = iota
 	OIDCAuthMethodTypePost
 	OIDCAuthMethodTypeNone
+	OIDCAuthMethodTypePrivateKeyJWT
 )
 
 type Compliance struct {
@@ -91,6 +94,27 @@ const (
 	OIDCTokenTypeBearer OIDCTokenType = iota
 	OIDCTokenTypeJWT
 )
+
+type ClientKey struct {
+	es_models.ObjectRoot
+
+	ApplicationID  string
+	ClientID       string
+	KeyID          string
+	Type           key_model.AuthNKeyType
+	ExpirationDate time.Time
+	PrivateKey     []byte
+}
+
+type Token struct {
+	es_models.ObjectRoot
+
+	TokenID    string
+	ClientID   string
+	Audience   []string
+	Expiration time.Time
+	Scopes     []string
+}
 
 func (c *OIDCConfig) IsValid() bool {
 	grantTypes := c.getRequiredGrantTypes()
@@ -115,10 +139,10 @@ func (c *OIDCConfig) GenerateNewClientID(idGenerator id.Generator, project *Proj
 }
 
 func (c *OIDCConfig) GenerateClientSecretIfNeeded(generator crypto.Generator) (string, error) {
-	if c.AuthMethodType == OIDCAuthMethodTypeNone {
-		return "", nil
+	if c.AuthMethodType == OIDCAuthMethodTypeBasic || c.AuthMethodType == OIDCAuthMethodTypePost {
+		return c.GenerateNewClientSecret(generator)
 	}
-	return c.GenerateNewClientSecret(generator)
+	return "", nil
 }
 
 func (c *OIDCConfig) GenerateNewClientSecret(generator crypto.Generator) (string, error) {

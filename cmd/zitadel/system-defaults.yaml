@@ -15,7 +15,7 @@ SystemDefaults:
       IncludeLowerLetters: true
       IncludeUpperLetters: true
       IncludeDigits: true
-      IncludeSymbols: true
+      IncludeSymbols: false
     InitializeUserCode:
       Length: 6
       Expiry: '72h'
@@ -45,6 +45,7 @@ SystemDefaults:
       IncludeDigits: true
       IncludeSymbols: false
     MachineKeySize: 2048
+    ClientKeySize: 2048
   Multifactors:
     OTP:
       Issuer: 'ZITADEL'

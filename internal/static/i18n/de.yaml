@@ -156,8 +156,12 @@ Errors:
     AppInvalid: Applikation ist ungültig
     AppNotExisting: Applikation exisitert nicht
     OIDCConfigInvalid: OIDC Konfiguration ist ungültig
+    APIConfigInvalid: API Konfiguration ist ungültig
     AppIsNotOIDC: Applikation ist nicht vom Typ OIDC
-    OIDCAuthMethodNoneSecret: OIDC Auth Method None benötigt kein Secret
+    AppIsNotAPI: Applikation ist nicht vom Typ API
+    OIDCAuthMethodNoSecret: Gewählte OIDC Auth Method benötigt kein Secret
+    APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
+    AuthMethodNoPrivateKeyJWT: Gewählte Auth Method benötigt keinen Key
     RequiredFieldsMissing: Benötigte Felder fehlen
     GrantNotFound: Grant konnte nicht gefunden werden
     GrantInvalid: Projekt Grant ist ungültig
@@ -165,7 +169,7 @@ Errors:
     GrantNotExists: Projekt Grant existiert nicht
     GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
     UserIDMisisng: User ID fehlt
-    OIDCSecretInvalid: Client Secret ist ungültig
+    ClientSecretInvalid: Client Secret ist ungültig
   IAM:
     MemberInvalid: Member ist ungültig
     MemberAlreadyExisting: Member existiert bereits
@@ -507,12 +511,20 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret Validierung erfolgreich
             failed: OIDC Client Secret Validierung fehlgeschlagen
+        key:
+          added: Applikations Schlüssel hinzugefügt
+          removed: Applikations Schlüssel entfernt
       config:
         oidc:
           added: OIDC Konfiguration hinzugefügt
           changed: OIDC Konfiguration geändert
           secret:
             changed: OIDC Client Secret geändert
+        api:
+          added: API Konfiguration hinzugefügt
+          changed: API Konfiguration geändert
+          secret:
+            changed: API Client Secret geändert
   policy:
     password:
       complexity:

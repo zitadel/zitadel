@@ -9,6 +9,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { LinksModule } from '../../links/links.module';
 
 import { LabelPolicyRoutingModule } from './label-policy-routing.module';
 import { LabelPolicyComponent } from './label-policy.component';
@@ -27,6 +28,7 @@ import { LabelPolicyComponent } from './label-policy.component';
         MatTooltipModule,
         TranslateModule,
         DetailLayoutModule,
+        LinksModule,
     ],
 })
 export class LabelPolicyModule { }

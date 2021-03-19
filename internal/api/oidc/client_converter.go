@@ -1,13 +1,13 @@
 package oidc
 
 import (
-	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
 	"strings"
 	"time"
 
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 
+	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/project/model"
 )
@@ -37,7 +37,7 @@ func (c *Client) ApplicationType() op.ApplicationType {
 	return op.ApplicationType(c.OIDCApplicationType)
 }
 
-func (c *Client) AuthMethod() op.AuthMethod {
+func (c *Client) AuthMethod() oidc.AuthMethod {
 	return authMethodToOIDC(c.OIDCAuthMethodType)
 }
 
@@ -129,16 +129,18 @@ func accessTokenTypeToOIDC(tokenType model.OIDCTokenType) op.AccessTokenType {
 	}
 }
 
-func authMethodToOIDC(authType model.OIDCAuthMethodType) op.AuthMethod {
+func authMethodToOIDC(authType model.OIDCAuthMethodType) oidc.AuthMethod {
 	switch authType {
 	case model.OIDCAuthMethodTypeBasic:
-		return op.AuthMethodBasic
+		return oidc.AuthMethodBasic
 	case model.OIDCAuthMethodTypePost:
-		return op.AuthMethodPost
+		return oidc.AuthMethodPost
 	case model.OIDCAuthMethodTypeNone:
-		return op.AuthMethodNone
+		return oidc.AuthMethodNone
+	case model.OIDCAuthMethodTypePrivateKeyJWT:
+		return oidc.AuthMethodPrivateKeyJWT
 	default:
-		return op.AuthMethodBasic
+		return oidc.AuthMethodBasic
 	}
 }
 

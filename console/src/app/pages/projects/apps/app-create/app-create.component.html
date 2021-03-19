@@ -15,7 +15,8 @@
         {{'APP.OIDC.PROSWITCH' | translate}}
     </mat-checkbox>
 
-    <mat-horizontal-stepper class="stepper" *ngIf="!devmode" linear #stepper labelPosition="bottom">
+    <mat-horizontal-stepper class="stepper" *ngIf="!devmode" linear #stepper labelPosition="bottom"
+        (selectionChange)="changeStep($event)">
         <mat-step [stepControl]="firstFormGroup" [editable]="true">
             <form [formGroup]="firstFormGroup">
                 <ng-template matStepLabel>{{'APP.OIDC.NAMEANDTYPESECTION' | translate}}</ng-template>
@@ -23,18 +24,15 @@
                 <p class="step-title">{{'APP.OIDC.TITLEFIRST' | translate}}</p>
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
-                    <input cnslInput formControlName="name" />
+                    <input cnslInput cdkFocusInitial formControlName="name" />
                     <span cnsl-error *ngIf="name?.errors?.required">{{'PROJECT.APP.NAMEREQUIRED' | translate}}</span>
                 </cnsl-form-field>
 
                 <p class="step-title">{{'APP.OIDC.TYPETITLE' | translate}}</p>
-                <mat-radio-group color="primary" aria-labelledby="radio-group-label" class="radio-group"
-                    formControlName="applicationType">
-                    <mat-radio-button class="radio-button" *ngFor="let type of oidcAppTypes | keyvalue"
-                        [value]="type.value">
-                        <div>{{('APP.OIDC.APPTYPE'+type.key.toString()) | translate}}</div>
-                    </mat-radio-button>
-                </mat-radio-group>
+
+                <app-type-radio [types]="appTypes" (selectedType)="appType?.setValue($event)"
+                    [selected]="appType?.value">
+                </app-type-radio>
                 <div class="actions">
                     <button mat-raised-button [disabled]="firstFormGroup.invalid" color="primary"
                         matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
@@ -42,44 +40,28 @@
             </form>
         </mat-step>
 
-        <mat-step [editable]="true"
-            *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
-            <ng-template matStepLabel>{{'APP.OIDC.RESPONSESECTION' | translate}}</ng-template>
-            <div class="checkbox-container">
-                <mat-checkbox class="checkbox" *ngFor="let responsetype of oidcResponseTypes"
-                    (change)="changeResponseType()" color="primary" [(ngModel)]="responsetype.checked"
-                    [disabled]="responsetype.disabled">
-                    {{'APP.OIDC.RESPONSE'+responsetype.type | translate}}
-                </mat-checkbox>
-            </div>
-            <div class="actions">
-                <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
-            </div>
-        </mat-step>
-
-        <mat-step *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB"
+        <!-- skip for native applications -->
+        <mat-step *ngIf="oidcApp.applicationType !== OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE"
             [stepControl]="secondFormGroup" [editable]="true">
             <form [formGroup]="secondFormGroup">
-                <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHODSECTION' | translate}}</ng-template>
+                <ng-template matStepLabel>{{'APP.AUTHMETHODSECTION' | translate}}</ng-template>
 
-                <mat-radio-group color="primary" aria-labelledby="example-radio-group-label" class="radio-group"
-                    formControlName="authMethodType">
-                    <mat-radio-button class="radio-button" *ngFor="let authmethod of oidcAuthMethodType"
-                        [disabled]="authmethod.disabled" [value]="authmethod.type">
-                        {{'APP.OIDC.AUTHMETHOD'+authmethod.type | translate}}
-                    </mat-radio-button>
-                </mat-radio-group>
+                <app-auth-method-radio [authMethods]="authMethods" [selected]="authMethod?.value"
+                    [isOIDC]="appType?.value?.createType == AppCreateType.OIDC"
+                    (selectedMethod)="authMethod?.setValue($event)">
+                </app-auth-method-radio>
+
                 <div class="actions">
-                    <button mat-stroked-button color="primary"
-                        matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
+                    <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' |
+                        translate}}</button>
                     <button mat-raised-button color="primary" [disabled]="secondFormGroup.invalid"
                         matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
                 </div>
             </form>
         </mat-step>
 
-        <mat-step [editable]="true">
+        <!-- show redirect step only for OIDC apps -->
+        <mat-step *ngIf="appType?.value?.createType == AppCreateType.OIDC" [editable]="true">
             <ng-template matStepLabel>{{'APP.OIDC.REDIRECTSECTION' | translate}}</ng-template>
 
             <p class="step-title">{{'APP.OIDC.REDIRECTTITLE' | translate}}</p>
@@ -89,25 +71,11 @@
             <p class="step-description" *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB">
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
-            <form class="chip-form" (ngSubmit)="addUri(redInput, 'REDIRECT')">
-                <cnsl-form-field appearance="outline" class="full-width">
-                    <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
-                    <input #redInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
-                        [formControl]="redirectControl">
-                </cnsl-form-field>
-                <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button>
-                    <mat-icon>add</mat-icon>
-                </button>
-            </form>
-            <mat-chip-list #chipRedirectList aria-label="uri selection">
-                <mat-chip #redInput class="chip" *ngFor="let uri of oidcApp.redirectUrisList" selected removable
-                    [matTooltip]="!uri?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
-                    [color]="!uri?.startsWith('https://') ? 'warn': 'white'" (removed)="removeUri(uri, 'REDIRECT')">
-                    {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
-                </mat-chip>
-            </mat-chip-list>
-
-            <p *ngIf="redirectControl.invalid" class="error">{{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
+            <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
+                [isNative]="oidcApp.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE"
+                (changedUris)="oidcApp.redirectUrisList = $event" [urisList]="oidcApp.redirectUrisList"
+                [getValues]="requestRedirectValuesSubject$" title="{{ 'APP.OIDC.REDIRECT' | translate }}">
+            </cnsl-redirect-uris>
 
             <p class="step-title">{{'APP.OIDC.POSTREDIRECTTITLE' | translate}}</p>
             <p class="step-description"
@@ -117,26 +85,12 @@
                 *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
-            <form class="chip-form" (ngSubmit)="addUri(postInput, 'POSTREDIRECT')">
-                <cnsl-form-field appearance="outline" class="full-width">
-                    <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
-                    <input #postInput cnslInput placeholder="{{'APP.OIDC.COMMAORENTERSEPERATION' | translate}}"
-                        [formControl]="postRedirectControl">
-                </cnsl-form-field>
-                <button matTooltip="{{'ACTIONS.ADD' | translate}}" type="submit" mat-icon-button>
-                    <mat-icon>add</mat-icon>
-                </button>
-            </form>
-            <mat-chip-list #chipPostRedirectList aria-label="uri selection">
-                <mat-chip class="chip" *ngFor="let uri of oidcApp.postLogoutRedirectUrisList"
-                    [matTooltip]="!uri?.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
-                    removable (removed)="removeUri(uri, 'POSTREDIRECT')" selected
-                    [color]="!uri?.startsWith('https://') ? 'warn': 'white'">
-                    {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
-                </mat-chip>
-            </mat-chip-list>
-
-            <p *ngIf="postRedirectControl.invalid" class="error">{{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
+            <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
+                (changedUris)="oidcApp.postLogoutRedirectUrisList = $event"
+                [urisList]="oidcApp.postLogoutRedirectUrisList" title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+                [getValues]="requestRedirectValuesSubject$"
+                [isNative]="oidcApp.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+            </cnsl-redirect-uris>
 
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
@@ -156,82 +110,94 @@
                     {{oidcApp.name}}
                 </span>
             </div>
-            <div class="row">
-                <span class="left">
-                    {{ 'APP.TYPE' | translate }}
-                </span>
-                <span class="right">
-                    {{'APP.OIDC.APPTYPE'+oidcApp.applicationType | translate}}
-                </span>
-            </div>
-            <div class="row">
-                <span class="left">
-                    {{ 'APP.GRANT' | translate }}
-                </span>
-                <span class="right" *ngIf="oidcApp.grantTypesList?.length > 0">
-                    [<span *ngFor="let element of oidcApp.grantTypesList; index as i">
-                        {{'APP.OIDC.GRANT'+element | translate}}
-                        {{i < oidcApp.grantTypesList.length - 1 ? ', ': ''}}
-                    </span>]
-                </span>
-            </div>
-            <div class="row">
-                <span class="left">
-                    {{ 'APP.OIDC.RESPONSE' | translate }}
-                </span>
-                <span class="right" *ngIf="oidcApp.responseTypesList?.length > 0">
-                    [<span *ngFor="let element of oidcApp.responseTypesList; index as i">
-                        {{('APP.OIDC.RESPONSE'+element | translate)}}
-                        {{i < oidcApp.responseTypesList.length - 1 ? ', ': ''}}
-                    </span>]
-                </span>
-            </div>
 
-            <div class="row">
-                <span class="left">
-                    {{ 'APP.OIDC.AUTHMETHOD' | translate }}
-                </span>
-                <span class="right">
-                    <span>
-                        {{'APP.OIDC.AUTHMETHOD'+oidcApp?.authMethodType | translate}}
+            <ng-container *ngIf="appType?.value?.createType == AppCreateType.OIDC">
+                <div class="row">
+                    <span class="left">
+                        {{ 'APP.TYPE' | translate }}
                     </span>
-                </span>
-            </div>
+                    <span class="right">
+                        {{'APP.OIDC.APPTYPE.'+oidcApp.applicationType | translate}}
+                    </span>
+                </div>
+                <div class="row">
+                    <span class="left">
+                        {{ 'APP.GRANT' | translate }}
+                    </span>
+                    <span class="right" *ngIf="oidcApp.grantTypesList?.length > 0">
+                        [<span *ngFor="let element of oidcApp.grantTypesList; index as i">
+                            {{'APP.OIDC.GRANT.'+element | translate}}
+                            {{i < oidcApp.grantTypesList.length - 1 ? ', ' : '' }} </span>]
+                        </span>
+                </div>
+                <div class="row">
+                    <span class="left">
+                        {{ 'APP.OIDC.RESPONSETYPE' | translate }}
+                    </span>
+                    <span class="right" *ngIf="oidcApp.responseTypesList?.length > 0">
+                        [<span *ngFor="let element of oidcApp.responseTypesList; index as i">
+                            {{('APP.OIDC.RESPONSE.'+element | translate)}}
+                            {{i < oidcApp.responseTypesList.length - 1 ? ', ' : '' }} </span>]
+                        </span>
+                </div>
 
-            <div class="row">
-                <span class="left">
-                    {{ 'APP.OIDC.REDIRECT' | translate }}
-                </span>
-                <span class="right" *ngIf="oidcApp.redirectUrisList?.length > 0">
-                    [<span *ngFor="let redirect of oidcApp.redirectUrisList; index as i">
-                        {{redirect}}
-                        {{i < oidcApp.redirectUrisList.length - 1 ? ', ': ''}}
-                    </span>]
-                </span>
-            </div>
+                <div class="row">
+                    <span class="left">
+                        {{ 'APP.AUTHMETHOD' | translate }}
+                    </span>
+                    <span class="right">
+                        <span>
+                            {{'APP.OIDC.AUTHMETHOD.'+oidcApp?.authMethodType | translate}}
+                        </span>
+                    </span>
+                </div>
 
-            <div class="row">
-                <span class="left">
-                    {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
-                </span>
-                <span class="right" *ngIf="oidcApp.postLogoutRedirectUrisList?.length > 0">
-                    [<span *ngFor="let redirect of oidcApp.postLogoutRedirectUrisList; index as i">
-                        {{redirect}}
-                        {{i < oidcApp.postLogoutRedirectUrisList.length - 1 ? ', ': ''}}
-                    </span>]
-                </span>
-            </div>
+                <div class="row">
+                    <span class="left">
+                        {{ 'APP.OIDC.REDIRECT' | translate }}
+                    </span>
+                    <span class="right" *ngIf="oidcApp.redirectUrisList?.length > 0">
+                        [<span *ngFor="let redirect of oidcApp.redirectUrisList; index as i">
+                            {{redirect}}
+                            {{i < oidcApp.redirectUrisList.length - 1 ? ', ' : '' }} </span>]
+                        </span>
+                </div>
+
+                <div class="row">
+                    <span class="left">
+                        {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
+                    </span>
+                    <span class="right" *ngIf="oidcApp.postLogoutRedirectUrisList?.length > 0">
+                        [<span *ngFor="let redirect of oidcApp.postLogoutRedirectUrisList; index as i">
+                            {{redirect}}
+                            {{i < oidcApp.postLogoutRedirectUrisList.length - 1 ? ', ' : '' }} </span>]
+                        </span>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="appType?.value?.createType == AppCreateType.API">
+                <div class="row">
+                    <span class="left">
+                        {{ 'APP.AUTHMETHOD' | translate }}
+                    </span>
+                    <span class="right">
+                        <span>
+                            {{'APP.API.AUTHMETHOD.'+apiApp?.authMethodType | translate}}
+                        </span>
+                    </span>
+                </div>
+            </ng-container>
 
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary"
-                    (click)="saveOIDCApp()">{{'ACTIONS.CREATE' | translate}}</button>
+                <button mat-raised-button color="primary" (click)="createApp()">{{'ACTIONS.CREATE' |
+                    translate}}</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>
 
     <div *ngIf="devmode" class="dev">
-        <form [formGroup]="form" (ngSubmit)="saveOIDCApp()">
+        <form [formGroup]="form" (ngSubmit)="createApp()">
             <div class="content">
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
@@ -239,67 +205,61 @@
                 </cnsl-form-field>
 
                 <cnsl-form-field appearance="outline" class="formfield">
-                    <cnsl-label>{{ 'APP.OIDC.APPTYPE' | translate }}</cnsl-label>
-                    <mat-select formControlName="applicationType">
-                        <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
-                            {{ 'APP.OIDC.APPTYPE'+type | translate }}
+                    <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
+                    <mat-select formControlName="appType">
+                        <mat-option *ngFor="let appType of appTypes" [value]="appType">
+                            {{ appType.titleI18nKey | translate }}
                         </mat-option>
                     </mat-select>
                 </cnsl-form-field>
 
-                <cnsl-form-field appearance="outline" class="formfield">
-                    <cnsl-label>{{ 'APP.OIDC.GRANT' | translate }}</cnsl-label>
-                    <mat-select formControlName="grantTypesList" multiple>
-                        <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant.type">
-                            {{ ('APP.OIDC.GRANT' + grant.type) | translate }}
-                        </mat-option>
-                    </mat-select>
-                </cnsl-form-field>
+                <ng-container *ngIf="formappType?.value?.createType == AppCreateType.OIDC">
+                    <cnsl-form-field appearance="outline" class="formfield">
+                        <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
+                        <mat-select formControlName="grantTypesList" multiple>
+                            <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant.type">
+                                {{ ('APP.OIDC.GRANT.' + grant.type) | translate }}
+                            </mat-option>
+                        </mat-select>
+                    </cnsl-form-field>
+
+                    <cnsl-form-field appearance="outline" class="formfield">
+                        <cnsl-label>{{ 'APP.OIDC.RESPONSETYPE' | translate }}</cnsl-label>
+                        <mat-select formControlName="responseTypesList" multiple>
+                            <mat-option *ngFor="let type of oidcResponseTypes" [value]="type.type">
+                                {{ 'APP.OIDC.RESPONSE.'+type.type | translate }}
+                            </mat-option>
+                        </mat-select>
+                    </cnsl-form-field>
+                </ng-container>
 
                 <cnsl-form-field appearance="outline" class="formfield">
-                    <cnsl-label>{{ 'APP.OIDC.RESPONSE' | translate }}</cnsl-label>
-                    <mat-select formControlName="responseTypesList" multiple>
-                        <mat-option *ngFor="let type of oidcResponseTypes" [value]="type.type">
-                            {{ 'APP.OIDC.RESPONSE'+type.type | translate }}
-                        </mat-option>
-                    </mat-select>
-                </cnsl-form-field>
-
-                <cnsl-form-field appearance="outline" class="formfield">
-                    <cnsl-label>{{ 'APP.OIDC.AUTHMETHOD' | translate }}</cnsl-label>
+                    <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
                     <mat-select formControlName="authMethodType">
-                        <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type.type">
-                            {{ 'APP.OIDC.AUTHMETHOD'+type.type | translate }}
+                        <mat-option *ngFor="let type of authMethodTypes" [value]="type.type">
+                            <span *ngIf="type.oidc">{{ 'APP.OIDC.AUTHMETHOD.'+type.type | translate }}</span>
+                            <span *ngIf="type.api">{{ 'APP.API.AUTHMETHOD.'+type.type | translate }}</span>
                         </mat-option>
                     </mat-select>
                 </cnsl-form-field>
+            </div>
 
-                <cnsl-form-field appearance="outline" class="formfield full-width">
-                    <cnsl-label>{{ 'APP.OIDC.REDIRECT' | translate }}</cnsl-label>
-                    <mat-chip-list #chipRedirectList aria-label="uri selection">
-                        <mat-chip class="chip" *ngFor="let uri of oidcApp.redirectUrisList" removable
-                            (removed)="removeUri(uri, 'REDIRECT')">
-                            {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
-                        </mat-chip>
-                        <input cnslInput [matChipInputFor]="chipRedirectList"
-                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
-                            (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
-                    </mat-chip-list>
-                </cnsl-form-field>
+            <div class="content" *ngIf="formappType?.value?.createType == AppCreateType.OIDC">
+                <div class="formfield full-width">
+                    <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
+                        (changedUris)="oidcApp.redirectUrisList = $event" [urisList]="oidcApp.redirectUrisList"
+                        title="{{ 'APP.OIDC.REDIRECT' | translate }}" [getValues]="requestRedirectValuesSubject$"
+                        [isNative]="oidcApp.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+                    </cnsl-redirect-uris>
 
-                <cnsl-form-field appearance="outline" class="formfield full-width">
-                    <cnsl-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</cnsl-label>
-                    <mat-chip-list #chipPostRedirectList aria-label="uri selection">
-                        <mat-chip class="chip" *ngFor="let uri of oidcApp.postLogoutRedirectUrisList" removable
-                            (removed)="removeUri(uri, 'POSTREDIRECT')">
-                            {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
-                        </mat-chip>
-                        <input cnslInput [matChipInputFor]="chipPostRedirectList"
-                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
-                            (matChipInputTokenEnd)="addUri($event, 'POSTREDIRECT')">
-                    </mat-chip-list>
-                </cnsl-form-field>
-
+                    <cnsl-redirect-uris class="redirect-section" [canWrite]="true"
+                        (changedUris)="oidcApp.postLogoutRedirectUrisList = $event"
+                        [urisList]="oidcApp.postLogoutRedirectUrisList"
+                        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+                        [getValues]="requestRedirectValuesSubject$"
+                        [isNative]="oidcApp.applicationType == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+                    </cnsl-redirect-uris>
+                </div>
             </div>
 
             <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" cdkFocusInitial

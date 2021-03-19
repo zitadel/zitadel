@@ -87,6 +87,8 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 	case es_model.ApplicationChanged,
 		es_model.OIDCConfigAdded,
 		es_model.OIDCConfigChanged,
+		es_model.APIConfigAdded,
+		es_model.APIConfigChanged,
 		es_model.ApplicationDeactivated,
 		es_model.ApplicationReactivated:
 		err = app.SetData(event)
