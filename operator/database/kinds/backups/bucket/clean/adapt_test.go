@@ -50,8 +50,6 @@ func TestBackup_Adapt1(t *testing.T) {
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
 	client.EXPECT().GetJob(jobDef.Namespace, jobDef.Name).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, jobName))
-	// TODO: incomment!!!		client.EXPECT().WaitUntilJobCompleted(jobDef.Namespace, jobDef.Name, timeout).Times(1).Return(nil)
-	// TODO: incomment!!!		client.EXPECT().DeleteJob(jobDef.Namespace, jobDef.Name).Times(1).Return(nil)
 
 	query, _, err := AdaptFunc(
 		monitor,
@@ -110,8 +108,6 @@ func TestBackup_Adapt2(t *testing.T) {
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
 	client.EXPECT().GetJob(jobDef.Namespace, jobDef.Name).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, jobName))
-	// TODO: incomment!!!		client.EXPECT().WaitUntilJobCompleted(jobDef.Namespace, jobDef.Name, timeout).Times(1).Return(nil)
-	// TODO: incomment!!!		client.EXPECT().DeleteJob(jobDef.Namespace, jobDef.Name).Times(1).Return(nil)
 
 	query, _, err := AdaptFunc(
 		monitor,
