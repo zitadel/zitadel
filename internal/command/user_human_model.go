@@ -152,11 +152,11 @@ func (wm *HumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEve
 }
 
 func (wm *HumanWriteModel) reduceHumanProfileChangedEvent(e *user.HumanProfileChangedEvent) {
-	if e.FirstName != nil {
-		wm.FirstName = *e.FirstName
+	if e.FirstName != "" {
+		wm.FirstName = e.FirstName
 	}
-	if e.LastName != nil {
-		wm.LastName = *e.LastName
+	if e.LastName != "" {
+		wm.LastName = e.LastName
 	}
 	if e.NickName != nil {
 		wm.NickName = *e.NickName

@@ -2,7 +2,6 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -44,7 +43,7 @@ func (wm *OrgIdentityProviderWriteModel) Reduce() error {
 }
 
 func (wm *OrgIdentityProviderWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		ResourceOwner(wm.ResourceOwner).
 		EventTypes(

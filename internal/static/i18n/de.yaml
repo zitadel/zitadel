@@ -226,7 +226,6 @@ Errors:
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
     LoginPolicyInvalid: Login Policy ist ungültig
     LoginPolicyNotExisting: Login Policy nicht vorhanden
-    IdpProviderInvalid:
     LoginPolicy:
       NotFound: Default Login Policy konnte nicht gefunden
       NotChanged: Default Login Policy wurde nicht verändert

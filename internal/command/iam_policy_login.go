@@ -86,7 +86,7 @@ func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, iamAgg *eventst
 
 func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
 	if !idpProvider.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-9nf88", "Errors.IAM.LoginPolicy.IDP.")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-9nf88", "Errors.IAM.LoginPolicy.IDP.Invalid")
 	}
 	_, err := c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
 	if err != nil {
