@@ -408,7 +408,7 @@ service ManagementService {
 
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/passwordless"
+            delete: "/users/{user_id}/passwordless/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {

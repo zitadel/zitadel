@@ -436,7 +436,7 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 		return nil, err
 	}
 	if existingWebAuthN.State == domain.MFAStateUnspecified || existingWebAuthN.State == domain.MFAStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2M9ds", "Errors.User.ExternalIDP.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-DAfb2", "Errors.User.WebAuthN.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingWebAuthN.WriteModel)
