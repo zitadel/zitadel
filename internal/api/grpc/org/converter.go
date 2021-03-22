@@ -29,8 +29,11 @@ func OrgQueryToModel(query *org_pb.OrgQuery) (*org_model.OrgSearchQuery, error) 
 			Value:  q.DomainQuery.Domain,
 		}, nil
 	case *org_pb.OrgQuery_NameQuery:
-		//TODO: implement name in backend
-		return nil, errors.ThrowUnimplemented(nil, "ADMIN-KGXnX", "name query not implemented")
+		return &org_model.OrgSearchQuery{
+			Key:    org_model.OrgSearchKeyOrgName,
+			Method: object.TextMethodToModel(q.NameQuery.Method),
+			Value:  q.NameQuery.Name,
+		}, nil
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-vR9nC", "List.Query.Invalid")
 	}

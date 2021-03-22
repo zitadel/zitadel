@@ -139,7 +139,6 @@ func (s *Server) GenerateOrgDomainValidation(ctx context.Context, req *mgmt_pb.G
 	return &mgmt_pb.GenerateOrgDomainValidationResponse{
 		Token: token,
 		Url:   url,
-		//TODO: remove details from proto
 	}, nil
 }
 

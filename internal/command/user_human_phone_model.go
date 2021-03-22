@@ -48,6 +48,10 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 				wm.State = domain.PhoneStateActive
 			}
 			wm.UserState = domain.UserStateActive
+		case *user.HumanInitialCodeAddedEvent:
+			wm.UserState = domain.UserStateInitial
+		case *user.HumanInitializedCheckSucceededEvent:
+			wm.UserState = domain.UserStateActive
 		case *user.HumanPhoneChangedEvent:
 			wm.Phone = e.PhoneNumber
 			wm.IsPhoneVerified = false

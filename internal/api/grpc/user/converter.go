@@ -244,7 +244,6 @@ func WebAuthNTokenViewToPb(token *model.WebAuthNView) *user_pb.WebAuthNToken {
 
 func WebAuthNTokenToWebAuthNKeyPb(token *domain.WebAuthNToken) *user_pb.WebAuthNKey {
 	return &user_pb.WebAuthNKey{
-		Id:        string(token.KeyID), //TODO: ask if it's the correct id?
 		PublicKey: token.PublicKey,
 	}
 }

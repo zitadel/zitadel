@@ -126,6 +126,12 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil, time.Hour*1,
+							),
+						),
 					),
 					expectPush(
 						[]*repository.Event{
@@ -178,6 +184,12 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil, time.Hour*1,
+							),
+						),
 					),
 					expectPush(
 						[]*repository.Event{
@@ -227,6 +239,12 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 								domain.GenderUnspecified,
 								"email@test.ch",
 								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil, time.Hour*1,
 							),
 						),
 					),

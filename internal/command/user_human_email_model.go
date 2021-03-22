@@ -37,10 +37,14 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
 			wm.Email = e.EmailAddress
-			wm.UserState = domain.UserStateInitial
+			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
 			wm.Email = e.EmailAddress
+			wm.UserState = domain.UserStateActive
+		case *user.HumanInitialCodeAddedEvent:
 			wm.UserState = domain.UserStateInitial
+		case *user.HumanInitializedCheckSucceededEvent:
+			wm.UserState = domain.UserStateActive
 		case *user.HumanEmailChangedEvent:
 			wm.Email = e.EmailAddress
 			wm.IsEmailVerified = false
@@ -52,9 +56,6 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 		case *user.HumanEmailVerifiedEvent:
 			wm.IsEmailVerified = true
 			wm.Code = nil
-			if wm.UserState == domain.UserStateInitial {
-				wm.UserState = domain.UserStateActive
-			}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		}

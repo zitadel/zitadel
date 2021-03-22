@@ -515,7 +515,9 @@ message VerifyMyPhoneRequest {
     string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message VerifyMyPhoneResponse {}
+message VerifyMyPhoneResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message ResendMyPhoneVerificationRequest {}
 
