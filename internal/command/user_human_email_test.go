@@ -572,6 +572,12 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil, time.Hour*1,
+							),
+						),
 					),
 				),
 			},
