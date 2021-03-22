@@ -55,7 +55,9 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public addAuthFactor(): void {
         const dialogRef = this.dialog.open(AuthFactorDialogComponent, {
-            width: '400px',
+            data: {
+                otpDisabled: !this.otpAvailable
+            }
         });
 
         dialogRef.afterClosed().subscribe((code) => {
