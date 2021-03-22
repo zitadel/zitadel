@@ -69,8 +69,6 @@ func MachineAddedEventMapper(event *repository.Event) (eventstore.EventReader, e
 type MachineChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName string `json:"userName"`
-
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 }
