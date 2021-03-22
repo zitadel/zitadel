@@ -11,7 +11,7 @@ import (
 
 func FeaturesFromModel(features *features_model.FeaturesView) *features_pb.Features {
 	return &features_pb.Features{
-		Details:   object_grpc.ToDetailsPb(features.Sequence, features.ChangeDate, features.AggregateID),
+		Details:   object_grpc.ToViewDetailsPb(features.Sequence, features.CreationDate, features.ChangeDate, features.AggregateID),
 		Tier:      FeatureTierToPb(features.TierName, features.TierDescription, features.State, features.StateDescription),
 		IsDefault: features.Default,
 

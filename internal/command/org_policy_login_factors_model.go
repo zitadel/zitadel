@@ -82,7 +82,7 @@ func (wm *OrgMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReade
 }
 
 func (wm *OrgMultiFactorWriteModel) Reduce() error {
-	return wm.MultiFactoryWriteModel.Reduce()
+	return wm.MultiFactorWriteModel.Reduce()
 }
 
 func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
