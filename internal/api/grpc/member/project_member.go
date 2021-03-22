@@ -17,13 +17,13 @@ func ProjectMembersToPb(members []*proj_model.ProjectMemberView) []*member_pb.Me
 
 func ProjectMemberToPb(m *proj_model.ProjectMemberView) *member_pb.Member {
 	return &member_pb.Member{
-		UserId: m.UserID,
-		Roles:  m.Roles,
-		// PreferredLoginName: //TODO: not implemented in be
-		Email:       m.Email,
-		FirstName:   m.FirstName,
-		LastName:    m.LastName,
-		DisplayName: m.DisplayName,
+		UserId:             m.UserID,
+		Roles:              m.Roles,
+		PreferredLoginName: m.PreferredLoginName,
+		Email:              m.Email,
+		FirstName:          m.FirstName,
+		LastName:           m.LastName,
+		DisplayName:        m.DisplayName,
 		Details: object.ToViewDetailsPb(
 			m.Sequence,
 			m.CreationDate,

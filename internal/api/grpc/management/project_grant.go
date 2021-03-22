@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
@@ -106,8 +107,8 @@ func (s *Server) RemoveProjectGrant(ctx context.Context, req *mgmt_pb.RemoveProj
 func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.ListProjectGrantMemberRolesRequest) (*mgmt_pb.ListProjectGrantMemberRolesResponse, error) {
 	roles := s.project.GetProjectGrantMemberRoles()
 	return &mgmt_pb.ListProjectGrantMemberRolesResponse{
-		Result: roles,
-		//TODO: metadata
+		Result:  roles,
+		Details: object_grpc.ToListDetails(uint64(len(roles)), 0, time.Now()),
 	}, nil
 }
 

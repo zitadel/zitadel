@@ -41,14 +41,13 @@ func (s *Server) SetMyPhone(ctx context.Context, req *auth_pb.SetMyPhoneRequest)
 
 func (s *Server) VerifyMyPhone(ctx context.Context, req *auth_pb.VerifyMyPhoneRequest) (*auth_pb.VerifyMyPhoneResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	_, err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner)
+	objectDetails, err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO: response from business
 	return &auth_pb.VerifyMyPhoneResponse{
-		//Details: object.DomainToChangeDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 

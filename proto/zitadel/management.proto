@@ -2206,9 +2206,8 @@ message GenerateOrgDomainValidationRequest {
 }
 
 message GenerateOrgDomainValidationResponse {
-    zitadel.v1.ObjectDetails details = 1;
-    string token = 2;
-    string url = 3;
+    string token = 1;
+    string url = 2;
 }
 
 message ValidateOrgDomainRequest {

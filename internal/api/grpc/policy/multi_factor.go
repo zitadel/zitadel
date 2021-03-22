@@ -7,7 +7,8 @@ import (
 
 func MultiFactorTypeToDomain(multiFactorType policy_pb.MultiFactorType) domain.MultiFactorType {
 	switch multiFactorType {
-	//TODO: gap between proto and backend
+	case policy_pb.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION:
+		return domain.MultiFactorTypeU2FWithPIN
 	default:
 		return domain.MultiFactorTypeUnspecified
 	}
