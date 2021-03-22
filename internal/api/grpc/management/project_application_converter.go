@@ -121,7 +121,7 @@ func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAppKeyRequest) *domain.Appli
 
 func ListAPIClientKeysRequestToModel(req *mgmt_pb.ListAppKeysRequest) (*key_model.AuthNKeySearchRequest, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := make([]*key_model.AuthNKeySearchQuery, 2)
+	queries := make([]*key_model.AuthNKeySearchQuery, 0)
 	queries = append(queries, &key_model.AuthNKeySearchQuery{
 		Key:    key_model.AuthNKeyObjectID,
 		Method: domain.SearchMethodEquals,
