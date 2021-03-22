@@ -6,8 +6,8 @@
     <cnsl-form-field class="formfield">
         <cnsl-label>{{data.labelKey | translate }} <span *ngIf="isPhone && phoneCountry">({{ phoneCountry }})</span>
         </cnsl-label>
-        <input cnslInput [(ngModel)]="value" (change)="changeValue($event)"
-            (keydown.enter)="value ? closeDialogWithValue(value) : null" />
+        <input [formControl]="valueControl" cnslInput
+            (keydown.enter)="valueControl.valid ? closeDialogWithValue() : null" />
     </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
@@ -15,8 +15,8 @@
         {{data.cancelKey | translate}}
     </button>
 
-    <button [disabled]="!value" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
-        (click)="closeDialogWithValue(value)">
+    <button [disabled]="valueControl.invalid" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
+        (click)="closeDialogWithValue()">
         {{data.confirmKey | translate}}
     </button>
 </div>

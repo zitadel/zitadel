@@ -70,6 +70,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     public getMFAs(): void {
         this.service.listMyMultiFactors().then(mfas => {
             const list = mfas.resultList;
+            console.log(list);
             this.dataSource = new MatTableDataSource(list);
             this.dataSource.sort = this.sort;
 
