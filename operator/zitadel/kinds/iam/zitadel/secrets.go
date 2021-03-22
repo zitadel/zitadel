@@ -66,6 +66,9 @@ func getSecretsMap(desiredKind *DesiredV0) (
 	secrets[gchatkey] = conf.Notifications.GoogleChatURL
 	existing[gchatkey] = conf.Notifications.ExistingGoogleChatURL
 
+	if conf.Notifications.Twilio == nil {
+		conf.Notifications.Twilio = &configuration.Twilio{}
+	}
 	if conf.Notifications.Twilio.SID == nil {
 		conf.Notifications.Twilio.SID = &secret.Secret{}
 	}
@@ -86,6 +89,9 @@ func getSecretsMap(desiredKind *DesiredV0) (
 	secrets[twilOAuthKey] = conf.Notifications.Twilio.AuthToken
 	existing[twilOAuthKey] = conf.Notifications.Twilio.ExistingAuthToken
 
+	if conf.Notifications.Email == nil {
+		conf.Notifications.Email = &configuration.Email{}
+	}
 	if conf.Notifications.Email.AppKey == nil {
 		conf.Notifications.Email.AppKey = &secret.Secret{}
 	}
