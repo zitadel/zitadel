@@ -70,6 +70,8 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.HumanInitialCodeAddedType,
+			user.HumanInitializedCheckSucceededType,
 			user.HumanPasswordChangedType,
 			user.HumanPasswordCodeAddedType,
 			user.HumanEmailVerifiedType,

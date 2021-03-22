@@ -101,6 +101,8 @@ func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.HumanInitialCodeAddedType,
+			user.HumanInitializedCheckSucceededType,
 			user.UserUserNameChangedType,
 			user.HumanProfileChangedType,
 			user.HumanEmailChangedType,
