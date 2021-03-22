@@ -67,7 +67,6 @@ func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFac
 	}
 	return &auth_pb.AddMyAuthFactorU2FResponse{
 		Key: &user_pb.WebAuthNKey{
-			Id:        u2f.WebAuthNTokenID,
 			PublicKey: u2f.CredentialCreationData,
 		},
 		Details: object.AddToDetailsPb(
