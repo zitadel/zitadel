@@ -4,7 +4,8 @@
 <p class="desc">{{data.descriptionKey | translate}}</p>
 <div mat-dialog-content>
     <cnsl-form-field class="formfield">
-        <cnsl-label>{{data.labelKey | translate }} <span *ngIf="phoneCountry">({{ phoneCountry }})</span></cnsl-label>
+        <cnsl-label>{{data.labelKey | translate }} <span *ngIf="isPhone && phoneCountry">({{ phoneCountry }})</span>
+        </cnsl-label>
         <input cnslInput [(ngModel)]="value" (change)="changeValue($event)"
             (keydown.enter)="value ? closeDialogWithValue(value) : null" />
     </cnsl-form-field>

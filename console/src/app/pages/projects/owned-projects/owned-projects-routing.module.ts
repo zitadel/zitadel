@@ -16,7 +16,7 @@ const routes: Routes = [
         loadChildren: () => import('../project-create/project-create.module').then(m => m.ProjectCreateModule),
         canActivate: [RoleGuard],
         data: {
-            roles: ['project.write'],
+            roles: ['project.create'],
         },
     },
     {

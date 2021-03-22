@@ -112,8 +112,9 @@ export class OrgCreateComponent {
 
         this.adminService
             .SetUpOrg(createOrgRequest, humanRequest)
-            .then(() => {
+            .then((resp) => {
                 this.router.navigate(['/org/overview']);
+
                 // const orgResp = org.getOrg();
                 // if (orgResp) {
                 //     this.authService.setActiveOrg(orgResp.toObject());
@@ -194,6 +195,8 @@ export class OrgCreateComponent {
             this.orgForm = this.fb.group({
                 name: ['', [Validators.required]],
             });
+
+            console.log(this.orgForm);
         } else {
             this.createSteps = 2;
 

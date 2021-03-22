@@ -21,6 +21,15 @@ export class EditDialogComponent {
         this.value = data.value;
         if (data.type == EditDialogType.PHONE) {
             this.isPhone = true;
+
+            if (this.value) {
+                const phoneNumber = parsePhoneNumber(this.value ?? '', 'CH');
+                if (phoneNumber) {
+                    const formmatted = phoneNumber.formatInternational();
+                    this.phoneCountry = phoneNumber.country || '';
+                    this.value = formmatted;
+                }
+            }
         }
     }
 

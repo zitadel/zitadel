@@ -62,6 +62,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         } else if (this.target === UserTarget.SELF) {
             this.getFilteredResults(); // new subscription
         }
+        console.log(this.users);
     }
 
     public ngAfterContentChecked(): void {
