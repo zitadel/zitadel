@@ -430,7 +430,6 @@ service ManagementService {
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/keys/{key_id}"
-            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
