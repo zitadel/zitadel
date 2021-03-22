@@ -429,7 +429,7 @@ service ManagementService {
 
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/keys/{key_id}"
+            get: "/users/{user_id}/keys/{key_id}"
             body: "*"
         };
 
