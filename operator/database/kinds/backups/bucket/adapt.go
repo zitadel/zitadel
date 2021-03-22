@@ -142,6 +142,11 @@ func AdaptFunc(
 		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+
+				if err := desiredKind.validateSecrets(); err != nil {
+					return nil, err
+				}
+
 				currentDB, err := coreDB.ParseQueriedForDatabase(queried)
 				if err != nil {
 					return nil, err
