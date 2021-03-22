@@ -388,7 +388,7 @@ service ManagementService {
 
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/auth_factors/u2f"
+            delete: "/users/{user_id}/auth_factors/u2f/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -408,7 +408,7 @@ service ManagementService {
 
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/passwordless"
+            delete: "/users/{user_id}/passwordless/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -429,8 +429,7 @@ service ManagementService {
 
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/keys/{key_id}"
-            body: "*"
+            get: "/users/{user_id}/keys/{key_id}"
         };
 
         option (zitadel.v1.auth_option) = {
