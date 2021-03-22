@@ -10,14 +10,14 @@ import (
 )
 
 const (
-	namespace  = "caos-system"
+	Namespace  = "caos-system"
 	kind       = "Zitadel"
 	apiVersion = "caos.ch/v1"
-	name       = "zitadel"
+	Name       = "zitadel"
 )
 
 func ReadCrd(k8sClient kubernetes.ClientInt) (*tree.Tree, error) {
-	unstruct, err := k8sClient.GetNamespacedCRDResource(zitadelv1.GroupVersion.Group, zitadelv1.GroupVersion.Version, kind, namespace, name)
+	unstruct, err := k8sClient.GetNamespacedCRDResource(zitadelv1.GroupVersion.Group, zitadelv1.GroupVersion.Version, kind, Namespace, Name)
 	if err != nil {
 		if macherrs.IsNotFound(err) || meta.IsNoMatchError(err) {
 			return nil, nil
@@ -35,10 +35,10 @@ func WriteCrd(k8sClient kubernetes.ClientInt, t *tree.Tree) error {
 		return err
 	}
 
-	unstruct.SetName(name)
-	unstruct.SetNamespace(namespace)
+	unstruct.SetName(Name)
+	unstruct.SetNamespace(Namespace)
 	unstruct.SetKind(kind)
 	unstruct.SetAPIVersion(apiVersion)
 
-	return k8sClient.ApplyNamespacedCRDResource(zitadelv1.GroupVersion.Group, zitadelv1.GroupVersion.Version, kind, namespace, name, unstruct)
+	return k8sClient.ApplyNamespacedCRDResource(zitadelv1.GroupVersion.Group, zitadelv1.GroupVersion.Version, kind, Namespace, Name, unstruct)
 }

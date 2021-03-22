@@ -2,6 +2,7 @@ package zitadel
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -29,6 +30,10 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 	defer func() {
 		r.Monitor.Error(err)
 	}()
+
+	if req.Namespace != zitadel.Name || req.Name != zitadel.Name {
+		return res, fmt.Errorf("resource must be named %s and namespaced in %s", zitadel.Name, zitadel.Namespace)
+	}
 
 	desired, err := zitadel.ReadCrd(r.ClientInt)
 	if err != nil {
