@@ -48,4 +48,5 @@ func (d *DesiredV0) validateSecrets() error {
 	if err := secret.ValidateSecret(d.Spec.ServiceAccountJSON, d.Spec.ExistingServiceAccountJSON); err != nil {
 		return fmt.Errorf("validating api key failed: %w", err)
 	}
+	return nil
 }
