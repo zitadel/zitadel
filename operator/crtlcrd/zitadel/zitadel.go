@@ -31,7 +31,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 		r.Monitor.Error(err)
 	}()
 
-	if req.Namespace != zitadel.Name || req.Name != zitadel.Name {
+	if req.Namespace != zitadel.Namespace || req.Name != zitadel.Name {
 		return res, fmt.Errorf("resource must be named %s and namespaced in %s", zitadel.Name, zitadel.Namespace)
 	}
 

@@ -27,7 +27,11 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 		"namespace": req.NamespacedName,
 	})
 
-	if req.Namespace != database.Name || req.Name != database.Name {
+	defer func() {
+		r.Monitor.Error(err)
+	}()
+
+	if req.Namespace != database.Namespace || req.Name != database.Name {
 		return res, fmt.Errorf("resource must be named %s and namespaced in %s", database.Name, database.Namespace)
 	}
 
