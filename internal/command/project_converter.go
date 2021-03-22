@@ -38,7 +38,6 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		AppName:                  writeModel.AppName,
 		State:                    writeModel.State,
 		ClientID:                 writeModel.ClientID,
-		ClientSecret:             writeModel.ClientSecret,
 		RedirectUris:             writeModel.RedirectUris,
 		ResponseTypes:            writeModel.ResponseTypes,
 		GrantTypes:               writeModel.GrantTypes,
@@ -62,7 +61,6 @@ func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIA
 		AppName:        writeModel.AppName,
 		State:          writeModel.State,
 		ClientID:       writeModel.ClientID,
-		ClientSecret:   writeModel.ClientSecret,
 		AuthMethodType: writeModel.AuthMethodType,
 	}
 }

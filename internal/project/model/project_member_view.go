@@ -6,17 +6,18 @@ import (
 )
 
 type ProjectMemberView struct {
-	UserID       string
-	ProjectID    string
-	UserName     string
-	Email        string
-	FirstName    string
-	LastName     string
-	DisplayName  string
-	Roles        []string
-	CreationDate time.Time
-	ChangeDate   time.Time
-	Sequence     uint64
+	UserID             string
+	ProjectID          string
+	UserName           string
+	Email              string
+	FirstName          string
+	LastName           string
+	DisplayName        string
+	PreferredLoginName string
+	Roles              []string
+	CreationDate       time.Time
+	ChangeDate         time.Time
+	Sequence           uint64
 }
 
 type ProjectMemberSearchRequest struct {

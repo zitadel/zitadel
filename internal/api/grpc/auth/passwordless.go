@@ -27,7 +27,7 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 	}
 	return &auth_pb.AddMyPasswordlessResponse{
 		Key: user_grpc.WebAuthNTokenToWebAuthNKeyPb(u2f),
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			u2f.Sequence,
 			u2f.ChangeDate,
 			u2f.ResourceOwner,
@@ -37,12 +37,12 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 
 func (s *Server) VerifyMyPasswordless(ctx context.Context, req *auth_pb.VerifyMyPasswordlessRequest) (*auth_pb.VerifyMyPasswordlessResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, ctxData.UserID, ctxData.OrgID, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
+	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.VerifyMyPasswordlessResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -53,6 +53,6 @@ func (s *Server) RemoveMyPasswordless(ctx context.Context, req *auth_pb.RemoveMy
 		return nil, err
 	}
 	return &auth_pb.RemoveMyPasswordlessResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

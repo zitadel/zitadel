@@ -24,10 +24,11 @@ func ModelIDPViewToPb(idp *iam_model.IDPConfigView) *idp_pb.IDP {
 		StylingType: ModelIDPStylingTypeToPb(idp.StylingType),
 		Owner:       ModelIDPProviderTypeToPb(idp.IDPProviderType),
 		Config:      ModelIDPViewToConfigPb(idp),
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ToViewDetailsPb(
 			idp.Sequence,
+			idp.CreationDate,
 			idp.ChangeDate,
-			"idp.ResourceOwner", //TODO: backend
+			"", //TODO: backend
 		),
 	}
 }
@@ -39,7 +40,7 @@ func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
 		Name:        idp.Name,
 		StylingType: IDPStylingTypeToPb(idp.StylingType),
 		Config:      IDPViewToConfigPb(idp),
-		Details:     obj_grpc.ToDetailsPb(idp.Sequence, idp.ChangeDate, "idp.ResourceOwner"), //TODO: resource owner in view
+		Details:     obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, ""), //TODO: resource owner in view
 	}
 	return mapped
 }
@@ -220,9 +221,31 @@ func ModelIDPProviderTypeToPb(typ iam_model.IDPProviderType) idp_pb.IDPOwnerType
 	}
 }
 
+func IDPProviderTypeFromPb(typ idp_pb.IDPOwnerType) domain.IdentityProviderType {
+	switch typ {
+	case idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG:
+		return domain.IdentityProviderTypeOrg
+	case idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM:
+		return domain.IdentityProviderTypeSystem
+	default:
+		return domain.IdentityProviderTypeOrg
+	}
+}
+
+func IDPProviderTypeModelFromPb(typ idp_pb.IDPOwnerType) iam_model.IDPProviderType {
+	switch typ {
+	case idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG:
+		return iam_model.IDPProviderTypeOrg
+	case idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM:
+		return iam_model.IDPProviderTypeSystem
+	default:
+		return iam_model.IDPProviderTypeOrg
+	}
+}
+
 func IDPIDQueryToModel(query *idp_pb.IDPIDQuery) *iam_model.IDPConfigSearchQuery {
 	return &iam_model.IDPConfigSearchQuery{
-		Key:    iam_model.IDPConfigSearchKeyIdpConfigID, //TODO: whats the difference between idpconfigid and aggregateid search key?
+		Key:    iam_model.IDPConfigSearchKeyIdpConfigID,
 		Method: domain.SearchMethodEquals,
 		Value:  query.Id,
 	}
@@ -233,5 +256,13 @@ func IDPNameQueryToModel(query *idp_pb.IDPNameQuery) *iam_model.IDPConfigSearchQ
 		Key:    iam_model.IDPConfigSearchKeyName,
 		Method: obj_grpc.TextMethodToModel(query.Method),
 		Value:  query.Name,
+	}
+}
+
+func IDPOwnerTypeQueryToModel(query *idp_pb.IDPOwnerTypeQuery) *iam_model.IDPConfigSearchQuery {
+	return &iam_model.IDPConfigSearchQuery{
+		Key:    iam_model.IDPConfigSearchKeyName,
+		Method: domain.SearchMethodEquals,
+		Value:  IDPProviderTypeModelFromPb(query.OwnerType),
 	}
 }

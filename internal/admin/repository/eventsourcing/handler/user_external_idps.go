@@ -181,7 +181,7 @@ func (i *ExternalIDP) getOrgIDPConfig(ctx context.Context, aggregateID, idpConfi
 	if _, i := existing.GetIDP(idpConfigID); i != nil {
 		return i, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-2n8Fh", "Errors.Org.IdpNotExisting")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-2n8Fh", "Errors.IDP.NotExisting")
 }
 
 func (i *ExternalIDP) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
@@ -231,5 +231,5 @@ func (u *ExternalIDP) getDefaultIDPConfig(ctx context.Context, idpConfigID strin
 	if _, existingIDP := existing.GetIDP(idpConfigID); existingIDP != nil {
 		return existingIDP, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-49O0f", "Errors.IAM.IdpNotExisting")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-49O0f", "Errors.IDP.NotExisting")
 }

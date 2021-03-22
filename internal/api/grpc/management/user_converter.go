@@ -93,6 +93,7 @@ func UpdateHumanProfileRequestToDomain(req *mgmt_pb.UpdateHumanProfileRequest) *
 
 func UpdateHumanEmailRequestToDomain(req *mgmt_pb.UpdateHumanEmailRequest) *domain.Email {
 	return &domain.Email{
+		ObjectRoot:      models.ObjectRoot{AggregateID: req.UserId},
 		EmailAddress:    req.Email,
 		IsEmailVerified: req.IsEmailVerified,
 	}
@@ -100,6 +101,7 @@ func UpdateHumanEmailRequestToDomain(req *mgmt_pb.UpdateHumanEmailRequest) *doma
 
 func UpdateHumanPhoneRequestToDomain(req *mgmt_pb.UpdateHumanPhoneRequest) *domain.Phone {
 	return &domain.Phone{
+		ObjectRoot:      models.ObjectRoot{AggregateID: req.UserId},
 		PhoneNumber:     req.Phone,
 		IsPhoneVerified: req.IsPhoneVerified,
 	}

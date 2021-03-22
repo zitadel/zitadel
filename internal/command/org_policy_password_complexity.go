@@ -21,6 +21,9 @@ func (c *Commands) getOrgPasswordComplexityPolicy(ctx context.Context, orgID str
 }
 
 func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-7ufEs", "Errors.ResourceOwnerMissing")
+	}
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
@@ -55,6 +58,9 @@ func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwne
 }
 
 func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3J8fs", "Errors.ResourceOwnerMissing")
+	}
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
@@ -86,6 +92,9 @@ func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceO
 }
 
 func (c *Commands) RemovePasswordComplexityPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-J8fsf", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy := NewOrgPasswordComplexityPolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {

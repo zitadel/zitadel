@@ -27,7 +27,7 @@ func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginP
 		return nil, err
 	}
 	return &admin_pb.UpdateLoginPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
@@ -52,7 +52,7 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *admin_pb.AddIDPTo
 		return nil, err
 	}
 	return &admin_pb.AddIDPToLoginPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			idp.Sequence,
 			idp.ChangeDate,
 			idp.ResourceOwner,
@@ -70,7 +70,7 @@ func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *admin_pb.Rem
 		return nil, err
 	}
 	return &admin_pb.RemoveIDPFromLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -92,7 +92,7 @@ func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *admin_pb
 		return nil, err
 	}
 	return &admin_pb.AddSecondFactorToLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToAddDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -102,7 +102,7 @@ func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *adm
 		return nil, err
 	}
 	return &admin_pb.RemoveSecondFactorFromLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -124,7 +124,7 @@ func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *admin_pb.
 		return nil, err
 	}
 	return &admin_pb.AddMultiFactorToLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToAddDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -134,6 +134,6 @@ func (s *Server) RemoveMultiFactorFromLoginPolicy(ctx context.Context, req *admi
 		return nil, err
 	}
 	return &admin_pb.RemoveMultiFactorFromLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

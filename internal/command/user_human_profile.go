@@ -18,9 +18,13 @@ func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profi
 		return nil, err
 	}
 	if existingProfile.UserState == domain.UserStateUnspecified || existingProfile.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.User.Profile.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9sd", "Errors.User.Profile.NotFound")
 	}
-	changedEvent, hasChanged := existingProfile.NewChangedEvent(ctx, profile.FirstName, profile.LastName, profile.NickName, profile.DisplayName, profile.PreferredLanguage, profile.Gender)
+	userAgg := UserAggregateFromWriteModel(&existingProfile.WriteModel)
+	changedEvent, hasChanged, err := existingProfile.NewChangedEvent(ctx, userAgg, profile.FirstName, profile.LastName, profile.NickName, profile.DisplayName, profile.PreferredLanguage, profile.Gender)
+	if err != nil {
+		return nil, err
+	}
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
 	}

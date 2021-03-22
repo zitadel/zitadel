@@ -178,7 +178,7 @@ func (i *IDPProvider) getOrgIDPConfig(ctx context.Context, aggregateID, idpConfi
 	if _, i := existing.GetIDP(idpConfigID); i != nil {
 		return i, nil
 	}
-	return nil, errors.ThrowNotFound(nil, "EVENT-2m9fS", "Errors.Org.IdpNotExisting")
+	return nil, errors.ThrowNotFound(nil, "EVENT-2m9fS", "Errors.IDP.NotExisting")
 }
 
 func (i *IDPProvider) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
@@ -228,5 +228,5 @@ func (u *IDPProvider) getDefaultIDPConfig(ctx context.Context, idpConfigID strin
 	if _, existingIDP := existing.GetIDP(idpConfigID); existingIDP != nil {
 		return existingIDP, nil
 	}
-	return nil, errors.ThrowNotFound(nil, "EVENT-49O0f", "Errors.IAM.IdpNotExisting")
+	return nil, errors.ThrowNotFound(nil, "EVENT-49O0f", "Errors.IDP.NotExisting")
 }

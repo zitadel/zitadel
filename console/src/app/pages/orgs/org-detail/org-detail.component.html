@@ -7,18 +7,18 @@
                 description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
 
                 <div *ngFor="let domain of domains" class="domain">
-                    <span *ngIf="canwrite$ | async" (click)="verifyDomain(domain )"
-                        class="title">{{domain.domain}}</span>
-                    <span *ngIf="(canwrite$ | async) == false" class="title disabled">{{domain.domain}}</span>
+                    <span *ngIf="canwrite$ | async" (click)="verifyDomain(domain)"
+                        class="title">{{domain.domainName}}</span>
+                    <span *ngIf="(canwrite$ | async) == false" class="title disabled">{{domain?.domainName}}</span>
 
-                    <i matTooltip="verified" *ngIf="domain.verified" class="verified las la-check-circle"></i>
-                    <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-star"></i>
-                    <a *ngIf="!domain.primary && (canwrite$ | async)" class="primaryset"
+                    <i matTooltip="verified" *ngIf="domain.isVerified" class="verified las la-check-circle"></i>
+                    <i matTooltip="primary" *ngIf="domain.isPrimary" class="primary las la-star"></i>
+                    <a *ngIf="!domain.isPrimary && (canwrite$ | async)" class="primaryset"
                         (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
 
                     <span class="fill-space"></span>
                     <button class="rem-button" [disabled]="(canwrite$ | async) == false" matTooltip="Remove domain"
-                        color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
+                        color="warn" mat-icon-button (click)="removeDomain(domain.domainName)"><i
                             class="las la-trash"></i></button>
                 </div>
                 <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>

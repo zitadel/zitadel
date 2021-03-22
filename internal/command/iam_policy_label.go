@@ -29,6 +29,9 @@ func (c *Commands) AddDefaultLabelPolicy(ctx context.Context, policy *domain.Lab
 }
 
 func (c *Commands) addDefaultLabelPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMLabelPolicyWriteModel, policy *domain.LabelPolicy) (eventstore.EventPusher, error) {
+	if !policy.IsValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3m9fo", "Errors.IAM.LabelPolicy.Invalid")
+	}
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -42,6 +45,9 @@ func (c *Commands) addDefaultLabelPolicy(ctx context.Context, iamAgg *eventstore
 }
 
 func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+	if !policy.IsValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-33m8f", "Errors.IAM.LabelPolicy.Invalid")
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err

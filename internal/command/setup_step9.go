@@ -22,7 +22,7 @@ func (s *Step9) execute(ctx context.Context, commandSide *Commands) error {
 
 func (c *Commands) SetupStep9(ctx context.Context, step *Step9) error {
 	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
-		multiFactorModel := NewIAMMultiFactorWriteModel()
+		multiFactorModel := NewIAMMultiFactorWriteModel(domain.MultiFactorTypeU2FWithPIN)
 		iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
 		if !step.Passwordless {
 			return []eventstore.EventPusher{}, nil

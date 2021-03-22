@@ -12,7 +12,10 @@ import (
 	org_repo "github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
+func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, resourceOwner string) (*domain.IDPConfig, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
+	}
 	if config.OIDCConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
 	}
@@ -21,7 +24,7 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig) (
 	if err != nil {
 		return nil, err
 	}
-	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, config.AggregateID)
+	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, resourceOwner)
 
 	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
 	if err != nil {
@@ -60,7 +63,10 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig) (
 	return writeModelToIDPConfig(&addedConfig.IDPConfigWriteModel), nil
 }
 
-func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
+func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig, resourceOwner string) (*domain.IDPConfig, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Gh8ds", "Errors.ResourceOwnerMissing")
+	}
 	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, config.IDPConfigID, config.AggregateID)
 	if err != nil {
 		return nil, err
@@ -149,7 +155,7 @@ func (c *Commands) getOrgIDPConfigByID(ctx context.Context, idpID, orgID string)
 		return nil, err
 	}
 	if !config.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.Org.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-4M9so", "Errors.Org.IDPConfig.NotExisting")
 	}
 	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
 }

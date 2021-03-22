@@ -35,13 +35,14 @@ func (e *HumanPhoneChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneChangedEvent {
+func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, phone string) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanPhoneChangedType,
 		),
+		PhoneNumber: phone,
 	}
 }
 

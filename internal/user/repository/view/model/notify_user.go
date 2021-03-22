@@ -2,16 +2,18 @@ package model
 
 import (
 	"encoding/json"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"time"
 
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"github.com/lib/pq"
 )
 
 const (
@@ -117,7 +119,8 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserAdded,
 		es_model.UserRegistered,
 		es_model.HumanRegistered,
-		es_model.HumanAdded:
+		es_model.HumanAdded,
+		es_model.MachineAdded:
 		u.CreationDate = event.CreationDate
 		u.setRootData(event)
 		err = u.setData(event)
@@ -130,7 +133,8 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 		es_model.UserPhoneChanged,
 		es_model.HumanProfileChanged,
 		es_model.HumanEmailChanged,
-		es_model.HumanPhoneChanged:
+		es_model.HumanPhoneChanged,
+		es_model.UserUserNameChanged:
 		err = u.setData(event)
 	case es_model.UserEmailVerified,
 		es_model.HumanEmailVerified:

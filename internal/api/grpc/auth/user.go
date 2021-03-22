@@ -54,7 +54,7 @@ func (s *Server) UpdateMyUserName(ctx context.Context, req *auth_pb.UpdateMyUser
 		return nil, err
 	}
 	return &auth_pb.UpdateMyUserNameResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 

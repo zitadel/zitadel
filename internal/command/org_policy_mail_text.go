@@ -9,8 +9,11 @@ import (
 )
 
 func (c *Commands) AddMailText(ctx context.Context, resourceOwner string, mailText *domain.MailText) (*domain.MailText, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-MFiig", "Errors.ResourceOwnerMissing")
+	}
 	if !mailText.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4778u", "Errors.Org.MailText.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4778u", "Errors.Org.MailText.Invalid")
 	}
 	addedPolicy := NewOrgMailTextWriteModel(resourceOwner, mailText.MailTextType, mailText.Language)
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
@@ -47,8 +50,11 @@ func (c *Commands) AddMailText(ctx context.Context, resourceOwner string, mailTe
 }
 
 func (c *Commands) ChangeMailText(ctx context.Context, resourceOwner string, mailText *domain.MailText) (*domain.MailText, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-NFus3", "Errors.ResourceOwnerMissing")
+	}
 	if !mailText.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-3m9fs", "Errors.Org.MailText.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3m9fs", "Errors.Org.MailText.Invalid")
 	}
 	existingPolicy := NewOrgMailTextWriteModel(resourceOwner, mailText.MailTextType, mailText.Language)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
@@ -88,6 +94,12 @@ func (c *Commands) ChangeMailText(ctx context.Context, resourceOwner string, mai
 }
 
 func (c *Commands) RemoveMailText(ctx context.Context, resourceOwner, mailTextType, language string) error {
+	if resourceOwner == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "Org-2N7fd", "Errors.ResourceOwnerMissing")
+	}
+	if mailTextType == "" || language == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "Org-N8fsf", "Errors.Org.MailText.Invalid")
+	}
 	existingPolicy := NewOrgMailTextWriteModel(resourceOwner, mailTextType, language)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {

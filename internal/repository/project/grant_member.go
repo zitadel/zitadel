@@ -35,10 +35,9 @@ func NewRemoveProjectGrantMemberUniqueConstraint(projectID, userID, grantID stri
 type GrantMemberAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Roles     []string `json:"roles"`
-	UserID    string   `json:"userId"`
-	GrantID   string   `json:"grantId"`
-	projectID string
+	Roles   []string `json:"roles"`
+	UserID  string   `json:"userId"`
+	GrantID string   `json:"grantId"`
 }
 
 func (e *GrantMemberAddedEvent) Data() interface{} {
@@ -46,13 +45,12 @@ func (e *GrantMemberAddedEvent) Data() interface{} {
 }
 
 func (e *GrantMemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectGrantMemberUniqueConstraint(e.projectID, e.UserID, e.GrantID)}
+	return []*eventstore.EventUniqueConstraint{NewAddProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
 }
 
 func NewProjectGrantMemberAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	projectID,
 	userID,
 	grantID string,
 	roles ...string,
@@ -63,10 +61,9 @@ func NewProjectGrantMemberAddedEvent(
 			aggregate,
 			GrantMemberAddedType,
 		),
-		projectID: projectID,
-		UserID:    userID,
-		GrantID:   grantID,
-		Roles:     roles,
+		UserID:  userID,
+		GrantID: grantID,
+		Roles:   roles,
 	}
 }
 
@@ -134,9 +131,8 @@ func GrantMemberChangedEventMapper(event *repository.Event) (eventstore.EventRea
 type GrantMemberRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID    string `json:"userId"`
-	GrantID   string `json:"grantId"`
-	projectID string
+	UserID  string `json:"userId"`
+	GrantID string `json:"grantId"`
 }
 
 func (e *GrantMemberRemovedEvent) Data() interface{} {
@@ -144,13 +140,12 @@ func (e *GrantMemberRemovedEvent) Data() interface{} {
 }
 
 func (e *GrantMemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.projectID, e.UserID, e.GrantID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
 }
 
 func NewProjectGrantMemberRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	projectID,
 	userID,
 	grantID string,
 ) *GrantMemberRemovedEvent {
@@ -160,9 +155,8 @@ func NewProjectGrantMemberRemovedEvent(
 			aggregate,
 			GrantMemberRemovedType,
 		),
-		UserID:    userID,
-		GrantID:   grantID,
-		projectID: projectID,
+		UserID:  userID,
+		GrantID: grantID,
 	}
 }
 

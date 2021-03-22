@@ -15,7 +15,7 @@ func GetPasswordAgePolicyByAggregateID(db *gorm.DB, table, aggregateID string) (
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.IAM.PasswordAgePolicy.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-6M9vs", "Errors.IAM.PasswordAgePolicy.NotExisting")
 	}
 	return policy, err
 }

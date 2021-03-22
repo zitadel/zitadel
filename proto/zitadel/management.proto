@@ -389,7 +389,7 @@ service ManagementService {
 
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/auth_factors/u2f"
+            delete: "/users/{user_id}/auth_factors/u2f/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -409,7 +409,7 @@ service ManagementService {
 
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/passwordless"
+            delete: "/users/{user_id}/passwordless/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -430,8 +430,7 @@ service ManagementService {
 
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/keys/{key_id}"
-            body: "*"
+            get: "/users/{user_id}/keys/{key_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2233,9 +2232,8 @@ message GenerateOrgDomainValidationRequest {
 }
 
 message GenerateOrgDomainValidationResponse {
-    zitadel.v1.ObjectDetails details = 1;
-    string token = 2;
-    string url = 3;
+    string token = 1;
+    string url = 2;
 }
 
 message ValidateOrgDomainRequest {
@@ -2837,7 +2835,7 @@ message ListUserGrantResponse {
 message AddUserGrantRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string project_grant_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_grant_id = 3 [(validate.rules).string = {max_len: 200}];
     repeated string role_keys = 4;
 }
 
@@ -2887,14 +2885,7 @@ message BulkRemoveUserGrantRequest {
     repeated string grant_id = 1;
 }
 
-message BulkRemoveUserGrantResponse {
-    message RemovedUserGrant {
-        zitadel.v1.ObjectDetails details = 1;
-        string grant_id = 2;
-    }
-
-    repeated RemovedUserGrant result = 1;
-}
+message BulkRemoveUserGrantResponse {}
 
 message GetFeaturesRequest {}
 
@@ -2962,6 +2953,7 @@ message ListLoginPolicyIDPsResponse {
 
 message AddIDPToLoginPolicyRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.IDPOwnerType ownerType = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message AddIDPToLoginPolicyResponse {

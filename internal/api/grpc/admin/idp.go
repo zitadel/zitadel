@@ -34,7 +34,7 @@ func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest
 	}
 	return &admin_pb.AddOIDCIDPResponse{
 		IdpId: config.AggregateID,
-		Details: object_pb.ToDetailsPb(
+		Details: object_pb.AddToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
@@ -48,7 +48,7 @@ func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) 
 		return nil, err
 	}
 	return &admin_pb.UpdateIDPResponse{
-		Details: object_pb.ToDetailsPb(
+		Details: object_pb.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
@@ -61,7 +61,7 @@ func (s *Server) DeactivateIDP(ctx context.Context, req *admin_pb.DeactivateIDPR
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.DeactivateIDPResponse{Details: object_pb.DomainToDetailsPb(objectDetails)}, nil
+	return &admin_pb.DeactivateIDPResponse{Details: object_pb.DomainToChangeDetailsPb(objectDetails)}, nil
 }
 
 func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPRequest) (*admin_pb.ReactivateIDPResponse, error) {
@@ -69,7 +69,7 @@ func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPR
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.ReactivateIDPResponse{Details: object_pb.DomainToDetailsPb(objectDetails)}, nil
+	return &admin_pb.ReactivateIDPResponse{Details: object_pb.DomainToChangeDetailsPb(objectDetails)}, nil
 }
 
 func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) (*admin_pb.RemoveIDPResponse, error) {
@@ -85,7 +85,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.RemoveIDPResponse{Details: object_pb.DomainToDetailsPb(objectDetails)}, nil
+	return &admin_pb.RemoveIDPResponse{Details: object_pb.DomainToChangeDetailsPb(objectDetails)}, nil
 }
 
 func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateIDPOIDCConfigRequest) (*admin_pb.UpdateIDPOIDCConfigResponse, error) {
@@ -94,7 +94,7 @@ func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateID
 		return nil, err
 	}
 	return &admin_pb.UpdateIDPOIDCConfigResponse{
-		Details: object_pb.ToDetailsPb(
+		Details: object_pb.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,

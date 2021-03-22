@@ -15,7 +15,7 @@ func GetPasswordLockoutPolicyByAggregateID(db *gorm.DB, table, aggregateID strin
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.IAM.PasswordLockoutPolicy.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-M9fsf", "Errors.IAM.PasswordLockoutPolicy.NotExisting")
 	}
 	return policy, err
 }

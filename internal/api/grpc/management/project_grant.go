@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
@@ -25,6 +26,7 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 	if err != nil {
 		return nil, err
 	}
+	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	domains, err := s.project.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err
@@ -46,7 +48,7 @@ func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGra
 	}
 	return &mgmt_pb.AddProjectGrantResponse{
 		GrantId: grant.GrantID,
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.AddToDetailsPb(
 			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
@@ -64,7 +66,7 @@ func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProj
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectGrantResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
@@ -78,7 +80,7 @@ func (s *Server) DeactivateProjectGrant(ctx context.Context, req *mgmt_pb.Deacti
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateProjectGrantResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -88,7 +90,7 @@ func (s *Server) ReactivateProjectGrant(ctx context.Context, req *mgmt_pb.Reacti
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateProjectGrantResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -98,15 +100,15 @@ func (s *Server) RemoveProjectGrant(ctx context.Context, req *mgmt_pb.RemoveProj
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectGrantResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.ListProjectGrantMemberRolesRequest) (*mgmt_pb.ListProjectGrantMemberRolesResponse, error) {
 	roles := s.project.GetProjectGrantMemberRoles()
 	return &mgmt_pb.ListProjectGrantMemberRolesResponse{
-		Result: roles,
-		//TODO: metadata
+		Result:  roles,
+		Details: object_grpc.ToListDetails(uint64(len(roles)), 0, time.Now()),
 	}, nil
 }
 
@@ -126,12 +128,12 @@ func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListP
 }
 
 func (s *Server) AddProjectGrantMember(ctx context.Context, req *mgmt_pb.AddProjectGrantMemberRequest) (*mgmt_pb.AddProjectGrantMemberResponse, error) {
-	member, err := s.command.AddProjectGrantMember(ctx, AddProjectGrantMemberRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	member, err := s.command.AddProjectGrantMember(ctx, AddProjectGrantMemberRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectGrantMemberResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.AddToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -140,12 +142,12 @@ func (s *Server) AddProjectGrantMember(ctx context.Context, req *mgmt_pb.AddProj
 }
 
 func (s *Server) UpdateProjectGrantMember(ctx context.Context, req *mgmt_pb.UpdateProjectGrantMemberRequest) (*mgmt_pb.UpdateProjectGrantMemberResponse, error) {
-	member, err := s.command.ChangeProjectGrantMember(ctx, UpdateProjectGrantMemberRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	member, err := s.command.ChangeProjectGrantMember(ctx, UpdateProjectGrantMemberRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectGrantMemberResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -154,11 +156,11 @@ func (s *Server) UpdateProjectGrantMember(ctx context.Context, req *mgmt_pb.Upda
 }
 
 func (s *Server) RemoveProjectGrantMember(ctx context.Context, req *mgmt_pb.RemoveProjectGrantMemberRequest) (*mgmt_pb.RemoveProjectGrantMemberResponse, error) {
-	details, err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectGrantMemberResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }

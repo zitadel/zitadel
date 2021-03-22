@@ -83,7 +83,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 	}
 	return &mgmt_pb.AddHumanUserResponse{
 		UserId: human.AggregateID,
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.AddToDetailsPb(
 			human.Sequence,
 			human.ChangeDate,
 			human.ResourceOwner,
@@ -98,7 +98,7 @@ func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUser
 	}
 	return &mgmt_pb.AddMachineUserResponse{
 		UserId: machine.AggregateID,
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.AddToDetailsPb(
 			machine.Sequence,
 			machine.ChangeDate,
 			machine.ResourceOwner,
@@ -112,7 +112,7 @@ func (s *Server) DeactivateUser(ctx context.Context, req *mgmt_pb.DeactivateUser
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateUserResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -122,7 +122,7 @@ func (s *Server) ReactivateUser(ctx context.Context, req *mgmt_pb.ReactivateUser
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateUserResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -132,7 +132,7 @@ func (s *Server) LockUser(ctx context.Context, req *mgmt_pb.LockUserRequest) (*m
 		return nil, err
 	}
 	return &mgmt_pb.LockUserResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -142,7 +142,7 @@ func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest)
 		return nil, err
 	}
 	return &mgmt_pb.UnlockUserResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -156,7 +156,7 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 		return nil, err
 	}
 	return &mgmt_pb.RemoveUserResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -174,7 +174,7 @@ func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserName
 		return nil, err
 	}
 	return &mgmt_pb.UpdateUserNameResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -185,8 +185,9 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 	}
 	return &mgmt_pb.GetHumanProfileResponse{
 		Profile: user_grpc.ProfileToPb(profile),
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ToViewDetailsPb(
 			profile.Sequence,
+			profile.CreationDate,
 			profile.ChangeDate,
 			profile.ResourceOwner,
 		),
@@ -199,7 +200,7 @@ func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHuma
 		return nil, err
 	}
 	return &mgmt_pb.UpdateHumanProfileResponse{
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ChangeToDetailsPb(
 			profile.Sequence,
 			profile.ChangeDate,
 			profile.ResourceOwner,
@@ -214,8 +215,9 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 	}
 	return &mgmt_pb.GetHumanEmailResponse{
 		Email: user_grpc.EmailToPb(email),
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ToViewDetailsPb(
 			email.Sequence,
+			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
@@ -228,7 +230,7 @@ func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanE
 		return nil, err
 	}
 	return &mgmt_pb.UpdateHumanEmailResponse{
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ChangeToDetailsPb(
 			email.Sequence,
 			email.ChangeDate,
 			email.ResourceOwner,
@@ -242,7 +244,7 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanInitializationResponse{
-		Details: obj_grpc.DomainToDetailsPb(details),
+		Details: obj_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -252,7 +254,7 @@ func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanEmailVerificationResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -263,8 +265,9 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 	}
 	return &mgmt_pb.GetHumanPhoneResponse{
 		Phone: user_grpc.PhoneToPb(phone),
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ToViewDetailsPb(
 			phone.Sequence,
+			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),
@@ -272,12 +275,12 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 }
 
 func (s *Server) UpdateHumanPhone(ctx context.Context, req *mgmt_pb.UpdateHumanPhoneRequest) (*mgmt_pb.UpdateHumanPhoneResponse, error) {
-	phone, err := s.command.ChangeHumanPhone(ctx, UpdateHumanPhoneRequestToDomain(req))
+	phone, err := s.command.ChangeHumanPhone(ctx, UpdateHumanPhoneRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateHumanPhoneResponse{
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ChangeToDetailsPb(
 			phone.Sequence,
 			phone.ChangeDate,
 			phone.ResourceOwner,
@@ -291,7 +294,7 @@ func (s *Server) RemoveHumanPhone(ctx context.Context, req *mgmt_pb.RemoveHumanP
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanPhoneResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -301,7 +304,7 @@ func (s *Server) ResendHumanPhoneVerification(ctx context.Context, req *mgmt_pb.
 		return nil, err
 	}
 	return &mgmt_pb.ResendHumanPhoneVerificationResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -311,7 +314,7 @@ func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHu
 		return nil, err
 	}
 	return &mgmt_pb.SetHumanInitialPasswordResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -321,7 +324,7 @@ func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mg
 		return nil, err
 	}
 	return &mgmt_pb.SendHumanResetPasswordNotificationResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -341,7 +344,7 @@ func (s *Server) RemoveHumanAuthFactorOTP(ctx context.Context, req *mgmt_pb.Remo
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanAuthFactorOTPResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -351,7 +354,7 @@ func (s *Server) RemoveHumanAuthFactorU2F(ctx context.Context, req *mgmt_pb.Remo
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanAuthFactorU2FResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -371,7 +374,7 @@ func (s *Server) RemoveHumanPasswordless(ctx context.Context, req *mgmt_pb.Remov
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanPasswordlessResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -381,7 +384,7 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 		return nil, err
 	}
 	return &mgmt_pb.UpdateMachineResponse{
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ChangeToDetailsPb(
 			machine.Sequence,
 			machine.ChangeDate,
 			machine.ResourceOwner,
@@ -426,7 +429,7 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	return &mgmt_pb.AddMachineKeyResponse{
 		KeyId:      key.KeyID,
 		KeyDetails: keyDetails,
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			key.Sequence,
 			key.ChangeDate,
 			key.ResourceOwner,
@@ -440,7 +443,7 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 		return nil, err
 	}
 	return &mgmt_pb.RemoveMachineKeyResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -464,7 +467,7 @@ func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHu
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanLinkedIDPResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 

@@ -17,17 +17,18 @@ func ProjectGrantMembersToPb(members []*proj_model.ProjectGrantMemberView) []*me
 
 func ProjectGrantMemberToPb(m *proj_model.ProjectGrantMemberView) *member_pb.Member {
 	return &member_pb.Member{
-		UserId: m.UserID,
-		Roles:  m.Roles,
-		// PreferredLoginName: //TODO: not implemented in be
-		Email:       m.Email,
-		FirstName:   m.FirstName,
-		LastName:    m.LastName,
-		DisplayName: m.DisplayName,
-		Details: object.ToDetailsPb(
+		UserId:             m.UserID,
+		Roles:              m.Roles,
+		PreferredLoginName: m.PreferredLoginName,
+		Email:              m.Email,
+		FirstName:          m.FirstName,
+		LastName:           m.LastName,
+		DisplayName:        m.DisplayName,
+		Details: object.ToViewDetailsPb(
 			m.Sequence,
+			m.CreationDate,
 			m.ChangeDate,
-			"m.ResourceOwner", //TODO: not returnd
+			"", //TODO: not returnd
 		),
 	}
 }

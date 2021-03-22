@@ -20,7 +20,8 @@ type HumanPhoneWriteModel struct {
 	CodeCreationDate time.Time
 	CodeExpiry       time.Duration
 
-	State domain.PhoneState
+	State     domain.PhoneState
+	UserState domain.UserState
 }
 
 func NewHumanPhoneWriteModel(userID, resourceOwner string) *HumanPhoneWriteModel {
@@ -38,13 +39,19 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 		case *user.HumanAddedEvent:
 			if e.PhoneNumber != "" {
 				wm.Phone = e.PhoneNumber
+				wm.State = domain.PhoneStateActive
 			}
-			wm.State = domain.PhoneStateActive
+			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
 			if e.PhoneNumber != "" {
 				wm.Phone = e.PhoneNumber
 				wm.State = domain.PhoneStateActive
 			}
+			wm.UserState = domain.UserStateActive
+		case *user.HumanInitialCodeAddedEvent:
+			wm.UserState = domain.UserStateInitial
+		case *user.HumanInitializedCheckSucceededEvent:
+			wm.UserState = domain.UserStateActive
 		case *user.HumanPhoneChangedEvent:
 			wm.Phone = e.PhoneNumber
 			wm.IsPhoneVerified = false
@@ -60,7 +67,7 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 		case *user.HumanPhoneRemovedEvent:
 			wm.State = domain.PhoneStateRemoved
 		case *user.UserRemovedEvent:
-			wm.State = domain.PhoneStateRemoved
+			wm.UserState = domain.UserStateDeleted
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -84,11 +91,6 @@ func (wm *HumanPhoneWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	phone string,
 ) (*user.HumanPhoneChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := user.NewHumanPhoneChangedEvent(ctx, aggregate)
-	if wm.Phone != phone {
-		hasChanged = true
-		changedEvent.PhoneNumber = phone
-	}
-	return changedEvent, hasChanged
+	changedEvent := user.NewHumanPhoneChangedEvent(ctx, aggregate, phone)
+	return changedEvent, phone != wm.Phone
 }

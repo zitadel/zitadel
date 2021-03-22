@@ -172,8 +172,7 @@ message AuthFactorU2F {
 }
 
 message WebAuthNKey {
-    string id = 1;
-    bytes public_key = 2;
+    bytes public_key = 1;
 }
 
 message WebAuthNVerification {

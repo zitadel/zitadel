@@ -5,17 +5,7 @@ import { take } from 'rxjs/operators';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-export function _arrayBufferToBase64(buffer: any): string {
-    let binary = '';
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary).replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=/g, '');
-}
+import { _arrayBufferToBase64 } from '../u2f_util';
 
 export enum U2FComponentDestination {
     MFA = 'mfa',

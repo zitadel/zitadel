@@ -44,10 +44,11 @@ SetUp:
           Password: 'Password1!'
         Projects:
           - Name: 'Zitadel'
-            OIDCApps:
+            APIs:
               - Name: 'Management-API'
               - Name: 'Auth-API'
               - Name: 'Admin-API'
+            OIDCApps:
               - Name: 'Zitadel Console'
                 RedirectUris:
                   - '$ZITADEL_CONSOLE/auth/callback'

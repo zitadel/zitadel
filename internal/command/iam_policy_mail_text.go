@@ -30,7 +30,7 @@ func (c *Commands) AddDefaultMailText(ctx context.Context, policy *domain.MailTe
 
 func (c *Commands) addDefaultMailText(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMMailTextWriteModel, mailText *domain.MailText) (eventstore.EventPusher, error) {
 	if !mailText.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-3n8fs", "Errors.IAM.MailText.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3n8fs", "Errors.IAM.MailText.Invalid")
 	}
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -55,7 +55,7 @@ func (c *Commands) addDefaultMailText(ctx context.Context, iamAgg *eventstore.Ag
 
 func (c *Commands) ChangeDefaultMailText(ctx context.Context, mailText *domain.MailText) (*domain.MailText, error) {
 	if !mailText.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-kd9fs", "Errors.IAM.MailText.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-kd9fs", "Errors.IAM.MailText.Invalid")
 	}
 	existingPolicy, err := c.defaultMailTextWriteModelByID(ctx, mailText.MailTextType, mailText.Language)
 	if err != nil {

@@ -37,10 +37,10 @@ func (wm *HumanInitCodeWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
 			wm.Email = e.EmailAddress
-			wm.UserState = domain.UserStateInitial
+			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
 			wm.Email = e.EmailAddress
-			wm.UserState = domain.UserStateInitial
+			wm.UserState = domain.UserStateActive
 		case *user.HumanEmailChangedEvent:
 			wm.Email = e.EmailAddress
 			wm.IsEmailVerified = false
@@ -54,8 +54,10 @@ func (wm *HumanInitCodeWriteModel) Reduce() error {
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
 			wm.CodeExpiry = e.Expiry
+			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.Code = nil
+			wm.UserState = domain.UserStateActive
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		}
@@ -84,11 +86,6 @@ func (wm *HumanInitCodeWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	email string,
 ) (*user.HumanEmailChangedEvent, bool) {
-	hasChanged := false
-	changedEvent := user.NewHumanEmailChangedEvent(ctx, aggregate)
-	if wm.Email != email {
-		hasChanged = true
-		changedEvent.EmailAddress = email
-	}
-	return changedEvent, hasChanged
+	changedEvent := user.NewHumanEmailChangedEvent(ctx, aggregate, email)
+	return changedEvent, wm.Email != email
 }

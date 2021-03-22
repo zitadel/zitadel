@@ -12,6 +12,7 @@ import (
 func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMemberRolesRequest) (*admin_pb.ListIAMMemberRolesResponse, error) {
 	roles := s.iam.GetIAMMemberRoles()
 	return &admin_pb.ListIAMMemberRolesResponse{
+		Roles:   roles,
 		Details: object.ToListDetails(uint64(len(roles)), 0, time.Now()),
 	}, nil
 }
@@ -33,7 +34,7 @@ func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberReq
 		return nil, err
 	}
 	return &admin_pb.AddIAMMemberResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -47,7 +48,7 @@ func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMem
 		return nil, err
 	}
 	return &admin_pb.UpdateIAMMemberResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -61,6 +62,6 @@ func (s *Server) RemoveIAMMember(ctx context.Context, req *admin_pb.RemoveIAMMem
 		return nil, err
 	}
 	return &admin_pb.RemoveIAMMemberResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

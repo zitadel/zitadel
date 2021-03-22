@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { ProjectType } from 'src/app/modules/project-members/project-members.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -18,7 +17,6 @@ import { IamMembersDataSource } from './iam-members-datasource';
 })
 export class IamMembersComponent {
     public INITIALPAGESIZE: number = 25;
-    public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public dataSource!: IamMembersDataSource;
 
     public memberRoleOptions: string[] = [];

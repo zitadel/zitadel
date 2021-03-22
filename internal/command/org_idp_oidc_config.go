@@ -6,15 +6,21 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
-func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
-	existingConfig := NewOrgIDPOIDCConfigWriteModel(config.IDPConfigID, config.AggregateID)
+func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig, resourceOwner string) (*domain.OIDCIDPConfig, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4n8f2", "Errors.ResourceOwnerMissing")
+	}
+	if config.IDPConfigID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-66Qwj", "Errors.IDMissing")
+	}
+	existingConfig := NewOrgIDPOIDCConfigWriteModel(config.IDPConfigID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-67J9d", "Errors.Org.IDPConfig.AlreadyExists")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-67J9d", "Errors.Org.IDPConfig.AlreadyExists")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingConfig.WriteModel)
