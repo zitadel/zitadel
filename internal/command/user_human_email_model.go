@@ -68,6 +68,8 @@ func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.HumanInitialCodeAddedType,
+			user.HumanInitializedCheckSucceededType,
 			user.HumanEmailChangedType,
 			user.HumanEmailCodeAddedType,
 			user.HumanEmailVerifiedType,
