@@ -388,7 +388,7 @@ service ManagementService {
 
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/auth_factors/u2f"
+            delete: "/users/{user_id}/auth_factors/u2f/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {

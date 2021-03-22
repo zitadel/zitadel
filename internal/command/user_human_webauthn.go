@@ -173,6 +173,7 @@ func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowne
 			webAuthN.PublicKey,
 			webAuthN.AAGUID,
 			webAuthN.SignCount,
+			userAgentID,
 		),
 	)
 	if err != nil {
@@ -206,6 +207,7 @@ func (c *Commands) HumanHumanPasswordlessSetup(ctx context.Context, userID, reso
 			webAuthN.PublicKey,
 			webAuthN.AAGUID,
 			webAuthN.SignCount,
+			userAgentID,
 		),
 	)
 	if err != nil {

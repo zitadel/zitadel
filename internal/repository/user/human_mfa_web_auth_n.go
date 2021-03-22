@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -56,6 +57,7 @@ type HumanWebAuthNVerifiedEvent struct {
 	AAGUID            []byte `json:"aaguid"`
 	SignCount         uint32 `json:"signCount"`
 	WebAuthNTokenName string `json:"webAuthNTokenName"`
+	UserAgentID       string `json:"userAgentID,omitempty"`
 }
 
 func (e *HumanWebAuthNVerifiedEvent) Data() interface{} {
@@ -75,6 +77,7 @@ func NewHumanWebAuthNVerifiedEvent(
 	publicKey,
 	aaguid []byte,
 	signCount uint32,
+	userAgentID string,
 ) *HumanWebAuthNVerifiedEvent {
 	return &HumanWebAuthNVerifiedEvent{
 		BaseEvent:         *base,
@@ -85,6 +88,7 @@ func NewHumanWebAuthNVerifiedEvent(
 		AAGUID:            aaguid,
 		SignCount:         signCount,
 		WebAuthNTokenName: webAuthNTokenName,
+		UserAgentID:       userAgentID,
 	}
 }
 

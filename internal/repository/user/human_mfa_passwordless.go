@@ -64,6 +64,7 @@ func NewHumanPasswordlessVerifiedEvent(
 	publicKey,
 	aaguid []byte,
 	signCount uint32,
+	userAgentID string,
 ) *HumanPasswordlessVerifiedEvent {
 	return &HumanPasswordlessVerifiedEvent{
 		HumanWebAuthNVerifiedEvent: *NewHumanWebAuthNVerifiedEvent(
@@ -79,6 +80,7 @@ func NewHumanPasswordlessVerifiedEvent(
 			publicKey,
 			aaguid,
 			signCount,
+			userAgentID,
 		),
 	}
 }
