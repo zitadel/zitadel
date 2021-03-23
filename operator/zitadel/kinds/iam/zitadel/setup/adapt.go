@@ -153,7 +153,9 @@ func jobDef(name *labels.Name, users []string, version *string, resources *k8s.R
 			Annotations: map[string]string{},
 		},
 		Spec: batchv1.JobSpec{
-			Completions: helpers.PointerInt32(1),
+			Parallelism:  helpers.PointerInt32(1),
+			Completions:  helpers.PointerInt32(1),
+			BackoffLimit: helpers.PointerInt32(6),
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{},

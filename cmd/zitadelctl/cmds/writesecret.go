@@ -70,7 +70,7 @@ orbctl writesecret mygceprovider.google_application_credentials_value --value "$
 			s,
 			"zitadelctl",
 			fmt.Sprintf(rv.Version),
-			secrets.GetAllSecretsFunc(monitor, rv.Gitops, gitClient, k8sClient, orbConfig),
+			secrets.GetAllSecretsFunc(monitor, path != "", rv.Gitops, gitClient, k8sClient, orbConfig),
 			secrets.PushFunc(monitor, rv.Gitops, gitClient, k8sClient),
 		); err != nil {
 			monitor.Error(err)
