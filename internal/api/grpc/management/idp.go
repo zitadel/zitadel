@@ -3,9 +3,6 @@ package management
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	object_pb "github.com/caos/zitadel/internal/api/grpc/object"
@@ -30,7 +27,7 @@ func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsReques
 	}, nil
 }
 func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRequest) (*mgmt_pb.AddOrgOIDCIDPResponse, error) {
-	config, err := s.command.AddDefaultIDPConfig(ctx, addOIDCIDPRequestToDomain(req))
+	config, err := s.command.AddIDPConfig(ctx, addOIDCIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,14 +41,14 @@ func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRe
 	}, nil
 }
 func (s *Server) DeactivateOrgIDP(ctx context.Context, req *mgmt_pb.DeactivateOrgIDPRequest) (*mgmt_pb.DeactivateOrgIDPResponse, error) {
-	objectDetails, err := s.command.DeactivateDefaultIDPConfig(ctx, req.IdpId)
+	objectDetails, err := s.command.DeactivateIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateOrgIDPResponse{Details: object_pb.DomainToChangeDetailsPb(objectDetails)}, nil
 }
 func (s *Server) ReactivateOrgIDP(ctx context.Context, req *mgmt_pb.ReactivateOrgIDPRequest) (*mgmt_pb.ReactivateOrgIDPResponse, error) {
-	objectDetails, err := s.command.ReactivateDefaultIDPConfig(ctx, req.IdpId)
+	objectDetails, err := s.command.ReactivateIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -66,14 +63,14 @@ func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequ
 	if err != nil {
 		return nil, err
 	}
-	_, err = s.command.RemoveDefaultIDPConfig(ctx, req.IdpId, idpProviderViewsToDomain(idpProviders), externalIDPViewsToDomain(externalIDPs)...)
+	_, err = s.command.RemoveIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID, len(idpProviders) > 0, externalIDPViewsToDomain(externalIDPs)...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveOrgIDPResponse{}, nil
 }
 func (s *Server) UpdateOrgIDP(ctx context.Context, req *mgmt_pb.UpdateOrgIDPRequest) (*mgmt_pb.UpdateOrgIDPResponse, error) {
-	config, err := s.command.ChangeDefaultIDPConfig(ctx, updateIDPToDomain(req))
+	config, err := s.command.ChangeIDPConfig(ctx, updateIDPToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -85,6 +82,17 @@ func (s *Server) UpdateOrgIDP(ctx context.Context, req *mgmt_pb.UpdateOrgIDPRequ
 		),
 	}, nil
 }
+
 func (s *Server) UpdateOrgIDPOIDCConfig(ctx context.Context, req *mgmt_pb.UpdateOrgIDPOIDCConfigRequest) (*mgmt_pb.UpdateOrgIDPOIDCConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateOrgIDPOIDCConfig not implemented")
+	config, err := s.command.ChangeIDPOIDCConfig(ctx, updateOIDCConfigToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateOrgIDPOIDCConfigResponse{
+		Details: object_pb.ChangeToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
 }

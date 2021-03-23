@@ -97,43 +97,57 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 	return writeModelToIDPConfig(&existingIDP.IDPConfigWriteModel), nil
 }
 
-func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string) error {
+func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string) (*domain.ObjectDetails, error) {
 	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateActive {
-		return caos_errs.ThrowPreconditionFailed(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotActive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingIDP, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ReactivateIDPConfig(ctx context.Context, idpID, orgID string) error {
+func (c *Commands) ReactivateIDPConfig(ctx context.Context, idpID, orgID string) (*domain.ObjectDetails, error) {
 	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateInactive {
-		return caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingIDP, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.ExternalIDP) error {
+func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.ExternalIDP) (*domain.ObjectDetails, error) {
 	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return caos_errs.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
 	}
 	if existingIDP.State != domain.IDPConfigStateInactive {
-		return caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
@@ -145,8 +159,15 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 		removeIDPEvents := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true, cascadeExternalIDPs...)
 		events = append(events, removeIDPEvents...)
 	}
-	_, err = c.eventstore.PushEvents(ctx, events...)
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingIDP, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
 func (c *Commands) getOrgIDPConfigByID(ctx context.Context, idpID, orgID string) (*domain.IDPConfig, error) {
