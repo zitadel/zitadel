@@ -39,17 +39,49 @@ func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.EventReader
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(e)
 			}
+		case *user.HumanPasswordlessAddedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(&e.HumanWebAuthNAddedEvent)
+			}
+		case *user.HumanU2FAddedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(&e.HumanWebAuthNAddedEvent)
+			}
 		case *user.HumanWebAuthNVerifiedEvent:
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanPasswordlessVerifiedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(&e.HumanWebAuthNVerifiedEvent)
+			}
+		case *user.HumanU2FVerifiedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(&e.HumanWebAuthNVerifiedEvent)
 			}
 		case *user.HumanWebAuthNSignCountChangedEvent:
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(e)
 			}
+		case *user.HumanPasswordlessSignCountChangedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(&e.HumanWebAuthNSignCountChangedEvent)
+			}
+		case *user.HumanU2FSignCountChangedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(&e.HumanWebAuthNSignCountChangedEvent)
+			}
 		case *user.HumanWebAuthNRemovedEvent:
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanPasswordlessRemovedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(&e.HumanWebAuthNRemovedEvent)
+			}
+		case *user.HumanU2FRemovedEvent:
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+				wm.WriteModel.AppendEvents(&e.HumanWebAuthNRemovedEvent)
 			}
 		case *user.UserRemovedEvent:
 			wm.WriteModel.AppendEvents(e)

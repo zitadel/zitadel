@@ -64,6 +64,7 @@ func NewHumanU2FVerifiedEvent(
 	publicKey,
 	aaguid []byte,
 	signCount uint32,
+	userAgentID string,
 ) *HumanU2FVerifiedEvent {
 	return &HumanU2FVerifiedEvent{
 		HumanWebAuthNVerifiedEvent: *NewHumanWebAuthNVerifiedEvent(
@@ -79,6 +80,7 @@ func NewHumanU2FVerifiedEvent(
 			publicKey,
 			aaguid,
 			signCount,
+			userAgentID,
 		),
 	}
 }

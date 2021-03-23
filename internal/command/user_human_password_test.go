@@ -757,7 +757,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 			},
 		},
 		{
-			name: "phone already verified, precondition error",
+			name: "user initial, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -774,6 +774,12 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 								domain.GenderUnspecified,
 								"email@test.ch",
 								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil, time.Hour*1,
 							),
 						),
 						eventFromEventPusher(

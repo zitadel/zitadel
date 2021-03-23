@@ -245,7 +245,7 @@ func IDPProviderTypeModelFromPb(typ idp_pb.IDPOwnerType) iam_model.IDPProviderTy
 
 func IDPIDQueryToModel(query *idp_pb.IDPIDQuery) *iam_model.IDPConfigSearchQuery {
 	return &iam_model.IDPConfigSearchQuery{
-		Key:    iam_model.IDPConfigSearchKeyIdpConfigID, //TODO: whats the difference between idpconfigid and aggregateid search key?
+		Key:    iam_model.IDPConfigSearchKeyIdpConfigID,
 		Method: domain.SearchMethodEquals,
 		Value:  query.Id,
 	}

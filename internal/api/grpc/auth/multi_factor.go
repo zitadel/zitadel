@@ -67,7 +67,6 @@ func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFac
 	}
 	return &auth_pb.AddMyAuthFactorU2FResponse{
 		Key: &user_pb.WebAuthNKey{
-			Id:        u2f.WebAuthNTokenID,
 			PublicKey: u2f.CredentialCreationData,
 		},
 		Details: object.AddToDetailsPb(
@@ -91,7 +90,7 @@ func (s *Server) VerifyMyAuthFactorU2F(ctx context.Context, req *auth_pb.VerifyM
 
 func (s *Server) RemoveMyAuthFactorU2F(ctx context.Context, req *auth_pb.RemoveMyAuthFactorU2FRequest) (*auth_pb.RemoveMyAuthFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanRemovePasswordless(ctx, ctxData.UserID, req.TokenId, ctxData.ResourceOwner)
+	objectDetails, err := s.command.HumanRemoveU2F(ctx, ctxData.UserID, req.TokenId, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

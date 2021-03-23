@@ -100,7 +100,5 @@ func (s *Server) BulkRemoveUserGrant(ctx context.Context, req *mgmt_pb.BulkRemov
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.BulkRemoveUserGrantResponse{
-		//TODO: Do we need details here?
-	}, nil
+	return &mgmt_pb.BulkRemoveUserGrantResponse{}, nil
 }

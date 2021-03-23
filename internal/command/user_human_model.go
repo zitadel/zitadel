@@ -54,6 +54,10 @@ func (wm *HumanWriteModel) Reduce() error {
 			wm.reduceHumanAddedEvent(e)
 		case *user.HumanRegisteredEvent:
 			wm.reduceHumanRegisteredEvent(e)
+		case *user.HumanInitialCodeAddedEvent:
+			wm.UserState = domain.UserStateInitial
+		case *user.HumanInitializedCheckSucceededEvent:
+			wm.UserState = domain.UserStateActive
 		case *user.UsernameChangedEvent:
 			wm.UserName = e.UserName
 		case *user.HumanProfileChangedEvent:
@@ -97,6 +101,8 @@ func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.HumanInitialCodeAddedType,
+			user.HumanInitializedCheckSucceededType,
 			user.UserUserNameChangedType,
 			user.HumanProfileChangedType,
 			user.HumanEmailChangedType,
@@ -128,7 +134,7 @@ func (wm *HumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.StreetAddress = e.StreetAddress
 	wm.Secret = e.Secret
 	wm.SecretChangeRequired = e.ChangeRequired
-	wm.UserState = domain.UserStateInitial
+	wm.UserState = domain.UserStateActive
 }
 
 func (wm *HumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEvent) {
@@ -148,7 +154,7 @@ func (wm *HumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEve
 	wm.StreetAddress = e.StreetAddress
 	wm.Secret = e.Secret
 	wm.SecretChangeRequired = e.ChangeRequired
-	wm.UserState = domain.UserStateInitial
+	wm.UserState = domain.UserStateActive
 }
 
 func (wm *HumanWriteModel) reduceHumanProfileChangedEvent(e *user.HumanProfileChangedEvent) {

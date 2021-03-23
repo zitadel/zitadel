@@ -37,10 +37,14 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 		case *user.HumanAddedEvent:
 			wm.Secret = e.Secret
 			wm.SecretChangeRequired = e.ChangeRequired
-			wm.UserState = domain.UserStateInitial
+			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
 			wm.Secret = e.Secret
 			wm.SecretChangeRequired = e.ChangeRequired
+			wm.UserState = domain.UserStateActive
+		case *user.HumanInitialCodeAddedEvent:
+			wm.UserState = domain.UserStateInitial
+		case *user.HumanInitializedCheckSucceededEvent:
 			wm.UserState = domain.UserStateActive
 		case *user.HumanPasswordChangedEvent:
 			wm.Secret = e.Secret
@@ -66,6 +70,8 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.HumanInitialCodeAddedType,
+			user.HumanInitializedCheckSucceededType,
 			user.HumanPasswordChangedType,
 			user.HumanPasswordCodeAddedType,
 			user.HumanEmailVerifiedType,

@@ -91,9 +91,12 @@ func UpdateHumanProfileRequestToDomain(req *mgmt_pb.UpdateHumanProfileRequest) *
 	}
 }
 
-func UpdateHumanEmailRequestToDomain(req *mgmt_pb.UpdateHumanEmailRequest) *domain.Email {
+func UpdateHumanEmailRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateHumanEmailRequest) *domain.Email {
 	return &domain.Email{
-		ObjectRoot:      models.ObjectRoot{AggregateID: req.UserId},
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		},
 		EmailAddress:    req.Email,
 		IsEmailVerified: req.IsEmailVerified,
 	}

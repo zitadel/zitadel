@@ -221,7 +221,7 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 }
 
 func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanEmailRequest) (*mgmt_pb.UpdateHumanEmailResponse, error) {
-	email, err := s.command.ChangeHumanEmail(ctx, UpdateHumanEmailRequestToDomain(req))
+	email, err := s.command.ChangeHumanEmail(ctx, UpdateHumanEmailRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}

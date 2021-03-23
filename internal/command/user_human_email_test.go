@@ -80,6 +80,49 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			},
 		},
 		{
+			name: "user not initialized, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil, time.Hour*1,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				email: &domain.Email{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					EmailAddress: "email@test.ch",
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "email not changed, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -570,6 +613,12 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 								domain.GenderUnspecified,
 								"email@test.ch",
 								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil, time.Hour*1,
 							),
 						),
 					),
