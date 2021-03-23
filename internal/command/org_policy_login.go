@@ -26,7 +26,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
 	}
 
-	err = c.checkLoginPolicyAllowed(ctx, resourceOwner, nil)
+	err = c.checkLoginPolicyAllowed(ctx, resourceOwner, policy)
 	if err != nil {
 		return nil, err
 	}
