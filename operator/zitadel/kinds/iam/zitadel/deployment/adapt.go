@@ -21,8 +21,8 @@ const (
 	containerName = "zitadel"
 	RunAsUser     = int64(1000)
 	//zitadelImage can be found in github.com/caos/zitadel repo
-	zitadelImage               = "ghcr.io/caos/zitadel"
-	timeout      time.Duration = 60
+	zitadelImage = "ghcr.io/caos/zitadel"
+	timeout      = 60 * time.Second
 )
 
 func AdaptFunc(

@@ -21,7 +21,7 @@ const (
 	containerName = "zitadel"
 	rootSecret    = "client-root"
 	dbSecrets     = "db-secrets"
-	timeout       = 300 * time.Second
+	timeout       = 5 * time.Minute
 )
 
 func AdaptFunc(

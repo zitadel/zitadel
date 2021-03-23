@@ -21,9 +21,9 @@ type ConsoleEnv struct {
 }
 
 const (
-	googleServiceAccountJSONPath               = "google-serviceaccount-key.json"
-	zitadelKeysPath                            = "zitadel-keys.yaml"
-	timeout                      time.Duration = 60
+	googleServiceAccountJSONPath = "google-serviceaccount-key.json"
+	zitadelKeysPath              = "zitadel-keys.yaml"
+	timeout                      = 60 * time.Second
 )
 
 func AdaptFunc(

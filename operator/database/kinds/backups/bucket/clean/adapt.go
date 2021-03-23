@@ -1,8 +1,9 @@
 package clean
 
 import (
-	"github.com/caos/zitadel/operator"
 	"time"
+
+	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -12,16 +13,16 @@ import (
 )
 
 const (
-	Instant                          = "clean"
-	defaultMode                      = int32(256)
-	certPath                         = "/cockroach/cockroach-certs"
-	secretPath                       = "/secrets/sa.json"
-	internalSecretName               = "client-certs"
-	image                            = "ghcr.io/caos/zitadel-crbackup"
-	rootSecretName                   = "cockroachdb.client.root"
-	jobPrefix                        = "backup-"
-	jobSuffix                        = "-clean"
-	timeout            time.Duration = 60
+	Instant            = "clean"
+	defaultMode        = int32(256)
+	certPath           = "/cockroach/cockroach-certs"
+	secretPath         = "/secrets/sa.json"
+	internalSecretName = "client-certs"
+	image              = "ghcr.io/caos/zitadel-crbackup"
+	rootSecretName     = "cockroachdb.client.root"
+	jobPrefix          = "backup-"
+	jobSuffix          = "-clean"
+	timeout            = 60 * time.Second
 )
 
 func AdaptFunc(
