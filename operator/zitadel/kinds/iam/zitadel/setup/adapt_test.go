@@ -89,19 +89,16 @@ func TestSetup_AdaptFunc(t *testing.T) {
 			Annotations: annotations,
 		},
 		Spec: batchv1.JobSpec{
-			Parallelism:  helpers.PointerInt32(1),
-			Completions:  helpers.PointerInt32(1),
-			BackoffLimit: helpers.PointerInt32(6),
+			Completions: helpers.PointerInt32(1),
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: annotations,
 				},
 				Spec: corev1.PodSpec{
-					NodeSelector:    nodeselector,
-					Tolerations:     tolerations,
-					InitContainers:  initContainers,
-					Containers:      containers,
-					SecurityContext: &corev1.PodSecurityContext{},
+					NodeSelector:   nodeselector,
+					Tolerations:    tolerations,
+					InitContainers: initContainers,
+					Containers:     containers,
 
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",

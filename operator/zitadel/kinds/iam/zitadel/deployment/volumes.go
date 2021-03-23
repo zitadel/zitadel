@@ -16,7 +16,8 @@ func GetVolumes(
 		Name: secretName,
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
-				SecretName: secretName,
+				SecretName:  secretName,
+				DefaultMode: helpers.PointerInt32(420),
 			},
 		},
 	}, {
@@ -31,7 +32,8 @@ func GetVolumes(
 		Name: secretPasswordsName,
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
-				SecretName: secretPasswordsName,
+				SecretName:  secretPasswordsName,
+				DefaultMode: helpers.PointerInt32(384),
 			},
 		},
 	}, {
@@ -39,6 +41,7 @@ func GetVolumes(
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{Name: consoleCMName},
+				DefaultMode:          helpers.PointerInt32(420),
 			},
 		},
 	}, {

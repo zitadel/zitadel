@@ -101,10 +101,9 @@ func AdaptFunc(
 							},
 						},
 						Spec: corev1.PodSpec{
-							NodeSelector:    nodeselector,
-							Tolerations:     tolerations,
-							SecurityContext: &corev1.PodSecurityContext{},
-							InitContainers:  getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName),
+							NodeSelector:   nodeselector,
+							Tolerations:    tolerations,
+							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName),
 							Containers: []corev1.Container{
 								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users),
 							},

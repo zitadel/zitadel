@@ -1,6 +1,7 @@
 package deployment
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
@@ -63,6 +64,7 @@ func GetContainer(
 			}},
 	}
 
+	sort.Strings(users)
 	for _, user := range users {
 		envVars = append(envVars, corev1.EnvVar{
 			Name: "CR_" + strings.ToUpper(user) + "_PASSWORD",
@@ -92,7 +94,7 @@ func GetContainer(
 		},
 		Name:            containerName,
 		Image:           zitadelImage + ":" + version,
-		ImagePullPolicy: "IfNotPresent",
+		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{
 			{Name: "grpc", ContainerPort: 50001},
 			{Name: "http", ContainerPort: 50002},
@@ -127,5 +129,7 @@ func GetContainer(
 			PeriodSeconds:    5,
 			FailureThreshold: 2,
 		},
+		TerminationMessagePolicy: "File",
+		TerminationMessagePath:   "/dev/termination-log",
 	}
 }
