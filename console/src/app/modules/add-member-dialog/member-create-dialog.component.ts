@@ -97,9 +97,12 @@ export class MemberCreateDialogComponent {
     }
 
     public selectProject(project: Project.AsObject | GrantedProject.AsObject | any): void {
-        this.projectId = project.projectId;
-        if (project.id) {
-            this.grantId = project.id;
+        if (project.projectId && project.grantId) {
+            this.projectId = project.projectId;
+            this.grantId = project.grantId;
+        }
+        else if (project.id) {
+            this.projectId = project.id;
         }
     }
 

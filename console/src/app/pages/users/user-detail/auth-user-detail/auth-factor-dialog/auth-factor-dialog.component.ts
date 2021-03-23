@@ -52,7 +52,6 @@ export class AuthFactorDialogComponent {
             });
         } else if (type == AuthFactorType.U2F) {
             this.authService.addMyMultiFactorU2F().then((u2fresp) => {
-                console.log(u2fresp);
                 const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
 
                 if (credOptions.publicKey?.challenge) {
