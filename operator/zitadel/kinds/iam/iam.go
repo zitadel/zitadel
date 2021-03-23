@@ -3,10 +3,10 @@ package iam
 import (
 	"fmt"
 
-	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/orbos/pkg/orb"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
@@ -22,7 +22,8 @@ func GetQueryAndDestroyFuncs(
 	currentTree *tree.Tree,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	orbconfig *orb.Orb,
+	dbClient database.Client,
+	namespace string,
 	action string,
 	version *string,
 	features []string,
@@ -30,6 +31,8 @@ func GetQueryAndDestroyFuncs(
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
 	secrets map[string]*secret.Secret,
+	existing map[string]*secret.Existing,
+	migrate bool,
 	err error,
 ) {
 
@@ -42,8 +45,8 @@ func GetQueryAndDestroyFuncs(
 	switch desiredTree.Common.Kind {
 	case "zitadel.caos.ch/ZITADEL":
 		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version)
-		return zitadel.AdaptFunc(apiLabels, nodeselector, tolerations, orbconfig, action, version, features)(monitor, desiredTree, currentTree)
+		return zitadel.AdaptFunc(apiLabels, nodeselector, tolerations, dbClient, namespace, action, version, features)(monitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, false, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
 	}
 }

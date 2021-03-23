@@ -1,83 +1,106 @@
 package zitadel
 
 import (
+	"github.com/caos/orbos/pkg/helper"
+	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/orbos/pkg/secret"
 	"sort"
 
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 )
 
-const migrationUser = "flyway"
+const (
+	migrationUser = "flyway"
+	mgmtUser      = "management"
+	adminUser     = "adminapi"
+	authUser      = "auth"
+	authzUser     = "authz"
+	notUser       = "notification"
+	esUser        = "eventstore"
+)
 
-func getAllUsers(desired *DesiredV0) map[string]string {
+func getUserListWithoutPasswords(desired *DesiredV0) []string {
+	userpw, _ := getAllUsers(nil, desired)
+	users := make([]string, 0)
+	for user := range userpw {
+		users = append(users, user)
+	}
+
+	sort.Slice(users, func(i, j int) bool {
+		return users[i] < users[j]
+	})
+	return users
+}
+
+func getAllUsers(k8sClient kubernetes.ClientInt, desired *DesiredV0) (map[string]string, error) {
 	passwords := &configuration.Passwords{}
 	if desired != nil && desired.Spec != nil && desired.Spec.Configuration != nil && desired.Spec.Configuration.Passwords != nil {
 		passwords = desired.Spec.Configuration.Passwords
 	}
 	users := make(map[string]string, 0)
 
-	migrationPassword := migrationUser
-	if passwords.Migration != nil {
-		migrationPassword = passwords.Migration.Value
+	if err := fillInUserPassword(k8sClient, migrationUser, passwords.Migration, passwords.ExistingMigration, users); err != nil {
+		return nil, err
 	}
-	users[migrationUser] = migrationPassword
-
-	mgmtUser := "management"
-	mgmtPassword := mgmtUser
-	if passwords != nil && passwords.Management != nil {
-		mgmtPassword = passwords.Management.Value
+	if err := fillInUserPassword(k8sClient, mgmtUser, passwords.Management, passwords.ExistingManagement, users); err != nil {
+		return nil, err
 	}
-	users[mgmtUser] = mgmtPassword
-
-	adminUser := "adminapi"
-	adminPassword := adminUser
-	if passwords != nil && passwords.Adminapi != nil {
-		adminPassword = passwords.Adminapi.Value
+	if err := fillInUserPassword(k8sClient, adminUser, passwords.Adminapi, passwords.ExistingAdminapi, users); err != nil {
+		return nil, err
 	}
-	users[adminUser] = adminPassword
-
-	authUser := "auth"
-	authPassword := authUser
-	if passwords != nil && passwords.Auth != nil {
-		authPassword = passwords.Auth.Value
+	if err := fillInUserPassword(k8sClient, authUser, passwords.Auth, passwords.ExistingAuth, users); err != nil {
+		return nil, err
 	}
-	users[authUser] = authPassword
-
-	authzUser := "authz"
-	authzPassword := authzUser
-	if passwords != nil && passwords.Authz != nil {
-		authzPassword = passwords.Authz.Value
+	if err := fillInUserPassword(k8sClient, authzUser, passwords.Authz, passwords.ExistingAuthz, users); err != nil {
+		return nil, err
 	}
-	users[authzUser] = authzPassword
-
-	notUser := "notification"
-	notPassword := notUser
-	if passwords != nil && passwords.Notification != nil {
-		notPassword = passwords.Notification.Value
+	if err := fillInUserPassword(k8sClient, notUser, passwords.Notification, passwords.ExistingNotification, users); err != nil {
+		return nil, err
 	}
-	users[notUser] = notPassword
-
-	esUser := "eventstore"
-	esPassword := esUser
-	if passwords != nil && passwords.Eventstore != nil {
-		esPassword = passwords.Eventstore.Value
+	if err := fillInUserPassword(k8sClient, esUser, passwords.Eventstore, passwords.ExistingEventstore, users); err != nil {
+		return nil, err
 	}
-	users[esUser] = esPassword
 
-	return users
+	return users, nil
 }
 
-func getZitadelUserList() []string {
-	allUsersMap := getAllUsers(nil)
+func fillInUserPassword(
+	k8sClient kubernetes.ClientInt,
+	user string,
+	secret *secret.Secret,
+	existing *secret.Existing,
+	userpw map[string]string,
+) error {
+	if k8sClient == nil {
+		userpw[user] = user
+		return nil
+	}
 
-	allZitadelUsers := make([]string, 0)
-	for k := range allUsersMap {
+	pw, err := helper.GetSecretValue(k8sClient, secret, existing)
+	if err != nil {
+		return err
+	}
+	if pw != "" {
+		userpw[user] = pw
+	} else {
+		userpw[user] = user
+	}
+
+	return nil
+}
+
+func getZitadelUserList(k8sClient kubernetes.ClientInt, desired *DesiredV0) (map[string]string, error) {
+	allUsersMap, err := getAllUsers(k8sClient, desired)
+	if err != nil {
+		return nil, err
+	}
+
+	allZitadelUsers := make(map[string]string, 0)
+	for k, v := range allUsersMap {
 		if k != migrationUser {
-			allZitadelUsers = append(allZitadelUsers, k)
+			allZitadelUsers[k] = v
 		}
 	}
-	sort.Slice(allZitadelUsers, func(i, j int) bool {
-		return allZitadelUsers[i] < allZitadelUsers[j]
-	})
 
-	return allZitadelUsers
+	return allZitadelUsers, nil
 }

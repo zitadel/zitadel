@@ -9,6 +9,9 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/orbos/pkg/treelabels"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
+	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
+	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
 	"github.com/caos/zitadel/operator/database/kinds/databases"
 	"github.com/pkg/errors"
 )
@@ -21,18 +24,29 @@ func OperatorSelector() *labels.Selector {
 	return labels.OpenOperatorSelector("ZITADEL", "database.caos.ch")
 }
 
-func AdaptFunc(timestamp string, binaryVersion *string, features ...string) operator.AdaptFunc {
+func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ...string) operator.AdaptFunc {
 
-	return func(monitor mntr.Monitor, orbDesiredTree *tree.Tree, currentTree *tree.Tree) (queryFunc operator.QueryFunc, destroyFunc operator.DestroyFunc, secrets map[string]*secret.Secret, err error) {
+	return func(
+		monitor mntr.Monitor,
+		orbDesiredTree *tree.Tree,
+		currentTree *tree.Tree,
+	) (
+		queryFunc operator.QueryFunc,
+		destroyFunc operator.DestroyFunc,
+		secrets map[string]*secret.Secret,
+		existing map[string]*secret.Existing,
+		migrate bool,
+		err error,
+	) {
 		defer func() {
 			err = errors.Wrapf(err, "building %s failed", orbDesiredTree.Common.Kind)
 		}()
 
 		orbMonitor := monitor.WithField("kind", "orb")
 
-		desiredKind, err := parseDesiredV0(orbDesiredTree)
+		desiredKind, err := ParseDesiredV0(orbDesiredTree)
 		if err != nil {
-			return nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, migrate, errors.Wrap(err, "parsing desired state failed")
 		}
 		orbDesiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
@@ -43,18 +57,18 @@ func AdaptFunc(timestamp string, binaryVersion *string, features ...string) oper
 
 		queryNS, err := namespace.AdaptFuncToEnsure(NamespaceStr)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, migrate, err
 		}
-		destroyNS, err := namespace.AdaptFuncToDestroy(NamespaceStr)
+		/*destroyNS, err := namespace.AdaptFuncToDestroy(NamespaceStr)
 		if err != nil {
 			return nil, nil, nil, err
-		}
+		}*/
 
 		databaseCurrent := &tree.Tree{}
 
 		operatorLabels := mustDatabaseOperator(binaryVersion)
 
-		queryDB, destroyDB, secrets, err := databases.GetQueryAndDestroyFuncs(
+		queryDB, destroyDB, secrets, existing, migrate, err := databases.GetQueryAndDestroyFuncs(
 			orbMonitor,
 			desiredKind.Database,
 			databaseCurrent,
@@ -66,23 +80,28 @@ func AdaptFunc(timestamp string, binaryVersion *string, features ...string) oper
 			desiredKind.Spec.Version,
 			features,
 		)
-
 		if err != nil {
-			return nil, nil, nil, err
-		}
-		queriers := []operator.QueryFunc{
-			operator.ResourceQueryToZitadelQuery(queryNS),
-			queryDB,
-		}
-		if desiredKind.Spec.SelfReconciling {
-			queriers = append(queriers,
-				operator.EnsureFuncToQueryFunc(Reconcile(monitor, orbDesiredTree)),
-			)
+			return nil, nil, nil, nil, migrate, err
 		}
 
-		destroyers := []operator.DestroyFunc{
-			operator.ResourceDestroyToZitadelDestroy(destroyNS),
-			destroyDB,
+		destroyers := make([]operator.DestroyFunc, 0)
+		queriers := make([]operator.QueryFunc, 0)
+		for _, feature := range features {
+			switch feature {
+			case "database", backup.Instant, backup.Normal, restore.Instant, clean.Instant:
+				queriers = append(queriers,
+					operator.ResourceQueryToZitadelQuery(queryNS),
+					queryDB,
+				)
+				destroyers = append(destroyers,
+					destroyDB,
+				)
+			case "operator":
+				queriers = append(queriers,
+					operator.ResourceQueryToZitadelQuery(queryNS),
+					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec)),
+				)
+			}
 		}
 
 		currentTree.Parsed = &DesiredV0{
@@ -105,6 +124,8 @@ func AdaptFunc(timestamp string, binaryVersion *string, features ...string) oper
 				return operator.DestroyersToDestroyFunc(monitor, destroyers)(k8sClient)
 			},
 			secrets,
+			existing,
+			migrate,
 			nil
 	}
 }

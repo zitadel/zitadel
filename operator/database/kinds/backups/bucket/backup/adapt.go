@@ -22,7 +22,7 @@ const (
 	internalSecretName               = "client-certs"
 	image                            = "ghcr.io/caos/zitadel-crbackup"
 	rootSecretName                   = "cockroachdb.client.root"
-	timeout            time.Duration = 60
+	timeout            time.Duration = 1200
 	Normal                           = "backup"
 	Instant                          = "instantbackup"
 )
@@ -119,7 +119,6 @@ func AdaptFunc(
 			queriers = append(queriers,
 				operator.EnsureFuncToQueryFunc(checkDBReady),
 				operator.ResourceQueryToZitadelQuery(queryJ),
-				operator.EnsureFuncToQueryFunc(getCleanupFunc(monitor, jobDef.Namespace, jobDef.Name)),
 			)
 		}
 	}

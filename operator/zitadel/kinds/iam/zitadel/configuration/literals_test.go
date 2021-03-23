@@ -1,6 +1,8 @@
 package configuration
 
 import (
+	"testing"
+
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
@@ -8,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"testing"
 )
 
 var (
@@ -110,6 +111,62 @@ var (
 			Adminapi:     &secret.Secret{Value: "adminapi"},
 			Notification: &secret.Secret{Value: "notification"},
 			Eventstore:   &secret.Secret{Value: "eventstore"},
+		},
+		DebugMode: true,
+		LogLevel:  "debug",
+		DNS: &DNS{
+			Domain:    "domain",
+			TlsSecret: "tls",
+			Subdomains: &Subdomains{
+				Accounts: "accounts",
+				API:      "api",
+				Console:  "console",
+				Issuer:   "issuer",
+			},
+		},
+		ClusterDNS: "cluster",
+	}
+	desiredFullExisting = &Configuration{
+		Tracing: &Tracing{
+			ExistingServiceAccountJSON: &secret.Existing{"sajson", "sajson", "sajson"},
+			ProjectID:                  "projectid",
+			Fraction:                   "fraction",
+			Type:                       "type",
+		},
+		Secrets: &Secrets{
+			ExistingKeys:            &secret.Existing{"keys", "keys", "keys"},
+			UserVerificationID:      "userid",
+			OTPVerificationID:       "otpid",
+			OIDCKeysID:              "oidcid",
+			CookieID:                "cookieid",
+			CSRFID:                  "csrfid",
+			DomainVerificationID:    "domainid",
+			IDPConfigVerificationID: "idpid",
+		},
+		Notifications: &Notifications{
+			ExistingGoogleChatURL: &secret.Existing{"chat", "chat", "chat"},
+			Email: &Email{
+				SMTPHost:       "smtphost",
+				SMTPUser:       "smtpuser",
+				SenderAddress:  "sender",
+				SenderName:     "sendername",
+				TLS:            true,
+				ExistingAppKey: &secret.Existing{"appkey", "appkey", "appkey"},
+			},
+			Twilio: &Twilio{
+				SenderName:        "sendername",
+				ExistingAuthToken: &secret.Existing{"migration", "migration", "migration"},
+				ExistingSID:       &secret.Existing{"sid", "sid", "sid"},
+			},
+		},
+		Passwords: &Passwords{
+			ExistingMigration:    &secret.Existing{"migration", "migration", "migration"},
+			ExistingEventstore:   &secret.Existing{"eventstore", "eventstore", "eventstore"},
+			ExistingNotification: &secret.Existing{"notification", "notification", "notification"},
+			ExistingAuthz:        &secret.Existing{"authz", "authz", "authz"},
+			ExistingAuth:         &secret.Existing{"auth", "auth", "auth"},
+			ExistingAdminapi:     &secret.Existing{"adminapi", "adminapi", "adminapi"},
+			ExistingManagement:   &secret.Existing{"management", "management", "management"},
 		},
 		DebugMode: true,
 		LogLevel:  "debug",
@@ -281,6 +338,7 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 }
 
 func TestConfiguration_LiteralsSecrets(t *testing.T) {
+	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	googleSA := "sajson"
 	zitadelKeyPath := "zitadel"
 
@@ -289,11 +347,13 @@ func TestConfiguration_LiteralsSecrets(t *testing.T) {
 		zitadelKeyPath: "",
 	}
 
-	literals := literalsSecret(desiredEmpty, googleSA, zitadelKeyPath)
+	literals, err := literalsSecret(client, desiredEmpty, googleSA, zitadelKeyPath)
+	assert.NoError(t, err)
 	assert.EqualValues(t, equals, literals)
 }
 
 func TestConfiguration_LiteralsSecretsFull(t *testing.T) {
+	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	googleSA := "sajson"
 	zitadelKeyPath := "zitadel"
 
@@ -302,31 +362,123 @@ func TestConfiguration_LiteralsSecretsFull(t *testing.T) {
 		zitadelKeyPath: "keys",
 	}
 
-	literals := literalsSecret(desiredFull, googleSA, zitadelKeyPath)
+	literals, err := literalsSecret(client, desiredFull, googleSA, zitadelKeyPath)
+	assert.NoError(t, err)
+	assert.EqualValues(t, equals, literals)
+}
+
+func TestConfiguration_LiteralsSecretsExisting(t *testing.T) {
+	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
+	sajson := "sajson"
+	keys := "keys"
+	namespace := "caos-system"
+	client.EXPECT().GetSecret(namespace, desiredFullExisting.Tracing.ExistingServiceAccountJSON.Name).Return(&corev1.Secret{
+		StringData: map[string]string{
+			desiredFullExisting.Tracing.ExistingServiceAccountJSON.Key: sajson,
+		},
+		Data: map[string][]byte{
+			desiredFullExisting.Tracing.ExistingServiceAccountJSON.Key: []byte(sajson),
+		},
+	}, nil)
+	client.EXPECT().GetSecret(namespace, desiredFullExisting.Secrets.ExistingKeys.Name).Return(&corev1.Secret{
+		StringData: map[string]string{
+			desiredFullExisting.Secrets.ExistingKeys.Key: keys,
+		},
+		Data: map[string][]byte{
+			desiredFullExisting.Secrets.ExistingKeys.Key: []byte(keys),
+		},
+	}, nil)
+	googleSA := "sajson"
+	zitadelKeyPath := "zitadel"
+
+	equals := map[string]string{
+		googleSA:       sajson,
+		zitadelKeyPath: keys,
+	}
+
+	literals, err := literalsSecret(client, desiredFullExisting, googleSA, zitadelKeyPath)
+	assert.NoError(t, err)
 	assert.EqualValues(t, equals, literals)
 }
 
 func TestConfiguration_LiteralsSecretVars(t *testing.T) {
+	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	equals := map[string]string{
 		"ZITADEL_EMAILAPPKEY":       "",
 		"ZITADEL_GOOGLE_CHAT_URL":   "",
 		"ZITADEL_TWILIO_AUTH_TOKEN": "",
 		"ZITADEL_TWILIO_SID":        "",
 	}
-	literals := literalsSecretVars(desiredEmpty)
+	literals, err := literalsSecretVars(client, desiredEmpty)
+	assert.NoError(t, err)
 
 	assert.EqualValues(t, equals, literals)
 }
 
 func TestConfiguration_LiteralsSecretVarsFull(t *testing.T) {
+	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	equals := map[string]string{
 		"ZITADEL_EMAILAPPKEY":       "appkey",
 		"ZITADEL_GOOGLE_CHAT_URL":   "chat",
 		"ZITADEL_TWILIO_AUTH_TOKEN": "authtoken",
 		"ZITADEL_TWILIO_SID":        "sid",
 	}
-	literals := literalsSecretVars(desiredFull)
+	literals, err := literalsSecretVars(client, desiredFull)
 
+	assert.NoError(t, err)
+	assert.EqualValues(t, equals, literals)
+}
+
+func TestConfiguration_LiteralsSecretVarsExisting(t *testing.T) {
+	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
+	//	namespace := "caos-system"
+	appkey := "appkey"
+	chat := "chat"
+	authtoken := "authtoken"
+	sid := "sid"
+	/* TODO: incomment!!!
+	client.EXPECT().GetSecret(namespace, desiredFullExisting.Notifications.Email.ExistingAppKey.Name).Return(&corev1.Secret{
+			StringData: map[string]string{
+				desiredFullExisting.Notifications.Email.ExistingAppKey.Key: appkey,
+			},
+			Data: map[string][]byte{
+				desiredFullExisting.Notifications.Email.ExistingAppKey.Key: []byte(appkey),
+			},
+		}, nil)
+		client.EXPECT().GetSecret(namespace, desiredFullExisting.Notifications.ExistingGoogleChatURL.Name).Return(&corev1.Secret{
+			StringData: map[string]string{
+				desiredFullExisting.Notifications.ExistingGoogleChatURL.Key: chat,
+			},
+			Data: map[string][]byte{
+				desiredFullExisting.Notifications.ExistingGoogleChatURL.Key: []byte(chat),
+			},
+		}, nil)
+		client.EXPECT().GetSecret(namespace, desiredFullExisting.Notifications.Twilio.ExistingAuthToken.Name).Return(&corev1.Secret{
+			StringData: map[string]string{
+				desiredFullExisting.Notifications.Twilio.ExistingAuthToken.Key: authtoken,
+			},
+			Data: map[string][]byte{
+				desiredFullExisting.Notifications.Twilio.ExistingAuthToken.Key: []byte(authtoken),
+			},
+		}, nil)
+		client.EXPECT().GetSecret(namespace, desiredFullExisting.Notifications.Twilio.ExistingSID.Name).Return(&corev1.Secret{
+			StringData: map[string]string{
+				desiredFullExisting.Notifications.Twilio.ExistingSID.Key: sid,
+			},
+			Data: map[string][]byte{
+				desiredFullExisting.Notifications.Twilio.ExistingSID.Key: []byte(sid),
+			},
+		}, nil)
+	*/
+	equals := map[string]string{
+		"ZITADEL_EMAILAPPKEY":       appkey,
+		"ZITADEL_GOOGLE_CHAT_URL":   chat,
+		"ZITADEL_TWILIO_AUTH_TOKEN": authtoken,
+		"ZITADEL_TWILIO_SID":        sid,
+	}
+	literals, err := literalsSecretVars(client, desiredFull)
+
+	assert.NoError(t, err)
 	assert.EqualValues(t, equals, literals)
 }
 
