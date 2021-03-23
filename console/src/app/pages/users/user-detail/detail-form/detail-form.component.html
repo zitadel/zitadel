@@ -17,6 +17,10 @@
             <input cnslInput formControlName="nickName" />
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.PROFILE.DISPLAYNAME' | translate }}</cnsl-label>
+            <input cnslInput formControlName="displayName" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'USER.PROFILE.GENDER' | translate }}</cnsl-label>
             <mat-select formControlName="gender">
                 <mat-option *ngFor="let gender of genders" [value]="gender">
@@ -34,7 +38,7 @@
         </cnsl-form-field>
     </div>
     <div class="btn-container">
-        <button [disabled]="disabled" class="submit-button" type="submit" color="primary"
-            mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+        <button [disabled]="disabled" class="submit-button" type="submit" color="primary" mat-raised-button>{{
+            'ACTIONS.SAVE' | translate }}</button>
     </div>
 </form>

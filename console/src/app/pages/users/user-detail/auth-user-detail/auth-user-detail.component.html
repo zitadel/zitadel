@@ -27,10 +27,9 @@
             </div>
         </app-card>
 
-        <app-card *ngIf="user && user.human?.profile?.userName" class=" app-card"
-            title="{{ 'USER.PROFILE.TITLE' | translate }}">
-            <app-detail-form [genders]="genders" [languages]="languages" [username]="user.human?.profile?.userName"
-                [user]="user.human" (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
+        <app-card *ngIf="user && user.human?.profile" class=" app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
+            <app-detail-form [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
+                (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
             </app-detail-form>
         </app-card>
 

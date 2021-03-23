@@ -91,6 +91,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         this.loadingSubject.next(true);
         this.mgmtService.listGrantedProjects(limit, offset).then(resp => {
             this.grantedProjectList = resp.resultList;
+            console.log(this.grantedProjectList);
             if (resp.details?.totalResult) {
                 this.totalResult = resp.details.totalResult;
             }
@@ -101,6 +102,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
                 this.grid = false;
             }
             this.dataSource.data = this.grantedProjectList;
+
             this.loadingSubject.next(false);
         }).catch(error => {
             console.error(error);

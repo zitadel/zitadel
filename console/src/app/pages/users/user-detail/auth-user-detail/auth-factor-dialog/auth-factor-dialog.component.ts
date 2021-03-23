@@ -42,6 +42,8 @@ export class AuthFactorDialogComponent {
     }
 
     public selectType(type: AuthFactorType): void {
+        this.selectedType = type;
+
         if (type == AuthFactorType.OTP) {
             this.authService.addMyMultiFactorOTP().then((otpresp) => {
                 this.otpurl = otpresp.url;
@@ -95,6 +97,7 @@ export class AuthFactorDialogComponent {
                     (resp as any).response.clientDataJSON &&
                     (resp as any).rawId) {
 
+                    console.log(resp);
                     const attestationObject = (resp as any).response.attestationObject;
                     const clientDataJSON = (resp as any).response.clientDataJSON;
                     const rawId = (resp as any).rawId;

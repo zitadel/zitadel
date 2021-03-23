@@ -67,13 +67,13 @@
             <ng-container matColumnDef="dates">
                 <th mat-header-cell *matHeaderCellDef> DATES </th>
                 <td mat-cell *matCellDef="let grant">
-                    <div class="date-block">
+                    <div class="date-block" *ngIf="grant.details?.creationDate">
                         <span class="date-sub">{{ 'PROJECT.GRANT.CREATIONDATE' | translate }}:</span>
-                        <span>{{grant.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                        <span>{{grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
                     </div>
-                    <div class="date-block">
+                    <div class="date-block" *ngIf="grant.details?.changeDate">
                         <span class="date-sub">{{ 'PROJECT.GRANT.CHANGEDATE' | translate }}</span>
-                        <span>{{grant.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                        <span>{{grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
                     </div>
                 </td>
             </ng-container>
@@ -86,14 +86,14 @@
                 </th>
                 <td mat-cell *matCellDef="let grant; let i = index" class="role-data">
                     <ng-container
-                        *ngIf="(context === UserGrantContext.USER || context === UserGrantContext.NONE) && (grant.grantId && grantToEdit !== grant.id) || (grantToEdit !== grant.id)">
+                        *ngIf="(context === UserGrantContext.USER || context === UserGrantContext.NONE) && (grant.grantId && grantToEdit !== grant.grantId) || (grantToEdit !== grant.grantId)">
                         <div class="flex-row">
                             <div class="role">
                                 <span *ngFor="let role of grant.roleKeysList">{{ role }}</span>
                             </div>
                             <span class="fill-space"></span>
                             <button mat-stroked-button
-                                *ngIf="grant.grantId ? grantToEdit !== grant.id : grantToEdit !== grant.id"
+                                *ngIf="grant.grantId ? grantToEdit !== grant.grantId : grantToEdit !== grant.grantId"
                                 [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.grantId] : []) | hasRole | async))"
                                 (click)="loadGrantOptions(grant)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
                                 <i class="las la-edit"></i>
@@ -104,7 +104,7 @@
 
                     <div class="row-form">
                         <ng-container
-                            *ngIf="(context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantToEdit == grant.id && loadedProjectId && loadedProjectId === grant.projectId">
+                            *ngIf="(context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantToEdit == grant.grantId && loadedProjectId && loadedProjectId === grant.projectId">
                             <cnsl-form-field class="form-field" appearance="outline">
                                 <!-- <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label> -->
                                 <mat-select [(ngModel)]="grant.roleKeysList" multiple
@@ -123,7 +123,7 @@
                         </ng-container>
 
                         <ng-container
-                            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && loadedGrantId && loadedGrantId === grant.grantId && grantToEdit == grant.id">
+                            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && loadedGrantId && loadedGrantId === grant.grantId && grantToEdit == grant.grantId">
                             <cnsl-form-field class="form-field" appearance="outline">
                                 <!-- <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label> -->
                                 <mat-select [(ngModel)]="grant.roleKeysList" multiple

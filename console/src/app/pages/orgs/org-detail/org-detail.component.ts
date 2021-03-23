@@ -70,6 +70,7 @@ export class OrgDetailComponent implements OnInit {
     public loadDomains(): void {
         this.mgmtService.listOrgDomains().then(result => {
             this.domains = result.resultList;
+            console.log(this.domains);
             this.primaryDomain = this.domains.find(domain => domain.isPrimary)?.domainName ?? '';
         });
     }

@@ -222,10 +222,11 @@
             "TITLE": "Multifaktor-Authentisierung",
             "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
             "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
-            "OTP": "OTP konfigurieren",
+            "ADD":"Faktor hinzufügen",
+            "OTP": "OTP (One-Time Password)",
             "OTP_DIALOG_TITLE": "OTP hinzufügen",
             "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
-            "U2F":"U2F hinzufügen",
+            "U2F":"U2F (Universal 2nd Factor)",
             "U2F_DIALOG_TITLE": "U2F hinzufügen",
             "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
             "U2F_SUCCESS":"U2F erfolgreich erstellt!",
@@ -244,7 +245,9 @@
             },
             "DIALOG": {
                 "MFA_DELETE_TITLE":"Zweiten Faktor entfernen",
-                "MFA_DELETE_DESCRIPTION":"Sie sind im Begriff eine Zweitfaktormethode zu entfernen. Sind sie sicher?"
+                "MFA_DELETE_DESCRIPTION":"Sie sind im Begriff eine Zweitfaktormethode zu entfernen. Sind sie sicher?",
+                "ADD_MFA_TITLE":"Zweiten Faktor hinzufügen",
+                "ADD_MFA_DESCRIPTION":"Wählen Sie einen der verfügbaren Optionen."
             }
         },
         "EXTERNALIDP": {

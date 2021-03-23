@@ -8,7 +8,7 @@
         <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="loginname selection">
             <mat-chip class="chip" *ngFor="let selecteduser of users" [selectable]="selectable" [removable]="removable"
                 (removed)="remove(selecteduser)">
-                {{ selecteduser?.human ? (selecteduser.human.firstName + ' ' + selecteduser.human.lastName) :
+                {{ selecteduser?.human?.profile ? (selecteduser.human.profile.displayName) :
                 selecteduser?.machine?.name}}
                 | <small>
                     {{selecteduser.preferredLoginName}}</small>

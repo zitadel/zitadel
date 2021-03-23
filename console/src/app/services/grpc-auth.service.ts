@@ -253,6 +253,7 @@ export class GrpcAuthService {
         firstName?: string,
         lastName?: string,
         nickName?: string,
+        displayName?: string,
         preferredLanguage?: string,
         gender?: Gender,
     ): Promise<UpdateMyProfileResponse.AsObject> {
@@ -265,6 +266,9 @@ export class GrpcAuthService {
         }
         if (nickName) {
             req.setNickName(nickName);
+        }
+        if (displayName) {
+            req.setDisplayName(displayName);
         }
         if (gender) {
             req.setGender(gender);

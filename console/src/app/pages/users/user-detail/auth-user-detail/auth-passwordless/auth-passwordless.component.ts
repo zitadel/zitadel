@@ -53,6 +53,7 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
     public addPasswordless(): void {
         this.service.addMyPasswordless().then((resp) => {
             if (resp.key) {
+                console.log(resp.key);
                 const credOptions: CredentialCreationOptions = JSON.parse(atob(resp.key.publicKey as string));
 
                 if (credOptions.publicKey?.challenge) {

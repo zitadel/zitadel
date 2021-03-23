@@ -1,4 +1,5 @@
 import { Component, Inject } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { parsePhoneNumber } from 'libphonenumber-js';
 
@@ -13,34 +14,46 @@ export enum EditDialogType {
     styleUrls: ['./edit-dialog.component.scss'],
 })
 export class EditDialogComponent {
-    public value: string = '';
     public isPhone: boolean = false;
     public phoneCountry: string = 'CH';
+    public valueControl: FormControl = new FormControl(['', [Validators.required]]);
     constructor(public dialogRef: MatDialogRef<EditDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any) {
-        this.value = data.value;
+        this.valueControl.setValue(data.value);
         if (data.type == EditDialogType.PHONE) {
             this.isPhone = true;
         }
+
+        this.valueControl.valueChanges.subscribe(value => {
+            console.log(value);
+            if (value && value.length > 1) {
+                this.changeValue(value);
+            }
+        });
     }
 
-    changeValue(change: any) {
-        const value = change.target.value;
-        if (this.isPhone && value) {
-            const phoneNumber = parsePhoneNumber(value ?? '', 'CH');
-            if (phoneNumber) {
-                const formmatted = phoneNumber.formatInternational();
-                this.phoneCountry = phoneNumber.country || '';
-                this.value = formmatted;
+    changeValue(changedValue: string) {
+        if (this.isPhone && changedValue) {
+            try {
+                const phoneNumber = parsePhoneNumber(changedValue ?? '', 'CH');
+                if (phoneNumber) {
+                    const formmatted = phoneNumber.formatInternational();
+                    this.phoneCountry = phoneNumber.country || '';
+                    if (formmatted !== this.valueControl.value) {
+                        this.valueControl.setValue(formmatted);
+                    }
+                }
+            } catch (error) {
+                console.error(error);
             }
         }
     }
 
-    closeDialog(email: string = ''): void {
-        this.dialogRef.close(email);
+    closeDialog(): void {
+        this.dialogRef.close();
     }
 
-    closeDialogWithValue(value: string = ''): void {
-        this.dialogRef.close(value);
+    closeDialogWithValue(): void {
+        this.dialogRef.close(this.valueControl.value);
     }
 }

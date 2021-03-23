@@ -1,26 +1,38 @@
 <h1 mat-dialog-title>
-    <span class="title">{{'USER.CODEDIALOG.TITLE' | translate}} {{data?.number}}</span>
+    <span class="title">{{'USER.MFA.DIALOG.ADD_MFA_TITLE' | translate}} {{data?.number}}</span>
 </h1>
-<p class="desc">{{'USER.CODEDIALOG.DESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
-    <div class="type-selection">
-        <button class="otp" (click)="selectType(AuthFactorType.OTP)">
-            <mat-icon class="icon" svgIcon="mdi_radar"></mat-icon>
-            <span>{{'USER.MFA.OTP' | translate}}</span>
-        </button>
-        <button class="u2f" (click)="selectType(AuthFactorType.U2F)">
-            <i class="las la-fingerprint"></i>
-            <span>{{'USER.MFA.U2F' | translate}}</span>
-        </button>
-    </div>
+    <ng-container *ngIf="selectedType == undefined">
+        <p class="desc">{{'USER.MFA.DIALOG.ADD_MFA_DESCRIPTION' | translate}}</p>
+
+        <div class="type-selection">
+            <button mat-raised-button [disabled]="data.otpDisabled" (click)="selectType(AuthFactorType.OTP)">
+                <div class="otp-btn">
+                    <mat-icon class="icon" svgIcon="mdi_radar"></mat-icon>
+                    <span>{{'USER.MFA.OTP' | translate}}</span>
+                </div>
+            </button>
+            <button mat-raised-button (click)="selectType(AuthFactorType.U2F)">
+                <div class="u2f-btn">
+                    <div class="icon-row">
+                        <i matTooltip="Fingerprint" class="las la-fingerprint"></i>
+                        <i matTooltip="Security Key" class="lab la-usb"></i>
+                        <mat-icon matTooltip="NFC">nfc</mat-icon>
+                    </div>
+                    <span>{{'USER.MFA.U2F' | translate}}</span>
+                </div>
+            </button>
+        </div>
+    </ng-container>
 
     <div class="otp" *ngIf="selectedType == AuthFactorType.OTP">
-        <p>{{'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate}}</p>
+        <p class="desc">{{'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate}}</p>
+
         <div class="qrcode-wrapper">
             <qrcode *ngIf="otpurl" class="qrcode" [qrdata]="otpurl" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
         </div>
 
-        <cnsl-form-field class="form-field" label="Access Code" required="true">
+        <cnsl-form-field class="formfield" label="Access Code" required="true">
             <cnsl-label>Code</cnsl-label>
             <input cnslInput [(ngModel)]="otpcode" />
         </cnsl-form-field>
@@ -44,7 +56,8 @@
         {{'ACTIONS.CLOSE' | translate}}
     </button>
 
-    <button cdkFocusInitial color="primary" mat-raised-button class="ok-button" (click)="submitAuth()">
+    <button *ngIf="selectedType !== undefined" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
+        (click)="submitAuth()">
         {{'ACTIONS.CREATE' | translate}}
     </button>
 </div>
