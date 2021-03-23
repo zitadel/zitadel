@@ -80,7 +80,6 @@ func AdaptFunc(
 	queriers := []operator.QueryFunc{
 		operator.EnsureFuncToQueryFunc(checkDBReady),
 		operator.ResourceQueryToZitadelQuery(queryJ),
-		operator.EnsureFuncToQueryFunc(getCleanupFunc(monitor, jobdef.Namespace, jobdef.Name)),
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {

@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/setup"
@@ -13,7 +12,6 @@ import (
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/orbos/pkg/kubernetes/resources/namespace"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
@@ -28,7 +26,8 @@ func AdaptFunc(
 	apiLabels *labels.API,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	orbconfig *orb.Orb,
+	dbClient database.Client,
+	namespace string,
 	action string,
 	version *string,
 	features []string,
@@ -41,24 +40,25 @@ func AdaptFunc(
 		operator.QueryFunc,
 		operator.DestroyFunc,
 		map[string]*secret.Secret,
+		map[string]*secret.Existing,
+		bool,
 		error,
 	) {
 
-		allSecrets := make(map[string]*secret.Secret)
 		internalMonitor := monitor.WithField("kind", "iam")
 
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, allSecrets, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
-		secret.AppendSecrets("", allSecrets, getSecretsMap(desiredKind))
+
+		allSecrets, allExisting := getSecretsMap(desiredKind)
 
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
 			internalMonitor.Verbose()
 		}
 
-		namespaceStr := "caos-zitadel"
 		// shared elements
 		cmName := "zitadel-vars"
 		secretName := "zitadel-secret"
@@ -70,28 +70,12 @@ func AdaptFunc(
 		secretPath := "/secret"
 		//services which are kubernetes resources and are used in the ambassador elements
 		grpcServiceName := "grpc-v1"
-		var grpcPort uint16 = 80
+		grpcPort := 80
 		httpServiceName := "http-v1"
-		var httpPort uint16 = 80
+		httpPort := 80
 		uiServiceName := "ui-v1"
-		var uiPort uint16 = 80
-
-		//		labels := getLabels()
-		users := getAllUsers(desiredKind)
-		allZitadelUsers := getZitadelUserList()
-		dbClient, err := database.NewClient(monitor, orbconfig.URL, orbconfig.Repokey)
-		if err != nil {
-			return nil, nil, allSecrets, err
-		}
-
-		queryNS, err := namespace.AdaptFuncToEnsure(namespaceStr)
-		if err != nil {
-			return nil, nil, allSecrets, err
-		}
-		destroyNS, err := namespace.AdaptFuncToDestroy(namespaceStr)
-		if err != nil {
-			return nil, nil, allSecrets, err
-		}
+		uiPort := 80
+		usersWithoutPWs := getUserListWithoutPasswords(desiredKind)
 
 		zitadelComponent := labels.MustForComponent(apiLabels, "ZITADEL")
 		zitadelDeploymentName := labels.MustForName(zitadelComponent, "zitadel")
@@ -100,21 +84,21 @@ func AdaptFunc(
 			internalMonitor,
 			zitadelComponent,
 			zitadelPodSelector,
-			namespaceStr,
+			namespace,
 			grpcServiceName,
-			grpcPort,
+			uint16(grpcPort),
 			httpServiceName,
-			httpPort,
+			uint16(httpPort),
 			uiServiceName,
-			uiPort)
+			uint16(uiPort))
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, false, err
 		}
 
-		queryC, destroyC, getConfigurationHashes, err := configuration.AdaptFunc(
+		getQueryC, destroyC, getConfigurationHashes, err := configuration.AdaptFunc(
 			internalMonitor,
 			zitadelComponent,
-			namespaceStr,
+			namespace,
 			desiredKind.Spec.Configuration,
 			cmName,
 			certPath,
@@ -123,12 +107,11 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
-			users,
-			services.GetClientIDFunc(namespaceStr, httpServiceName, httpPort),
 			dbClient,
+			services.GetClientIDFunc(namespace, httpServiceName, httpPort),
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		queryDB, err := database.AdaptFunc(
@@ -136,28 +119,28 @@ func AdaptFunc(
 			dbClient,
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		queryM, destroyM, err := migration.AdaptFunc(
 			internalMonitor,
 			labels.MustForComponent(apiLabels, "database"),
-			namespaceStr,
+			namespace,
 			action,
 			secretPasswordName,
 			migrationUser,
-			allZitadelUsers,
+			usersWithoutPWs,
 			nodeselector,
 			tolerations,
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, false, err
 		}
 
-		querySetup, destroySetup, err := setup.AdaptFunc(
+		getQuerySetup, destroySetup, err := setup.AdaptFunc(
 			internalMonitor,
 			zitadelComponent,
-			namespaceStr,
+			namespace,
 			action,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
@@ -170,11 +153,10 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
-			allZitadelUsers,
-			migration.GetDoneFunc(monitor, namespaceStr, action),
-			configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
-			getConfigurationHashes,
 		)
+		if err != nil {
+			return nil, nil, nil, nil, false, err
+		}
 
 		queryD, destroyD, err := deployment.AdaptFunc(
 			internalMonitor,
@@ -182,7 +164,7 @@ func AdaptFunc(
 			zitadelPodSelector,
 			desiredKind.Spec.Force,
 			version,
-			namespaceStr,
+			namespace,
 			desiredKind.Spec.ReplicaCount,
 			desiredKind.Spec.Affinity,
 			cmName,
@@ -192,64 +174,38 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
-			allZitadelUsers,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
 			desiredKind.Spec.Resources,
-			migration.GetDoneFunc(monitor, namespaceStr, action),
-			configuration.GetReadyFunc(monitor, namespaceStr, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
-			setup.GetDoneFunc(monitor, namespaceStr, action),
-			getConfigurationHashes,
+			migration.GetDoneFunc(monitor, namespace, action),
+			configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
+			setup.GetDoneFunc(monitor, namespace, action),
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		queryAmbassador, destroyAmbassador, err := ambassador.AdaptFunc(
 			internalMonitor,
 			labels.MustForComponent(apiLabels, "apiGateway"),
-			namespaceStr,
-			grpcServiceName+"."+namespaceStr+":"+strconv.Itoa(int(grpcPort)),
-			"http://"+httpServiceName+"."+namespaceStr+":"+strconv.Itoa(int(httpPort)),
-			"http://"+uiServiceName+"."+namespaceStr,
+			namespace,
+			grpcServiceName+"."+namespace+":"+strconv.Itoa(grpcPort),
+			"http://"+httpServiceName+"."+namespace+":"+strconv.Itoa(httpPort),
+			"http://"+uiServiceName+"."+namespace,
 			desiredKind.Spec.Configuration.DNS,
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
-		queriers := make([]operator.QueryFunc, 0)
 		for _, feature := range features {
 			switch feature {
 			case "migration":
-				queriers = append(queriers,
-					queryDB,
-					//configuration
-					queryC,
-					//migration
-					queryM,
-					//wait until migration is completed
-					operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespaceStr, action)),
-				)
 				destroyers = append(destroyers,
 					destroyM,
 				)
 			case "iam":
-				queriers = append(queriers,
-					operator.ResourceQueryToZitadelQuery(queryNS),
-					queryDB,
-					//configuration
-					queryC,
-					//migration
-					queryM,
-					//services
-					queryS,
-					querySetup,
-					queryD,
-					operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespaceStr, zitadelDeploymentName)),
-					queryAmbassador,
-				)
 				destroyers = append(destroyers,
 					destroyAmbassador,
 					destroyS,
@@ -257,24 +213,85 @@ func AdaptFunc(
 					destroyD,
 					destroySetup,
 					destroyC,
-					operator.ResourceDestroyToZitadelDestroy(destroyNS),
-				)
-			case "scaledown":
-				queriers = append(queriers,
-					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(0)),
-				)
-			case "scaleup":
-				queriers = append(queriers,
-					operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespaceStr, zitadelDeploymentName)(desiredKind.Spec.ReplicaCount)),
 				)
 			}
 		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+				users, err := getAllUsers(k8sClient, desiredKind)
+				if err != nil {
+					return nil, err
+				}
+				allZitadelUsers, err := getZitadelUserList(k8sClient, desiredKind)
+				if err != nil {
+					return nil, err
+				}
+
+				queryReadyM := operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespace, action))
+				queryC := getQueryC(users)
+				queryReadyC := operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName))
+				querySetup := getQuerySetup(allZitadelUsers, getConfigurationHashes)
+				queryReadySetup := operator.EnsureFuncToQueryFunc(setup.GetDoneFunc(monitor, namespace, action))
+				queryD := queryD(allZitadelUsers, getConfigurationHashes)
+				queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespace, zitadelDeploymentName))
+
+				queriers := make([]operator.QueryFunc, 0)
+				for _, feature := range features {
+					switch feature {
+					case "migration":
+						queriers = append(queriers,
+							queryDB,
+							//configuration
+							queryC,
+							queryReadyC,
+							//migration
+							queryM,
+							queryReadyM,
+							operator.EnsureFuncToQueryFunc(migration.GetCleanupFunc(monitor, namespace, action)),
+						)
+					case "iam":
+						queriers = append(queriers,
+							queryDB,
+							//configuration
+							queryC,
+							queryReadyC,
+							//migration
+							queryM,
+							queryReadyM,
+							//services
+							queryS,
+							//setup
+							querySetup,
+							queryReadySetup,
+							//deployment
+							queryD,
+							queryReadyD,
+							//handle change if necessary for clientID
+							queryC,
+							queryReadyC,
+							//again apply deployment if config changed
+							queryD,
+							queryReadyD,
+							//apply ambassador crds after zitadel is ready
+							queryAmbassador,
+						)
+					case "scaledown":
+						queriers = append(queriers,
+							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespace, zitadelDeploymentName)(0)),
+						)
+					case "scaleup":
+						queriers = append(queriers,
+							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespace, zitadelDeploymentName)(desiredKind.Spec.ReplicaCount)),
+						)
+					}
+				}
+
 				return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(monitor, destroyers),
 			allSecrets,
+			allExisting,
+			false,
 			nil
 	}
 }

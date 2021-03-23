@@ -9,7 +9,7 @@ import (
 
 func BackupListFunc() func(monitor mntr.Monitor, desiredTree *tree.Tree) (strings []string, err error) {
 	return func(monitor mntr.Monitor, desiredTree *tree.Tree) (strings []string, err error) {
-		desiredKind, err := parseDesiredV0(desiredTree)
+		desiredKind, err := ParseDesiredV0(desiredTree)
 		if err != nil {
 			return nil, errors.Wrap(err, "parsing desired state failed")
 		}

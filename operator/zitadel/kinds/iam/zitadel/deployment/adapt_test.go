@@ -32,7 +32,11 @@ func TestDeployment_Adapt(t *testing.T) {
 	secretName := "testSecret"
 	consoleCMName := "testConsoleCM"
 	cmName := "testCM"
-	users := []string{"test"}
+	usersMap := map[string]string{"test": "test"}
+	users := []string{}
+	for _, user := range usersMap {
+		users = append(users, user)
+	}
 	annotations := map[string]string{"testHash": "test"}
 
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
@@ -115,8 +119,8 @@ func TestDeployment_Adapt(t *testing.T) {
 	}
 	k8sClient.EXPECT().ApplyDeployment(deploymentDef, false).Times(1)
 
-	getConfigurationHashes := func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) map[string]string {
-		return map[string]string{"testHash": "test"}
+	getConfigurationHashes := func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error) {
+		return map[string]string{"testHash": "test"}, nil
 	}
 	migrationDone := func(k8sClient kubernetes.ClientInt) error {
 		return nil
@@ -128,7 +132,7 @@ func TestDeployment_Adapt(t *testing.T) {
 		return nil
 	}
 
-	query, _, err := AdaptFunc(
+	getQuery, _, err := AdaptFunc(
 		monitor,
 		mocklabels.Name,
 		mocklabels.ClosedNameSelector,
@@ -144,17 +148,16 @@ func TestDeployment_Adapt(t *testing.T) {
 		consoleCMName,
 		secretVarsName,
 		secretPasswordsName,
-		users,
 		nodeSelector,
 		nil,
 		resources,
 		migrationDone,
 		configurationDone,
 		setupDone,
-		getConfigurationHashes,
 	)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
+	query := getQuery(usersMap, getConfigurationHashes)
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(k8sClient))

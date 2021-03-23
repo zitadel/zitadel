@@ -3,6 +3,7 @@ package deployment
 import (
 	"github.com/caos/zitadel/operator/helpers"
 	corev1 "k8s.io/api/core/v1"
+	"sort"
 	"strings"
 )
 
@@ -16,7 +17,8 @@ func GetVolumes(
 		Name: secretName,
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
-				SecretName: secretName,
+				SecretName:  secretName,
+				DefaultMode: helpers.PointerInt32(420),
 			},
 		},
 	}, {
@@ -31,7 +33,8 @@ func GetVolumes(
 		Name: secretPasswordsName,
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
-				SecretName: secretPasswordsName,
+				SecretName:  secretPasswordsName,
+				DefaultMode: helpers.PointerInt32(384),
 			},
 		},
 	}, {
@@ -39,6 +42,7 @@ func GetVolumes(
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{Name: consoleCMName},
+				DefaultMode:          helpers.PointerInt32(420),
 			},
 		},
 	}, {
@@ -56,6 +60,7 @@ func userVolumes(
 ) []corev1.Volume {
 	volumes := make([]corev1.Volume, 0)
 
+	sort.Strings(users)
 	for _, user := range users {
 		userReplaced := strings.ReplaceAll(user, "_", "-")
 		internalName := "client-" + userReplaced

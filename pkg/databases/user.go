@@ -6,11 +6,25 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/api"
+	"github.com/caos/zitadel/operator/api/database"
 	coredb "github.com/caos/zitadel/operator/database/kinds/databases/core"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 )
 
-func ListUsers(
+func CrdListUsers(
+	monitor mntr.Monitor,
+	k8sClient kubernetes.ClientInt,
+) ([]string, error) {
+	desired, err := database.ReadCrd(k8sClient)
+	if err != nil {
+		monitor.Error(err)
+		return nil, err
+	}
+
+	return listUsers(monitor, k8sClient, desired)
+}
+
+func GitOpsListUsers(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
@@ -20,9 +34,18 @@ func ListUsers(
 		monitor.Error(err)
 		return nil, err
 	}
+
+	return listUsers(monitor, k8sClient, desired)
+}
+
+func listUsers(
+	monitor mntr.Monitor,
+	k8sClient kubernetes.ClientInt,
+	desired *tree.Tree,
+) ([]string, error) {
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil)(monitor, desired, current)
+	query, _, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +75,20 @@ func ListUsers(
 	return users, nil
 }
 
-func AddUser(
+func CrdAddUser(
+	monitor mntr.Monitor,
+	user string,
+	k8sClient kubernetes.ClientInt,
+) error {
+	desired, err := database.ReadCrd(k8sClient)
+	if err != nil {
+		monitor.Error(err)
+		return err
+	}
+	return addUser(monitor, user, k8sClient, desired)
+}
+
+func GitOpsAddUser(
 	monitor mntr.Monitor,
 	user string,
 	k8sClient kubernetes.ClientInt,
@@ -63,9 +99,18 @@ func AddUser(
 		monitor.Error(err)
 		return err
 	}
+	return addUser(monitor, user, k8sClient, desired)
+}
+
+func addUser(
+	monitor mntr.Monitor,
+	user string,
+	k8sClient kubernetes.ClientInt,
+	desired *tree.Tree,
+) error {
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil)(monitor, desired, current)
+	query, _, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
 	if err != nil {
 		return err
 	}
@@ -91,7 +136,7 @@ func AddUser(
 	return ensureUser(k8sClient)
 }
 
-func DeleteUser(
+func GitOpsDeleteUser(
 	monitor mntr.Monitor,
 	user string,
 	k8sClient kubernetes.ClientInt,
@@ -102,9 +147,33 @@ func DeleteUser(
 		monitor.Error(err)
 		return err
 	}
+
+	return deleteUser(monitor, user, k8sClient, desired)
+}
+
+func CrdDeleteUser(
+	monitor mntr.Monitor,
+	user string,
+	k8sClient kubernetes.ClientInt,
+) error {
+	desired, err := database.ReadCrd(k8sClient)
+	if err != nil {
+		monitor.Error(err)
+		return err
+	}
+
+	return deleteUser(monitor, user, k8sClient, desired)
+}
+
+func deleteUser(
+	monitor mntr.Monitor,
+	user string,
+	k8sClient kubernetes.ClientInt,
+	desired *tree.Tree,
+) error {
 	current := &tree.Tree{}
 
-	query, _, _, err := orbdb.AdaptFunc("", nil)(monitor, desired, current)
+	query, _, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
 	if err != nil {
 		return err
 	}

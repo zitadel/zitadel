@@ -120,7 +120,6 @@ func AdaptFunc(
 			queriers = append(queriers,
 				operator.EnsureFuncToQueryFunc(checkDBReady),
 				operator.ResourceQueryToZitadelQuery(queryJ),
-				operator.EnsureFuncToQueryFunc(getCleanupFunc(monitor, jobDef.Namespace, jobDef.Name)),
 			)
 		}
 	}

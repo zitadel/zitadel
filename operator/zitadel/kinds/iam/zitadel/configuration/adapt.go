@@ -38,20 +38,21 @@ func AdaptFunc(
 	consoleCMName string,
 	secretVarsName string,
 	secretPasswordName string,
-	necessaryUsers map[string]string,
+	dbClient database.Client,
 	getClientID func() string,
-	dbClient database.ClientInt,
 ) (
-	operator.QueryFunc,
+	func(
+		necessaryUsers map[string]string,
+	) operator.QueryFunc,
 	operator.DestroyFunc,
-	func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) map[string]string,
+	func(
+		k8sClient kubernetes.ClientInt,
+		queried map[string]interface{},
+		necessaryUsers map[string]string,
+	) (map[string]string, error),
 	error,
 ) {
 	internalMonitor := monitor.WithField("component", "configuration")
-
-	literalsSecret := literalsSecret(desired, googleServiceAccountJSONPath, zitadelKeysPath)
-	literalsSecretVars := literalsSecretVars(desired)
-
 	destroyCM, err := configmap.AdaptFuncToDestroy(namespace, cmName)
 	if err != nil {
 		return nil, nil, nil, err
@@ -73,7 +74,7 @@ func AdaptFunc(
 		return nil, nil, nil, err
 	}
 
-	_, destroyUser, err := users.AdaptFunc(internalMonitor, necessaryUsers, dbClient)
+	_, destroyUser, err := users.AdaptFunc(internalMonitor, dbClient)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -87,71 +88,97 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroySP),
 	}
 
-	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			queryUser, _, err := users.AdaptFunc(internalMonitor, necessaryUsers, dbClient)
-			if err != nil {
-				return nil, err
-			}
-			queryS, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretName), literalsSecret)
-			if err != nil {
-				return nil, err
-			}
-			querySV, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretVarsName), literalsSecretVars)
-			if err != nil {
-				return nil, err
-			}
-			querySP, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretPasswordName), necessaryUsers)
-			if err != nil {
-				return nil, err
-			}
+	return func(
+			necessaryUsers map[string]string,
+		) operator.QueryFunc {
+			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+				literalsSecret, err := literalsSecret(k8sClient, desired, googleServiceAccountJSONPath, zitadelKeysPath)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars, err := literalsSecretVars(k8sClient, desired)
+				if err != nil {
+					return nil, err
+				}
 
-			queryCCM, err := configmap.AdaptFuncToEnsure(
-				namespace,
-				consoleCMName,
-				labels.MustForNameK8SMap(componentLabels, consoleCMName),
-				literalsConsoleCM(
-					getClientID(),
-					desired.DNS,
-					k8sClient,
+				queryUser, _, err := users.AdaptFunc(internalMonitor, dbClient)
+				if err != nil {
+					return nil, err
+				}
+				queryS, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretName), literalsSecret)
+				if err != nil {
+					return nil, err
+				}
+				querySV, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretVarsName), literalsSecretVars)
+				if err != nil {
+					return nil, err
+				}
+				querySP, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretPasswordName), necessaryUsers)
+				if err != nil {
+					return nil, err
+				}
+
+				queryCCM, err := configmap.AdaptFuncToEnsure(
 					namespace,
 					consoleCMName,
-				),
-			)
-			if err != nil {
-				return nil, err
-			}
+					labels.MustForNameK8SMap(componentLabels, consoleCMName),
+					literalsConsoleCM(
+						getClientID(),
+						desired.DNS,
+						k8sClient,
+						namespace,
+						consoleCMName,
+					),
+				)
+				if err != nil {
+					return nil, err
+				}
 
-			queryCM, err := configmap.AdaptFuncToEnsure(
-				namespace,
-				cmName,
-				labels.MustForNameK8SMap(componentLabels, cmName),
-				literalsConfigMap(
-					desired,
-					necessaryUsers,
-					certPath,
-					secretPath,
-					googleServiceAccountJSONPath,
-					zitadelKeysPath,
-					queried,
-				),
-			)
-			if err != nil {
-				return nil, err
-			}
+				queryCM, err := configmap.AdaptFuncToEnsure(
+					namespace,
+					cmName,
+					labels.MustForNameK8SMap(componentLabels, cmName),
+					literalsConfigMap(
+						desired,
+						necessaryUsers,
+						certPath,
+						secretPath,
+						googleServiceAccountJSONPath,
+						zitadelKeysPath,
+						queried,
+					),
+				)
+				if err != nil {
+					return nil, err
+				}
 
-			queriers := []operator.QueryFunc{
-				queryUser,
-				operator.ResourceQueryToZitadelQuery(queryS),
-				operator.ResourceQueryToZitadelQuery(queryCCM),
-				operator.ResourceQueryToZitadelQuery(querySV),
-				operator.ResourceQueryToZitadelQuery(querySP),
-				operator.ResourceQueryToZitadelQuery(queryCM),
-			}
+				queriers := []operator.QueryFunc{
+					queryUser(necessaryUsers),
+					operator.ResourceQueryToZitadelQuery(queryS),
+					operator.ResourceQueryToZitadelQuery(queryCCM),
+					operator.ResourceQueryToZitadelQuery(querySV),
+					operator.ResourceQueryToZitadelQuery(querySP),
+					operator.ResourceQueryToZitadelQuery(queryCM),
+				}
 
-			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
+				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
+			}
 		},
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-		func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) map[string]string {
+		func(
+			k8sClient kubernetes.ClientInt,
+			queried map[string]interface{},
+			necessaryUsers map[string]string,
+		) (map[string]string, error) {
+			literalsSecret, err := literalsSecret(k8sClient, desired, googleServiceAccountJSONPath, zitadelKeysPath)
+			if err != nil {
+				return nil, err
+			}
+			literalsSecretVars, err := literalsSecretVars(k8sClient, desired)
+			if err != nil {
+				return nil, err
+			}
+
 			return map[string]string{
 				secretName:         getHash(literalsSecret),
 				secretVarsName:     getHash(literalsSecretVars),
@@ -176,7 +203,7 @@ func AdaptFunc(
 						consoleCMName,
 					),
 				),
-			}
+			}, nil
 		},
 		nil
 }
