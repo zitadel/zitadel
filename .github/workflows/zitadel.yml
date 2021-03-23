@@ -265,19 +265,18 @@ jobs:
         if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
       - name: Dev-Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: ncipollo/release-action@v1.8.1
         if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
-        env:
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ needs.refs.outputs.short_ref }}-dev
-          name: Branch ${{ needs.refs.outputs.short_ref }}
-          draft: false
-          prerelease: true
+          artifacts: "${{ env.ARTIFACTS_FOLDER }}/zitadelctl-darwin-amd64/zitadelctl-darwin-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-linux-amd64/zitadelctl-linux-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe"
           body: |
             This is a release from a development branch.
             Do not use these artifacts in production.
-          files: |
-            ${{ env.ARTIFACTS_FOLDER }}/zitadelctl-darwin-amd64/zitadelctl-darwin-amd64
-            ${{ env.ARTIFACTS_FOLDER }}/zitadelctl-linux-amd64/zitadelctl-linux-amd64
-            ${{ env.ARTIFACTS_FOLDER }}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
+          tag: ${{ needs.refs.outputs.short_ref }}-dev
+          commit: ${{ needs.refs.outputs.short_ref }}
+          name: Branch ${{ needs.refs.outputs.short_ref }}
+          token: ${{ env.GITHUB_TOKEN }}
+          replacesArtifacts: true
+          prerelease: true
+          draft: false
+          allowUpdates: true

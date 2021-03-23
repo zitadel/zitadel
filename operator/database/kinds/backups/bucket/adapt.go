@@ -2,6 +2,7 @@ package bucket
 
 import (
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/helper"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/orbos/pkg/labels"
@@ -32,15 +33,28 @@ func AdaptFunc(
 	version string,
 	features []string,
 ) operator.AdaptFunc {
-	return func(monitor mntr.Monitor, desired *tree.Tree, current *tree.Tree) (queryFunc operator.QueryFunc, destroyFunc operator.DestroyFunc, secrets map[string]*secretpkg.Secret, err error) {
+	return func(
+		monitor mntr.Monitor,
+		desired *tree.Tree,
+		current *tree.Tree,
+	) (
+		operator.QueryFunc,
+		operator.DestroyFunc,
+		map[string]*secretpkg.Secret,
+		map[string]*secretpkg.Existing,
+		bool,
+		error,
+	) {
 
 		internalMonitor := monitor.WithField("component", "backup")
 
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
+
+		secrets, existing := getSecretsMap(desiredKind)
 
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
 			internalMonitor.Verbose()
@@ -48,12 +62,7 @@ func AdaptFunc(
 
 		destroyS, err := secret.AdaptFuncToDestroy(namespace, secretName)
 		if err != nil {
-			return nil, nil, nil, err
-		}
-
-		queryS, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretName), map[string]string{secretKey: desiredKind.Spec.ServiceAccountJSON.Value})
-		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		_, destroyB, err := backup.AdaptFunc(
@@ -74,7 +83,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		_, destroyR, err := restore.AdaptFunc(
@@ -93,7 +102,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		_, destroyC, err := clean.AdaptFunc(
@@ -110,7 +119,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, false, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -133,6 +142,11 @@ func AdaptFunc(
 		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+
+				if err := desiredKind.validateSecrets(); err != nil {
+					return nil, err
+				}
+
 				currentDB, err := coreDB.ParseQueriedForDatabase(queried)
 				if err != nil {
 					return nil, err
@@ -141,6 +155,16 @@ func AdaptFunc(
 				databases, err := currentDB.GetListDatabasesFunc()(k8sClient)
 				if err != nil {
 					databases = []string{}
+				}
+
+				value, err := helper.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
+				if err != nil {
+					return nil, err
+				}
+
+				queryS, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretName), map[string]string{secretKey: value})
+				if err != nil {
+					return nil, err
 				}
 
 				queryB, _, err := backup.AdaptFunc(
@@ -201,30 +225,53 @@ func AdaptFunc(
 				}
 
 				queriers := make([]operator.QueryFunc, 0)
+				cleanupQueries := make([]operator.QueryFunc, 0)
 				if databases != nil && len(databases) != 0 {
 					for _, feature := range features {
 						switch feature {
-						case backup.Normal, backup.Instant:
+						case backup.Normal:
 							queriers = append(queriers,
 								operator.ResourceQueryToZitadelQuery(queryS),
 								queryB,
 							)
+						case backup.Instant:
+							queriers = append(queriers,
+								operator.ResourceQueryToZitadelQuery(queryS),
+								queryB,
+							)
+							cleanupQueries = append(cleanupQueries,
+								operator.EnsureFuncToQueryFunc(backup.GetCleanupFunc(monitor, namespace, name)),
+							)
 						case clean.Instant:
 							queriers = append(queriers,
+								operator.ResourceQueryToZitadelQuery(queryS),
 								queryC,
+							)
+							cleanupQueries = append(cleanupQueries,
+								operator.EnsureFuncToQueryFunc(clean.GetCleanupFunc(monitor, namespace, name)),
 							)
 						case restore.Instant:
 							queriers = append(queriers,
+								operator.ResourceQueryToZitadelQuery(queryS),
 								queryR,
+							)
+							cleanupQueries = append(cleanupQueries,
+								operator.EnsureFuncToQueryFunc(restore.GetCleanupFunc(monitor, namespace, name)),
 							)
 						}
 					}
 				}
 
+				for _, cleanup := range cleanupQueries {
+					queriers = append(queriers, cleanup)
+				}
+
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-			getSecretsMap(desiredKind),
+			secrets,
+			existing,
+			false,
 			nil
 	}
 }

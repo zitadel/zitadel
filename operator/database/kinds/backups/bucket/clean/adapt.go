@@ -21,7 +21,7 @@ const (
 	rootSecretName                   = "cockroachdb.client.root"
 	jobPrefix                        = "backup-"
 	jobSuffix                        = "-clean"
-	timeout            time.Duration = 60
+	timeout            time.Duration = 600
 )
 
 func AdaptFunc(
@@ -71,7 +71,6 @@ func AdaptFunc(
 	queriers := []operator.QueryFunc{
 		operator.EnsureFuncToQueryFunc(checkDBReady),
 		operator.ResourceQueryToZitadelQuery(queryJ),
-		operator.EnsureFuncToQueryFunc(getCleanupFunc(monitor, jobDef.Namespace, jobDef.Name)),
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
