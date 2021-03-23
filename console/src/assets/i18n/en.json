@@ -722,6 +722,7 @@
             "USERNAME": "User Name",
             "FIRSTNAME": "First Name",
             "LASTNAME": "Last Name",
+            "LOGINNAME":"Loginname",
             "EMAIL": "E-mail",
             "ROLES": "Roles",
             "USERID":"User ID"
@@ -855,7 +856,7 @@
             "DESCRIPTION":"Provide the correct OIDC Configuration for your identity Provider below!"
           }
         },
-        "TYPES": {
+        "OWNERTYPES": {
             "0":"unknown",
             "1":"System",
             "2":"Organisation"

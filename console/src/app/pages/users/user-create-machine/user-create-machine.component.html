@@ -8,17 +8,17 @@
                 <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}</cnsl-label>
                 <input cnslInput formControlName="userName" required />
                 <span cnsl-error *ngIf="userName?.invalid && userName?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}asdf
                 </span>
                 <span cnsl-error *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
-                    {{ 'USER.VALIDATION.NOEMAIL' | translate }}
+                    {{ 'USER.VALIDATION.NOEMAIL' | translate }}ökl
                 </span>
             </cnsl-form-field>
             <cnsl-form-field class="formfield">
                 <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}</cnsl-label>
                 <input cnslInput formControlName="name" required />
                 <span cnsl-error *ngIf="name?.invalid && name?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}ölkj
                 </span>
             </cnsl-form-field>
             <cnsl-form-field class="formfield">
@@ -27,8 +27,8 @@
             </cnsl-form-field>
         </div>
         <div class="btn-container">
-            <button color="primary" [disabled]="userForm.invalid" type="submit"
-                mat-raised-button>{{ 'ACTIONS.CREATE' | translate }}</button>
+            <button color="primary" [disabled]="userForm.invalid" type="submit" mat-raised-button>{{ 'ACTIONS.CREATE' |
+                translate }}</button>
         </div>
     </form>
 </app-detail-layout>

@@ -23,7 +23,7 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
             userName: [{ value: '', disabled: true }, [
                 Validators.required,
             ]],
-            name: [{ value: '', disabled: true }, Validators.required],
+            name: [{ value: '', disabled: this.disabled }, Validators.required],
             description: [{ value: '', disabled: this.disabled }],
         });
     }

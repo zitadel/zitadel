@@ -46,7 +46,7 @@
             <div class="meta-row">
                 <span class="first">{{'ORG.PAGES.STATE' | translate}}</span>
                 <span *ngIf="org && org.state !== undefined" class="state"
-                    [ngClass]="{'active': org.state === OrgState.ORGSTATE_ACTIVE, 'inactive': org.state === OrgState.ORGSTATE_INACTIVE}">{{'ORG.STATE.'+org.state
+                    [ngClass]="{'active': org.state === OrgState.ORG_STATE_ACTIVE, 'inactive': org.state === OrgState.ORG_STATE_INACTIVE}">{{'ORG.STATE.'+org.state
                     |
                     translate}}</span>
             </div>

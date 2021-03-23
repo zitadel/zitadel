@@ -51,7 +51,7 @@ export class IdpTableComponent implements OnInit {
     ngOnInit(): void {
         this.getData(10, 0);
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            this.displayedColumns = ['select', 'name', 'config', 'dates', 'state', 'type'];
+            this.displayedColumns = ['select', 'name', 'config', 'dates', 'state', 'owner'];
         }
 
         if (!this.disabled) {

@@ -51,10 +51,10 @@
                     {{member.lastName}} </td>
             </ng-container>
 
-            <ng-container matColumnDef="username">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.USERNAME' | translate }} </th>
+            <ng-container matColumnDef="loginname">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.LOGINNAME' | translate }} </th>
                 <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
-                    {{member.userName}} </td>
+                    {{member.preferredloginname}} </td>
             </ng-container>
 
             <ng-container matColumnDef="email">
