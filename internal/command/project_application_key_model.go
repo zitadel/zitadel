@@ -93,6 +93,7 @@ func (wm *ApplicationKeyWriteModel) Reduce() error {
 			wm.ClientID = e.ClientID
 			wm.ExpirationDate = e.ExpirationDate
 			wm.KeyType = e.KeyType
+			wm.State = domain.AppStateActive
 		case *project.ApplicationKeyRemovedEvent:
 			wm.State = domain.AppStateRemoved
 		case *project.ProjectRemovedEvent:
