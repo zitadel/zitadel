@@ -22,7 +22,7 @@ const (
 	image              = "ghcr.io/caos/zitadel-crbackup"
 	internalSecretName = "client-certs"
 	rootSecretName     = "cockroachdb.client.root"
-	timeout            = 60 * time.Second
+	timeout            = 5 * time.Minute
 )
 
 func AdaptFunc(
