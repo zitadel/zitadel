@@ -23,7 +23,7 @@ const (
 	internalSecretName       = "client-certs"
 	image                    = "ghcr.io/caos/zitadel-crbackup"
 	rootSecretName           = "cockroachdb.client.root"
-	timeout                  = 5 * time.Minute
+	timeout                  = 15 * time.Minute
 	Normal                   = "backup"
 	Instant                  = "instantbackup"
 )
