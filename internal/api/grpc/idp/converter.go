@@ -261,7 +261,7 @@ func IDPNameQueryToModel(query *idp_pb.IDPNameQuery) *iam_model.IDPConfigSearchQ
 
 func IDPOwnerTypeQueryToModel(query *idp_pb.IDPOwnerTypeQuery) *iam_model.IDPConfigSearchQuery {
 	return &iam_model.IDPConfigSearchQuery{
-		Key:    iam_model.IDPConfigSearchKeyName,
+		Key:    iam_model.IDPConfigSearchKeyIdpProviderType,
 		Method: domain.SearchMethodEquals,
 		Value:  IDPProviderTypeModelFromPb(query.OwnerType),
 	}
