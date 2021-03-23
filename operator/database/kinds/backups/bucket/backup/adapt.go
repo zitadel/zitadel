@@ -1,8 +1,9 @@
 package backup
 
 import (
-	"github.com/caos/zitadel/operator"
 	"time"
+
+	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -13,18 +14,18 @@ import (
 )
 
 const (
-	defaultMode        int32         = 256
-	certPath                         = "/cockroach/cockroach-certs"
-	secretPath                       = "/secrets/sa.json"
-	backupPath                       = "/cockroach"
-	backupNameEnv                    = "BACKUP_NAME"
-	cronJobNamePrefix                = "backup-"
-	internalSecretName               = "client-certs"
-	image                            = "ghcr.io/caos/zitadel-crbackup"
-	rootSecretName                   = "cockroachdb.client.root"
-	timeout            time.Duration = 1200
-	Normal                           = "backup"
-	Instant                          = "instantbackup"
+	defaultMode        int32 = 256
+	certPath                 = "/cockroach/cockroach-certs"
+	secretPath               = "/secrets/sa.json"
+	backupPath               = "/cockroach"
+	backupNameEnv            = "BACKUP_NAME"
+	cronJobNamePrefix        = "backup-"
+	internalSecretName       = "client-certs"
+	image                    = "ghcr.io/caos/zitadel-crbackup"
+	rootSecretName           = "cockroachdb.client.root"
+	timeout                  = 15 * time.Minute
+	Normal                   = "backup"
+	Instant                  = "instantbackup"
 )
 
 func AdaptFunc(
