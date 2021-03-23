@@ -262,6 +262,7 @@ message UserGrant {
     
     string project_id = 14;
     string project_name = 15;
+    string project_grant_id = 16;
 }
 
 enum UserGrantState {

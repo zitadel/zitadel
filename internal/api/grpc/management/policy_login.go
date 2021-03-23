@@ -119,7 +119,7 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *mgmt_pb.
 }
 
 func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.AddSecondFactorToLoginPolicyRequest) (*mgmt_pb.AddSecondFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
+	_, objectDetails, err := s.command.AddSecondFactorToLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.
 }
 
 func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *mgmt_pb.RemoveSecondFactorFromLoginPolicyRequest) (*mgmt_pb.RemoveSecondFactorFromLoginPolicyResponse, error) {
-	objectDetails, err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.RemoveSecondFactorFromLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *mgmt_pb.L
 }
 
 func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.AddMultiFactorToLoginPolicyRequest) (*mgmt_pb.AddMultiFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
+	_, objectDetails, err := s.command.AddMultiFactorToLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.A
 }
 
 func (s *Server) RemoveMultiFactorFromLoginPolicy(ctx context.Context, req *mgmt_pb.RemoveMultiFactorFromLoginPolicyRequest) (*mgmt_pb.RemoveMultiFactorFromLoginPolicyResponse, error) {
-	objectDetails, err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.RemoveMultiFactorFromLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
