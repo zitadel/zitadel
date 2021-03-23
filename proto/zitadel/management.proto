@@ -700,7 +700,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.read"
-            check_field_name: "Id"
+            check_field_name: "GrantId"
         };
     }
 
@@ -886,7 +886,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.member.write"
-            check_field_name: "Id"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -909,7 +909,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.member.delete"
-            check_field_name: "Id"
+            check_field_name: "ProjectId"
         };
     }
 
