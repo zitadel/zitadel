@@ -3,7 +3,6 @@ module github.com/caos/zitadel
 go 1.15
 
 require (
-	cloud.google.com/go v0.71.0 // indirect
 	cloud.google.com/go/storage v1.10.0
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
@@ -26,7 +25,6 @@ require (
 	github.com/golang/mock v1.5.0
 	github.com/golang/protobuf v1.4.3
 	github.com/golang/snappy v0.0.2 // indirect
-	github.com/google/go-cmp v0.5.3 // indirect
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
@@ -66,13 +64,12 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout v0.13.0
 	go.opentelemetry.io/otel/sdk v0.13.0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
-	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
 	golang.org/x/text v0.3.5
-	golang.org/x/tools v0.0.0-20201103235415-b653051172e4
-	google.golang.org/api v0.34.0
+	golang.org/x/tools v0.1.0
+	google.golang.org/api v0.42.0
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20201110150050-8816d57aaa9a
-	google.golang.org/grpc v1.34.0
+	google.golang.org/genproto v0.0.0-20210312152112-fc591d9ea70f
+	google.golang.org/grpc v1.36.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
