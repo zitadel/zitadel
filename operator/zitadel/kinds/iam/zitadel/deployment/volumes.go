@@ -3,6 +3,7 @@ package deployment
 import (
 	"github.com/caos/zitadel/operator/helpers"
 	corev1 "k8s.io/api/core/v1"
+	"sort"
 	"strings"
 )
 
@@ -59,6 +60,7 @@ func userVolumes(
 ) []corev1.Volume {
 	volumes := make([]corev1.Volume, 0)
 
+	sort.Strings(users)
 	for _, user := range users {
 		userReplaced := strings.ReplaceAll(user, "_", "-")
 		internalName := "client-" + userReplaced
