@@ -265,15 +265,16 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 			ErrType:    errType,
 			ErrMessage: errMessage,
 		},
-		Lang:      l.renderer.Lang(r).String(),
-		Title:     title,
-		Theme:     l.getTheme(r),
-		ThemeMode: l.getThemeMode(r),
-		OrgID:     l.getOrgID(authReq),
-		OrgName:   l.getOrgName(authReq),
-		AuthReqID: getRequestID(authReq, r),
-		CSRF:      csrf.TemplateField(r),
-		Nonce:     http_mw.GetNonce(r),
+		Lang:          l.renderer.Lang(r).String(),
+		Title:         title,
+		Theme:         l.getTheme(r),
+		ThemeMode:     l.getThemeMode(r),
+		OrgID:         l.getOrgID(authReq),
+		OrgName:       l.getOrgName(authReq),
+		PrimaryDomain: l.getOrgPrimaryDomain(authReq),
+		AuthReqID:     getRequestID(authReq, r),
+		CSRF:          csrf.TemplateField(r),
+		Nonce:         http_mw.GetNonce(r),
 	}
 	if authReq != nil {
 		baseData.LoginPolicy = authReq.LoginPolicy
@@ -329,6 +330,13 @@ func (l *Login) getOrgName(authReq *model.AuthRequest) string {
 	return authReq.RequestedOrgName
 }
 
+func (l *Login) getOrgPrimaryDomain(authReq *model.AuthRequest) string {
+	if authReq == nil {
+		return ""
+	}
+	return authReq.RequestedPrimaryDomain
+}
+
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
@@ -351,17 +359,18 @@ func (l *Login) cspErrorHandler(err error) http.Handler {
 
 type baseData struct {
 	errorData
-	Lang         string
-	Title        string
-	Theme        string
-	ThemeMode    string
-	OrgID        string
-	OrgName      string
-	AuthReqID    string
-	CSRF         template.HTML
-	Nonce        string
-	LoginPolicy  *iam_model.LoginPolicyView
-	IDPProviders []*iam_model.IDPProviderView
+	Lang          string
+	Title         string
+	Theme         string
+	ThemeMode     string
+	OrgID         string
+	OrgName       string
+	PrimaryDomain string
+	AuthReqID     string
+	CSRF          template.HTML
+	Nonce         string
+	LoginPolicy   *iam_model.LoginPolicyView
+	IDPProviders  []*iam_model.IDPProviderView
 }
 
 type errorData struct {

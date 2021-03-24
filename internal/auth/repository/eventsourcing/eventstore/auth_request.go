@@ -456,14 +456,19 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model
 		orgID = repo.IAMID
 	}
 
-	policy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
+	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
 	if err != nil {
 		return err
 	}
-	request.LoginPolicy = policy
+	request.LoginPolicy = loginPolicy
 	if idpProviders != nil {
 		request.AllowedExternalIDPs = idpProviders
 	}
+	labelPolicy, err := repo.getLabelPolicy(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	request.LabelPolicy = labelPolicy
 	return nil
 }
 
@@ -733,6 +738,21 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 	return iam_es_model.LoginPolicyViewToModel(policy), err
 }
 
+func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*iam_model.LabelPolicyView, error) {
+	policy, err := repo.View.LabelPolicyByAggregateID(orgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.LabelPolicyByAggregateID(repo.IAMID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
 func setOrgID(orgViewProvider orgViewProvider, request *model.AuthRequest) error {
 	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	if primaryDomain == "" {
@@ -745,6 +765,7 @@ func setOrgID(orgViewProvider orgViewProvider, request *model.AuthRequest) error
 	}
 	request.RequestedOrgID = org.ID
 	request.RequestedOrgName = org.Name
+	request.RequestedPrimaryDomain = primaryDomain
 	return nil
 }
 

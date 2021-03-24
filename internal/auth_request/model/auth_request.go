@@ -27,23 +27,25 @@ type AuthRequest struct {
 	MaxAuthAge    uint32
 	Request       Request
 
-	levelOfAssurance    LevelOfAssurance
-	UserID              string
-	LoginName           string
-	DisplayName         string
-	UserOrgID           string
-	RequestedOrgID      string
-	RequestedOrgName    string
-	SelectedIDPConfigID string
-	LinkingUsers        []*ExternalUser
-	PossibleSteps       []NextStep
-	PasswordVerified    bool
-	MFAsVerified        []MFAType
-	Audience            []string
-	AuthTime            time.Time
-	Code                string
-	LoginPolicy         *model.LoginPolicyView
-	AllowedExternalIDPs []*model.IDPProviderView
+	levelOfAssurance       LevelOfAssurance
+	UserID                 string
+	LoginName              string
+	DisplayName            string
+	UserOrgID              string
+	RequestedOrgID         string
+	RequestedOrgName       string
+	RequestedPrimaryDomain string
+	SelectedIDPConfigID    string
+	LinkingUsers           []*ExternalUser
+	PossibleSteps          []NextStep
+	PasswordVerified       bool
+	MFAsVerified           []MFAType
+	Audience               []string
+	AuthTime               time.Time
+	Code                   string
+	LoginPolicy            *model.LoginPolicyView
+	LabelPolicy            *model.LabelPolicyView
+	AllowedExternalIDPs    []*model.IDPProviderView
 }
 
 type ExternalUser struct {

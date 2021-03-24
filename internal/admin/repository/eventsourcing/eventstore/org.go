@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	"github.com/caos/logging"
+
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
