@@ -12,6 +12,7 @@ message Change {
     google.protobuf.Timestamp change_date = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "the creation date of an event";
+            example: "\"2019-04-01T08:45:00.000000Z\"";
         }
     ];
     zitadel.v1.LocalizedMessage event_type = 2;

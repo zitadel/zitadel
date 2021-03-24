@@ -1764,8 +1764,11 @@ message GetUserByLoginNameGlobalResponse {
 }
 
 message ListUsersRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    // the field the result is sorted
     zitadel.user.v1.UserFieldName sorting_column = 2;
+    //criterias the client is looking for
     repeated zitadel.user.v1.SearchQuery queries = 3;
 }
 
@@ -1776,6 +1779,7 @@ message ListUsersResponse {
 }
 
 message ListUserChangesRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
     string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -2070,6 +2074,7 @@ message GetMachineKeyByIDsResponse {
 
 message ListMachineKeysRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
 }
 
@@ -2081,7 +2086,12 @@ message ListMachineKeysResponse {
 message AddMachineKeyRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
     zitadel.authn.v1.KeyType type = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
-    google.protobuf.Timestamp expiration_date = 3;
+    google.protobuf.Timestamp expiration_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the key will expire and no logins will be possible";
+        }
+    ];
 }
 
 message AddMachineKeyResponse {
@@ -2101,6 +2111,7 @@ message RemoveMachineKeyResponse {
 
 message ListHumanLinkedIDPsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
 }
 
@@ -2120,8 +2131,11 @@ message RemoveHumanLinkedIDPResponse {
 }
 
 message ListUserMembershipsRequest {
+    //list limitations and ordering
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //the field the result is sorted
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.user.v1.MembershipQuery queries = 3;
 }
 
@@ -2141,6 +2155,7 @@ message GetOrgByDomainGlobalRequest {
 }
 
 message ListOrgChangesRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
 }
 
@@ -2175,7 +2190,9 @@ message ReactivateOrgResponse {
 }
 
 message ListOrgDomainsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.org.v1.DomainSearchQuery queries = 2;
 }
 
@@ -2234,12 +2251,16 @@ message ListOrgMemberRolesResponse {
 }
 
 message ListOrgMembersRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 2;
 }
 
 message ListOrgMembersResponse {
+    //list limitations and ordering
     zitadel.v1.ListDetails details = 1;
+    //criterias the client is looking for
     repeated zitadel.member.v1.Member result = 2;
 }
 
@@ -2286,7 +2307,9 @@ message GetGrantedProjectByIDResponse {
 }
 
 message ListProjectsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
@@ -2296,7 +2319,9 @@ message ListProjectsResponse {
 }
 
 message ListGrantedProjectsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
@@ -2306,6 +2331,7 @@ message ListGrantedProjectsResponse {
 }
 
 message ListProjectChangesRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
     string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -2416,7 +2442,9 @@ message RemoveProjectRoleResponse {
 
 message ListProjectRolesRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.project.v1.RoleQuery queries = 3;
 }
 
@@ -2427,7 +2455,9 @@ message ListProjectRolesResponse {
 
 message ListProjectMembersRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 3;
 }
 
@@ -2476,7 +2506,9 @@ message GetAppByIDResponse {
 
 message ListAppsRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.app.v1.AppQuery queries = 3;
 }
 
@@ -2486,6 +2518,7 @@ message ListAppsResponse {
 }
 
 message ListAppChangesRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
     string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -2661,6 +2694,7 @@ message GetAppKeyResponse {
 }
 
 message ListAppKeysRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string project_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -2674,7 +2708,12 @@ message AddAppKeyRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.authn.v1.KeyType type = 3 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
-    google.protobuf.Timestamp expiration_date = 4;
+    google.protobuf.Timestamp expiration_date = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the key will expire and no logins will be possible";
+        }
+    ];
 }
 
 message AddAppKeyResponse {
@@ -2704,7 +2743,9 @@ message GetProjectGrantByIDResponse {
 
 message ListProjectGrantsRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.project.v1.ProjectGrantQuery queries = 3;
 }
 
@@ -2772,7 +2813,9 @@ message ListProjectGrantMemberRolesResponse {
 message ListProjectGrantMembersRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 3;
+    //criterias the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 4;
 }
 
@@ -2823,7 +2866,9 @@ message GetUserGrantByIDResponse {
 }
 
 message ListUserGrantRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.user.v1.UserGrantQuery queries = 2;
 }
 
@@ -3139,8 +3184,11 @@ message GetOrgIDPByIDResponse {
 }
 
 message ListOrgIDPsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //the field the result is sorted
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
+    //criterias the client is looking for
     repeated IDPQuery queries = 3;
 }
 

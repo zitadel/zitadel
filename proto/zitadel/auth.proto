@@ -406,10 +406,15 @@ message GetMyUserRequest {}
 
 message GetMyUserResponse {
     zitadel.user.v1.User user = 1;
-    google.protobuf.Timestamp last_login = 2;
+    google.protobuf.Timestamp last_login = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The timestamp of the last successful login";
+        }
+    ];
 }
 
 message ListMyUserChangesRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
 }
 
@@ -530,6 +535,7 @@ message RemoveMyPhoneResponse {
 }
 
 message ListMyLinkedIDPsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
     //PLANNED: queries for idp name and login name
 }
@@ -629,6 +635,7 @@ message RemoveMyPasswordlessResponse {
 }
 
 message ListMyUserGrantsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
 }
 
@@ -647,7 +654,9 @@ message UserGrant {
 }
 
 message ListMyProjectOrgsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.org.v1.OrgQuery queries = 2;
 }
 

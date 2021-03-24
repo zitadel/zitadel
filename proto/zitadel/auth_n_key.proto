@@ -23,6 +23,7 @@ message Key {
     google.protobuf.Timestamp expiration_date = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "the date a key will expire";
+            example: "\"3019-04-01T08:45:00.000000Z\"";
         }
     ];
 }

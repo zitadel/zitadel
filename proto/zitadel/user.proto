@@ -197,9 +197,9 @@ message UserNameQuery {
     string user_name = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                max_length: 200;
-                example: "\"mr_long_neck\"";
-            }
+            max_length: 200;
+            example: "\"mr_long_neck\"";
+        }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
