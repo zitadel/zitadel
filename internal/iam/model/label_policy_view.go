@@ -7,11 +7,11 @@ import (
 )
 
 type LabelPolicyView struct {
-	AggregateID           string
-	PrimaryColor          string
-	SecondaryColor        string
-	HideLoginPolicySuffix bool
-	Default               bool
+	AggregateID         string
+	PrimaryColor        string
+	SecondaryColor      string
+	HideLoginNameSuffix bool
+	Default             bool
 
 	CreationDate time.Time
 	ChangeDate   time.Time
