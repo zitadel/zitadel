@@ -82,7 +82,7 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 	return repo.UserEvents.CreateUser(ctx, user, pwPolicyView, orgPolicyView)
 }
 
-func (repo *UserRepo) ImportHuman(ctx context.Context, user *usr_model.User, passwordChangeRequired bool) (*usr_model.User, error) {
+func (repo *UserRepo) ImportUser(ctx context.Context, user *usr_model.User, passwordChangeRequired bool) (*usr_model.User, error) {
 	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if err != nil && caos_errs.IsNotFound(err) {
 		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
