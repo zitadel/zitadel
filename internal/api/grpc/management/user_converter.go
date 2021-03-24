@@ -60,6 +60,42 @@ func userCreateToModel(user *management.CreateUserRequest) *usr_model.User {
 	}
 }
 
+func humanImportToModel(user *management.ImportHumanRequest) *usr_model.User {
+	preferredLanguage, err := language.Parse(user.PreferredLanguage)
+	logging.Log("GRPC-cK5k2").OnError(err).Debug("language malformed")
+
+	human := &usr_model.Human{
+		Profile: &usr_model.Profile{
+			FirstName:         user.FirstName,
+			LastName:          user.LastName,
+			NickName:          user.NickName,
+			PreferredLanguage: preferredLanguage,
+			Gender:            genderToModel(user.Gender),
+		},
+		Email: &usr_model.Email{
+			EmailAddress:    user.Email,
+			IsEmailVerified: user.IsEmailVerified,
+		},
+		Address: &usr_model.Address{
+			Country:       user.Country,
+			Locality:      user.Locality,
+			PostalCode:    user.PostalCode,
+			Region:        user.Region,
+			StreetAddress: user.StreetAddress,
+		},
+	}
+	if user.Password != "" {
+		human.Password = &usr_model.Password{SecretString: user.Password}
+	}
+	if user.Phone != "" {
+		human.Phone = &usr_model.Phone{PhoneNumber: user.Phone, IsPhoneVerified: user.IsPhoneVerified}
+	}
+	return &usr_model.User{
+		UserName: user.UserName,
+		Human:    human,
+	}
+}
+
 func passwordRequestToModel(r *management.PasswordRequest) *usr_model.Password {
 	return &usr_model.Password{
 		ObjectRoot:   models.ObjectRoot{AggregateID: r.Id},

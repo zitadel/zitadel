@@ -114,6 +114,17 @@ service ManagementService {
     };
   }
 
+  rpc ImportHuman(ImportHumanRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      post: "/users/humans/_import"
+      body: "*"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "user.write"
+    };
+  }
+
   rpc DeactivateUser(UserID) returns (UserResponse) {
     option (google.api.http) = {
       put: "/users/{id}/_deactivate"
@@ -1902,6 +1913,26 @@ message CreateUserRequest {
     CreateHumanRequest human = 2;
     CreateMachineRequest machine = 3;
   }
+}
+
+message ImportHumanRequest {
+  string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
+  string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string nick_name = 4 [(validate.rules).string = {max_len: 200}];
+  string preferred_language = 5 [(validate.rules).string = {max_len: 200}];
+  Gender gender = 6;
+  string email = 7 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
+  bool is_email_verified = 8;
+  string phone = 9 [(validate.rules).string = {max_len: 20}];
+  bool is_phone_verified = 10;
+  string country = 11 [(validate.rules).string = {max_len: 200}];
+  string locality = 12 [(validate.rules).string = {max_len: 200}];
+  string postal_code = 13 [(validate.rules).string = {max_len: 200}];
+  string region = 14 [(validate.rules).string = {max_len: 200}];
+  string street_address = 15 [(validate.rules).string = {max_len: 200}];
+  string password = 16 [(validate.rules).string = {max_len: 72}];
+  bool password_change_required = 17;
 }
 
 message CreateHumanRequest {

@@ -59,6 +59,14 @@ func (s *Server) CreateUser(ctx context.Context, in *management.CreateUserReques
 	return userFromModel(user), nil
 }
 
+func (s *Server) ImportHuman(ctx context.Context, in *management.ImportHumanRequest) (*management.UserResponse, error) {
+	user, err := s.user.ImportUser(ctx, humanImportToModel(in), in.PasswordChangeRequired)
+	if err != nil {
+		return nil, err
+	}
+	return userFromModel(user), nil
+}
+
 func (s *Server) DeactivateUser(ctx context.Context, in *management.UserID) (*management.UserResponse, error) {
 	user, err := s.user.DeactivateUser(ctx, in.Id)
 	if err != nil {

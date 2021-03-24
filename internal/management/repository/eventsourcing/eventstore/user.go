@@ -82,6 +82,26 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 	return repo.UserEvents.CreateUser(ctx, user, pwPolicyView, orgPolicyView)
 }
 
+func (repo *UserRepo) ImportHuman(ctx context.Context, user *usr_model.User, passwordChangeRequired bool) (*usr_model.User, error) {
+	pwPolicy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && caos_errs.IsNotFound(err) {
+		pwPolicy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
+	if err != nil {
+		return nil, err
+	}
+	pwPolicyView := iam_es_model.PasswordComplexityViewToModel(pwPolicy)
+	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if err != nil && errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
+	}
+	if err != nil {
+		return nil, err
+	}
+	orgPolicyView := iam_es_model.OrgIAMViewToModel(orgPolicy)
+	return repo.UserEvents.ImportUser(ctx, user, pwPolicyView, orgPolicyView, passwordChangeRequired)
+}
+
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
 	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
