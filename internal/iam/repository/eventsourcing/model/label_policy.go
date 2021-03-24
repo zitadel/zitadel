@@ -19,10 +19,11 @@ type LabelPolicy struct {
 
 func LabelPolicyToModel(policy *LabelPolicy) *iam_model.LabelPolicy {
 	return &iam_model.LabelPolicy{
-		ObjectRoot:     policy.ObjectRoot,
-		State:          iam_model.PolicyState(policy.State),
-		PrimaryColor:   policy.PrimaryColor,
-		SecondaryColor: policy.SecondaryColor,
+		ObjectRoot:          policy.ObjectRoot,
+		State:               iam_model.PolicyState(policy.State),
+		PrimaryColor:        policy.PrimaryColor,
+		SecondaryColor:      policy.SecondaryColor,
+		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 	}
 }
 
