@@ -10,37 +10,36 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Reconcile(monitor mntr.Monitor, desiredTree *tree.Tree, takeoff bool) operator.EnsureFunc {
+func Reconcile(
+	monitor mntr.Monitor,
+	spec *Spec,
+) operator.EnsureFunc {
 	return func(k8sClient kubernetes2.ClientInt) (err error) {
-		defer func() {
-			err = errors.Wrapf(err, "building %s failed", desiredTree.Common.Kind)
-		}()
+		recMonitor := monitor.WithField("version", spec.Version)
 
-		desiredKind, err := parseDesiredV0(desiredTree)
-		if err != nil {
-			return errors.Wrap(err, "parsing desired state failed")
-		}
-		desiredTree.Parsed = desiredKind
-
-		recMonitor := monitor.WithField("version", desiredKind.Spec.Version)
-
-		if desiredKind.Spec.Version == "" {
-			err := errors.New("No version set in zitadel.yml")
+		if spec.Version == "" {
+			err := errors.New("No version provided for self-reconciling")
 			recMonitor.Error(err)
 			return err
 		}
 
-		imageRegistry := desiredKind.Spec.CustomImageRegistry
+		imageRegistry := spec.CustomImageRegistry
 		if imageRegistry == "" {
 			imageRegistry = "ghcr.io"
 		}
 
-		if takeoff || desiredKind.Spec.SelfReconciling {
-			if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustZITADELOperator(&desiredKind.Spec.Version)), k8sClient, desiredKind.Spec.Version, desiredKind.Spec.NodeSelector, desiredKind.Spec.Tolerations, imageRegistry); err != nil {
+		if spec.SelfReconciling {
+			desiredTree := &tree.Tree{
+				Common: &tree.Common{
+					Kind:    "zitadel.caos.ch/Orb",
+					Version: "v0",
+				},
+			}
+
+			if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustZITADELOperator(&spec.Version)), k8sClient, spec.Version, spec.NodeSelector, spec.Tolerations, imageRegistry, spec.GitOps); err != nil {
 				recMonitor.Error(errors.Wrap(err, "Failed to deploy zitadel-operator into k8s-cluster"))
 				return err
 			}
-
 			recMonitor.Info("Applied zitadel-operator")
 		}
 		return nil

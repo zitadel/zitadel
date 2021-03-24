@@ -2,6 +2,7 @@ package deployment
 
 import (
 	corev1 "k8s.io/api/core/v1"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -24,6 +25,8 @@ func GetInitContainer(
 	}
 
 	copySecrets := append([]string{}, "cp "+certMountPath+"/client_root/ca.crt "+certTempMountPath+"/ca.crt")
+
+	sort.Strings(users)
 	for _, user := range users {
 		userReplaced := strings.ReplaceAll(user, "_", "-")
 		internalName := "client-" + userReplaced
@@ -43,10 +46,13 @@ func GetInitContainer(
 	)
 
 	return corev1.Container{
-		Name:         "fix-permissions",
-		Image:        "alpine:3.11",
-		Command:      []string{"/bin/sh", "-c"},
-		Args:         []string{strings.Join(initCommands, " && ")},
-		VolumeMounts: initVolumeMounts,
+		Name:                     "fix-permissions",
+		Image:                    "alpine:3.11",
+		Command:                  []string{"/bin/sh", "-c"},
+		Args:                     []string{strings.Join(initCommands, " && ")},
+		VolumeMounts:             initVolumeMounts,
+		TerminationMessagePolicy: "File",
+		TerminationMessagePath:   "/dev/termination-log",
+		ImagePullPolicy:          corev1.PullIfNotPresent,
 	}
 }

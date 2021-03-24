@@ -4,13 +4,12 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/pkg/errors"
+	"github.com/rakyll/statik/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
-
-	"github.com/pkg/errors"
-	"github.com/rakyll/statik/fs"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -102,10 +101,9 @@ func AdaptFunc(
 							},
 						},
 						Spec: corev1.PodSpec{
-							NodeSelector:    nodeselector,
-							Tolerations:     tolerations,
-							SecurityContext: &corev1.PodSecurityContext{},
-							InitContainers:  getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName),
+							NodeSelector:   nodeselector,
+							Tolerations:    tolerations,
+							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName),
 							Containers: []corev1.Container{
 								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users),
 							},
