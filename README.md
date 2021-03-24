@@ -9,9 +9,9 @@
 
 ## What Is ZITADEL
 
-**ZITADEL** is a "Cloud Native Identity and Access Management'' solution built for the cloud era. ZITADEL uses a modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and  [**CockroachDB**](https://www.cockroachlabs.com/) as sole storage and follows an event sourced pattern.
+**ZITADEL** is a "Cloud Native Identity and Access Management" solution built for the cloud era. ZITADEL uses a modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and  [**CockroachDB**](https://www.cockroachlabs.com/) as sole storage and follows an event sourced pattern.
 
-We built **ZITADEL** not only with the vision of  becoming a great open source project but also as a superb platform to support developers building their applications, without need to handle secure user login and account management themselves.
+We built **ZITADEL** not only with the vision of becoming a great open source project but also as a superb platform to support developers building their applications, without need to handle secure user login and account management themselves.
 
 ## How Does It Work
 
@@ -40,7 +40,7 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 
 ### ZITADEL Cloud
 
-We provide a shared-cloud [**ZITADEL.ch**](https://zitadel.ch) system where people can register their own organization. There is a **free tier** including unlimited users and all the security features you need.
+We provide a cloud service [**ZITADEL.ch**](https://zitadel.ch) where people can register their own organization. There is a **free tier** including unlimited users and all the security features you need.
 
 ### Run ZITADEL in the cloud or on-premise
 
@@ -49,13 +49,13 @@ We provide a shared-cloud [**ZITADEL.ch**](https://zitadel.ch) system where peop
 You can run **ZITADEL** in combination with [**ORBOS**](https://github.com/caos/orbos/) for easy and scalable operation on 
 * **[GCEProvider](https://cloud.google.com/compute)**
 * **[StaticProvider](https://github.com/caos/orbos/blob/master/docs/orbiter/static.md)**
-* CNCF conform Kubernetes
+* Any CNCF conform Kubernetes
 
 > Stay tuned, we will soon publish a more detailed guide on how you can deploy a **hyperconverged** system on your own.
 
 ### Let us run ZITADEL for you
 
-If shared-cloud and running **ZITADEL** on your own does not work for you, we are happy to run a private instance of **ZITADEL** for you or provide you with Support Services. [Get in touch!](https://zitadel.ch/contact/)
+If  our cloud service or running **ZITADEL** on your own infrastructure does not work for you, we are happy to run a private instance of **ZITADEL** for you or provide you with our support services. [Get in touch!](https://zitadel.ch/contact/)
 
 ## Help and Documentation
 
