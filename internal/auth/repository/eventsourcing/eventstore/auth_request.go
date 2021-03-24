@@ -244,7 +244,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if request.RequestedOrgID != "" && request.RequestedOrgID != user.ResourceOwner {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-fJe2a", "Errors.User.NotAllowedOrg")
 	}
-	request.SetUserInfo(user.ID, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
+	request.SetUserInfo(user.ID, user.UserName, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -475,7 +475,11 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *model
 func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.AuthRequest, loginName string) (err error) {
 	user := new(user_view_model.UserView)
 	if request.RequestedOrgID != "" {
-		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, request.RequestedOrgID)
+		preferredLoginName := loginName
+		if request.RequestedOrgID != "" { //&& request.LabelPolicy != nil && !request.LabelPolicy.HideLoginNameSuffix {
+			preferredLoginName += "@" + request.RequestedPrimaryDomain
+		}
+		user, err = repo.View.UserByLoginNameAndResourceOwner(preferredLoginName, request.RequestedOrgID)
 	} else {
 		user, err = repo.View.UserByLoginName(loginName)
 		if err == nil {
@@ -489,7 +493,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.
 		return err
 	}
 
-	request.SetUserInfo(user.ID, loginName, "", user.ResourceOwner)
+	request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", user.ResourceOwner)
 	return nil
 }
 
@@ -532,7 +536,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(request *model.AuthRequest, 
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(externalIDP.UserID, "", "", externalIDP.ResourceOwner)
+	request.SetUserInfo(externalIDP.UserID, "", "", "", externalIDP.ResourceOwner)
 	return nil
 }
 
@@ -635,6 +639,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 		users[i] = model.UserSelection{
 			UserID:            session.UserID,
 			DisplayName:       session.DisplayName,
+			UserName:          session.UserName,
 			LoginName:         session.LoginName,
 			UserSessionState:  session.State,
 			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,

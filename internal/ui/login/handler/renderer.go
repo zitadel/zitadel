@@ -265,16 +265,17 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 			ErrType:    errType,
 			ErrMessage: errMessage,
 		},
-		Lang:          l.renderer.Lang(r).String(),
-		Title:         title,
-		Theme:         l.getTheme(r),
-		ThemeMode:     l.getThemeMode(r),
-		OrgID:         l.getOrgID(authReq),
-		OrgName:       l.getOrgName(authReq),
-		PrimaryDomain: l.getOrgPrimaryDomain(authReq),
-		AuthReqID:     getRequestID(authReq, r),
-		CSRF:          csrf.TemplateField(r),
-		Nonce:         http_mw.GetNonce(r),
+		Lang:                   l.renderer.Lang(r).String(),
+		Title:                  title,
+		Theme:                  l.getTheme(r),
+		ThemeMode:              l.getThemeMode(r),
+		OrgID:                  l.getOrgID(authReq),
+		OrgName:                l.getOrgName(authReq),
+		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
+		DisplayLoginNameSuffix: l.isDisplayLoginNameSuffix(authReq),
+		AuthReqID:              getRequestID(authReq, r),
+		CSRF:                   csrf.TemplateField(r),
+		Nonce:                  http_mw.GetNonce(r),
 	}
 	if authReq != nil {
 		baseData.LoginPolicy = authReq.LoginPolicy
@@ -284,12 +285,14 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 }
 
 func (l *Login) getProfileData(authReq *model.AuthRequest) profileData {
-	var loginName, displayName string
+	var userName, loginName, displayName string
 	if authReq != nil {
+		userName = authReq.UserName
 		loginName = authReq.LoginName
 		displayName = authReq.DisplayName
 	}
 	return profileData{
+		UserName:    userName,
 		LoginName:   loginName,
 		DisplayName: displayName,
 	}
@@ -337,6 +340,16 @@ func (l *Login) getOrgPrimaryDomain(authReq *model.AuthRequest) string {
 	return authReq.RequestedPrimaryDomain
 }
 
+func (l *Login) isDisplayLoginNameSuffix(authReq *model.AuthRequest) bool {
+	if authReq == nil {
+		return false
+	}
+	if authReq.RequestedOrgID == "" {
+		return false
+	}
+	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
+}
+
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
@@ -359,18 +372,19 @@ func (l *Login) cspErrorHandler(err error) http.Handler {
 
 type baseData struct {
 	errorData
-	Lang          string
-	Title         string
-	Theme         string
-	ThemeMode     string
-	OrgID         string
-	OrgName       string
-	PrimaryDomain string
-	AuthReqID     string
-	CSRF          template.HTML
-	Nonce         string
-	LoginPolicy   *iam_model.LoginPolicyView
-	IDPProviders  []*iam_model.IDPProviderView
+	Lang                   string
+	Title                  string
+	Theme                  string
+	ThemeMode              string
+	OrgID                  string
+	OrgName                string
+	PrimaryDomain          string
+	DisplayLoginNameSuffix bool
+	AuthReqID              string
+	CSRF                   template.HTML
+	Nonce                  string
+	LoginPolicy            *iam_model.LoginPolicyView
+	IDPProviders           []*iam_model.IDPProviderView
 }
 
 type errorData struct {
@@ -389,6 +403,7 @@ type userData struct {
 
 type profileData struct {
 	LoginName   string
+	UserName    string
 	DisplayName string
 }
 

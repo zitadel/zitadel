@@ -55,9 +55,6 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	loginName := data.LoginName
-	if authReq.LabelPolicy != nil && authReq.LabelPolicy.HideLoginNameSuffix {
-		loginName += "@" + authReq.RequestedPrimaryDomain
-	}
 	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, loginName, userAgentID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
@@ -78,9 +75,6 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 		},
 		"hasExternalLogin": func() bool {
 			return authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
-		},
-		"displayLoginSuffix": func() bool {
-			return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
 		},
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, funcs)

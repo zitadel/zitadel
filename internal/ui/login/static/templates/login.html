@@ -20,11 +20,13 @@
     {{if hasUsernamePasswordLogin }}
     <div class="fields">
         <label class="lgn-label" for="loginName">{{t "Login.Loginname"}}</label>
+        <div class="lgn-suffix-wrapper">
             <input class="lgn-input lgn-suffix-input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}"
-            value="{{ .LoginName }}" {{if .ErrMessage}}shake {{end}} autocomplete="username" autofocus required>
-            {{if displayLoginSuffix}}
-                <span>{{.PrimaryDomain}}</span>
+            value="{{ .UserName }}" {{if .ErrMessage}}shake {{end}} autocomplete="username" autofocus required>
+            {{if .DisplayLoginNameSuffix}}
+                <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
             {{end}}
+        </div>
     </div>
     {{end}}
 
@@ -56,5 +58,6 @@
 
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+<script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
 
 {{template "main-bottom" .}}
