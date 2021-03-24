@@ -1,14 +1,16 @@
 package configuration
 
 import (
+	"testing"
+
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/secret"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"testing"
+
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
 var (
@@ -191,6 +193,7 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 		"SMTP_HOST":                           "",
 		"CAOS_OIDC_DEV":                       "true",
 		"DEBUG_MODE":                          "false",
+		"ZITADEL_MIGRATE_ES_V1":               "false",
 		"CR_AUTH_CERT":                        "test/client.auth.crt",
 		"ZITADEL_OIDC_KEYS_ID":                "",
 		"CR_MIGRATION_CERT":                   "test/client.migration.crt",
@@ -267,6 +270,7 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 		"ZITADEL_ISSUER":                      "https://issuer.domain",
 		"ZITADEL_KEY_PATH":                    "test/test",
 		"ZITADEL_LOG_LEVEL":                   "debug",
+		"ZITADEL_MIGRATE_ES_V1":               "false",
 		"ZITADEL_OAUTH":                       "https://api.domain/oauth/v2",
 		"ZITADEL_OIDC_KEYS_ID":                "oidcid",
 		"ZITADEL_OTP_VERIFICATION_KEY":        "otpid",
