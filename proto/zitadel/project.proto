@@ -22,7 +22,7 @@ message Project {
     ];
     ProjectState state = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"PROJECT_STATE_ACTIVE\""
+            description: "current state of the project";
         }
     ];
     // describes if roles of user should be added in token
@@ -54,7 +54,7 @@ message GrantedProject {
     ];
     ProjectGrantState state = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"PROJECT_GRANT_STATE_ACTIVE\""
+            description: "current state of the project grant";
         }
     ];
     
@@ -112,7 +112,7 @@ message ProjectNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -155,7 +155,7 @@ message RoleKeyQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -170,7 +170,7 @@ message RoleDisplayNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -194,7 +194,7 @@ message GrantProjectNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -209,7 +209,7 @@ message GrantRoleKeyQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which text equality method is used"
         }
     ];
 }

@@ -18,7 +18,7 @@ message User {
     zitadel.v1.ObjectDetails details = 2;
     UserState state = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"USER_STATE_ACTIVE\"";
+            description: "current state of the user";
         }
     ];
     string user_name = 4 [
@@ -110,7 +110,7 @@ message Profile {
     ];
     Gender gender = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"GENDER_DIVERSE\"";
+            description: "the gender of the human";
         }
     ];
 }
@@ -204,7 +204,7 @@ message UserNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -220,7 +220,7 @@ message FirstNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -236,7 +236,7 @@ message LastNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -246,7 +246,7 @@ message NickNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -262,7 +262,7 @@ message DisplayNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -279,7 +279,7 @@ message EmailQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -289,7 +289,7 @@ message StateQuery {
     UserState state = 1 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"USER_STATE_ACTIVE\"";
+            description: "current state of the user";
         }
     ];
 }
@@ -299,7 +299,7 @@ message TypeQuery {
     Type type = 1 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TYPE_HUMAN\"";
+            description: "the type of the user";
         }
     ];
 }
@@ -325,7 +325,7 @@ enum UserFieldName {
 message AuthFactor {
     AuthFactorState state = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"AUTH_FACTOR_STATE_READY\"";
+            description: "current state of the auth factor";
         }
     ];
     oneof type {
@@ -372,18 +372,21 @@ message WebAuthNKey {
     ];
     bytes public_key = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "key to validate" //TODO: better description
+            description: "json representation of public key credential creation options used by the webauthn client"
         }
     ];
 }
 
 message WebAuthNVerification {
     bytes public_key_credential = 1 [
-        (validate.rules).bytes.min_len = 50,
+        (validate.rules).bytes.min_len = 55,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "key to validate" //TODO: better description
+            description: "json representation of public key credential issued by the webauthn client";
+            min_length: 55;
+            max_length: 1048576; //1 mb
+            //TODO: add example validate max
         }
-    ]; //TODO: define correct min and max len
+    ];
     string token_name = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -402,7 +405,7 @@ message WebAuthNToken {
     ];
     AuthFactorState state = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"AUTH_FACTOR_STATE_READY\"";
+            description: "current state of the token";
         }
     ];
     string name = 3 [
@@ -515,7 +518,7 @@ message Session {
     ];
     SessionState auth_state = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"SESSION_STATE_TERMINATED\""
+            description: "current state of the session";
         }
     ];
     string user_id = 4 [
@@ -562,7 +565,7 @@ message UserGrant {
     ];
     UserGrantState state = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"USER_GRANT_STATE_ACTIVE\""
+            description: "current state of the user";
         }
     ];
     
@@ -687,7 +690,7 @@ message UserGrantRoleKeyQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -711,7 +714,7 @@ message UserGrantUserNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -726,7 +729,7 @@ message UserGrantFirstNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -741,7 +744,7 @@ message UserGrantLastNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -756,7 +759,7 @@ message UserGrantEmailQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -771,7 +774,7 @@ message UserGrantOrgNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_STARTS_WITH\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -786,7 +789,7 @@ message UserGrantOrgDomainQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_ENDS_WITH\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -801,7 +804,7 @@ message UserGrantProjectNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_CONTAINS\""
+            example: "3"
         }
     ];
 }
@@ -816,7 +819,7 @@ message UserGrantDisplayNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\""
+            description: "defines which equality method is used";
         }
     ];
 }

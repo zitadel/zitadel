@@ -17,7 +17,7 @@ message Key {
     zitadel.v1.ObjectDetails details = 2;
     KeyType type = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"KEY_TYPE_JSON\"";
+            description: "the file type of the key";
         }
     ];
     google.protobuf.Timestamp expiration_date = 4 [

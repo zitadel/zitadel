@@ -75,7 +75,7 @@ message FirstNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -91,7 +91,7 @@ message LastNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -108,7 +108,7 @@ message EmailQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }

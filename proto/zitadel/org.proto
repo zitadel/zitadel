@@ -17,7 +17,7 @@ message Org {
     zitadel.v1.ObjectDetails details = 2;
     OrgState state = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ORG_STATE_ACTIVE\"";
+            description: "current state of the organisation";
         }
     ];
     string name = 4 [
@@ -62,8 +62,7 @@ message Domain {
     ];
     DomainValidationType validation_type = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines how the domain was validated"
-            example: "DOMAIN_VALIDATION_TYPE_HTTP"
+            description: "defines the protocol the domain was validated with";
         }
     ];
 }
@@ -93,7 +92,7 @@ message OrgNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -108,7 +107,7 @@ message OrgDomainQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE\"";
+            description: "defines which text equality method is used";
         }
     ];
 }
@@ -136,7 +135,7 @@ message DomainNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_EQUALS\"";
+            description: "defines which text equality method is used";
         }
     ];
 }

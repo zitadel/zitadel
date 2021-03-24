@@ -19,7 +19,7 @@ message App {
     zitadel.v1.ObjectDetails details = 2;
     AppState state = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"APP_STATE_ACTIVE\"";
+            description: "current state of the application";
         }
     ];
     string name = 4 [
@@ -57,7 +57,7 @@ message AppNameQuery {
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"TEXT_QUERY_METHOD_STARTS_WITH\""
+            description: "defines which text equality method is used"
         }
     ];
 }
@@ -65,28 +65,29 @@ message AppNameQuery {
 message OIDCConfig {
     repeated string redirect_uris = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"console.zitadel.ch/authorized\"]"
+            example: "[\"console.zitadel.ch/authorized\"]";
+            description: "Callback URI of the authorization request where the code or tokens will be sent to";
         }
     ];
     repeated OIDCResponseType response_types = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"OIDC_RESPONSE_TYPE_ID_TOKEN\""
+            description: "Determines whether a code, id_token token or just id_token will be returned"
         }
     ];
     repeated OIDCGrantType grant_types = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"OIDC_GRANT_TYPE_IMPLICIT\""
+            description: "The flow type the application uses to gain access";
         }
     ];
     OIDCAppType app_type = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"OIDC_APP_TYPE_USER_AGENT\""
+            description: "determines the paradigm of the application";
         }
     ];
     string client_id = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"69629023906488334\""; //TODO: better example?
-            description: "the id of the client"; //TODO: how to describe?
+            example: "\"69629023906488334@ZITADEL\"";
+            description: "generated oauth2/oidc client id";
         }
     ];
     string client_secret = 6 [
@@ -97,22 +98,30 @@ message OIDCConfig {
     ];
     OIDCAuthMethodType auth_method_type = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"OIDC_AUTH_METHOD_TYPE_POST\"";
+            description: "defines how the application passes login credentials";
         }
     ];
     repeated string post_logout_redirect_uris = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"console.zitadel.ch/logout\"]";
-            description: "where to go after logout";
+            description: "ZITADEL will redirect to this link after a successful logout";
         }
     ];
     OIDCVersion version = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"OIDC_VERSION_1_0\"";
+            description: "the oidc version used by the application";
         }
     ];
-    bool none_compliant = 10;
-    repeated zitadel.v1.LocalizedMessage compliance_problems = 11;
+    bool none_compliant = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "specifies wheter the config is oidc compliant. A production configuration SHOULD be compliant";
+        }
+    ];
+    repeated zitadel.v1.LocalizedMessage compliance_problems = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "lists the problems for non compliancy";
+        }
+    ];
     bool dev_mode = 12 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "used for development";
@@ -120,27 +129,29 @@ message OIDCConfig {
     ];
     OIDCTokenType access_token_type = 13 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"OIDC_TOKEN_TYPE_JWT\"";
+            description: "type of the access token returned from ZITADEL";
         }
     ];
     bool access_token_role_assertion = 14 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "validates if the user has the required roles";
+            description: "adds roles to the claims of the access token (only if type == jwt) even if they are not requested by scopes";
         }
     ];
     bool id_token_role_assertion = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "validates if the user has the required roles";
+            description: "adds roles to the claims of the id token even if they are not requested by scopes";
         }
     ];
     bool id_token_userinfo_assertion = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: ""; //TODO: what to write
+            description: "claims of profile, email, address and phone scopes are added to the id token even if an access token is issued. Attention this violates the oidc specification";
         }
     ];
     google.protobuf.Duration clock_skew = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "maximal time difference"; //TODO: what to write
+            description: "Used to compensate time difference of servers. Duration added to the \"exp\" claim and substracted from \"iat\", \"auth_time\" and \"nbf\" claims";
+            // min: "0s";
+            // max: "5s";
         }
     ];
 }
@@ -187,8 +198,8 @@ enum APIAuthMethodType {
 message APIConfig {
     string client_id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"69629023906488334\""; //TODO: better example?
-            description: "the id of the client"; //TODO: how to describe?
+            example: "\"69629023906488334@ZITADEL\"";
+            description: "generated oauth2/oidc client_id";
         }
     ];
     string client_secret = 2 [
@@ -199,8 +210,7 @@ message APIConfig {
     ];
     APIAuthMethodType auth_method_type = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"API_AUTH_METHOD_TYPE_BASIC\"";
-            description: "defines how the api passes the credentials";
+            description: "defines how the api passes the login credentials";
         }
     ];
 }
