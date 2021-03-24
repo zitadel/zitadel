@@ -13,7 +13,7 @@ CREATE TABLE auth.label_policies (
 
    primary_color TEXT,
    secondary_color TEXT,
-   hide_login_name_suffix BOOLEAN
+   hide_login_name_suffix BOOLEAN,
 
    PRIMARY KEY (aggregate_id)
 );
