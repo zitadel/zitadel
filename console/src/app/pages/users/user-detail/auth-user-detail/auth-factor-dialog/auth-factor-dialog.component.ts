@@ -52,20 +52,22 @@ export class AuthFactorDialogComponent {
             });
         } else if (type == AuthFactorType.U2F) {
             this.authService.addMyMultiFactorU2F().then((u2fresp) => {
-                const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
+                if (u2fresp.key) {
+                    const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
 
-                if (credOptions.publicKey?.challenge) {
-                    credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
-                    credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
-                    if (credOptions.publicKey.excludeCredentials) {
-                        credOptions.publicKey.excludeCredentials.map(cred => {
-                            cred.id = _base64ToArrayBuffer(cred.id as any);
-                            return cred;
-                        });
+                    if (credOptions.publicKey?.challenge) {
+                        console.log(credOptions.publicKey);
+                        credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
+                        credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
+                        if (credOptions.publicKey.excludeCredentials) {
+                            credOptions.publicKey.excludeCredentials.map(cred => {
+                                cred.id = _base64ToArrayBuffer(cred.id as any);
+                                return cred;
+                            });
+                        }
+                        this.u2fCredentialOptions = credOptions;
                     }
-                    this.u2fCredentialOptions = credOptions;
                 }
-
             }, error => {
                 this.toast.showError(error);
             });

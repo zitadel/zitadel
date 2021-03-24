@@ -111,6 +111,7 @@ export class UserDetailComponent implements OnInit {
             this.mgmtUserService
                 .updateMachine(
                     this.user.id,
+                    this.user.machine.name,
                     this.user.machine.description)
                 .then(() => {
                     this.toast.showInfo('USER.TOAST.SAVED', true);
@@ -156,6 +157,14 @@ export class UserDetailComponent implements OnInit {
         if (this.user.id && email) {
             this.mgmtUserService.updateHumanEmail(this.user.id, email).then(() => {
                 this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
+                if (this.user.state == UserState.USER_STATE_INITIAL) {
+                    this.mgmtUserService.resendHumanInitialization(this.user.id, email ?? '').then(() => {
+                        this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
+                        this.refreshChanges$.emit();
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
                 if (this.user.human) {
                     this.user.human.email = new Email().setEmail(email).toObject();
                     this.refreshUser();

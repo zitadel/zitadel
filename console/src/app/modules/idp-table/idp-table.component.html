@@ -69,19 +69,19 @@
                 <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
                     <div class="date-block">
                         <span class="date-sub">{{ 'IDP.CREATIONDATE' | translate }}:</span>
-                        <span>{{idp.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                        <span>{{idp.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
                     </div>
                     <div class="date-block">
                         <span class="date-sub">{{ 'IDP.CHANGEDATE' | translate }}</span>
-                        <span>{{idp.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                        <span>{{idp.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
                     </div>
                 </td>
             </ng-container>
 
-            <ng-container matColumnDef="type">
+            <ng-container matColumnDef="owner">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.TYPE' | translate }} </th>
                 <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
-                    {{'IDP.TYPES.'+idp.providerType | translate }} </td>
+                    {{'IDP.OWNERTYPES.'+idp.owner | translate }} </td>
             </ng-container>
 
             <ng-container matColumnDef="actions" stickyEnd>
@@ -89,7 +89,7 @@
                 <td mat-cell *matCellDef="let idp">
                     <button
                         [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IDPOwnerType.IDP_OWNER_TYPE_ORG"
-                        mat-icon-button color="warn" matTooltip="{{'IAM.VIEWS.CLEAR' | translate}}"
+                        mat-icon-button color="warn" matTooltip="{{'IAM.VIEWS.DELETE' | translate}}"
                         (click)="removeIdp(idp)">
                         <i class="las la-trash"></i>
                     </button>
