@@ -3,15 +3,16 @@ package configuration
 import "github.com/caos/orbos/pkg/secret"
 
 type Configuration struct {
-	Tracing       *Tracing       `yaml:"tracing,omitempty"`
-	Cache         *Cache         `yaml:"cache,omitempty"`
-	Secrets       *Secrets       `yaml:"secrets,omitempty"`
-	Notifications *Notifications `yaml:"notifications,omitempty"`
-	Passwords     *Passwords     `yaml:"passwords,omitempty"`
-	DebugMode     bool           `yaml:"debugMode"`
-	LogLevel      string         `yaml:"logLevel"`
-	DNS           *DNS           `yaml:"dns"`
-	ClusterDNS    string         `yaml:"clusterdns"`
+	Tracing             *Tracing       `yaml:"tracing,omitempty"`
+	Cache               *Cache         `yaml:"cache,omitempty"`
+	Secrets             *Secrets       `yaml:"secrets,omitempty"`
+	Notifications       *Notifications `yaml:"notifications,omitempty"`
+	Passwords           *Passwords     `yaml:"passwords,omitempty"`
+	DebugMode           bool           `yaml:"debugMode"`
+	LogLevel            string         `yaml:"logLevel"`
+	MigrateEventStoreV1 bool           `yaml:"migrateEventstoreV1"`
+	DNS                 *DNS           `yaml:"dns"`
+	ClusterDNS          string         `yaml:"clusterdns"`
 }
 
 type DNS struct {

@@ -2,10 +2,12 @@ package configuration
 
 import (
 	"encoding/json"
-	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"strconv"
 	"strings"
+
+	"github.com/caos/orbos/pkg/kubernetes"
+
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
 const (
@@ -31,6 +33,7 @@ func literalsConfigMap(
 		"ZITADEL_KEY_PATH":               secretPath + "/" + zitadelKeysPath,
 		"ZITADEL_LOG_LEVEL":              "info",
 		"DEBUG_MODE":                     strconv.FormatBool(desired.DebugMode),
+		"ZITADEL_MIGRATE_ES_V1":          strconv.FormatBool(desired.MigrateEventStoreV1),
 		"SMTP_TLS":                       tls,
 		"CAOS_OIDC_DEV":                  "true",
 		"CR_SSL_MODE":                    "require",
