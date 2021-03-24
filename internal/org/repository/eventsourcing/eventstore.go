@@ -758,6 +758,20 @@ func (es *OrgEventstore) ChangeLabelPolicy(ctx context.Context, policy *iam_mode
 	return iam_es_model.LabelPolicyToModel(repoOrg.LabelPolicy), nil
 }
 
+func (es *OrgEventstore) RemoveLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) error {
+	if policy == nil || !policy.IsValid() {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-M9gs", "Errors.Org.LabelPolicy.Invalid")
+	}
+	org, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return err
+	}
+	repoOrg := model.OrgFromModel(org)
+
+	addAggregate := LabelPolicyRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+}
+
 func (es *OrgEventstore) AddLoginPolicy(ctx context.Context, policy *iam_model.LoginPolicy) (*iam_model.LoginPolicy, error) {
 	if policy == nil || !policy.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Sjkl9", "Errors.Org.LoginPolicy.Invalid")

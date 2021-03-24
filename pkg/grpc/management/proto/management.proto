@@ -3758,9 +3758,10 @@ message LabelPolicyRequest {
 }
 
 message LabelPolicyView {
-  string primary_color = 1;
-  string secondary_color = 2;
-  google.protobuf.Timestamp creation_date = 3;
-  google.protobuf.Timestamp change_date = 4;
-  bool hide_login_name_suffix = 5;
+  bool default = 1;
+  string primary_color = 2;
+  string secondary_color = 3;
+  google.protobuf.Timestamp creation_date = 4;
+  google.protobuf.Timestamp change_date = 5;
+  bool hide_login_name_suffix = 6;
 }

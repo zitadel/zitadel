@@ -326,6 +326,32 @@ func (repo *OrgRepository) GetLabelPolicy(ctx context.Context) (*iam_model.Label
 	return iam_es_model.LabelPolicyViewToModel(policy), err
 }
 
+func (repo *OrgRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, viewErr := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if errors.IsNotFound(viewErr) {
+		policy = new(iam_es_model.LabelPolicyView)
+	}
+	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3Nf8sd", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-28uLp").WithError(esErr).Debug("error retrieving new events")
+		return iam_es_model.LabelPolicyViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_es_model.LabelPolicyViewToModel(policy), nil
+		}
+	}
+	policy.Default = true
+	return iam_es_model.LabelPolicyViewToModel(policy), nil
+}
+
 func (repo *OrgRepository) AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
 	policy.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.AddLabelPolicy(ctx, policy)
@@ -334,6 +360,13 @@ func (repo *OrgRepository) AddLabelPolicy(ctx context.Context, policy *iam_model
 func (repo *OrgRepository) ChangeLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error) {
 	policy.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.ChangeLabelPolicy(ctx, policy)
+}
+
+func (repo *OrgRepository) RemoveLabelPolicy(ctx context.Context) error {
+	policy := &iam_model.LabelPolicy{ObjectRoot: models.ObjectRoot{
+		AggregateID: authz.GetCtxData(ctx).OrgID,
+	}}
+	return repo.OrgEventstore.RemoveLabelPolicy(ctx, policy)
 }
 
 func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
