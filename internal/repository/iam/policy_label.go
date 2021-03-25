@@ -22,6 +22,7 @@ func NewLabelPolicyAddedEvent(
 	aggregate *eventstore.Aggregate,
 	primaryColor,
 	secondaryColor string,
+	hideLoginNameSuffix bool,
 ) *LabelPolicyAddedEvent {
 	return &LabelPolicyAddedEvent{
 		LabelPolicyAddedEvent: *policy.NewLabelPolicyAddedEvent(
@@ -30,7 +31,8 @@ func NewLabelPolicyAddedEvent(
 				aggregate,
 				LabelPolicyAddedEventType),
 			primaryColor,
-			secondaryColor),
+			secondaryColor,
+			hideLoginNameSuffix),
 	}
 }
 

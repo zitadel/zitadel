@@ -60,6 +60,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary-color",
 								"secondary-color",
+								true,
 							),
 						),
 					),
@@ -68,8 +69,9 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:        "primary-color",
+					SecondaryColor:      "secondary-color",
+					HideLoginNameSuffix: true,
 				},
 			},
 			res: res{
@@ -89,6 +91,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 									&iam.NewAggregate().Aggregate,
 									"primary-color",
 									"secondary-color",
+									true,
 								),
 							),
 						},
@@ -98,8 +101,9 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:        "primary-color",
+					SecondaryColor:      "secondary-color",
+					HideLoginNameSuffix: true,
 				},
 			},
 			res: res{
@@ -108,8 +112,9 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 						AggregateID:   "IAM",
 						ResourceOwner: "IAM",
 					},
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:        "primary-color",
+					SecondaryColor:      "secondary-color",
+					HideLoginNameSuffix: true,
 				},
 			},
 		},
@@ -199,6 +204,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary-color",
 								"secondary-color",
+								true,
 							),
 						),
 					),
@@ -207,8 +213,9 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:        "primary-color",
+					SecondaryColor:      "secondary-color",
+					HideLoginNameSuffix: true,
 				},
 			},
 			res: res{
@@ -226,13 +233,14 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary-color",
 								"secondary-color",
+								true,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newDefaultLabelPolicyChangedEvent(context.Background(), "primary-color-change", "secondary-color-change"),
+								newDefaultLabelPolicyChangedEvent(context.Background(), "primary-color-change", "secondary-color-change", false),
 							),
 						},
 					),
@@ -241,8 +249,9 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color-change",
-					SecondaryColor: "secondary-color-change",
+					PrimaryColor:        "primary-color-change",
+					SecondaryColor:      "secondary-color-change",
+					HideLoginNameSuffix: false,
 				},
 			},
 			res: res{
@@ -251,8 +260,9 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 						AggregateID:   "IAM",
 						ResourceOwner: "IAM",
 					},
-					PrimaryColor:   "primary-color-change",
-					SecondaryColor: "secondary-color-change",
+					PrimaryColor:        "primary-color-change",
+					SecondaryColor:      "secondary-color-change",
+					HideLoginNameSuffix: false,
 				},
 			},
 		},
@@ -276,12 +286,13 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultLabelPolicyChangedEvent(ctx context.Context, primaryColor, secondaryColor string) *iam.LabelPolicyChangedEvent {
+func newDefaultLabelPolicyChangedEvent(ctx context.Context, primaryColor, secondaryColor string, hideLoginNameSuffix bool) *iam.LabelPolicyChangedEvent {
 	event, _ := iam.NewLabelPolicyChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
 		[]policy.LabelPolicyChanges{
 			policy.ChangePrimaryColor(primaryColor),
 			policy.ChangeSecondaryColor(secondaryColor),
+			policy.ChangeHideLoginNameSuffix(hideLoginNameSuffix),
 		},
 	)
 	return event

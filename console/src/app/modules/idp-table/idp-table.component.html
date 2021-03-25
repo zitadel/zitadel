@@ -2,18 +2,15 @@
     [emitRefreshOnPreviousRoutes]="['/iam/idp/create']" [timestamp]="idpResult?.details?.viewTimestamp"
     [selection]="selection">
     <div actions>
-        <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
-            <mat-icon>block</mat-icon>
+        <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="ar-button"
+            mat-stroked-button *ngIf="selection.hasValue()" [disabled]="disabled">
+            {{'IDP.DEACTIVATE' | translate}}
         </button>
-        <button (click)="reactivateSelectedIdps()" matTooltip="{{'IDP.ACTIVATE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
-            <mat-icon>play_circle_outline</mat-icon>
+        <button (click)="reactivateSelectedIdps()" matTooltip="{{'IDP.ACTIVATE' | translate}}" class="ar-button"
+            mat-stroked-button *ngIf="selection.hasValue()" [disabled]="disabled">
+            {{'IDP.ACTIVATE' | translate}}
         </button>
-        <button color="warn" (click)="removeSelectedIdps()" matTooltip="{{'IDP.DELETE' | translate}}"
-            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
-            <i class="las la-trash"></i>
-        </button>
+
         <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
@@ -31,7 +28,7 @@
                 </th>
                 <td mat-cell *matCellDef="let idp">
                     <mat-checkbox color="primary" (click)="$event.stopPropagation()" class="chbox"
-                        [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IDPOwnerType.IDPPROVIDERTYPE_SYSTEM"
+                        [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.owner == IDPOwnerType.IDP_OWNER_TYPE_SYSTEM"
                         (change)="$event ? selection.toggle(idp) : null" [checked]="selection.isSelected(idp)">
                         <img src="../../../assets/images/google.png"
                             *ngIf="idp.stylingType == IdpStylingType.IDPSTYLINGTYPE_GOOGLE" alt="google" />

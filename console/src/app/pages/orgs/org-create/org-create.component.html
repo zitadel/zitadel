@@ -6,7 +6,8 @@
     </div>
 
     <ng-template appHasRole [appHasRole]="['iam.write']">
-        <mat-slide-toggle class="example-margin" color="primary" (change)="changeSelf($event)" [(ngModel)]="forSelf">
+        <mat-slide-toggle [disabled]="currentCreateStep != 1" class="example-margin" color="primary"
+            (change)="changeSelf($event)" [(ngModel)]="forSelf">
             Use your personal account as organisation owner
         </mat-slide-toggle>
 

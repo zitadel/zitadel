@@ -174,8 +174,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     public loadGrantOptions(grant: UserGrant.AsObject): void {
         this.grantToEdit = grant.grantId;
-        if (grant.grantId && grant.projectId) {
-            this.getGrantRoleOptions(grant.grantId, grant.projectId);
+        if (grant.projectGrantId && grant.projectId) {
+            this.getGrantRoleOptions(grant.projectGrantId, grant.projectId);
         } else if (grant.projectId) {
             this.getProjectRoleOptions(grant.projectId);
         }
