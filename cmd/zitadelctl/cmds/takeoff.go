@@ -2,7 +2,7 @@ package cmds
 
 import (
 	"github.com/caos/orbos/pkg/kubernetes/cli"
-	"github.com/ghodss/yaml"
+	"gopkg.in/yaml.v3"
 
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 
@@ -17,18 +17,12 @@ import (
 
 func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	var (
-		gitOpsZitadel  bool
-		gitOpsDatabase bool
-		cmd            = &cobra.Command{
+		cmd = &cobra.Command{
 			Use:   "takeoff",
 			Short: "Launch a ZITADEL operator on the orb",
 			Long:  "Ensures a desired state of the resources on the orb",
 		}
 	)
-
-	flags := cmd.Flags()
-	flags.BoolVar(&gitOpsZitadel, "gitops-zitadel", false, "defines if the zitadel operator should run in gitops mode")
-	flags.BoolVar(&gitOpsDatabase, "gitops-database", false, "defines if the database operator should run in gitops mode")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		rv, err := getRv()
@@ -48,7 +42,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			orbConfig,
 			gitClient,
 			rv.Kubeconfig,
-			gitOpsZitadel || gitOpsDatabase,
+			rv.Gitops,
 		)
 		if err != nil {
 			return err
@@ -59,7 +53,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			return err
 		}
 
-		if gitOpsZitadel || gitOpsDatabase {
+		if rv.Gitops {
 
 			orbConfigBytes, err := yaml.Marshal(orbConfig)
 			if err != nil {
@@ -77,7 +71,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			gitClient,
 			k8sClient,
 			rv.Version,
-			rv.Gitops || gitOpsZitadel,
+			rv.Gitops,
 		); err != nil {
 			monitor.Error(err)
 		}
@@ -87,7 +81,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			gitClient,
 			k8sClient,
 			rv.Version,
-			rv.Gitops || gitOpsDatabase,
+			rv.Gitops,
 		); err != nil {
 			monitor.Error(err)
 		}
@@ -113,11 +107,10 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 				return err
 			}
 			spec := desired.Spec
-			spec.GitOps = gitops
 
 			// at takeoff the artifacts have to be applied
 			spec.SelfReconciling = true
-			if err := orbzit.Reconcile(monitor, spec)(k8sClient); err != nil {
+			if err := orbzit.Reconcile(monitor, spec, gitops)(k8sClient); err != nil {
 				return err
 			}
 		}
@@ -126,10 +119,9 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 		spec := &orbzit.Spec{
 			Version:         version,
 			SelfReconciling: true,
-			GitOps:          gitops,
 		}
 
-		if err := orbzit.Reconcile(monitor, spec)(k8sClient); err != nil {
+		if err := orbzit.Reconcile(monitor, spec, gitops)(k8sClient); err != nil {
 			return err
 		}
 	}
@@ -153,13 +145,14 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 				return err
 			}
 			spec := desired.Spec
-			spec.GitOps = gitops
 
 			// at takeoff the artifacts have to be applied
 			spec.SelfReconciling = true
 			if err := orbdb.Reconcile(
 				monitor,
-				spec)(k8sClient); err != nil {
+				spec,
+				gitops,
+			)(k8sClient); err != nil {
 				return err
 			}
 		}
@@ -168,12 +161,13 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 		spec := &orbdb.Spec{
 			Version:         version,
 			SelfReconciling: true,
-			GitOps:          gitops,
 		}
 
 		if err := orbdb.Reconcile(
 			monitor,
-			spec)(k8sClient); err != nil {
+			spec,
+			gitops,
+		)(k8sClient); err != nil {
 			return err
 		}
 	}
