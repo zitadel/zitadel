@@ -83,7 +83,7 @@ func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Hum
 	if orgID == "" || !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
-	return c.createHuman(ctx, orgID, human, nil, true, orgIAMPolicy, pwPolicy)
+	return c.createHuman(ctx, orgID, human, nil, false, orgIAMPolicy, pwPolicy)
 }
 
 func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {

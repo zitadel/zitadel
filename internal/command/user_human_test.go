@@ -172,51 +172,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "org policy check failed, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								1,
-								false,
-								false,
-								false,
-								false,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				human: &domain.Human{
-					Username: "email@test.ch",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
-					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
-				},
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
 			name: "add human (with initial code), ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -820,54 +775,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				orgID: "org1",
 				human: &domain.Human{
 					Username: "username",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
-					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
-					Password: &domain.Password{
-						SecretString: "password",
-					},
-				},
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "org policy check failed, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
-								1,
-								false,
-								false,
-								false,
-								false,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				human: &domain.Human{
-					Username: "email@test.ch",
 					Profile: &domain.Profile{
 						FirstName: "firstname",
 						LastName:  "lastname",
