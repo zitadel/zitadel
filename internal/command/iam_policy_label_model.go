@@ -53,6 +53,7 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	primaryColor,
 	secondaryColor string,
+	hideLoginNameSuffix bool,
 ) (*iam.LabelPolicyChangedEvent, bool) {
 	changes := make([]policy.LabelPolicyChanges, 0)
 	if wm.PrimaryColor != primaryColor {
@@ -60,6 +61,12 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.SecondaryColor != secondaryColor {
 		changes = append(changes, policy.ChangeSecondaryColor(secondaryColor))
+	}
+	if wm.SecondaryColor != secondaryColor {
+		changes = append(changes, policy.ChangeSecondaryColor(secondaryColor))
+	}
+	if wm.HideLoginNameSuffix != hideLoginNameSuffix {
+		changes = append(changes, policy.ChangeHideLoginNameSuffix(hideLoginNameSuffix))
 	}
 	if len(changes) == 0 {
 		return nil, false
