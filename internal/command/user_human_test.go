@@ -650,6 +650,553 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	}
 }
 
+func TestCommandSide_ImportHuman(t *testing.T) {
+	type fields struct {
+		eventstore      *eventstore.Eventstore
+		idGenerator     id.Generator
+		secretGenerator crypto.Generator
+		userPasswordAlg crypto.HashAlgorithm
+	}
+	type args struct {
+		ctx   context.Context
+		orgID string
+		human *domain.Human
+	}
+	type res struct {
+		want *domain.Human
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "orgid missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "org policy not found, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "password policy not found, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "user invalid, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add human (with password and initial code), ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("password", true, ""),
+							),
+							eventFromEventPusher(
+								user.NewHumanInitialCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour*1,
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				secretGenerator: GetMockSecretGenerator(t),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Password: &domain.Password{
+						SecretString:   "password",
+						ChangeRequired: true,
+					},
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+				},
+			},
+			res: res{
+				want: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: language.Und,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					State: domain.UserStateInitial,
+				},
+			},
+		},
+		{
+			name: "add human email verified password change not required, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("password", false, ""),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				secretGenerator: GetMockSecretGenerator(t),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Password: &domain.Password{
+						SecretString:   "password",
+						ChangeRequired: false,
+					},
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: language.Und,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					State: domain.UserStateActive,
+				},
+			},
+		},
+		{
+			name: "add human (with phone), ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("password", false, "+41711234567"),
+							),
+							eventFromEventPusher(
+								user.NewHumanInitialCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour*1,
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanPhoneCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour*1)),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				secretGenerator: GetMockSecretGenerator(t),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Password: &domain.Password{
+						SecretString:   "password",
+						ChangeRequired: false,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					Phone: &domain.Phone{
+						PhoneNumber: "+41711234567",
+					},
+				},
+			},
+			res: res{
+				want: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: language.Und,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					Phone: &domain.Phone{
+						PhoneNumber: "+41711234567",
+					},
+					State: domain.UserStateInitial,
+				},
+			},
+		},
+		{
+			name: "add human (with verified phone), ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("password", false, "+41711234567"),
+							),
+							eventFromEventPusher(
+								user.NewHumanInitialCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour*1,
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanPhoneVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				secretGenerator: GetMockSecretGenerator(t),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Password: &domain.Password{
+						SecretString:   "password",
+						ChangeRequired: false,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					Phone: &domain.Phone{
+						PhoneNumber:     "+41711234567",
+						IsPhoneVerified: true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: language.Und,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					Phone: &domain.Phone{
+						PhoneNumber: "+41711234567",
+					},
+					State: domain.UserStateInitial,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:            tt.fields.eventstore,
+				idGenerator:           tt.fields.idGenerator,
+				initializeUserCode:    tt.fields.secretGenerator,
+				phoneVerificationCode: tt.fields.secretGenerator,
+				userPasswordAlg:       tt.fields.userPasswordAlg,
+			}
+			got, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
 func TestCommandSide_RegisterHuman(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore

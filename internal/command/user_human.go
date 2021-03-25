@@ -83,6 +83,9 @@ func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Hum
 	if orgID == "" || !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
+	if human.Password != nil && human.SecretString != "" {
+		human.ChangeRequired = true
+	}
 	return c.createHuman(ctx, orgID, human, nil, false, orgIAMPolicy, pwPolicy)
 }
 
@@ -90,7 +93,7 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 	if orgID == "" || !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
-	return c.createHuman(ctx, orgID, human, nil, human.ChangeRequired, orgIAMPolicy, pwPolicy)
+	return c.createHuman(ctx, orgID, human, nil, false, orgIAMPolicy, pwPolicy)
 }
 
 func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
@@ -140,6 +143,9 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 	if err != nil {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
 	}
+	if human.Password != nil && human.SecretString != "" {
+		human.ChangeRequired = false
+	}
 	return c.createHuman(ctx, orgID, human, externalIDP, true, orgIAMPolicy, pwPolicy)
 }
 
@@ -153,9 +159,12 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 	human.AggregateID = userID
 	human.SetNamesAsDisplayname()
-	if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, !selfregister); err != nil {
-		return nil, nil, err
+	if human.Password != nil {
+		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, human.ChangeRequired); err != nil {
+			return nil, nil, err
+		}
 	}
+
 	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
 	//TODO: adlerhurst maybe we could simplify the code below
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
