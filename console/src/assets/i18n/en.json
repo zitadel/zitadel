@@ -773,7 +773,8 @@
                 "PROJECTGRANTCHANGED":"Project grant changed.",
                 "PROJECTGRANTMEMBERADDED":"Grant manager added.",
                 "PROJECTGRANTMEMBERCHANGED":"Grant manager changed.",
-                "PROJECTGRANTMEMBERREMOVED":"Grant manager removed."
+                "PROJECTGRANTMEMBERREMOVED":"Grant manager removed.",
+                "PROJECTGRANTUPDATED":"Project Grant updated"
             },
             "ROLES":"Project Roles"
         },
