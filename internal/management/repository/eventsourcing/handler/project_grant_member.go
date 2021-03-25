@@ -182,7 +182,7 @@ func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberV
 	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
-		member.DisplayName = user.FirstName + " " + user.LastName
+		member.DisplayName = user.DisplayName
 		member.Email = user.Email
 	}
 	if user.MachineView != nil {

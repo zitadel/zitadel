@@ -17,7 +17,7 @@ func UserGrantsToPb(grants []*usr_grant_model.UserGrantView) []*user_pb.UserGran
 
 func UserGrantToPb(grant *usr_grant_model.UserGrantView) *user_pb.UserGrant {
 	return &user_pb.UserGrant{
-		GrantId:        grant.ID,
+		Id:             grant.ID,
 		UserId:         grant.UserID,
 		State:          ModelUserGrantStateToPb(grant.State),
 		RoleKeys:       grant.RoleKeys,
