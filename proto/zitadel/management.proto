@@ -1701,6 +1701,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "label_policy"
         };
     }
 
@@ -1712,6 +1713,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+            feature: "label_policy"
         };
     }
 

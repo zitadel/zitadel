@@ -37,6 +37,7 @@ type FeaturesView struct {
 	LoginPolicyRegistration  bool          `json:"loginPolicyRegistration" gorm:"column:login_policy_registration"`
 	LoginPolicyUsernameLogin bool          `json:"loginPolicyUsernameLogin" gorm:"column:login_policy_username_login"`
 	PasswordComplexityPolicy bool          `json:"passwordComplexityPolicy" gorm:"column:password_complexity_policy"`
+	LabelPolicy              bool          `json:"labelPolicy" gorm:"column:label_policy"`
 }
 
 func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
@@ -57,6 +58,7 @@ func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
 		LoginPolicyRegistration:  features.LoginPolicyRegistration,
 		LoginPolicyUsernameLogin: features.LoginPolicyUsernameLogin,
 		PasswordComplexityPolicy: features.PasswordComplexityPolicy,
+		LabelPolicy:              features.LabelPolicy,
 	}
 }
 

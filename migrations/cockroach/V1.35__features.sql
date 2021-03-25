@@ -19,6 +19,7 @@ CREATE TABLE adminapi.features
     login_policy_registration   BOOLEAN,
     login_policy_username_login BOOLEAN,
     password_complexity_policy  BOOLEAN,
+    label_policy                BOOLEAN,
 
     PRIMARY KEY (aggregate_id)
 );
@@ -44,6 +45,7 @@ CREATE TABLE auth.features
     login_policy_registration   BOOLEAN,
     login_policy_username_login BOOLEAN,
     password_complexity_policy  BOOLEAN,
+    label_policy                BOOLEAN,
 
     PRIMARY KEY (aggregate_id)
 );
@@ -69,6 +71,7 @@ CREATE TABLE authz.features
     login_policy_registration   BOOLEAN,
     login_policy_username_login BOOLEAN,
     password_complexity_policy  BOOLEAN,
+    label_policy                BOOLEAN,
 
     PRIMARY KEY (aggregate_id)
 );
@@ -94,6 +97,7 @@ CREATE TABLE management.features
     login_policy_registration   BOOLEAN,
     login_policy_username_login BOOLEAN,
     password_complexity_policy  BOOLEAN,
+    label_policy                BOOLEAN,
 
     PRIMARY KEY (aggregate_id)
 );

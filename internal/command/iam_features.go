@@ -46,6 +46,7 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *IAM
 		features.LoginPolicyRegistration,
 		features.LoginPolicyUsernameLogin,
 		features.PasswordComplexityPolicy,
+		features.LabelPolicy,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")

@@ -315,7 +315,7 @@ func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor 
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
-	return multiFactorModel.MultiFactoryWriteModel.MFAType, writeModelToObjectDetails(&multiFactorModel.WriteModel), nil
+	return multiFactorModel.MultiFactorWriteModel.MFAType, writeModelToObjectDetails(&multiFactorModel.WriteModel), nil
 }
 
 func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) (*domain.ObjectDetails, error) {

@@ -67,7 +67,8 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	loginPolicyPasswordless,
 	loginPolicyRegistration,
 	loginPolicyUsernameLogin,
-	passwordComplexityPolicy bool,
+	passwordComplexityPolicy,
+	labelPolicy bool,
 ) (*org.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -104,6 +105,9 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.PasswordComplexityPolicy != passwordComplexityPolicy {
 		changes = append(changes, features.ChangePasswordComplexityPolicy(passwordComplexityPolicy))
+	}
+	if wm.LabelPolicy != labelPolicy {
+		changes = append(changes, features.ChangeLabelPolicy(labelPolicy))
 	}
 
 	if len(changes) == 0 {

@@ -20,6 +20,7 @@ message Features {
   bool login_policy_factors = 8;
   bool login_policy_passwordless = 9;
   bool password_complexity_policy = 10;
+  bool label_policy = 11;
 }
 
 message FeatureTier {
