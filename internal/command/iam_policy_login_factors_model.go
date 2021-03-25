@@ -51,12 +51,12 @@ func (wm *IAMSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 type IAMMultiFactorWriteModel struct {
-	MultiFactoryWriteModel
+	MultiFactorWriteModel
 }
 
 func NewIAMMultiFactorWriteModel(factorType domain.MultiFactorType) *IAMMultiFactorWriteModel {
 	return &IAMMultiFactorWriteModel{
-		MultiFactoryWriteModel{
+		MultiFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   domain.IAMID,
 				ResourceOwner: domain.IAMID,
@@ -82,7 +82,7 @@ func (wm *IAMMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReade
 }
 
 func (wm *IAMMultiFactorWriteModel) Reduce() error {
-	return wm.MultiFactoryWriteModel.Reduce()
+	return wm.MultiFactorWriteModel.Reduce()
 }
 
 func (wm *IAMMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {

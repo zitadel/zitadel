@@ -14,4 +14,5 @@ extend google.protobuf.MethodOptions {
 message AuthOption {
     string permission = 1;
     string check_field_name = 2;
+    string feature = 3;
 }

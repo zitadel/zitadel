@@ -1,6 +1,10 @@
 package models
 
-import "github.com/caos/zitadel/internal/errors"
+import (
+	"time"
+
+	"github.com/caos/zitadel/internal/errors"
+)
 
 //SearchQuery is deprecated. Use SearchQueryFactory
 type SearchQuery struct {
@@ -66,6 +70,10 @@ func (q *SearchQuery) SequenceBetween(from, to uint64) *SearchQuery {
 
 func (q *SearchQuery) ResourceOwnerFilter(resourceOwner string) *SearchQuery {
 	return q.setFilter(NewFilter(Field_ResourceOwner, resourceOwner, Operation_Equals))
+}
+
+func (q *SearchQuery) CreationDateNewerFilter(time time.Time) *SearchQuery {
+	return q.setFilter(NewFilter(Field_CreationDate, time, Operation_Greater))
 }
 
 func (q *SearchQuery) setFilter(filter *Filter) *SearchQuery {

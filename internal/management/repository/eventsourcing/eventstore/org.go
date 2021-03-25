@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/golang/protobuf/ptypes"
 	"strings"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -93,8 +94,8 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 	return result, nil
 }
 
-func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
-	changes, err := repo.getOrgChanges(ctx, id, lastSequence, limit, sortAscending)
+func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
+	changes, err := repo.getOrgChanges(ctx, id, lastSequence, limit, sortAscending, auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -537,8 +538,8 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
 }
 
-func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
-	query := org_view.ChangesQuery(orgID, lastSequence, limit, sortAscending)
+func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
+	query := org_view.ChangesQuery(orgID, lastSequence, limit, sortAscending, auditLogRetention)
 
 	events, err := repo.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {

@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"google.golang.org/grpc"
+
 	"github.com/caos/zitadel/internal/admin/repository"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -8,7 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/admin"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -25,6 +26,7 @@ type Server struct {
 	iam           repository.IAMRepository
 	administrator repository.AdministratorRepository
 	repo          repository.Repository
+	features      repository.FeaturesRepository
 }
 
 type Config struct {
@@ -39,6 +41,7 @@ func CreateServer(command *command.Commands, query *query.Queries, repo reposito
 		iam:           repo,
 		administrator: repo,
 		repo:          repo,
+		features:      repo,
 	}
 }
 

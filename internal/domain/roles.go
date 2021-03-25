@@ -1,8 +1,9 @@
 package domain
 
 import (
-	"github.com/caos/zitadel/internal/api/authz"
 	"strings"
+
+	"github.com/caos/zitadel/internal/api/authz"
 )
 
 const (

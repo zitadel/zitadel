@@ -181,6 +181,8 @@ func getField(field es_models.Field) string {
 		return "editor_user"
 	case es_models.Field_EventType:
 		return "event_type"
+	case es_models.Field_CreationDate:
+		return "creation_date"
 	}
 	return ""
 }

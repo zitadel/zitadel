@@ -24,7 +24,11 @@ func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*a
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	changes, err := s.repo.MyUserChanges(ctx, offset, limit, asc)
+	features, err := s.repo.GetOrgFeatures(ctx, authz.GetCtxData(ctx).ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	changes, err := s.repo.MyUserChanges(ctx, offset, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}

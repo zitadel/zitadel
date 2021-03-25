@@ -42,7 +42,11 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 
 func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChangesRequest) (*mgmt_pb.ListAppChangesResponse, error) {
 	offset, limit, asc := object_grpc.ListQueryToModel(req.Query)
-	res, err := s.project.ApplicationChanges(ctx, req.ProjectId, req.AppId, offset, limit, asc)
+	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.project.ApplicationChanges(ctx, req.ProjectId, req.AppId, offset, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}

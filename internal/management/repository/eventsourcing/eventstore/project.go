@@ -10,6 +10,7 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"strings"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
@@ -180,8 +181,8 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID strin
 	return result, nil
 }
 
-func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
-	changes, err := repo.getProjectChanges(ctx, id, lastSequence, limit, sortAscending)
+func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*proj_model.ProjectChanges, error) {
+	changes, err := repo.getProjectChanges(ctx, id, lastSequence, limit, sortAscending, retention)
 	if err != nil {
 		return nil, err
 	}
@@ -254,8 +255,8 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 	return result, nil
 }
 
-func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
-	changes, err := repo.getApplicationChanges(ctx, id, appId, lastSequence, limit, sortAscending)
+func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*proj_model.ApplicationChanges, error) {
+	changes, err := repo.getApplicationChanges(ctx, projectID, appID, lastSequence, limit, sortAscending, retention)
 	if err != nil {
 		return nil, err
 	}
@@ -505,8 +506,8 @@ func (r *ProjectRepo) getUserEvents(ctx context.Context, userID string, sequence
 	return r.Eventstore.FilterEvents(ctx, query)
 }
 
-func (repo *ProjectRepo) getProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
-	query := proj_view.ChangesQuery(id, lastSequence, limit, sortAscending)
+func (repo *ProjectRepo) getProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*proj_model.ProjectChanges, error) {
+	query := proj_view.ChangesQuery(id, lastSequence, limit, sortAscending, retention)
 
 	events, err := repo.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
@@ -561,8 +562,8 @@ func (repo *ProjectRepo) getProjectEvents(ctx context.Context, id string, sequen
 	return repo.Eventstore.FilterEvents(ctx, query)
 }
 
-func (repo *ProjectRepo) getApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
-	query := proj_view.ChangesQuery(projectID, lastSequence, limit, sortAscending)
+func (repo *ProjectRepo) getApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*proj_model.ApplicationChanges, error) {
+	query := proj_view.ChangesQuery(projectID, lastSequence, limit, sortAscending, retention)
 
 	events, err := repo.Eventstore.FilterEvents(ctx, query)
 	if err != nil {

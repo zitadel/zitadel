@@ -14,6 +14,7 @@ type MethodMapping map[string]Option
 type Option struct {
 	Permission string
 	CheckParam string
+	Feature    string
 }
 
 func (a *Config) getPermissionsFromRole(role string) []string {

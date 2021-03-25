@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 )
@@ -15,6 +17,7 @@ type SearchQueryFactory struct {
 	sequenceTo     uint64
 	eventTypes     []EventType
 	resourceOwner  string
+	creationDate   time.Time
 }
 
 type searchQuery struct {
@@ -63,7 +66,8 @@ func FactoryFromSearchQuery(query *SearchQuery) *SearchQueryFactory {
 			factory = factory.EventTypes(filter.value.([]EventType)...)
 		case Field_EditorService, Field_EditorUser:
 			logging.Log("MODEL-Mr0VN").WithField("value", filter.value).Panic("field not converted to factory")
-
+		case Field_CreationDate:
+			factory = factory.CreationDateNewer(filter.value.(time.Time))
 		}
 	}
 
@@ -116,6 +120,11 @@ func (factory *SearchQueryFactory) ResourceOwner(resourceOwner string) *SearchQu
 	return factory
 }
 
+func (factory *SearchQueryFactory) CreationDateNewer(time time.Time) *SearchQueryFactory {
+	factory.creationDate = time
+	return factory
+}
+
 func (factory *SearchQueryFactory) OrderDesc() *SearchQueryFactory {
 	factory.desc = true
 	return factory
@@ -142,6 +151,7 @@ func (factory *SearchQueryFactory) Build() (*searchQuery, error) {
 		factory.sequenceToFilter,
 		factory.eventTypeFilter,
 		factory.resourceOwnerFilter,
+		factory.creationDateNewerFilter,
 	} {
 		if filter := f(); filter != nil {
 			filters = append(filters, filter)
@@ -210,4 +220,11 @@ func (factory *SearchQueryFactory) resourceOwnerFilter() *Filter {
 		return nil
 	}
 	return NewFilter(Field_ResourceOwner, factory.resourceOwner, Operation_Equals)
+}
+
+func (factory *SearchQueryFactory) creationDateNewerFilter() *Filter {
+	if factory.creationDate.IsZero() {
+		return nil
+	}
+	return NewFilter(Field_CreationDate, factory.creationDate, Operation_Greater)
 }
