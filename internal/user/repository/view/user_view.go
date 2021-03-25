@@ -18,6 +18,7 @@ func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.User.NotFound")
 	}
+	user.SetEmptyUserType()
 	return user, err
 }
 
@@ -28,6 +29,7 @@ func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso9s", "Errors.User.NotFound")
 	}
+	user.SetEmptyUserType()
 	return user, err
 }
 
@@ -43,6 +45,7 @@ func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, err
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFound")
 	}
+	user.SetEmptyUserType()
 	return user, err
 }
 
@@ -63,6 +66,7 @@ func UserByLoginNameAndResourceOwner(db *gorm.DB, table, loginName, resourceOwne
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFoundOnOrg")
 	}
+	user.SetEmptyUserType()
 	return user, err
 }
 
@@ -121,6 +125,7 @@ func GetGlobalUserByLoginName(db *gorm.DB, table, loginName string) (*model.User
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-8uWer", "Errors.User.NotFound")
 	}
+	user.SetEmptyUserType()
 	return user, err
 }
 
