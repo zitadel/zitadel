@@ -60,7 +60,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     public projectRoleOptions: Role.AsObject[] = [];
     public routerLink: any = [''];
 
-    public loadedGrantId: string = '';
+    public loadedId: string = '';
     public loadedProjectId: string = '';
     public grantToEdit: string = '';
 
@@ -173,7 +173,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public loadGrantOptions(grant: UserGrant.AsObject): void {
-        this.grantToEdit = grant.grantId;
+        this.grantToEdit = grant.id;
         if (grant.projectGrantId && grant.projectId) {
             this.getGrantRoleOptions(grant.projectGrantId, grant.projectId);
         } else if (grant.projectId) {
@@ -181,11 +181,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         }
     }
 
-    private getGrantRoleOptions(grantId: string, projectId: string): void {
-        console.log(projectId, grantId);
-        this.mgmtService.getGrantedProjectByID(projectId, grantId).then(resp => {
+    private getGrantRoleOptions(id: string, projectId: string): void {
+        console.log(projectId, id);
+        this.mgmtService.getGrantedProjectByID(projectId, id).then(resp => {
             if (resp.grantedProject) {
-                this.loadedGrantId = grantId;
+                this.loadedId = id;
                 this.grantRoleOptions = resp.grantedProject?.grantedRoleKeysList;
             }
         }).catch(error => {
@@ -202,7 +202,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     updateRoles(grant: UserGrant.AsObject, selectionChange: MatSelectChange): void {
-        this.userService.updateUserGrant(grant.grantId, grant.userId, selectionChange.value)
+        this.userService.updateUserGrant(grant.id, grant.userId, selectionChange.value)
             .then(() => {
                 this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
             }).catch(error => {
@@ -211,11 +211,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     deleteGrantSelection(): void {
-        this.userService.bulkRemoveUserGrant(this.selection.selected.map(grant => grant.grantId)).then(() => {
+        this.userService.bulkRemoveUserGrant(this.selection.selected.map(grant => grant.id)).then(() => {
             this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
             const data = this.dataSource.grantsSubject.getValue();
             this.selection.selected.forEach((item) => {
-                const index = data.findIndex(i => i.grantId === item.grantId);
+                const index = data.findIndex(i => i.id === item.id);
                 if (index > -1) {
                     data.splice(index, 1);
                     this.dataSource.grantsSubject.next(data);
