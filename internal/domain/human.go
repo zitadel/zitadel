@@ -1,11 +1,11 @@
 package domain
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"strings"
-	"time"
 )
 
 type Human struct {
@@ -58,9 +58,6 @@ func (u *Human) IsValid() bool {
 func (u *Human) CheckOrgIAMPolicy(policy *OrgIAMPolicy) error {
 	if policy == nil {
 		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-zSH7j", "Errors.Users.OrgIamPolicyNil")
-	}
-	if policy.UserLoginMustBeDomain && strings.Contains(u.Username, "@") {
-		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-se4sJ", "Errors.User.EmailAsUsernameNotAllowed")
 	}
 	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.Username == "" && u.Email != nil {
 		u.Username = u.EmailAddress

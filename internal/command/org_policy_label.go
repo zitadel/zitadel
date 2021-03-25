@@ -69,19 +69,26 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 	return writeModelToLabelPolicy(&existingPolicy.LabelPolicyWriteModel), nil
 }
 
-func (c *Commands) RemoveLabelPolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemoveLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgLabelPolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LabelPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewLabelPolicyRemovedEvent(ctx, orgAgg))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyRemovedEvent(ctx, orgAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }

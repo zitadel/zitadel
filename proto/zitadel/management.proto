@@ -162,6 +162,17 @@ service ManagementService {
         };
     }
 
+    rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
+        option (google.api.http) = {
+            post: "/users/human/_import"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
     rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
         option (google.api.http) = {
             post: "/users/machine"
@@ -1641,6 +1652,58 @@ service ManagementService {
         };
     }
 
+    rpc GetLabelPolicy(GetLabelPolicyRequest) returns (GetLabelPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    rpc GetDefaultLabelPolicy(GetDefaultLabelPolicyRequest) returns (GetDefaultLabelPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/default/label"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    rpc AddCustomLabelPolicy(AddCustomLabelPolicyRequest) returns (AddCustomLabelPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/label"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    rpc UpdateCustomLabelPolicy(UpdateCustomLabelPolicyRequest) returns (UpdateCustomLabelPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/label"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    rpc ResetLabelPolicyToDefault(ResetLabelPolicyToDefaultRequest) returns (ResetLabelPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
+
     rpc GetOrgIDPByID(GetOrgIDPByIDRequest) returns (GetOrgIDPByIDResponse) {
         option (google.api.http) = {
             get: "/idps/{id}"
@@ -1821,6 +1884,39 @@ message AddHumanUserRequest {
 }
 
 message AddHumanUserResponse {
+    string user_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+}
+
+message ImportHumanUserRequest {
+    message Profile {
+        string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+        string display_name = 4 [(validate.rules).string = {max_len: 200}];
+        string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
+        zitadel.user.v1.Gender gender = 6;
+    }
+    message Email {
+        string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
+        bool is_email_verified = 2;
+    }
+    message Phone {
+        // has to be a global number
+        string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
+        bool is_phone_verified = 2;
+    }
+
+    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    Profile profile = 2 [(validate.rules).message.required = true];
+    Email email = 3 [(validate.rules).message.required = true];
+    Phone phone = 4;
+    string password = 5;
+    bool password_change_required = 6;
+}
+
+message ImportHumanUserResponse {
     string user_id = 1;
     zitadel.v1.ObjectDetails details = 2;
 }
@@ -3094,6 +3190,45 @@ message UpdateCustomPasswordLockoutPolicyResponse {
 message ResetPasswordLockoutPolicyToDefaultRequest {}
 
 message ResetPasswordLockoutPolicyToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetLabelPolicyRequest {}
+
+message GetLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
+    bool is_default = 2;
+}
+
+message GetDefaultLabelPolicyRequest {}
+
+message GetDefaultLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
+}
+
+message AddCustomLabelPolicyRequest {
+    string primary_color = 1 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    bool hide_login_name_suffix = 3;
+}
+
+message AddCustomLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateCustomLabelPolicyRequest {
+    string primary_color = 1 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    bool hide_login_name_suffix = 3;
+}
+
+message UpdateCustomLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetLabelPolicyToDefaultRequest {}
+
+message ResetLabelPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

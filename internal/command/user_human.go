@@ -50,11 +50,47 @@ func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Hum
 	return writeModelToHuman(addedHuman), nil
 }
 
+func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human) (*domain.Human, error) {
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
+	}
+	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-2N9fs", "Errors.Org.OrgIAMPolicy.NotFound")
+	}
+	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexity.NotFound")
+	}
+	events, addedHuman, err := c.importHuman(ctx, orgID, human, orgIAMPolicy, pwPolicy)
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = AppendAndReduce(addedHuman, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToHuman(addedHuman), nil
+}
+
 func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if orgID == "" || !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
 	}
-	return c.createHuman(ctx, orgID, human, nil, false, orgIAMPolicy, pwPolicy)
+	return c.createHuman(ctx, orgID, human, nil, true, orgIAMPolicy, pwPolicy)
+}
+
+func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+	if orgID == "" || !human.IsValid() {
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
+	}
+	return c.createHuman(ctx, orgID, human, nil, human.ChangeRequired, orgIAMPolicy, pwPolicy)
 }
 
 func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
