@@ -21,7 +21,7 @@
     <div class="fields">
         <label class="lgn-label" for="loginName">{{t "Login.Loginname"}}</label>
         <div class="lgn-suffix-wrapper">
-            <input class="lgn-input lgn-suffix-input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}"
+            <input class="lgn-input lgn-suffix-input" type="text" id="loginName" name="loginName" placeholder="{{if .OrgID }}{{t "Login.UsernamePlaceHolder"}}{{else}}{{t "Login.LoginnamePlaceHolder"}}{{end}}"
             value="{{ .UserName }}" {{if .ErrMessage}}shake {{end}} autocomplete="username" autofocus required>
             {{if .DisplayLoginNameSuffix}}
                 <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>

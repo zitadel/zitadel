@@ -4,6 +4,7 @@ Login:
   TitleLinking: Login for userlinking
   DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
   Loginname: Loginname
+  UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
   ExternalLogin: Login with an external user.
   MustBeMemberOfOrg: The user must be mermber of the {{.OrgName}} organisation.
