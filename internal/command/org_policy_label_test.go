@@ -82,6 +82,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"primary-color",
 								"secondary-color",
+								true,
 							),
 						),
 					),
@@ -91,8 +92,9 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:        "primary-color",
+					SecondaryColor:      "secondary-color",
+					HideLoginNameSuffix: true,
 				},
 			},
 			res: res{
@@ -112,6 +114,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 									&org.NewAggregate("org1", "org1").Aggregate,
 									"primary-color",
 									"secondary-color",
+									true,
 								),
 							),
 						},
@@ -122,8 +125,9 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:        "primary-color",
+					SecondaryColor:      "secondary-color",
+					HideLoginNameSuffix: true,
 				},
 			},
 			res: res{
@@ -132,8 +136,9 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
 					},
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:        "primary-color",
+					SecondaryColor:      "secondary-color",
+					HideLoginNameSuffix: true,
 				},
 			},
 		},
@@ -244,6 +249,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"primary-color",
 								"secondary-color",
+								true,
 							),
 						),
 					),
@@ -253,8 +259,9 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:        "primary-color",
+					SecondaryColor:      "secondary-color",
+					HideLoginNameSuffix: true,
 				},
 			},
 			res: res{
@@ -272,13 +279,14 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"primary-color",
 								"secondary-color",
+								true,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newLabelPolicyChangedEvent(context.Background(), "org1", "primary-color-change", "secondary-color-change"),
+								newLabelPolicyChangedEvent(context.Background(), "org1", "primary-color-change", "secondary-color-change", false),
 							),
 						},
 					),
@@ -288,8 +296,9 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color-change",
-					SecondaryColor: "secondary-color-change",
+					PrimaryColor:        "primary-color-change",
+					SecondaryColor:      "secondary-color-change",
+					HideLoginNameSuffix: false,
 				},
 			},
 			res: res{
@@ -298,8 +307,9 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
 					},
-					PrimaryColor:   "primary-color-change",
-					SecondaryColor: "secondary-color-change",
+					PrimaryColor:        "primary-color-change",
+					SecondaryColor:      "secondary-color-change",
+					HideLoginNameSuffix: false,
 				},
 			},
 		},
@@ -381,6 +391,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"primary-color",
 								"secondary-color",
+								true,
 							),
 						),
 					),
@@ -406,7 +417,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.RemoveLabelPolicy(tt.args.ctx, tt.args.orgID)
+			_, err := r.RemoveLabelPolicy(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -417,12 +428,13 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 	}
 }
 
-func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, secondaryColor string) *org.LabelPolicyChangedEvent {
+func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, secondaryColor string, hideLoginNameSuffix bool) *org.LabelPolicyChangedEvent {
 	event, _ := org.NewLabelPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
 		[]policy.LabelPolicyChanges{
 			policy.ChangePrimaryColor(primaryColor),
 			policy.ChangeSecondaryColor(secondaryColor),
+			policy.ChangeHideLoginNameSuffix(hideLoginNameSuffix),
 		},
 	)
 	return event

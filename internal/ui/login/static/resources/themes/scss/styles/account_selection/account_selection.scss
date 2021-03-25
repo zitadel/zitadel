@@ -12,6 +12,11 @@ $lgn-container-margin: 0px auto 50px auto;
         align-items: center;
         border: none;
         outline: none;
+        cursor: pointer;
+
+        &:disabled {
+            cursor: not-allowed;
+        }
 
         .left {
             padding: .5rem 1rem;
