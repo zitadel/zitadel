@@ -45,4 +45,13 @@ type OrgRepository interface {
 
 	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
 	GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
+	AddMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
+	ChangeMailText(ctx context.Context, mailText *iam_model.MailText) (*iam_model.MailText, error)
+	RemoveMailText(ctx context.Context, mailText *iam_model.MailText) error
+
+	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+	AddLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error)
+	ChangeLabelPolicy(ctx context.Context, policy *iam_model.LabelPolicy) (*iam_model.LabelPolicy, error)
+	RemoveLabelPolicy(ctx context.Context) error
 }

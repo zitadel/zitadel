@@ -244,7 +244,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if request.RequestedOrgID != "" && request.RequestedOrgID != user.ResourceOwner {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-fJe2a", "Errors.User.NotAllowedOrg")
 	}
-	request.SetUserInfo(user.ID, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
+	request.SetUserInfo(user.ID, user.UserName, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -425,21 +425,30 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *domai
 		orgID = repo.IAMID
 	}
 
-	policy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
+	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
 	if err != nil {
 		return err
 	}
-	request.LoginPolicy = policy
+	request.LoginPolicy = loginPolicy
 	if idpProviders != nil {
 		request.AllowedExternalIDPs = idpProviders
 	}
+	labelPolicy, err := repo.getLabelPolicy(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	request.LabelPolicy = labelPolicy
 	return nil
 }
 
 func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain.AuthRequest, loginName string) (err error) {
 	user := new(user_view_model.UserView)
 	if request.RequestedOrgID != "" {
-		user, err = repo.View.UserByLoginNameAndResourceOwner(loginName, request.RequestedOrgID)
+		preferredLoginName := loginName
+		if request.RequestedOrgID != "" {
+			preferredLoginName += "@" + request.RequestedPrimaryDomain
+		}
+		user, err = repo.View.UserByLoginNameAndResourceOwner(preferredLoginName, request.RequestedOrgID)
 	} else {
 		user, err = repo.View.UserByLoginName(loginName)
 		if err == nil {
@@ -453,7 +462,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		return err
 	}
 
-	request.SetUserInfo(user.ID, loginName, "", user.ResourceOwner)
+	request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", user.ResourceOwner)
 	return nil
 }
 
@@ -496,7 +505,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(request *domain.AuthRequest,
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(externalIDP.UserID, "", "", externalIDP.ResourceOwner)
+	request.SetUserInfo(externalIDP.UserID, "", "", "", externalIDP.ResourceOwner)
 	return nil
 }
 
@@ -599,6 +608,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 		users[i] = domain.UserSelection{
 			UserID:            session.UserID,
 			DisplayName:       session.DisplayName,
+			UserName:          session.UserName,
 			LoginName:         session.LoginName,
 			UserSessionState:  auth_req_model.UserSessionStateToDomain(session.State),
 			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
@@ -695,6 +705,21 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 	return iam_es_model.LoginPolicyViewToModel(policy), err
 }
 
+func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*iam_model.LabelPolicyView, error) {
+	policy, err := repo.View.LabelPolicyByAggregateID(orgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.LabelPolicyByAggregateID(repo.IAMID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
 func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
 	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	if primaryDomain == "" {
@@ -707,6 +732,7 @@ func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) erro
 	}
 	request.RequestedOrgID = org.ID
 	request.RequestedOrgName = org.Name
+	request.RequestedPrimaryDomain = primaryDomain
 	return nil
 }
 

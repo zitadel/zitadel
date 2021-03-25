@@ -249,6 +249,14 @@ func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanE
 	}, nil
 }
 
+func (s *Server) ImportHuman(ctx context.Context, in *management.ImportHumanRequest) (*management.UserResponse, error) {
+	user, err := s.user.ImportUser(ctx, humanImportToModel(in), in.PasswordChangeRequired)
+	if err != nil {
+		return nil, err
+	}
+	return userFromModel(user), nil
+}
+
 func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.ResendHumanInitializationRequest) (*mgmt_pb.ResendHumanInitializationResponse, error) {
 	details, err := s.command.ResendInitialMail(ctx, req.UserId, req.Email, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
