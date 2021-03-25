@@ -1020,11 +1020,13 @@ message DefaultLabelPolicy {
     string secondary_color = 2;
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
+    bool hide_login_name_suffix = 5;
 }
 
 message DefaultLabelPolicyUpdate {
     string primary_color = 1;
     string secondary_color = 2;
+    bool hide_login_name_suffix = 3;
 }
 
 message DefaultLabelPolicyView {
@@ -1032,6 +1034,7 @@ message DefaultLabelPolicyView {
     string secondary_color = 2;
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
+    bool hide_login_name_suffix = 5;
 }
 
 message DefaultMailTemplate {

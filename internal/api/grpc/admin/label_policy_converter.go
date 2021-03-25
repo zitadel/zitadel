@@ -9,8 +9,9 @@ import (
 
 func labelPolicyToModel(policy *admin.DefaultLabelPolicyUpdate) *iam_model.LabelPolicy {
 	return &iam_model.LabelPolicy{
-		PrimaryColor:   policy.PrimaryColor,
-		SecondaryColor: policy.SecondaryColor,
+		PrimaryColor:        policy.PrimaryColor,
+		SecondaryColor:      policy.SecondaryColor,
+		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 	}
 }
 
@@ -22,10 +23,11 @@ func labelPolicyFromModel(policy *iam_model.LabelPolicy) *admin.DefaultLabelPoli
 	logging.Log("ADMIN-mAgcI").OnError(err).Debug("date parse failed")
 
 	return &admin.DefaultLabelPolicy{
-		PrimaryColor:   policy.PrimaryColor,
-		SecondaryColor: policy.SecondaryColor,
-		CreationDate:   creationDate,
-		ChangeDate:     changeDate,
+		PrimaryColor:        policy.PrimaryColor,
+		SecondaryColor:      policy.SecondaryColor,
+		HideLoginNameSuffix: policy.HideLoginNameSuffix,
+		CreationDate:        creationDate,
+		ChangeDate:          changeDate,
 	}
 }
 
@@ -37,9 +39,10 @@ func labelPolicyViewFromModel(policy *iam_model.LabelPolicyView) *admin.DefaultL
 	logging.Log("ADMIN-Vhvfp").OnError(err).Debug("date parse failed")
 
 	return &admin.DefaultLabelPolicyView{
-		PrimaryColor:   policy.PrimaryColor,
-		SecondaryColor: policy.SecondaryColor,
-		CreationDate:   creationDate,
-		ChangeDate:     changeDate,
+		PrimaryColor:        policy.PrimaryColor,
+		SecondaryColor:      policy.SecondaryColor,
+		HideLoginNameSuffix: policy.HideLoginNameSuffix,
+		CreationDate:        creationDate,
+		ChangeDate:          changeDate,
 	}
 }

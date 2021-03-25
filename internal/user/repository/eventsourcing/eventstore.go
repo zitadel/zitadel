@@ -145,7 +145,7 @@ func (es *UserEventstore) prepareCreateMachine(ctx context.Context, user *usr_mo
 	return machine, createAggregates, err
 }
 
-func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView, changePasswordRequired bool, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	err := user.CheckOrgIAMPolicy(orgIAMPolicy)
 	if err != nil {
 		return nil, nil, err
@@ -155,7 +155,7 @@ func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_mode
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-LoIxJ", "Errors.User.Invalid")
 	}
 
-	err = user.HashPasswordIfExisting(pwPolicy, es.PasswordAlg, true)
+	err = user.HashPasswordIfExisting(pwPolicy, es.PasswordAlg, changePasswordRequired)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -177,7 +177,7 @@ func (es *UserEventstore) prepareCreateHuman(ctx context.Context, user *usr_mode
 	return repoUser, createAggregates, err
 }
 
-func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView, changePasswordRequired bool, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
@@ -185,7 +185,7 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	user.AggregateID = id
 
 	if user.Human != nil {
-		return es.prepareCreateHuman(ctx, user, pwPolicy, orgIAMPolicy, resourceOwner)
+		return es.prepareCreateHuman(ctx, user, pwPolicy, orgIAMPolicy, changePasswordRequired, resourceOwner)
 	} else if user.Machine != nil {
 		return es.prepareCreateMachine(ctx, user, orgIAMPolicy, resourceOwner)
 	}
@@ -193,7 +193,22 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 }
 
 func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView) (*usr_model.User, error) {
-	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, pwPolicy, orgIAMPolicy, "")
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, pwPolicy, orgIAMPolicy, true, "")
+	if err != nil {
+		return nil, err
+	}
+
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoUser)
+	return model.UserToModel(repoUser), nil
+}
+
+func (es *UserEventstore) ImportUser(ctx context.Context, user *usr_model.User, pwPolicy *iam_model.PasswordComplexityPolicyView, orgIAMPolicy *iam_model.OrgIAMPolicyView, changePasswordRequired bool) (*usr_model.User, error) {
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, pwPolicy, orgIAMPolicy, changePasswordRequired, "")
 	if err != nil {
 		return nil, err
 	}

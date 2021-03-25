@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	"github.com/caos/logging"
+
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -58,7 +59,7 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 	if err != nil {
 		return nil, err
 	}
-	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, pwPolicyView, orgPolicy, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, pwPolicyView, orgPolicy, true, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}

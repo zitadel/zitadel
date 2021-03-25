@@ -10,6 +10,7 @@ import (
 type UserRepository interface {
 	UserByID(ctx context.Context, id string) (*model.UserView, error)
 	CreateUser(ctx context.Context, user *model.User) (*model.User, error)
+	ImportUser(ctx context.Context, user *model.User, passwordChangeRequired bool) (*model.User, error)
 	RegisterUser(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error)
 	DeactivateUser(ctx context.Context, id string) (*model.User, error)
 	ReactivateUser(ctx context.Context, id string) (*model.User, error)
