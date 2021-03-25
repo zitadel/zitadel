@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 
@@ -29,6 +30,10 @@ func BackupListCommand(getRv GetRootValues) *cobra.Command {
 		monitor := rv.Monitor
 		orbConfig := rv.OrbConfig
 		gitClient := rv.GitClient
+
+		if !rv.Gitops {
+			return errors.New("backuplist command is only supported with the --gitops flag yet")
+		}
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
 			monitor.Error(err)

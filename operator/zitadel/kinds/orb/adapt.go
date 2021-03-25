@@ -112,7 +112,7 @@ func AdaptFunc(
 			case "operator":
 				queriers = append(queriers,
 					operator.ResourceQueryToZitadelQuery(queryNS),
-					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec)),
+					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec, gitops)),
 				)
 			}
 		}
