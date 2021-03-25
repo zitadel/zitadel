@@ -37,6 +37,9 @@ func (v *verifierMock) ExistsOrg(ctx context.Context, orgID string) error {
 func (v *verifierMock) VerifierClientID(ctx context.Context, appName string) (string, error) {
 	return "", nil
 }
+func (v *verifierMock) CheckOrgFeatures(context.Context, string, ...string) error {
+	return nil
+}
 
 func Test_authorize(t *testing.T) {
 	type args struct {

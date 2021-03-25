@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/user/model"
@@ -15,7 +16,7 @@ type UserRepository interface {
 	GetUserByLoginNameGlobal(ctx context.Context, email string) (*model.UserView, error)
 	IsUserUnique(ctx context.Context, userName, email string) (bool, error)
 
-	UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
+	UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error)
 
 	ProfileByID(ctx context.Context, userID string) (*model.Profile, error)
 

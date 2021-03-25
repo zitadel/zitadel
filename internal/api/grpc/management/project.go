@@ -73,7 +73,11 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 
 func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjectChangesRequest) (*mgmt_pb.ListProjectChangesResponse, error) {
 	offset, limit, asc := object_grpc.ListQueryToModel(req.Query)
-	res, err := s.project.ProjectChanges(ctx, req.ProjectId, offset, limit, asc)
+	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.project.ProjectChanges(ctx, req.ProjectId, offset, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}

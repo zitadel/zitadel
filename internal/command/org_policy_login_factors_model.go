@@ -51,12 +51,12 @@ func (wm *OrgSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 type OrgMultiFactorWriteModel struct {
-	MultiFactoryWriteModel
+	MultiFactorWriteModel
 }
 
 func NewOrgMultiFactorWriteModel(orgID string, factorType domain.MultiFactorType) *OrgMultiFactorWriteModel {
 	return &OrgMultiFactorWriteModel{
-		MultiFactoryWriteModel{
+		MultiFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   orgID,
 				ResourceOwner: orgID,
@@ -82,7 +82,7 @@ func (wm *OrgMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReade
 }
 
 func (wm *OrgMultiFactorWriteModel) Reduce() error {
-	return wm.MultiFactoryWriteModel.Reduce()
+	return wm.MultiFactorWriteModel.Reduce()
 }
 
 func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {

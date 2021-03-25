@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/authz"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -49,13 +50,14 @@ type Commands struct {
 	keyAlgorithm       crypto.EncryptionAlgorithm
 	privateKeyLifetime time.Duration
 	publicKeyLifetime  time.Duration
+	tokenVerifier      *authz.TokenVerifier
 }
 
 type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config) (repo *Commands, err error) {
+func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, authZRepo *authz_repo.EsRepository) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         eventstore,
 		idGenerator:        id.SonyFlakeGenerator,
@@ -119,6 +121,8 @@ func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults
 		return nil, err
 	}
 	repo.keyAlgorithm = keyAlgorithm
+
+	repo.tokenVerifier = authz.Start(authZRepo)
 	return repo, nil
 }
 

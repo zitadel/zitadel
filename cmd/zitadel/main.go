@@ -103,24 +103,24 @@ func startZitadel(configPaths []string) {
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
-	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
-	if err != nil {
-		return
-	}
-	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ)
-	if err != nil {
-		return
-	}
 	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
 	if err != nil {
-		return
+		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	}
 	queries, err := query.StartQueries(esQueries, conf.SystemDefaults)
 	if err != nil {
-		return
+		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start queries")
 	}
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
+	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
+	if err != nil {
+		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for commands")
+	}
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, authZRepo)
+	if err != nil {
+		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start commands")
+	}
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
 		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
@@ -190,7 +190,7 @@ func startSetup(configPaths []string, localDevMode bool) {
 	es, err := eventstore.Start(conf.Eventstore)
 	logging.Log("MAIN-Ddt3").OnError(err).Fatal("cannot start eventstore")
 
-	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ)
+	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ, nil)
 	logging.Log("MAIN-dsjrr").OnError(err).Fatal("cannot start command side")
 
 	err = setup.Execute(ctx, conf.SetUp, conf.SystemDefaults.IamID, commands)

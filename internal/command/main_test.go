@@ -2,7 +2,14 @@ package command
 
 import (
 	"context"
+	"testing"
+	"time"
+
+	"github.com/golang/mock/gomock"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/repository/mock"
@@ -12,9 +19,6 @@ import (
 	proj_repo "github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/repository/usergrant"
-	"github.com/golang/mock/gomock"
-	"testing"
-	"time"
 )
 
 type expect func(mockRepository *mock.MockRepository)
@@ -171,4 +175,49 @@ func GetMockSecretGenerator(t *testing.T) crypto.Generator {
 	generator.EXPECT().Expiry().Return(time.Hour * 1).AnyTimes()
 
 	return generator
+}
+
+func GetMockVerifier(t *testing.T, features ...string) *authz.TokenVerifier {
+	return authz.Start(&testVerifier{
+		features: features,
+	})
+}
+
+type testVerifier struct {
+	features []string
+}
+
+func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, error) {
+	return "userID", "agentID", "de", "orgID", nil
+}
+func (v *testVerifier) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
+	return nil, nil
+}
+
+func (v *testVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
+	return "", nil, nil
+}
+
+func (v *testVerifier) ExistsOrg(ctx context.Context, orgID string) error {
+	return nil
+}
+
+func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, error) {
+	return "clientID", nil
+}
+
+func (v *testVerifier) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
+	for _, feature := range requiredFeatures {
+		hasFeature := false
+		for _, f := range v.features {
+			if f == feature {
+				hasFeature = true
+				break
+			}
+		}
+		if !hasFeature {
+			return errors.ThrowPermissionDenied(nil, "id", "missing feature")
+		}
+	}
+	return nil
 }
