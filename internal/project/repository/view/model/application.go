@@ -179,10 +179,7 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 	case es_model.APIConfigChanged:
 		return a.SetData(event)
 	case es_model.ProjectChanged:
-		project := &es_model.Project{}
-		project.SetData(event)
-		a.ProjectRoleAssertion = project.ProjectRoleAssertion
-		a.ProjectRoleCheck = project.ProjectRoleAssertion
+		return a.setProjectChanges(event)
 	case es_model.ApplicationDeactivated:
 		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:
@@ -224,4 +221,22 @@ func (a *ApplicationView) setCompliance() {
 	compliance := model.GetOIDCCompliance(model.OIDCVersion(a.OIDCVersion), model.OIDCApplicationType(a.OIDCApplicationType), OIDCGrantTypesToModel(a.OIDCGrantTypes), OIDCResponseTypesToModel(a.OIDCResponseTypes), model.OIDCAuthMethodType(a.OIDCAuthMethodType), a.OIDCRedirectUris)
 	a.NoneCompliant = compliance.NoneCompliant
 	a.ComplianceProblems = compliance.Problems
+}
+
+func (a *ApplicationView) setProjectChanges(event *models.Event) error {
+	changes := struct {
+		ProjectRoleAssertion *bool `json:"projectRoleAssertion,omitempty"`
+		ProjectRoleCheck     *bool `json:"projectRoleCheck,omitempty"`
+	}{}
+	if err := json.Unmarshal(event.Data, &changes); err != nil {
+		logging.Log("EVEN-DFbfg").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(err, "MODEL-Bw221", "Could not unmarshal data")
+	}
+	if changes.ProjectRoleAssertion != nil {
+		a.ProjectRoleAssertion = *changes.ProjectRoleAssertion
+	}
+	if changes.ProjectRoleCheck != nil {
+		a.ProjectRoleCheck = *changes.ProjectRoleCheck
+	}
+	return nil
 }

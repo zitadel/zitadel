@@ -20,6 +20,7 @@ require (
 	github.com/caos/orbos v1.5.14-0.20210323181340-093f4c8a30f9
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
+	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.5.0
@@ -81,5 +82,4 @@ require (
 	k8s.io/apimachinery v0.20.2
 	k8s.io/client-go v0.20.2
 	sigs.k8s.io/controller-runtime v0.8.1
-	sigs.k8s.io/yaml v1.2.0
 )
