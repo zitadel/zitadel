@@ -62,9 +62,6 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	if wm.SecondaryColor != secondaryColor {
 		changes = append(changes, policy.ChangeSecondaryColor(secondaryColor))
 	}
-	if wm.SecondaryColor != secondaryColor {
-		changes = append(changes, policy.ChangeSecondaryColor(secondaryColor))
-	}
 	if wm.HideLoginNameSuffix != hideLoginNameSuffix {
 		changes = append(changes, policy.ChangeHideLoginNameSuffix(hideLoginNameSuffix))
 	}
