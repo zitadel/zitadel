@@ -179,7 +179,7 @@ func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user 
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.Email = user.Email
-		member.DisplayName = user.FirstName + " " + user.LastName
+		member.DisplayName = user.DisplayName
 	}
 	if user.MachineView != nil {
 		member.DisplayName = user.MachineView.Name

@@ -104,6 +104,8 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
 			wm.UserExists = true
+		case *user.HumanRegisteredEvent:
+			wm.UserExists = true
 		case *user.MachineAddedEvent:
 			wm.UserExists = true
 		case *user.UserRemovedEvent:
@@ -150,6 +152,7 @@ func (wm *UserGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType, project.AggregateType).
 		AggregateIDs(wm.UserID, wm.ProjectID).
 		EventTypes(user.HumanAddedType,
+			user.HumanRegisteredType,
 			user.MachineAddedEventType,
 			user.UserRemovedType,
 			project.ProjectAddedType,

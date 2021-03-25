@@ -79,13 +79,8 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if err != nil {
 		return nil, nil, err
 	}
-	if !userGrant.IsValid() || userGrant.AggregateID == "" {
+	if userGrant.AggregateID == "" {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
-	}
-
-	err = c.checkUserGrantPreCondition(ctx, userGrant)
-	if err != nil {
-		return nil, nil, err
 	}
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, userGrant.AggregateID, userGrant.ResourceOwner)
 	if err != nil {
@@ -96,6 +91,10 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	}
 	if reflect.DeepEqual(existingUserGrant.RoleKeys, userGrant.RoleKeys) {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Rs8fy", "Errors.UserGrant.NotChanged")
+	}
+	err = c.checkUserGrantPreCondition(ctx, userGrantWriteModelToUserGrant(existingUserGrant))
+	if err != nil {
+		return nil, nil, err
 	}
 
 	changedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, resourceOwner)

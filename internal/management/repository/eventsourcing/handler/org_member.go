@@ -175,7 +175,7 @@ func (m *OrgMember) fillUserData(member *org_view_model.OrgMemberView, user *usr
 	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
-		member.DisplayName = user.FirstName + " " + user.LastName
+		member.DisplayName = user.DisplayName
 		member.Email = user.Email
 	}
 	if user.MachineView != nil {
