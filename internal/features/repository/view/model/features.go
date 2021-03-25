@@ -30,7 +30,7 @@ type FeaturesView struct {
 	TierDescription          string        `json:"tierDescription" gorm:"column:tier_description"`
 	State                    int32         `json:"state" gorm:"column:state"`
 	StateDescription         string        `json:"stateDescription" gorm:"column:state_description"`
-	AuditLogRetention        time.Duration `json:"audit_log_retention" gorm:"column:audit_log_retention"`
+	AuditLogRetention        time.Duration `json:"auditLogRetention" gorm:"column:audit_log_retention"`
 	LoginPolicyFactors       bool          `json:"loginPolicyFactors" gorm:"column:login_policy_factors"`
 	LoginPolicyIDP           bool          `json:"loginPolicyIDP" gorm:"column:login_policy_idp"`
 	LoginPolicyPasswordless  bool          `json:"loginPolicyPasswordless" gorm:"column:login_policy_passwordless"`
