@@ -1,19 +1,10 @@
-Password:
-  Title: Willkommen zurück!
-  Description: Gib deine Benutzerdaten ein.
-  Password: Passwort
-  MinLength: Mindestlänge
-  HasUppercase: Grossbuchstaben
-  HasLowercase: Kleinbuchstaben
-  HasNumber: Nummer
-  HasSymbol: Symbol
-
 Login:
   Title: Anmeldung
   Description: Mit ZITADEL-Konto anmelden.
   TitleLinking: Anmeldung für Benutzer Linking
   DescriptionLinking: Gib deine Benutzerdaten ein um den externen Benutzer mit einem ZITADEL Benutzer zu linken.
   Loginname: Loginname
+  UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
   ExternalLogin: Melde dich mit einem externen Benutzer an
   MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
@@ -27,6 +18,16 @@ UserSelection:
   SessionState0: aktiv
   SessionState1: inaktiv
   MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
+
+Password:
+  Title: Willkommen zurück!
+  Description: Gib deine Benutzerdaten ein.
+  Password: Passwort
+  MinLength: Mindestlänge
+  HasUppercase: Grossbuchstaben
+  HasLowercase: Kleinbuchstaben
+  HasNumber: Nummer
+  HasSymbol: Symbol
 
 UsernameChange:
   Title: Usernamen ändern
