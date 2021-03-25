@@ -105,8 +105,9 @@
                     *ngIf="idp.stylingType == IDPStylingType.STYLING_TYPE_GOOGLE" alt="google" />
                 <div>
                     <span class="name">{{idp.name}}</span>
-                    <span class="meta-info">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.TYPES.'+idp.type | translate }}</span>
-                    <span class="meta-info">{{ 'IDP.ID' | translate }}: {{idp.idpConfigId}}</span>
+                    <span class="meta-info">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.OWNERTYPES.'+idp.idpType | translate
+                        }}</span>
+                    <span class="meta-info">{{ 'IDP.ID' | translate }}: {{idp.idpId}}</span>
                 </div>
             </div>
         </div>

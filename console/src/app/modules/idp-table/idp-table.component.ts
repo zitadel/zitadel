@@ -110,34 +110,6 @@ export class IdpTableComponent implements OnInit {
         });
     }
 
-    public removeSelectedIdps(): void {
-        const dialogRef = this.dialog.open(WarnDialogComponent, {
-            data: {
-                confirmKey: 'ACTIONS.DELETE',
-                cancelKey: 'ACTIONS.CANCEL',
-                titleKey: 'IDP.DELETE_SELECTION_TITLE',
-                descriptionKey: 'IDP.DELETE_SELECTION_DESCRIPTION',
-            },
-            width: '400px',
-        });
-
-        dialogRef.afterClosed().subscribe(resp => {
-            if (resp) {
-                this.selection.clear();
-                Promise.all(this.selection.selected.map(value => {
-                    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-                        return (this.service as ManagementService).removeOrgIDP(value.id);
-                    } else {
-                        return (this.service as AdminService).removeIDP(value.id);
-                    }
-                })).then(() => {
-                    this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
-                    this.refreshPage();
-                });
-            }
-        });
-    }
-
     public removeIdp(idp: IDP.AsObject): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
@@ -153,17 +125,21 @@ export class IdpTableComponent implements OnInit {
             if (resp) {
                 if (this.serviceType === PolicyComponentServiceType.MGMT) {
                     (this.service as ManagementService).removeOrgIDP(idp.id).then(() => {
-                        this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                        this.toast.showInfo('IDP.TOAST.DELETED', true);
                         setTimeout(() => {
                             this.refreshPage();
                         }, 1000);
+                    }, error => {
+                        this.toast.showError(error);
                     });
                 } else {
                     (this.service as AdminService).removeIDP(idp.id).then(() => {
-                        this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                        this.toast.showInfo('IDP.TOAST.DELETED', true);
                         setTimeout(() => {
                             this.refreshPage();
                         }, 1000);
+                    }, error => {
+                        this.toast.showError(error);
                     });
                 }
             }
@@ -177,6 +153,7 @@ export class IdpTableComponent implements OnInit {
             (this.service as ManagementService).listOrgIDPs(limit, offset).then(resp => {
                 this.idpResult = resp;
                 this.dataSource.data = resp.resultList;
+                console.log(resp.resultList);
                 this.loadingSubject.next(false);
             }).catch(error => {
                 this.toast.showError(error);
@@ -186,6 +163,8 @@ export class IdpTableComponent implements OnInit {
             (this.service as AdminService).listIDPs(limit, offset).then(resp => {
                 this.idpResult = resp;
                 this.dataSource.data = resp.resultList;
+                console.log(resp.resultList);
+
                 this.loadingSubject.next(false);
             }).catch(error => {
                 this.toast.showError(error);

@@ -9,7 +9,7 @@ import {
     UpdateLoginPolicyRequest,
     UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDP, IDPLoginPolicyLink, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDP, IDPLoginPolicyLink, IDPOwnerType, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
     AddCustomLoginPolicyRequest,
     GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
@@ -101,6 +101,7 @@ export class LoginPolicyComponent implements OnDestroy {
         });
         this.getIdps().then(resp => {
             this.idps = resp;
+            console.log(resp);
         });
     }
 
@@ -199,7 +200,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp && resp.idp) {
-                this.addIdp(resp.idp).then(() => {
+                this.addIdp(resp.idp, resp.type).then(() => {
                     this.loading = true;
                     setTimeout(() => {
                         this.fetchData();
@@ -211,10 +212,12 @@ export class LoginPolicyComponent implements OnDestroy {
         });
     }
 
-    private addIdp(idp: IDP.AsObject | IDP.AsObject): Promise<any> {
+    private addIdp(idp: IDP.AsObject | IDP.AsObject, ownerType?: IDPOwnerType): Promise<any> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                return (this.service as ManagementService).addIDPToLoginPolicy(idp.id);
+                if (ownerType) {
+                    return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, ownerType);
+                }
             case PolicyComponentServiceType.ADMIN:
                 return (this.service as AdminService).addIDPToLoginPolicy(idp.id);
         }
@@ -228,6 +231,8 @@ export class LoginPolicyComponent implements OnDestroy {
                     if (index > -1) {
                         this.idps.splice(index, 1);
                     }
+                }, error => {
+                    this.toast.showError(error);
                 });
                 break;
             case PolicyComponentServiceType.ADMIN:
@@ -236,6 +241,8 @@ export class LoginPolicyComponent implements OnDestroy {
                     if (index > -1) {
                         this.idps.splice(index, 1);
                     }
+                }, error => {
+                    this.toast.showError(error);
                 });
                 break;
         }
