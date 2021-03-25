@@ -1,5 +1,5 @@
 {{define "user-profile"}}
-{{if .LoginName}}
+{{if or .LoginName .UserName}}
 <div class="lgn-login-profile">
     <div class="lgn-profile-image"></div>
     <div class="lgn-names">
@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="lgn-loginname">
-            <p>{{.LoginName}}</p>
+            <p>{{if .DisplayLoginNameSuffix}}{{.LoginName}}{{else}}{{.UserName}}{{end}}</p>
         </div>
     </div>
 </div>

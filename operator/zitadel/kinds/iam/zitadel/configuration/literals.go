@@ -2,10 +2,12 @@ package configuration
 
 import (
 	"encoding/json"
-	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"strconv"
 	"strings"
+
+	"github.com/caos/orbos/pkg/helper"
+	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
 const (
@@ -31,6 +33,7 @@ func literalsConfigMap(
 		"ZITADEL_KEY_PATH":               secretPath + "/" + zitadelKeysPath,
 		"ZITADEL_LOG_LEVEL":              "info",
 		"DEBUG_MODE":                     strconv.FormatBool(desired.DebugMode),
+		"ZITADEL_MIGRATE_ES_V1":          strconv.FormatBool(desired.MigrateEventStoreV1),
 		"SMTP_TLS":                       tls,
 		"CAOS_OIDC_DEV":                  "true",
 		"CR_SSL_MODE":                    "require",
@@ -106,38 +109,62 @@ func literalsConfigMap(
 	return literalsConfigMap
 }
 
-func literalsSecret(desired *Configuration, googleServiceAccountJSONPath, zitadelKeysPath string) map[string]string {
+func literalsSecret(k8sClient kubernetes.ClientInt, desired *Configuration, googleServiceAccountJSONPath, zitadelKeysPath string) (map[string]string, error) {
 	literalsSecret := map[string]string{}
 	if desired != nil {
-		if desired.Tracing != nil && desired.Tracing.ServiceAccountJSON != nil {
-			literalsSecret[googleServiceAccountJSONPath] = desired.Tracing.ServiceAccountJSON.Value
+		if desired.Tracing != nil && (desired.Tracing.ServiceAccountJSON != nil || desired.Tracing.ExistingServiceAccountJSON != nil) {
+			value, err := helper.GetSecretValue(k8sClient, desired.Tracing.ServiceAccountJSON, desired.Tracing.ExistingServiceAccountJSON)
+			if err != nil {
+				return nil, err
+			}
+			literalsSecret[googleServiceAccountJSONPath] = value
 		}
-		if desired.Secrets != nil && desired.Secrets.Keys != nil {
-			literalsSecret[zitadelKeysPath] = desired.Secrets.Keys.Value
+		if desired.Secrets != nil && (desired.Secrets.Keys != nil || desired.Secrets.ExistingKeys != nil) {
+			value, err := helper.GetSecretValue(k8sClient, desired.Secrets.Keys, desired.Secrets.ExistingKeys)
+			if err != nil {
+				return nil, err
+			}
+			literalsSecret[zitadelKeysPath] = value
 		}
 	}
-	return literalsSecret
+	return literalsSecret, nil
 }
 
-func literalsSecretVars(desired *Configuration) map[string]string {
+func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) (map[string]string, error) {
 	literalsSecretVars := map[string]string{}
 	if desired != nil {
 		if desired.Notifications != nil {
-			if desired.Notifications.Email.AppKey != nil {
-				literalsSecretVars["ZITADEL_EMAILAPPKEY"] = desired.Notifications.Email.AppKey.Value
+			if desired.Notifications.Email.AppKey != nil || desired.Notifications.Email.ExistingAppKey != nil {
+				value, err := helper.GetSecretValue(k8sClient, desired.Notifications.Email.AppKey, desired.Notifications.Email.ExistingAppKey)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_EMAILAPPKEY"] = value
 			}
-			if desired.Notifications.GoogleChatURL != nil {
-				literalsSecretVars["ZITADEL_GOOGLE_CHAT_URL"] = desired.Notifications.GoogleChatURL.Value
+			if desired.Notifications.GoogleChatURL != nil || desired.Notifications.ExistingGoogleChatURL != nil {
+				value, err := helper.GetSecretValue(k8sClient, desired.Notifications.GoogleChatURL, desired.Notifications.ExistingGoogleChatURL)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_GOOGLE_CHAT_URL"] = value
 			}
-			if desired.Notifications.Twilio.AuthToken != nil {
-				literalsSecretVars["ZITADEL_TWILIO_AUTH_TOKEN"] = desired.Notifications.Twilio.AuthToken.Value
+			if desired.Notifications.Twilio.AuthToken != nil || desired.Notifications.Twilio.ExistingAuthToken != nil {
+				value, err := helper.GetSecretValue(k8sClient, desired.Notifications.Twilio.AuthToken, desired.Notifications.Twilio.ExistingAuthToken)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_TWILIO_AUTH_TOKEN"] = value
 			}
-			if desired.Notifications.Twilio.SID != nil {
-				literalsSecretVars["ZITADEL_TWILIO_SID"] = desired.Notifications.Twilio.SID.Value
+			if desired.Notifications.Twilio.SID != nil || desired.Notifications.Twilio.ExistingSID != nil {
+				value, err := helper.GetSecretValue(k8sClient, desired.Notifications.Twilio.SID, desired.Notifications.Twilio.ExistingSID)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_TWILIO_SID"] = value
 			}
 		}
 	}
-	return literalsSecretVars
+	return literalsSecretVars, nil
 }
 
 func literalsConsoleCM(

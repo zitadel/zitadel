@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/pkg/grpc/auth"
-	"golang.org/x/text/language"
 )
 
 func UpdateProfileToDomain(ctx context.Context, profile *auth.UpdateMyProfileRequest) *domain.Profile {
@@ -19,6 +20,7 @@ func UpdateProfileToDomain(ctx context.Context, profile *auth.UpdateMyProfileReq
 		FirstName:         profile.FirstName,
 		LastName:          profile.LastName,
 		NickName:          profile.NickName,
+		DisplayName:       profile.DisplayName,
 		PreferredLanguage: lang,
 		Gender:            user.GenderToDomain(profile.Gender),
 	}

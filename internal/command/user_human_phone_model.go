@@ -79,6 +79,8 @@ func (wm *HumanPhoneWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.HumanInitialCodeAddedType,
+			user.HumanInitializedCheckSucceededType,
 			user.HumanPhoneChangedType,
 			user.HumanPhoneVerifiedType,
 			user.HumanPhoneCodeAddedType,

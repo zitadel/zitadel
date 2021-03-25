@@ -867,6 +867,7 @@ message GetLabelPolicyResponse {
 message UpdateLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {min_len: 1, max_len: 50}];
     string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    bool hide_login_name_suffix = 3;
 }
 
 message UpdateLabelPolicyResponse {

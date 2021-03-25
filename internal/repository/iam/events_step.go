@@ -3,6 +3,7 @@ package iam
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -34,6 +35,10 @@ func SetupStepMapper(event *repository.Event) (eventstore.EventReader, error) {
 	step := &SetupStepEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 		Done:      eventstore.EventType(event.Type) == SetupDoneEventType,
+		Step:      domain.Step1,
+	}
+	if len(event.Data) == 0 {
+		return step, nil
 	}
 	err := json.Unmarshal(event.Data, step)
 	if err != nil {

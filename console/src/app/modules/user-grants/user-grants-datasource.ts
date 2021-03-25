@@ -128,6 +128,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe(grants => {
+            console.log(grants);
             this.grantsSubject.next(grants);
         });
     }

@@ -141,6 +141,13 @@
             <app-client-keys [projectId]="projectId" [appId]="app.id"></app-client-keys>
         </app-card>
 
+        <div *ngIf="oidcForm && app?.apiConfig" class="btn-container">
+            <button class="submit-button" (click)="saveAPIApp()" color="primary"
+                [disabled]="apiForm.invalid || !canWrite" mat-raised-button>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+        </div>
+
         <div *ngIf="currentAuthMethod == 'BASIC'">
             <button [disabled]="!canWrite" mat-stroked-button
                 (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' | translate}}</button>
@@ -266,6 +273,6 @@
             </div>
         </div>
 
-        <app-changes *ngIf="app" [changeType]="ChangeType.APP" [id]="projectId" [secId]="app.id"></app-changes>
+        <app-changes *ngIf="app" [changeType]="ChangeType.APP" [id]="app.id" [secId]="projectId"></app-changes>
     </div>
 </app-meta-layout>

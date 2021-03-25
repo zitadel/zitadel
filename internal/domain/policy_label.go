@@ -7,9 +7,10 @@ import (
 type LabelPolicy struct {
 	models.ObjectRoot
 
-	Default        bool
-	PrimaryColor   string
-	SecondaryColor string
+	Default             bool
+	PrimaryColor        string
+	SecondaryColor      string
+	HideLoginNameSuffix bool
 }
 
 func (p *LabelPolicy) IsValid() bool {

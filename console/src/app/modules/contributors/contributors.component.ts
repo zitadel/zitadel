@@ -1,6 +1,7 @@
 import { animate, animateChild, keyframes, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 
 @Component({
     selector: 'app-contributors',
@@ -29,7 +30,7 @@ export class ContributorsComponent {
     @Input() disabled: boolean = false;
     @Input() totalResult: number = 0;
     @Input() loading: boolean = false;
-    @Input() membersSubject!: BehaviorSubject<any[]>;
+    @Input() membersSubject!: BehaviorSubject<Member.AsObject[]>;
     @Output() addClicked: EventEmitter<void> = new EventEmitter();
     @Output() showDetailClicked: EventEmitter<void> = new EventEmitter();
     @Output() refreshClicked: EventEmitter<void> = new EventEmitter();

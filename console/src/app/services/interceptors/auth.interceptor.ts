@@ -61,7 +61,7 @@ export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
 
         dialogRef.afterClosed().pipe(take(1)).subscribe(resp => {
             if (resp) {
-                this.authenticationService.authenticate(undefined, true, true);
+                this.authenticationService.authenticate(undefined);
             }
         });
     }

@@ -9,8 +9,9 @@ import (
 type LabelPolicyWriteModel struct {
 	eventstore.WriteModel
 
-	PrimaryColor   string
-	SecondaryColor string
+	PrimaryColor        string
+	SecondaryColor      string
+	HideLoginNameSuffix bool
 
 	State domain.PolicyState
 }
@@ -21,6 +22,7 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 		case *policy.LabelPolicyAddedEvent:
 			wm.PrimaryColor = e.PrimaryColor
 			wm.SecondaryColor = e.SecondaryColor
+			wm.HideLoginNameSuffix = e.HideLoginNameSuffix
 			wm.State = domain.PolicyStateActive
 		case *policy.LabelPolicyChangedEvent:
 			if e.PrimaryColor != nil {
@@ -28,6 +30,9 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 			}
 			if e.SecondaryColor != nil {
 				wm.SecondaryColor = *e.SecondaryColor
+			}
+			if e.HideLoginNameSuffix != nil {
+				wm.HideLoginNameSuffix = *e.HideLoginNameSuffix
 			}
 		case *policy.LabelPolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved

@@ -13,15 +13,15 @@
         (click)="navigateToProject(item.id, $event)"
         [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
         <div class="text-part">
-            <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+            <span *ngIf="item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
-                item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
                 }}</span>
             <span class="name" *ngIf="item.name">{{ item.name }}</span>
 
-            <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
+            <span *ngIf="item.details.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{
-                item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
                 }}</span>
             <span class="fill-space"></span>
         </div>

@@ -1171,7 +1171,7 @@ func TestCommandSide_AddSecondFactorLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddSecondFactorToLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
+			got, _, err := r.AddSecondFactorToLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1322,7 +1322,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.RemoveSecondFactorFromLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
+			_, err := r.RemoveSecondFactorFromLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1438,7 +1438,7 @@ func TestCommandSide_AddMultiFactorLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddMultiFactorToLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
+			got, _, err := r.AddMultiFactorToLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1589,7 +1589,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.RemoveMultiFactorFromLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
+			_, err := r.RemoveMultiFactorFromLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -3,12 +3,15 @@ package cmds
 import (
 	"os"
 
-	"github.com/caos/orbos/pkg/secret"
+	"github.com/caos/orbos/pkg/kubernetes/cli"
+
 	"github.com/caos/zitadel/operator/secrets"
+
+	"github.com/caos/orbos/pkg/secret"
 	"github.com/spf13/cobra"
 )
 
-func ReadSecretCommand(rv RootValues) *cobra.Command {
+func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 	return &cobra.Command{
 		Use:     "readsecret [path]",
 		Short:   "Print a secrets decrypted value to stdout",
@@ -16,32 +19,33 @@ func ReadSecretCommand(rv RootValues) *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		Example: `zitadelctl readsecret zitadel.emailappkey > ~/emailappkey`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			_, monitor, orbConfig, gitClient, _, errFunc, err := rv()
+			rv, err := getRv()
 			if err != nil {
 				return err
 			}
 			defer func() {
-				err = errFunc(err)
+				err = rv.ErrFunc(err)
 			}()
-			if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-				return err
-			}
 
-			if err := gitClient.Clone(); err != nil {
-				return err
-			}
+			monitor := rv.Monitor
+			orbConfig := rv.OrbConfig
+			gitClient := rv.GitClient
 
 			path := ""
 			if len(args) > 0 {
 				path = args[0]
 			}
 
+			k8sClient, _, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+			if err != nil && !rv.Gitops {
+				return err
+			}
+
 			value, err := secret.Read(
-				monitor,
-				gitClient,
+				k8sClient,
 				path,
-				secrets.GetAllSecretsFunc(orbConfig))
+				secrets.GetAllSecretsFunc(monitor, path == "", rv.Gitops, gitClient, k8sClient, orbConfig),
+			)
 			if err != nil {
 				monitor.Error(err)
 				return nil

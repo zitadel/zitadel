@@ -30,6 +30,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
             firstName: [{ value: '', disabled: this.disabled }, Validators.required],
             lastName: [{ value: '', disabled: this.disabled }, Validators.required],
             nickName: [{ value: '', disabled: this.disabled }],
+            displayName: [{ value: '', disabled: this.disabled }, Validators.required],
             gender: [{ value: 0, disabled: this.disabled }],
             preferredLanguage: [{ value: '', disabled: this.disabled }],
         });
@@ -43,6 +44,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
             firstName: [{ value: '', disabled: this.disabled }, Validators.required],
             lastName: [{ value: '', disabled: this.disabled }, Validators.required],
             nickName: [{ value: '', disabled: this.disabled }],
+            displayName: [{ value: '', disabled: this.disabled }, Validators.required],
             gender: [{ value: 0, disabled: this.disabled }],
             preferredLanguage: [{ value: '', disabled: this.disabled }],
         });
@@ -76,6 +78,9 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
     }
     public get nickName(): AbstractControl | null {
         return this.profileForm.get('nickName');
+    }
+    public get displayName(): AbstractControl | null {
+        return this.profileForm.get('displayName');
     }
     public get gender(): AbstractControl | null {
         return this.profileForm.get('gender');

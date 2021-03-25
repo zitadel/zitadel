@@ -23,6 +23,9 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*
 	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
 	}
+	if existingEmail.UserState == domain.UserStateInitial {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J8dsk", "Errors.User.NotInitialised")
+	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 	changedEvent, hasChanged := existingEmail.NewChangedEvent(ctx, userAgg, email.EmailAddress)
 	if !hasChanged {

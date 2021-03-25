@@ -91,6 +91,21 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 	}, nil
 }
 
+func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUserRequest) (*mgmt_pb.ImportHumanUserResponse, error) {
+	human, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, ImportHumanUserRequestToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ImportHumanUserResponse{
+		UserId: human.AggregateID,
+		Details: obj_grpc.AddToDetailsPb(
+			human.Sequence,
+			human.ChangeDate,
+			human.ResourceOwner,
+		),
+	}, nil
+}
+
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
 	machine, err := s.command.AddMachine(ctx, authz.GetCtxData(ctx).OrgID, AddMachineUserRequestToDomain(req))
 	if err != nil {
@@ -225,7 +240,7 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 }
 
 func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanEmailRequest) (*mgmt_pb.UpdateHumanEmailResponse, error) {
-	email, err := s.command.ChangeHumanEmail(ctx, UpdateHumanEmailRequestToDomain(req))
+	email, err := s.command.ChangeHumanEmail(ctx, UpdateHumanEmailRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}

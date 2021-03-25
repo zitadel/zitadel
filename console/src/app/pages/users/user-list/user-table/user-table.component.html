@@ -38,7 +38,7 @@
                             class="avatar" [name]="user.human.profile.displayName" [size]="32">
                         </app-avatar>
                         <ng-template #cog>
-                            <div class="sa-icon">
+                            <div class="sa-icon" *ngIf="user.machine">
                                 <i class="las la-user-cog"></i>
                             </div>
                         </ng-template>

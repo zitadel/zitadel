@@ -69,6 +69,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                     this.user.human.profile?.firstName,
                     this.user.human.profile?.lastName,
                     this.user.human.profile?.nickName,
+                    this.user.human.profile?.displayName,
                     this.user.human.profile?.preferredLanguage,
                     this.user.human.profile?.gender,
                 )
@@ -169,6 +170,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                         titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
                         value: this.user.human?.phone?.phone,
+                        type: type,
                     },
                     width: '400px',
                 });
@@ -180,6 +182,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                 });
                 break;
             case EditDialogType.EMAIL:
+                console.log('email');
                 const dialogRefEmail = this.dialog.open(EditDialogComponent, {
                     data: {
                         confirmKey: 'ACTIONS.SAVE',
@@ -188,6 +191,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                         titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
                         value: this.user.human?.email?.email,
+                        type: type
                     },
                     width: '400px',
                 });
