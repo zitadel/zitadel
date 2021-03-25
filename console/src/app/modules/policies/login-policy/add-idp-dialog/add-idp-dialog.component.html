@@ -8,7 +8,7 @@
         <cnsl-label>{{ 'IDP.TYPE' | translate }}</cnsl-label>
         <mat-select [(ngModel)]="idpType" (selectionChange)="loadIdps()">
             <mat-option *ngFor="let type of idpTypes" [value]="type">
-                {{ 'IDP.TYPES.'+type | translate}}
+                {{ 'IDP.OWNERTYPES.'+type | translate}}
             </mat-option>
         </mat-select>
     </cnsl-form-field>

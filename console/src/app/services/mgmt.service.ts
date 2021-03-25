@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
+import { IDPOwnerType } from '../proto/generated/zitadel/idp_pb';
 import {
     AddAPIAppRequest,
     AddAPIAppResponse,
@@ -387,9 +388,10 @@ export class ManagementService {
         return this.grpcService.mgmt.resetLoginPolicyToDefault(req, null).then(resp => resp.toObject());
     }
 
-    public addIDPToLoginPolicy(idpId: string): Promise<AddIDPToLoginPolicyResponse.AsObject> {
+    public addIDPToLoginPolicy(idpId: string, ownerType: IDPOwnerType): Promise<AddIDPToLoginPolicyResponse.AsObject> {
         const req = new AddIDPToLoginPolicyRequest();
         req.setIdpId(idpId);
+        req.setOwnertype(ownerType);
         return this.grpcService.mgmt.addIDPToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 

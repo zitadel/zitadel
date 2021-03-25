@@ -775,7 +775,8 @@
                 "PROJECTGRANTCHANGED":"Projektberechtigung geändert.",
                 "PROJECTGRANTMEMBERADDED":"Berechtigungsmanager hinzugefügt.",
                 "PROJECTGRANTMEMBERCHANGED":"Berechtigungsmanager verändert.",
-                "PROJECTGRANTMEMBERREMOVED":"Berechtigungsmanager entfernt."
+                "PROJECTGRANTMEMBERREMOVED":"Berechtigungsmanager entfernt.",
+                "PROJECTGRANTUPDATED":"Projectberechtigung geändert."
             },
             "ROLES":"Projektrollen"
         },
