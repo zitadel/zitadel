@@ -705,7 +705,7 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 	return iam_es_model.LoginPolicyViewToModel(policy), err
 }
 
-func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*iam_model.LabelPolicyView, error) {
+func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
 	policy, err := repo.View.LabelPolicyByAggregateID(orgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.LabelPolicyByAggregateID(repo.IAMID)
@@ -717,7 +717,7 @@ func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.LabelPolicyViewToModel(policy), err
+	return policy.ToDomain(), err
 }
 
 func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {

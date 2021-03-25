@@ -333,14 +333,14 @@ func (l *Login) getOrgName(authReq *domain.AuthRequest) string {
 	return authReq.RequestedOrgName
 }
 
-func (l *Login) getOrgPrimaryDomain(authReq *model.AuthRequest) string {
+func (l *Login) getOrgPrimaryDomain(authReq *domain.AuthRequest) string {
 	if authReq == nil {
 		return ""
 	}
 	return authReq.RequestedPrimaryDomain
 }
 
-func (l *Login) isDisplayLoginNameSuffix(authReq *model.AuthRequest) bool {
+func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	if authReq == nil {
 		return false
 	}

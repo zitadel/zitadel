@@ -207,7 +207,7 @@ func (repo *OrgRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_mode
 	if errors.IsNotFound(viewErr) {
 		policy = new(iam_es_model.LabelPolicyView)
 	}
-	events, esErr := repo.IAMEventstore.IAMEventsByID(ctx, repo.SystemDefaults.IamID, policy.Sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3Nf8sd", "Errors.IAM.LabelPolicy.NotFound")
 	}

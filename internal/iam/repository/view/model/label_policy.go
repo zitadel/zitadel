@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -32,16 +33,18 @@ type LabelPolicyView struct {
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func LabelPolicyViewFromModel(policy *model.LabelPolicyView) *LabelPolicyView {
-	return &LabelPolicyView{
-		AggregateID:         policy.AggregateID,
-		Sequence:            policy.Sequence,
-		CreationDate:        policy.CreationDate,
-		ChangeDate:          policy.ChangeDate,
-		PrimaryColor:        policy.PrimaryColor,
-		SecondaryColor:      policy.SecondaryColor,
-		HideLoginNameSuffix: policy.HideLoginNameSuffix,
-		Default:             policy.Default,
+func (p *LabelPolicyView) ToDomain() *domain.LabelPolicy {
+	return &domain.LabelPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:  p.AggregateID,
+			CreationDate: p.CreationDate,
+			ChangeDate:   p.ChangeDate,
+			Sequence:     p.Sequence,
+		},
+		Default:             p.Default,
+		PrimaryColor:        p.PrimaryColor,
+		SecondaryColor:      p.SecondaryColor,
+		HideLoginNameSuffix: p.HideLoginNameSuffix,
 	}
 }
 
