@@ -1,10 +1,12 @@
 package domain
 
 import (
-	"github.com/caos/zitadel/internal/errors"
-	"golang.org/x/text/language"
 	"strings"
 	"time"
+
+	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/errors"
 )
 
 type AuthRequest struct {
@@ -23,23 +25,26 @@ type AuthRequest struct {
 	MaxAuthAge    uint32
 	Request       Request
 
-	levelOfAssurance    LevelOfAssurance
-	UserID              string
-	LoginName           string
-	DisplayName         string
-	UserOrgID           string
-	RequestedOrgID      string
-	RequestedOrgName    string
-	SelectedIDPConfigID string
-	LinkingUsers        []*ExternalUser
-	PossibleSteps       []NextStep
-	PasswordVerified    bool
-	MFAsVerified        []MFAType
-	Audience            []string
-	AuthTime            time.Time
-	Code                string
-	LoginPolicy         *LoginPolicy
-	AllowedExternalIDPs []*IDPProvider
+	levelOfAssurance       LevelOfAssurance
+	UserID                 string
+	UserName               string
+	LoginName              string
+	DisplayName            string
+	UserOrgID              string
+	RequestedOrgID         string
+	RequestedOrgName       string
+	RequestedPrimaryDomain string
+	SelectedIDPConfigID    string
+	LinkingUsers           []*ExternalUser
+	PossibleSteps          []NextStep
+	PasswordVerified       bool
+	MFAsVerified           []MFAType
+	Audience               []string
+	AuthTime               time.Time
+	Code                   string
+	LoginPolicy            *LoginPolicy
+	AllowedExternalIDPs    []*IDPProvider
+	LabelPolicy            *LabelPolicy
 }
 
 type ExternalUser struct {
@@ -103,8 +108,9 @@ func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {
 	return a
 }
 
-func (a *AuthRequest) SetUserInfo(userID, loginName, displayName, userOrgID string) {
+func (a *AuthRequest) SetUserInfo(userID, userName, loginName, displayName, userOrgID string) {
 	a.UserID = userID
+	a.UserName = userName
 	a.LoginName = loginName
 	a.DisplayName = displayName
 	a.UserOrgID = userOrgID

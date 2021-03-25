@@ -10,26 +10,29 @@ import (
 
 type LabelPolicy struct {
 	es_models.ObjectRoot
-	State          int32  `json:"-"`
-	PrimaryColor   string `json:"primaryColor"`
-	SecondaryColor string `json:"secondaryColor"`
+	State               int32  `json:"-"`
+	PrimaryColor        string `json:"primaryColor"`
+	SecondaryColor      string `json:"secondaryColor"`
+	HideLoginNameSuffix bool   `json:"hideLoginNameSuffix"`
 }
 
 func LabelPolicyToModel(policy *LabelPolicy) *iam_model.LabelPolicy {
 	return &iam_model.LabelPolicy{
-		ObjectRoot:     policy.ObjectRoot,
-		State:          iam_model.PolicyState(policy.State),
-		PrimaryColor:   policy.PrimaryColor,
-		SecondaryColor: policy.SecondaryColor,
+		ObjectRoot:          policy.ObjectRoot,
+		State:               iam_model.PolicyState(policy.State),
+		PrimaryColor:        policy.PrimaryColor,
+		SecondaryColor:      policy.SecondaryColor,
+		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 	}
 }
 
 func LabelPolicyFromModel(policy *iam_model.LabelPolicy) *LabelPolicy {
 	return &LabelPolicy{
-		ObjectRoot:     policy.ObjectRoot,
-		State:          int32(policy.State),
-		PrimaryColor:   policy.PrimaryColor,
-		SecondaryColor: policy.SecondaryColor,
+		ObjectRoot:          policy.ObjectRoot,
+		State:               int32(policy.State),
+		PrimaryColor:        policy.PrimaryColor,
+		SecondaryColor:      policy.SecondaryColor,
+		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 	}
 }
 

@@ -87,6 +87,21 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 	}, nil
 }
 
+func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUserRequest) (*mgmt_pb.ImportHumanUserResponse, error) {
+	human, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, ImportHumanUserRequestToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ImportHumanUserResponse{
+		UserId: human.AggregateID,
+		Details: obj_grpc.AddToDetailsPb(
+			human.Sequence,
+			human.ChangeDate,
+			human.ResourceOwner,
+		),
+	}, nil
+}
+
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
 	machine, err := s.command.AddMachine(ctx, authz.GetCtxData(ctx).OrgID, AddMachineUserRequestToDomain(req))
 	if err != nil {

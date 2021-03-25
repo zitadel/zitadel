@@ -17,6 +17,7 @@ message LabelPolicy {
     string primary_color = 2;
     string secondary_color = 3;
     bool is_default = 4;
+    bool hide_login_name_suffix = 5;
 }
 
 message LoginPolicy {
