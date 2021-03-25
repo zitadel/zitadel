@@ -476,7 +476,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *model.
 	user := new(user_view_model.UserView)
 	if request.RequestedOrgID != "" {
 		preferredLoginName := loginName
-		if request.RequestedOrgID != "" { //&& request.LabelPolicy != nil && !request.LabelPolicy.HideLoginNameSuffix {
+		if request.RequestedOrgID != "" {
 			preferredLoginName += "@" + request.RequestedPrimaryDomain
 		}
 		user, err = repo.View.UserByLoginNameAndResourceOwner(preferredLoginName, request.RequestedOrgID)
