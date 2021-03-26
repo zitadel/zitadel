@@ -100,7 +100,7 @@ message PasswordComplexityPolicy {
     ];
     bool has_uppercase = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the password MUST contain a upper case letter"
+            description: "defines if the password MUST contain an upper case letter"
         }
     ];
     bool has_lowercase = 4 [
@@ -129,13 +129,13 @@ message PasswordAgePolicy {
     zitadel.v1.ObjectDetails details = 1;
     uint64 max_age_days = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Maximum days of last password change"
+            description: "Maximum days since last password change"
             example: "\"365\""
         }
     ];
     uint64 expire_warn_days = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Days the user get remembered before his password expires"
+            description: "Days before the password expiry the user gets notified to change the password"
             example: "\"10\""
         }
     ];
@@ -154,6 +154,7 @@ message PasswordLockoutPolicy {
             example: "\"10\""
         }
     ];
+    // TODO: how to describe?
     bool show_lockout_failure = 3;
     bool is_default = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

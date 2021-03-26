@@ -74,6 +74,28 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 			}
 		}
 	}
+    responses: {
+        key: "403";
+        value: {
+            description: "Returned when the user does not have permission to access the resource.";
+            schema: {
+                json_schema: {
+                    ref: "#/definitions/rpcStatus";
+                }
+            }
+        }
+    }
+    responses: {
+        key: "404";
+        value: {
+            description: "Returned when the resource does not exist.";
+            schema: {
+                json_schema: {
+                    ref: "#/definitions/rpcStatus";
+                }
+            }
+        }
+    }
 };
 
 service AdminService {
@@ -153,17 +175,6 @@ service AdminService {
                 key: "200";
                 value: {
                     description: "requested org found";
-                };
-            };
-            responses: {
-                key: "404";
-                value: {
-                    description: "org not found";
-                    schema: {
-                        json_schema: {
-                            ref: "#/definitions/rpcStatus";
-                        };
-                    };
                 };
             };
         };
@@ -269,17 +280,6 @@ service AdminService {
                 };
             };
             responses: {
-                key: "404";
-                value: {
-                    description: "idp not found";
-                    schema: {
-                        json_schema: {
-                            ref: "#/definitions/rpcStatus";
-                        };
-                    };
-                };
-            };
-            responses: {
                 key: "400";
                 value: {
                     description: "invalid argument";
@@ -341,6 +341,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
+            tags: "oidc";
+
             external_docs: {
                 url: "https://docs.zitadel.ch/architecture#OpenID_Connect_1_0_and_OAuth_2_0";
                 description: "detailed descriptions about oidc configuration";
@@ -542,17 +544,6 @@ service AdminService {
                 key: "400";
                 value: {
                     description: "invalid argument";
-                    schema: {
-                        json_schema: {
-                            ref: "#/definitions/rpcStatus";
-                        };
-                    };
-                };
-            };
-            responses: {
-                key: "404";
-                value: {
-                    description: "not found";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -890,17 +881,6 @@ service AdminService {
                     description: "identity poviders added to default login policy";
                 };
             };
-            responses: {
-                key: "404";
-                value: {
-                    description: "idp not found";
-                    schema: {
-                        json_schema: {
-                            ref: "#/definitions/rpcStatus";
-                        };
-                    };
-                };
-            };
         };
     }
 
@@ -927,17 +907,6 @@ service AdminService {
                 key: "200";
                 value: {
                     description: "identity poviders removed from default login policy";
-                };
-            };
-            responses: {
-                key: "404";
-                value: {
-                    description: "idp not found";
-                    schema: {
-                        json_schema: {
-                            ref: "#/definitions/rpcStatus";
-                        };
-                    };
                 };
             };
         };
@@ -1039,17 +1008,6 @@ service AdminService {
                 key: "400";
                 value: {
                     description: "invalid second factor type";
-                    schema: {
-                        json_schema: {
-                            ref: "#/definitions/rpcStatus";
-                        };
-                    };
-                };
-            };
-            responses: {
-                key: "404";
-                value: {
-                    description: "second factor not defined on policy";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -1577,17 +1535,6 @@ service AdminService {
                     description: "View cleared";
                 };
             };
-            responses: {
-                key: "404";
-                value: {
-                    description: "view not found";
-                    schema: {
-                        json_schema: {
-                            ref: "#/definitions/rpcStatus";
-                        };
-                    };
-                };
-            };
         };
     }
 
@@ -1663,18 +1610,29 @@ message HealthzRequest {}
 
 message HealthzResponse {}
 
-// parameters are ANDed
+// parameters are ORed
 message IsOrgUniqueRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			description: "All unique fields of an organisation";
+			required: ["name", "domain"]
+		};
+	};
+
     string name = 1 [
-        (validate.rules).string.min_len = 1,
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"CAOS AG\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string domain = 2 [
-        (validate.rules).string.min_len = 1,
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"caos.ch\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
 }
@@ -1685,9 +1643,11 @@ message IsOrgUniqueResponse {
 
 message GetOrgByIDRequest {
     string id = 1 [
-        (validate.rules).string.min_len = 1,
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
 }
@@ -1697,6 +1657,13 @@ message GetOrgByIDResponse {
 }
 
 message ListOrgsRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			description: "Search query for lists";
+			required: ["query"]
+		};
+	};
+
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
     // the field the result is sorted
@@ -1714,7 +1681,7 @@ message ListOrgsResponse {
 message SetUpOrgRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
-			description: "Request to set up an organisation. User is requried";
+			description: "Request to set up an organisation. User is required";
 			required: ["org", "user"]
 		};
 	};
@@ -1862,6 +1829,7 @@ message SetUpOrgRequest {
     oneof user {
         option (validate.required) = true;
 
+        // oneof field for the user managing the organisation
         Human human = 2;
     }
 }
@@ -1910,10 +1878,18 @@ message ListIDPsResponse {
 }
 
 message AddOIDCIDPRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["name", "client_id", "client_secret", "issuer"]
+        };
+    };
+
     string name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"google\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     zitadel.idp.v1.IDPStylingType styling_type = 2 [
@@ -1926,12 +1902,16 @@ message AddOIDCIDPRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "client id generated by the identity provider";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string client_secret = 4 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "client secret generated by the identity provider";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string issuer = 5 [
@@ -1939,6 +1919,8 @@ message AddOIDCIDPRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the oidc issuer of the identity provider";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     repeated string scopes = 6 [
@@ -1967,11 +1949,20 @@ message AddOIDCIDPResponse {
 }
 
 message UpdateIDPRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			description: "Updates fields of an idp";
+			required: ["idp_id", "name"]
+		};
+	};
+
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"google\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     zitadel.idp.v1.IDPStylingType styling_type = 3 [
@@ -1987,7 +1978,19 @@ message UpdateIDPResponse {
 }
 
 message DeactivateIDPRequest {
-    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["idp_id"]
+		};
+	};
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message DeactivateIDPResponse {
@@ -1995,7 +1998,19 @@ message DeactivateIDPResponse {
 }
 
 message ReactivateIDPRequest {
-    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["idp_id"]
+		};
+	};
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message ReactivateIDPResponse {
@@ -2003,7 +2018,20 @@ message ReactivateIDPResponse {
 }
 
 message RemoveIDPRequest {
-    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["idp_id"]
+		};
+	};
+
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message RemoveIDPResponse {
@@ -2011,10 +2039,18 @@ message RemoveIDPResponse {
 }
 
 message UpdateIDPOIDCConfigRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["idp_id", "issuer", "client_id"]
+		};
+	};
+
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string issuer = 2 [
@@ -2022,18 +2058,23 @@ message UpdateIDPOIDCConfigRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the oidc issuer of the identity provider";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string client_id = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "client id generated by the identity provider";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string client_secret = 4 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "client secret generated by the identity provider. If empty the secret is not overwritten";
+            max_length: 200;
         }
     ];
     repeated string scopes = 5 [
@@ -2075,7 +2116,19 @@ message UpdateOrgIAMPolicyResponse {
 }
 
 message GetCustomOrgIAMPolicyRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"#69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message GetCustomOrgIAMPolicyResponse {
@@ -2084,8 +2137,25 @@ message GetCustomOrgIAMPolicyResponse {
 }
 
 message AddCustomOrgIAMPolicyRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    bool user_login_must_be_domain = 2;
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+    
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"#69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool user_login_must_be_domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the username has to end with the domain of it's organisation"
+        }
+    ];
 }
 
 message AddCustomOrgIAMPolicyResponse {
@@ -2093,8 +2163,25 @@ message AddCustomOrgIAMPolicyResponse {
 }
 
 message UpdateCustomOrgIAMPolicyRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    bool user_login_must_be_domain = 2;
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool user_login_must_be_domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the username has to end with the domain of it's organisation"
+        }
+    ];
 }
 
 message UpdateCustomOrgIAMPolicyResponse {
@@ -2102,7 +2189,20 @@ message UpdateCustomOrgIAMPolicyResponse {
 }
 
 message ResetCustomOrgIAMPolicyToDefaultRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message ResetCustomOrgIAMPolicyToDefaultResponse {
@@ -2116,8 +2216,30 @@ message GetLabelPolicyResponse {
 }
 
 message UpdateLabelPolicyRequest {
-    string primary_color = 1 [(validate.rules).string = {min_len: 1, max_len: 50}];
-    string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["primary_color", "secondary_color"]
+		};
+	};
+    
+    string primary_color = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "respresents a color scheme"
+            example: "\"#353535\"";
+            min_length: 1;
+            max_length: 50;
+        }
+    ];
+    string secondary_color = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "respresents a color scheme";
+            example: "\"#707070\"";
+            min_length: 1;
+            max_length: 50;
+        }
+    ];
 }
 
 message UpdateLabelPolicyResponse {
@@ -2131,11 +2253,31 @@ message GetLoginPolicyResponse {
 }
 
 message UpdateLoginPolicyRequest {
-    bool allow_username_password = 1;
-    bool allow_register = 2;
-    bool allow_external_idp = 3;
-    bool force_mfa = 4;
-    zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
+    bool allow_username_password = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if a user is allowed to login with his username and password"
+        }
+    ];
+    bool allow_register = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if a person is allowed to register a user on this organisation"
+        }
+    ];
+    bool allow_external_idp = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if a user is allowed to add a defined identity provider. E.g. Google auth"
+        }
+    ];
+    bool force_mfa = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if a user MUST use a multi factor to log in"
+        }
+    ];
+    zitadel.policy.v1.PasswordlessType passwordless_type = 5 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if passwordless is allowed for users"
+        }];
 }
 
 message UpdateLoginPolicyResponse {
@@ -2153,7 +2295,20 @@ message ListLoginPolicyIDPsResponse {
 }
 
 message AddIDPToLoginPolicyRequest {
-    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message AddIDPToLoginPolicyResponse {
@@ -2161,7 +2316,20 @@ message AddIDPToLoginPolicyResponse {
 }
 
 message RemoveIDPFromLoginPolicyRequest {
-    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["idp_id"]
+		};
+	};
+    
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message RemoveIDPFromLoginPolicyResponse {
@@ -2176,6 +2344,12 @@ message ListLoginPolicySecondFactorsResponse {
 }
 
 message AddSecondFactorToLoginPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["type"]
+		};
+	};
+    
     zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -2184,6 +2358,12 @@ message AddSecondFactorToLoginPolicyResponse {
 }
 
 message RemoveSecondFactorFromLoginPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["type"]
+		};
+	};
+
     zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -2199,6 +2379,12 @@ message ListLoginPolicyMultiFactorsResponse {
 }
 
 message AddMultiFactorToLoginPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["type"]
+		};
+	};
+
     zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -2207,6 +2393,12 @@ message AddMultiFactorToLoginPolicyResponse {
 }
 
 message RemoveMultiFactorFromLoginPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["type"]
+		};
+	};
+    
     zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -2221,11 +2413,31 @@ message GetPasswordComplexityPolicyResponse {
 }
 
 message UpdatePasswordComplexityPolicyRequest {
-    uint32 min_length = 1;
-    bool has_uppercase = 2;
-    bool has_lowercase = 3;
-    bool has_number = 4;
-    bool has_symbol = 5;
+    uint32 min_length = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"8\""
+        }
+    ];
+    bool has_uppercase = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the password MUST contain an upper case letter"
+        }
+    ];
+    bool has_lowercase = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the password MUST contain a lower case letter"
+        }
+    ];
+    bool has_number = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the password MUST contain a numer"
+        }
+    ];
+    bool has_symbol = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the password MUST contain a symbol. E.g. \"$\""
+        }
+    ];
 }
 
 message UpdatePasswordComplexityPolicyResponse {
@@ -2239,8 +2451,18 @@ message GetPasswordAgePolicyResponse {
 }
 
 message UpdatePasswordAgePolicyRequest {
-    uint32 max_age_days = 1;
-    uint32 expire_warn_days = 2;
+    uint32 max_age_days = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum days since last password change"
+            example: "\"365\""
+        }
+    ];
+    uint32 expire_warn_days = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Days before the password expiry the user gets notified to change the password"
+            example: "\"10\""
+        }
+    ];
 }
 
 message UpdatePasswordAgePolicyResponse {
@@ -2254,7 +2476,14 @@ message GetPasswordLockoutPolicyResponse {
 }
 
 message UpdatePasswordLockoutPolicyRequest {
-    uint32 max_attempts = 1;
+    // failed attempts until a user gets locked
+    uint32 max_attempts = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
+            example: "\"10\""
+        }
+    ];
+    // TODO: how to describe?
     bool show_lockout_failure = 2;
 }
 
@@ -2263,7 +2492,21 @@ message UpdatePasswordLockoutPolicyResponse {
 }
 
 message AddIAMMemberRequest {
-    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["user_id"]
+		};
+	};
+
+    string user_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    //if no roles provided the user won't have any rights
     repeated string roles = 2;
 }
 
@@ -2272,7 +2515,21 @@ message AddIAMMemberResponse {
 }
 
 message UpdateIAMMemberRequest {
-    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["user_id"]
+		};
+	};
+
+    string user_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    //if no roles provided the user won't have any rights
     repeated string roles = 2;
 }
 
@@ -2281,7 +2538,20 @@ message UpdateIAMMemberResponse {
 }
 
 message RemoveIAMMemberRequest {
-    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["user_id"]
+		};
+	};
+
+    string user_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message RemoveIAMMemberResponse {
@@ -2310,13 +2580,33 @@ message ListIAMMembersResponse {
 message ListViewsRequest {}
 
 message ListViewsResponse {
-    //TODO: search
+    //TODO: list details
     repeated View result = 1;
 }
 
 message ClearViewRequest {
-    string database = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string view_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["database", "view_name"]
+		};
+	};
+
+    string database = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"adminapi\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string view_name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"iam_members\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message ClearViewResponse {}
@@ -2324,21 +2614,31 @@ message ClearViewResponse {}
 message ListFailedEventsRequest {}
 
 message ListFailedEventsResponse {
-    //TODO: search
+    //TODO: list details
     repeated FailedEvent result = 1;
 }
 
 message RemoveFailedEventRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["database", "view_name", "failed_sequence"]
+		};
+	};
+
     string database = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"adminapi\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string view_name = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"iam_members\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     uint64 failed_sequence = 3 [
