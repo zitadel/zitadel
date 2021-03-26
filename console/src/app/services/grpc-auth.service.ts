@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
-import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
+import { catchError, filter, finalize, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import {
     AddMyAuthFactorOTPRequest,
@@ -34,6 +34,8 @@ import {
     ListMyUserGrantsResponse,
     ListMyUserSessionsRequest,
     ListMyUserSessionsResponse,
+    ListMyZitadelFeaturesRequest,
+    ListMyZitadelFeaturesResponse,
     ListMyZitadelPermissionsRequest,
     ListMyZitadelPermissionsResponse,
     RemoveMyAuthFactorOTPRequest,
@@ -81,7 +83,10 @@ export class GrpcAuthService {
     private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
     public user!: Observable<User.AsObject | undefined>;
     private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
+    private zitadelFeatures: BehaviorSubject<string[]> = new BehaviorSubject(['']);
+
     public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
+    public readonly fetchedZitadelFeatures: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
 
     private cachedOrgs: Org.AsObject[] = [];
 
@@ -114,11 +119,13 @@ export class GrpcAuthService {
             }),
             finalize(() => {
                 this.loadPermissions();
+                this.loadFeatures();
             }),
         );
 
         this.activeOrgChanged.subscribe(() => {
             this.loadPermissions();
+            this.loadFeatures();
         });
     }
 
@@ -164,12 +171,7 @@ export class GrpcAuthService {
     }
 
     private loadPermissions(): void {
-        merge([
-            // this.authenticationChanged,
-            this.activeOrgChanged.pipe(map(org => !!org)),
-        ]).pipe(
-            first(),
-            switchMap(() => from(this.listMyZitadelPermissions())),
+        from(this.listMyZitadelPermissions()).pipe(
             map(rolesResp => rolesResp.resultList),
             catchError(_ => {
                 return of([]);
@@ -179,6 +181,21 @@ export class GrpcAuthService {
             }),
         ).subscribe(roles => {
             this.zitadelPermissions.next(roles);
+        });
+    }
+
+    private loadFeatures(): void {
+        from(this.listMyZitadelFeatures()).pipe(
+            map(featuresResp => featuresResp.resultList),
+            catchError(_ => {
+                return of([]);
+            }),
+            finalize(() => {
+                this.fetchedZitadelFeatures.next(true);
+            }),
+        ).subscribe(features => {
+            console.log(features);
+            this.zitadelFeatures.next(features);
         });
     }
 
@@ -203,6 +220,31 @@ export class GrpcAuthService {
         return requestedRoles.findIndex((regexp: any) => {
             return userRoles.findIndex(role => {
                 return new RegExp(regexp).test(role);
+            }) > -1;
+        }) > -1;
+    }
+
+    /**
+     * returns true if user has one of the provided features
+     * @param features regex of the user
+     */
+    public canUseFeature(features: string[] | RegExp[]): Observable<boolean> {
+        if (features && features.length > 0) {
+            return this.zitadelPermissions.pipe(switchMap(zFeatures => of(this.hasFeature(zFeatures, features))));
+        } else {
+            return of(false);
+        }
+    }
+
+    /**
+     * returns true if user has one of the provided features
+     * @param userFeature features of the user
+     * @param requestedFeature required features for accessing the respective component
+     */
+    public hasFeature(userFeatures: string[], requestedFeatures: string[] | RegExp[]): boolean {
+        return requestedFeatures.findIndex((regexp: any) => {
+            return userFeatures.findIndex(feature => {
+                return new RegExp(regexp).test(feature);
             }) > -1;
         }) > -1;
     }
@@ -326,6 +368,12 @@ export class GrpcAuthService {
     public listMyZitadelPermissions(): Promise<ListMyZitadelPermissionsResponse.AsObject> {
         return this.grpcService.auth.listMyZitadelPermissions(
             new ListMyZitadelPermissionsRequest(), null
+        ).then(resp => resp.toObject());
+    }
+
+    public listMyZitadelFeatures(): Promise<ListMyZitadelFeaturesResponse.AsObject> {
+        return this.grpcService.auth.listMyZitadelFeatures(
+            new ListMyZitadelFeaturesRequest(), null
         ).then(resp => resp.toObject());
     }
 

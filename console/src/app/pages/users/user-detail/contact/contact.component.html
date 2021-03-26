@@ -25,8 +25,7 @@
                 <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
                 <ng-container *ngIf="human?.email">
-                    <a *ngIf="canWrite && state != userStateEnum?.USERSTATE_INITIAL" class="verify"
-                        matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
+                    <a *ngIf="canWrite" class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
                         (click)="emitEmailVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
                 </ng-container>
             </div>
@@ -35,7 +34,8 @@
         </div>
 
         <div class="right">
-            <button matTooltip="{{'ACTIONS.EDIT' | translate}}" [disabled]="!canWrite"
+            <button matTooltip="{{'ACTIONS.EDIT' | translate}}"
+                [disabled]="!canWrite || state == UserState.USER_STATE_INITIAL"
                 (click)="openEditDialog(EditDialogType.EMAIL)" mat-icon-button>
                 <i class="las la-edit"></i>
             </button>
