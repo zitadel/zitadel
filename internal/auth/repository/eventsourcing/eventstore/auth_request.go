@@ -244,7 +244,11 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if request.RequestedOrgID != "" && request.RequestedOrgID != user.ResourceOwner {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-fJe2a", "Errors.User.NotAllowedOrg")
 	}
-	request.SetUserInfo(user.ID, user.UserName, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
+	username := user.UserName
+	if request.RequestedOrgID == "" {
+		username = user.PreferredLoginName
+	}
+	request.SetUserInfo(user.ID, username, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
