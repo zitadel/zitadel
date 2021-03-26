@@ -827,7 +827,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.role.write"
-            check_field_name: "Id"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -840,7 +840,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.role.write"
-            check_field_name: "Id"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -852,7 +852,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.role.write"
-            check_field_name: "Id"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -864,7 +864,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.role.delete"
-            check_field_name: "Id"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -910,7 +910,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.member.write"
-            check_field_name: "Id"
+            check_field_name: "ProjectId"
         };
     }
 
