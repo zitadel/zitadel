@@ -67,6 +67,7 @@ import {
     VerifyMyPhoneRequest,
     VerifyMyPhoneResponse,
 } from '../proto/generated/zitadel/auth_pb';
+import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { Gender, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
@@ -455,14 +456,15 @@ export class GrpcAuthService {
         return this.grpcService.auth.verifyMyPhone(req, null).then(resp => resp.toObject());
     }
 
-    public listMyUserChanges(limit: number, offset: number): Promise<ListMyUserChangesResponse.AsObject> {
+    public listMyUserChanges(limit: number, sequence: number): Promise<ListMyUserChangesResponse.AsObject> {
         const req = new ListMyUserChangesRequest();
-        const query = new ListQuery();
+        const query = new ChangeQuery();
+
         if (limit) {
             query.setLimit(limit);
         }
-        if (offset) {
-            query.setOffset(offset);
+        if (sequence) {
+            query.setSequence(sequence);
         }
         req.setQuery(query);
         return this.grpcService.auth.listMyUserChanges(req, null).then(resp => resp.toObject());
