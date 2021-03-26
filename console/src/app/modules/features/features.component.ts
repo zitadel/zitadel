@@ -97,7 +97,6 @@ export class FeaturesComponent implements OnDestroy {
                 req.setPasswordComplexityPolicy(this.features.passwordComplexityPolicy);
                 req.setLabelPolicy(this.features.labelPolicy);
 
-                console.log(req.getLabelPolicy());
                 this.adminService.setOrgFeatures(req).then(() => {
                     this.toast.showInfo('POLICY.TOAST.SET', true);
                 }).catch(error => {
