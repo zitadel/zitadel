@@ -65,7 +65,6 @@ export class FeaturesComponent implements OnDestroy {
         this.getData().then(resp => {
             if (resp?.features) {
                 this.features = resp.features;
-                console.log(resp);
             }
         });
     }
@@ -75,7 +74,6 @@ export class FeaturesComponent implements OnDestroy {
             case FeatureServiceType.MGMT:
                 return this.managementService.getFeatures();
             case FeatureServiceType.ADMIN:
-                console.log(this.org.id);
                 if (this.org?.id) {
                     return this.adminService.getDefaultFeatures();
                 }

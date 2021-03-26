@@ -27,13 +27,11 @@ export class ApplicationGridComponent implements OnInit {
     public loadApps(): void {
         from(this.mgmtService.listApps(this.projectId, 100, 0)).pipe(
             map(resp => {
-                console.log(resp.resultList);
                 return resp.resultList;
             }),
             // catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe((apps) => {
-            console.log(apps);
             this.appsSubject.next(apps as App.AsObject[]);
         });
     }

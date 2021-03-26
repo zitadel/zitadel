@@ -109,7 +109,6 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     private async getData(limit?: number, offset?: number): Promise<void> {
         this.loadingSubject.next(true);
         this.mgmtService.listProjects(limit, offset).then(resp => {
-            console.log(resp.resultList);
             this.ownedProjectList = resp.resultList;
             if (resp.details?.totalResult) {
                 this.totalResult = resp.details.totalResult;

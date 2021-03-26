@@ -196,7 +196,6 @@ export class OrgCreateComponent {
                 name: ['', [Validators.required]],
             });
 
-            console.log(this.orgForm);
         } else {
             this.createSteps = 2;
 

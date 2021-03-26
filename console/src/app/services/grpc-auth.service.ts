@@ -194,7 +194,6 @@ export class GrpcAuthService {
                 this.fetchedZitadelFeatures.next(true);
             }),
         ).subscribe(features => {
-            console.log(features);
             this.zitadelFeatures.next(features);
         });
     }
