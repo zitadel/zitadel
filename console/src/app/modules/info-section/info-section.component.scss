@@ -20,7 +20,6 @@
         margin-left: .5rem;
     }
 
-
     .info-section-content {
         flex: 1;
     }
@@ -37,6 +36,10 @@
     &.warn {
         background-color: if($is-dark-theme, #4f566b, #ffc1c1);
         color: if($is-dark-theme, #ffc1c1, #620e0e);
+
+        .icon {
+            color: if($is-dark-theme, #ffc1c1, #620e0e);
+        }
     }
   }
 }

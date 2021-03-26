@@ -578,7 +578,8 @@
             "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwortlose Authentifizierung",
             "LOGINPOLICYCOMPLEXITYPOLICY":"Password Komplexitätseinstellungen",
             "LABELPOLICY":"Labelling Einstellungen"
-        }
+        },
+        "NOTAVAILABLE":"Feature {{value}} is missing on your organization."
     },
     "POLICY": {
         "TITLE":"Explore Policies",

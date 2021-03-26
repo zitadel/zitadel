@@ -10,7 +10,7 @@
         {{(componentType == LoginMethodComponentType.SecondFactor ? 'MFA.SECONDFACTORTYPES.':
         LoginMethodComponentType.MultiFactor ? 'MFA.MULTIFACTORTYPES.': '')+mfa | translate}}
     </div>
-    <div class="new-mfa" (click)="addMfa()" matRipple>
+    <div class="new-mfa" [ngClass]="{'disabled': disabled}" (click)="!disabled ? addMfa(): null" matRipple>
         <mat-icon>add</mat-icon>
     </div>
 </div>

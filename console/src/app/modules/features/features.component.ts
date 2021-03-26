@@ -77,7 +77,7 @@ export class FeaturesComponent implements OnDestroy {
             case FeatureServiceType.ADMIN:
                 console.log(this.org.id);
                 if (this.org?.id) {
-                    return this.adminService.getOrgFeatures(this.org.id);
+                    return this.adminService.getDefaultFeatures();
                 }
                 break;
         }

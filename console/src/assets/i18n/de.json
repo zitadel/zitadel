@@ -580,7 +580,8 @@
             "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwordless Authentication",
             "LOGINPOLICYCOMPLEXITYPOLICY":"Password Complexity Settings",
             "LABELPOLICY":"Label Policy"
-        }
+        },
+        "NOTAVAILABLE":"Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!"
     },
     "POLICY": {
         "TITLE":"Richtlinen entdecken",
