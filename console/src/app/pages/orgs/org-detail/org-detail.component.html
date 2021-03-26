@@ -28,6 +28,13 @@
             </app-card>
         </ng-container>
 
+        <h2>{{'FEATURES.TITLE' | translate}}</h2>
+        <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
+        <div>
+
+        </div>
+        <button mat-raised-button [routerLink]="['features']">{{'FEATURES.BTN-EDIT' | translate}}</button>
+
         <ng-template appHasRole [appHasRole]="['policy.read']">
             <app-policy-grid [type]="PolicyGridType.ORG"></app-policy-grid>
         </ng-template>

@@ -3,6 +3,13 @@
         <h1 class="h1">{{'IAM.POLICIES.TITLE' | translate}}</h1>
         <p class="sub">{{'IAM.POLICIES.DESCRIPTION' | translate}} </p>
 
+        <h2>{{'FEATURES.TITLE' | translate}}</h2>
+        <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
+        <div>
+
+        </div>
+        <button mat-raised-button [routerLink]="['/iam','features']">{{'FEATURES.BTN-EDIT' | translate}}</button>
+
         <app-policy-grid [type]="PolicyGridType.IAM"></app-policy-grid>
     </div>
 

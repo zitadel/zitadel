@@ -566,6 +566,20 @@
             "SETPRIMARY":"Primary domain set."
         }
     },
+    "FEATURES": {
+        "TITLE":"Features",
+        "DESCRIPTION":"here you can see your Features as well as your Tier your subscribed on.",
+        "BTN-EDIT":"Edit Featureset",
+        "DATA": {
+            "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Benutzername als Loginname",
+            "LOGINPOLICYREGISTRATION":"Login Policy - Registration",
+            "LOGINPOLICYIDP":"Login Policy - Identity Provider",
+            "LOGINPOLICYFACTORS":"Login Policy - Multifaktoren",
+            "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwortlose Authentifizierung",
+            "LOGINPOLICYCOMPLEXITYPOLICY":"Password Komplexitätseinstellungen",
+            "LABELPOLICY":"Labelling Einstellungen"
+        }
+    },
     "POLICY": {
         "TITLE":"Explore Policies",
         "DESCRIPTION":"Pre-packaged policies that enhance your security.",

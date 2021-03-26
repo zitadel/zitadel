@@ -2,6 +2,17 @@
   margin-top: 0;
 }
 
+h2 {
+  font-size: 1.2rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+  
+.top-desc {
+  color: var(--grey);
+  font-size: 14px;
+}
+
 .sub {
   color: var(--grey);
   margin-bottom: 2rem;

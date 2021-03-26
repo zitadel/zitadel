@@ -19,12 +19,16 @@ import {
     DeactivateIDPResponse,
     GetCustomOrgIAMPolicyRequest,
     GetCustomOrgIAMPolicyResponse,
+    GetDefaultFeaturesRequest,
+    GetDefaultFeaturesResponse,
     GetIDPByIDRequest,
     GetIDPByIDResponse,
     GetLabelPolicyRequest,
     GetLabelPolicyResponse,
     GetLoginPolicyRequest,
     GetLoginPolicyResponse,
+    GetOrgFeaturesRequest,
+    GetOrgFeaturesResponse,
     GetOrgIAMPolicyRequest,
     GetOrgIAMPolicyResponse,
     GetPasswordAgePolicyRequest,
@@ -66,6 +70,12 @@ import {
     RemoveSecondFactorFromLoginPolicyResponse,
     ResetCustomOrgIAMPolicyToDefaultRequest,
     ResetCustomOrgIAMPolicyToDefaultResponse,
+    ResetOrgFeaturesRequest,
+    ResetOrgFeaturesResponse,
+    SetDefaultFeaturesRequest,
+    SetDefaultFeaturesResponse,
+    SetOrgFeaturesRequest,
+    SetOrgFeaturesResponse,
     SetUpOrgRequest,
     SetUpOrgResponse,
     UpdateCustomOrgIAMPolicyRequest,
@@ -165,6 +175,33 @@ export class AdminService {
         req.setViewName(viewname);
         req.setFailedSequence(sequence);
         return this.grpcService.admin.removeFailedEvent(req, null).then(resp => resp.toObject());;
+    }
+
+    // Features
+
+    public getOrgFeatures(orgId: string): Promise<GetOrgFeaturesResponse.AsObject> {
+        const req = new GetOrgFeaturesRequest();
+        req.setOrgId(orgId);
+        return this.grpcService.admin.getOrgFeatures(req, null).then(resp => resp.toObject());
+    }
+
+    public setOrgFeatures(req: SetOrgFeaturesRequest): Promise<SetOrgFeaturesResponse.AsObject> {
+        return this.grpcService.admin.setOrgFeatures(req, null).then(resp => resp.toObject());
+    }
+
+    public resetOrgFeatures(orgId: string): Promise<ResetOrgFeaturesResponse.AsObject> {
+        const req = new ResetOrgFeaturesRequest();
+        req.setOrgId(orgId);
+        return this.grpcService.admin.resetOrgFeatures(req, null).then(resp => resp.toObject());
+    }
+
+    public getDefaultFeatures(): Promise<GetDefaultFeaturesResponse.AsObject> {
+        const req = new GetDefaultFeaturesRequest();
+        return this.grpcService.admin.getDefaultFeatures(req, null).then(resp => resp.toObject());
+    }
+
+    public setDefaultFeatures(req: SetDefaultFeaturesRequest): Promise<SetDefaultFeaturesResponse.AsObject> {
+        return this.grpcService.admin.setDefaultFeatures(req, null).then(resp => resp.toObject());
     }
 
     /* Policies */

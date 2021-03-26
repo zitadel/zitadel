@@ -49,7 +49,9 @@ export class OrgDetailComponent implements OnInit {
         public mgmtService: ManagementService,
         private toast: ToastService,
         private router: Router,
-    ) { }
+    ) {
+
+    }
 
     public ngOnInit(): void {
         this.getData();

@@ -1,0 +1,72 @@
+<app-detail-layout [backRouterLink]="[ serviceType === FeatureServiceType.ADMIN ? '/iam/policies' : '/org']"
+    [title]="'FEATURES.TITLE' | translate" [description]="'FEATURES.DESCRIPTION' | translate">
+    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
+
+    <ng-template appHasRole [appHasRole]="['iam.policy.delete']">
+        <button *ngIf="serviceType === FeatureServiceType.MGMT && !isDefault"
+            matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="resetFeatures()" mat-stroked-button>
+            {{'POLICY.RESET' | translate}}
+        </button>
+    </ng-template>
+
+    <div class="content" *ngIf="features">
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYUSERNAMELOGIN' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="features.loginPolicyUsernameLogin">
+            </mat-slide-toggle>
+        </div>
+
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYREGISTRATION' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="features.loginPolicyRegistration">
+            </mat-slide-toggle>
+        </div>
+
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYIDP' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.loginPolicyIdp">
+            </mat-slide-toggle>
+        </div>
+
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYFACTORS' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="features.loginPolicyFactors">
+            </mat-slide-toggle>
+        </div>
+
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYPASSWORDLESS' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="features.loginPolicyPasswordless">
+            </mat-slide-toggle>
+        </div>
+
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYCOMPLEXITYPOLICY' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                [(ngModel)]="features.passwordComplexityPolicy">
+            </mat-slide-toggle>
+        </div>
+
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.LABELPOLICY' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicy">
+            </mat-slide-toggle>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
+            }}</button>
+    </div>
+</app-detail-layout>

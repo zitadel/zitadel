@@ -93,7 +93,7 @@ export class AuthFactorDialogComponent {
     public submitU2F(): void {
         if (this.u2fname && this.u2fCredentialOptions.publicKey) {
             // this.data.credOptions.publicKey.rp.id = 'localhost';
-            navigator.credentials.create(this.data.credOptions).then((resp) => {
+            navigator.credentials.create(this.u2fCredentialOptions).then((resp) => {
                 if (resp &&
                     (resp as any).response.attestationObject &&
                     (resp as any).response.clientDataJSON &&

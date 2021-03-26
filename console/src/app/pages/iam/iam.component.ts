@@ -29,6 +29,7 @@ export class IamComponent {
     constructor(public adminService: AdminService, private dialog: MatDialog, private toast: ToastService,
         private router: Router) {
         this.loadMembers();
+        this.adminService.getDefaultFeatures();
     }
 
     public loadMembers(): void {

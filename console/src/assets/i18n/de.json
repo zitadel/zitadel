@@ -568,6 +568,20 @@
             "SETPRIMARY":"Primäre Domain gesetzt."
         }
     },
+    "FEATURES": {
+        "TITLE":"Features",
+        "DESCRIPTION":"Hier sehen Sie Ihre Funktionen sowie Ihre Tier",
+        "BTN-EDIT":"Featureset anpassen",
+        "DATA": {
+            "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Username as login",
+            "LOGINPOLICYREGISTRATION":"Login Policy - Registration",
+            "LOGINPOLICYIDP":"Login Policy - Identity Providers",
+            "LOGINPOLICYFACTORS":"Login Policy - Factors",
+            "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwordless Authentication",
+            "LOGINPOLICYCOMPLEXITYPOLICY":"Password Complexity Settings",
+            "LABELPOLICY":"Label Policy"
+        }
+    },
     "POLICY": {
         "TITLE":"Richtlinen entdecken",
         "DESCRIPTION":"Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
