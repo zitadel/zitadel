@@ -56,9 +56,6 @@ func (q *SearchQuery) LatestSequenceFilter(sequence uint64) *SearchQuery {
 		return q
 	}
 	sortOrder := Operation_Greater
-	if q.Desc {
-		sortOrder = Operation_Less
-	}
 	return q.setFilter(NewFilter(Field_LatestSequence, sequence, sortOrder))
 }
 
