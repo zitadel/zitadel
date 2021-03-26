@@ -420,7 +420,7 @@ message GetMyUserResponse {
 }
 
 message ListMyUserChangesRequest {
-    zitadel.v1.ListQuery query = 1;
+    zitadel.change.v1.ChangeQuery query = 1;
 }
 
 message ListMyUserChangesResponse {
