@@ -21,9 +21,6 @@
                 required>
         </div>
 
-        <button class="lgn-button lgn-primary block" type="submit" name="resend" value="true"
-            formnovalidate>{{t "Actions.Resend" }}</button>
-
         {{ if not .PasswordSet }}
         <div class="field">
             <label class="lgn-label" for="password">{{t "InitUser.NewPassword"}}</label>
@@ -43,13 +40,18 @@
 
     {{ template "error-message" .}}
 
-    <div class="lgn-actions">
-        <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+    <div class="lgn-actions lgn-reverse-order">
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
         </a>
-        <span class="fill-space"></span>
+
         <button type="submit" id="init-button" name="resend" value="false"
             class="lgn-primary lgn-raised-button">{{t "Actions.Next"}}</button>
+
+        <span class="fill-space"></span>
+
+        <button type="submit" name="resend" value="true" class="lgn-stroked-button" formnovalidate>{{t "Actions.Resend" }}</button>
     </div>
 </form>
 
