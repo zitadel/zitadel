@@ -571,6 +571,7 @@
         "DESCRIPTION":"here you can edit your ZITADEL Features based on your Tier",
         "BTN-EDIT":"Edit Featureset",
         "DATA": {
+            "AUDITLOGRETENTION":"Audit Log retention",
             "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Benutzername als Loginname",
             "LOGINPOLICYREGISTRATION":"Login Policy - Registration",
             "LOGINPOLICYIDP":"Login Policy - Identity Provider",

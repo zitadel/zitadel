@@ -10,6 +10,12 @@
     </ng-template>
 
     <div class="content" *ngIf="features">
+
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.AUDITLOGRETENTION' | translate}}</span>
+            <span class="fill-space"></span>
+            <span>{{features.auditLogRetention | json }}</span>
+        </div>
         <div class="row">
             <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYUSERNAMELOGIN' | translate}}</span>
             <span class="fill-space"></span>
