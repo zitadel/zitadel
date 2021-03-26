@@ -568,7 +568,7 @@
     },
     "FEATURES": {
         "TITLE":"Features",
-        "DESCRIPTION":"here you can see your Features as well as your Tier your subscribed on.",
+        "DESCRIPTION":"here you can edit your ZITADEL Features based on your Tier",
         "BTN-EDIT":"Edit Featureset",
         "DATA": {
             "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Benutzername als Loginname",
@@ -578,6 +578,12 @@
             "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwortlose Authentifizierung",
             "LOGINPOLICYCOMPLEXITYPOLICY":"Password Komplexitätseinstellungen",
             "LABELPOLICY":"Labelling Einstellungen"
+        },
+        "TIERSTATES": {
+            "0":"Active",
+            "1":"Action required",
+            "2":"Cancelled",
+            "3":"Grandfathered"
         },
         "NOTAVAILABLE":"Feature {{value}} is missing on your organization."
     },

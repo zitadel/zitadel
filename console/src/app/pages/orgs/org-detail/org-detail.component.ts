@@ -10,6 +10,7 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { PolicyGridType } from 'src/app/modules/policy-grid/policy-grid.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { Features } from 'src/app/proto/generated/zitadel/features_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Domain, Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -43,6 +44,8 @@ export class OrgDetailComponent implements OnInit {
         = new BehaviorSubject<Member.AsObject[]>([]);
     public PolicyGridType: any = PolicyGridType;
 
+    public features!: Features.AsObject;
+
     constructor(
         private dialog: MatDialog,
         public translate: TranslateService,
@@ -67,6 +70,7 @@ export class OrgDetailComponent implements OnInit {
         });
         this.loadMembers();
         this.loadDomains();
+        this.loadFeatures();
     }
 
     public loadDomains(): void {
@@ -208,6 +212,15 @@ export class OrgDetailComponent implements OnInit {
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe(members => {
             this.membersSubject.next(members);
+        });
+    }
+
+    public loadFeatures(): void {
+        this.loadingSubject.next(true);
+        this.mgmtService.getFeatures().then(resp => {
+            if (resp.features) {
+                this.features = resp.features;
+            }
         });
     }
 }

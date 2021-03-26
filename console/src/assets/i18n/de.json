@@ -570,7 +570,7 @@
     },
     "FEATURES": {
         "TITLE":"Features",
-        "DESCRIPTION":"Hier sehen Sie Ihre Funktionen sowie Ihre Tier",
+        "DESCRIPTION":"Hier können Sie Funktionen von ZITADEL auf Basis von Ihrem Tier aktivieren sowie deaktivieren.",
         "BTN-EDIT":"Featureset anpassen",
         "DATA": {
             "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Username as login",
@@ -580,6 +580,12 @@
             "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwordless Authentication",
             "LOGINPOLICYCOMPLEXITYPOLICY":"Password Complexity Settings",
             "LABELPOLICY":"Label Policy"
+        },
+        "TIERSTATES": {
+            "0":"Aktiv",
+            "1":"Aktion erforderlich",
+            "2":"Annuliert",
+            "3":"Besitzstandswahrend"
         },
         "NOTAVAILABLE":"Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!"
     },
