@@ -438,10 +438,10 @@
             "REMOVE":"Remove",
             "TYPE":"Type",
             "TYPES":{
-                "0":"Unknown",
-                "1":"Organisation",
-                "2":"Project",
-                "3":"Granted Project"
+                "UNKNOWN":"Unknown",
+                "ORG":"Organisation",
+                "PROJECT":"Project",
+                "GRANTEDPROJECT":"Granted Project"
             }
         }
     },
@@ -565,6 +565,28 @@
             "MEMBERCHANGED":"Manager changed.",
             "SETPRIMARY":"Primary domain set."
         }
+    },
+    "FEATURES": {
+        "TITLE":"Features",
+        "DESCRIPTION":"here you can edit your ZITADEL Features based on your Tier",
+        "BTN-EDIT":"Edit Featureset",
+        "DATA": {
+            "AUDITLOGRETENTION":"Audit Log retention",
+            "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Benutzername als Loginname",
+            "LOGINPOLICYREGISTRATION":"Login Policy - Registration",
+            "LOGINPOLICYIDP":"Login Policy - Identity Provider",
+            "LOGINPOLICYFACTORS":"Login Policy - Multifaktoren",
+            "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwortlose Authentifizierung",
+            "LOGINPOLICYCOMPLEXITYPOLICY":"Password Komplexitätseinstellungen",
+            "LABELPOLICY":"Labelling Einstellungen"
+        },
+        "TIERSTATES": {
+            "0":"Active",
+            "1":"Action required",
+            "2":"Cancelled",
+            "3":"Grandfathered"
+        },
+        "NOTAVAILABLE":"Feature {{value}} is missing on your organization."
     },
     "POLICY": {
         "TITLE":"Explore Policies",

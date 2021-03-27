@@ -101,7 +101,6 @@ export class LoginPolicyComponent implements OnDestroy {
         });
         this.getIdps().then(resp => {
             this.idps = resp;
-            console.log(resp);
         });
     }
 
@@ -144,7 +143,6 @@ export class LoginPolicyComponent implements OnDestroy {
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
                 mgmtreq.setForceMfa(this.loginData.forceMfa);
                 mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
-                // console.log(mgmtreq.toObject());
                 if ((this.loginData as LoginPolicy.AsObject).isDefault) {
                     return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
                 } else {
@@ -157,8 +155,6 @@ export class LoginPolicyComponent implements OnDestroy {
                 adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
                 adminreq.setForceMfa(this.loginData.forceMfa);
                 adminreq.setPasswordlessType(this.loginData.passwordlessType);
-
-                // console.log(adminreq.toObject());
 
                 return (this.service as AdminService).updateLoginPolicy(adminreq);
         }

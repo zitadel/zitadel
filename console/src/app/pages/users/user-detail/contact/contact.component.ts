@@ -21,7 +21,7 @@ export class ContactComponent {
     @Output() resendPhoneVerification: EventEmitter<void> = new EventEmitter();
     @Output() enteredPhoneCode: EventEmitter<string> = new EventEmitter();
     @Output() deletedPhone: EventEmitter<void> = new EventEmitter();
-    @Input() public userStateEnum: any;
+    public UserState: any = UserState;
 
     public EditDialogType: any = EditDialogType;
     constructor(private dialog: MatDialog) { }

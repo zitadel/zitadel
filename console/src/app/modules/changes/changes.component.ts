@@ -75,7 +75,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
     }
 
     public scrollHandler(e: any): void {
-        console.log('bottom');
         if (e === 'bottom') {
             this.more();
         }
@@ -107,7 +106,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
 
     private more(): void {
         const cursor = this.getCursor();
-        console.log('cursor' + cursor);
 
         let more: Promise<ListChanges>;
 
@@ -152,7 +150,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
                 take(1),
                 tap((res: ListChanges) => {
                     const values = res.resultList;
-                    console.log(values);
                     const mapped = this.mapChanges(values);
                     // update source with new values, done loading
                     // this._data.next(values);
@@ -226,7 +223,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
             return parseFloat(b.key) - parseFloat(a.key);
         });
 
-        // console.log(arr);
         return arr;
     }
 
@@ -237,7 +233,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
 
     getTimestampIndex(date: any): number {
         const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000 / 1000);
-        console.log(ts);
         return ts.getTime();
     }
 

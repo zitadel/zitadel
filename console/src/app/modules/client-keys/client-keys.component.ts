@@ -86,7 +86,6 @@ export class ClientKeysComponent implements OnInit {
 
                 if (resp.date as Moment) {
                     const ts = new Timestamp();
-                    console.log(resp.date.toDate());
                     const milliseconds = resp.date.toDate().getTime();
                     const seconds = Math.abs(milliseconds / 1000);
                     const nanos = (milliseconds - seconds * 1000) * 1000 * 1000;

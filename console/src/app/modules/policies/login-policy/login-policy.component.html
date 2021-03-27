@@ -37,9 +37,17 @@
                 [(ngModel)]="loginData.allowRegister">
                 {{'POLICY.DATA.ALLOWREGISTER' | translate}}
             </mat-slide-toggle>
-            <cnsl-info-section class="info">
-                {{'POLICY.DATA.ALLOWREGISTER_DESC' | translate}}
-            </cnsl-info-section>
+
+            <ng-container *ngIf="(['login_policy.registration'] | hasFeature | async) == false; else regInfo">
+                <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+                    'login_policy.registration'})}}
+                </cnsl-info-section>
+            </ng-container>
+            <ng-template #regInfo>
+                <cnsl-info-section class="info">
+                    {{'POLICY.DATA.ALLOWREGISTER_DESC' | translate}}
+                </cnsl-info-section>
+            </ng-template>
         </div>
         <div class="row">
             <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
@@ -60,14 +68,21 @@
             </cnsl-info-section>
         </div>
         <div class="row">
+
             <cnsl-form-field class="form-field" label="Access Code" required="true">
                 <cnsl-label>{{'LOGINPOLICY.PASSWORDLESS' | translate}}</cnsl-label>
-                <mat-select [(ngModel)]="loginData.passwordlessType">
+                <mat-select [(ngModel)]="loginData.passwordlessType"
+                    [disabled]="disabled || (['login_policy.passwordless'] | hasFeature | async) == false">
                     <mat-option *ngFor="let pt of passwordlessTypes" [value]="pt">
                         {{'LOGINPOLICY.PASSWORDLESSTYPE.'+pt | translate}}
                     </mat-option>
                 </mat-select>
             </cnsl-form-field>
+            <ng-container *ngIf="(['login_policy.passwordless'] | hasFeature | async) == false">
+                <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+                    'login_policy.passwordless'})}}
+                </cnsl-info-section>
+            </ng-container>
         </div>
     </div>
 
@@ -79,24 +94,40 @@
     <ng-container *ngIf="!isDefault">
         <h3 class="subheader">{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
         <p class="subdesc">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
+        <ng-container *ngIf="(['login_policy.factors'] | hasFeature | async) == false">
+            <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.factors'})}}
+            </cnsl-info-section>
+        </ng-container>
         <app-mfa-table [service]="service" [serviceType]="serviceType"
             [componentType]="LoginMethodComponentType.MultiFactor"
-            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false">
+            [disabled]="(([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false) || ((['login_policy.factors'] | hasFeature | async) == false)">
         </app-mfa-table>
 
         <h3 class="subheader">{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
         <p class="subdesc">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
+        <ng-container *ngIf="(['login_policy.factors'] | hasFeature | async) == false">
+            <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.factors'})}}
+            </cnsl-info-section>
+        </ng-container>
         <app-mfa-table [service]="service" [serviceType]="serviceType"
             [componentType]="LoginMethodComponentType.SecondFactor"
-            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false">
+            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false || ((['login_policy.factors'] | hasFeature | async) == false)">
         </app-mfa-table>
     </ng-container>
 
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>
 
+    <ng-container *ngIf="(['login_policy.idp'] | hasFeature | async) == false">
+        <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+            'login_policy.idp'})}}
+        </cnsl-info-section>
+    </ng-container>
+
     <div class="idps">
-        <div class="idp" [ngClass]="{'disabled': disabled}" *ngFor="let idp of idps">
-            <button [disabled]="disabled" mat-icon-button (click)="removeIdp(idp)" class="rm">
+        <div class="idp" [ngClass]="{'disabled': disabled || (['login_policy.idp'] | hasFeature | async) == false}"
+            *ngFor="let idp of idps">
+            <button [disabled]="disabled || (['login_policy.idp'] | hasFeature | async) == false" mat-icon-button
+                (click)="removeIdp(idp)" class="rm">
                 <mat-icon matTooltip="{{'ACTIONS.REMOVE' | translate}}">
                     remove_circle</mat-icon>
             </button>
@@ -105,13 +136,15 @@
                     *ngIf="idp.stylingType == IDPStylingType.STYLING_TYPE_GOOGLE" alt="google" />
                 <div>
                     <span class="name">{{idp.name}}</span>
-                    <span class="meta-info">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.OWNERTYPES.'+idp.idpType | translate
+                    <span class="meta-info">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.OWNERTYPES.'+idp.idpType |
+                        translate
                         }}</span>
                     <span class="meta-info">{{ 'IDP.ID' | translate }}: {{idp.idpId}}</span>
                 </div>
             </div>
         </div>
-        <div *ngIf="!disabled" class="new-idp" (click)="openDialog()" matRipple>
+        <div *ngIf="!disabled && (['login_policy.idp'] | hasFeature | async)" class="new-idp" (click)="openDialog()"
+            matRipple>
             <mat-icon>add</mat-icon>
         </div>
     </div>
@@ -127,7 +160,7 @@
                 <i class="lab la-gitlab"></i>
             </div>
             <app-idp-table [service]="service" [serviceType]="serviceType"
-                [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false">
+                [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false || (['login_policy.idp'] | hasFeature | async) == false">
             </app-idp-table>
         </app-card>
     </ng-template>

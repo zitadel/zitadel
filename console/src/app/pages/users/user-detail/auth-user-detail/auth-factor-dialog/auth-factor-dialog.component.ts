@@ -56,7 +56,6 @@ export class AuthFactorDialogComponent {
                     const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
 
                     if (credOptions.publicKey?.challenge) {
-                        console.log(credOptions.publicKey);
                         credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
                         credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
                         if (credOptions.publicKey.excludeCredentials) {
@@ -93,13 +92,12 @@ export class AuthFactorDialogComponent {
     public submitU2F(): void {
         if (this.u2fname && this.u2fCredentialOptions.publicKey) {
             // this.data.credOptions.publicKey.rp.id = 'localhost';
-            navigator.credentials.create(this.data.credOptions).then((resp) => {
+            navigator.credentials.create(this.u2fCredentialOptions).then((resp) => {
                 if (resp &&
                     (resp as any).response.attestationObject &&
                     (resp as any).response.clientDataJSON &&
                     (resp as any).rawId) {
 
-                    console.log(resp);
                     const attestationObject = (resp as any).response.attestationObject;
                     const clientDataJSON = (resp as any).response.clientDataJSON;
                     const rawId = (resp as any).rawId;

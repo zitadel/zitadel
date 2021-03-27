@@ -25,7 +25,6 @@ export class EditDialogComponent {
         }
 
         this.valueControl.valueChanges.subscribe(value => {
-            console.log(value);
             if (value && value.length > 1) {
                 this.changeValue(value);
             }

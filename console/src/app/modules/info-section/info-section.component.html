@@ -1,6 +1,6 @@
 <div class="info-section-row" [ngClass]="{'info': type == 'INFO', 'warn': type == 'WARN'}">
     <i *ngIf="type == 'INFO'" class="icon las la-info"></i>
-    <i *ngIf="type == 'WARN'" class="las la-exclamation"></i>
+    <i *ngIf="type == 'WARN'" class="icon las la-exclamation"></i>
 
     <div class="info-section-content">
         <ng-content></ng-content>

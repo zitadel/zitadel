@@ -182,7 +182,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     private getGrantRoleOptions(id: string, projectId: string): void {
-        console.log(projectId, id);
         this.mgmtService.getGrantedProjectByID(projectId, id).then(resp => {
             if (resp.grantedProject) {
                 this.loadedId = id;

@@ -153,7 +153,6 @@ export class IdpTableComponent implements OnInit {
             (this.service as ManagementService).listOrgIDPs(limit, offset).then(resp => {
                 this.idpResult = resp;
                 this.dataSource.data = resp.resultList;
-                console.log(resp.resultList);
                 this.loadingSubject.next(false);
             }).catch(error => {
                 this.toast.showError(error);
@@ -163,7 +162,6 @@ export class IdpTableComponent implements OnInit {
             (this.service as AdminService).listIDPs(limit, offset).then(resp => {
                 this.idpResult = resp;
                 this.dataSource.data = resp.resultList;
-                console.log(resp.resultList);
 
                 this.loadingSubject.next(false);
             }).catch(error => {

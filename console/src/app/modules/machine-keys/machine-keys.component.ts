@@ -85,7 +85,6 @@ export class MachineKeysComponent implements OnInit {
 
                 if (resp.date as Moment) {
                     const ts = new Timestamp();
-                    console.log(resp.date.toDate());
                     const milliseconds = resp.date.toDate().getTime();
                     const seconds = Math.abs(milliseconds / 1000);
                     const nanos = (milliseconds - seconds * 1000) * 1000 * 1000;
@@ -123,7 +122,6 @@ export class MachineKeysComponent implements OnInit {
         if (this.userId) {
             this.mgmtService.listMachineKeys(this.userId, limit, offset).then(resp => {
                 this.keyResult = resp;
-                console.log(resp);
                 if (resp.resultList) {
                     this.dataSource.data = resp.resultList;
                 }

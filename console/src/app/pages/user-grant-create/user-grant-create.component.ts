@@ -95,10 +95,6 @@ export class UserGrantCreateComponent implements OnDestroy {
     public addGrant(): void {
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:
-                console.log('owned', this.userId,
-                    this.rolesList,
-                    this.projectId,
-                    this.grantId);
                 this.userService.addUserGrant(
                     this.userId,
                     this.rolesList,
@@ -111,11 +107,6 @@ export class UserGrantCreateComponent implements OnDestroy {
                 });
                 break;
             case UserGrantContext.GRANTED_PROJECT:
-
-                console.log('granted', this.userId,
-                    this.rolesList,
-                    this.projectId,
-                    this.grantId);
                 this.userService.addUserGrant(
                     this.userId,
                     this.rolesList,
@@ -134,11 +125,6 @@ export class UserGrantCreateComponent implements OnDestroy {
                 if ((this.project as GrantedProject.AsObject)?.grantId) {
                     grantId = (this.project as GrantedProject.AsObject).grantId;
                 }
-
-                console.log(this.userId,
-                    this.rolesList,
-                    this.projectId,
-                    grantId);
 
                 this.userService.addUserGrant(
                     this.userId,

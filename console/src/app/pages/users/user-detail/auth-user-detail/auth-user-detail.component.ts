@@ -182,7 +182,6 @@ export class AuthUserDetailComponent implements OnDestroy {
                 });
                 break;
             case EditDialogType.EMAIL:
-                console.log('email');
                 const dialogRefEmail = this.dialog.open(EditDialogComponent, {
                     data: {
                         confirmKey: 'ACTIONS.SAVE',
