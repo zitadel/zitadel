@@ -214,8 +214,6 @@ export class MfaTableComponent implements OnInit {
                 });
             }
         }
-
-        console.log(this.mfas);
     }
 
     public refreshPageAfterTimout(to: number): void {

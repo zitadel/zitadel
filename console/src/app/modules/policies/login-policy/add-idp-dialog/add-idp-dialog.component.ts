@@ -63,7 +63,6 @@ export class AddIdpDialogComponent {
             case IDPOwnerType.IDP_OWNER_TYPE_SYSTEM:
                 this.adminService.listIDPs().then(resp => {
                     this.availableIdps = resp.resultList;
-                    console.log(resp);
                 });
                 break;
 

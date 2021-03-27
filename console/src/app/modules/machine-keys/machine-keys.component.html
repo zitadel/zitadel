@@ -36,14 +36,14 @@
             <ng-container matColumnDef="creationDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.CREATIONDATE' | translate }} </th>
                 <td mat-cell *matCellDef="let key">
-                    {{key.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
+                    {{key.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
                 </td>
             </ng-container>
 
             <ng-container matColumnDef="expirationDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.EXPIRATIONDATE' | translate }} </th>
                 <td mat-cell *matCellDef="let key">
-                    {{key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
+                    {{key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
                 </td>
             </ng-container>
 

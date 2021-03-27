@@ -52,7 +52,6 @@ export class UserDetailComponent implements OnInit {
             this.mgmtUserService.getUserByID(id).then(resp => {
                 if (resp.user) {
                     this.user = resp.user;
-                    console.log(this.user);
                 }
             }).catch(err => {
                 console.error(err);
@@ -83,7 +82,6 @@ export class UserDetailComponent implements OnInit {
     }
 
     public saveProfile(profileData: Profile.AsObject): void {
-        console.log(profileData);
         if (this.user.human) {
             this.user.human.profile = profileData;
             this.mgmtUserService
@@ -159,7 +157,6 @@ export class UserDetailComponent implements OnInit {
             this.mgmtUserService.updateHumanEmail(this.user.id, email).then(() => {
                 this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
                 if (this.user.state == UserState.USER_STATE_INITIAL) {
-                    console.log('init');
                     this.mgmtUserService.resendHumanInitialization(this.user.id, email ?? '').then(() => {
                         this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
                         this.refreshChanges$.emit();

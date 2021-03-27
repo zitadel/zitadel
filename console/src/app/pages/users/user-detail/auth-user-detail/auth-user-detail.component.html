@@ -44,9 +44,8 @@
                 <mat-icon>refresh</mat-icon>
             </button>
             <app-contact *ngIf="user?.human" [human]="user.human" [state]="user.state" canWrite="true"
-                [userStateEnum]="UserState" (editType)="openEditDialog($event)"
-                (enteredPhoneCode)="enteredPhoneCode($event)" (deletedPhone)="deletePhone()"
-                (resendEmailVerification)="resendEmailVerification()"
+                (editType)="openEditDialog($event)" (enteredPhoneCode)="enteredPhoneCode($event)"
+                (deletedPhone)="deletePhone()" (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
             </app-contact>
         </app-card>

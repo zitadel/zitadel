@@ -77,7 +77,6 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
         this.getData().then(data => {
             if (data.policy) {
                 this.complexityData = data.policy;
-                console.log(data.policy);
                 this.loading = false;
             }
         });

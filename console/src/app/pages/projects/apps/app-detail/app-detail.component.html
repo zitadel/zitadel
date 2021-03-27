@@ -39,13 +39,13 @@
         <form *ngIf="app && editState" [formGroup]="appNameForm">
             <div class="name-content">
                 <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
-                    <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE"
+                    <mat-button-toggle [value]="AppState.APP_STATE_INACTIVE"
                         matTooltip="{{ 'ACTIONS.DEACTIVATE' | translate}}">
-                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_INACTIVE | translate}}
+                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APP_STATE_INACTIVE | translate}}
                     </mat-button-toggle>
                     <mat-button-toggle [value]="AppState.APPSTATE_ACTIVE"
                         matTooltip="{{ 'ACTIONS.REACTIVATE' | translate}}">
-                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_ACTIVE | translate}}
+                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APP_STATE_ACTIVE | translate}}
                     </mat-button-toggle>
                 </mat-button-toggle-group>
 

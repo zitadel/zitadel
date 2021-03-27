@@ -80,7 +80,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
     @HostListener('blur', ['false'])
     _focusChanged(isFocused: boolean): void {
-        console.log('blur1');
         if (isFocused !== this.focused && (!isFocused)) {
             this.focused = isFocused;
             this.stateChanges.next();

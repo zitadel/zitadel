@@ -91,7 +91,6 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         this.loadingSubject.next(true);
         this.mgmtService.listGrantedProjects(limit, offset).then(resp => {
             this.grantedProjectList = resp.resultList;
-            console.log(this.grantedProjectList);
             if (resp.details?.totalResult) {
                 this.totalResult = resp.details.totalResult;
             }

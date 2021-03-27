@@ -28,6 +28,23 @@
             </app-card>
         </ng-container>
 
+        <h2>{{'FEATURES.TITLE' | translate}}</h2>
+        <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
+        <div *ngIf="features" class="tier">
+            <mat-icon>stars</mat-icon>
+            <div class="text" *ngIf="features.tier">
+                <p class="title"><strong>ZITADEL {{features.tier.name}}</strong></p>
+                <p>{{features.tier?.description}}</p>
+                <p>{{'FEATURES.TIERSTATES.'+features.tier.state | translate}}</p>
+                <p>{{features.tier?.statusInfo}}</p>
+            </div>
+            <span class="fill-space"></span>
+            <a class="ext" href="https://zitadel.ch/pricing" target="_blank"><i
+                    class="las la-external-link-alt"></i></a>
+
+            <button mat-raised-button [routerLink]="['features']">{{'FEATURES.BTN-EDIT' | translate}}</button>
+        </div>
+
         <ng-template appHasRole [appHasRole]="['policy.read']">
             <app-policy-grid [type]="PolicyGridType.ORG"></app-policy-grid>
         </ng-template>

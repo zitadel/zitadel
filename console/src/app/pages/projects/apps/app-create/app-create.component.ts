@@ -273,7 +273,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     private async getData({ projectid }: Params): Promise<void> {
         this.projectId = projectid;
-        console.log(this.projectId);
         this.oidcAppRequest.projectId = projectid;
         this.apiAppRequest.projectId = projectid;
     }

@@ -440,10 +440,10 @@
             "REMOVE":"Entfernen",
             "TYPE":"Typ",
             "TYPES":{
-                "0":"Unbekannt",
-                "1":"Organisation",
-                "2":"Projekt",
-                "3":"Berechtigtes Projekt"
+                "UNKNOWN":"Unbekannt",
+                "ORG":"Organisation",
+                "PROJECT":"Projekt",
+                "GRANTEDPROJECT":"Berechtigtes Projekt"
             }
         }
     },
@@ -567,6 +567,28 @@
             "MEMBERCHANGED":"Manager geändert.",
             "SETPRIMARY":"Primäre Domain gesetzt."
         }
+    },
+    "FEATURES": {
+        "TITLE":"Features",
+        "DESCRIPTION":"Hier können Sie Funktionen von ZITADEL auf Basis von Ihrem Tier aktivieren sowie deaktivieren.",
+        "BTN-EDIT":"Featureset anpassen",
+        "DATA": {
+            "AUDITLOGRETENTION":"Audit Log retention",
+            "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Username as login",
+            "LOGINPOLICYREGISTRATION":"Login Policy - Registration",
+            "LOGINPOLICYIDP":"Login Policy - Identity Providers",
+            "LOGINPOLICYFACTORS":"Login Policy - Factors",
+            "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwordless Authentication",
+            "LOGINPOLICYCOMPLEXITYPOLICY":"Password Complexity Settings",
+            "LABELPOLICY":"Label Policy"
+        },
+        "TIERSTATES": {
+            "0":"Aktiv",
+            "1":"Aktion erforderlich",
+            "2":"Annuliert",
+            "3":"Besitzstandswahrend"
+        },
+        "NOTAVAILABLE":"Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!"
     },
     "POLICY": {
         "TITLE":"Richtlinen entdecken",
