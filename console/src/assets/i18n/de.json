@@ -440,10 +440,10 @@
             "REMOVE":"Entfernen",
             "TYPE":"Typ",
             "TYPES":{
-                "0":"Unbekannt",
-                "1":"Organisation",
-                "2":"Projekt",
-                "3":"Berechtigtes Projekt"
+                "UNKNOWN":"Unbekannt",
+                "ORG":"Organisation",
+                "PROJECT":"Projekt",
+                "GRANTEDPROJECT":"Berechtigtes Projekt"
             }
         }
     },
