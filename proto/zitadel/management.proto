@@ -2991,12 +2991,6 @@ message GetFeaturesResponse {
     zitadel.features.v1.Features features = 1;
 }
 
-message GetFeaturesRequest {}
-
-message GetFeaturesResponse {
-    zitadel.features.v1.Features features = 1;
-}
-
 message GetOrgIAMPolicyRequest {}
 
 message GetOrgIAMPolicyResponse {
