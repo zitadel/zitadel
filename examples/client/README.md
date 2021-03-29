@@ -10,6 +10,13 @@ As the go-sdk is not ready yet we recommend to to build the client in your own p
 
  - docker
 
-## Befehl
+## Generate client stub
 
-`DOCKER_BUILDKIT=1 docker build --target zitadel-copy -t zitadel:example -f Dockerfile . -o .`
+### PROJECT_PATH
+
+The PROJECT_PATH argument is needed for replacing imports in the generated files.
+The path MUST represent the folder where the generated ZITADEL packages will reside in.
+
+This replacement is needed for the message proto.
+
+`DOCKER_BUILDKIT=1 docker build --target zitadel-copy -t zitadel:example --build-arg PROJECT_PATH=github.com/caos/zitadel/examples/client -f Dockerfile . -o .`

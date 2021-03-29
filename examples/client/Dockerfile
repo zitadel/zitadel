@@ -48,7 +48,6 @@ COPY --from=base /zitadel/zitadel .
 COPY --from=base /.tmp/bin /usr/local/bin/
 
 RUN go mod download
-
 RUN go install \
     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
@@ -60,10 +59,12 @@ RUN go get -u google.golang.org/protobuf/cmd/protoc-gen-go \
 
 RUN ./build/zitadel/generate-grpc-clients.sh ${PROJECT_PATH}
 
-
+#######################
+## prepare generated files for output
+#######################
 FROM scratch as zitadel-copy
 ARG PROJECT_PATH
 COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/admin/*.pb.go /zitadel/admin/
 COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/auth/*.pb.go /zitadel/auth/
 COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/management/*.pb.go /zitadel/management/
-COPY --from=zitadel-client /go/src/${PROJECT_PATH}/*.pb.go /zitadel/message/
+COPY --from=zitadel-client /go/src/${PROJECT_PATH}/zitadel/message/*.pb.go /zitadel/message/
