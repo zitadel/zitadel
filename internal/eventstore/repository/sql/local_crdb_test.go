@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/caos/logging"
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
@@ -66,27 +65,9 @@ func executeMigrations() error {
 			return err
 		}
 		migration := os.ExpandEnv(string(migrationData))
-		transactionInMigration := strings.Contains(migration, "BEGIN;")
-		exec := testCRDBClient.Exec
-		var tx *sql.Tx
-		if !transactionInMigration {
-			tx, err = testCRDBClient.Begin()
-			if err != nil {
-				return fmt.Errorf("begin file: %v || err: %w", file, err)
-			}
-			exec = tx.Exec
-		}
-		if _, err = exec(migration); err != nil {
+		if _, err = testCRDBClient.Exec(migration); err != nil {
 			return fmt.Errorf("exec file: %v || err: %w", file, err)
 		}
-		duration := 1 * time.Second
-		if !transactionInMigration {
-			if err = tx.Commit(); err != nil {
-				return fmt.Errorf("commit file: %v || err: %w", file, err)
-			}
-			duration = 0
-		}
-		time.Sleep(duration)
 	}
 	return nil
 }
