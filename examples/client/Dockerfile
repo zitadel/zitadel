@@ -1,0 +1,113 @@
+#######################
+## These steps set platform / arch type specific variables
+#######################
+FROM alpine AS arm64-base
+ENV PROTOC_ARCH aarch_64
+
+FROM alpine AS amd64-base
+ENV PROTOC_ARCH x86_64
+
+#######################
+## This step downloads the protofiles, protoc and protoc-gen-grpc-web for later use
+#######################
+FROM ${BUILDARCH}-base as base
+ARG GOPATH
+# RUN if [[ -z "$GOPATH" ]] ; then echo "Argument not provided" && exit 1 ; fi
+
+ARG ZITADEL_PATH=src/github.com/caos/zitadel
+
+
+RUN apk add tar curl git
+WORKDIR /.tmp
+RUN protoc_url="https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-${PROTOC_ARCH}.zip" \
+    && wget -O protoc ${protoc_url} \
+    && unzip protoc \
+    && wget -O bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64 \
+    && chmod +x bin/protoc-gen-grpc-web
+RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1/validate/validate.proto --create-dirs -o validate/validate.proto  \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto --create-dirs -o protoc-gen-swagger/options/annotations.proto \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto --create-dirs -o protoc-gen-swagger/options/openapiv2.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto --create-dirs -o google/api/annotations.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto --create-dirs -o google/api/http.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/empty.proto --create-dirs -o google/protobuf/empty.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/timestamp.proto --create-dirs -o google/protobuf/timestamp.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/descriptor.proto --create-dirs -o google/protobuf/descriptor.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/duration.proto --create-dirs -o google/protobuf/duration.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/any.proto --create-dirs -o google/protobuf/any.proto \
+    && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/struct.proto --create-dirs -o google/protobuf/struct.proto
+
+WORKDIR /zitadel
+RUN git clone https://github.com/caos/zitadel
+
+#######################
+## Go base build
+## Speed up this step by mounting your local go mod pkg directory
+#######################
+FROM golang:1.15 as zitadel-client
+ARG GOPATH
+ARG ZITADEL_PATH=src/github.com/caos/zitadel
+ARG GO_OUT
+ARG GRPC_OUT
+
+WORKDIR /go/src/github.com/caos/zitadel
+
+# copy ZITADEL proto dependencies
+COPY --from=base /.tmp /.tmp/protos/
+COPY --from=base /zitadel/zitadel .
+COPY --from=base /.tmp/bin /usr/local/bin/
+
+RUN go mod download
+
+RUN go install \
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
+    github.com/golang/protobuf/protoc-gen-go \
+    github.com/envoyproxy/protoc-gen-validate
+
+# RUN go get -u github.com/go-bindata/go-bindata/... \
+#     && go-bindata ./internal/protoc/protoc-gen-authoption/templates \
+#     && go install ./internal/protoc/protoc-gen-authoption
+# copy the ZITADEL protos
+# COPY --from=base /zitadel/pkg/grpc/admin/proto/admin.proto pkg/admin/proto/admin.proto
+# COPY --from=base /zitadel/pkg/grpc/auth/proto/auth.proto pkg/auth/proto/auth.proto
+# COPY --from=base /zitadel/pkg/grpc/management/proto/management.proto pkg/management/proto/management.proto
+# COPY --from=base /zitadel/pkg/grpc/message/proto/message.proto pkg/message/proto/message.proto
+# COPY --from=base /zitadel/build/zitadel/generate-grpc-clients.sh build/zitadel/
+# COPY --from=base /zitadel/internal/protoc/protoc-gen-authoption internal/protoc/protoc-gen-authoption
+# COPY --from=base /zitadel/internal/protoc/protoc-base internal/protoc/protoc-base/
+# COPY --from=base /zitadel/internal/protoc/protoc-gen-authoption internal/protoc/protoc-gen-authoption/
+
+# copy required proto executables
+# RUN go get -u \
+#     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
+#     github.com/golang/protobuf/protoc-gen-go \
+#     github.com/envoyproxy/protoc-gen-validate \
+#     github.com/golang/protobuf/protoc-gen-go/descriptor \
+#     github.com/golang/protobuf/proto \
+#     github.com/golang/glog \
+#     github.com/Masterminds/sprig \
+#     github.com/go-bindata/go-bindata/... \
+#     && go install \
+#     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
+#     github.com/golang/protobuf/protoc-gen-go \
+#     github.com/envoyproxy/protoc-gen-validate \
+#     && go-bindata ./internal/protoc/protoc-gen-authoption/templates \
+#     && go install ./internal/protoc/protoc-gen-authoption
+
+
+# RUN go get -u github.com/go-bindata/go-bindata/... \
+#     && go install github.com/go-bindata/go-bindata/... \
+#     && go-bindata ./internal/protoc/protoc-gen-authoption/templates \
+#     && go install ./internal/protoc/protoc-gen-authoption
+
+
+
+# # copy your project
+# COPY ${ZITADEL_PATH}/examples/client src/github.com/caos/zitadel/examples/client
+# WORKDIR src/github.com/caos/zitadel/examples/client
+
+
+# RUN /go/src/github.com/caos/zitadel/build/zitadel/generate-grpc-clients.sh ${GO_OUT} ${GRPC_OUT}
+
+# FROM scratch as go-copy
+# COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
