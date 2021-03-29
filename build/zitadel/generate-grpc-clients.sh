@@ -12,7 +12,7 @@ generate () {
         -I=/.tmp/protos \
         -I=/go/src/github.com/caos/zitadel/pkg/grpc/message \
         -I=/go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption \
-        -I=$1 \
+        -I=/go/src \
         --go_opt=Mproto/message.proto=${GO_MESSAGE_IMPORT} \
         --go_out /go/src \
         --go-grpc_out /go/src \
