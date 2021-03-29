@@ -23,6 +23,7 @@ func main() {
 		cmds.WriteSecretCommand(rootValues),
 		cmds.BackupCommand(rootValues),
 		cmds.StartDatabase(rootValues),
+		cmds.TeardownCommand(rootValues),
 	)
 
 	if err := rootCmd.Execute(); err != nil {
