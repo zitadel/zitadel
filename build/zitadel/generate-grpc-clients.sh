@@ -22,10 +22,9 @@ generate () {
         --go-grpc_out $GOPATH/src \
         $1/$2
 }
-
-generate /go/src/github.com/caos/zitadel/pkg/message/proto message.proto
-# generate /go/src/github.com/caos/zitadel/pkg/admin/proto admin.proto
-# generate /go/src/github.com/caos/zitadel/pkg/auth/proto auth.proto
-# generate /go/src/github.com/caos/zitadel/pkg/management/proto management.proto
+generate /go/src/github.com/caos/zitadel/pkg/grpc/message/proto message.proto
+# generate /go/src/github.com/caos/zitadel/pkg/grpc/admin/proto admin.proto
+# generate /go/src/github.com/caos/zitadel/pkg/grpc/auth/proto auth.proto
+# generate /go/src/github.com/caos/zitadel/pkg/grpc/management/proto management.proto
 
 echo "done generating grpc"
