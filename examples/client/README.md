@@ -12,4 +12,4 @@ As the go-sdk is not ready yet we recommend to to build the client in your own p
 
 ## Befehl
 
-`DOCKER_BUILDKIT=1 docker build --target zitadel-copy -t zitadel:example --build-arg GOPATH=$GOPATH -f Dockerfile . -o .`
+`DOCKER_BUILDKIT=1 docker build --target zitadel-copy -t zitadel:example -f Dockerfile . -o .`
