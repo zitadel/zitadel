@@ -15,3 +15,9 @@ message Change {
     string editor_display_name = 5;
     string resource_owner_id = 6;
 }
+
+message ChangeQuery {
+    uint64 sequence = 1;
+    uint32 limit = 2;
+    bool asc = 3;
+}
