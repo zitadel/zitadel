@@ -37,7 +37,9 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1
     && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/struct.proto --create-dirs -o google/protobuf/struct.proto
 
 WORKDIR /zitadel
-RUN git clone https://github.com/caos/zitadel
+RUN git clone https://github.com/caos/zitadel \
+    && cd zitadel \
+    && git checkout origin/example-client
 
 #######################
 ## Go base build
@@ -64,50 +66,11 @@ RUN go install \
     github.com/golang/protobuf/protoc-gen-go \
     github.com/envoyproxy/protoc-gen-validate
 
-# RUN go get -u github.com/go-bindata/go-bindata/... \
-#     && go-bindata ./internal/protoc/protoc-gen-authoption/templates \
-#     && go install ./internal/protoc/protoc-gen-authoption
-# copy the ZITADEL protos
-# COPY --from=base /zitadel/pkg/grpc/admin/proto/admin.proto pkg/admin/proto/admin.proto
-# COPY --from=base /zitadel/pkg/grpc/auth/proto/auth.proto pkg/auth/proto/auth.proto
-# COPY --from=base /zitadel/pkg/grpc/management/proto/management.proto pkg/management/proto/management.proto
-# COPY --from=base /zitadel/pkg/grpc/message/proto/message.proto pkg/message/proto/message.proto
-# COPY --from=base /zitadel/build/zitadel/generate-grpc-clients.sh build/zitadel/
-# COPY --from=base /zitadel/internal/protoc/protoc-gen-authoption internal/protoc/protoc-gen-authoption
-# COPY --from=base /zitadel/internal/protoc/protoc-base internal/protoc/protoc-base/
-# COPY --from=base /zitadel/internal/protoc/protoc-gen-authoption internal/protoc/protoc-gen-authoption/
+RUN go get -u google.golang.org/protobuf/cmd/protoc-gen-go \
+    google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
-# copy required proto executables
-# RUN go get -u \
-#     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
-#     github.com/golang/protobuf/protoc-gen-go \
-#     github.com/envoyproxy/protoc-gen-validate \
-#     github.com/golang/protobuf/protoc-gen-go/descriptor \
-#     github.com/golang/protobuf/proto \
-#     github.com/golang/glog \
-#     github.com/Masterminds/sprig \
-#     github.com/go-bindata/go-bindata/... \
-#     && go install \
-#     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
-#     github.com/golang/protobuf/protoc-gen-go \
-#     github.com/envoyproxy/protoc-gen-validate \
-#     && go-bindata ./internal/protoc/protoc-gen-authoption/templates \
-#     && go install ./internal/protoc/protoc-gen-authoption
+RUN go get -u github.com/go-bindata/go-bindata/... \
+    go-bindata ./internal/protoc/protoc-gen-authoption/templates \
+    && go install ./internal/protoc/protoc-gen-authoption
 
-
-# RUN go get -u github.com/go-bindata/go-bindata/... \
-#     && go install github.com/go-bindata/go-bindata/... \
-#     && go-bindata ./internal/protoc/protoc-gen-authoption/templates \
-#     && go install ./internal/protoc/protoc-gen-authoption
-
-
-
-# # copy your project
-# COPY ${ZITADEL_PATH}/examples/client src/github.com/caos/zitadel/examples/client
-# WORKDIR src/github.com/caos/zitadel/examples/client
-
-
-# RUN /go/src/github.com/caos/zitadel/build/zitadel/generate-grpc-clients.sh ${GO_OUT} ${GRPC_OUT}
-
-# FROM scratch as go-copy
-# COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/ .
+RUN ./build/zitadel/generate-grpc-clients.sh /go/src
