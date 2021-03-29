@@ -19,7 +19,7 @@ generate () {
         -I=/go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption \
         -I=$1 \
         --go_out ${GO_OUT} \
-        --go-grpc_out $GOPATH/src \
+        --go-grpc_out ${GO_OUT} \
         $1/$2
 }
 generate /go/src/github.com/caos/zitadel/pkg/grpc/message/proto message.proto
