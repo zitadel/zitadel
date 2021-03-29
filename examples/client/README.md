@@ -19,4 +19,10 @@ The path MUST represent the folder where the generated ZITADEL packages will res
 
 This replacement is needed for the message proto.
 
-`DOCKER_BUILDKIT=1 docker build --target zitadel-copy -t zitadel:example --build-arg PROJECT_PATH=github.com/caos/zitadel/examples/client -f Dockerfile . -o .`
+### TAG_NAME
+
+It's recommended to clone a specific tag.
+
+For example: TAG_NAME=v0.118.3
+
+`DOCKER_BUILDKIT=1 docker build --target zitadel-copy -t zitadel:example --build-arg PROJECT_PATH=github.com/caos/zitadel/examples/client --build-arg TAG_NAME=master -f Dockerfile . -o .`

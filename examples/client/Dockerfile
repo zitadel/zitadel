@@ -11,6 +11,8 @@ ENV PROTOC_ARCH x86_64
 ## This step downloads the protofiles, protoc and protoc-gen-grpc-web for later use
 #######################
 FROM ${BUILDARCH}-base as base
+ARG TAG_NAME=master
+
 RUN apk add tar curl git
 WORKDIR /.tmp
 RUN protoc_url="https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-${PROTOC_ARCH}.zip" \
@@ -29,9 +31,7 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1
     && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/struct.proto --create-dirs -o google/protobuf/struct.proto
 
 WORKDIR /zitadel
-RUN git clone https://github.com/caos/zitadel \
-    && cd zitadel \
-    && git checkout origin/example-client
+RUN git clone -b ${TAG_NAME} https://github.com/caos/zitadel
 
 #######################
 ## Go base build
