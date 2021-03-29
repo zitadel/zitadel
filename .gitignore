@@ -48,3 +48,6 @@ console/src/app/proto/generated/
 pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
 pkg/grpc/*/mock/*.mock.go
+
+# examples
+examples/client/zitadel/*
