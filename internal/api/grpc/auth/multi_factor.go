@@ -22,14 +22,14 @@ func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFac
 
 func (s *Server) AddMyAuthFactorOTP(ctx context.Context, _ *auth_pb.AddMyAuthFactorOTPRequest) (*auth_pb.AddMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.OrgID)
+	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.AddMyAuthFactorOTPResponse{
 		Url:    otp.Url,
 		Secret: otp.SecretString,
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			otp.Sequence,
 			otp.ChangeDate,
 			otp.ResourceOwner,
@@ -44,18 +44,18 @@ func (s *Server) VerifyMyAuthFactorOTP(ctx context.Context, req *auth_pb.VerifyM
 		return nil, err
 	}
 	return &auth_pb.VerifyMyAuthFactorOTPResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) RemoveMyAuthFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyAuthFactorOTPRequest) (*auth_pb.RemoveMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.OrgID)
+	objectDetails, err := s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.RemoveMyAuthFactorOTPResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -67,10 +67,9 @@ func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFac
 	}
 	return &auth_pb.AddMyAuthFactorU2FResponse{
 		Key: &user_pb.WebAuthNKey{
-			Id:        u2f.WebAuthNTokenID,
 			PublicKey: u2f.CredentialCreationData,
 		},
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			u2f.Sequence,
 			u2f.ChangeDate,
 			u2f.ResourceOwner,
@@ -80,22 +79,22 @@ func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFac
 
 func (s *Server) VerifyMyAuthFactorU2F(ctx context.Context, req *auth_pb.VerifyMyAuthFactorU2FRequest) (*auth_pb.VerifyMyAuthFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, ctxData.UserID, ctxData.OrgID, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
+	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Verification.TokenName, "", req.Verification.PublicKeyCredential)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.VerifyMyAuthFactorU2FResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) RemoveMyAuthFactorU2F(ctx context.Context, req *auth_pb.RemoveMyAuthFactorU2FRequest) (*auth_pb.RemoveMyAuthFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanRemovePasswordless(ctx, ctxData.UserID, req.TokenId, ctxData.ResourceOwner)
+	objectDetails, err := s.command.HumanRemoveU2F(ctx, ctxData.UserID, req.TokenId, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.RemoveMyAuthFactorU2FResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

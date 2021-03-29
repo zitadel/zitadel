@@ -16,8 +16,9 @@ const (
 type LabelPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	PrimaryColor   string `json:"primaryColor,omitempty"`
-	SecondaryColor string `json:"secondaryColor,omitempty"`
+	PrimaryColor        string `json:"primaryColor,omitempty"`
+	SecondaryColor      string `json:"secondaryColor,omitempty"`
+	HideLoginNameSuffix bool   `json:"hideLoginNameSuffix,omitempty"`
 }
 
 func (e *LabelPolicyAddedEvent) Data() interface{} {
@@ -32,12 +33,14 @@ func NewLabelPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	primaryColor,
 	secondaryColor string,
+	hideLoginNameSuffix bool,
 ) *LabelPolicyAddedEvent {
 
 	return &LabelPolicyAddedEvent{
-		BaseEvent:      *base,
-		PrimaryColor:   primaryColor,
-		SecondaryColor: secondaryColor,
+		BaseEvent:           *base,
+		PrimaryColor:        primaryColor,
+		SecondaryColor:      secondaryColor,
+		HideLoginNameSuffix: hideLoginNameSuffix,
 	}
 }
 
@@ -57,8 +60,9 @@ func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReade
 type LabelPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	PrimaryColor   *string `json:"primaryColor,omitempty"`
-	SecondaryColor *string `json:"secondaryColor,omitempty"`
+	PrimaryColor        *string `json:"primaryColor,omitempty"`
+	SecondaryColor      *string `json:"secondaryColor,omitempty"`
+	HideLoginNameSuffix *bool   `json:"hideLoginNameSuffix,omitempty"`
 }
 
 func (e *LabelPolicyChangedEvent) Data() interface{} {
@@ -96,6 +100,12 @@ func ChangePrimaryColor(primaryColor string) func(*LabelPolicyChangedEvent) {
 func ChangeSecondaryColor(secondaryColor string) func(*LabelPolicyChangedEvent) {
 	return func(e *LabelPolicyChangedEvent) {
 		e.SecondaryColor = &secondaryColor
+	}
+}
+
+func ChangeHideLoginNameSuffix(hideLoginNameSuffix bool) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.HideLoginNameSuffix = &hideLoginNameSuffix
 	}
 }
 

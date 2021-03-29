@@ -36,16 +36,17 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchProjects(ctx, queries)
+	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	projects, err := s.project.SearchProjects(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectsResponse{
-		Result: project_grpc.ProjectsToPb(domains.Result),
+		Result: project_grpc.ProjectsToPb(projects.Result),
 		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
+			projects.TotalResult,
+			projects.Sequence,
+			projects.Timestamp,
 		),
 	}, nil
 }
@@ -55,16 +56,17 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchGrantedProjects(ctx, queries)
+	queries.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
+	projects, err := s.project.SearchGrantedProjects(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListGrantedProjectsResponse{
-		Result: project_grpc.GrantedProjectsToPb(domains.Result),
+		Result: project_grpc.GrantedProjectsToPb(projects.Result),
 		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
+			projects.TotalResult,
+			projects.Sequence,
+			projects.Timestamp,
 		),
 	}, nil
 }
@@ -86,13 +88,13 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 
 func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest) (*mgmt_pb.AddProjectResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	project, err := s.command.AddProject(ctx, ProjectCreateToDomain(req), ctxData.ResourceOwner, ctxData.UserID)
+	project, err := s.command.AddProject(ctx, ProjectCreateToDomain(req), ctxData.OrgID, ctxData.UserID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectResponse{
 		Id: project.AggregateID,
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.AddToDetailsPb(
 			project.Sequence,
 			project.ChangeDate,
 			project.ResourceOwner,
@@ -101,12 +103,12 @@ func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest)
 }
 
 func (s *Server) UpdateProject(ctx context.Context, req *mgmt_pb.UpdateProjectRequest) (*mgmt_pb.UpdateProjectResponse, error) {
-	project, err := s.command.ChangeProject(ctx, ProjectUpdateToDomain(req), authz.GetCtxData(ctx).ResourceOwner)
+	project, err := s.command.ChangeProject(ctx, ProjectUpdateToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			project.Sequence,
 			project.ChangeDate,
 			project.ResourceOwner,
@@ -115,22 +117,22 @@ func (s *Server) UpdateProject(ctx context.Context, req *mgmt_pb.UpdateProjectRe
 }
 
 func (s *Server) DeactivateProject(ctx context.Context, req *mgmt_pb.DeactivateProjectRequest) (*mgmt_pb.DeactivateProjectResponse, error) {
-	details, err := s.command.DeactivateProject(ctx, req.Id, authz.GetCtxData(ctx).ResourceOwner)
+	details, err := s.command.DeactivateProject(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateProjectResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) ReactivateProject(ctx context.Context, req *mgmt_pb.ReactivateProjectRequest) (*mgmt_pb.ReactivateProjectResponse, error) {
-	details, err := s.command.ReactivateProject(ctx, req.Id, authz.GetCtxData(ctx).ResourceOwner)
+	details, err := s.command.ReactivateProject(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateProjectResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -144,7 +146,7 @@ func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRe
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -153,6 +155,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	if err != nil {
 		return nil, err
 	}
+	queries.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	roles, err := s.project.SearchProjectRoles(ctx, req.ProjectId, queries)
 	if err != nil {
 		return nil, err
@@ -173,7 +176,7 @@ func (s *Server) AddProjectRole(ctx context.Context, req *mgmt_pb.AddProjectRole
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectRoleResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.AddToDetailsPb(
 			role.Sequence,
 			role.ChangeDate,
 			role.ResourceOwner,
@@ -187,7 +190,7 @@ func (s *Server) BulkAddProjectRoles(ctx context.Context, req *mgmt_pb.BulkAddPr
 		return nil, err
 	}
 	return &mgmt_pb.BulkAddProjectRolesResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToAddDetailsPb(details),
 	}, nil
 }
 
@@ -197,7 +200,7 @@ func (s *Server) UpdateProjectRole(ctx context.Context, req *mgmt_pb.UpdateProje
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectRoleResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			role.Sequence,
 			role.ChangeDate,
 			role.ResourceOwner,
@@ -219,11 +222,11 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectRoleResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) ListProjectMemberRoles(ctx context.Context, req *mgmt_pb.ListProjectMemberRolesRequest) (*mgmt_pb.ListProjectMemberRolesResponse, error) {
+func (s *Server) ListProjectMemberRoles(ctx context.Context, _ *mgmt_pb.ListProjectMemberRolesRequest) (*mgmt_pb.ListProjectMemberRolesResponse, error) {
 	roles, err := s.project.GetProjectMemberRoles(ctx)
 	if err != nil {
 		return nil, err
@@ -236,16 +239,17 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchProjectMembers(ctx, queries)
+	queries.AppendProjectQuery(req.ProjectId)
+	members, err := s.project.SearchProjectMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
-		Result: member_grpc.ProjectMembersToPb(domains.Result),
+		Result: member_grpc.ProjectMembersToPb(members.Result),
 		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
+			members.TotalResult,
+			members.Sequence,
+			members.Timestamp,
 		),
 	}, nil
 }
@@ -256,7 +260,7 @@ func (s *Server) AddProjectMember(ctx context.Context, req *mgmt_pb.AddProjectMe
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectMemberResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.AddToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -270,7 +274,7 @@ func (s *Server) UpdateProjectMember(ctx context.Context, req *mgmt_pb.UpdatePro
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectMemberResponse{
-		Details: object_grpc.ToDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
@@ -284,6 +288,6 @@ func (s *Server) RemoveProjectMember(ctx context.Context, req *mgmt_pb.RemovePro
 		return nil, err
 	}
 	return &mgmt_pb.RemoveProjectMemberResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }

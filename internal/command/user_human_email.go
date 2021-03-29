@@ -13,7 +13,7 @@ import (
 
 func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*domain.Email, error) {
 	if !email.IsValid() || email.AggregateID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
 	}
 
 	existingEmail, err := c.emailWriteModel(ctx, email.AggregateID, email.ResourceOwner)
@@ -21,7 +21,10 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*
 		return nil, err
 	}
 	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
+	}
+	if existingEmail.UserState == domain.UserStateInitial {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J8dsk", "Errors.User.NotInitialised")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 	changedEvent, hasChanged := existingEmail.NewChangedEvent(ctx, userAgg, email.EmailAddress)
@@ -54,10 +57,10 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*
 
 func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceowner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 	if code == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-çm0ds", "Errors.User.Code.Empty")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-çm0ds", "Errors.User.Code.Empty")
 	}
 
 	existingCode, err := c.emailWriteModel(ctx, userID, resourceowner)
@@ -89,7 +92,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 
 func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 
 	existingEmail, err := c.emailWriteModel(ctx, userID, resourceOwner)
@@ -122,6 +125,9 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 }
 
 func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9fs", "Errors.IDMissing")
+	}
 	existingEmail, err := c.emailWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return err

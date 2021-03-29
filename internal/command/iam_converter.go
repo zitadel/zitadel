@@ -46,9 +46,10 @@ func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 
 func writeModelToLabelPolicy(wm *LabelPolicyWriteModel) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
-		PrimaryColor:   wm.PrimaryColor,
-		SecondaryColor: wm.SecondaryColor,
+		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
+		PrimaryColor:        wm.PrimaryColor,
+		SecondaryColor:      wm.SecondaryColor,
+		HideLoginNameSuffix: wm.HideLoginNameSuffix,
 	}
 }
 
@@ -70,6 +71,7 @@ func writeModelToMailText(wm *MailTextWriteModel) *domain.MailText {
 		Greeting:     wm.Greeting,
 		Text:         wm.Text,
 		ButtonText:   wm.ButtonText,
+		State:        wm.State,
 	}
 }
 
@@ -156,5 +158,23 @@ func writeModelToIDPProvider(wm *IdentityProviderWriteModel) *domain.IDPProvider
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
 		IDPConfigID: wm.IDPConfigID,
 		Type:        wm.IDPProviderType,
+	}
+}
+
+func writeModelToFeatures(wm *FeaturesWriteModel) *domain.Features {
+	return &domain.Features{
+		ObjectRoot:               writeModelToObjectRoot(wm.WriteModel),
+		TierName:                 wm.TierName,
+		TierDescription:          wm.TierDescription,
+		State:                    wm.State,
+		StateDescription:         wm.StateDescription,
+		AuditLogRetention:        wm.AuditLogRetention,
+		LoginPolicyFactors:       wm.LoginPolicyFactors,
+		LoginPolicyIDP:           wm.LoginPolicyIDP,
+		LoginPolicyPasswordless:  wm.LoginPolicyPasswordless,
+		LoginPolicyRegistration:  wm.LoginPolicyRegistration,
+		LoginPolicyUsernameLogin: wm.LoginPolicyUsernameLogin,
+		PasswordComplexityPolicy: wm.PasswordComplexityPolicy,
+		LabelPolicy:              wm.LabelPolicy,
 	}
 }

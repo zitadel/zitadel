@@ -15,7 +15,7 @@ func GetPasswordComplexityPolicyByAggregateID(db *gorm.DB, table, aggregateID st
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso0cs", "Errors.IAM.PasswordComplexityPolicy.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-2N9fs", "Errors.IAM.PasswordComplexityPolicy.NotExisting")
 	}
 	return policy, err
 }

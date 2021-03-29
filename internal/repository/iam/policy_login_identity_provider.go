@@ -23,7 +23,6 @@ func NewIdentityProviderAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	idpConfigID string,
-	idpProviderType domain.IdentityProviderType,
 ) *IdentityProviderAddedEvent {
 
 	return &IdentityProviderAddedEvent{
@@ -33,7 +32,7 @@ func NewIdentityProviderAddedEvent(
 				aggregate,
 				LoginPolicyIDPProviderAddedEventType),
 			idpConfigID,
-			idpProviderType),
+			domain.IdentityProviderTypeSystem),
 	}
 }
 

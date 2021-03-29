@@ -115,7 +115,7 @@ func (wm *IDPOIDCConfigWriteModel) NewChangedEvent(
 	if userNameMapping.Valid() && wm.UserNameMapping != userNameMapping {
 		changes = append(changes, idpconfig.ChangeUserNameMapping(userNameMapping))
 	}
-	if reflect.DeepEqual(wm.Scopes, scopes) {
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
 		changes = append(changes, idpconfig.ChangeScopes(scopes))
 	}
 	if len(changes) == 0 {

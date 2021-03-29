@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
+import { IDPOwnerType } from '../proto/generated/zitadel/idp_pb';
 import {
     AddAPIAppRequest,
     AddAPIAppResponse,
@@ -74,6 +75,8 @@ import {
     GetAppByIDResponse,
     GetDefaultPasswordComplexityPolicyRequest,
     GetDefaultPasswordComplexityPolicyResponse,
+    GetFeaturesRequest,
+    GetFeaturesResponse,
     GetGrantedProjectByIDRequest,
     GetGrantedProjectByIDResponse,
     GetHumanEmailRequest,
@@ -387,9 +390,10 @@ export class ManagementService {
         return this.grpcService.mgmt.resetLoginPolicyToDefault(req, null).then(resp => resp.toObject());
     }
 
-    public addIDPToLoginPolicy(idpId: string): Promise<AddIDPToLoginPolicyResponse.AsObject> {
+    public addIDPToLoginPolicy(idpId: string, ownerType: IDPOwnerType): Promise<AddIDPToLoginPolicyResponse.AsObject> {
         const req = new AddIDPToLoginPolicyRequest();
         req.setIdpId(idpId);
+        req.setOwnertype(ownerType);
         return this.grpcService.mgmt.addIDPToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
@@ -697,6 +701,13 @@ export class ManagementService {
     public listOrgMemberRoles(): Promise<ListOrgMemberRolesResponse.AsObject> {
         const req = new ListOrgMemberRolesRequest();
         return this.grpcService.mgmt.listOrgMemberRoles(req, null).then(resp => resp.toObject());
+    }
+
+    // Features
+
+    public getFeatures(): Promise<GetFeaturesResponse.AsObject> {
+        const req = new GetFeaturesRequest();
+        return this.grpcService.mgmt.getFeatures(req, null).then(resp => resp.toObject());
     }
 
     // Policy
@@ -1556,7 +1567,6 @@ export class ManagementService {
         if (offset) {
             query.setOffset(offset);
         }
-
         req.setQuery(query);
         if (queryList) {
             req.setQueriesList(queryList);

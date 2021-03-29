@@ -173,6 +173,7 @@ func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowne
 			webAuthN.PublicKey,
 			webAuthN.AAGUID,
 			webAuthN.SignCount,
+			userAgentID,
 		),
 	)
 	if err != nil {
@@ -206,6 +207,7 @@ func (c *Commands) HumanHumanPasswordlessSetup(ctx context.Context, userID, reso
 			webAuthN.PublicKey,
 			webAuthN.AAGUID,
 			webAuthN.SignCount,
+			userAgentID,
 		),
 	)
 	if err != nil {
@@ -436,7 +438,7 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 		return nil, err
 	}
 	if existingWebAuthN.State == domain.MFAStateUnspecified || existingWebAuthN.State == domain.MFAStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2M9ds", "Errors.User.ExternalIDP.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-DAfb2", "Errors.User.WebAuthN.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingWebAuthN.WriteModel)

@@ -25,7 +25,7 @@ func (s *Server) SetDefaultFeatures(ctx context.Context, req *admin_pb.SetDefaul
 		return nil, err
 	}
 	return &admin_pb.SetDefaultFeaturesResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -45,7 +45,7 @@ func (s *Server) SetOrgFeatures(ctx context.Context, req *admin_pb.SetOrgFeature
 		return nil, err
 	}
 	return &admin_pb.SetOrgFeaturesResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -55,7 +55,7 @@ func (s *Server) ResetOrgFeatures(ctx context.Context, req *admin_pb.ResetOrgFea
 		return nil, err
 	}
 	return &admin_pb.ResetOrgFeaturesResponse{
-		Details: object_grpc.DomainToDetailsPb(details),
+		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -76,8 +76,8 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 	return &domain.Features{
 		TierName:                 req.TierName,
 		TierDescription:          req.Description,
-		TierState:                features_grpc.TierStateToDomain(req.State),
-		TierStateDescription:     req.StateDescription,
+		State:                    features_grpc.FeaturesStateToDomain(req.State),
+		StateDescription:         req.StateDescription,
 		AuditLogRetention:        req.AuditLogRetention.AsDuration(),
 		LoginPolicyFactors:       req.LoginPolicyFactors,
 		LoginPolicyIDP:           req.LoginPolicyIdp,

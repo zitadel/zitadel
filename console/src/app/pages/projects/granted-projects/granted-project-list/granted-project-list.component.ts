@@ -101,6 +101,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
                 this.grid = false;
             }
             this.dataSource.data = this.grantedProjectList;
+
             this.loadingSubject.next(false);
         }).catch(error => {
             console.error(error);

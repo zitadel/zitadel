@@ -6,7 +6,10 @@ import { ListProjectGrantMembersResponse, ListProjectMembersResponse } from 'src
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
-import { ProjectType } from './project-members.component';
+export enum ProjectType {
+    PROJECTTYPE_OWNED = "OWNED",
+    PROJECTTYPE_GRANTED = "GRANTED"
+}
 
 /**
  * Data source for the ProjectMembers view. This class should

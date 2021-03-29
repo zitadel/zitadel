@@ -3,18 +3,25 @@ package orb
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/orbos/pkg/kubernetes/resources/namespace"
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam"
+	zitadeldb "github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/pkg/errors"
+)
+
+const (
+	namespaceName = "caos-zitadel"
 )
 
 func AdaptFunc(
 	orbconfig *orb.Orb,
 	action string,
 	binaryVersion *string,
+	gitops bool,
 	features []string,
 ) operator.AdaptFunc {
 	return func(
@@ -25,6 +32,8 @@ func AdaptFunc(
 		queryFunc operator.QueryFunc,
 		destroyFunc operator.DestroyFunc,
 		allSecrets map[string]*secret.Secret,
+		allExisting map[string]*secret.Existing,
+		migrate bool,
 		err error,
 	) {
 		defer func() {
@@ -32,12 +41,13 @@ func AdaptFunc(
 		}()
 
 		allSecrets = make(map[string]*secret.Secret)
+		allExisting = make(map[string]*secret.Existing)
 
 		orbMonitor := monitor.WithField("kind", "orb")
 
-		desiredKind, err := parseDesiredV0(desiredTree)
+		desiredKind, err := ParseDesiredV0(desiredTree)
 		if err != nil {
-			return nil, nil, allSecrets, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
@@ -46,35 +56,64 @@ func AdaptFunc(
 			orbMonitor = orbMonitor.Verbose()
 		}
 
+		var dbClient zitadeldb.Client
+		if gitops {
+			dbClientT, err := zitadeldb.NewGitOpsClient(monitor, orbconfig.URL, orbconfig.Repokey)
+			if err != nil {
+				monitor.Error(err)
+				return nil, nil, nil, nil, false, err
+			}
+			dbClient = dbClientT
+		} else {
+			dbClient = zitadeldb.NewCrdClient(monitor)
+		}
+
 		operatorLabels := mustZITADELOperator(binaryVersion)
 
+		queryNS, err := namespace.AdaptFuncToEnsure(namespaceName)
+		if err != nil {
+			return nil, nil, nil, nil, false, err
+		}
+		/*destroyNS, err := namespace.AdaptFuncToDestroy(namespaceName)
+		if err != nil {
+			return nil, nil, allSecrets, err
+		}*/
+
 		iamCurrent := &tree.Tree{}
-		queryIAM, destroyIAM, zitadelSecrets, err := iam.GetQueryAndDestroyFuncs(
+		queryIAM, destroyIAM, zitadelSecrets, zitadelExisting, migrateIAM, err := iam.GetQueryAndDestroyFuncs(
 			orbMonitor,
 			operatorLabels,
 			desiredKind.IAM,
 			iamCurrent,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
-			orbconfig,
+			dbClient,
+			namespaceName,
 			action,
 			&desiredKind.Spec.Version,
 			features,
 		)
 		if err != nil {
-			return nil, nil, allSecrets, err
+			return nil, nil, nil, nil, false, err
 		}
-		secret.AppendSecrets("", allSecrets, zitadelSecrets)
+		migrate = migrate || migrateIAM
+		secret.AppendSecrets("", allSecrets, zitadelSecrets, allExisting, zitadelExisting)
 
 		destroyers := make([]operator.DestroyFunc, 0)
 		queriers := make([]operator.QueryFunc, 0)
 		for _, feature := range features {
 			switch feature {
 			case "iam", "migration", "scaleup", "scaledown":
-				queriers = append(queriers, queryIAM)
+				queriers = append(queriers,
+					operator.ResourceQueryToZitadelQuery(queryNS),
+					queryIAM,
+				)
 				destroyers = append(destroyers, destroyIAM)
 			case "operator":
-				queriers = append(queriers, operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredTree, false)))
+				queriers = append(queriers,
+					operator.ResourceQueryToZitadelQuery(queryNS),
+					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec, gitops)),
+				)
 			}
 		}
 
@@ -96,6 +135,8 @@ func AdaptFunc(
 				return operator.DestroyersToDestroyFunc(monitor, destroyers)(k8sClient)
 			},
 			allSecrets,
+			allExisting,
+			migrate,
 			nil
 	}
 }

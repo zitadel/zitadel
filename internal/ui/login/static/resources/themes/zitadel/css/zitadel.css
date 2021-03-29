@@ -440,6 +440,10 @@ i {
   align-items: center;
   border: none;
   outline: none;
+  cursor: pointer;
+}
+.lgn-account-selection .lgn-account:disabled {
+  cursor: not-allowed;
 }
 .lgn-account-selection .lgn-account .left {
   padding: 0.5rem 1rem;
@@ -1202,7 +1206,6 @@ a:hover, a:active {
   color: inherit;
   background: transparent;
   box-shadow: inset 0 -1px #303131;
-  cursor: pointer;
 }
 .lgn-account-selection .lgn-account:hover {
   background-color: rgba(255, 255, 255, 0.02);
@@ -1522,7 +1525,6 @@ a:hover, a:active {
   color: inherit;
   background: transparent;
   box-shadow: inset 0 -1px #303131;
-  cursor: pointer;
 }
 .lgn-dark-theme .lgn-account-selection .lgn-account:hover {
   background-color: rgba(255, 255, 255, 0.02);
@@ -1836,7 +1838,6 @@ a:hover, a:active {
   color: inherit;
   background: transparent;
   box-shadow: inset 0 -1px #e3e8ee;
-  cursor: pointer;
 }
 .lgn-light-theme .lgn-account-selection .lgn-account:hover {
   background-color: rgba(0, 0, 0, 0.02);

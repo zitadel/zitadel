@@ -1,22 +1,26 @@
 package bucket
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestBucket_getSecretsFull(t *testing.T) {
-	secrets := getSecretsMap(&desired)
+	secrets, existing := getSecretsMap(&desired)
 	assert.Equal(t, desired.Spec.ServiceAccountJSON, secrets["serviceaccountjson"])
+	assert.Equal(t, desired.Spec.ExistingServiceAccountJSON, existing["serviceaccountjson"])
 }
 
 func TestBucket_getSecretsEmpty(t *testing.T) {
-	secrets := getSecretsMap(&desiredWithoutSecret)
+	secrets, existing := getSecretsMap(&desiredWithoutSecret)
 	assert.Equal(t, &secret.Secret{}, secrets["serviceaccountjson"])
+	assert.Equal(t, &secret.Existing{}, existing["serviceaccountjson"])
 }
 
 func TestBucket_getSecretsNil(t *testing.T) {
-	secrets := getSecretsMap(&desiredNil)
+	secrets, existing := getSecretsMap(&desiredNil)
 	assert.Equal(t, &secret.Secret{}, secrets["serviceaccountjson"])
+	assert.Equal(t, &secret.Existing{}, existing["serviceaccountjson"])
 }

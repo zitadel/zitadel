@@ -34,7 +34,7 @@ const (
 )
 
 func (a *APIApp) IsValid() bool {
-	return true
+	return a.AppName != ""
 }
 
 func (a *APIApp) setClientID(clientID string) {

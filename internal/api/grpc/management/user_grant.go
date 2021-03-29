@@ -21,6 +21,7 @@ func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrant
 
 func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*mgmt_pb.ListUserGrantResponse, error) {
 	r := ListUserGrantsRequestToModel(ctx, req)
+	r.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	res, err := s.usergrant.SearchUserGrants(ctx, r)
 	if err != nil {
 		return nil, err
@@ -42,7 +43,7 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 	}
 	return &mgmt_pb.AddUserGrantResponse{
 		UserGrantId: grant.AggregateID,
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.AddToDetailsPb(
 			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
@@ -56,7 +57,7 @@ func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGra
 		return nil, err
 	}
 	return &mgmt_pb.UpdateUserGrantResponse{
-		Details: obj_grpc.ToDetailsPb(
+		Details: obj_grpc.ChangeToDetailsPb(
 			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
@@ -70,7 +71,7 @@ func (s *Server) DeactivateUserGrant(ctx context.Context, req *mgmt_pb.Deactivat
 		return nil, err
 	}
 	return &mgmt_pb.DeactivateUserGrantResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -80,7 +81,7 @@ func (s *Server) ReactivateUserGrant(ctx context.Context, req *mgmt_pb.Reactivat
 		return nil, err
 	}
 	return &mgmt_pb.ReactivateUserGrantResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -90,7 +91,7 @@ func (s *Server) RemoveUserGrant(ctx context.Context, req *mgmt_pb.RemoveUserGra
 		return nil, err
 	}
 	return &mgmt_pb.RemoveUserGrantResponse{
-		Details: obj_grpc.DomainToDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -99,7 +100,5 @@ func (s *Server) BulkRemoveUserGrant(ctx context.Context, req *mgmt_pb.BulkRemov
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.BulkRemoveUserGrantResponse{
-		//TODO: Do we need details here?
-	}, nil
+	return &mgmt_pb.BulkRemoveUserGrantResponse{}, nil
 }

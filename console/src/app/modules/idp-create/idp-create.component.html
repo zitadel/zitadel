@@ -55,7 +55,7 @@
                     <cnsl-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</cnsl-label>
                     <mat-select formControlName="idpDisplayNameMapping">
                         <mat-option *ngFor="let field of mappingFields" [value]="field">
-                            {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                            {{ 'IDP.MAPPINGFIELD.'+field | translate }}
                         </mat-option>
                     </mat-select>
                 </cnsl-form-field>
@@ -63,7 +63,7 @@
                     <cnsl-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</cnsl-label>
                     <mat-select formControlName="usernameMapping">
                         <mat-option *ngFor="let field of mappingFields" [value]="field">
-                            {{ 'IDP.MAPPINTFIELD.'+field | translate }}
+                            {{ 'IDP.MAPPINGFIELD.'+field | translate }}
                         </mat-option>
                     </mat-select>
                 </cnsl-form-field>

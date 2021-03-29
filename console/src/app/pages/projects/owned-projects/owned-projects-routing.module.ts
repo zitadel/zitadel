@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RoleGuard } from 'src/app/guards/role.guard';
-import { ProjectType } from 'src/app/modules/project-members/project-members.component';
+import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 
 import { OwnedProjectsComponent } from './owned-projects.component';
 
@@ -16,7 +16,7 @@ const routes: Routes = [
         loadChildren: () => import('../project-create/project-create.module').then(m => m.ProjectCreateModule),
         canActivate: [RoleGuard],
         data: {
-            roles: ['project.write'],
+            roles: ['project.create'],
         },
     },
     {

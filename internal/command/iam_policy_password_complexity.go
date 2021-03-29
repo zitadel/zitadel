@@ -15,6 +15,9 @@ func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context) (*dom
 	if err != nil {
 		return nil, err
 	}
+	if !policyWriteModel.State.Exists() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-M0gsf", "Errors.IAM.OrgIAMPolicy.NotFound")
+	}
 	policy := writeModelToPasswordComplexityPolicy(&policyWriteModel.PasswordComplexityPolicyWriteModel)
 	policy.Default = true
 	return policy, nil

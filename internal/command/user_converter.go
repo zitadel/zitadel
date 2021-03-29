@@ -6,7 +6,7 @@ import (
 )
 
 func writeModelToHuman(wm *HumanWriteModel) *domain.Human {
-	return &domain.Human{
+	human := &domain.Human{
 		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
 		Username:   wm.UserName,
 		State:      wm.UserState,
@@ -22,14 +22,22 @@ func writeModelToHuman(wm *HumanWriteModel) *domain.Human {
 			EmailAddress:    wm.Email,
 			IsEmailVerified: wm.IsEmailVerified,
 		},
-		Address: &domain.Address{
+	}
+	if wm.Phone != "" {
+		human.Phone = &domain.Phone{
+			PhoneNumber: wm.Phone,
+		}
+	}
+	if wm.Country != "" || wm.Locality != "" || wm.PostalCode != "" || wm.Region != "" || wm.StreetAddress != "" {
+		human.Address = &domain.Address{
 			Country:       wm.Country,
 			Locality:      wm.Locality,
 			PostalCode:    wm.PostalCode,
 			Region:        wm.Region,
 			StreetAddress: wm.StreetAddress,
-		},
+		}
 	}
+	return human
 }
 
 func writeModelToProfile(wm *HumanProfileWriteModel) *domain.Profile {
@@ -73,8 +81,10 @@ func writeModelToAddress(wm *HumanAddressWriteModel) *domain.Address {
 func writeModelToMachine(wm *MachineWriteModel) *domain.Machine {
 	return &domain.Machine{
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
+		Username:    wm.UserName,
 		Name:        wm.Name,
 		Description: wm.Description,
+		State:       wm.UserState,
 	}
 }
 

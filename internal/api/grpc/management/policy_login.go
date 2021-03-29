@@ -35,7 +35,7 @@ func (s *Server) AddCustomLoginPolicy(ctx context.Context, req *mgmt_pb.AddCusto
 		return nil, err
 	}
 	return &mgmt_pb.AddCustomLoginPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
@@ -49,7 +49,7 @@ func (s *Server) UpdateCustomLoginPolicy(ctx context.Context, req *mgmt_pb.Updat
 		return nil, err
 	}
 	return &mgmt_pb.UpdateCustomLoginPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
@@ -63,7 +63,7 @@ func (s *Server) ResetLoginPolicyToDefault(ctx context.Context, req *mgmt_pb.Res
 		return nil, err
 	}
 	return &mgmt_pb.ResetLoginPolicyToDefaultResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -79,12 +79,12 @@ func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *mgmt_pb.ListLogin
 }
 
 func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *mgmt_pb.AddIDPToLoginPolicyRequest) (*mgmt_pb.AddIDPToLoginPolicyResponse, error) {
-	idp, err := s.command.AddIDPProviderToLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, &domain.IDPProvider{IDPConfigID: req.IdpId}) //TODO: old way was to also add type but this doesnt make sense in my point of view
+	idp, err := s.command.AddIDPProviderToLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, &domain.IDPProvider{IDPConfigID: req.IdpId, Type: idp.IDPProviderTypeFromPb(req.OwnerType)})
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddIDPToLoginPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			idp.Sequence,
 			idp.ChangeDate,
 			idp.ResourceOwner,
@@ -102,7 +102,7 @@ func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *mgmt_pb.Remo
 		return nil, err
 	}
 	return &mgmt_pb.RemoveIDPFromLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -119,22 +119,22 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *mgmt_pb.
 }
 
 func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.AddSecondFactorToLoginPolicyRequest) (*mgmt_pb.AddSecondFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
+	_, objectDetails, err := s.command.AddSecondFactorToLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddSecondFactorToLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToAddDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *mgmt_pb.RemoveSecondFactorFromLoginPolicyRequest) (*mgmt_pb.RemoveSecondFactorFromLoginPolicyResponse, error) {
-	objectDetails, err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.RemoveSecondFactorFromLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveSecondFactorFromLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -151,21 +151,21 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *mgmt_pb.L
 }
 
 func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *mgmt_pb.AddMultiFactorToLoginPolicyRequest) (*mgmt_pb.AddMultiFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
+	_, objectDetails, err := s.command.AddMultiFactorToLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddMultiFactorToLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToAddDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) RemoveMultiFactorFromLoginPolicy(ctx context.Context, req *mgmt_pb.RemoveMultiFactorFromLoginPolicyRequest) (*mgmt_pb.RemoveMultiFactorFromLoginPolicyResponse, error) {
-	objectDetails, err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.RemoveMultiFactorFromLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveMultiFactorFromLoginPolicyResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

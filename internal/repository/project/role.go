@@ -37,7 +37,6 @@ type RoleAddedEvent struct {
 	Key         string `json:"key,omitempty"`
 	DisplayName string `json:"displayName,omitempty"`
 	Group       string `json:"group,omitempty"`
-	projectID   string
 }
 
 func (e *RoleAddedEvent) Data() interface{} {
@@ -45,7 +44,7 @@ func (e *RoleAddedEvent) Data() interface{} {
 }
 
 func (e *RoleAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.projectID)}
+	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
 }
 
 func NewRoleAddedEvent(
@@ -53,8 +52,7 @@ func NewRoleAddedEvent(
 	aggregate *eventstore.Aggregate,
 	key,
 	displayName,
-	group,
-	projectID string,
+	group string,
 ) *RoleAddedEvent {
 	return &RoleAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -65,7 +63,6 @@ func NewRoleAddedEvent(
 		Key:         key,
 		DisplayName: displayName,
 		Group:       group,
-		projectID:   projectID,
 	}
 }
 
@@ -101,6 +98,7 @@ func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 func NewRoleChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	key string,
 	changes []RoleChanges,
 ) (*RoleChangedEvent, error) {
 	if len(changes) == 0 {
@@ -112,6 +110,7 @@ func NewRoleChangedEvent(
 			aggregate,
 			RoleChangedType,
 		),
+		Key: key,
 	}
 	for _, change := range changes {
 		change(changeEvent)
@@ -154,8 +153,7 @@ func RoleChangedEventMapper(event *repository.Event) (eventstore.EventReader, er
 type RoleRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Key       string `json:"key,omitempty"`
-	projectID string `json:"-"`
+	Key string `json:"key,omitempty"`
 }
 
 func (e *RoleRemovedEvent) Data() interface{} {
@@ -163,22 +161,20 @@ func (e *RoleRemovedEvent) Data() interface{} {
 }
 
 func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.projectID)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
 }
 
 func NewRoleRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	key,
-	projectID string) *RoleRemovedEvent {
+	key string) *RoleRemovedEvent {
 	return &RoleRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			RoleRemovedType,
 		),
-		Key:       key,
-		projectID: projectID,
+		Key: key,
 	}
 }
 

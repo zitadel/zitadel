@@ -2,8 +2,15 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view"
 
 	"github.com/caos/logging"
@@ -11,6 +18,7 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -153,22 +161,32 @@ func (p *ProjectMember) fillData(member *view_model.ProjectMemberView) (err erro
 	if err != nil {
 		return err
 	}
-	p.fillUserData(member, user)
-	return nil
+	return p.fillUserData(member, user)
 }
 
-func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user *usr_view_model.UserView) {
+func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user *usr_view_model.UserView) error {
+	org, err := p.getOrgByID(context.Background(), user.ResourceOwner)
+	policy := org.OrgIamPolicy
+	if policy == nil {
+		policy, err = p.getDefaultOrgIAMPolicy(context.TODO())
+		if err != nil {
+			return err
+		}
+	}
 	member.UserName = user.UserName
+	member.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
 	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.Email = user.Email
-		member.DisplayName = user.FirstName + " " + user.LastName
+		member.DisplayName = user.DisplayName
 	}
 	if user.MachineView != nil {
 		member.DisplayName = user.MachineView.Name
 	}
+	return nil
 }
+
 func (p *ProjectMember) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in projectmember handler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectMemberFailedEvent, p.view.ProcessedProjectMemberFailedEvent, p.view.ProcessedProjectMemberSequence, p.errorCountUntilSkip)
@@ -209,4 +227,54 @@ func (u *ProjectMember) getUserEvents(userID string, sequence uint64) ([]*es_mod
 	}
 
 	return u.es.FilterEvents(context.Background(), query)
+}
+
+func (u *ProjectMember) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
+	query, err := org_view.OrgByIDQuery(orgID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	esOrg := &org_es_model.Org{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: orgID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+	if esOrg.Sequence == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-3N8fs", "Errors.Org.NotFound")
+	}
+
+	return org_es_model.OrgToModel(esOrg), nil
+}
+
+func (u *ProjectMember) getDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicy, error) {
+	existingIAM, err := u.getIAMByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if existingIAM.DefaultOrgIAMPolicy == nil {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-5M9sd", "Errors.IAM.OrgIAMPolicy.NotExisting")
+	}
+	return existingIAM.DefaultOrgIAMPolicy, nil
+}
+
+func (u *ProjectMember) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
+	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+	if err != nil {
+		return nil, err
+	}
+	iam := &iam_es_model.IAM{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: domain.IAMID,
+		},
+	}
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, iam.AppendEvents, query)
+	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
+		return nil, err
+	}
+	return iam_es_model.IAMToModel(iam), nil
 }

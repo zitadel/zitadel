@@ -172,8 +172,7 @@ message AuthFactorU2F {
 }
 
 message WebAuthNKey {
-    string id = 1;
-    bytes public_key = 2;
+    bytes public_key = 1;
 }
 
 message WebAuthNVerification {
@@ -245,7 +244,7 @@ enum SessionState {
 }
 
 message UserGrant {
-    string grant_id = 1;
+    string id = 1;
     zitadel.v1.ObjectDetails details = 2;
     repeated string role_keys = 3;
     UserGrantState state = 4;
@@ -263,6 +262,7 @@ message UserGrant {
     
     string project_id = 14;
     string project_name = 15;
+    string project_grant_id = 16;
 }
 
 enum UserGrantState {

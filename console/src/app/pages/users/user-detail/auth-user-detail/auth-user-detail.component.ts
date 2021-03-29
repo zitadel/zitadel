@@ -8,8 +8,7 @@ import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/ge
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { EditDialogType } from '../user-detail/user-detail.component';
-import { EditDialogComponent } from './edit-dialog/edit-dialog.component';
+import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
 @Component({
     selector: 'app-auth-user-detail',
@@ -70,6 +69,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                     this.user.human.profile?.firstName,
                     this.user.human.profile?.lastName,
                     this.user.human.profile?.nickName,
+                    this.user.human.profile?.displayName,
                     this.user.human.profile?.preferredLanguage,
                     this.user.human.profile?.gender,
                 )
@@ -169,7 +169,8 @@ export class AuthUserDetailComponent implements OnDestroy {
                         labelKey: 'ACTIONS.NEWVALUE',
                         titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
-                        value: this.user.human?.phone,
+                        value: this.user.human?.phone?.phone,
+                        type: type,
                     },
                     width: '400px',
                 });
@@ -188,7 +189,8 @@ export class AuthUserDetailComponent implements OnDestroy {
                         labelKey: 'ACTIONS.NEWVALUE',
                         titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
-                        value: this.user.human?.email,
+                        value: this.user.human?.email?.email,
+                        type: type
                     },
                     width: '400px',
                 });

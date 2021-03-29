@@ -7,6 +7,9 @@ import (
 )
 
 func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
+	if config.IDPConfigID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-9djf8", "Errors.IDMissing")
+	}
 	existingConfig := NewIAMIDPOIDCConfigWriteModel(config.IDPConfigID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
@@ -14,7 +17,7 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 	}
 
 	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-67J9d", "Errors.IAM.IDPConfig.AlreadyExists")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-67J9d", "Errors.IAM.IDPConfig.AlreadyExists")
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingConfig.WriteModel)

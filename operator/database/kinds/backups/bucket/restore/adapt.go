@@ -1,8 +1,9 @@
 package restore
 
 import (
-	"github.com/caos/zitadel/operator"
 	"time"
+
+	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -12,16 +13,16 @@ import (
 )
 
 const (
-	Instant                          = "restore"
-	defaultMode                      = int32(256)
-	certPath                         = "/cockroach/cockroach-certs"
-	secretPath                       = "/secrets/sa.json"
-	jobPrefix                        = "backup-"
-	jobSuffix                        = "-restore"
-	image                            = "ghcr.io/caos/zitadel-crbackup"
-	internalSecretName               = "client-certs"
-	rootSecretName                   = "cockroachdb.client.root"
-	timeout            time.Duration = 60
+	Instant            = "restore"
+	defaultMode        = int32(256)
+	certPath           = "/cockroach/cockroach-certs"
+	secretPath         = "/secrets/sa.json"
+	jobPrefix          = "backup-"
+	jobSuffix          = "-restore"
+	image              = "ghcr.io/caos/zitadel-crbackup"
+	internalSecretName = "client-certs"
+	rootSecretName     = "cockroachdb.client.root"
+	timeout            = 15 * time.Minute
 )
 
 func AdaptFunc(
@@ -79,7 +80,6 @@ func AdaptFunc(
 	queriers := []operator.QueryFunc{
 		operator.EnsureFuncToQueryFunc(checkDBReady),
 		operator.ResourceQueryToZitadelQuery(queryJ),
-		operator.EnsureFuncToQueryFunc(getCleanupFunc(monitor, jobdef.Namespace, jobdef.Name)),
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {

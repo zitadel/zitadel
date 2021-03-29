@@ -23,13 +23,13 @@
 
             <button mat-stroked-button color="warn"
                 [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) == false"
-                *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE"
-                (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' |
+                *ngIf="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
+                (click)="changeState(ProjectState.PROJECT_STATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' |
                 translate}}</button>
             <button mat-stroked-button color="warn"
                 [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) == false"
-                *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE"
-                (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' |
+                *ngIf="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
+                (click)="changeState(ProjectState.PROJECT_STATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' |
                 translate}}</button>
 
             <div class="full-width">
@@ -67,8 +67,7 @@
             </ng-template>
 
             <ng-container *ngIf="isZitadel == false">
-                <ng-template appHasRole
-                    [appHasRole]="['project.grant.read:' + project.id, 'project.grant.read']">
+                <ng-template appHasRole [appHasRole]="['project.grant.read:' + project.id, 'project.grant.read']">
                     <app-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
                         description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
                         <app-project-grants
@@ -120,7 +119,7 @@
             <div class="meta-row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
                 <span *ngIf="project && project.state !== undefined" class="state"
-                    [ngClass]="{'active': project.state === ProjectState.PROJECTSTATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECTSTATE_INACTIVE}">{{'PROJECT.STATE.'+project.state
+                    [ngClass]="{'active': project.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECT_STATE_INACTIVE}">{{'PROJECT.STATE.'+project.state
                     | translate}}</span>
             </div>
         </div>

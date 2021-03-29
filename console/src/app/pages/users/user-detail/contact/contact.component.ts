@@ -4,7 +4,7 @@ import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.com
 import { Human, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { CodeDialogComponent } from '../auth-user-detail/code-dialog/code-dialog.component';
-import { EditDialogType } from '../user-detail/user-detail.component';
+import { EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 
 @Component({
     selector: 'app-contact',
@@ -21,7 +21,7 @@ export class ContactComponent {
     @Output() resendPhoneVerification: EventEmitter<void> = new EventEmitter();
     @Output() enteredPhoneCode: EventEmitter<string> = new EventEmitter();
     @Output() deletedPhone: EventEmitter<void> = new EventEmitter();
-    @Input() public userStateEnum: any;
+    public UserState: any = UserState;
 
     public EditDialogType: any = EditDialogType;
     constructor(private dialog: MatDialog) { }

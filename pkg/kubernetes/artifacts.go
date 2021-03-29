@@ -3,6 +3,9 @@ package kubernetes
 import (
 	"fmt"
 
+	"gopkg.in/yaml.v3"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
@@ -21,6 +24,7 @@ func EnsureZitadelOperatorArtifacts(
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
 	imageRegistry string,
+	gitops bool,
 ) error {
 
 	monitor.WithFields(map[string]interface{}{
@@ -78,6 +82,174 @@ func EnsureZitadelOperatorArtifacts(
 		return err
 	}
 
+	if !gitops {
+		crd := `apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.2
+  creationTimestamp: null
+  name: zitadels.caos.ch
+spec:
+  group: caos.ch
+  names:
+    kind: Zitadel
+    listKind: ZitadelList
+    plural: zitadels
+    singular: zitadel
+  scope: ""
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            iam:
+              type: object
+            kind:
+              type: string
+            spec:
+              properties:
+                customImageRegistry:
+                  description: 'Use this registry to pull the zitadel operator image
+                    from @default: ghcr.io'
+                  type: string
+                databaseCrd:
+                  properties:
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                  type: object
+                gitops:
+                  type: boolean
+                nodeSelector:
+                  additionalProperties:
+                    type: string
+                  type: object
+                selfReconciling:
+                  type: boolean
+                tolerations:
+                  items:
+                    description: The pod this Toleration is attached to tolerates
+                      any taint that matches the triple <key,value,effect> using the
+                      matching operator <operator>.
+                    properties:
+                      effect:
+                        description: Effect indicates the taint effect to match. Empty
+                          means match all taint effects. When specified, allowed values
+                          are NoSchedule, PreferNoSchedule and NoExecute.
+                        type: string
+                      key:
+                        description: Key is the taint key that the toleration applies
+                          to. Empty means match all taint keys. If the key is empty,
+                          operator must be Exists; this combination means to match
+                          all values and all keys.
+                        type: string
+                      operator:
+                        description: Operator represents a key's relationship to the
+                          value. Valid operators are Exists and Equal. Defaults to
+                          Equal. Exists is equivalent to wildcard for value, so that
+                          a pod can tolerate all taints of a particular category.
+                        type: string
+                      tolerationSeconds:
+                        description: TolerationSeconds represents the period of time
+                          the toleration (which must be of effect NoExecute, otherwise
+                          this field is ignored) tolerates the taint. By default,
+                          it is not set, which means tolerate the taint forever (do
+                          not evict). Zero and negative values will be treated as
+                          0 (evict immediately) by the system.
+                        format: int64
+                        type: integer
+                      value:
+                        description: Value is the taint value the toleration matches
+                          to. If the operator is Exists, the value should be empty,
+                          otherwise just a regular string.
+                        type: string
+                    type: object
+                  type: array
+                verbose:
+                  type: boolean
+                version:
+                  type: string
+              required:
+              - selfReconciling
+              - verbose
+              type: object
+            version:
+              type: string
+          required:
+          - iam
+          - kind
+          - spec
+          - version
+          type: object
+        status:
+          type: object
+      type: object
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []`
+
+		crdDefinition := &unstructured.Unstructured{}
+		if err := yaml.Unmarshal([]byte(crd), &crdDefinition.Object); err != nil {
+			return err
+		}
+
+		if err := client.ApplyCRDResource(
+			crdDefinition,
+		); err != nil {
+			return err
+		}
+		monitor.WithFields(map[string]interface{}{
+			"version": version,
+		}).Debug("Database Operator crd ensured")
+	}
+
+	var (
+		cmd          = []string{"/zitadelctl", "operator"}
+		volumes      []core.Volume
+		volumeMounts []core.VolumeMount
+	)
+
+	if gitops {
+		cmd = append(cmd, "--gitops", "-f", "/secrets/orbconfig")
+		volumes = []core.Volume{{
+			Name: "orbconfig",
+			VolumeSource: core.VolumeSource{
+				Secret: &core.SecretVolumeSource{
+					SecretName: "caos",
+				},
+			},
+		}}
+		volumeMounts = []core.VolumeMount{{
+			Name:      "orbconfig",
+			ReadOnly:  true,
+			MountPath: "/secrets",
+		}}
+	} else {
+		cmd = append(cmd, "--kubeconfig", "")
+	}
+
 	deployment := &apps.Deployment{
 		ObjectMeta: mach.ObjectMeta{
 			Name:      nameLabels.Name(),
@@ -99,18 +271,14 @@ func EnsureZitadelOperatorArtifacts(
 						Name:            "zitadel",
 						ImagePullPolicy: core.PullIfNotPresent,
 						Image:           fmt.Sprintf("%s/caos/zitadel-operator:%s", imageRegistry, version),
-						Command:         []string{"/zitadelctl", "operator", "-f", "/secrets/orbconfig"},
+						Command:         cmd,
 						Args:            []string{},
 						Ports: []core.ContainerPort{{
 							Name:          "metrics",
 							ContainerPort: 2112,
 							Protocol:      "TCP",
 						}},
-						VolumeMounts: []core.VolumeMount{{
-							Name:      "orbconfig",
-							ReadOnly:  true,
-							MountPath: "/secrets",
-						}},
+						VolumeMounts: volumeMounts,
 						Resources: core.ResourceRequirements{
 							Limits: core.ResourceList{
 								"cpu":    resource.MustParse("500m"),
@@ -122,16 +290,9 @@ func EnsureZitadelOperatorArtifacts(
 							},
 						},
 					}},
-					NodeSelector: nodeselector,
-					Tolerations:  tolerations,
-					Volumes: []core.Volume{{
-						Name: "orbconfig",
-						VolumeSource: core.VolumeSource{
-							Secret: &core.SecretVolumeSource{
-								SecretName: "caos",
-							},
-						},
-					}},
+					NodeSelector:                  nodeselector,
+					Tolerations:                   tolerations,
+					Volumes:                       volumes,
 					TerminationGracePeriodSeconds: int64Ptr(10),
 				},
 			},
@@ -170,7 +331,8 @@ func EnsureDatabaseArtifacts(
 	version string,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	imageRegistry string) error {
+	imageRegistry string,
+	gitops bool) error {
 
 	monitor.WithFields(map[string]interface{}{
 		"database": version,
@@ -227,6 +389,167 @@ func EnsureDatabaseArtifacts(
 		return err
 	}
 
+	if !gitops {
+		crd := `apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.2
+  creationTimestamp: null
+  name: databases.caos.ch
+spec:
+  group: caos.ch
+  names:
+    kind: Database
+    listKind: DatabaseList
+    plural: databases
+    singular: database
+  scope: ""
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            database:
+              type: object
+            kind:
+              type: string
+            spec:
+              properties:
+                customImageRegistry:
+                  description: 'Use this registry to pull the Database operator image
+                    from @default: ghcr.io'
+                  type: string
+                gitOps:
+                  type: boolean
+                nodeSelector:
+                  additionalProperties:
+                    type: string
+                  type: object
+                selfReconciling:
+                  type: boolean
+                tolerations:
+                  items:
+                    description: The pod this Toleration is attached to tolerates
+                      any taint that matches the triple <key,value,effect> using the
+                      matching operator <operator>.
+                    properties:
+                      effect:
+                        description: Effect indicates the taint effect to match. Empty
+                          means match all taint effects. When specified, allowed values
+                          are NoSchedule, PreferNoSchedule and NoExecute.
+                        type: string
+                      key:
+                        description: Key is the taint key that the toleration applies
+                          to. Empty means match all taint keys. If the key is empty,
+                          operator must be Exists; this combination means to match
+                          all values and all keys.
+                        type: string
+                      operator:
+                        description: Operator represents a key's relationship to the
+                          value. Valid operators are Exists and Equal. Defaults to
+                          Equal. Exists is equivalent to wildcard for value, so that
+                          a pod can tolerate all taints of a particular category.
+                        type: string
+                      tolerationSeconds:
+                        description: TolerationSeconds represents the period of time
+                          the toleration (which must be of effect NoExecute, otherwise
+                          this field is ignored) tolerates the taint. By default,
+                          it is not set, which means tolerate the taint forever (do
+                          not evict). Zero and negative values will be treated as
+                          0 (evict immediately) by the system.
+                        format: int64
+                        type: integer
+                      value:
+                        description: Value is the taint value the toleration matches
+                          to. If the operator is Exists, the value should be empty,
+                          otherwise just a regular string.
+                        type: string
+                    type: object
+                  type: array
+                verbose:
+                  type: boolean
+                version:
+                  type: string
+              required:
+              - selfReconciling
+              - verbose
+              type: object
+            version:
+              type: string
+          required:
+          - database
+          - kind
+          - spec
+          - version
+          type: object
+        status:
+          type: object
+      type: object
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []`
+
+		crdDefinition := &unstructured.Unstructured{}
+		if err := yaml.Unmarshal([]byte(crd), &crdDefinition.Object); err != nil {
+			return err
+		}
+
+		if err := client.ApplyCRDResource(
+			crdDefinition,
+		); err != nil {
+			return err
+		}
+		monitor.WithFields(map[string]interface{}{
+			"version": version,
+		}).Debug("Database Operator crd ensured")
+	}
+
+	var (
+		cmd          = []string{"/zitadelctl", "database"}
+		volumes      []core.Volume
+		volumeMounts []core.VolumeMount
+	)
+
+	if gitops {
+		cmd = append(cmd, "--gitops", "-f", "/secrets/orbconfig")
+		volumes = []core.Volume{{
+			Name: "orbconfig",
+			VolumeSource: core.VolumeSource{
+				Secret: &core.SecretVolumeSource{
+					SecretName: "caos",
+				},
+			},
+		}}
+		volumeMounts = []core.VolumeMount{{
+			Name:      "orbconfig",
+			ReadOnly:  true,
+			MountPath: "/secrets",
+		}}
+	} else {
+		cmd = append(cmd, "--kubeconfig", "")
+	}
+
 	deployment := &apps.Deployment{
 		ObjectMeta: mach.ObjectMeta{
 			Name:      "database-operator",
@@ -248,18 +571,14 @@ func EnsureDatabaseArtifacts(
 						Name:            "database",
 						ImagePullPolicy: core.PullIfNotPresent,
 						Image:           fmt.Sprintf("%s/caos/zitadel-operator:%s", imageRegistry, version),
-						Command:         []string{"/zitadelctl", "database", "-f", "/secrets/orbconfig"},
+						Command:         cmd,
 						Args:            []string{},
 						Ports: []core.ContainerPort{{
 							Name:          "metrics",
 							ContainerPort: 2112,
 							Protocol:      "TCP",
 						}},
-						VolumeMounts: []core.VolumeMount{{
-							Name:      "orbconfig",
-							ReadOnly:  true,
-							MountPath: "/secrets",
-						}},
+						VolumeMounts: volumeMounts,
 						Resources: core.ResourceRequirements{
 							Limits: core.ResourceList{
 								"cpu":    resource.MustParse("500m"),
@@ -271,16 +590,9 @@ func EnsureDatabaseArtifacts(
 							},
 						},
 					}},
-					NodeSelector: nodeselector,
-					Tolerations:  tolerations,
-					Volumes: []core.Volume{{
-						Name: "orbconfig",
-						VolumeSource: core.VolumeSource{
-							Secret: &core.SecretVolumeSource{
-								SecretName: "caos",
-							},
-						},
-					}},
+					NodeSelector:                  nodeselector,
+					Tolerations:                   tolerations,
+					Volumes:                       volumes,
 					TerminationGracePeriodSeconds: int64Ptr(10),
 				},
 			},

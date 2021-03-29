@@ -13,10 +13,13 @@ func (c *Commands) ChangeHumanAddress(ctx context.Context, address *domain.Addre
 		return nil, err
 	}
 	if existingAddress.State == domain.AddressStateUnspecified || existingAddress.State == domain.AddressStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-0pLdo", "Errors.User.Address.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0pLdo", "Errors.User.Address.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingAddress.WriteModel)
-	changedEvent, hasChanged := existingAddress.NewChangedEvent(ctx, userAgg, address.Country, address.Locality, address.PostalCode, address.Region, address.StreetAddress)
+	changedEvent, hasChanged, err := existingAddress.NewChangedEvent(ctx, userAgg, address.Country, address.Locality, address.PostalCode, address.Region, address.StreetAddress)
+	if err != nil {
+		return nil, err
+	}
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0cs", "Errors.User.Address.NotChanged")
 	}

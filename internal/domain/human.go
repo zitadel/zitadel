@@ -1,11 +1,11 @@
 package domain
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"strings"
-	"time"
 )
 
 type Human struct {
@@ -18,12 +18,7 @@ type Human struct {
 	*Email
 	*Phone
 	*Address
-	ExternalIDPs       []*ExternalIDP
-	OTP                *OTP
-	U2FTokens          []*WebAuthNToken
-	PasswordlessTokens []*WebAuthNToken
-	U2FLogins          []*WebAuthNLogin
-	PasswordlessLogins []*WebAuthNLogin
+	ExternalIDPs []*ExternalIDP
 }
 
 func (h Human) GetUsername() string {
@@ -57,15 +52,12 @@ func (f Gender) Valid() bool {
 }
 
 func (u *Human) IsValid() bool {
-	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
+	return u.Profile != nil && u.Profile.IsValid() && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
 }
 
 func (u *Human) CheckOrgIAMPolicy(policy *OrgIAMPolicy) error {
 	if policy == nil {
 		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-zSH7j", "Errors.Users.OrgIamPolicyNil")
-	}
-	if policy.UserLoginMustBeDomain && strings.Contains(u.Username, "@") {
-		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-se4sJ", "Errors.User.EmailAsUsernameNotAllowed")
 	}
 	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.Username == "" && u.Email != nil {
 		u.Username = u.EmailAddress

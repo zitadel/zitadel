@@ -372,7 +372,7 @@ type HumanSignedOutEvent struct {
 }
 
 func (e *HumanSignedOutEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanSignedOutEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {

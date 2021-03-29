@@ -14,16 +14,17 @@ const (
 	FeatureLoginPolicyRegistration  = FeatureLoginPolicy + ".registration"
 	FeatureLoginPolicyUsernameLogin = FeatureLoginPolicy + ".username_login"
 	FeaturePasswordComplexityPolicy = "password_complexity_policy"
+	FeatureLabelPolicy              = "label_policy"
 )
 
 type Features struct {
 	es_models.ObjectRoot
 
-	TierName             string
-	TierDescription      string
-	TierState            FeaturesState
-	TierStateDescription string
-	IsDefault            bool
+	TierName         string
+	TierDescription  string
+	State            FeaturesState
+	StateDescription string
+	IsDefault        bool
 
 	AuditLogRetention        time.Duration
 	LoginPolicyFactors       bool
@@ -32,6 +33,7 @@ type Features struct {
 	LoginPolicyRegistration  bool
 	LoginPolicyUsernameLogin bool
 	PasswordComplexityPolicy bool
+	LabelPolicy              bool
 }
 
 type FeaturesState int32
@@ -41,6 +43,7 @@ const (
 	FeaturesStateActive
 	FeaturesStateActionRequired
 	FeaturesStateCanceled
+	FeaturesStateGrandfathered
 	FeaturesStateRemoved
 
 	featuresStateCount

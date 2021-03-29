@@ -20,6 +20,7 @@ message Features {
   bool login_policy_factors = 8;
   bool login_policy_passwordless = 9;
   bool password_complexity_policy = 10;
+  bool label_policy = 11;
 }
 
 message FeatureTier {
@@ -34,4 +35,5 @@ enum FeaturesState {
   FEATURES_STATE_ACTIVE = 0;
   FEATURES_STATE_ACTION_REQUIRED = 1;
   FEATURES_STATE_CANCELED = 2;
+  FEATURES_STATE_GRANDFATHERED = 3;
 }

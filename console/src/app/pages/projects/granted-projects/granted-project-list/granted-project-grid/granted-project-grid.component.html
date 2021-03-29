@@ -9,17 +9,18 @@
     <p class="n-items" *ngIf="!loading && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' | translate}}</p>
 
     <div class="item card" *ngFor="let item of selection.selected; index as i"
-        [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}"
-        (click)="navigateToProject(item.projectId,item.id, $event)">
+        [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}"
+        (click)="navigateToProject(item.projectId,item.grantId, $event)">
         <div class="text-part">
-            <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+            <span *ngIf="item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
-                        item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-            }}</span>
+                item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                }}</span>
             <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
             <span class="description" *ngIf="item.resourceOwnerName">{{item.resourceOwnerName}}</span>
-            <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
-                {{ item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+            <span *ngIf="item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
+                {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                }}</span>
             <span class="fill-space"></span>
         </div>
 
@@ -33,17 +34,17 @@
     <p class="n-items" *ngIf="!loading && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
 
     <div class="item card" *ngFor="let item of notPinned; index as i"
-        (click)="navigateToProject(item.projectId,item.id, $event)"
-        [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
+        (click)="navigateToProject(item.projectId,item.grantId, $event)"
+        [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
         <div class="text-part">
-            <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+            <span *ngIf="item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
-                        item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-            }}</span>
+                item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+                }}</span>
             <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
             <span class="description" *ngIf="item.resourceOwnerName">{{item.resourceOwnerName}}</span>
-            <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
-                {{ item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+            <span *ngIf="item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
+                {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <span class="fill-space"></span>
         </div>
         <button [ngClass]="{ selected: selection.isSelected(item)}"

@@ -34,7 +34,7 @@ func (p *Phone) IsValid() bool {
 func (p *Phone) formatPhone() error {
 	phoneNr, err := libphonenumber.Parse(p.PhoneNumber, defaultRegion)
 	if err != nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-so0wa", "Errors.User.Phone.Invalid")
+		return caos_errs.ThrowInvalidArgument(nil, "EVENT-so0wa", "Errors.User.Phone.Invalid")
 	}
 	p.PhoneNumber = libphonenumber.Format(phoneNr, libphonenumber.E164)
 	return nil

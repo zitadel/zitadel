@@ -1,6 +1,7 @@
 package command
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/org"
 )
@@ -9,13 +10,14 @@ type OrgSecondFactorWriteModel struct {
 	SecondFactorWriteModel
 }
 
-func NewOrgSecondFactorWriteModel(orgID string) *OrgSecondFactorWriteModel {
+func NewOrgSecondFactorWriteModel(orgID string, factorType domain.SecondFactorType) *OrgSecondFactorWriteModel {
 	return &OrgSecondFactorWriteModel{
 		SecondFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   orgID,
 				ResourceOwner: orgID,
 			},
+			MFAType: factorType,
 		},
 	}
 }
@@ -24,15 +26,19 @@ func (wm *OrgSecondFactorWriteModel) AppendEvents(events ...eventstore.EventRead
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LoginPolicySecondFactorAddedEvent:
-			wm.WriteModel.AppendEvents(&e.SecondFactorAddedEvent)
+			if wm.MFAType == e.MFAType {
+				wm.WriteModel.AppendEvents(&e.SecondFactorAddedEvent)
+			}
 		case *org.LoginPolicySecondFactorRemovedEvent:
-			wm.WriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
+			if wm.MFAType == e.MFAType {
+				wm.WriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
+			}
 		}
 	}
 }
 
 func (wm *OrgSecondFactorWriteModel) Reduce() error {
-	return wm.WriteModel.Reduce()
+	return wm.SecondFactorWriteModel.Reduce()
 }
 
 func (wm *OrgSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -45,16 +51,17 @@ func (wm *OrgSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 type OrgMultiFactorWriteModel struct {
-	MultiFactoryWriteModel
+	MultiFactorWriteModel
 }
 
-func NewOrgMultiFactorWriteModel(orgID string) *OrgMultiFactorWriteModel {
+func NewOrgMultiFactorWriteModel(orgID string, factorType domain.MultiFactorType) *OrgMultiFactorWriteModel {
 	return &OrgMultiFactorWriteModel{
-		MultiFactoryWriteModel{
+		MultiFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   orgID,
 				ResourceOwner: orgID,
 			},
+			MFAType: factorType,
 		},
 	}
 }
@@ -63,15 +70,19 @@ func (wm *OrgMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReade
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LoginPolicyMultiFactorAddedEvent:
-			wm.WriteModel.AppendEvents(&e.MultiFactorAddedEvent)
+			if wm.MFAType == e.MFAType {
+				wm.WriteModel.AppendEvents(&e.MultiFactorAddedEvent)
+			}
 		case *org.LoginPolicyMultiFactorRemovedEvent:
-			wm.WriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
+			if wm.MFAType == e.MFAType {
+				wm.WriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
+			}
 		}
 	}
 }
 
 func (wm *OrgMultiFactorWriteModel) Reduce() error {
-	return wm.WriteModel.Reduce()
+	return wm.MultiFactorWriteModel.Reduce()
 }
 
 func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {

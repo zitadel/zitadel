@@ -4,9 +4,10 @@ Login:
   TitleLinking: Login for userlinking
   DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
   Loginname: Loginname
+  UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
   ExternalLogin: Login with an external user.
-  MustBeMemberOfOrg: The user must be mermber of the {{.OrgDomain}} organisation.
+  MustBeMemberOfOrg: The user must be mermber of the {{.OrgName}} organisation.
 
 UserSelection:
   Title: Select account
@@ -16,7 +17,7 @@ UserSelection:
   OtherUser: Other User
   SessionState0: active
   SessionState1: inactive
-  MustBeMemberOfOrg: The user must be mermber of the {{.OrgDomain}} organisation.
+  MustBeMemberOfOrg: The user must be mermber of the {{.OrgName}} organisation.
 
 Password:
   Title: Password

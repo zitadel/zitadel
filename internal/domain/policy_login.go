@@ -27,6 +27,10 @@ type IDPProvider struct {
 	IDPState      IDPConfigState
 }
 
+func (p IDPProvider) IsValid() bool {
+	return p.IDPConfigID != ""
+}
+
 type PasswordlessType int32
 
 const (

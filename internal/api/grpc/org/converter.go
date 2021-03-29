@@ -29,8 +29,11 @@ func OrgQueryToModel(query *org_pb.OrgQuery) (*org_model.OrgSearchQuery, error) 
 			Value:  q.DomainQuery.Domain,
 		}, nil
 	case *org_pb.OrgQuery_NameQuery:
-		//TODO: implement name in backend
-		return nil, errors.ThrowUnimplemented(nil, "ADMIN-KGXnX", "name query not implemented")
+		return &org_model.OrgSearchQuery{
+			Key:    org_model.OrgSearchKeyOrgName,
+			Method: object.TextMethodToModel(q.NameQuery.Method),
+			Value:  q.NameQuery.Name,
+		}, nil
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-vR9nC", "List.Query.Invalid")
 	}
@@ -49,8 +52,9 @@ func OrgViewToPb(org *org_model.OrgView) *org_pb.Org {
 		Id:    org.ID,
 		State: OrgStateToPb(org.State),
 		Name:  org.Name,
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			org.Sequence,
+			org.CreationDate,
 			org.ChangeDate,
 			org.ResourceOwner,
 		),
@@ -70,10 +74,10 @@ func OrgToPb(org *grant_model.Org) *org_pb.Org {
 		Id:   org.OrgID,
 		Name: org.OrgName,
 		// State: OrgStateToPb(org.State), //TODO: not provided
-		// Details: object.ToDetailsPb(//TODO: not provided
+		// Details: object.ChangeToDetailsPb(//TODO: not provided
 		// 	org.Sequence,//TODO: not provided
 		// 	org.CreationDate,//TODO: not provided
-		// 	org.ChangeDate,//TODO: not provided
+		// 	org.EventDate,//TODO: not provided
 		// 	org.ResourceOwner,//TODO: not provided
 		// ),//TODO: not provided
 	}
@@ -133,8 +137,9 @@ func DomainToPb(domain *org_model.OrgDomainView) *org_pb.Domain {
 		IsVerified:     domain.Verified,
 		IsPrimary:      domain.Primary,
 		ValidationType: DomainValidationTypeFromModel(domain.ValidationType),
-		Details: object.ToDetailsPb(
+		Details: object.ToViewDetailsPb(
 			0,
+			domain.CreationDate,
 			domain.ChangeDate,
 			"",
 		),

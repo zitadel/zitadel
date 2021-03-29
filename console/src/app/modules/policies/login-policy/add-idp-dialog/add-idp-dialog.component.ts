@@ -49,19 +49,23 @@ export class AddIdpDialogComponent {
 
     public loadIdps(): void {
         this.idp = undefined;
-        if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            const query: IDPQuery = new IDPQuery();
-            const idpOTQ: IDPOwnerTypeQuery = new IDPOwnerTypeQuery();
-            idpOTQ.setOwnerType(this.idpType);
-            query.setOwnerTypeQuery(idpOTQ);
+        switch (this.idpType) {
+            case IDPOwnerType.IDP_OWNER_TYPE_ORG:
+                const query: IDPQuery = new IDPQuery();
+                const idpOTQ: IDPOwnerTypeQuery = new IDPOwnerTypeQuery();
+                idpOTQ.setOwnerType(this.idpType);
+                query.setOwnerTypeQuery(idpOTQ);
 
-            this.mgmtService.listOrgIDPs(undefined, undefined, [query]).then(resp => {
-                this.availableIdps = resp.resultList;
-            });
-        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-            this.adminService.listIDPs().then(resp => {
-                this.availableIdps = resp.resultList;
-            });
+                this.mgmtService.listOrgIDPs(undefined, undefined, [query]).then(resp => {
+                    this.availableIdps = resp.resultList;
+                });
+                break;
+            case IDPOwnerType.IDP_OWNER_TYPE_SYSTEM:
+                this.adminService.listIDPs().then(resp => {
+                    this.availableIdps = resp.resultList;
+                });
+                break;
+
         }
     }
 

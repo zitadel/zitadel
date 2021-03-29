@@ -222,10 +222,11 @@
             "TITLE": "Multifactor Authentication",
             "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
             "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
-            "OTP": "Configure OTP",
+            "ADD":"Add AuthFactor",
+            "OTP": "OTP (One-Time Password)",
             "OTP_DIALOG_TITLE": "Add OTP",
             "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
-            "U2F":"Add U2F",
+            "U2F":"U2F (Universal 2nd Factor)",
             "U2F_DIALOG_TITLE": "Verify U2F",
             "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
             "U2F_SUCCESS":"U2F created successfully!",
@@ -437,10 +438,10 @@
             "REMOVE":"Remove",
             "TYPE":"Type",
             "TYPES":{
-                "0":"Unknown",
-                "1":"Organisation",
-                "2":"Project",
-                "3":"Granted Project"
+                "UNKNOWN":"Unknown",
+                "ORG":"Organisation",
+                "PROJECT":"Project",
+                "GRANTEDPROJECT":"Granted Project"
             }
         }
     },
@@ -564,6 +565,28 @@
             "MEMBERCHANGED":"Manager changed.",
             "SETPRIMARY":"Primary domain set."
         }
+    },
+    "FEATURES": {
+        "TITLE":"Features",
+        "DESCRIPTION":"here you can edit your ZITADEL Features based on your Tier",
+        "BTN-EDIT":"Edit Featureset",
+        "DATA": {
+            "AUDITLOGRETENTION":"Audit Log retention",
+            "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Benutzername als Loginname",
+            "LOGINPOLICYREGISTRATION":"Login Policy - Registration",
+            "LOGINPOLICYIDP":"Login Policy - Identity Provider",
+            "LOGINPOLICYFACTORS":"Login Policy - Multifaktoren",
+            "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwortlose Authentifizierung",
+            "LOGINPOLICYCOMPLEXITYPOLICY":"Password Komplexitätseinstellungen",
+            "LABELPOLICY":"Labelling Einstellungen"
+        },
+        "TIERSTATES": {
+            "0":"Active",
+            "1":"Action required",
+            "2":"Cancelled",
+            "3":"Grandfathered"
+        },
+        "NOTAVAILABLE":"Feature {{value}} is missing on your organization."
     },
     "POLICY": {
         "TITLE":"Explore Policies",
@@ -721,6 +744,7 @@
             "USERNAME": "User Name",
             "FIRSTNAME": "First Name",
             "LASTNAME": "Last Name",
+            "LOGINNAME":"Loginname",
             "EMAIL": "E-mail",
             "ROLES": "Roles",
             "USERID":"User ID"
@@ -771,7 +795,8 @@
                 "PROJECTGRANTCHANGED":"Project grant changed.",
                 "PROJECTGRANTMEMBERADDED":"Grant manager added.",
                 "PROJECTGRANTMEMBERCHANGED":"Grant manager changed.",
-                "PROJECTGRANTMEMBERREMOVED":"Grant manager removed."
+                "PROJECTGRANTMEMBERREMOVED":"Grant manager removed.",
+                "PROJECTGRANTUPDATED":"Project Grant updated"
             },
             "ROLES":"Project Roles"
         },
@@ -854,7 +879,7 @@
             "DESCRIPTION":"Provide the correct OIDC Configuration for your identity Provider below!"
           }
         },
-        "TYPES": {
+        "OWNERTYPES": {
             "0":"unknown",
             "1":"System",
             "2":"Organisation"

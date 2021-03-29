@@ -25,11 +25,14 @@ func TestDeployment_GetInitContainer(t *testing.T) {
 	}
 
 	equals := corev1.Container{
-		Name:         "fix-permissions",
-		Image:        "alpine:3.11",
-		Command:      []string{"/bin/sh", "-c"},
-		Args:         []string{strings.Join(initCommands, " && ")},
-		VolumeMounts: initVolumeMounts,
+		Name:                     "fix-permissions",
+		Image:                    "alpine:3.11",
+		Command:                  []string{"/bin/sh", "-c"},
+		Args:                     []string{strings.Join(initCommands, " && ")},
+		VolumeMounts:             initVolumeMounts,
+		ImagePullPolicy:          corev1.PullIfNotPresent,
+		TerminationMessagePolicy: "File",
+		TerminationMessagePath:   "/dev/termination-log",
 	}
 
 	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser)
@@ -55,11 +58,14 @@ func TestDeployment_GetInitContainer1(t *testing.T) {
 	}
 
 	equals := corev1.Container{
-		Name:         "fix-permissions",
-		Image:        "alpine:3.11",
-		Command:      []string{"/bin/sh", "-c"},
-		Args:         []string{strings.Join(initCommands, " && ")},
-		VolumeMounts: initVolumeMounts,
+		Name:                     "fix-permissions",
+		Image:                    "alpine:3.11",
+		Command:                  []string{"/bin/sh", "-c"},
+		Args:                     []string{strings.Join(initCommands, " && ")},
+		VolumeMounts:             initVolumeMounts,
+		TerminationMessagePolicy: "File",
+		TerminationMessagePath:   "/dev/termination-log",
+		ImagePullPolicy:          corev1.PullIfNotPresent,
 	}
 
 	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser)
@@ -88,11 +94,14 @@ func TestDeployment_GetInitContainer2(t *testing.T) {
 	}
 
 	equals := corev1.Container{
-		Name:         "fix-permissions",
-		Image:        "alpine:3.11",
-		Command:      []string{"/bin/sh", "-c"},
-		Args:         []string{strings.Join(initCommands, " && ")},
-		VolumeMounts: initVolumeMounts,
+		Name:                     "fix-permissions",
+		Image:                    "alpine:3.11",
+		Command:                  []string{"/bin/sh", "-c"},
+		Args:                     []string{strings.Join(initCommands, " && ")},
+		VolumeMounts:             initVolumeMounts,
+		ImagePullPolicy:          corev1.PullIfNotPresent,
+		TerminationMessagePolicy: "File",
+		TerminationMessagePath:   "/dev/termination-log",
 	}
 
 	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser)

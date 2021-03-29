@@ -22,3 +22,7 @@ const (
 func (f UserState) Valid() bool {
 	return f >= 0 && f < userStateCount
 }
+
+func (s UserState) Exists() bool {
+	return s != UserStateUnspecified && s != UserStateDeleted
+}

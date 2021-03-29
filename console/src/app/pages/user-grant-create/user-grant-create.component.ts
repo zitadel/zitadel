@@ -129,7 +129,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                 this.userService.addUserGrant(
                     this.userId,
                     this.rolesList,
-                    (this.project as GrantedProject.AsObject).projectId,
+                    this.projectId,
                     grantId,
                 ).then(() => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
@@ -148,7 +148,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                 this.userService.addUserGrant(
                     this.userId,
                     this.rolesList,
-                    (this.project as GrantedProject.AsObject).projectId,
+                    this.projectId,
                     tempGrantId,
                 ).then(() => {
                     this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
@@ -163,7 +163,7 @@ export class UserGrantCreateComponent implements OnDestroy {
 
     public selectProject(project: Project.AsObject | GrantedProject.AsObject | any): void {
         this.project = project;
-        this.projectId = project.projectId;
+        this.projectId = project.id || project.projectId;
         this.grantRolesKeyList = project.roleKeysList ?? [];
     }
 

@@ -17,7 +17,7 @@ func (c *Commands) AddProjectRole(ctx context.Context, projectRole *domain.Proje
 
 	roleWriteModel := NewProjectRoleWriteModelWithKey(projectRole.Key, projectRole.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
-	events, err := c.addProjectRoles(ctx, projectAgg, projectRole.AggregateID, projectRole)
+	events, err := c.addProjectRoles(ctx, projectAgg, projectRole)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 
 	roleWriteModel := NewProjectRoleWriteModel(projectID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
-	events, err := c.addProjectRoles(ctx, projectAgg, projectID, projectRoles...)
+	events, err := c.addProjectRoles(ctx, projectAgg, projectRoles...)
 	if err != nil {
 		return details, err
 	}
@@ -56,11 +56,12 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 	return writeModelToObjectDetails(&roleWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.Aggregate, projectID string, projectRoles ...*domain.ProjectRole) ([]eventstore.EventPusher, error) {
+func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.Aggregate, projectRoles ...*domain.ProjectRole) ([]eventstore.EventPusher, error) {
 	var events []eventstore.EventPusher
 	for _, projectRole := range projectRoles {
+		projectRole.AggregateID = projectAgg.ID
 		if !projectRole.IsValid() {
-			return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
 		}
 		events = append(events, project.NewRoleAddedEvent(
 			ctx,
@@ -68,7 +69,6 @@ func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.A
 			projectRole.Key,
 			projectRole.DisplayName,
 			projectRole.Group,
-			projectID,
 		))
 	}
 
@@ -77,7 +77,7 @@ func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.A
 
 func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.ProjectRole, resourceOwner string) (_ *domain.ProjectRole, err error) {
 	if !projectRole.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
 	}
 	err = c.checkProjectExists(ctx, projectRole.AggregateID, resourceOwner)
 	if err != nil {
@@ -115,7 +115,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.Pr
 
 func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resourceOwner string, cascadingProjectGrantIds []string, cascadeUserGrantIDs ...string) (details *domain.ObjectDetails, err error) {
 	if projectID == "" || key == "" {
-		return details, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
+		return details, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
 	}
 	existingRole, err := c.getProjectRoleWriteModelByID(ctx, key, projectID, resourceOwner)
 	if err != nil {
@@ -126,7 +126,7 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
 	events := []eventstore.EventPusher{
-		project.NewRoleRemovedEvent(ctx, projectAgg, key, projectID),
+		project.NewRoleRemovedEvent(ctx, projectAgg, key),
 	}
 
 	for _, projectGrantID := range cascadingProjectGrantIds {

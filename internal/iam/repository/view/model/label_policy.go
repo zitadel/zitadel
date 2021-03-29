@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -24,34 +25,39 @@ type LabelPolicyView struct {
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 	State        int32     `json:"-" gorm:"column:label_policy_state"`
 
-	PrimaryColor   string `json:"primaryColor" gorm:"column:primary_color"`
-	SecondaryColor string `json:"secondaryColor" gorm:"column:secondary_color"`
-	Default        bool   `json:"-" gorm:"-"`
+	PrimaryColor        string `json:"primaryColor" gorm:"column:primary_color"`
+	SecondaryColor      string `json:"secondaryColor" gorm:"column:secondary_color"`
+	HideLoginNameSuffix bool   `json:"hideLoginNameSuffix" gorm:"column:hide_login_name_suffix"`
+	Default             bool   `json:"-" gorm:"-"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func LabelPolicyViewFromModel(policy *model.LabelPolicyView) *LabelPolicyView {
-	return &LabelPolicyView{
-		AggregateID:    policy.AggregateID,
-		Sequence:       policy.Sequence,
-		CreationDate:   policy.CreationDate,
-		ChangeDate:     policy.ChangeDate,
-		PrimaryColor:   policy.PrimaryColor,
-		SecondaryColor: policy.SecondaryColor,
-		Default:        policy.Default,
+func (p *LabelPolicyView) ToDomain() *domain.LabelPolicy {
+	return &domain.LabelPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:  p.AggregateID,
+			CreationDate: p.CreationDate,
+			ChangeDate:   p.ChangeDate,
+			Sequence:     p.Sequence,
+		},
+		Default:             p.Default,
+		PrimaryColor:        p.PrimaryColor,
+		SecondaryColor:      p.SecondaryColor,
+		HideLoginNameSuffix: p.HideLoginNameSuffix,
 	}
 }
 
 func LabelPolicyViewToModel(policy *LabelPolicyView) *model.LabelPolicyView {
 	return &model.LabelPolicyView{
-		AggregateID:    policy.AggregateID,
-		Sequence:       policy.Sequence,
-		CreationDate:   policy.CreationDate,
-		ChangeDate:     policy.ChangeDate,
-		PrimaryColor:   policy.PrimaryColor,
-		SecondaryColor: policy.SecondaryColor,
-		Default:        policy.Default,
+		AggregateID:         policy.AggregateID,
+		Sequence:            policy.Sequence,
+		CreationDate:        policy.CreationDate,
+		ChangeDate:          policy.ChangeDate,
+		PrimaryColor:        policy.PrimaryColor,
+		SecondaryColor:      policy.SecondaryColor,
+		HideLoginNameSuffix: policy.HideLoginNameSuffix,
+		Default:             policy.Default,
 	}
 }
 

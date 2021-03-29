@@ -30,7 +30,7 @@ func (s *Server) AddCustomPasswordLockoutPolicy(ctx context.Context, req *mgmt_p
 		return nil, err
 	}
 	return &mgmt_pb.AddCustomPasswordLockoutPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.AddToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
@@ -44,7 +44,7 @@ func (s *Server) UpdateCustomPasswordLockoutPolicy(ctx context.Context, req *mgm
 		return nil, err
 	}
 	return &mgmt_pb.UpdateCustomPasswordLockoutPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
@@ -58,6 +58,6 @@ func (s *Server) ResetPasswordLockoutPolicyToDefault(ctx context.Context, req *m
 		return nil, err
 	}
 	return &mgmt_pb.ResetPasswordLockoutPolicyToDefaultResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

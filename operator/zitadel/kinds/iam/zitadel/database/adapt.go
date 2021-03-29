@@ -8,7 +8,7 @@ import (
 
 func AdaptFunc(
 	monitor mntr.Monitor,
-	dbClient ClientInt,
+	dbClient Client,
 ) (
 	operator.QueryFunc,
 	error,

@@ -30,13 +30,14 @@ type FeaturesView struct {
 	TierDescription          string        `json:"tierDescription" gorm:"column:tier_description"`
 	State                    int32         `json:"state" gorm:"column:state"`
 	StateDescription         string        `json:"stateDescription" gorm:"column:state_description"`
-	AuditLogRetention        time.Duration `json:"audit_log_retention" gorm:"column:audit_log_retention"`
+	AuditLogRetention        time.Duration `json:"auditLogRetention" gorm:"column:audit_log_retention"`
 	LoginPolicyFactors       bool          `json:"loginPolicyFactors" gorm:"column:login_policy_factors"`
 	LoginPolicyIDP           bool          `json:"loginPolicyIDP" gorm:"column:login_policy_idp"`
 	LoginPolicyPasswordless  bool          `json:"loginPolicyPasswordless" gorm:"column:login_policy_passwordless"`
 	LoginPolicyRegistration  bool          `json:"loginPolicyRegistration" gorm:"column:login_policy_registration"`
 	LoginPolicyUsernameLogin bool          `json:"loginPolicyUsernameLogin" gorm:"column:login_policy_username_login"`
 	PasswordComplexityPolicy bool          `json:"passwordComplexityPolicy" gorm:"column:password_complexity_policy"`
+	LabelPolicy              bool          `json:"labelPolicy" gorm:"column:label_policy"`
 }
 
 func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
@@ -57,6 +58,7 @@ func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
 		LoginPolicyRegistration:  features.LoginPolicyRegistration,
 		LoginPolicyUsernameLogin: features.LoginPolicyUsernameLogin,
 		PasswordComplexityPolicy: features.PasswordComplexityPolicy,
+		LabelPolicy:              features.LabelPolicy,
 	}
 }
 

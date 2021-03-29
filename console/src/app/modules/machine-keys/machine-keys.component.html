@@ -1,11 +1,6 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
     [timestamp]="keyResult?.details?.viewTimestamp" [selection]="selection">
     <div actions>
-        <button color="warn" [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false"
-            (click)="deleteSelectedKeys()" matTooltip="{{'ACTIONS.DELETE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue()">
-            <i class="las la-trash"></i>
-        </button>
         <a [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false" color="primary"
             mat-raised-button (click)="openAddKey()">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
@@ -41,14 +36,25 @@
             <ng-container matColumnDef="creationDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.CREATIONDATE' | translate }} </th>
                 <td mat-cell *matCellDef="let key">
-                    {{key.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
+                    {{key.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
                 </td>
             </ng-container>
 
             <ng-container matColumnDef="expirationDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.EXPIRATIONDATE' | translate }} </th>
                 <td mat-cell *matCellDef="let key">
-                    {{key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
+                    {{key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let key">
+                    <button [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false"
+                        mat-icon-button color="warn" matTooltip="{{'ACTIONS.DELETE' | translate}}"
+                        (click)="deleteKey(key)">
+                        <i class="las la-trash"></i>
+                    </button>
                 </td>
             </ng-container>
 

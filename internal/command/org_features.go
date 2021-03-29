@@ -18,8 +18,8 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		OrgAggregateFromWriteModel(&existingFeatures.FeaturesWriteModel.WriteModel),
 		features.TierName,
 		features.TierDescription,
-		features.TierState,
-		features.TierStateDescription,
+		features.State,
+		features.StateDescription,
 		features.AuditLogRetention,
 		features.LoginPolicyFactors,
 		features.LoginPolicyIDP,
@@ -27,6 +27,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.LoginPolicyRegistration,
 		features.LoginPolicyUsernameLogin,
 		features.PasswordComplexityPolicy,
+		features.LabelPolicy,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")

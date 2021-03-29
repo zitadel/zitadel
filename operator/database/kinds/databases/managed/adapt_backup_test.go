@@ -1,6 +1,9 @@
 package managed
 
 import (
+	"testing"
+	"time"
+
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/labels"
@@ -13,8 +16,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
-	"testing"
-	"time"
 )
 
 func getTreeWithDBAndBackup(t *testing.T, masterkey string, saJson string, backupName string) *tree.Tree {
@@ -81,9 +82,9 @@ func TestManaged_AdaptBucketBackup(t *testing.T) {
 
 	features := []string{backup.Normal}
 	bucket.SetBackup(k8sClient, namespace, labels, saJson)
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(60))
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second)
 
-	query, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
@@ -119,11 +120,11 @@ func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 
 	features := []string{backup.Instant}
 	bucket.SetInstantBackup(k8sClient, namespace, backupName, labels, saJson)
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(60))
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second)
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
 
-	query, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
@@ -159,12 +160,12 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 
 	features := []string{restore.Instant, clean.Instant}
 	bucket.SetRestore(k8sClient, namespace, backupName, labels, saJson)
-	bucket.SetClean(k8sClient, namespace, backupName)
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, time.Duration(60)).Times(2)
+	bucket.SetClean(k8sClient, namespace, backupName, labels, saJson)
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second).Times(2)
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
 
-	query, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}

@@ -69,6 +69,38 @@ func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human
 	return h
 }
 
+func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) *domain.Human {
+	h := &domain.Human{
+		Username: req.UserName,
+	}
+	preferredLanguage, err := language.Parse(req.Profile.PreferredLanguage)
+	logging.Log("MANAG-3GUFJ").OnError(err).Debug("language malformed")
+	h.Profile = &domain.Profile{
+		FirstName:         req.Profile.FirstName,
+		LastName:          req.Profile.LastName,
+		NickName:          req.Profile.NickName,
+		DisplayName:       req.Profile.DisplayName,
+		PreferredLanguage: preferredLanguage,
+		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
+	}
+	h.Email = &domain.Email{
+		EmailAddress:    req.Email.Email,
+		IsEmailVerified: req.Email.IsEmailVerified,
+	}
+	if req.Phone != nil {
+		h.Phone = &domain.Phone{
+			PhoneNumber:     req.Phone.Phone,
+			IsPhoneVerified: req.Phone.IsPhoneVerified,
+		}
+	}
+	if req.Password != "" {
+		h.Password = &domain.Password{SecretString: req.Password}
+		h.Password.ChangeRequired = true
+	}
+
+	return h
+}
+
 func AddMachineUserRequestToDomain(req *mgmt_pb.AddMachineUserRequest) *domain.Machine {
 	return &domain.Machine{
 		Username:    req.UserName,
@@ -91,8 +123,12 @@ func UpdateHumanProfileRequestToDomain(req *mgmt_pb.UpdateHumanProfileRequest) *
 	}
 }
 
-func UpdateHumanEmailRequestToDomain(req *mgmt_pb.UpdateHumanEmailRequest) *domain.Email {
+func UpdateHumanEmailRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateHumanEmailRequest) *domain.Email {
 	return &domain.Email{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		},
 		EmailAddress:    req.Email,
 		IsEmailVerified: req.IsEmailVerified,
 	}
@@ -100,6 +136,7 @@ func UpdateHumanEmailRequestToDomain(req *mgmt_pb.UpdateHumanEmailRequest) *doma
 
 func UpdateHumanPhoneRequestToDomain(req *mgmt_pb.UpdateHumanPhoneRequest) *domain.Phone {
 	return &domain.Phone{
+		ObjectRoot:      models.ObjectRoot{AggregateID: req.UserId},
 		PhoneNumber:     req.Phone,
 		IsPhoneVerified: req.IsPhoneVerified,
 	}

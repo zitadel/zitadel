@@ -95,7 +95,7 @@ export class OrgCreateComponent {
         createOrgRequest.setDomain(this.domain?.value);
 
         const humanRequest: SetUpOrgRequest.Human = new SetUpOrgRequest.Human();
-        humanRequest.setEmail(this.email?.value);
+        humanRequest.setEmail(new SetUpOrgRequest.Human.Email().setEmail(this.email?.value));
         humanRequest.setUserName(this.userName?.value);
 
         const profile: SetUpOrgRequest.Human.Profile = new SetUpOrgRequest.Human.Profile();
@@ -105,15 +105,16 @@ export class OrgCreateComponent {
         profile.setGender(this.gender?.value);
         profile.setPreferredLanguage(this.preferredLanguage?.value);
 
-        humanRequest.setProfile(this.firstName?.value);
+        humanRequest.setProfile(profile);
         if (this.usePassword && this.password) {
             humanRequest.setPassword(this.password?.value);
         }
 
         this.adminService
             .SetUpOrg(createOrgRequest, humanRequest)
-            .then(() => {
+            .then((resp) => {
                 this.router.navigate(['/org/overview']);
+
                 // const orgResp = org.getOrg();
                 // if (orgResp) {
                 //     this.authService.setActiveOrg(orgResp.toObject());
@@ -194,6 +195,7 @@ export class OrgCreateComponent {
             this.orgForm = this.fb.group({
                 name: ['', [Validators.required]],
             });
+
         } else {
             this.createSteps = 2;
 

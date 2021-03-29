@@ -38,6 +38,7 @@ func SetConfigMap(
 }
 
 func SetSecretVars(
+	t *testing.T,
 	k8sClient *kubernetesmock.MockClientInt,
 	namespace string,
 	secretVarsName string,
@@ -45,6 +46,8 @@ func SetSecretVars(
 	desired *Configuration,
 ) {
 
+	literalsSV, err := literalsSecretVars(k8sClient, desired)
+	assert.NoError(t, err)
 	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
@@ -52,7 +55,7 @@ func SetSecretVars(
 			Labels:    labels,
 		},
 		Type:       "Opaque",
-		StringData: literalsSecretVars(desired),
+		StringData: literalsSV,
 	}).Times(1)
 }
 func SetConsoleCM(
@@ -76,12 +79,16 @@ func SetConsoleCM(
 	k8sClient.EXPECT().ApplyConfigmap(consoleCM).Times(1)
 }
 func SetSecrets(
+	t *testing.T,
 	k8sClient *kubernetesmock.MockClientInt,
 	namespace string,
 	secretName string,
 	labels map[string]string,
 	desired *Configuration,
 ) {
+	literalsS, err := literalsSecret(k8sClient, desired, googleServiceAccountJSONPath, zitadelKeysPath)
+	assert.NoError(t, err)
+
 	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
@@ -89,7 +96,7 @@ func SetSecrets(
 			Labels:    labels,
 		},
 		Type:       "Opaque",
-		StringData: literalsSecret(desired, googleServiceAccountJSONPath, zitadelKeysPath),
+		StringData: literalsS,
 	}).Times(1)
 }
 
@@ -114,7 +121,7 @@ func SetSecretPasswords(
 
 func TestConfiguration_Adapt(t *testing.T) {
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
-	dbClient := databasemock.NewMockClientInt(gomock.NewController(t))
+	dbClient := databasemock.NewMockClient(gomock.NewController(t))
 
 	monitor := mntr.Monitor{Fields: map[string]interface{}{"component": "configuration"}}
 	namespace := "test"
@@ -162,6 +169,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 		zitadelKeysPath)
 
 	SetSecretVars(
+		t,
 		k8sClient,
 		namespace,
 		secretVarsName,
@@ -179,6 +187,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 	)
 
 	SetSecrets(
+		t,
 		k8sClient,
 		namespace,
 		secretName,
@@ -194,7 +203,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 		users,
 	)
 
-	query, _, _, err := AdaptFunc(
+	getQuery, _, _, err := AdaptFunc(
 		monitor,
 		componentLabels,
 		namespace,
@@ -206,12 +215,11 @@ func TestConfiguration_Adapt(t *testing.T) {
 		consoleCMName,
 		secretVarsName,
 		secretPasswordName,
-		users,
-		getClientID,
 		dbClient,
+		getClientID,
 	)
-
 	assert.NoError(t, err)
+	query := getQuery(users)
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(k8sClient))
@@ -220,7 +228,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 
 func TestConfiguration_AdaptFull(t *testing.T) {
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
-	dbClient := databasemock.NewMockClientInt(gomock.NewController(t))
+	dbClient := databasemock.NewMockClient(gomock.NewController(t))
 
 	monitor := mntr.Monitor{Fields: map[string]interface{}{"component": "configuration"}}
 	namespace := "test2"
@@ -268,6 +276,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		zitadelKeysPath)
 
 	SetSecretVars(
+		t,
 		k8sClient,
 		namespace,
 		secretVarsName,
@@ -285,6 +294,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 	)
 
 	SetSecrets(
+		t,
 		k8sClient,
 		namespace,
 		secretName,
@@ -300,7 +310,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		users,
 	)
 
-	query, _, _, err := AdaptFunc(
+	getQuery, _, _, err := AdaptFunc(
 		monitor,
 		componentLabels,
 		namespace,
@@ -312,12 +322,12 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		consoleCMName,
 		secretVarsName,
 		secretPasswordName,
-		users,
-		getClientID,
 		dbClient,
+		getClientID,
 	)
 
 	assert.NoError(t, err)
+	query := getQuery(users)
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(k8sClient))

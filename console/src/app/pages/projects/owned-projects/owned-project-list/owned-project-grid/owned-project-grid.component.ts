@@ -3,7 +3,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ProjectType } from 'src/app/modules/project-members/project-members.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
@@ -51,7 +50,6 @@ export class OwnedProjectGridComponent implements OnChanges {
 
     public showNewProject: boolean = false;
     public ProjectState: any = ProjectState;
-    public ProjectType: any = ProjectType;
     @Input() public zitadelProjectId: string = '';
     constructor(
         private router: Router,

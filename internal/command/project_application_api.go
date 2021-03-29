@@ -9,9 +9,12 @@ import (
 )
 
 func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.APIApp, resourceOwner string) (_ *domain.APIApp, err error) {
+	if application == nil || application.AggregateID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Application.Invalid")
+	}
 	project, err := c.getProjectByID(ctx, application.AggregateID, resourceOwner)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(err, "PROJECT-9fnsf", "Errors.Project.NotFound")
 	}
 	addedApplication := NewAPIApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
@@ -35,7 +38,7 @@ func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.AP
 
 func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, apiAppApp *domain.APIApp, resourceOwner string) (events []eventstore.EventPusher, stringPW string, err error) {
 	if !apiAppApp.IsValid() {
-		return nil, "", caos_errs.ThrowPreconditionFailed(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
+		return nil, "", caos_errs.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
 	apiAppApp.AppID, err = c.idGenerator.Next()
 	if err != nil {
@@ -43,7 +46,7 @@ func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore
 	}
 
 	events = []eventstore.EventPusher{
-		project.NewApplicationAddedEvent(ctx, projectAgg, apiAppApp.AppID, apiAppApp.AppName, resourceOwner),
+		project.NewApplicationAddedEvent(ctx, projectAgg, apiAppApp.AppID, apiAppApp.AppName),
 	}
 
 	var stringPw string
@@ -66,8 +69,8 @@ func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore
 }
 
 func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
-	if !apiApp.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m900", "Errors.Project.App.APIConfigInvalid")
+	if !apiApp.IsValid() || apiApp.AppID == "" || apiApp.AggregateID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-1m900", "Errors.Project.App.APIConfigInvalid")
 	}
 
 	existingAPI, err := c.getAPIAppWriteModel(ctx, apiApp.AggregateID, apiApp.AppID, resourceOwner)
@@ -99,13 +102,12 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 		return nil, err
 	}
 
-	result := apiWriteModelToAPIConfig(existingAPI)
-	return result, nil
+	return apiWriteModelToAPIConfig(existingAPI), nil
 }
 
 func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.APIApp, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-99i83", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
 	}
 
 	existingAPI, err := c.getAPIAppWriteModel(ctx, projectID, appID, resourceOwner)

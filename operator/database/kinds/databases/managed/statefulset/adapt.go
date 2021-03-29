@@ -2,12 +2,14 @@ package statefulset
 
 import (
 	"fmt"
+	"sort"
+	"strings"
+	"time"
+
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"sort"
-	"strings"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -216,7 +218,7 @@ func AdaptFunc(
 	wrapedQuery, wrapedDestroy, err := resources.WrapFuncs(internalMonitor, query, destroy)
 	checkDBRunning := func(k8sClient kubernetes.ClientInt) error {
 		internalMonitor.Info("waiting for statefulset to be running")
-		if err := k8sClient.WaitUntilStatefulsetIsReady(namespace, name, true, false, 60); err != nil {
+		if err := k8sClient.WaitUntilStatefulsetIsReady(namespace, name, true, false, 60*time.Second); err != nil {
 			internalMonitor.Error(errors.Wrap(err, "error while waiting for statefulset to be running"))
 			return err
 		}
@@ -226,7 +228,7 @@ func AdaptFunc(
 
 	checkDBNotReady := func(k8sClient kubernetes.ClientInt) error {
 		internalMonitor.Info("checking for statefulset to not be ready")
-		if err := k8sClient.WaitUntilStatefulsetIsReady(namespace, name, true, true, 1); err != nil {
+		if err := k8sClient.WaitUntilStatefulsetIsReady(namespace, name, true, true, 1*time.Second); err != nil {
 			internalMonitor.Info("statefulset is not ready")
 			return nil
 		}
@@ -253,7 +255,7 @@ func AdaptFunc(
 
 	checkDBReady := func(k8sClient kubernetes.ClientInt) error {
 		internalMonitor.Info("waiting for statefulset to be ready")
-		if err := k8sClient.WaitUntilStatefulsetIsReady(namespace, name, true, true, 60); err != nil {
+		if err := k8sClient.WaitUntilStatefulsetIsReady(namespace, name, true, true, 60*time.Second); err != nil {
 			internalMonitor.Error(errors.Wrap(err, "error while waiting for statefulset to be ready"))
 			return err
 		}

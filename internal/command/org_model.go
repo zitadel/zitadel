@@ -29,6 +29,8 @@ func (wm *OrgWriteModel) Reduce() error {
 		case *org.OrgAddedEvent:
 			wm.Name = e.Name
 			wm.State = domain.OrgStateActive
+		case *org.OrgDeactivatedEvent:
+			wm.State = domain.OrgStateInactive
 		case *org.OrgChangedEvent:
 			wm.Name = e.Name
 		case *org.DomainPrimarySetEvent:

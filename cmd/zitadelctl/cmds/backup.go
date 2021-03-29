@@ -1,18 +1,19 @@
 package cmds
 
 import (
-	"github.com/caos/orbos/pkg/kubernetes"
+	"errors"
+
+	"github.com/caos/orbos/pkg/kubernetes/cli"
+
 	"github.com/caos/zitadel/operator/api"
-	"github.com/caos/zitadel/operator/start"
+	"github.com/caos/zitadel/operator/crtlgitops"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 )
 
-func BackupCommand(rv RootValues) *cobra.Command {
+func BackupCommand(getRv GetRootValues) *cobra.Command {
 	var (
-		kubeconfig string
-		backup     string
-		cmd        = &cobra.Command{
+		backup string
+		cmd    = &cobra.Command{
 			Use:   "backup",
 			Short: "Instant backup",
 			Long:  "Instant backup",
@@ -20,23 +21,28 @@ func BackupCommand(rv RootValues) *cobra.Command {
 	)
 
 	flags := cmd.Flags()
-	flags.StringVar(&kubeconfig, "kubeconfig", "~/.kube/config", "Kubeconfig of cluster where the backup should be done")
 	flags.StringVar(&backup, "backup", "", "Name used for backup folder")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
-		_, monitor, orbConfig, gitClient, version, errFunc, err := rv()
+		rv, err := getRv()
 		if err != nil {
 			return err
 		}
 		defer func() {
-			err = errFunc(err)
+			err = rv.ErrFunc(err)
 		}()
 
-		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-			return err
+		monitor := rv.Monitor
+		orbConfig := rv.OrbConfig
+		gitClient := rv.GitClient
+		version := rv.Version
+
+		if !rv.Gitops {
+			return errors.New("backup command is only supported with the --gitops flag yet")
 		}
 
-		if err := gitClient.Clone(); err != nil {
+		k8sClient, _, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+		if err != nil {
 			return err
 		}
 
@@ -46,26 +52,15 @@ func BackupCommand(rv RootValues) *cobra.Command {
 		}
 		if found {
 
-			value, err := ioutil.ReadFile(kubeconfig)
-			if err != nil {
-				monitor.Error(err)
-				return nil
+			if err := crtlgitops.Backup(
+				monitor,
+				orbConfig.Path,
+				k8sClient,
+				backup,
+				&version,
+			); err != nil {
+				return err
 			}
-			kubeconfigStr := string(value)
-
-			k8sClient := kubernetes.NewK8sClient(monitor, &kubeconfigStr)
-			if k8sClient.Available() {
-				if err := start.Backup(
-					monitor,
-					orbConfig.Path,
-					k8sClient,
-					backup,
-					&version,
-				); err != nil {
-					return err
-				}
-			}
-
 		}
 		return nil
 	}
