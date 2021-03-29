@@ -1,7 +1,5 @@
 #! /bin/sh
 
-echo "Generate grpc"
-
 if [ -n $1 ]; then
     GO_OUT=$1
 else
@@ -23,8 +21,6 @@ generate () {
         $1/$2
 }
 generate /go/src/github.com/caos/zitadel/pkg/grpc/message/proto message.proto
-# generate /go/src/github.com/caos/zitadel/pkg/grpc/admin/proto admin.proto
-# generate /go/src/github.com/caos/zitadel/pkg/grpc/auth/proto auth.proto
-# generate /go/src/github.com/caos/zitadel/pkg/grpc/management/proto management.proto
-
-echo "done generating grpc"
+generate /go/src/github.com/caos/zitadel/pkg/grpc/admin/proto admin.proto
+generate /go/src/github.com/caos/zitadel/pkg/grpc/auth/proto auth.proto
+generate /go/src/github.com/caos/zitadel/pkg/grpc/management/proto management.proto
