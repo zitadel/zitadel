@@ -28,7 +28,6 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1
     && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/any.proto --create-dirs -o google/protobuf/any.proto \
     && curl https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/struct.proto --create-dirs -o google/protobuf/struct.proto
 
-RUN echo "a"
 WORKDIR /zitadel
 RUN git clone https://github.com/caos/zitadel \
     && cd zitadel \
@@ -39,8 +38,7 @@ RUN git clone https://github.com/caos/zitadel \
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
 FROM golang:1.15 as zitadel-client
-ARG GO_OUT
-ARG GRPC_OUT
+ARG PROJECT_PATH
 
 WORKDIR /go/src/github.com/caos/zitadel
 
@@ -60,10 +58,12 @@ RUN go install \
 RUN go get -u google.golang.org/protobuf/cmd/protoc-gen-go \
     google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
-RUN ./build/zitadel/generate-grpc-clients.sh /go/src /go/src github.com/caos/zitadel/examples/client/zitadel/message
+RUN ./build/zitadel/generate-grpc-clients.sh ${PROJECT_PATH}
+
 
 FROM scratch as zitadel-copy
+ARG PROJECT_PATH
 COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/admin/*.pb.go /zitadel/admin/
 COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/auth/*.pb.go /zitadel/auth/
 COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/management/*.pb.go /zitadel/management/
-COPY --from=zitadel-client /go/src/github.com/caos/zitadel/examples/client/zitadel/message/*.pb.go /zitadel/message/
+COPY --from=zitadel-client /go/src/${PROJECT_PATH}/*.pb.go /zitadel/message/
