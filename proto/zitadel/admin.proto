@@ -43,6 +43,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     produces: "application/json";
     produces: "application/grpc";
 
+    host: "api.zitadel.io";
+    base_path: "/admin/v1";
+
     security_definitions: {
 		security: {
 			key: "BasicAuth";
@@ -55,23 +58,28 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 			value: {
 				type: TYPE_OAUTH2;
 				flow: FLOW_ACCESS_CODE;
-				authorization_url: "https://example.com/oauth/authorize";
-				token_url: "https://example.com/oauth/token";
-				scopes: {
+				authorization_url: "https://accounts.zitadel.io/oauth/v2/authorize";
+				token_url: "https://api.zitadel.io/oauth/v2/token";
+                scopes: {
 					scope: {
-						key: "read";
-						value: "Grants read access";
+						key: "openid";
+						value: "openid";
 					}
-					scope: {
-						key: "write";
-						value: "Grants write access";
-					}
-					scope: {
-						key: "admin";
-						value: "Grants read and write access to administrative information";
-					}
+                    scope: {
+                        key: "urn:zitadel:iam:org:project:id:100992085158584780:aud";
+                        value: "urn:zitadel:iam:org:project:id:100992085158584780:aud";
+                    }
 				}
 			}
+		}
+	}
+    security: {
+		security_requirement: {
+			key: "OAuth2";
+            value: {
+                scope: "openid";
+                scope: "urn:zitadel:iam:org:project:id:100992085158584780:aud";
+            }
 		}
 	}
     responses: {
@@ -96,6 +104,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             }
         }
     }
+
+    extensions: {
+		key: "x-zitadel-orgid";
+		value: {
+			string_value: "your-org-id";
+		}
+	}
 };
 
 service AdminService {
