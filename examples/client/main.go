@@ -6,12 +6,13 @@ import (
 	"log"
 	"strings"
 
-	pb "github.com/caos/zitadel/examples/client/zitadel/admin"
+	pb "github.com/caos/zitadel/examples/client/zitadel/management"
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
-const zitadelAPI = "api.zitadel.ch:433"
+const zitadelAPI = "api.zitadel.ch:443"
 
 func main() {
 	conn, err := grpc.Dial(zitadelAPI, grpc.WithTransportCredentials(cert()))
@@ -19,9 +20,12 @@ func main() {
 		log.Fatalf("fail to dial: %v", err)
 	}
 	defer conn.Close()
-	client := pb.NewAdminServiceClient(conn)
-	res, err := client.Healthz(context.TODO(), nil)
-	log.Println(res, err)
+	client := pb.NewManagementServiceClient(conn)
+	_, err = client.Healthz(context.TODO(), &empty.Empty{})
+	if err != nil {
+		log.Fatalln("call failed: ", err)
+	}
+	log.Println("call was successful")
 }
 
 func cert() credentials.TransportCredentials {

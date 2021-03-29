@@ -66,4 +66,4 @@ FROM scratch as zitadel-copy
 COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/admin/*.pb.go /zitadel/admin/
 COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/auth/*.pb.go /zitadel/auth/
 COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/management/*.pb.go /zitadel/management/
-COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/message/*.pb.go /zitadel/message/
+COPY --from=zitadel-client /go/src/github.com/caos/zitadel/examples/client/zitadel/message/*.pb.go /zitadel/message/
