@@ -8,6 +8,13 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
+func ChangeQueryToModel(query *change_pb.ChangeQuery) (sequence uint64, limit uint64, asc bool) {
+	if query == nil {
+		return 0, 0, false
+	}
+	return query.Sequence, uint64(query.Limit), query.Asc
+}
+
 func UserChangesToPb(changes []*user_model.UserChange) []*change_pb.Change {
 	c := make([]*change_pb.Change, len(changes))
 	for i, change := range changes {

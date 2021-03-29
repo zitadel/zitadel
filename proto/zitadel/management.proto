@@ -135,6 +135,7 @@ service ManagementService {
     rpc ListUserChanges(ListUserChangesRequest) returns (ListUserChangesResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/changes/_search"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -536,6 +537,7 @@ service ManagementService {
     rpc ListOrgChanges(ListOrgChangesRequest) returns (ListOrgChangesResponse) {
         option (google.api.http) = {
             post: "/orgs/me/changes/_search"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1867,7 +1869,7 @@ message ListUsersResponse {
 }
 
 message ListUserChangesRequest {
-    zitadel.v1.ListQuery query = 1;
+    zitadel.change.v1.ChangeQuery query = 1;
     string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -2265,7 +2267,7 @@ message GetOrgByDomainGlobalRequest {
 }
 
 message ListOrgChangesRequest {
-    zitadel.v1.ListQuery query = 1;
+    zitadel.change.v1.ChangeQuery query = 1;
 }
 
 message ListOrgChangesResponse {
@@ -2429,7 +2431,7 @@ message ListGrantedProjectsResponse {
 }
 
 message ListProjectChangesRequest {
-    zitadel.v1.ListQuery query = 1;
+    zitadel.change.v1.ChangeQuery query = 1;
     string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -2609,7 +2611,7 @@ message ListAppsResponse {
 }
 
 message ListAppChangesRequest {
-    zitadel.v1.ListQuery query = 1;
+    zitadel.change.v1.ChangeQuery query = 1;
     string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
