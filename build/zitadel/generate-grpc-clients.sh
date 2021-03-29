@@ -14,7 +14,7 @@ fi
 
 generate () {
     protoc \
-        -I=.tmp/protos \
+        -I=/.tmp/protos \
         -I=/go/src/github.com/caos/zitadel/pkg/grpc/message \
         -I=/go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption \
         -I=$1 \
