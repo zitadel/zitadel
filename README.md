@@ -22,16 +22,16 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 ## Features of ZITADEL platform
 
 * Authentication
-    * OpenID Connect 1.0 Protocol (OP),  OAuth 2.0 Protocol (OP)
+    * OpenID Connect 1.0 Protocol (OP)
     * Username / Password
     * Machine-to-machine (JWT profile)
-    * Passwordless/WebAuthN (FIDO2)
+    * Passwordless with FIDO2
 * Multifactor authentication with OTP, U2F
-* Federation with OpenID Connect 1.0 Protocol (RP), OAuth 2.0 Protocol (RP), Google
+* Federation with OpenID Connect 1.0 Protocol (RP), OAuth 2.0 Protocol (RP)
 * Authorization via Role Based Access Control (RBAC)
 * Identity Brokering
 * Delegation of roles to other organizations for self-management
-* Strong audit trail of all IAM resources
+* Strong audit trail for all IAM resources
 * User interface for administration
 * APIs for Management, Administration, and Authentication
 * Policy configuration and enforcement
