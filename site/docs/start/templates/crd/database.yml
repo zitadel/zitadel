@@ -1,0 +1,33 @@
+apiVersion: caos.ch/v1
+kind: Database
+metadata:
+  name: database
+  namespace: caos-system
+spec:
+  kind: databases.caos.ch/Orb
+  version: v0
+  spec:
+    verbose: false
+    tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+    version: 0.118.2
+    selfReconciling: true
+  database:
+    kind: databases.caos.ch/CockroachDB
+    version: v0
+    spec:
+      verbose: false
+      replicaCount: 1
+      storageCapacity: 368Gi
+      storageClass: fast
+      clusterDNS: cluster.local
+      backups: {}
+        # bucket:
+        #  kind: databases.caos.ch/BucketBackup
+        # version: v0
+        #spec:
+        #  verbose: true
+        #  cron: 0 * * * *
+        #  bucket: dummy
+      #  serviceAccountJSON: {}
