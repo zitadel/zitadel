@@ -7,8 +7,9 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	orbconfig "github.com/caos/orbos/pkg/orb"
 	"github.com/caos/zitadel/operator/database"
+	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	"github.com/caos/zitadel/operator/zitadel"
-	"github.com/caos/zitadel/operator/zitadel/kinds/orb"
+	orbz "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 )
 
 func DestroyOperator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, version *string, gitops bool) error {
@@ -25,7 +26,7 @@ func DestroyOperator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kube
 		return err
 	}
 
-	return zitadel.Destroy(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"zitadel", "iam"}), k8sClient)()
+	return zitadel.Destroy(monitor, gitClient, orbz.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"zitadel", "iam"}), k8sClient)()
 }
 
 func DestroyDatabase(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, version *string, gitops bool) error {
@@ -42,5 +43,5 @@ func DestroyDatabase(monitor mntr.Monitor, orbConfigPath string, k8sClient *kube
 		return err
 	}
 
-	return database.Destroy(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"operator", "database", "backup"}), k8sClient)()
+	return database.Destroy(monitor, gitClient, orbdb.AdaptFunc("", version, gitops, "operator", "database", "backup"), k8sClient)()
 }
