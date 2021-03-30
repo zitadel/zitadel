@@ -34,7 +34,7 @@ We provide a [shared-cloud ZITADEL](https://zitadel.ch) system where people can 
 
 ### Running your own IAM
 
-You can run an automatically operated ZITADEL instance to a Kubernetes cluster of your choice. You can do so by using [CRDs](https://docs.zitadel.ch/start#CRD_Mode_on_an_existing_Kubernetes_cluster), [GitOps](#GitOps_Mode_on_an_existing_Kubernetes_cluster) or on a dedicated Kubernetes Cluster using [ORBOS](#GitOps_Mode_on_dedicated_Kubernetes_Clusters_using_ORBOS)
+You can run an automatically operated ZITADEL instance to a Kubernetes cluster of your choice. You can do so by using [CRDs](https://docs.zitadel.ch/start#CRD_Mode_on_an_existing_Kubernetes_cluster), [GitOps](https://docs.zitadel.ch/start##GitOps_Mode_on_an_existing_Kubernetes_cluster) or on a dedicated Kubernetes Cluster using [ORBOS](https://docs.zitadel.ch/start##GitOps_Mode_on_dedicated_Kubernetes_Clusters_using_ORBOS)
 
 ## Give me some docs
 
