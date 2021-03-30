@@ -2,10 +2,10 @@ package cmds
 
 import (
 	"errors"
+	"github.com/caos/zitadel/pkg/zitadel"
 
 	"github.com/caos/orbos/pkg/kubernetes/cli"
 
-	"github.com/caos/zitadel/operator/crtlgitops"
 	"github.com/caos/zitadel/pkg/databases"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -48,10 +48,21 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 			return err
 		}
 
-		list, err := databases.ListBackups(monitor, gitClient)
-		if err != nil {
-			monitor.Error(err)
-			return nil
+		list := make([]string, 0)
+		if rv.Gitops {
+			listT, err := databases.GitOpsListBackups(monitor, gitClient)
+			if err != nil {
+				monitor.Error(err)
+				return nil
+			}
+			list = listT
+		} else {
+			listT, err := databases.CrdListBackups(monitor, k8sClient)
+			if err != nil {
+				monitor.Error(err)
+				return nil
+			}
+			list = listT
 		}
 
 		if backup == "" {
@@ -79,9 +90,19 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 			return nil
 		}
 
-		if err := crtlgitops.Restore(monitor, gitClient, orbConfig, k8sClient, backup, rv.Gitops, &version); err != nil {
-			monitor.Error(err)
+		if rv.Gitops {
+			if err := zitadel.GitOpsClearMigrateRestore(monitor, gitClient, orbConfig, k8sClient, backup, &version); err != nil {
+				monitor.Error(err)
+				return err
+			}
+		} else {
+			if err := zitadel.CrdClearMigrateRestore(monitor, k8sClient, backup, &version); err != nil {
+				monitor.Error(err)
+				return err
+			}
+
 		}
+
 		return nil
 	}
 	return cmd

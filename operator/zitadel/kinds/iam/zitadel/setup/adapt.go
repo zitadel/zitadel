@@ -50,7 +50,7 @@ func AdaptFunc(
 	jobName := getJobName(reason)
 	nameLabels := labels.MustForName(componentLabels, jobName)
 
-	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)
+	destroyJ, err := job.AdaptFuncToDestroy(namespace, jobName)
 	if err != nil {
 		return nil, nil, err
 	}

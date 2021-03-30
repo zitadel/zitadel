@@ -33,7 +33,7 @@ func AdaptFunc(
 		return nil, nil, err
 	}
 
-	destroyR, err := role.AdaptFuncToDestroy(namespace, roleLabels.Name())
+	destroyR, err := role.AdaptFuncToDestroy(roleLabels.Name(), namespace)
 	if err != nil {
 		return nil, nil, err
 	}

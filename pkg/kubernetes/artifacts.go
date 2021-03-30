@@ -356,7 +356,7 @@ func ScaleZitadelOperator(
 	replicaCount int,
 ) error {
 	monitor.Debug("Scaling zitadel-operator")
-	return client.ScaleDeployment("caos-system", "zitadel-operator", replicaCount)
+	return client.ScaleDeployment(namespace, "zitadel-operator", replicaCount)
 }
 
 func int32Ptr(i int32) *int32 { return &i }

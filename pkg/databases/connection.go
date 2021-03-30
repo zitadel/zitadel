@@ -20,7 +20,7 @@ func CrdGetConnectionInfo(
 		return "", "", err
 	}
 
-	return getConnectionInfo(monitor, k8sClient, desired)
+	return getConnectionInfo(monitor, k8sClient, desired, false)
 }
 
 func GitOpsGetConnectionInfo(
@@ -34,17 +34,18 @@ func GitOpsGetConnectionInfo(
 		return "", "", err
 	}
 
-	return getConnectionInfo(monitor, k8sClient, desired)
+	return getConnectionInfo(monitor, k8sClient, desired, true)
 }
 
 func getConnectionInfo(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
 	desired *tree.Tree,
+	gitOps bool,
 ) (string, string, error) {
 	current := &tree.Tree{}
 
-	query, _, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
+	query, _, _, _, _, err := orbdb.AdaptFunc("", nil, gitOps, "database")(monitor, desired, current)
 	if err != nil {
 		return "", "", err
 	}
