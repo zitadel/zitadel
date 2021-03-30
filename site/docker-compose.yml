@@ -5,6 +5,7 @@ services:
     build:
       context: ..
       dockerfile: site/dockerfile
+      target: builder
     command: sh -c "npm run dev"
     ports:
       - 3000:3000

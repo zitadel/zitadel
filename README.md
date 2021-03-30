@@ -30,16 +30,11 @@ One feature that we often missed, was a solid **audit trail** of all IAM resourc
 
 ### Use our free tier
 
-We provide a shared-cloud ZITADEL system where people can register there own organisation.
-Until end of 2020 we operator under a **early access** model where everything is free.
-Go check it out under [zitadel.ch](https://zitadel.ch)
+We provide a [shared-cloud ZITADEL](https://zitadel.ch) system where people can register their own organisation in a [free tier](https://zitadel.ch/pricing). Our free tier contains most functionality, especially all security relevant features.
 
-### Run your own IAM
+### Running your own IAM
 
-Stay tuned, we will soon publish a guide how you can deploy a **hyperconverged** system with our automation tooling called [**ORBOS**](https://github.com/caos/orbos/).
-With [**ORBOS**](https://github.com/caos/orbos/) you will be able to run [**Kubernetes**](https://kubernetes.io/) with Google on **[GCEProvider](https://cloud.google.com/compute)**, on **[StaticProvider](https://github.com/caos/orbos/blob/master/docs/orbiter/static.md)** for in-house scenarios or on the Swiss based **[CloudscaleProvider](https://www.cloudscale.ch/)** within 20 minutes. To achieve this, [**ORBOS**](https://github.com/caos/orbos/) will bootstrap and maintain a [**Kubernetes**](https://kubernetes.io/) cluster, essential platform components (logging, metrics, ingress, ...), a secure [**CockroachDB**](https://www.cockroachlabs.com/) cluster and **ZITADEL** itself.
-
-The combination of the tools [**ORBOS**](https://github.com/caos/orbos/) and **ZITADEL** is what makes the operation easy and scalable.
+You can run an automatically operated ZITADEL instance to a Kubernetes cluster of your choice. You can do so by using [CRDs](https://docs.zitadel.ch/start#CRD_Mode_on_an_existing_Kubernetes_cluster), [GitOps](#GitOps_Mode_on_an_existing_Kubernetes_cluster) or on a dedicated Kubernetes Cluster using [ORBOS](#GitOps_Mode_on_dedicated_Kubernetes_Clusters_using_ORBOS)
 
 ## Give me some docs
 

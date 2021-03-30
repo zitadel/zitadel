@@ -1,0 +1,56 @@
+apiVersion: caos.ch/v1
+kind: Zitadel
+metadata:
+  name: zitadel
+  namespace: caos-system
+spec:
+  kind: zitadel.caos.ch/Orb
+  version: v0
+  spec:
+    verbose: false
+    version: 0.118.2
+    selfReconciling: true
+  iam:
+    kind: zitadel.caos.ch/ZITADEL
+    version: v0
+    spec:
+      verbose: false
+      force: false
+      replicaCount: 1
+      configuration:
+        cache:
+          maxAge: 12h
+          sharedMaxAge: 168h
+          shortMaxAge: 5m
+          shortSharedMaxAge: 15m
+        secrets:
+          existingKeys:
+            key: keys
+            name: zitadel
+          userVerificationID: userverificationkey_1
+          otpVerificationID: otpverificationkey_1
+          oidcKeysID: oidckey_1
+          cookieID: cookiekey_1
+          csrfID: cookiekey_1
+          domainVerificationID: domainverificationkey_1
+          idpConfigVerificationID: idpconfigverificationkey_1
+        notifications:
+          email:
+            smtpHost: smtp.gmail.com:465
+            smtpUser: dummy
+            senderAddress: dummy
+            senderName: dummy
+            tls: true
+          twilio:
+            senderName: dummy
+        debugMode: true
+        logLevel: info
+        dns:
+          domain: myzitadel.ch
+          tlsSecret: tls-cert-wildcard
+          subdomains:
+            accounts: accounts
+            api: api
+            console: console
+            issuer: issuer
+        clusterdns: cluster.local
