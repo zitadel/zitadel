@@ -54,3 +54,6 @@ pkg/grpc/*/mock/*.mock.go
 **.proto.mock.go
 **.pb.*.go
 **.gen.go
+
+# examples
+examples/client/zitadel/*
