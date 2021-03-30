@@ -46,7 +46,7 @@ We provide a cloud service [**ZITADEL.ch**](https://zitadel.ch) where people can
 
 **ZITADEL** is free open source software under [Apache 2.0](##License) managed by [CAOS](https://caos.ch). We provide our community access to ZITADEL releases at no cost and welcome all contributions.
 
-You can run an automatically operated **ZITADEL** instance to a Kubernetes cluster of your choice. You can do so by using [CRDs](https://docs.zitadel.ch/start#CRD_Mode_on_an_existing_Kubernetes_cluster), [GitOps](https://docs.zitadel.ch/start#GitOps_Mode_on_an_existing_Kubernetes_cluster) or on a dedicated Kubernetes Cluster on various infrastructure providers using [ORBOS](#GitOps_Mode_on_dedicated_Kubernetes_Clusters_using_ORBOS)
+You can run an automatically operated **ZITADEL** instance to a Kubernetes cluster of your choice. You can do so by using [CRDs](https://docs.zitadel.ch/start#CRD_Mode_on_an_existing_Kubernetes_cluster), [GitOps](https://docs.zitadel.ch/start#GitOps_Mode_on_an_existing_Kubernetes_cluster) or on a dedicated Kubernetes Cluster on various infrastructure providers using [ORBOS](https://docs.zitadel.ch/start#GitOps_Mode_on_dedicated_Kubernetes_Clusters_using_ORBOS)
 
 ### Let us run ZITADEL for you
 
