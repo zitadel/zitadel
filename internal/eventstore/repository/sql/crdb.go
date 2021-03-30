@@ -39,8 +39,8 @@ const (
 		"    WITH previous_data AS (" +
 		"        SELECT MAX(event_sequence) AS seq, resource_owner " +
 		"        FROM eventstore.events " +
-		//TODO: remove LIMIT 1 as soon as data cleaned up (only 1 resource_owner per aggregate)
-		"        WHERE aggregate_type = $2 AND aggregate_id = $3 GROUP BY resource_owner LIMIT 1" +
+		//TODO: remove LIMIT 1 / order by as soon as data cleaned up (only 1 resource_owner per aggregate)
+		"        WHERE aggregate_type = $2 AND aggregate_id = $3 GROUP BY resource_owner order by seq desc LIMIT 1" +
 		"    )" +
 		// defines the data to be inserted
 		"    SELECT " +
