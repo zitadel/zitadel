@@ -56,6 +56,7 @@ func setSetUpContextData(ctx context.Context) context.Context {
 }
 
 func (c *Commands) StartSetup(ctx context.Context, step domain.Step) (*domain.IAM, error) {
+	logging.Log("COMMA-3M9fs").Infof("start setup step %v", step)
 	iamWriteModel, err := c.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
