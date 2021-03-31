@@ -65,13 +65,6 @@ func HumanToPb(view *model.HumanView) *user_pb.Human {
 			Phone:           view.Phone,
 			IsPhoneVerified: view.IsPhoneVerified,
 		},
-		Address: &user_pb.Address{ //TODO: remove?
-			Country:       view.Country,
-			Locality:      view.Locality,
-			PostalCode:    view.PostalCode,
-			Region:        view.Region,
-			StreetAddress: view.StreetAddress,
-		},
 	}
 }
 

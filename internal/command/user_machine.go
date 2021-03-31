@@ -74,7 +74,6 @@ func (c *Commands) ChangeMachine(ctx context.Context, machine *domain.Machine) (
 	return writeModelToMachine(existingMachine), nil
 }
 
-//TODO: adlerhurst we should check userID on the same level, in user.go userID is checked in public funcs
 func (c *Commands) machineWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *MachineWriteModel, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Plof", "Errors.User.UserIDMissing")

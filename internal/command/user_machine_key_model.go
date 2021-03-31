@@ -32,8 +32,6 @@ func (wm *MachineKeyWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.MachineKeyAddedEvent:
-			//TODO: adlerhurst we should decide who should handle the correct event appending
-			// IMO in this append events we should only get events with the correct keyID
 			if wm.KeyID != e.KeyID {
 				continue
 			}
