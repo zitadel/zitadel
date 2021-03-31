@@ -310,6 +310,11 @@ Errors:
     LoginPolicy:
       MFA:
         ForceAndNotConfigured: Multifactor is configured as required, but no possible providers are configured. Please contact your system administrator.
+  Step:
+    Started:
+      AlreadyExists: Step started already exists
+    Done:
+      AlreadyExists: Step done already exists
 EventTypes:
   user:
     added: User added

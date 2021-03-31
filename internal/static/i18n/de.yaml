@@ -309,6 +309,11 @@ Errors:
     LoginPolicy:
       MFA:
         ForceAndNotConfigured: Multifaktor ist als zwingend konfiguriert, jedoch sind keine möglichen Provider hinterlegt. Bitte melde dich beim Administrator des Systems.
+  Step:
+    Started:
+      AlreadyExists: Schritt gestartet existiert bereits
+    Done:
+      AlreadyExists: Schritt ausgeführt existiert bereits
 EventTypes:
   user:
     added: Benutzer hinzugefügt
