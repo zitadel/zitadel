@@ -17,10 +17,10 @@ wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/star
 
 # Before applying, adjust the values in ./database.yml and zitadel.yml using your favorite text editor to match your environment.
 # Especially the values for the domain, cluster DNS and storage class are important
-kubectl apply --filename ./database.yml ./zitadel.yml
+kubectl apply --filename ./database.yml,./zitadel.yml
 
 # Write the minimal Secrets
-wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/start/templates/example_keys | zitadelctl writesecret zitadel.keys.existing --stdin
+wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/start/templates/example_keys && zitadelctl writesecret zitadel.keys.existing --file ./example_keys
 
 # Enjoy watching the zitadel pods becoming ready
 watch "kubectl --namespace caos-zitadel get pods"
@@ -36,7 +36,7 @@ curl -s https://api.github.com/repos/caos/orbos/releases/tags/v3.1.4 | grep "bro
 orbctl takeoff
 
 # Downloading the configuration template
-wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/start/templates/crd/boom.yml
+wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/start/templates/boom.yml
 
 # Before applying, adjust the values in ./boom.yml using your favorite text editor to match your environment.
 # Especially the value for proxyProtocol is of special interest
