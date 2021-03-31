@@ -3,6 +3,7 @@ package iam
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -28,14 +29,14 @@ type SetupStepEvent struct {
 func NewAddSetupStepStartedUniqueConstraint(step domain.Step) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueStepStarted,
-		string(step),
+		strconv.Itoa(int(step)),
 		"Errors.Step.Started.AlreadyExists")
 }
 
 func NewAddSetupStepDoneUniqueConstraint(step domain.Step) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueStepDone,
-		string(step),
+		strconv.Itoa(int(step)),
 		"Errors.Step.Done.AlreadyExists")
 }
 
