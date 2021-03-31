@@ -8,15 +8,18 @@ spec:
   version: v0
   spec:
     verbose: false
-    tolerations:
-      - key: node-role.kubernetes.io/master
-        operator: Exists
     version: 0.118.2
     selfReconciling: true
   database:
     kind: databases.caos.ch/CockroachDB
     version: v0
     spec:
+      resources:
+        limits:
+          memory: 8Gi
+        requests:
+          cpu: 1
+          memory: 6Gi
       verbose: false
       replicaCount: 1
       storageCapacity: 368Gi
