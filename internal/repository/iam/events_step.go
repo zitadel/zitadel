@@ -82,6 +82,7 @@ func NewSetupStepDoneEvent(
 			SetupDoneEventType,
 		),
 		Step: step,
+		Done: true,
 	}
 }
 
