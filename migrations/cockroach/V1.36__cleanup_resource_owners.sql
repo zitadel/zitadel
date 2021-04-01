@@ -9,7 +9,7 @@ WITH resource_owners AS (
 					aggregate_type, 
 					aggregate_id, 
 					resource_owner 
-				from events
+				from eventstore.events
 				where aggregate_type not like '%.%'
 				group by 
 					aggregate_type, 
@@ -39,8 +39,8 @@ WITH resource_owners AS (
 	FROM 
 		first_sequences f
 	JOIN
-		events e ON f.seq = e.event_sequence
+		eventstore.events e ON f.seq = e.event_sequence
 )
-UPDATE events e 
+UPDATE eventstore.events e 
 SET resource_owner = r.resource_owner
 FROM resource_owners r where e.aggregate_id = r.aggregate_id;
