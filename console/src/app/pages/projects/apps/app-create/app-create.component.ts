@@ -10,13 +10,17 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import {
     APIAuthMethodType,
-    App,
     OIDCAppType,
     OIDCAuthMethodType,
     OIDCGrantType,
     OIDCResponseType,
 } from 'src/app/proto/generated/zitadel/app_pb';
-import { AddAPIAppRequest, AddOIDCAppRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import {
+    AddAPIAppRequest,
+    AddAPIAppResponse,
+    AddOIDCAppRequest,
+    AddOIDCAppResponse,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -289,11 +293,11 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 .addOIDCApp(this.oidcAppRequest)
                 .then((resp) => {
                     this.loading = false;
-                    // if (resp.oidcConfig?.authMethodType !== OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE) {
-                    // this.showSavedDialog(resp);
-                    // } else {
-                    //     this.router.navigate(['projects', this.projectId, 'apps', response.id]);
-                    // }
+                    if (resp.clientId || resp.clientSecret) {
+                        this.showSavedDialog(resp);
+                    } else {
+                        this.router.navigate(['projects', this.projectId, 'apps', resp.appId]);
+                    }
                 })
                 .catch(error => {
                     this.loading = false;
@@ -305,12 +309,12 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 .addAPIApp(this.apiAppRequest)
                 .then((resp) => {
                     this.loading = false;
-                    // const response = resp.toObject();
-                    // if (response.apiConfig?.authMethodType == APIAuthMethodType.APIAUTHMETHODTYPE_BASIC) {
-                    // this.showSavedDialog(resp);
-                    // } else {
-                    //     this.router.navigate(['projects', this.projectId, 'apps', response.id]);
-                    // }
+
+                    if (resp.clientId || resp.clientSecret) {
+                        this.showSavedDialog(resp);
+                    } else {
+                        this.router.navigate(['projects', this.projectId, 'apps', resp.appId]);
+                    }
                 })
                 .catch(error => {
                     this.loading = false;
@@ -319,27 +323,25 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         }
     }
 
-    public showSavedDialog(app: App.AsObject): void {
-        if (app.oidcConfig?.clientSecret !== undefined) {
-            const dialogRef = this.dialog.open(AppSecretDialogComponent, {
-                data: app.oidcConfig,
-            });
-
-            dialogRef.afterClosed().subscribe(() => {
-                this.router.navigate(['projects', this.projectId, 'apps', app.id]);
-            });
+    public showSavedDialog(added: AddOIDCAppResponse.AsObject | AddAPIAppResponse.AsObject): void {
+        let clientSecret = '';
+        if (added.clientSecret) {
+            clientSecret = added.clientSecret;
         }
-        else if (app.apiConfig?.clientSecret !== undefined) {
-            const dialogRef = this.dialog.open(AppSecretDialogComponent, {
-                data: app.apiConfig,
-            });
-
-            dialogRef.afterClosed().subscribe(() => {
-                this.router.navigate(['projects', this.projectId, 'apps', app.id]);
-            });
-        } else {
-            this.router.navigate(['projects', this.projectId, 'apps', app.id]);
+        let clientId = '';
+        if (added.clientId) {
+            clientId = added.clientId;
         }
+        const dialogRef = this.dialog.open(AppSecretDialogComponent, {
+            data: {
+                clientSecret: clientSecret,
+                clientId: clientId
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(() => {
+            this.router.navigate(['projects', this.projectId, 'apps', added.appId]);
+        });
     }
 
     get name(): AbstractControl | null {

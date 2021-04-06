@@ -222,10 +222,11 @@
             "TITLE": "Multifaktor-Authentisierung",
             "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
             "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
-            "OTP": "OTP konfigurieren",
+            "ADD":"Faktor hinzufügen",
+            "OTP": "OTP (One-Time Password)",
             "OTP_DIALOG_TITLE": "OTP hinzufügen",
             "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
-            "U2F":"U2F hinzufügen",
+            "U2F":"U2F (Universal 2nd Factor)",
             "U2F_DIALOG_TITLE": "U2F hinzufügen",
             "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
             "U2F_SUCCESS":"U2F erfolgreich erstellt!",
@@ -244,7 +245,9 @@
             },
             "DIALOG": {
                 "MFA_DELETE_TITLE":"Zweiten Faktor entfernen",
-                "MFA_DELETE_DESCRIPTION":"Sie sind im Begriff eine Zweitfaktormethode zu entfernen. Sind sie sicher?"
+                "MFA_DELETE_DESCRIPTION":"Sie sind im Begriff eine Zweitfaktormethode zu entfernen. Sind sie sicher?",
+                "ADD_MFA_TITLE":"Zweiten Faktor hinzufügen",
+                "ADD_MFA_DESCRIPTION":"Wählen Sie einen der verfügbaren Optionen."
             }
         },
         "EXTERNALIDP": {
@@ -437,10 +440,10 @@
             "REMOVE":"Entfernen",
             "TYPE":"Typ",
             "TYPES":{
-                "0":"Unbekannt",
-                "1":"Organisation",
-                "2":"Projekt",
-                "3":"Berechtigtes Projekt"
+                "UNKNOWN":"Unbekannt",
+                "ORG":"Organisation",
+                "PROJECT":"Projekt",
+                "GRANTEDPROJECT":"Berechtigtes Projekt"
             }
         }
     },
@@ -564,6 +567,28 @@
             "MEMBERCHANGED":"Manager geändert.",
             "SETPRIMARY":"Primäre Domain gesetzt."
         }
+    },
+    "FEATURES": {
+        "TITLE":"Features",
+        "DESCRIPTION":"Hier können Sie Funktionen von ZITADEL auf Basis von Ihrem Tier aktivieren sowie deaktivieren.",
+        "BTN-EDIT":"Featureset anpassen",
+        "DATA": {
+            "AUDITLOGRETENTION":"Audit Log retention",
+            "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Username as login",
+            "LOGINPOLICYREGISTRATION":"Login Policy - Registration",
+            "LOGINPOLICYIDP":"Login Policy - Identity Providers",
+            "LOGINPOLICYFACTORS":"Login Policy - Factors",
+            "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwordless Authentication",
+            "LOGINPOLICYCOMPLEXITYPOLICY":"Password Complexity Settings",
+            "LABELPOLICY":"Label Policy"
+        },
+        "TIERSTATES": {
+            "0":"Aktiv",
+            "1":"Aktion erforderlich",
+            "2":"Annuliert",
+            "3":"Besitzstandswahrend"
+        },
+        "NOTAVAILABLE":"Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!"
     },
     "POLICY": {
         "TITLE":"Richtlinen entdecken",
@@ -721,6 +746,7 @@
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
+            "LOGINNAME":"Loginname",
             "EMAIL": "E-Mail",
             "ROLES": "Rollen",
             "USERID": "Benutzer-ID"
@@ -771,7 +797,8 @@
                 "PROJECTGRANTCHANGED":"Projektberechtigung geändert.",
                 "PROJECTGRANTMEMBERADDED":"Berechtigungsmanager hinzugefügt.",
                 "PROJECTGRANTMEMBERCHANGED":"Berechtigungsmanager verändert.",
-                "PROJECTGRANTMEMBERREMOVED":"Berechtigungsmanager entfernt."
+                "PROJECTGRANTMEMBERREMOVED":"Berechtigungsmanager entfernt.",
+                "PROJECTGRANTUPDATED":"Projectberechtigung geändert."
             },
             "ROLES":"Projektrollen"
         },
@@ -854,7 +881,7 @@
             "DESCRIPTION":"Geben Sie die korrekte OIDC Konfiguration Ihres Identity Providers an!"
           }
         },
-        "TYPES": {
+        "OWNERTYPES": {
             "0":"unknown",
             "1":"System",
             "2":"Organisation"

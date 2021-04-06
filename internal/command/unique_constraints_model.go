@@ -46,18 +46,24 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 		case *org.OrgChangedEvent:
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgNameUniqueConstraint(e.Name))
 		case *org.DomainVerifiedEvent:
-			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgNameUniqueConstraint(e.Domain))
+			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgDomainUniqueConstraint(e.Domain))
 		case *org.DomainRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.UniqueOrgDomain)
 		case *iam.IDPConfigAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner))
 		case *iam.IDPConfigChangedEvent:
+			if e.Name == nil {
+				continue
+			}
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner))
 		case *iam.IDPConfigRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.UniqueIDPConfigNameType)
 		case *org.IDPConfigAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner))
 		case *org.IDPConfigChangedEvent:
+			if e.Name == nil {
+				continue
+			}
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner))
 		case *org.IDPConfigRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.UniqueIDPConfigNameType)
@@ -70,6 +76,9 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 		case *project.ProjectAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, project.NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner))
 		case *project.ProjectChangeEvent:
+			if e.Name == nil {
+				continue
+			}
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, project.NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner))
 		case *project.ProjectRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, project.UniqueProjectnameType)

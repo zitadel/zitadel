@@ -365,12 +365,7 @@ message AuthFactorU2F {
 }
 
 message WebAuthNKey {
-    string id = 1 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"69629023906488334\""
-        }
-    ];
-    bytes public_key = 2 [
+    bytes public_key = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "json representation of public key credential creation options used by the webauthn client"
         }
@@ -552,7 +547,7 @@ enum SessionState {
 }
 
 message UserGrant {
-    string grant_id = 1 [
+    string id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\""
         }
@@ -603,7 +598,6 @@ message UserGrant {
             example: "\"Gigi Giraffe\"";
         }
     ];
-    
     string org_id = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\""
@@ -619,7 +613,6 @@ message UserGrant {
             example: "\"caos.ch\"";
         }
     ];
-    
     string project_id = 14 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\""
@@ -628,6 +621,11 @@ message UserGrant {
     string project_name = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL\"";
+        }
+    ];
+    string project_grant_id = 16 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
         }
     ];
 }

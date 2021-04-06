@@ -44,10 +44,11 @@ SetUp:
           Password: 'Password1!'
         Projects:
           - Name: 'Zitadel'
-            OIDCApps:
+            APIs:
               - Name: 'Management-API'
               - Name: 'Auth-API'
               - Name: 'Admin-API'
+            OIDCApps:
               - Name: 'Zitadel Console'
                 RedirectUris:
                   - '$ZITADEL_CONSOLE/auth/callback'
@@ -174,3 +175,6 @@ SetUp:
         ButtonText: Login
   Step11:
     MigrateV1EventstoreToV2: $ZITADEL_MIGRATE_ES_V1
+  Step12:
+    TierName: FREE Tier
+    AuditLogRetention: 9600h #400d = ~13months

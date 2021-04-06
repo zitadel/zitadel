@@ -36,6 +36,7 @@ import { AvatarModule } from './modules/avatar/avatar.module';
 import { InputModule } from './modules/input/input.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
+import { HasFeaturePipeModule } from './pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
@@ -112,6 +113,7 @@ const authConfig: AuthConfig = {
         OutsideClickModule,
         InputModule,
         HasRolePipeModule,
+        HasFeaturePipeModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
         MatToolbarModule,

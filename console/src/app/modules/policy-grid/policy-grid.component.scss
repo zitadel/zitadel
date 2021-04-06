@@ -6,6 +6,7 @@ h2 {
 
 .top-desc {
   color: var(--grey);
+  font-size: 14px;
 }
 
 .row-lyt {
@@ -65,6 +66,10 @@ h2 {
       color: var(--grey);
     }
 
+    .warn {
+        margin-bottom: .5rem;
+    }
+    
     .icons {
         margin-bottom: 1rem;
         .icon {

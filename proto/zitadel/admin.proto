@@ -7,9 +7,11 @@ import "zitadel/options.proto";
 import "zitadel/org.proto";
 import "zitadel/policy.proto";
 import "zitadel/member.proto";
+import "zitadel/features.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -579,6 +581,58 @@ service AdminService {
             };
         };
     }
+    
+    rpc GetDefaultFeatures(GetDefaultFeaturesRequest) returns (GetDefaultFeaturesResponse) {
+        option(google.api.http) = {
+            get: "/features"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.features.read"
+        };
+    }
+
+    rpc SetDefaultFeatures(SetDefaultFeaturesRequest) returns (SetDefaultFeaturesResponse) {
+        option(google.api.http) = {
+            put: "/features"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.features.write"
+        };
+    }
+
+    rpc GetOrgFeatures(GetOrgFeaturesRequest) returns (GetOrgFeaturesResponse) {
+        option(google.api.http) = {
+            get: "/orgs/{org_id}/features"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.features.read"
+        };
+    }
+
+    rpc SetOrgFeatures(SetOrgFeaturesRequest) returns (SetOrgFeaturesResponse) {
+        option(google.api.http) = {
+            put: "/orgs/{org_id}/features"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.features.write"
+        };
+    }
+
+    rpc ResetOrgFeatures(ResetOrgFeaturesRequest) returns (ResetOrgFeaturesResponse) {
+        option(google.api.http) = {
+            delete: "/orgs/{org_id}/features"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.features.write"
+        };
+    }
 
     //Returns the IAM policy defined by the administrators of ZITADEL
     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
@@ -792,7 +846,7 @@ service AdminService {
         option (google.api.http) = {
             get: "/policies/login";
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
@@ -820,7 +874,7 @@ service AdminService {
             put: "/policies/login";
             body: "*";
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
@@ -1211,7 +1265,7 @@ service AdminService {
         option (google.api.http) = {
             get: "/policies/password/age";
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
@@ -1236,7 +1290,7 @@ service AdminService {
             put: "/policies/password/age";
             body: "*";
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
@@ -1270,7 +1324,7 @@ service AdminService {
         option (google.api.http) = {
             get: "/policies/password/lockout";
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
@@ -1295,7 +1349,7 @@ service AdminService {
             put: "/policies/password/lockout";
             body: "*";
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
@@ -2116,6 +2170,66 @@ message UpdateIDPOIDCConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message GetDefaultFeaturesRequest {}
+
+message GetDefaultFeaturesResponse {
+    zitadel.features.v1.Features features = 1;
+}
+
+message SetDefaultFeaturesRequest {
+    string tier_name = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 200}];
+
+    google.protobuf.Duration audit_log_retention = 5 [(validate.rules).duration = {gte: {seconds: 0}}];
+    bool login_policy_username_login = 6;
+    bool login_policy_registration = 7;
+    bool login_policy_idp = 8;
+    bool login_policy_factors = 9;
+    bool login_policy_passwordless = 10;
+    bool password_complexity_policy = 11;
+    bool label_policy = 12;
+}
+
+message SetDefaultFeaturesResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetOrgFeaturesRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetOrgFeaturesResponse {
+    zitadel.features.v1.Features features = 1;
+}
+
+message SetOrgFeaturesRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string tier_name = 2 [(validate.rules).string = {max_len: 200}];
+    string description = 3 [(validate.rules).string = {max_len: 200}];
+    zitadel.features.v1.FeaturesState state = 4;
+    string state_description = 5 [(validate.rules).string = {max_len: 200}];
+
+    google.protobuf.Duration audit_log_retention = 6 [(validate.rules).duration = {gte: {seconds: 0}}];
+    bool login_policy_username_login = 7;
+    bool login_policy_registration = 8;
+    bool login_policy_idp = 9;
+    bool login_policy_factors = 10;
+    bool login_policy_passwordless = 11;
+    bool password_complexity_policy = 12;
+    bool label_policy = 13;
+}
+
+message SetOrgFeaturesResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetOrgFeaturesRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+message ResetOrgFeaturesResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetOrgIAMPolicyRequest {}
 
 message GetOrgIAMPolicyResponse {
@@ -2253,6 +2367,11 @@ message UpdateLabelPolicyRequest {
             example: "\"#707070\"";
             min_length: 1;
             max_length: 50;
+        }
+    ];
+    bool hide_login_name_suffix = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/architecture#Reserved_Scopes";
         }
     ];
 }

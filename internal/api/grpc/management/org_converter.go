@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -12,14 +13,15 @@ import (
 )
 
 func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*org_model.OrgDomainSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := org_grpc.DomainQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
 	return &org_model.OrgDomainSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

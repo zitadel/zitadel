@@ -10,7 +10,7 @@ import (
 func ProjectToPb(project *proj_model.ProjectView) *proj_pb.Project {
 	return &proj_pb.Project{
 		Id:                   project.ProjectID,
-		Details:              object_grpc.ToDetailsPb(project.Sequence, project.ChangeDate, project.ResourceOwner),
+		Details:              object_grpc.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
 		Name:                 project.Name,
 		State:                projectStateToPb(project.State),
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
@@ -22,7 +22,7 @@ func GrantedProjectToPb(project *proj_model.ProjectGrantView) *proj_pb.GrantedPr
 	return &proj_pb.GrantedProject{
 		GrantId:          project.GrantID,
 		ProjectId:        project.ProjectID,
-		Details:          object_grpc.ToDetailsPb(project.Sequence, project.ChangeDate, project.ResourceOwner),
+		Details:          object_grpc.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
 		ProjectName:      project.Name,
 		State:            grantedProjectStateToPb(project.State),
 		ProjectOwnerId:   project.ResourceOwner,
@@ -176,7 +176,7 @@ func RolesToPb(roles []*proj_model.ProjectRoleView) []*proj_pb.Role {
 func RoleToPb(role *proj_model.ProjectRoleView) *proj_pb.Role {
 	return &proj_pb.Role{
 		Key:         role.Key,
-		Details:     object_grpc.ToDetailsPb(role.Sequence, role.ChangeDate, role.ResourceOwner),
+		Details:     object_grpc.ToViewDetailsPb(role.Sequence, role.CreationDate, role.ChangeDate, role.ResourceOwner),
 		DisplayName: role.DisplayName,
 		Group:       role.Group,
 	}

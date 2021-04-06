@@ -34,6 +34,10 @@ func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (st
 	return "clientID", nil
 }
 
+func (v *testVerifier) CheckOrgFeatures(context.Context, string, ...string) error {
+	return nil
+}
+
 func equalStringArray(a, b []string) bool {
 	if len(a) != len(b) {
 		return false

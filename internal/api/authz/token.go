@@ -25,6 +25,7 @@ type authZRepo interface {
 	SearchMyMemberships(ctx context.Context) ([]*Membership, error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
 	ExistsOrg(ctx context.Context, orgID string) error
+	CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error
 }
 
 func Start(authZRepo authZRepo) (v *TokenVerifier) {

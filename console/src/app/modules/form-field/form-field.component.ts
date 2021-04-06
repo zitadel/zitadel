@@ -63,8 +63,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     @ContentChild(MatFormFieldControl) _controlNonStatic!: MatFormFieldControl<any>;
     @ContentChild(MatFormFieldControl, { static: true }) _controlStatic!: MatFormFieldControl<any>;
     get _control(): MatFormFieldControl<any> {
-        // TODO(crisbeto): we need this workaround in order to support both Ivy and ViewEngine.
-        //  We should clean this up once Ivy is the default renderer.
         return this._explicitFormFieldControl || this._controlNonStatic || this._controlStatic;
     }
     set _control(value: MatFormFieldControl<any>) {
@@ -80,7 +78,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
     @HostListener('blur', ['false'])
     _focusChanged(isFocused: boolean): void {
-        console.log('blur1');
         if (isFocused !== this.focused && (!isFocused)) {
             this.focused = isFocused;
             this.stateChanges.next();
@@ -140,7 +137,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
         if (this._control) {
             const ids: string[] = [];
 
-            // TODO(wagnermaciel): Remove the type check when we find the root cause of this bug.
             if (this._control.userAriaDescribedBy &&
                 typeof this._control.userAriaDescribedBy === 'string') {
                 ids.push(...this._control.userAriaDescribedBy.split(' '));

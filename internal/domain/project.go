@@ -7,12 +7,8 @@ import (
 type Project struct {
 	models.ObjectRoot
 
-	State   ProjectState
-	Name    string
-	Members []*Member
-	Roles   []*ProjectRole
-	//Applications         []*Application
-	//Grants               []*ProjectGrant
+	State                ProjectState
+	Name                 string
 	ProjectRoleAssertion bool
 	ProjectRoleCheck     bool
 }

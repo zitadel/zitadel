@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnDestroy, Type } from '@angular/core';
+import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -27,7 +27,6 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
     styleUrls: ['./org-iam-policy.component.scss'],
 })
 export class OrgIamPolicyComponent implements OnDestroy {
-    @Input() service!: AdminService;
     private managementService!: ManagementService;
     public serviceType!: PolicyComponentServiceType;
 

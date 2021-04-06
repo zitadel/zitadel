@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/org/model"
@@ -8,14 +9,15 @@ import (
 )
 
 func listOrgRequestToModel(req *admin.ListOrgsRequest) (*model.OrgSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := org_grpc.OrgQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
 	return &model.OrgSearchRequest{
-		Offset:  req.Query.Offset,
-		Limit:   uint64(req.Query.Limit),
-		Asc:     req.Query.Asc,
+		Offset:  offset,
+		Limit:   limit,
+		Asc:     asc,
 		Queries: queries,
 	}, nil
 }

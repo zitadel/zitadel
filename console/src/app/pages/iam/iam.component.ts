@@ -6,6 +6,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { PolicyGridType } from 'src/app/modules/policy-grid/policy-grid.component';
+import { Features } from 'src/app/proto/generated/zitadel/features_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -25,10 +26,13 @@ export class IamComponent {
         = new BehaviorSubject<Member.AsObject[]>([]);
 
     public PolicyGridType: any = PolicyGridType;
+    public features!: Features.AsObject;
 
     constructor(public adminService: AdminService, private dialog: MatDialog, private toast: ToastService,
         private router: Router) {
         this.loadMembers();
+        this.loadFeatures();
+        this.adminService.getDefaultFeatures();
     }
 
     public loadMembers(): void {
@@ -78,5 +82,14 @@ export class IamComponent {
 
     public showDetail(): void {
         this.router.navigate(['iam/members']);
+    }
+
+    public loadFeatures(): void {
+        this.loadingSubject.next(true);
+        this.adminService.getDefaultFeatures().then(resp => {
+            if (resp.features) {
+                this.features = resp.features;
+            }
+        });
     }
 }

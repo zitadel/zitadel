@@ -27,6 +27,7 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
 	eventstore.IAMRepository
+	eventstore.FeaturesRepo
 	view *mgmt_view.View
 }
 
@@ -54,10 +55,9 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID},
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view},
-		IAMRepository: eventstore.IAMRepository{
-			IAMV2Query: queries,
-		},
-		view: view,
+		IAMRepository: eventstore.IAMRepository{IAMV2Query: queries},
+		FeaturesRepo:  eventstore.FeaturesRepo{es, view, conf.SearchLimit, systemDefaults},
+		view:          view,
 	}, nil
 }
 

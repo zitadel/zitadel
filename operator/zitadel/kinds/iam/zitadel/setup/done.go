@@ -5,6 +5,11 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator"
 	"github.com/pkg/errors"
+	"time"
+)
+
+const (
+	timeout = 20 * time.Minute
 )
 
 func GetDoneFunc(

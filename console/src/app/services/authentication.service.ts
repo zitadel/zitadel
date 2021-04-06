@@ -37,8 +37,6 @@ export class AuthenticationService {
 
     public async authenticate(
         partialConfig?: Partial<AuthConfig>,
-        setState: boolean = true,
-        force: boolean = false,
     ): Promise<boolean> {
         if (partialConfig) {
             Object.assign(this.authConfig, partialConfig);
@@ -50,8 +48,8 @@ export class AuthenticationService {
 
         this._authenticated = this.oauthService.hasValidAccessToken();
 
-        if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {
-            const newState = setState ? await this.statehandler.createState().toPromise() : undefined;
+        if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig) {
+            const newState = await this.statehandler.createState().toPromise();
             this.oauthService.initCodeFlow(newState);
         }
         this._authenticationChanged.next(this.authenticated);

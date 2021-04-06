@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
+import { FeatureServiceType } from 'src/app/modules/features/features.component';
 import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
 import { EventstoreComponent } from './eventstore/eventstore.component';
@@ -30,6 +31,15 @@ const routes: Routes = [
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['iam.member.read'],
+        },
+    },
+    {
+        path: 'features',
+        loadChildren: () => import('src/app/modules/features/features.module').then(m => m.FeaturesModule),
+        // canActivate: [RoleGuard],
+        data: {
+            roles: ['iam.features.read'],
+            serviceType: FeatureServiceType.ADMIN
         },
     },
     {

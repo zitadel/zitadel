@@ -3,6 +3,7 @@ Errors:
   NoChangesFound: No changes
   OriginNotAllowed: This "Origin" is not allowed
   IDMissing: ID missing
+  ResourceOwnerMissing: Resource Owner Organisation missing
   User:
     NotFound: User could not be found
     AlreadyExists: User already exists
@@ -170,7 +171,7 @@ Errors:
     Invalid: Project is invalid
     NotActive: Project is not active
     NotInactive: Project is not deactivated
-    NotFound: Porject not found
+    NotFound: Project not found
     UserIDMissing: User ID missing
     Member:
       NotFound: Project member not found
@@ -197,7 +198,7 @@ Errors:
       OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
       APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
       AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
-      OIDCSecretInvalid: Client Secret is invalid
+      ClientSecretInvalid: Client Secret is invalid
     RequiredFieldsMissing: Some required fields are missing
     Grant:
       AlreadyExists: Project grant already exists
@@ -231,15 +232,16 @@ Errors:
       NotChanged: Default Login Policy has not been changed
       NotExisting: Default Login Policy not existig
       AlreadyExists: Default Login Policy already exists
-      IdpProviderAlreadyExisting: Idp Provider already existing
-      IdpProviderNotExisting: Idp Provider not existing
       MFA:
         AlreadyExists: Multifactor already exists
         NotExisting: Multifactor not existing
         Unspecified: Multifactor invalid
+      IDP:
+        AlreadyExists: Identity provider already exists
+        NotExisting: Identity provider doesn't exist
+        Invalid: Identity Provider invalid
       IDPConfig:
         AlreadyExists: Identity Provider Configuration already exists
-        NotExisting: Identity Provider Configuration doesn't exist
         NotInactive: Identity Provider Configuration not inactive
         NotActive: Identity Provider Configuration not active
     LabelPolicy:
@@ -295,6 +297,7 @@ Errors:
     AlreadyExists: Member already exists
   IDPConfig:
     AlreadyExists: IDP Configuration with this name already exists
+    NotExisting: Identity Provider Configuration doesn't exist
   Changes:
     NotFound: No history found
   Token:
@@ -307,6 +310,11 @@ Errors:
     LoginPolicy:
       MFA:
         ForceAndNotConfigured: Multifactor is configured as required, but no possible providers are configured. Please contact your system administrator.
+  Step:
+    Started:
+      AlreadyExists: Step started already exists
+    Done:
+      AlreadyExists: Step done already exists
 EventTypes:
   user:
     added: User added
@@ -581,12 +589,20 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret check succeeded
             failed: OIDC Client Secret check failed
+        key:
+          added: Application key added
+          removed: Application key removed
       config:
         oidc:
           added: OIDC Configuration added
           changed: OIDC Configuration changed
           secret:
             changed: OIDC secret changed
+        api:
+          added: API Configuration added
+          changed: API Configuration changed
+          secret:
+            changed: API secret changed
   policy:
     password:
       complexity:

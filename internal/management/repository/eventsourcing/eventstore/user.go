@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -82,8 +84,8 @@ func (repo *UserRepo) UserIDsByDomain(ctx context.Context, domain string) ([]str
 	return repo.View.UserIDsByDomain(domain)
 }
 
-func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
-	changes, err := repo.getUserChanges(ctx, id, lastSequence, limit, sortAscending)
+func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*usr_model.UserChanges, error) {
+	changes, err := repo.getUserChanges(ctx, id, lastSequence, limit, sortAscending, retention)
 	if err != nil {
 		return nil, err
 	}
@@ -280,8 +282,8 @@ func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_mo
 	return result, nil
 }
 
-func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
-	query := usr_view.ChangesQuery(userID, lastSequence, limit, sortAscending)
+func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*usr_model.UserChanges, error) {
+	query := usr_view.ChangesQuery(userID, lastSequence, limit, sortAscending, retention)
 
 	events, err := r.Eventstore.FilterEvents(ctx, query)
 	if err != nil {

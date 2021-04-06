@@ -23,7 +23,12 @@ func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*a
 }
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
-	changes, err := s.repo.MyUserChanges(ctx, req.Query.Offset, uint64(req.Query.Limit), req.Query.Asc)
+	sequence, limit, asc := change.ChangeQueryToModel(req.Query)
+	features, err := s.repo.GetOrgFeatures(ctx, authz.GetCtxData(ctx).ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	changes, err := s.repo.MyUserChanges(ctx, sequence, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +54,7 @@ func (s *Server) UpdateMyUserName(ctx context.Context, req *auth_pb.UpdateMyUser
 		return nil, err
 	}
 	return &auth_pb.UpdateMyUserNameResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -89,10 +94,11 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 }
 
 func ListMyProjectOrgsRequestToModel(req *auth_pb.ListMyProjectOrgsRequest) *grant_model.UserGrantSearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	return &grant_model.UserGrantSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		// Queries: queries,//TODO:user grant queries missing in proto
 	}
 }

@@ -15,6 +15,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(LoginPolicyAddedEventType, LoginPolicyAddedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyChangedEventType, LoginPolicyChangedEventMapper).
 		RegisterFilterEventMapper(OrgIAMPolicyAddedEventType, OrgIAMPolicyAddedEventMapper).
+		RegisterFilterEventMapper(OrgIAMPolicyChangedEventType, OrgIAMPolicyChangedEventMapper).
 		RegisterFilterEventMapper(PasswordAgePolicyAddedEventType, PasswordAgePolicyAddedEventMapper).
 		RegisterFilterEventMapper(PasswordAgePolicyChangedEventType, PasswordAgePolicyChangedEventMapper).
 		RegisterFilterEventMapper(PasswordComplexityPolicyAddedEventType, PasswordComplexityPolicyAddedEventMapper).
@@ -41,5 +42,6 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(MailTemplateAddedEventType, MailTemplateAddedEventMapper).
 		RegisterFilterEventMapper(MailTemplateChangedEventType, MailTemplateChangedEventMapper).
 		RegisterFilterEventMapper(MailTextAddedEventType, MailTextAddedEventMapper).
-		RegisterFilterEventMapper(MailTextChangedEventType, MailTextChangedEventMapper)
+		RegisterFilterEventMapper(MailTextChangedEventType, MailTextChangedEventMapper).
+		RegisterFilterEventMapper(FeaturesSetEventType, FeaturesSetEventMapper)
 }

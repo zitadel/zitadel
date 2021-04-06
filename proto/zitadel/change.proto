@@ -40,3 +40,23 @@ message Change {
         }
     ];
 }
+
+message ChangeQuery {
+    //sequence represents the order of events. It's always upcounting
+    uint64 sequence = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2\"";
+        }
+    ];
+    //maximum amount of events returned
+    uint32 limit = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "20";
+        }
+    ];
+    bool asc = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "default is descending"
+        }
+    ];
+}

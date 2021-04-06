@@ -54,7 +54,8 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, data.LoginName, userAgentID)
+	loginName := data.LoginName
+	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, loginName, userAgentID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -69,8 +70,11 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 	}
 	data := l.getUserData(r, authReq, "Login", errType, errMessage)
 	funcs := map[string]interface{}{
+		"hasUsernamePasswordLogin": func() bool {
+			return authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword
+		},
 		"hasExternalLogin": func() bool {
-			return authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
+			return authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
 		},
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, funcs)

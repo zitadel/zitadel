@@ -500,3 +500,11 @@ func (u *UserView) ComputeMFAMaxSetUp() {
 	}
 	u.MFAMaxSetUp = int32(req_model.MFALevelNotSetUp)
 }
+
+func (u *UserView) SetEmptyUserType() {
+	if u.MachineView != nil && u.MachineView.Name == "" {
+		u.MachineView = nil
+	} else {
+		u.HumanView = nil
+	}
+}

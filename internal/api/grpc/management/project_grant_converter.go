@@ -2,6 +2,7 @@ package management
 
 import (
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	proj_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -10,6 +11,7 @@ import (
 )
 
 func ListProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*proj_model.ProjectGrantViewSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries := proj_grpc.ProjectGrantQueriesToModel(req.Queries)
 	queries = append(queries, &proj_model.ProjectGrantViewSearchQuery{
 		Key:    proj_model.GrantedProjectSearchKeyProjectID,
@@ -17,9 +19,9 @@ func ListProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*pr
 		Value:  req.ProjectId,
 	})
 	return &proj_model.ProjectGrantViewSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
@@ -46,16 +48,23 @@ func UpdateProjectGrantRequestToDomain(req *mgmt_pb.UpdateProjectGrantRequest) *
 }
 
 func ListProjectGrantMembersRequestToModel(req *mgmt_pb.ListProjectGrantMembersRequest) *proj_model.ProjectGrantMemberSearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries := member_grpc.MemberQueriesToProjectGrantMember(req.Queries)
-	queries = append(queries, &proj_model.ProjectGrantMemberSearchQuery{
-		Key:    proj_model.ProjectGrantMemberSearchKeyProjectID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.ProjectId,
-	})
+	queries = append(queries,
+		&proj_model.ProjectGrantMemberSearchQuery{
+			Key:    proj_model.ProjectGrantMemberSearchKeyProjectID,
+			Method: domain.SearchMethodEquals,
+			Value:  req.ProjectId,
+		},
+		&proj_model.ProjectGrantMemberSearchQuery{
+			Key:    proj_model.ProjectGrantMemberSearchKeyGrantID,
+			Method: domain.SearchMethodEquals,
+			Value:  req.GrantId,
+		})
 	return &proj_model.ProjectGrantMemberSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}

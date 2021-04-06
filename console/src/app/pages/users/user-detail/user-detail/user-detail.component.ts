@@ -12,13 +12,8 @@ import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { EditDialogComponent } from '../auth-user-detail/edit-dialog/edit-dialog.component';
+import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
-
-export enum EditDialogType {
-    PHONE = 1,
-    EMAIL = 2,
-}
 
 @Component({
     selector: 'app-user-detail',
@@ -115,6 +110,7 @@ export class UserDetailComponent implements OnInit {
             this.mgmtUserService
                 .updateMachine(
                     this.user.id,
+                    this.user.machine.name,
                     this.user.machine.description)
                 .then(() => {
                     this.toast.showInfo('USER.TOAST.SAVED', true);
@@ -160,6 +156,14 @@ export class UserDetailComponent implements OnInit {
         if (this.user.id && email) {
             this.mgmtUserService.updateHumanEmail(this.user.id, email).then(() => {
                 this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
+                if (this.user.state == UserState.USER_STATE_INITIAL) {
+                    this.mgmtUserService.resendHumanInitialization(this.user.id, email ?? '').then(() => {
+                        this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
+                        this.refreshChanges$.emit();
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
                 if (this.user.human) {
                     this.user.human.email = new Email().setEmail(email).toObject();
                     this.refreshUser();
@@ -252,7 +256,8 @@ export class UserDetailComponent implements OnInit {
                         labelKey: 'ACTIONS.NEWVALUE',
                         titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
-                        value: this.user.human?.phone,
+                        value: this.user.human?.phone?.phone,
+                        type: EditDialogType.PHONE,
                     },
                     width: '400px',
                 });
@@ -271,7 +276,8 @@ export class UserDetailComponent implements OnInit {
                         labelKey: 'ACTIONS.NEWVALUE',
                         titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
-                        value: this.user.human?.email,
+                        value: this.user.human?.email?.email,
+                        type: EditDialogType.EMAIL,
                     },
                     width: '400px',
                 });

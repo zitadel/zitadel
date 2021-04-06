@@ -1,4 +1,4 @@
-package usergrant
+package keypair
 
 import (
 	"github.com/caos/zitadel/internal/eventstore"

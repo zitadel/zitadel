@@ -37,7 +37,7 @@
     position: relative;
     z-index: 100;
     margin: 1rem;
-    flex-basis: 250px;
+    flex-basis: 260px;
     display: flex;
     text-decoration: none;
     cursor: pointer;
@@ -65,7 +65,7 @@
       display: flex;
       flex-direction: column;
       min-height: 70px;
-      padding: .5rem 0;
+      padding: .5rem 1rem 0 0;
 
       .top {
         font-size: .8rem;
@@ -168,7 +168,7 @@
 
   .add-project-button {
     z-index: 100;
-    flex-basis: 250px;
+    flex-basis: 260px;
     cursor: pointer;
     display: flex;
     justify-content: center;

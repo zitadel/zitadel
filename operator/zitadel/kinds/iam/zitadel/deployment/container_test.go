@@ -95,7 +95,7 @@ func TestDeployment_GetContainer(t *testing.T) {
 		},
 		Name:            containerName,
 		Image:           zitadelImage + ":" + version,
-		ImagePullPolicy: "IfNotPresent",
+		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{
 			{Name: "grpc", ContainerPort: 50001},
 			{Name: "http", ContainerPort: 50002},
@@ -130,6 +130,8 @@ func TestDeployment_GetContainer(t *testing.T) {
 			PeriodSeconds:    5,
 			FailureThreshold: 2,
 		},
+		TerminationMessagePolicy: "File",
+		TerminationMessagePath:   "/dev/termination-log",
 	}
 
 	container := GetContainer(

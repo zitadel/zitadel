@@ -440,6 +440,10 @@ i {
   align-items: center;
   border: none;
   outline: none;
+  cursor: pointer;
+}
+.lgn-account-selection .lgn-account:disabled {
+  cursor: not-allowed;
 }
 .lgn-account-selection .lgn-account .left {
   padding: 0.5rem 1rem;
@@ -1298,6 +1302,10 @@ i {
   align-items: center;
   border: none;
   outline: none;
+  cursor: pointer;
+}
+.lgn-account-selection .lgn-account:disabled {
+  cursor: not-allowed;
 }
 .lgn-account-selection .lgn-account .left {
   padding: 0.5rem 1rem;

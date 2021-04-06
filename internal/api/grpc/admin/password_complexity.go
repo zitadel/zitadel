@@ -22,7 +22,7 @@ func (s *Server) UpdatePasswordComplexityPolicy(ctx context.Context, req *admin_
 		return nil, err
 	}
 	return &admin_pb.UpdatePasswordComplexityPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,

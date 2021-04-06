@@ -15,6 +15,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
+import { FeaturesModule } from 'src/app/modules/features/features.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
@@ -57,6 +58,7 @@ import { OrgsRoutingModule } from './orgs-routing.module';
         ContributorsModule,
         CopyToClipboardModule,
         PolicyGridModule,
+        FeaturesModule,
     ],
 })
 export class OrgsModule { }

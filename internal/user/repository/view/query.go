@@ -1,6 +1,8 @@
 package view
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -20,11 +22,14 @@ func UserQuery(latestSequence uint64) *es_models.SearchQuery {
 		LatestSequenceFilter(latestSequence)
 }
 
-func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
+func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending bool, retention time.Duration) *es_models.SearchQuery {
 	query := es_models.NewSearchQuery().
 		AggregateTypeFilter(model.UserAggregate)
 	if !sortAscending {
 		query.OrderDesc()
+	}
+	if retention > 0 {
+		query.CreationDateNewerFilter(time.Now().Add(-retention))
 	}
 
 	query.LatestSequenceFilter(latestSequence).

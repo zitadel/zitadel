@@ -1,7 +1,7 @@
 {
-    "authServiceUrl": "https://api.zitadel.dev",
-    "mgmtServiceUrl": "https://api.zitadel.dev",
-    "adminServiceUrl":"https://api.zitadel.dev",
-    "issuer": "https://issuer.zitadel.dev",
-    "clientid": "70669160379706195@zitadel"
+    "authServiceUrl": "https://api.zitadel.io",
+    "mgmtServiceUrl": "https://api.zitadel.io",
+    "adminServiceUrl":"https://api.zitadel.io",
+    "issuer": "https://issuer.zitadel.io",
+    "clientid": "100992085175427532@zitadel"
 }

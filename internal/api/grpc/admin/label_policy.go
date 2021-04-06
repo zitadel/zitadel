@@ -22,7 +22,7 @@ func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabe
 		return nil, err
 	}
 	return &admin_pb.UpdateLabelPolicyResponse{
-		Details: object.ToDetailsPb(
+		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,

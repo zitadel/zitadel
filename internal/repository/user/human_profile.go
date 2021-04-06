@@ -35,13 +35,62 @@ func (e *HumanProfileChangedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
-func NewHumanProfileChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanProfileChangedEvent {
-	return &HumanProfileChangedEvent{
+func NewHumanProfileChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	changes []ProfileChanges,
+) (*HumanProfileChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "USER-33n8F", "Errors.NoChangesFound")
+	}
+	changeEvent := &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanProfileChangedType,
 		),
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type ProfileChanges func(event *HumanProfileChangedEvent)
+
+func ChangeFirstName(firstName string) func(event *HumanProfileChangedEvent) {
+	return func(e *HumanProfileChangedEvent) {
+		e.FirstName = firstName
+	}
+}
+
+func ChangeLastName(lastName string) func(event *HumanProfileChangedEvent) {
+	return func(e *HumanProfileChangedEvent) {
+		e.LastName = lastName
+	}
+}
+
+func ChangeNickName(nickName string) func(event *HumanProfileChangedEvent) {
+	return func(e *HumanProfileChangedEvent) {
+		e.NickName = &nickName
+	}
+}
+
+func ChangeDisplayName(displayName string) func(event *HumanProfileChangedEvent) {
+	return func(e *HumanProfileChangedEvent) {
+		e.DisplayName = &displayName
+	}
+}
+
+func ChangePreferredLanguage(language language.Tag) func(event *HumanProfileChangedEvent) {
+	return func(e *HumanProfileChangedEvent) {
+		e.PreferredLanguage = &language
+	}
+}
+
+func ChangeGender(gender domain.Gender) func(event *HumanProfileChangedEvent) {
+	return func(e *HumanProfileChangedEvent) {
+		e.Gender = &gender
 	}
 }
 

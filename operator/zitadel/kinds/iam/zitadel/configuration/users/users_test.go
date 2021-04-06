@@ -1,19 +1,20 @@
 package users
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	databasemock "github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestUsers_CreateIfNecessary(t *testing.T) {
 	users := []string{}
 	monitor := mntr.Monitor{}
 	user := "test"
-	dbClient := databasemock.NewMockClientInt(gomock.NewController(t))
+	dbClient := databasemock.NewMockClient(gomock.NewController(t))
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	dbClient.EXPECT().AddUser(monitor, user, k8sClient)
@@ -38,7 +39,7 @@ func TestUsers_DeleteIfNotRequired(t *testing.T) {
 	users := []string{}
 	monitor := mntr.Monitor{}
 	user := "test"
-	dbClient := databasemock.NewMockClientInt(gomock.NewController(t))
+	dbClient := databasemock.NewMockClient(gomock.NewController(t))
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
 	dbClient.EXPECT().DeleteUser(monitor, user, k8sClient)

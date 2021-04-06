@@ -23,20 +23,20 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     @Input() public canDelete: boolean = false;
     @Input() public canWrite: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<Member>;
+    @ViewChild(MatTable) public table!: MatTable<Member.AsObject>;
     @Input() public dataSource!: MemberDatasource;
     public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
     @Input() public memberRoleOptions: string[] = [];
     @Input() public factoryLoadFunc!: Function;
     @Input() public refreshTrigger!: Observable<void>;
-    @Output() public updateRoles: EventEmitter<{ member: Member, change: MatSelectChange; }> = new EventEmitter();
+    @Output() public updateRoles: EventEmitter<{ member: Member.AsObject, change: MatSelectChange; }> = new EventEmitter();
     @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
-    @Output() public deleteMember: EventEmitter<Member> = new EventEmitter();
+    @Output() public deleteMember: EventEmitter<Member.AsObject> = new EventEmitter();
 
     private destroyed: Subject<void> = new Subject();
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'username', 'email', 'roles'];
+    public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'loginname', 'email', 'roles'];
 
     constructor() {
         this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe(_ => {

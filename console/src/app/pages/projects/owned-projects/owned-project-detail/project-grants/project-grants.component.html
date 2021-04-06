@@ -35,22 +35,22 @@
 
             <ng-container matColumnDef="grantedOrgName">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORG' | translate }} </th>
-                <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
+                <td [routerLink]="['/projects',grant.projectId,'grant', grant.grantId]" class="pointer" mat-cell
                     *matCellDef="let grant">
                     {{grant.grantedOrgName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="dates">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.DATES' | translate }} </th>
-                <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
+                <td [routerLink]="['/projects',grant.projectId,'grant', grant.grantId]" class="pointer" mat-cell
                     *matCellDef="let grant">
                     <div class="date-block">
                         <span class="date-sub">{{ 'PROJECT.GRANT.CREATIONDATE' | translate }}:</span>
-                        <span>{{grant.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                        <span>{{grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
                     </div>
                     <div class="date-block">
                         <span class="date-sub">{{ 'PROJECT.GRANT.CHANGEDATE' | translate }}</span>
-                        <span>{{grant.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                        <span>{{grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
                     </div>
             </ng-container>
 

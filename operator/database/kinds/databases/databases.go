@@ -35,6 +35,8 @@ func GetQueryAndDestroyFuncs(
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
 	secrets map[string]*secret.Secret,
+	existing map[string]*secret.Existing,
+	migrate bool,
 	err error,
 ) {
 	componentLabels := labels.MustForComponent(apiLabels, component)
@@ -46,7 +48,7 @@ func GetQueryAndDestroyFuncs(
 	case "databases.caos.ch/ProvidedDatabase":
 		return provided.AdaptFunc()(internalMonitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, false, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
 	}
 }
 

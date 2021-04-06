@@ -57,10 +57,16 @@
             <p class="desc">
                 {{'POLICY.IAM_POLICY.DESCRIPTION' | translate}}</p>
 
+            <cnsl-info-section class="warn" *ngIf="(['password_complexity_policy'] | hasFeature | async) == false"
+                type="WARN">
+                {{'FEATURES.NOTAVAILABLE' | translate: ({value:
+                'password_complexity_policy'})}}
+            </cnsl-info-section>
+
             <span class="fill-space"></span>
             <div class="btn-wrapper">
                 <ng-template appHasRole [appHasRole]="['iam.policy.write']">
-                    <button
+                    <button [disabled]="(['password_complexity_policy'] | hasFeature | async) == false"
                         [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.IAM ]"
                         mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
@@ -111,12 +117,18 @@
                 <p class="desc">
                     {{'POLICY.LABEL.DESCRIPTION' | translate}}</p>
 
+                <cnsl-info-section class="warn" *ngIf="(['label_policy'] | hasFeature | async) == false" type="WARN">
+                    {{'FEATURES.NOTAVAILABLE' | translate: ({value:
+                    'label_policy'})}}
+                </cnsl-info-section>
+
                 <span class="fill-space"></span>
                 <div class="btn-wrapper">
                     <ng-template appHasRole [appHasRole]="['iam.policy.write']">
                         <button
                             [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.LABEL ]"
-                            mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
+                            mat-stroked-button [disabled]="(['label_policy'] | hasFeature | async) == false">
+                            {{'POLICY.BTN_EDIT' | translate}}</button>
                     </ng-template>
                 </div>
             </div>

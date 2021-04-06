@@ -80,7 +80,7 @@ func TestGrpc_Adapt(t *testing.T) {
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
 				"host":               ".",
-				"prefix":             "/caos.zitadel.admin.api.v1.AdminService/",
+				"prefix":             "/zitadel.admin.v1.AdminService/",
 				"rewrite":            "",
 				"service":            url,
 				"timeout_ms":         30000,
@@ -105,7 +105,7 @@ func TestGrpc_Adapt(t *testing.T) {
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
 				"host":               ".",
-				"prefix":             "/caos.zitadel.auth.api.v1.AuthService/",
+				"prefix":             "/zitadel.auth.v1.AuthService/",
 				"rewrite":            "",
 				"service":            url,
 				"timeout_ms":         30000,
@@ -130,7 +130,7 @@ func TestGrpc_Adapt(t *testing.T) {
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
 				"host":               ".",
-				"prefix":             "/caos.zitadel.management.api.v1.ManagementService/",
+				"prefix":             "/zitadel.management.v1.ManagementService/",
 				"rewrite":            "",
 				"service":            url,
 				"timeout_ms":         30000,
@@ -197,7 +197,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
 				"host":               "api.domain",
-				"prefix":             "/caos.zitadel.admin.api.v1.AdminService/",
+				"prefix":             "/zitadel.admin.v1.AdminService/",
 				"rewrite":            "",
 				"service":            url,
 				"timeout_ms":         30000,
@@ -222,7 +222,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
 				"host":               "api.domain",
-				"prefix":             "/caos.zitadel.auth.api.v1.AuthService/",
+				"prefix":             "/zitadel.auth.v1.AuthService/",
 				"rewrite":            "",
 				"service":            url,
 				"timeout_ms":         30000,
@@ -247,7 +247,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
 				"host":               "api.domain",
-				"prefix":             "/caos.zitadel.management.api.v1.ManagementService/",
+				"prefix":             "/zitadel.management.v1.ManagementService/",
 				"rewrite":            "",
 				"service":            url,
 				"timeout_ms":         30000,

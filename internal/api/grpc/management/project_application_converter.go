@@ -4,6 +4,7 @@ import (
 	"time"
 
 	authn_grpc "github.com/caos/zitadel/internal/api/grpc/authn"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	app_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -13,6 +14,7 @@ import (
 )
 
 func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*proj_model.ApplicationSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := app_grpc.AppQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -23,9 +25,9 @@ func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*proj_model.Applicati
 		Value:  req.ProjectId,
 	})
 	return &proj_model.ApplicationSearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
@@ -118,16 +120,17 @@ func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAppKeyRequest) *domain.Appli
 }
 
 func ListAPIClientKeysRequestToModel(req *mgmt_pb.ListAppKeysRequest) (*key_model.AuthNKeySearchRequest, error) {
-	queries := make([]*key_model.AuthNKeySearchQuery, 2)
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries := make([]*key_model.AuthNKeySearchQuery, 0)
 	queries = append(queries, &key_model.AuthNKeySearchQuery{
 		Key:    key_model.AuthNKeyObjectID,
 		Method: domain.SearchMethodEquals,
 		Value:  req.AppId,
 	})
 	return &key_model.AuthNKeySearchRequest{
-		Offset: req.Query.Offset,
-		Limit:  uint64(req.Query.Limit),
-		Asc:    req.Query.Asc,
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

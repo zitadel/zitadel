@@ -6,7 +6,7 @@
             </a>
             <div class="title-col">
                 <h1>{{app?.name}}</h1>
-                <span *ngIf="app?.oidcConfig">{{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.applicationType |
+                <span *ngIf="app?.oidcConfig">{{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.appType |
                     translate}}</span>
                 <span *ngIf="app?.apiConfig">API</span>
             </div>
@@ -39,13 +39,13 @@
         <form *ngIf="app && editState" [formGroup]="appNameForm">
             <div class="name-content">
                 <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
-                    <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE"
+                    <mat-button-toggle [value]="AppState.APP_STATE_INACTIVE"
                         matTooltip="{{ 'ACTIONS.DEACTIVATE' | translate}}">
-                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_INACTIVE | translate}}
+                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APP_STATE_INACTIVE | translate}}
                     </mat-button-toggle>
                     <mat-button-toggle [value]="AppState.APPSTATE_ACTIVE"
                         matTooltip="{{ 'ACTIONS.REACTIVATE' | translate}}">
-                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_ACTIVE | translate}}
+                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APP_STATE_ACTIVE | translate}}
                     </mat-button-toggle>
                 </mat-button-toggle-group>
 
@@ -141,6 +141,13 @@
             <app-client-keys [projectId]="projectId" [appId]="app.id"></app-client-keys>
         </app-card>
 
+        <div *ngIf="oidcForm && app?.apiConfig" class="btn-container">
+            <button class="submit-button" (click)="saveAPIApp()" color="primary"
+                [disabled]="apiForm.invalid || !canWrite" mat-raised-button>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+        </div>
+
         <div *ngIf="currentAuthMethod == 'BASIC'">
             <button [disabled]="!canWrite" mat-stroked-button
                 (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' | translate}}</button>
@@ -180,7 +187,7 @@
 
                     <cnsl-form-field appearance="outline" class="formfield">
                         <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
-                        <mat-select formControlName="applicationType">
+                        <mat-select formControlName="appType">
                             <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
                                 {{ 'APP.OIDC.APPTYPE.'+type | translate }}
                             </mat-option>
@@ -266,6 +273,6 @@
             </div>
         </div>
 
-        <app-changes *ngIf="app" [changeType]="ChangeType.APP" [id]="projectId" [secId]="app.id"></app-changes>
+        <app-changes *ngIf="app" [changeType]="ChangeType.APP" [id]="app.id" [secId]="projectId"></app-changes>
     </div>
 </app-meta-layout>

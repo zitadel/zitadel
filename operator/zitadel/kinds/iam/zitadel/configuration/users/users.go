@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
-func createIfNecessary(monitor mntr.Monitor, user string, list []string, dbClient database.ClientInt) operator.EnsureFunc {
+func createIfNecessary(monitor mntr.Monitor, user string, list []string, dbClient database.Client) operator.EnsureFunc {
 	existing := false
 	for _, listedUser := range list {
 		if listedUser == user {
@@ -23,7 +23,7 @@ func createIfNecessary(monitor mntr.Monitor, user string, list []string, dbClien
 	return nil
 }
 
-func deleteIfNotRequired(monitor mntr.Monitor, listedUser string, list []string, dbClient database.ClientInt) operator.EnsureFunc {
+func deleteIfNotRequired(monitor mntr.Monitor, listedUser string, list []string, dbClient database.Client) operator.EnsureFunc {
 	required := false
 	for _, user := range list {
 		if user == listedUser {

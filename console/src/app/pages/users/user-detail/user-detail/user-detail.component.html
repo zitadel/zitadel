@@ -15,11 +15,12 @@
 
             <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
                 <button class="state-button" mat-stroked-button color="warn"
-                    *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
-                    (click)="changeState(UserState.USERSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
+                    *ngIf="user?.state === UserState.USER_STATE_ACTIVE"
+                    (click)="changeState(UserState.USER_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
+                    translate}}</button>
                 <button class="state-button" mat-stroked-button color="warn"
-                    *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
-                    (click)="changeState(UserState.USERSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
+                    *ngIf="user?.state === UserState.USER_STATE_INACTIVE"
+                    (click)="changeState(UserState.USER_STATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
             </ng-template>
         </div>
 
@@ -76,11 +77,11 @@
                 (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
                 <button pwdAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
-                    mat-stroked-button color="primary"
-                    *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
-                <button emailAction class="resendemail" *ngIf="user.state == UserState.USERSTATE_INITIAL"
-                    mat-stroked-button color="primary"
-                    (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' | translate}}</button>
+                    mat-stroked-button color="primary" *ngIf="user.state === UserState.USER_STATE_INITIAL">{{
+                    'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
+                <button emailAction class="resendemail" *ngIf="user.state == UserState.USER_STATE_INITIAL"
+                    mat-stroked-button color="primary" (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' |
+                    translate}}</button>
             </app-contact>
         </app-card>
 
@@ -109,9 +110,10 @@
                 <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
             <div class="meta-row">
-                <span class="first">{{'ORG.PAGES.STATE'  | translate}}</span>
+                <span class="first">{{'ORG.PAGES.STATE' | translate}}</span>
                 <span *ngIf="user && user.state !== undefined" class="state"
-                    [ngClass]="{'active': user.state === UserState.USERSTATE_ACTIVE, 'inactive': user.state === UserState.USERSTATE_INACTIVE}">{{'USER.DATA.STATE'+user.state | translate}}</span>
+                    [ngClass]="{'active': user.state === UserState.USER_STATE_ACTIVE, 'inactive': user.state === UserState.USER_STATE_INACTIVE}">{{'USER.DATA.STATE'+user.state
+                    | translate}}</span>
             </div>
         </div>
 

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
@@ -12,6 +13,7 @@ import (
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 
 	"github.com/caos/logging"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -97,9 +99,13 @@ func (u *NotifyUser) ProcessUser(event *es_models.Event) (err error) {
 	case es_model.UserAdded,
 		es_model.UserRegistered,
 		es_model.HumanRegistered,
-		es_model.HumanAdded:
-		user.AppendEvent(event)
-		u.fillLoginNames(user)
+		es_model.HumanAdded,
+		es_model.MachineAdded:
+		err := user.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		err = u.fillLoginNames(user)
 	case es_model.UserProfileChanged,
 		es_model.UserEmailChanged,
 		es_model.UserEmailVerified,
@@ -128,7 +134,7 @@ func (u *NotifyUser) ProcessUser(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		u.fillLoginNames(user)
+		err = u.fillLoginNames(user)
 	case es_model.UserRemoved:
 		return u.view.DeleteNotifyUser(event.AggregateID, event)
 	default:
@@ -242,7 +248,11 @@ func (u *NotifyUser) getOrgByID(ctx context.Context, orgID string) (*org_model.O
 		return nil, err
 	}
 
-	var esOrg *org_es_model.Org
+	esOrg := &org_es_model.Org{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: orgID,
+		},
+	}
 	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err

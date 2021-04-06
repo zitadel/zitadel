@@ -30,9 +30,11 @@ func (wm *UserWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
 			wm.UserName = e.UserName
-			wm.UserState = domain.UserStateInitial
+			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
 			wm.UserName = e.UserName
+			wm.UserState = domain.UserStateActive
+		case *user.HumanInitialCodeAddedEvent:
 			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.UserState = domain.UserStateActive

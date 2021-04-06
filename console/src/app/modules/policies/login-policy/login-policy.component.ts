@@ -9,7 +9,7 @@ import {
     UpdateLoginPolicyRequest,
     UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDP, IDPLoginPolicyLink, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDP, IDPLoginPolicyLink, IDPOwnerType, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
     AddCustomLoginPolicyRequest,
     GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
@@ -143,7 +143,6 @@ export class LoginPolicyComponent implements OnDestroy {
                 mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
                 mgmtreq.setForceMfa(this.loginData.forceMfa);
                 mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
-                // console.log(mgmtreq.toObject());
                 if ((this.loginData as LoginPolicy.AsObject).isDefault) {
                     return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
                 } else {
@@ -156,8 +155,6 @@ export class LoginPolicyComponent implements OnDestroy {
                 adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
                 adminreq.setForceMfa(this.loginData.forceMfa);
                 adminreq.setPasswordlessType(this.loginData.passwordlessType);
-
-                // console.log(adminreq.toObject());
 
                 return (this.service as AdminService).updateLoginPolicy(adminreq);
         }
@@ -199,7 +196,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp && resp.idp) {
-                this.addIdp(resp.idp).then(() => {
+                this.addIdp(resp.idp, resp.type).then(() => {
                     this.loading = true;
                     setTimeout(() => {
                         this.fetchData();
@@ -211,10 +208,12 @@ export class LoginPolicyComponent implements OnDestroy {
         });
     }
 
-    private addIdp(idp: IDP.AsObject | IDP.AsObject): Promise<any> {
+    private addIdp(idp: IDP.AsObject | IDP.AsObject, ownerType?: IDPOwnerType): Promise<any> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                return (this.service as ManagementService).addIDPToLoginPolicy(idp.id);
+                if (ownerType) {
+                    return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, ownerType);
+                }
             case PolicyComponentServiceType.ADMIN:
                 return (this.service as AdminService).addIDPToLoginPolicy(idp.id);
         }
@@ -228,6 +227,8 @@ export class LoginPolicyComponent implements OnDestroy {
                     if (index > -1) {
                         this.idps.splice(index, 1);
                     }
+                }, error => {
+                    this.toast.showError(error);
                 });
                 break;
             case PolicyComponentServiceType.ADMIN:
@@ -236,6 +237,8 @@ export class LoginPolicyComponent implements OnDestroy {
                     if (index > -1) {
                         this.idps.splice(index, 1);
                     }
+                }, error => {
+                    this.toast.showError(error);
                 });
                 break;
         }

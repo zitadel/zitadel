@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectType } from 'src/app/modules/project-members/project-members.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -27,7 +26,6 @@ export class ProjectGrantDetailComponent {
     public projectid: string = '';
     public grantid: string = '';
 
-    public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
 
     public isZitadel: boolean = false;
@@ -108,7 +106,7 @@ export class ProjectGrantDetailComponent {
     updateRoles(selectionChange: MatSelectChange): void {
         this.mgmtService.updateProjectGrant(this.grant.grantId, this.grant.projectId, selectionChange.value)
             .then(() => {
-                this.toast.showInfo('PROJECT.TOAST.GRANTUPDATED');
+                this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
             }).catch(error => {
                 this.toast.showError(error);
             });

@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/golang/protobuf/ptypes"
 
@@ -187,8 +189,8 @@ func (repo *UserRepo) UserByLoginName(ctx context.Context, loginname string) (*m
 	}
 	return usr_view_model.UserToModel(&userCopy), nil
 }
-func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error) {
-	changes, err := repo.getUserChanges(ctx, authz.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending)
+func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error) {
+	changes, err := repo.getUserChanges(ctx, authz.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending, retention)
 	if err != nil {
 		return nil, err
 	}
@@ -215,8 +217,8 @@ func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*key_mo
 	return key_view_model.AuthNKeyToModel(key), nil
 }
 
-func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error) {
-	query := usr_view.ChangesQuery(userID, lastSequence, limit, sortAscending)
+func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error) {
+	query := usr_view.ChangesQuery(userID, lastSequence, limit, sortAscending, retention)
 
 	events, err := r.Eventstore.FilterEvents(ctx, query)
 	if err != nil {

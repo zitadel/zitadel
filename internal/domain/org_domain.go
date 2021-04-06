@@ -17,7 +17,7 @@ type OrgDomain struct {
 }
 
 func (domain *OrgDomain) IsValid() bool {
-	return domain.AggregateID != "" && domain.Domain != ""
+	return domain.Domain != ""
 }
 
 func (domain *OrgDomain) GenerateVerificationCode(codeGenerator crypto.Generator) (string, error) {

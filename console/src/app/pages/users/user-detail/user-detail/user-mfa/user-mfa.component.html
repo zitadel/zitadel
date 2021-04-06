@@ -3,7 +3,10 @@
         <table class="table" mat-table [dataSource]="dataSource">
             <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLETYPE' | translate }} </th>
-                <td mat-cell *matCellDef="let mfa"> {{'USER.MFA.TYPE.'+ mfa.type | translate}} </td>
+                <td mat-cell *matCellDef="let mfa">
+                    <span *ngIf="mfa.otp !== undefined">OTP (One-Time Password)</span>
+                    <span *ngIf="mfa.u2f !== undefined">U2F (Universal 2nd Factor)</span>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="attr">

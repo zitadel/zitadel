@@ -8,7 +8,6 @@ function login() {
     makeAssertionOptions.publicKey.allowCredentials.forEach(function (listItem) {
         listItem.id = bufferDecode(listItem.id)
     });
-    console.log(makeAssertionOptions);
     navigator.credentials.get({
         publicKey: makeAssertionOptions.publicKey
     }).then(function (credential) {

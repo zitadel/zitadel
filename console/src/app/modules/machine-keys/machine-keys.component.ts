@@ -28,7 +28,7 @@ export class MachineKeysComponent implements OnInit {
     public keyResult!: ListMachineKeysResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    @Input() public displayedColumns: string[] = ['select', 'id', 'type', 'creationDate', 'expirationDate'];
+    @Input() public displayedColumns: string[] = ['select', 'id', 'type', 'creationDate', 'expirationDate', 'actions'];
 
     @Output() public changedSelection: EventEmitter<Array<Key.AsObject>> = new EventEmitter();
 
@@ -61,11 +61,8 @@ export class MachineKeysComponent implements OnInit {
         this.getData(event.pageSize, event.pageIndex * event.pageSize);
     }
 
-    public deleteSelectedKeys(): void {
-        const mappedDeletions = this.selection.selected.map(value => {
-            return this.mgmtService.removeMachineKey(value.id, this.userId);
-        });
-        Promise.all(mappedDeletions).then(() => {
+    public deleteKey(key: Key.AsObject): void {
+        this.mgmtService.removeMachineKey(key.id, this.userId).then(() => {
             this.selection.clear();
             this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
             this.getData(10, 0);
@@ -88,7 +85,6 @@ export class MachineKeysComponent implements OnInit {
 
                 if (resp.date as Moment) {
                     const ts = new Timestamp();
-                    console.log(resp.date.toDate());
                     const milliseconds = resp.date.toDate().getTime();
                     const seconds = Math.abs(milliseconds / 1000);
                     const nanos = (milliseconds - seconds * 1000) * 1000 * 1000;

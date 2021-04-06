@@ -5,6 +5,8 @@ import { BehaviorSubject } from 'rxjs';
 
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
+import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
+import { IDPOwnerType } from '../proto/generated/zitadel/idp_pb';
 import {
     AddAPIAppRequest,
     AddAPIAppResponse,
@@ -74,6 +76,8 @@ import {
     GetAppByIDResponse,
     GetDefaultPasswordComplexityPolicyRequest,
     GetDefaultPasswordComplexityPolicyResponse,
+    GetFeaturesRequest,
+    GetFeaturesResponse,
     GetGrantedProjectByIDRequest,
     GetGrantedProjectByIDResponse,
     GetHumanEmailRequest,
@@ -387,9 +391,10 @@ export class ManagementService {
         return this.grpcService.mgmt.resetLoginPolicyToDefault(req, null).then(resp => resp.toObject());
     }
 
-    public addIDPToLoginPolicy(idpId: string): Promise<AddIDPToLoginPolicyResponse.AsObject> {
+    public addIDPToLoginPolicy(idpId: string, ownerType: IDPOwnerType): Promise<AddIDPToLoginPolicyResponse.AsObject> {
         const req = new AddIDPToLoginPolicyRequest();
         req.setIdpId(idpId);
+        req.setOwnertype(ownerType);
         return this.grpcService.mgmt.addIDPToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
@@ -697,6 +702,13 @@ export class ManagementService {
     public listOrgMemberRoles(): Promise<ListOrgMemberRolesResponse.AsObject> {
         const req = new ListOrgMemberRolesRequest();
         return this.grpcService.mgmt.listOrgMemberRoles(req, null).then(resp => resp.toObject());
+    }
+
+    // Features
+
+    public getFeatures(): Promise<GetFeaturesResponse.AsObject> {
+        const req = new GetFeaturesRequest();
+        return this.grpcService.mgmt.getFeatures(req, null).then(resp => resp.toObject());
     }
 
     // Policy
@@ -1133,62 +1145,63 @@ export class ManagementService {
         return this.grpcService.mgmt.bulkRemoveUserGrant(req, null).then(resp => resp.toObject());
     }
 
-    public listAppChanges(appId: string, projectId: string, limit: number, offset: number): Promise<ListAppChangesResponse.AsObject> {
+    public listAppChanges(appId: string, projectId: string, limit: number, sequence: number): Promise<ListAppChangesResponse.AsObject> {
         const req = new ListAppChangesRequest();
-        const query = new ListQuery();
+        const query = new ChangeQuery();
         req.setAppId(appId);
         req.setProjectId(projectId);
+
         if (limit) {
             query.setLimit(limit);
         }
-        if (offset) {
-            query.setOffset(offset);
+        if (sequence) {
+            query.setSequence(sequence);
         }
         req.setQuery(query);
         return this.grpcService.mgmt.listAppChanges(req, null).then(resp => resp.toObject());
     }
 
-    public listOrgChanges(limit: number, offset: number): Promise<ListOrgChangesResponse.AsObject> {
+    public listOrgChanges(limit: number, sequence: number): Promise<ListOrgChangesResponse.AsObject> {
         const req = new ListOrgChangesRequest();
-        const query = new ListQuery();
+        const query = new ChangeQuery();
 
         if (limit) {
             query.setLimit(limit);
         }
-        if (offset) {
-            query.setOffset(offset);
+        if (sequence) {
+            query.setSequence(sequence);
         }
 
         req.setQuery(query);
         return this.grpcService.mgmt.listOrgChanges(req, null).then(resp => resp.toObject());
     }
 
-    public listProjectChanges(projectId: string, limit: number, offset: number): Promise<ListProjectChangesResponse.AsObject> {
+    public listProjectChanges(projectId: string, limit: number, sequence: number): Promise<ListProjectChangesResponse.AsObject> {
         const req = new ListProjectChangesRequest();
         req.setProjectId(projectId);
-        const query = new ListQuery();
+        const query = new ChangeQuery();
 
         if (limit) {
             query.setLimit(limit);
         }
-        if (offset) {
-            query.setOffset(offset);
+        if (sequence) {
+            query.setSequence(sequence);
         }
 
         req.setQuery(query);
         return this.grpcService.mgmt.listProjectChanges(req, null).then(resp => resp.toObject());
     }
 
-    public listUserChanges(userId: string, limit: number, offset: number): Promise<ListUserChangesResponse.AsObject> {
+    public listUserChanges(userId: string, limit: number, sequence: number): Promise<ListUserChangesResponse.AsObject> {
         const req = new ListUserChangesRequest();
         req.setUserId(userId);
-        const query = new ListQuery();
+        const query = new ChangeQuery();
 
         if (limit) {
             query.setLimit(limit);
         }
-        if (offset) {
-            query.setOffset(offset);
+        if (sequence) {
+            query.setSequence(sequence);
         }
 
         req.setQuery(query);
@@ -1556,7 +1569,6 @@ export class ManagementService {
         if (offset) {
             query.setOffset(offset);
         }
-
         req.setQuery(query);
         if (queryList) {
             req.setQueriesList(queryList);

@@ -13,21 +13,18 @@ func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain
 	if !machine.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 	}
-
+	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.OrgIAMPolicy.NotFound")
+	}
+	if !orgIAMPolicy.UserLoginMustBeDomain {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.Invalid")
+	}
 	userID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 	machine.AggregateID = userID
-
-	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
-	if err != nil {
-		return nil, err
-	}
-	if !orgIAMPolicy.UserLoginMustBeDomain {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6M0ds", "Errors.User.Invalid")
-	}
-
 	addedMachine := NewMachineWriteModel(machine.AggregateID, orgID)
 	userAgg := UserAggregateFromWriteModel(&addedMachine.WriteModel)
 	events, err := c.eventstore.PushEvents(ctx, user.NewMachineAddedEvent(
@@ -58,7 +55,10 @@ func (c *Commands) ChangeMachine(ctx context.Context, machine *domain.Machine) (
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingMachine.WriteModel)
-	changedEvent, hasChanged := existingMachine.NewChangedEvent(ctx, userAgg, machine.Name, machine.Description)
+	changedEvent, hasChanged, err := existingMachine.NewChangedEvent(ctx, userAgg, machine.Name, machine.Description)
+	if err != nil {
+		return nil, err
+	}
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.NotChanged")
 	}
@@ -74,7 +74,6 @@ func (c *Commands) ChangeMachine(ctx context.Context, machine *domain.Machine) (
 	return writeModelToMachine(existingMachine), nil
 }
 
-//TODO: adlerhurst we should check userID on the same level, in user.go userID is checked in public funcs
 func (c *Commands) machineWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *MachineWriteModel, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Plof", "Errors.User.UserIDMissing")

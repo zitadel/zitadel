@@ -4,8 +4,10 @@
 <p class="desc">{{data.descriptionKey | translate}}</p>
 <div mat-dialog-content>
     <cnsl-form-field class="formfield">
-        <cnsl-label>{{data.labelKey | translate }}</cnsl-label>
-        <input cnslInput [(ngModel)]="value" (keydown.enter)="value ? closeDialogWithValue(value) : null" />
+        <cnsl-label>{{data.labelKey | translate }} <span *ngIf="isPhone && phoneCountry">({{ phoneCountry }})</span>
+        </cnsl-label>
+        <input [formControl]="valueControl" cnslInput
+            (keydown.enter)="valueControl.valid ? closeDialogWithValue() : null" />
     </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
@@ -13,8 +15,8 @@
         {{data.cancelKey | translate}}
     </button>
 
-    <button [disabled]="!value" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
-        (click)="closeDialogWithValue(value)">
+    <button [disabled]="valueControl.invalid" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
+        (click)="closeDialogWithValue()">
         {{data.confirmKey | translate}}
     </button>
 </div>

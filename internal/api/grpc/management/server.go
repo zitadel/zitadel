@@ -1,6 +1,8 @@
 package management
 
 import (
+	"google.golang.org/grpc"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/command"
@@ -9,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/management"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -27,6 +28,7 @@ type Server struct {
 	user           repository.UserRepository
 	usergrant      repository.UserGrantRepository
 	iam            repository.IamRepository
+	features       repository.FeaturesRepository
 	authZ          authz.Config
 	systemDefaults systemdefaults.SystemDefaults
 }
@@ -44,6 +46,7 @@ func CreateServer(command *command.Commands, query *query.Queries, repo reposito
 		user:           repo,
 		usergrant:      repo,
 		iam:            repo,
+		features:       repo,
 		systemDefaults: sd,
 	}
 }

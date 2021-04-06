@@ -19,7 +19,7 @@ type MachineAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	UserLoginMustBeDomain bool
+	userLoginMustBeDomain bool   `json:"-"`
 
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
@@ -30,7 +30,7 @@ func (e *MachineAddedEvent) Data() interface{} {
 }
 
 func (e *MachineAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.UserLoginMustBeDomain)}
+	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
 }
 
 func NewMachineAddedEvent(
@@ -50,7 +50,7 @@ func NewMachineAddedEvent(
 		UserName:              userName,
 		Name:                  name,
 		Description:           description,
-		UserLoginMustBeDomain: userLoginMustBeDomain,
+		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
 
@@ -69,8 +69,6 @@ func MachineAddedEventMapper(event *repository.Event) (eventstore.EventReader, e
 type MachineChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName string `json:"userName"`
-
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 }
@@ -86,13 +84,35 @@ func (e *MachineChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 func NewMachineChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-) *MachineChangedEvent {
-	return &MachineChangedEvent{
+	changes []MachineChanges,
+) (*MachineChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "USER-3M9fs", "Errors.NoChangesFound")
+	}
+	changeEvent := &MachineChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			MachineChangedEventType,
 		),
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type MachineChanges func(event *MachineChangedEvent)
+
+func ChangeName(name string) func(event *MachineChangedEvent) {
+	return func(e *MachineChangedEvent) {
+		e.Name = &name
+	}
+}
+
+func ChangeDescription(description string) func(event *MachineChangedEvent) {
+	return func(e *MachineChangedEvent) {
+		e.Description = &description
 	}
 }
 

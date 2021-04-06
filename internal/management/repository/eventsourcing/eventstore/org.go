@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/golang/protobuf/ptypes"
 	"strings"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -93,8 +94,8 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 	return result, nil
 }
 
-func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
-	changes, err := repo.getOrgChanges(ctx, id, lastSequence, limit, sortAscending)
+func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
+	changes, err := repo.getOrgChanges(ctx, id, lastSequence, limit, sortAscending, auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +124,7 @@ func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID stri
 
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID}
+	request.Queries = append(request.Queries, &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
 	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence()
 	logging.Log("EVENT-Smu3d").OnError(sequenceErr).Warn("could not read latest org member sequence")
 	members, count, err := repo.View.SearchOrgMembers(request)
@@ -197,6 +198,32 @@ func (repo *OrgRepository) GetLabelPolicy(ctx context.Context) (*iam_model.Label
 		return nil, err
 	}
 	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+func (repo *OrgRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, viewErr := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if errors.IsNotFound(viewErr) {
+		policy = new(iam_es_model.LabelPolicyView)
+	}
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-3Nf8sd", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-28uLp").WithError(esErr).Debug("error retrieving new events")
+		return iam_es_model.LabelPolicyViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_es_model.LabelPolicyViewToModel(policy), nil
+		}
+	}
+	policy.Default = true
+	return iam_es_model.LabelPolicyViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
@@ -511,8 +538,8 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
 }
 
-func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
-	query := org_view.ChangesQuery(orgID, lastSequence, limit, sortAscending)
+func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
+	query := org_view.ChangesQuery(orgID, lastSequence, limit, sortAscending, auditLogRetention)
 
 	events, err := repo.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {

@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MultiFactorType, SecondFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
 
 enum LoginMethodComponentType {
     MultiFactor = 1,
@@ -13,10 +14,11 @@ enum LoginMethodComponentType {
 })
 export class DialogAddTypeComponent {
     public LoginMethodComponentType: any = LoginMethodComponentType;
-    // public availableMfaTypes: Array<AdminMultiFactorType | MgmtMultiFactorType> = [];
+    public availableMfaTypes: Array<MultiFactorType | SecondFactorType> = [];
+    public newMfaType!: MultiFactorType | SecondFactorType;
     constructor(public dialogRef: MatDialogRef<DialogAddTypeComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any) {
-        // this.availableMfaTypes = data.types;
+        this.availableMfaTypes = data.types;
     }
 
     public closeDialog(): void {
@@ -24,6 +26,6 @@ export class DialogAddTypeComponent {
     }
 
     public closeDialogWithCode(): void {
-        // this.dialogRef.close(this.newMfaType);
+        this.dialogRef.close(this.newMfaType);
     }
 }

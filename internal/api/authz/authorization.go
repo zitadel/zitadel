@@ -23,6 +23,13 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 		return nil, err
 	}
 
+	if requiredAuthOption.Feature != "" {
+		err = CheckOrgFeatures(ctx, verifier, ctxData.OrgID, requiredAuthOption.Feature)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if requiredAuthOption.Permission == authenticated {
 		return func(parent context.Context) context.Context {
 			return context.WithValue(parent, dataKey, ctxData)
@@ -47,6 +54,10 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
 		return parent
 	}, nil
+}
+
+func CheckOrgFeatures(ctx context.Context, t *TokenVerifier, orgID string, requiredFeatures ...string) error {
+	return t.authZRepo.CheckOrgFeatures(ctx, orgID, requiredFeatures...)
 }
 
 func checkUserPermissions(req interface{}, userPerms []string, authOpt Option) error {

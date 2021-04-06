@@ -375,6 +375,16 @@ service AuthService {
         };
     }
 
+    rpc ListMyZitadelFeatures(ListMyZitadelFeaturesRequest) returns (ListMyZitadelFeaturesResponse) {
+        option (google.api.http) = {
+            post: "/features/zitadel/me/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
         option (google.api.http) = {
             post: "/permissions/zitadel/me/_search"
@@ -414,8 +424,7 @@ message GetMyUserResponse {
 }
 
 message ListMyUserChangesRequest {
-    //list limitations and ordering
-    zitadel.v1.ListQuery query = 1;
+    zitadel.change.v1.ChangeQuery query = 1;
 }
 
 message ListMyUserChangesResponse {
@@ -520,7 +529,9 @@ message VerifyMyPhoneRequest {
     string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message VerifyMyPhoneResponse {}
+message VerifyMyPhoneResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message ResendMyPhoneVerificationRequest {}
 
@@ -663,6 +674,12 @@ message ListMyProjectOrgsRequest {
 message ListMyProjectOrgsResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.org.v1.Org result = 2;
+}
+
+message ListMyZitadelFeaturesRequest {}
+
+message ListMyZitadelFeaturesResponse {
+    repeated string result = 1;
 }
 
 message ListMyZitadelPermissionsRequest {}

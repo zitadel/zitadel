@@ -9,6 +9,9 @@ import (
 )
 
 func (c *Commands) AddApplicationKey(ctx context.Context, key *domain.ApplicationKey, resourceOwner string) (_ *domain.ApplicationKey, err error) {
+	if key.AggregateID == "" || key.ApplicationID == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-55m9fs", "Errors.IDMissing")
+	}
 	application, err := c.getApplicationWriteModel(ctx, key.AggregateID, key.ApplicationID, resourceOwner)
 	if err != nil {
 		return nil, err

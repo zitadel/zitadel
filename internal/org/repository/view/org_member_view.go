@@ -48,9 +48,9 @@ func OrgMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.OrgM
 	return members, nil
 }
 
-func PutOrgMember(db *gorm.DB, table string, role *model.OrgMemberView) error {
+func PutOrgMember(db *gorm.DB, table string, member *model.OrgMemberView) error {
 	save := repository.PrepareSave(table)
-	return save(db, role)
+	return save(db, member)
 }
 
 func PutOrgMembers(db *gorm.DB, table string, members ...*model.OrgMemberView) error {

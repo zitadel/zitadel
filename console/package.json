@@ -35,6 +35,7 @@
     "google-protobuf": "^3.13.0",
     "grpc": "^1.24.5",
     "grpc-web": "^1.2.1",
+    "libphonenumber-js": "^1.9.13",
     "moment": "^2.29.1",
     "ngx-quicklink": "^0.2.6",
     "rxjs": "~6.6.3",

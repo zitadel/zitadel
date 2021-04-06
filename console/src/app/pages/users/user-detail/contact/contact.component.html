@@ -18,15 +18,14 @@
     <div class="method-row">
         <div class="left">
             <span class="label">{{ 'USER.EMAIL' | translate }}</span>
-            <span class="name">{{human?.email}}</span>
-            <span *ngIf="human?.profile.email.isEmailVerified" class="contact-state verified">{{'USER.EMAILVERIFIED' |
+            <span class="name">{{human?.email?.email}}</span>
+            <span *ngIf="human?.email?.isEmailVerified" class="contact-state verified">{{'USER.EMAILVERIFIED' |
                 translate}}</span>
-            <div *ngIf="!human?.profile.email.isEmailVerified" class="block">
+            <div *ngIf="!human?.email.isEmailVerified" class="block">
                 <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
                 <ng-container *ngIf="human?.email">
-                    <a *ngIf="canWrite && state != userStateEnum?.USERSTATE_INITIAL" class="verify"
-                        matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
+                    <a *ngIf="canWrite" class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
                         (click)="emitEmailVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
                 </ng-container>
             </div>
@@ -35,7 +34,8 @@
         </div>
 
         <div class="right">
-            <button matTooltip="{{'ACTIONS.EDIT' | translate}}" [disabled]="!canWrite"
+            <button matTooltip="{{'ACTIONS.EDIT' | translate}}"
+                [disabled]="!canWrite || state == UserState.USER_STATE_INITIAL"
                 (click)="openEditDialog(EditDialogType.EMAIL)" mat-icon-button>
                 <i class="las la-edit"></i>
             </button>
@@ -45,13 +45,13 @@
     <div class="method-row">
         <div class="left">
             <span class="label">{{ 'USER.PHONE' | translate }}</span>
-            <span class="name">{{human?.phone ? human.phone : ('USER.PHONEEMPTY' | translate)}}</span>
-            <span *ngIf="human?.profile.phone.isPhoneVerified" class="contact-state verified">{{'USER.PHONEVERIFIED' |
+            <span class="name">{{human?.phone?.phone ? human.phone?.phone : ('USER.PHONEEMPTY' | translate)}}</span>
+            <span *ngIf="human?.phone.isPhoneVerified" class="contact-state verified">{{'USER.PHONEVERIFIED' |
                 translate}}</span>
-            <div *ngIf="!human?.profile.phone.isPhoneVerified" class="block">
+            <div *ngIf="human.phone?.phone && !human?.phone.isPhoneVerified" class="block">
                 <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
-                <ng-container *ngIf="human?.phone">
+                <ng-container *ngIf="human?.phone?.phone">
                     <a *ngIf="!disablePhoneCode && canWrite" class="verify"
                         matTooltip="{{'USER.LOGINMETHODS.ENTERCODE_DESC' | translate}}"
                         (click)="enterCode()">{{'USER.LOGINMETHODS.ENTERCODE' | translate}}</a>
@@ -64,7 +64,7 @@
         </div>
 
         <div class="right">
-            <button matTooltip="{{'ACTIONS.DELETE' | translate}}" *ngIf="human && human.phone" color="warn"
+            <button matTooltip="{{'ACTIONS.DELETE' | translate}}" *ngIf="human && human.phone?.phone" color="warn"
                 (click)="emitDeletePhone()" mat-icon-button>
                 <i class="las la-trash"></i>
             </button>

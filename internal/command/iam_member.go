@@ -13,8 +13,15 @@ import (
 )
 
 func (c *Commands) AddIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+	if member.UserID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-Mf83b", "Errors.IAM.MemberInvalid")
+	}
 	addedMember := NewIAMMemberWriteModel(member.UserID)
 	iamAgg := IAMAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
+	err := c.checkUserExists(ctx, addedMember.UserID, "")
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "IAM-5N9vs", "Errors.User.NotFound")
+	}
 	event, err := c.addIAMMember(ctx, iamAgg, addedMember, member)
 	if err != nil {
 		return nil, err
@@ -32,13 +39,12 @@ func (c *Commands) AddIAMMember(ctx context.Context, member *domain.Member) (*do
 }
 
 func (c *Commands) addIAMMember(ctx context.Context, iamAgg *eventstore.Aggregate, addedMember *IAMMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
-	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-GR34U", "Errors.IAM.MemberInvalid")
+	if !member.IsIAMValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-GR34U", "Errors.IAM.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4m0fS", "Errors.IAM.MemberInvalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4m0fS", "Errors.IAM.MemberInvalid")
 	}
-
 	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
@@ -52,11 +58,11 @@ func (c *Commands) addIAMMember(ctx context.Context, iamAgg *eventstore.Aggregat
 
 //ChangeIAMMember updates an existing member
 func (c *Commands) ChangeIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
-	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.MemberInvalid")
+	if !member.IsIAMValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-LiaZi", "Errors.IAM.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-3m9fs", "Errors.IAM.MemberInvalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3m9fs", "Errors.IAM.MemberInvalid")
 	}
 
 	existingMember, err := c.iamMemberWriteModelByID(ctx, member.UserID)
@@ -81,6 +87,9 @@ func (c *Commands) ChangeIAMMember(ctx context.Context, member *domain.Member) (
 }
 
 func (c *Commands) RemoveIAMMember(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-LiaZi", "Errors.IDMissing")
+	}
 	memberWriteModel, err := c.iamMemberWriteModelByID(ctx, userID)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err

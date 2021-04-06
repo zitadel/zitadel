@@ -23,7 +23,7 @@ func (a *ApplicationRepo) ApplicationByClientID(ctx context.Context, clientID st
 	return proj_view_model.ApplicationViewToModel(app), nil
 }
 
-func (a *ApplicationRepo) AuthorizeOIDCApplication(ctx context.Context, clientID, secret string) (err error) {
+func (a *ApplicationRepo) AuthorizeClientIDSecret(ctx context.Context, clientID, secret string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

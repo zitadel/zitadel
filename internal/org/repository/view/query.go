@@ -1,6 +1,8 @@
 package view
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -36,12 +38,15 @@ func OrgNameUniqueQuery(name string) *es_models.SearchQuery {
 		SetLimit(1)
 }
 
-func ChangesQuery(orgID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
+func ChangesQuery(orgID string, latestSequence, limit uint64, sortAscending bool, auditLogRetention time.Duration) *es_models.SearchQuery {
 	query := es_models.NewSearchQuery().
 		AggregateTypeFilter(model.OrgAggregate)
 
 	if !sortAscending {
 		query.OrderDesc()
+	}
+	if auditLogRetention > 0 {
+		query.CreationDateNewerFilter(time.Now().Add(-auditLogRetention))
 	}
 
 	query.LatestSequenceFilter(latestSequence).

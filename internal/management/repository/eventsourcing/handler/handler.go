@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -76,6 +77,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
 		newMailText(
 			handler{view, bulkLimit, configs.cycleDuration("MailText"), errorCount, es}),
+		newFeatures(
+			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 	}
 }
 

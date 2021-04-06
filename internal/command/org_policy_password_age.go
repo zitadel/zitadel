@@ -9,6 +9,9 @@ import (
 )
 
 func (c *Commands) AddPasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M9fsd", "Errors.ResourceOwnerMissing")
+	}
 	addedPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -31,6 +34,9 @@ func (c *Commands) AddPasswordAgePolicy(ctx context.Context, resourceOwner strin
 }
 
 func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-57tGs", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
@@ -58,6 +64,9 @@ func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner st
 }
 
 func (c *Commands) RemovePasswordAgePolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-2N8fs", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy := NewOrgPasswordAgePolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {

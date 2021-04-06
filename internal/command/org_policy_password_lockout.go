@@ -8,6 +8,9 @@ import (
 )
 
 func (c *Commands) AddPasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-8fJif", "Errors.ResourceOwnerMissing")
+	}
 	addedPolicy := NewOrgPasswordLockoutPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -30,6 +33,9 @@ func (c *Commands) AddPasswordLockoutPolicy(ctx context.Context, resourceOwner s
 }
 
 func (c *Commands) ChangePasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3J9fs", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy := NewOrgPasswordLockoutPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
@@ -57,6 +63,9 @@ func (c *Commands) ChangePasswordLockoutPolicy(ctx context.Context, resourceOwne
 }
 
 func (c *Commands) RemovePasswordLockoutPolicy(ctx context.Context, orgID string) error {
+	if orgID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "Org-4J9fs", "Errors.ResourceOwnerMissing")
+	}
 	existingPolicy := NewOrgPasswordLockoutPolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {

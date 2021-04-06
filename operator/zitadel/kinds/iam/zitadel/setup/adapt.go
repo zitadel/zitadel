@@ -1,8 +1,6 @@
 package setup
 
 import (
-	"time"
-
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
@@ -17,11 +15,10 @@ import (
 )
 
 const (
-	jobNamePrefix               = "zitadel-setup-"
-	containerName               = "zitadel"
-	rootSecret                  = "client-root"
-	dbSecrets                   = "db-secrets"
-	timeout       time.Duration = 300
+	jobNamePrefix = "zitadel-setup-"
+	containerName = "zitadel"
+	rootSecret    = "client-root"
+	dbSecrets     = "db-secrets"
 )
 
 func AdaptFunc(
@@ -40,12 +37,11 @@ func AdaptFunc(
 	consoleCMName string,
 	secretVarsName string,
 	secretPasswordsName string,
-	users []string,
-	migrationDone operator.EnsureFunc,
-	configurationDone operator.EnsureFunc,
-	getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) map[string]string,
 ) (
-	operator.QueryFunc,
+	func(
+		necessaryUsers map[string]string,
+		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+	) operator.QueryFunc,
 	operator.DestroyFunc,
 	error,
 ) {
@@ -63,49 +59,60 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroyJ),
 	}
 
-	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-
-			jobDef := jobDef(
-				nameLabels,
-				users,
-				version,
-				resources,
-				cmName,
-				certPath,
-				secretName,
-				secretPath,
-				consoleCMName,
-				secretVarsName,
-				secretPasswordsName,
-				namespace,
-				componentLabels,
-				nodeselector,
-				tolerations,
-			)
-
-			hashes := getConfigurationHashes(k8sClient, queried)
-			if hashes != nil && len(hashes) != 0 {
-				for k, v := range hashes {
-					jobDef.Annotations[k] = v
-					jobDef.Spec.Template.Annotations[k] = v
+	return func(
+			necessaryUsers map[string]string,
+			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+		) operator.QueryFunc {
+			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+				users := make([]string, 0)
+				for user := range necessaryUsers {
+					users = append(users, user)
 				}
-			}
 
-			query, err := job.AdaptFuncToEnsure(jobDef)
-			if err != nil {
-				return nil, err
-			}
+				jobDef := jobDef(
+					nameLabels,
+					users,
+					version,
+					resources,
+					cmName,
+					certPath,
+					secretName,
+					secretPath,
+					consoleCMName,
+					secretVarsName,
+					secretPasswordsName,
+					namespace,
+					componentLabels,
+					nodeselector,
+					tolerations,
+				)
 
-			queriers := []operator.QueryFunc{
-				operator.EnsureFuncToQueryFunc(migrationDone),
-				operator.EnsureFuncToQueryFunc(configurationDone),
-				operator.ResourceQueryToZitadelQuery(query),
-			}
+				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
+				if err != nil {
+					return nil, err
+				}
+				if hashes != nil && len(hashes) != 0 {
+					for k, v := range hashes {
+						jobDef.Annotations[k] = v
+						jobDef.Spec.Template.Annotations[k] = v
+					}
+				}
 
-			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
+				query, err := job.AdaptFuncToEnsure(jobDef)
+				if err != nil {
+					return nil, err
+				}
+
+				queriers := []operator.QueryFunc{
+					operator.ResourceQueryToZitadelQuery(query),
+				}
+
+				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
+			}
 		},
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 		nil
+
 }
 
 func jobDef(name *labels.Name, users []string, version *string, resources *k8s.Resources, cmName string, certPath string, secretName string, secretPath string, consoleCMName string, secretVarsName string, secretPasswordsName string, namespace string, componentLabels *labels.Component, nodeselector map[string]string, tolerations []corev1.Toleration) *batchv1.Job {
@@ -152,11 +159,10 @@ func jobDef(name *labels.Name, users []string, version *string, resources *k8s.R
 					Annotations: map[string]string{},
 				},
 				Spec: corev1.PodSpec{
-					NodeSelector:    nodeselector,
-					Tolerations:     tolerations,
-					InitContainers:  initContainers,
-					Containers:      containers,
-					SecurityContext: &corev1.PodSecurityContext{},
+					NodeSelector:   nodeselector,
+					Tolerations:    tolerations,
+					InitContainers: initContainers,
+					Containers:     containers,
 
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",
