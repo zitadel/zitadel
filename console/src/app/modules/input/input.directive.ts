@@ -226,8 +226,6 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
         @Optional() @Self() @Inject(MAT_INPUT_VALUE_ACCESSOR) inputValueAccessor: any,
         private _autofillMonitor: AutofillMonitor,
         ngZone: NgZone,
-        // TODO: Remove this once the legacy appearance has been removed. We only need
-        // to inject the form-field for determining whether the placeholder has been promoted.
         @Optional() @Inject(MAT_FORM_FIELD) private _formField?: MatFormField) {
 
         super(_defaultErrorStateMatcher, _parentForm, _parentFormGroup, ngControl);
@@ -320,7 +318,6 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     // We have to use a `HostListener` here in order to support both Ivy and ViewEngine.
     // In Ivy the `host` bindings will be merged when this class is extended, whereas in
     // ViewEngine they're overwritten.
-    // TODO(crisbeto): we move this back into `host` once Ivy is turned on by default.
     /** Callback for the cases where the focused state of the input changes. */
     // tslint:disable:no-host-decorator-in-concrete
     @HostListener('focus', ['true'])
@@ -336,7 +333,6 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     // We have to use a `HostListener` here in order to support both Ivy and ViewEngine.
     // In Ivy the `host` bindings will be merged when this class is extended, whereas in
     // ViewEngine they're overwritten.
-    // TODO(crisbeto): we move this back into `host` once Ivy is turned on by default.
     // tslint:disable-next-line:no-host-decorator-in-concrete
     @HostListener('input')
     _onInput(): void {
@@ -353,8 +349,6 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     private _dirtyCheckPlaceholder(): void {
         // If we're hiding the native placeholder, it should also be cleared from the DOM, otherwise
         // screen readers will read it out twice: once from the label and once from the attribute.
-        // TODO: can be removed once we get rid of the `legacy` style for the form field, because it's
-        // the only one that supports promoting the placeholder to a label.
         const placeholder = this._formField?._hideControlPlaceholder?.() ? null : this.placeholder;
         if (placeholder !== this._previousPlaceholder) {
             const element = this._elementRef.nativeElement;
