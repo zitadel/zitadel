@@ -13,6 +13,7 @@ import (
 func GitOpsListBackups(
 	monitor mntr.Monitor,
 	gitClient *git.Client,
+	k8sClient kubernetes.ClientInt,
 ) (
 	[]string,
 	error,
@@ -23,7 +24,7 @@ func GitOpsListBackups(
 		return nil, err
 	}
 
-	return listBackups(monitor, desired)
+	return listBackups(monitor, k8sClient, desired)
 }
 
 func CrdListBackups(
@@ -39,17 +40,18 @@ func CrdListBackups(
 		return nil, err
 	}
 
-	return listBackups(monitor, desired)
+	return listBackups(monitor, k8sClient, desired)
 }
 
 func listBackups(
 	monitor mntr.Monitor,
+	k8sClient kubernetes.ClientInt,
 	desired *tree.Tree,
 ) (
 	[]string,
 	error,
 ) {
-	backups, err := orbdb.BackupListFunc()(monitor, desired)
+	backups, err := orbdb.BackupListFunc()(monitor, k8sClient, desired)
 	if err != nil {
 		monitor.Error(err)
 		return nil, err
