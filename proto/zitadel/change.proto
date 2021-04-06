@@ -48,10 +48,10 @@ message ChangeQuery {
             example: "\"2\"";
         }
     ];
-    //maximum amount of events returned
     uint32 limit = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "20";
+            description: "Maximum amount of events returned. Default is set to 1000 in https://github.com/caos/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If no limit is set or the limit exeeds the maximum configured ZITADEL will throw an error";
         }
     ];
     bool asc = 3 [

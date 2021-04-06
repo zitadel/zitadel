@@ -64,7 +64,6 @@ message Human {
     Profile profile = 1;
     Email email = 2;
     Phone phone = 3;
-    Address address = 4;
 }
 
 message Machine {
@@ -139,34 +138,6 @@ message Phone {
     bool is_phone_verified = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Is true if the user verified his phone or if the phone is managed outside ZITADEL"
-        }
-    ];
-}
-
-message Address {
-    string country = 1 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Don't use at the moment"
-        }
-    ];
-    string locality = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Don't use at the moment"
-        }
-    ];
-    string postal_code = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Don't use at the moment"
-        }
-    ];
-    string region = 4 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Don't use at the moment"
-        }
-    ];
-    string street_address = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Don't use at the moment"
         }
     ];
 }
