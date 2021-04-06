@@ -9,6 +9,7 @@ fi
 
 protoc \
     -I=/protos/include \
+    -I=/protos/include/zitadel \
     --go_opt=Mproto/message.proto=${GO_MESSAGE_IMPORT} \
     --go_out /go/src \
     --go-grpc_out /go/src \
