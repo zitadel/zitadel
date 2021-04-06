@@ -70,6 +70,8 @@ func (wm *HumanWriteModel) Reduce() error {
 			wm.reduceHumanPhoneChangedEvent(e)
 		case *user.HumanPhoneVerifiedEvent:
 			wm.reduceHumanPhoneVerifiedEvent()
+		case *user.HumanPhoneRemovedEvent:
+			wm.reduceHumanPhoneRemovedEvent()
 		case *user.HumanPasswordChangedEvent:
 			wm.reduceHumanPasswordChangedEvent(e)
 		case *user.UserLockedEvent:
@@ -109,12 +111,24 @@ func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanEmailVerifiedType,
 			user.HumanPhoneChangedType,
 			user.HumanPhoneVerifiedType,
+			user.HumanPhoneRemovedType,
 			user.HumanPasswordChangedType,
 			user.UserLockedType,
 			user.UserUnlockedType,
 			user.UserDeactivatedType,
 			user.UserReactivatedType,
-			user.UserRemovedType)
+			user.UserRemovedType,
+			user.UserV1AddedType,
+			user.UserV1RegisteredType,
+			user.UserV1InitialCodeAddedType,
+			user.UserV1InitializedCheckSucceededType,
+			user.UserV1ProfileChangedType,
+			user.UserV1EmailChangedType,
+			user.UserV1EmailVerifiedType,
+			user.UserV1PhoneChangedType,
+			user.UserV1PhoneVerifiedType,
+			user.UserV1PhoneRemovedType,
+			user.UserV1PasswordChangedType)
 }
 
 func (wm *HumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
@@ -194,6 +208,11 @@ func (wm *HumanWriteModel) reduceHumanPhoneChangedEvent(e *user.HumanPhoneChange
 
 func (wm *HumanWriteModel) reduceHumanPhoneVerifiedEvent() {
 	wm.IsPhoneVerified = true
+}
+
+func (wm *HumanWriteModel) reduceHumanPhoneRemovedEvent() {
+	wm.Phone = ""
+	wm.IsPhoneVerified = false
 }
 
 func (wm *HumanWriteModel) reduceHumanAddressChangedEvent(e *user.HumanAddressChangedEvent) {

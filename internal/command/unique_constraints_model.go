@@ -200,6 +200,8 @@ func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantMemberRemovedType,
 			project.RoleAddedType,
 			project.RoleRemovedType,
+			user.UserV1AddedType,
+			user.UserV1RegisteredType,
 			user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.MachineAddedEventType,

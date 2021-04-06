@@ -84,7 +84,10 @@ func (wm *HumanProfileWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.HumanProfileChangedType,
-			user.UserRemovedType)
+			user.UserRemovedType,
+			user.UserV1AddedType,
+			user.UserV1RegisteredType,
+			user.UserV1ProfileChangedType)
 }
 
 func (wm *HumanProfileWriteModel) NewChangedEvent(
