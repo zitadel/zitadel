@@ -7,14 +7,9 @@ else
     exit 3
 fi
 
-PROTO_PATH=/go/src/github.com/caos/zitadel/proto
-
 protoc \
-    -I=/.tmp/protos \
-    -I=/go/src/github.com/caos/zitadel/pkg/grpc/message \
-    -I=/go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption \
-    -I=/go/src \
+    -I=/protos/include \
     --go_opt=Mproto/message.proto=${GO_MESSAGE_IMPORT} \
     --go_out /go/src \
     --go-grpc_out /go/src \
-    $(find ${PROTO_PATH} -iname *.proto)
+    $(find /protos/include/zitadel -iname *.proto)
