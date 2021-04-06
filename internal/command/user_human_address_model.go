@@ -73,7 +73,10 @@ func (wm *HumanAddressWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		ResourceOwner(wm.ResourceOwner).
-		EventTypes(user.HumanAddedType,
+		EventTypes(user.UserV1AddedType,
+			user.UserV1RegisteredType,
+			user.UserV1AddressChangedType,
+			user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.HumanAddressChangedType,
 			user.UserRemovedType)

@@ -151,7 +151,9 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 func (wm *UserGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType, project.AggregateType).
 		AggregateIDs(wm.UserID, wm.ProjectID).
-		EventTypes(user.HumanAddedType,
+		EventTypes(user.UserV1AddedType,
+			user.HumanAddedType,
+			user.UserV1RegisteredType,
 			user.HumanRegisteredType,
 			user.MachineAddedEventType,
 			user.UserRemovedType,

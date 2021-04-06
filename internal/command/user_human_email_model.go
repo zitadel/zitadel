@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -66,12 +67,19 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.HumanAddedType,
+		EventTypes(user.UserV1AddedType,
+			user.HumanAddedType,
+			user.UserV1RegisteredType,
 			user.HumanRegisteredType,
+			user.UserV1InitialCodeAddedType,
 			user.HumanInitialCodeAddedType,
+			user.UserV1InitializedCheckSucceededType,
 			user.HumanInitializedCheckSucceededType,
+			user.UserV1EmailChangedType,
 			user.HumanEmailChangedType,
+			user.UserV1EmailCodeAddedType,
 			user.HumanEmailCodeAddedType,
+			user.UserV1EmailVerifiedType,
 			user.HumanEmailVerifiedType,
 			user.UserRemovedType)
 	if wm.ResourceOwner != "" {

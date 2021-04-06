@@ -90,6 +90,7 @@ func (wm *HumanPhoneWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1RegisteredType,
 			user.UserV1InitialCodeAddedType,
 			user.UserV1InitializedCheckSucceededType,
+			user.UserV1PhoneCodeAddedType,
 			user.UserV1PhoneChangedType,
 			user.UserV1PhoneVerifiedType,
 			user.UserV1PhoneRemovedType)
