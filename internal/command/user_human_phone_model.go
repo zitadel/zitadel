@@ -85,7 +85,14 @@ func (wm *HumanPhoneWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPhoneVerifiedType,
 			user.HumanPhoneCodeAddedType,
 			user.HumanPhoneRemovedType,
-			user.UserRemovedType)
+			user.UserRemovedType,
+			user.UserV1AddedType,
+			user.UserV1RegisteredType,
+			user.UserV1InitialCodeAddedType,
+			user.UserV1InitializedCheckSucceededType,
+			user.UserV1PhoneChangedType,
+			user.UserV1PhoneVerifiedType,
+			user.UserV1PhoneRemovedType)
 }
 
 func (wm *HumanPhoneWriteModel) NewChangedEvent(

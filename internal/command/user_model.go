@@ -80,7 +80,10 @@ func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserUnlockedType,
 			user.UserDeactivatedType,
 			user.UserReactivatedType,
-			user.UserRemovedType)
+			user.UserRemovedType,
+			user.UserV1AddedType,
+			user.UserV1RegisteredType,
+			user.UserV1InitializedCheckSucceededType)
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}
