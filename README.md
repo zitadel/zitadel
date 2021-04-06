@@ -7,13 +7,11 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
 [![codecov](https://codecov.io/gh/caos/zitadel/branch/master/graph/badge.svg)](https://codecov.io/gh/caos/zitadel)
 
-> This project is in a beta state and API might still change a bit
+## What Is ZITADEL
 
-## What Is It
+**ZITADEL** is a "Cloud Native Identity and Access Management" solution built for the cloud era. ZITADEL uses a modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and  [**CockroachDB**](https://www.cockroachlabs.com/) as sole storage and follows an event sourced pattern.
 
-**ZITADEL** is a "Cloud Native Identity and Access Management" solution. All server side components are written in [**Go**](https://golang.org/) and the management interface, called **Console**, is written in [**Angular**](https://angular.io/).
-
-We optimized **ZITADEL** for the usage as "service provider" IAM. By "service provider" we think of companies who build services for e.g SaaS cases. Often these companies would like to use an IAM where they can register their application and grant other people or companies the right to self manage a set of roles within that application.
+We built **ZITADEL** not only with the vision of becoming a great open source project but also as a superb platform to support developers building their applications, without need to handle secure user login and account management themselves.
 
 ## How Does It Work
 
@@ -21,29 +19,49 @@ We built **ZITADEL** around the idea that the IAM should be easy to deploy and s
 For example, **ZITADEL** is event sourced but it does not rely on a pub/sub system to function. Instead we built all the functionality right into one binary.
 **ZITADEL** only needs [**Kubernetes**](https://kubernetes.io/) for orchestration and [**CockroachDB**](https://www.cockroachlabs.com/) as storage.
 
-## Why Another IAM
+## Features of ZITADEL platform
 
-In the past we already built a closed sourced IAM and tested multiple others. With most of them we had some issues, either technology, feature, pricing or transparency related in nature. For example we find the idea that security related features like **MFA** should not be hidden behind a paywall or a feature price.
-One feature that we often missed, was a solid **audit trail** of all IAM resources. Most systems we saw so far either rely on simple log files or use a short retention for this.
+* Authentication
+    * OpenID Connect 1.0 Protocol (OP)
+    * Username / Password
+    * Machine-to-machine (JWT profile)
+    * Passwordless with FIDO2
+* Multifactor authentication with OTP, U2F
+* Federation with OpenID Connect 1.0 Protocol (RP), OAuth 2.0 Protocol (RP)
+* Authorization via Role Based Access Control (RBAC)
+* Identity Brokering
+* Delegation of roles to other organizations for self-management
+* Strong audit trail for all IAM resources
+* User interface for administration
+* APIs for Management, Administration, and Authentication
+* Policy configuration and enforcement
 
 ## How To Use It
 
-### Use our free tier
+### ZITADEL Cloud
 
-We provide a shared-cloud ZITADEL system where people can register there own organisation.
-Until end of 2020 we operator under a **early access** model where everything is free.
-Go check it out under [zitadel.ch](https://zitadel.ch)
+We provide a cloud service [**ZITADEL.ch**](https://zitadel.ch) where people can register their own organization. There is a **free tier** including unlimited users and all the security features you need.
 
-### Run your own IAM
+### Run ZITADEL in the cloud or on-premise
 
-Stay tuned, we will soon publish a guide how you can deploy a **hyperconverged** system with our automation tooling called [**ORBOS**](https://github.com/caos/orbos/).
-With [**ORBOS**](https://github.com/caos/orbos/) you will be able to run [**Kubernetes**](https://kubernetes.io/) with Google on **[GCEProvider](https://cloud.google.com/compute)**, on **[StaticProvider](https://github.com/caos/orbos/blob/master/docs/orbiter/static.md)** for in-house scenarios or on the Swiss based **[CloudscaleProvider](https://www.cloudscale.ch/)** within 20 minutes. To achieve this, [**ORBOS**](https://github.com/caos/orbos/) will bootstrap and maintain a [**Kubernetes**](https://kubernetes.io/) cluster, essential platform components (logging, metrics, ingress, ...), a secure [**CockroachDB**](https://www.cockroachlabs.com/) cluster and **ZITADEL** itself.
+**ZITADEL** is free open source software under [Apache 2.0](##License) managed by [CAOS](https://caos.ch). We provide our community access to ZITADEL releases at no cost and welcome all contributions.
 
-The combination of the tools [**ORBOS**](https://github.com/caos/orbos/) and **ZITADEL** is what makes the operation easy and scalable.
+You can run **ZITADEL** in combination with [**ORBOS**](https://github.com/caos/orbos/) for easy and scalable operation on 
+* **[GCEProvider](https://cloud.google.com/compute)**
+* **[StaticProvider](https://github.com/caos/orbos/blob/master/docs/orbiter/static.md)**
+* Any CNCF conform Kubernetes
 
-## Give me some docs
+> Stay tuned, we will soon publish a more detailed guide on how you can deploy a **hyperconverged** system on your own.
 
-Have a look at our constantly evolving docs page [docs.zitadel.ch](https://docs.zitadel.ch).
+### Let us run ZITADEL for you
+
+If  our cloud service or running **ZITADEL** on your own infrastructure does not work for you, we are happy to run a private instance of **ZITADEL** for you or provide you with our support services. [Get in touch!](https://zitadel.ch/contact/)
+
+## Help and Documentation
+
+* [Documentation](https://docs.zitadel.ch)
+* [Ask a question or share ideas](https://github.com/caos/zitadel/discussions)
+* [Say hello](https://zitadel.ch/contact/)
 
 ## How To Contribute
 
@@ -51,11 +69,17 @@ Details need to be announced, but feel free to contribute already. As long as yo
 
 We already have documentation specific [guidelines](./site/CONTRIBUTING.md).
 
-Howto develop ZITADEL: [contribute](./CONTRIBUTING.md)
+How to develop **ZITADEL**: [contribute](./CONTRIBUTING.md)
 
 ## Security
 
 See the policy [here](./SECURITY.md)
+
+
+## Other CAOS Projects
+* [**ORBOS**](https://github.com/caos/orbos/) - GitOps everything
+* [**OIDC for GO**](https://github.com/caos/oidc) - OpenID Connect SDK (client and server) for Go
+* [**ZITADEL Tools**](https://github.com/caos/zitadel-tools) - Go tool to convert  key file to privately signed JWT 
 
 ## License
 
