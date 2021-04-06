@@ -130,7 +130,7 @@ const (
 
 func (r *UserSearchRequest) EnsureLimit(limit uint64) error {
 	if r.Limit > limit {
-		return errors.ThrowInvalidArgument(nil, "SEARCH-8fn7f", "Errors.Limit.ExceedsDefault")
+		return errors.ThrowInvalidArgument(nil, "SEARCH-zz62F", "Errors.Limit.ExceedsDefault")
 	}
 	if r.Limit == 0 {
 		r.Limit = limit

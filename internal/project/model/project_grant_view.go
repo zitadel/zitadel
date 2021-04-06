@@ -81,7 +81,7 @@ func (r *ProjectGrantViewSearchRequest) AppendMyResourceOwnerQuery(orgID string)
 
 func (r *ProjectGrantViewSearchRequest) EnsureLimit(limit uint64) error {
 	if r.Limit > limit {
-		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-8fn7f", "Errors.Limit.ExceedsDefault")
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-2n8fS", "Errors.Limit.ExceedsDefault")
 	}
 	if r.Limit == 0 {
 		r.Limit = limit

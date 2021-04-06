@@ -52,7 +52,7 @@ type OrgDomainSearchResponse struct {
 
 func (r *OrgDomainSearchRequest) EnsureLimit(limit uint64) error {
 	if r.Limit > limit {
-		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-8fn7f", "Errors.Limit.ExceedsDefault")
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-38fhs", "Errors.Limit.ExceedsDefault")
 	}
 	if r.Limit == 0 {
 		r.Limit = limit
