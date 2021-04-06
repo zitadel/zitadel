@@ -2,6 +2,8 @@ package model
 
 import (
 	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
+
 	"time"
 )
 
@@ -58,8 +60,12 @@ func (r *ProjectRoleSearchRequest) AppendProjectQuery(projectID string) {
 	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: ProjectRoleSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: projectID})
 }
 
-func (r *ProjectRoleSearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *ProjectRoleSearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-92hNf", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }

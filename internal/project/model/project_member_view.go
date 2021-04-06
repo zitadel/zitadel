@@ -2,6 +2,8 @@ package model
 
 import (
 	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
+
 	"time"
 )
 
@@ -55,10 +57,14 @@ type ProjectMemberSearchResponse struct {
 	Timestamp   time.Time
 }
 
-func (r *ProjectMemberSearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *ProjectMemberSearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-389Nd", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }
 func (r *ProjectMemberSearchRequest) AppendProjectQuery(projectID string) {
 	r.Queries = append(r.Queries, &ProjectMemberSearchQuery{Key: ProjectMemberSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: projectID})

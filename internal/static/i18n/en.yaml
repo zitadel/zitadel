@@ -4,6 +4,8 @@ Errors:
   OriginNotAllowed: This "Origin" is not allowed
   IDMissing: ID missing
   ResourceOwnerMissing: Resource Owner Organisation missing
+  Limit:
+    ExceedsDefault: Limit exceeds default limit
   User:
     NotFound: User could not be found
     AlreadyExists: User already exists

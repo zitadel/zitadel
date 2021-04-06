@@ -87,7 +87,7 @@ func UserGrantAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 
 type UserGrantChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	RoleKeys             []string `json:"roleKeys,omitempty"`
+	RoleKeys             []string `json:"roleKeys"`
 }
 
 func (e *UserGrantChangedEvent) Data() interface{} {

@@ -2,6 +2,8 @@ package model
 
 import (
 	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
+
 	"time"
 )
 
@@ -55,8 +57,12 @@ type IAMMemberSearchResponse struct {
 	Timestamp   time.Time
 }
 
-func (r *IAMMemberSearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *IAMMemberSearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-vn8ds", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }

@@ -27,7 +27,10 @@ type UserGrantRepo struct {
 }
 
 func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, err := repo.View.GetLatestUserGrantSequence()
 	logging.Log("EVENT-Hd7s3").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest user grant sequence")
 	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).UserID})
@@ -49,12 +52,15 @@ func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *gran
 }
 
 func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.ProjectID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "APP-7lqva", "Could not get ProjectID")
 	}
-	err := repo.AuthZRepo.FillIamProjectID(ctx)
+	err = repo.AuthZRepo.FillIamProjectID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +100,10 @@ func membershipsToOrgResp(memberships []*user_view_model.UserMembershipView, cou
 }
 
 func (repo *UserGrantRepo) SearchMyUserMemberships(ctx context.Context, request *user_model.UserMembershipSearchRequest) (*user_model.UserMembershipSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
 	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
 
@@ -185,7 +194,9 @@ func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]st
 }
 
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
-	searchRequest := &org_model.OrgSearchRequest{}
+	searchRequest := &org_model.OrgSearchRequest{
+		SortingColumn: org_model.OrgSearchKeyOrgName,
+	}
 	if len(request.Queries) > 0 {
 		for _, q := range request.Queries {
 			if q.Key == grant_model.UserGrantSearchKeyOrgName {

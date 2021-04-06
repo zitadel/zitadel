@@ -65,10 +65,14 @@ type KeySearchResponse struct {
 	Result      []*KeyView
 }
 
-func (r *KeySearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *KeySearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return errors.ThrowInvalidArgument(nil, "SEARCH-Mf9sd", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }
 
 func SigningKeyFromKeyView(key *KeyView, alg crypto.EncryptionAlgorithm) (*SigningKey, error) {

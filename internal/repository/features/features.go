@@ -28,7 +28,7 @@ type FeaturesSetEvent struct {
 	LoginPolicyIDP           *bool                 `json:"loginPolicyIDP,omitempty"`
 	LoginPolicyPasswordless  *bool                 `json:"loginPolicyPasswordless,omitempty"`
 	LoginPolicyRegistration  *bool                 `json:"loginPolicyRegistration,omitempty"`
-	LoginPolicyUsernameLogin *bool                 `json:"loginPolicyUsername_login,omitempty"`
+	LoginPolicyUsernameLogin *bool                 `json:"loginPolicyUsernameLogin,omitempty"`
 	PasswordComplexityPolicy *bool                 `json:"passwordComplexityPolicy,omitempty"`
 	LabelPolicy              *bool                 `json:"labelPolicy,omitempty"`
 }
