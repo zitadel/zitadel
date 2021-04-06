@@ -50,8 +50,6 @@ RUN git clone -b ${TAG_NAME} https://github.com/caos/zitadel . \
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
 FROM golang:${GO_VERSION} as go-dep
-ARG PROJECT_PATH
-
 WORKDIR /go/src/github.com/caos/zitadel
 COPY --from=base /zitadel .
 
@@ -61,43 +59,16 @@ RUN ./tools/install.sh
 ## Go base build
 #######################
 FROM go-dep as zitadel-client
+ARG PROJECT_PATH
+
 COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
 RUN ./build/zitadel/generate-grpc-clients.sh ${PROJECT_PATH}
 
 
-# #######################
-# ## Go base build
-# ## Speed up this step by mounting your local go mod pkg directory
-# #######################
-# FROM golang:1.15 as zitadel-client
-# ARG PROJECT_PATH
-
-# WORKDIR /go/src/github.com/caos/zitadel
-
-# # copy ZITADEL proto dependencies
-# COPY --from=base /.tmp /.tmp/protos
-# COPY --from=base /zitadel/zitadel .
-# COPY --from=base /.tmp/bin /usr/local/bin/
-
-# RUN go mod download
-# RUN go install \
-#     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
-#     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
-#     github.com/golang/protobuf/protoc-gen-go \
-#     github.com/envoyproxy/protoc-gen-validate
-
-# RUN go get -u google.golang.org/protobuf/cmd/protoc-gen-go \
-#     google.golang.org/grpc/cmd/protoc-gen-go-grpc
-
-# RUN ./build/zitadel/generate-grpc-clients.sh ${PROJECT_PATH}
-
-# #######################
-# ## prepare generated files for output
-# #######################
-# FROM scratch as zitadel-copy
-# ARG PROJECT_PATH
-# COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/admin/*.pb.go /zitadel/admin/
-# COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/auth/*.pb.go /zitadel/auth/
-# COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc/management/*.pb.go /zitadel/management/
-# COPY --from=zitadel-client /go/src/${PROJECT_PATH}/zitadel/message/*.pb.go /zitadel/message/
+#######################
+## prepare generated files for output
+#######################
+FROM scratch as zitadel-copy
+ARG PROJECT_PATH
+COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc /zitadel
