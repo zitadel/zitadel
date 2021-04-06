@@ -50,7 +50,10 @@ func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
 }
 
 func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
 	logging.Log("EVENT-5Jsi8").OnError(seqErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest user sequence")
 	request.AppendUserQuery(authz.GetCtxData(ctx).UserID)

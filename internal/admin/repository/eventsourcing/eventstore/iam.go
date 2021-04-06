@@ -37,7 +37,10 @@ func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID stri
 }
 
 func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, err := repo.View.GetLatestIAMMemberSequence()
 	logging.Log("EVENT-Slkci").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
 	members, count, err := repo.View.SearchIAMMembers(request)
@@ -101,7 +104,10 @@ func (repo *IAMRepository) ExternalIDPsByIDPConfigIDFromDefaultPolicy(ctx contex
 }
 
 func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, err := repo.View.GetLatestIDPConfigSequence()
 	logging.Log("EVENT-Dk8si").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest idp config sequence")
 	idps, count, err := repo.View.SearchIDPConfigs(request)
@@ -147,7 +153,10 @@ func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 }
 
 func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
 	sequence, err := repo.View.GetLatestIDPProviderSequence()
 	logging.Log("EVENT-Tuiks").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
@@ -307,7 +316,10 @@ func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_mod
 }
 
 func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, err := repo.View.GetLatestIAMMemberSequence()
 	logging.Log("EVENT-Slkci").OnError(err).Warn("could not read latest iam sequence")
 	members, count, err := repo.View.SearchIAMMembers(request)

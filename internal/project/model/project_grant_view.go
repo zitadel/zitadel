@@ -2,6 +2,8 @@ package model
 
 import (
 	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
+
 	"time"
 )
 
@@ -77,8 +79,12 @@ func (r *ProjectGrantViewSearchRequest) AppendMyResourceOwnerQuery(orgID string)
 	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: orgID})
 }
 
-func (r *ProjectGrantViewSearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *ProjectGrantViewSearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-8fn7f", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }

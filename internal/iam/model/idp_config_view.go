@@ -3,6 +3,8 @@ package model
 import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
+
 	"time"
 )
 
@@ -59,10 +61,14 @@ type IDPConfigSearchResponse struct {
 	Timestamp   time.Time
 }
 
-func (r *IDPConfigSearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *IDPConfigSearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-8fn7f", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }
 
 func (r *IDPConfigSearchRequest) AppendMyOrgQuery(orgID, iamID string) {
