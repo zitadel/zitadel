@@ -209,7 +209,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 }
 
 func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
-	if orgID == "" || userID == "" {
+	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-55n8M", "Errors.IDMissing")
 	}
 
