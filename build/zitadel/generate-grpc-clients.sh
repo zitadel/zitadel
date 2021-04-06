@@ -12,4 +12,4 @@ protoc \
     --go_opt=Mproto/message.proto=${GO_MESSAGE_IMPORT} \
     --go_out /go/src \
     --go-grpc_out /go/src \
-    $(find /protos/include/zitadel -iname *.proto)
+    $(find /proto/include/zitadel -iname *.proto)
