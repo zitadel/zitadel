@@ -159,7 +159,8 @@ RUN go get github.com/rakyll/statik \
     && ./build/console/generate-static.sh \
     && ./build/login/generate-static.sh \
     && ./build/notification/generate-static.sh \
-    && ./build/zitadel/generate-static.sh
+    && ./build/zitadel/generate-static.sh \
+    && ./build/zitadel/generate-openapi-static.sh
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
 
 

@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/rakyll/statik/fs"
+
+	_ "github.com/caos/zitadel/openapi/statik"
 )
 
 func Start() (http.Handler, error) {
