@@ -39,6 +39,36 @@ func OrgQueryToModel(query *org_pb.OrgQuery) (*org_model.OrgSearchQuery, error) 
 	}
 }
 
+func OrgQueriesToUserGrantModel(queries []*org_pb.OrgQuery) (_ []*grant_model.UserGrantSearchQuery, err error) {
+	q := make([]*grant_model.UserGrantSearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = OrgQueryToUserGrantQueryModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func OrgQueryToUserGrantQueryModel(query *org_pb.OrgQuery) (*grant_model.UserGrantSearchQuery, error) {
+	switch q := query.Query.(type) {
+	case *org_pb.OrgQuery_DomainQuery:
+		return &grant_model.UserGrantSearchQuery{
+			Key:    grant_model.UserGrantSearchKeyOrgDomain,
+			Method: object.TextMethodToModel(q.DomainQuery.Method),
+			Value:  q.DomainQuery.Domain,
+		}, nil
+	case *org_pb.OrgQuery_NameQuery:
+		return &grant_model.UserGrantSearchQuery{
+			Key:    grant_model.UserGrantSearchKeyOrgName,
+			Method: object.TextMethodToModel(q.NameQuery.Method),
+			Value:  q.NameQuery.Name,
+		}, nil
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-ADvsd", "List.Query.Invalid")
+	}
+}
+
 func OrgViewsToPb(orgs []*org_model.OrgView) []*org_pb.Org {
 	o := make([]*org_pb.Org, len(orgs))
 	for i, org := range orgs {
