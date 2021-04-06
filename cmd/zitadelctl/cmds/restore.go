@@ -39,10 +39,6 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 		gitClient := rv.GitClient
 		version := rv.Version
 
-		if !rv.Gitops {
-			return errors.New("restore command is only supported with the --gitops flag yet")
-		}
-
 		k8sClient, _, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
 		if err != nil {
 			return err
@@ -50,7 +46,7 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 
 		list := make([]string, 0)
 		if rv.Gitops {
-			listT, err := databases.GitOpsListBackups(monitor, gitClient)
+			listT, err := databases.GitOpsListBackups(monitor, gitClient, k8sClient)
 			if err != nil {
 				monitor.Error(err)
 				return nil

@@ -32,6 +32,11 @@ func BackupListCommand(getRv GetRootValues) *cobra.Command {
 		gitClient := rv.GitClient
 
 		backups := make([]string, 0)
+		k8sClient, _, err := cli.Client(monitor, orbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops)
+		if err != nil {
+			return err
+		}
+
 		if rv.Gitops {
 			if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
 				monitor.Error(err)
@@ -43,18 +48,13 @@ func BackupListCommand(getRv GetRootValues) *cobra.Command {
 				return nil
 			}
 
-			backupsT, err := databases.GitOpsListBackups(monitor, gitClient)
+			backupsT, err := databases.GitOpsListBackups(monitor, gitClient, k8sClient)
 			if err != nil {
 				monitor.Error(err)
 				return nil
 			}
 			backups = backupsT
 		} else {
-			k8sClient, _, err := cli.Client(monitor, orbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops)
-			if err != nil {
-				return err
-			}
-
 			backupsT, err := databases.CrdListBackups(monitor, k8sClient)
 			if err != nil {
 				monitor.Error(err)
