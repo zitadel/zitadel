@@ -7,7 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/telemetry/tracing/google"
 	"github.com/caos/zitadel/internal/telemetry/tracing/log"
-	"github.com/caos/zitadel/internal/telemetry/tracing/otel"
 )
 
 type TracingConfig struct {
@@ -16,7 +15,6 @@ type TracingConfig struct {
 }
 
 var tracer = map[string]func() tracing.Config{
-	"otel":   func() tracing.Config { return &otel.Config{} },
 	"google": func() tracing.Config { return &google.Config{} },
 	"log":    func() tracing.Config { return &log.Config{} },
 	"none":   func() tracing.Config { return &NoTracing{} },
