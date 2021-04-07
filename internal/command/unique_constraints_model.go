@@ -281,6 +281,7 @@ func (rm *UniqueConstraintReadModel) listRemoveUniqueConstraint(aggregateID, con
 			copy(rm.UniqueConstraints[i:], rm.UniqueConstraints[i+1:])
 			rm.UniqueConstraints[len(rm.UniqueConstraints)-1] = nil
 			rm.UniqueConstraints = rm.UniqueConstraints[:len(rm.UniqueConstraints)-1]
+			i--
 		}
 	}
 }
