@@ -177,7 +177,7 @@ func NewHumanPasswordlessBeginLoginEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				HumanPasswordlessTokenVerifiedType,
+				HumanPasswordlessTokenBeginLoginType,
 			),
 			challenge,
 			info,

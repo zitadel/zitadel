@@ -177,7 +177,7 @@ func NewHumanU2FBeginLoginEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				HumanU2FTokenVerifiedType,
+				HumanU2FTokenBeginLoginType,
 			),
 			challenge,
 			info,

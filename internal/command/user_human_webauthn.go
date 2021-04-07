@@ -375,7 +375,7 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 	}
 
 	_, err = c.eventstore.PushEvents(ctx,
-		usr_repo.NewHumanU2FCheckSucceededEvent(
+		usr_repo.NewHumanPasswordlessCheckSucceededEvent(
 			ctx,
 			userAgg,
 			authRequestDomainToAuthRequestInfo(authRequest),
