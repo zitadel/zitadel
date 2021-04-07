@@ -43,7 +43,7 @@ func (c *Commands) getHumanU2FLogin(ctx context.Context, userID, authReqID, reso
 	if err != nil {
 		return nil, err
 	}
-	if tokenReadModel.State == domain.UserStateDeleted {
+	if tokenReadModel.State == domain.UserStateUnspecified || tokenReadModel.State == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5m88U", "Errors.User.NotFound")
 	}
 	return &domain.WebAuthNLogin{
@@ -62,11 +62,16 @@ func (c *Commands) getHumanPasswordlessLogin(ctx context.Context, userID, authRe
 	if err != nil {
 		return nil, err
 	}
-	if tokenReadModel.State == domain.UserStateDeleted {
+	if tokenReadModel.State == domain.UserStateUnspecified || tokenReadModel.State == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fm84R", "Errors.User.NotFound")
 	}
 	return &domain.WebAuthNLogin{
-		Challenge: tokenReadModel.Challenge,
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: tokenReadModel.AggregateID,
+		},
+		Challenge:            tokenReadModel.Challenge,
+		AllowedCredentialIDs: tokenReadModel.AllowedCredentialIDs,
+		UserVerification:     tokenReadModel.UserVerification,
 	}, nil
 }
 
