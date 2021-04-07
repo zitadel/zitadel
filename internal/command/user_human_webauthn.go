@@ -322,6 +322,10 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 
 	userAgg, token, signCount, err := c.finishWebAuthNLogin(ctx, userID, resourceOwner, credentialData, webAuthNLogin, u2fTokens, isLoginUI)
 	if err != nil {
+		if userAgg == nil {
+			logging.LogWithFields("EVENT-Addqd", "userID", userID, "resourceOwner", resourceOwner).WithError(err).Warn("missing userAggregate for pushing failed u2f check event")
+			return err
+		}
 		_, pushErr := c.eventstore.PushEvents(ctx,
 			usr_repo.NewHumanU2FCheckFailedEvent(
 				ctx,
@@ -329,7 +333,7 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 				authRequestDomainToAuthRequestInfo(authRequest),
 			),
 		)
-		logging.Log("EVENT-33M9f").OnError(pushErr).WithField("userID", userID).Warn("could not push failed passwordless check event")
+		logging.LogWithFields("EVENT-Bdgd2", "userID", userID, "resourceOwner", resourceOwner).OnError(pushErr).Warn("could not push failed u2f check event")
 		return err
 	}
 
@@ -363,6 +367,10 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 
 	userAgg, token, signCount, err := c.finishWebAuthNLogin(ctx, userID, resourceOwner, credentialData, webAuthNLogin, passwordlessTokens, isLoginUI)
 	if err != nil {
+		if userAgg == nil {
+			logging.LogWithFields("EVENT-Dbbbw", "userID", userID, "resourceOwner", resourceOwner).WithError(err).Warn("missing userAggregate for pushing failed passwordless check event")
+			return err
+		}
 		_, pushErr := c.eventstore.PushEvents(ctx,
 			usr_repo.NewHumanPasswordlessCheckFailedEvent(
 				ctx,
@@ -370,7 +378,7 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 				authRequestDomainToAuthRequestInfo(authRequest),
 			),
 		)
-		logging.Log("EVENT-33M9f").OnError(pushErr).WithField("userID", userID).Warn("could not push failed passwordless check event")
+		logging.LogWithFields("EVENT-33M9f", "userID", userID, "resourceOwner", resourceOwner).OnError(pushErr).Warn("could not push failed passwordless check event")
 		return err
 	}
 
