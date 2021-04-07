@@ -919,6 +919,7 @@ export class ManagementService {
         firstName?: string,
         lastName?: string,
         nickName?: string,
+        displayName?: string,
         preferredLanguage?: string,
         gender?: Gender
     ): Promise<UpdateHumanProfileResponse.AsObject> {
@@ -932,6 +933,9 @@ export class ManagementService {
         }
         if (nickName) {
             req.setNickName(nickName);
+        }
+        if (displayName) {
+            req.setDisplayName(displayName);
         }
         if (gender) {
             req.setGender(gender);

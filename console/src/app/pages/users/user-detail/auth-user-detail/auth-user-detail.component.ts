@@ -85,7 +85,7 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public saveEmail(email: string): void {
         this.userService
-            .setMyPhone(email).then(() => {
+            .setMyEmail(email).then(() => {
                 this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
                 if (this.user.human) {
                     const mailToSet = new Email();
