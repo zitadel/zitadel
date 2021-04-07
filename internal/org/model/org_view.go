@@ -37,6 +37,7 @@ const (
 	OrgSearchKeyOrgDomain
 	OrgSearchKeyState
 	OrgSearchKeyResourceOwner
+	OrgSearchKeyOrgNameLower //used for lowercase search
 )
 
 type OrgSearchQuery struct {
