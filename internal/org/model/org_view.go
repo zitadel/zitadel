@@ -1,11 +1,10 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	caos_errors "github.com/caos/zitadel/internal/errors"
-
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
@@ -37,6 +36,7 @@ const (
 	OrgSearchKeyOrgDomain
 	OrgSearchKeyState
 	OrgSearchKeyResourceOwner
+	OrgSearchKeyOrgNameIgnoreCase //used for lowercase search
 )
 
 type OrgSearchQuery struct {

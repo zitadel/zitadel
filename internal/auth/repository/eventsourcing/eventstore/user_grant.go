@@ -2,7 +2,9 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -195,7 +197,8 @@ func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]st
 
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
 	searchRequest := &org_model.OrgSearchRequest{
-		SortingColumn: org_model.OrgSearchKeyOrgName,
+		SortingColumn: org_model.OrgSearchKeyOrgNameIgnoreCase,
+		Asc:           true,
 	}
 	if len(request.Queries) > 0 {
 		for _, q := range request.Queries {
