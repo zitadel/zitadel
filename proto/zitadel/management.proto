@@ -741,6 +741,18 @@ service ManagementService {
         };
     }
 
+    // returns all roles of a project grant
+    rpc ListGrantedProjectRoles(ListGrantedProjectRolesRequest) returns (ListGrantedProjectRolesResponse) {
+        option (google.api.http) = {
+            get: "/granted_projects/{project_id}/grants/{grant_id}/roles/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.role.read"
+            check_field_name: "GrantId"
+        };
+    }
+
     rpc ListProjectChanges(ListProjectChangesRequest) returns (ListProjectChangesResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/changes/_search"
@@ -2574,6 +2586,20 @@ message ListProjectRolesRequest {
 }
 
 message ListProjectRolesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.project.v1.Role result = 2;
+}
+
+message ListGrantedProjectRolesRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 3;
+    //criterias the client is looking for
+    repeated zitadel.project.v1.RoleQuery queries = 4;
+}
+
+message ListGrantedProjectRolesResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.project.v1.Role result = 2;
 }
