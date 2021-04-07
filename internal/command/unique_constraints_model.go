@@ -82,6 +82,11 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, project.NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner))
 		case *project.ProjectRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, project.UniqueProjectnameType)
+			rm.listRemoveUniqueConstraint(e.Aggregate().ID, project.UniqueAppNameType)
+			rm.listRemoveUniqueConstraint(e.Aggregate().ID, member.UniqueMember)
+			rm.listRemoveUniqueConstraint(e.Aggregate().ID, project.UniqueRoleType)
+			rm.listRemoveUniqueConstraint(e.Aggregate().ID, project.UniqueGrantType)
+			rm.listRemoveUniqueConstraint(e.Aggregate().ID, project.UniqueProjectGrantMemberType)
 		case *project.ApplicationAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID))
 		case *project.ApplicationChangedEvent:
@@ -123,6 +128,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.UserRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.UniqueUsername)
+			rm.listRemoveUniqueConstraint(e.Aggregate().ID, user.UniqueExternalIDPType)
 		case *user.UsernameChangedEvent:
 			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
@@ -265,6 +271,16 @@ func (rm *UniqueConstraintReadModel) removeUniqueConstraint(aggregateID, objectI
 			rm.UniqueConstraints[len(rm.UniqueConstraints)-1] = nil
 			rm.UniqueConstraints = rm.UniqueConstraints[:len(rm.UniqueConstraints)-1]
 			return
+		}
+	}
+}
+
+func (rm *UniqueConstraintReadModel) listRemoveUniqueConstraint(aggregateID, constraintType string) {
+	for i, uniqueConstraint := range rm.UniqueConstraints {
+		if uniqueConstraint.AggregateID == aggregateID && uniqueConstraint.UniqueType == constraintType {
+			copy(rm.UniqueConstraints[i:], rm.UniqueConstraints[i+1:])
+			rm.UniqueConstraints[len(rm.UniqueConstraints)-1] = nil
+			rm.UniqueConstraints = rm.UniqueConstraints[:len(rm.UniqueConstraints)-1]
 		}
 	}
 }
