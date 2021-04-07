@@ -276,8 +276,8 @@ func (rm *UniqueConstraintReadModel) removeUniqueConstraint(aggregateID, objectI
 }
 
 func (rm *UniqueConstraintReadModel) listRemoveUniqueConstraint(aggregateID, constraintType string) {
-	for i, uniqueConstraint := range rm.UniqueConstraints {
-		if uniqueConstraint.AggregateID == aggregateID && uniqueConstraint.UniqueType == constraintType {
+	for i := len(rm.UniqueConstraints) - 1; i >= 0; i-- {
+		if rm.UniqueConstraints[i].AggregateID == aggregateID && rm.UniqueConstraints[i].UniqueType == constraintType {
 			copy(rm.UniqueConstraints[i:], rm.UniqueConstraints[i+1:])
 			rm.UniqueConstraints[len(rm.UniqueConstraints)-1] = nil
 			rm.UniqueConstraints = rm.UniqueConstraints[:len(rm.UniqueConstraints)-1]
