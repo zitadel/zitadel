@@ -3,7 +3,6 @@ module github.com/caos/zitadel
 go 1.15
 
 require (
-	cloud.google.com/go v0.71.0 // indirect
 	cloud.google.com/go/storage v1.10.0
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
@@ -66,13 +65,12 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout v0.13.0
 	go.opentelemetry.io/otel/sdk v0.13.0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
-	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
 	golang.org/x/text v0.3.5
-	golang.org/x/tools v0.0.0-20201103235415-b653051172e4
-	google.golang.org/api v0.34.0
+	golang.org/x/tools v0.1.0
+	google.golang.org/api v0.43.0
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20210207032614-bba0dbe2a9ea
-	google.golang.org/grpc v1.35.0
+	google.golang.org/genproto v0.0.0-20210319143718-93e7006c17a6
+	google.golang.org/grpc v1.36.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
