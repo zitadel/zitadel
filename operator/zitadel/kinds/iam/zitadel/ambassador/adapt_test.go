@@ -76,6 +76,8 @@ func SetMappingsHTTP(
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.MgmtName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.OauthName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.OauthName, gomock.Any()).MinTimes(1).MaxTimes(1)
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.OpenAPIName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.OpenAPIName, gomock.Any()).MinTimes(1).MaxTimes(1)
 }
 
 func SetMappingsGRPC(

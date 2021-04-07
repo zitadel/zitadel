@@ -31,7 +31,7 @@ func OrgByPrimaryDomain(db *gorm.DB, table, primaryDomain string) (*model.OrgVie
 
 func SearchOrgs(db *gorm.DB, table string, req *org_model.OrgSearchRequest) ([]*model.OrgView, uint64, error) {
 	orgs := make([]*model.OrgView, 0)
-	query := repository.PrepareSearchQuery(table, model.OrgSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
+	query := repository.PrepareSearchQuery(table, model.OrgSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries, SortingColumn: req.SortingColumn, Asc: req.Asc})
 	count, err := query(db, &orgs)
 	if err != nil {
 		return nil, 0, err

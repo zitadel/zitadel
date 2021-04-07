@@ -34,6 +34,7 @@ type ProjectRepository interface {
 
 	ProjectGrantByID(ctx context.Context, grantID string) (*model.ProjectGrantView, error)
 	SearchProjectGrantMembers(ctx context.Context, request *model.ProjectGrantMemberSearchRequest) (*model.ProjectGrantMemberSearchResponse, error)
+	SearchProjectGrantRoles(ctx context.Context, projectID, grantID string, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
 
 	ProjectGrantMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectGrantMemberView, error)
 	GetProjectGrantMemberRoles() []string

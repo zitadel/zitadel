@@ -1115,22 +1115,6 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 			},
 		},
 		{
-			name: "orgid missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "",
-				userID: "user1",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "user not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(

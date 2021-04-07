@@ -5,6 +5,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
 	"github.com/caos/orbos/pkg/labels"
+
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 )
@@ -17,6 +18,7 @@ const (
 	AuthorizeName  = "authorize-v1"
 	EndsessionName = "endsession-v1"
 	IssuerName     = "issuer-v1"
+	OpenAPIName    = "openapi"
 )
 
 func AdaptFunc(
@@ -67,6 +69,11 @@ func AdaptFunc(
 		return nil, nil, err
 	}
 
+	destroySwagger, err := mapping.AdaptFuncToDestroy(namespace, OpenAPIName)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	destroyers := []operator.DestroyFunc{
 		operator.ResourceDestroyToZitadelDestroy(destroyAdminR),
 		operator.ResourceDestroyToZitadelDestroy(destroyMgmtRest),
@@ -75,6 +82,7 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroyAuthorize),
 		operator.ResourceDestroyToZitadelDestroy(destroyEndsession),
 		operator.ResourceDestroyToZitadelDestroy(destroyIssuer),
+		operator.ResourceDestroyToZitadelDestroy(destroySwagger),
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
@@ -208,6 +216,22 @@ func AdaptFunc(
 				return nil, err
 			}
 
+			queryOpenAPI, err := mapping.AdaptFuncToEnsure(
+				namespace,
+				labels.MustForName(componentLabels, OpenAPIName),
+				false,
+				apiDomain,
+				"/openapi/v2/swagger",
+				"",
+				httpUrl,
+				30000,
+				30000,
+				nil,
+			)
+			if err != nil {
+				return nil, err
+			}
+
 			queriers := []operator.QueryFunc{
 				operator.ResourceQueryToZitadelQuery(queryAdminR),
 				operator.ResourceQueryToZitadelQuery(queryMgmtRest),
@@ -216,6 +240,7 @@ func AdaptFunc(
 				operator.ResourceQueryToZitadelQuery(queryAuthorize),
 				operator.ResourceQueryToZitadelQuery(queryEndsession),
 				operator.ResourceQueryToZitadelQuery(queryIssuer),
+				operator.ResourceQueryToZitadelQuery(queryOpenAPI),
 			}
 
 			return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)

@@ -230,7 +230,7 @@ export class GrpcAuthService {
      */
     public canUseFeature(features: string[] | RegExp[]): Observable<boolean> {
         if (features && features.length > 0) {
-            return this.zitadelPermissions.pipe(switchMap(zFeatures => of(this.hasFeature(zFeatures, features))));
+            return this.zitadelFeatures.pipe(switchMap(zFeatures => of(this.hasFeature(zFeatures, features))));
         } else {
             return of(false);
         }

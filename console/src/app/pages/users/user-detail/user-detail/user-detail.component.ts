@@ -90,6 +90,7 @@ export class UserDetailComponent implements OnInit {
                     this.user.human.profile.firstName,
                     this.user.human.profile.lastName,
                     this.user.human.profile.nickName,
+                    this.user.human.profile.displayName,
                     this.user.human.profile.preferredLanguage,
                     this.user.human.profile.gender)
                 .then(() => {

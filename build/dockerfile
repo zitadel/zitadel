@@ -48,7 +48,7 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1
     && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/field_behavior.proto --create-dirs -o include/google/api/field_behavior.proto
 
 #zitadel protos
-COPY /proto/ include/.
+COPY proto/ include/.
 
 
 #######################
@@ -95,28 +95,38 @@ RUN npm run prodbuild
 #######################
 FROM golang:${GO_VERSION} as go-dep
 RUN mkdir -p src/github.com/caos/zitadel
-COPY . src/github.com/caos/zitadel/
-WORKDIR /go/src/github.com/caos/zitadel/
+# copy mod definitions
+COPY tools src/github.com/caos/zitadel/tools
+COPY ./go.* src/github.com/caos/zitadel
 
+# install all dependencies
+WORKDIR /go/src/github.com/caos/zitadel
 RUN go mod download
 RUN ./tools/install.sh
+
+FROM go-dep AS go-gen
+COPY --from=base /proto /proto
+COPY --from=base /usr/local/bin /usr/local/bin/.
+COPY build/zitadel/generate-grpc.sh build/zitadel/generate-grpc.sh
+COPY internal/protoc internal/protoc
+RUN build/zitadel/generate-grpc.sh
 
 #######################
 ## Go base build
 #######################
-FROM go-dep as go-base
-COPY --from=base /proto /proto
-COPY --from=base /usr/local/bin /usr/local/bin/.
-RUN build/zitadel/generate-grpc.sh
+FROM go-gen as go-base
+# copy all zitadel files
+COPY . .
 
 
 #######################
 ## copy for local dev
 #######################
 FROM scratch as go-copy
-COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/grpc ./pkg/grpc
-COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
-COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go ./internal/protoc/protoc-gen-authoption/authoption/options.pb.go
+COPY --from=go-gen /go/src/github.com/caos/zitadel/pkg/grpc ./pkg/grpc
+COPY --from=go-gen /go/src/github.com/caos/zitadel/openapi/v2/zitadel ./openapi/v2/zitadel
+COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
+COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go ./internal/protoc/protoc-gen-authoption/authoption/options.pb.go
 
 
 #######################
@@ -149,7 +159,8 @@ RUN go get github.com/rakyll/statik \
     && ./build/console/generate-static.sh \
     && ./build/login/generate-static.sh \
     && ./build/notification/generate-static.sh \
-    && ./build/zitadel/generate-static.sh
+    && ./build/zitadel/generate-static.sh \
+    && ./build/zitadel/generate-openapi-static.sh
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
 
 

@@ -2,6 +2,8 @@ package model
 
 import (
 	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
+
 	"time"
 )
 
@@ -65,10 +67,14 @@ type UserMembershipSearchResponse struct {
 	Timestamp   time.Time
 }
 
-func (r *UserMembershipSearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *UserMembershipSearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-288fJ", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }
 
 func (r *UserMembershipSearchRequest) GetSearchQuery(key UserMembershipSearchKey) (int, *UserMembershipSearchQuery) {

@@ -73,7 +73,10 @@ func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.Or
 }
 
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
 	sequence, sequenceErr := repo.View.GetLatestOrgDomainSequence()
 	logging.Log("EVENT-SLowp").OnError(sequenceErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest org domain sequence")
@@ -123,7 +126,10 @@ func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID stri
 }
 
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	request.Queries = append(request.Queries, &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
 	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence()
 	logging.Log("EVENT-Smu3d").OnError(sequenceErr).Warn("could not read latest org member sequence")
@@ -163,7 +169,10 @@ func (repo *OrgRepository) IDPConfigByID(ctx context.Context, idpConfigID string
 }
 
 func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID, repo.SystemDefaults.IamID)
 
 	sequence, sequenceErr := repo.View.GetLatestIDPConfigSequence()
@@ -295,7 +304,10 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	} else {
 		request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
 	}
-	request.EnsureLimit(repo.SearchLimit)
+	err = request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, sequenceErr := repo.View.GetLatestIDPProviderSequence()
 	logging.Log("EVENT-Tuiks").OnError(sequenceErr).Warn("could not read latest iam sequence")
 	providers, count, err := repo.View.SearchIDPProviders(request)

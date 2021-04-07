@@ -114,16 +114,6 @@ func ModelPhoneToPb(phone *model.Phone) *user_pb.Phone {
 	}
 }
 
-func ModelAddressToPb(address *model.Address) *user_pb.Address {
-	return &user_pb.Address{
-		Country:       address.Country,
-		Locality:      address.Locality,
-		PostalCode:    address.PostalCode,
-		Region:        address.Region,
-		StreetAddress: address.StreetAddress,
-	}
-}
-
 func GenderToDomain(gender user_pb.Gender) domain.Gender {
 	switch gender {
 	case user_pb.Gender_GENDER_DIVERSE:
