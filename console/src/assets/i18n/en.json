@@ -173,6 +173,7 @@
             "DEACTIVATE":"Deactivate",
             "ACTIVATE":"Activate",
             "FILTER": {
+                "0":"Filter for DisplayName",
                 "1":"Filter for Username",
                 "2":"filter for Firstname",
                 "3":"filter for Lastname",
@@ -586,7 +587,8 @@
             "2":"Cancelled",
             "3":"Grandfathered"
         },
-        "NOTAVAILABLE":"Feature {{value}} is missing on your organization."
+        "NOTAVAILABLE":"Feature {{value}} is missing on your organization.",
+        "RETENTIONHOURS":"Hours"
     },
     "POLICY": {
         "TITLE":"Explore Policies",

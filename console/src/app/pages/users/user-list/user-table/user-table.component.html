@@ -48,10 +48,10 @@
 
             <ng-container matColumnDef="displayName">
                 <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.USERSEARCHKEY_DISPLAY_NAME}">
+                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.DISPLAY_NAME}">
                     {{ 'USER.PROFILE.DISPLAYNAME' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserListSearchKey.USERSEARCHKEY_DISPLAY_NAME}"></template>
+                        [ngTemplateOutletContext]="{key: UserListSearchKey.DISPLAY_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
                     {{user.human?.profile?.displayName}}

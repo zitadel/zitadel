@@ -3,7 +3,6 @@ import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -382,15 +381,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         });
     }
 
-    public changeState(event: MatButtonToggleChange): void {
-        if (event.value === AppState.APP_STATE_ACTIVE) {
+    public changeState(state: AppState): void {
+        if (state === AppState.APP_STATE_ACTIVE) {
             this.mgmtService.reactivateApp(this.projectId, this.app.id).then(() => {
+                this.app.state = state;
                 this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error);
             });
-        } else if (event.value === AppState.APP_STATE_INACTIVE) {
+        } else if (state === AppState.APP_STATE_INACTIVE) {
             this.mgmtService.deactivateApp(this.projectId, this.app.id).then(() => {
+                this.app.state = state;
                 this.toast.showInfo('APP.TOAST.DEACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error);

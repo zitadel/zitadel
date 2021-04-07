@@ -28,7 +28,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     @Output() public changedSelection: EventEmitter<Array<Role.AsObject>> = new EventEmitter();
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
+    public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate', 'actions'];
 
     constructor(private mgmtService: ManagementService, private toast: ToastService, private dialog: MatDialog) {
         this.dataSource = new ProjectRolesDataSource(this.mgmtService);
@@ -76,25 +76,16 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
             this.dataSource.rolesSubject.value.forEach((row: Role.AsObject) => this.selection.select(row));
     }
 
-    public deleteSelectedRoles(): Promise<any> {
-        const oldState = this.dataSource.rolesSubject.value;
-        const indexes = this.selection.selected.map(sel => {
-            return oldState.findIndex(iter => iter.key === sel.key);
-        });
+    public deleteRole(role: Role.AsObject): Promise<any> {
+        const index = this.dataSource.rolesSubject.value.findIndex(iter => iter.key === role.key);
 
-        return Promise.all(this.selection.selected.map(role => {
-            return this.mgmtService.removeProjectRole(this.projectId, role.key);
-        })).then(() => {
+        return this.mgmtService.removeProjectRole(this.projectId, role.key).then(() => {
             this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
-            indexes.forEach(index => {
-                if (index > -1) {
-                    oldState.splice(index, 1);
-                    this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
-                }
-            });
-            this.selection.clear();
-        }).catch(error => {
-            this.toast.showError(error);
+
+            if (index > -1) {
+                this.dataSource.rolesSubject.value.splice(index, 1);
+                this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
+            }
         });
     }
 

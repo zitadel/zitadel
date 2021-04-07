@@ -10,8 +10,8 @@
                         [ngStyle]="{'z-index': 100 - i}">
                         <div class="membership-avatar" [ngStyle]="{'background-color': getColor(membership)}">
                             <i *ngIf="membership.orgId" class="las la-archway"></i>
-                            <i *ngIf="membership.projectId && !membership.grantId" class="icon las la-layer-group"></i>
-                            <i *ngIf="membership.projectId && membership.grantId" class="icon las la-layer-group"></i>
+                            <i *ngIf="membership.projectId && !membership.projectGrantId" class="icon las la-layer-group"></i>
+                            <i *ngIf="membership.projectId && membership.projectGrantId" class="icon las la-layer-group"></i>
 
                             <span>{{membership.displayName}}</span>
                         </div>
@@ -25,6 +25,7 @@
                     </div>
                 </div>
             </ng-template>
+
             <button [disabled]="disabled" class="add-img" (click)="addMember()" mat-icon-button
                 matTooltip="{{'ACTIONS.ADD' | translate}}" aria-label="add membership">
                 <mat-icon>add</mat-icon>
