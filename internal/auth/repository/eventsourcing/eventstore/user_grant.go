@@ -197,7 +197,7 @@ func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]st
 
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
 	searchRequest := &org_model.OrgSearchRequest{
-		SortingColumn: org_model.OrgSearchKeyOrgNameLower,
+		SortingColumn: org_model.OrgSearchKeyOrgNameIgnoreCase,
 		Asc:           true,
 	}
 	if len(request.Queries) > 0 {

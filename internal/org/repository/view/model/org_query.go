@@ -57,7 +57,7 @@ func (key OrgSearchKey) ToColumnName() string {
 		return OrgKeyOrgID
 	case usr_model.OrgSearchKeyOrgName:
 		return OrgKeyOrgName
-	case usr_model.OrgSearchKeyOrgNameLower:
+	case usr_model.OrgSearchKeyOrgNameIgnoreCase:
 		return "LOWER(" + OrgKeyOrgName + ")" //used for lowercase search
 	case usr_model.OrgSearchKeyResourceOwner:
 		return OrgKeyResourceOwner
