@@ -77,9 +77,9 @@ require (
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 	gotest.tools v2.2.0+incompatible
-	k8s.io/api v0.19.2
-	k8s.io/apiextensions-apiserver v0.19.2
-	k8s.io/apimachinery v0.19.2
-	k8s.io/client-go v0.19.2
+	k8s.io/api v0.20.5
+	k8s.io/apiextensions-apiserver v0.20.5
+	k8s.io/apimachinery v0.20.5
+	k8s.io/client-go v0.20.5
 	sigs.k8s.io/controller-runtime v0.7.0
 )
