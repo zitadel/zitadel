@@ -2,12 +2,12 @@ name: "Code scanning - action"
 
 on:
   push:
-    branches: [master, ]
+    branches: [main, ]
     paths-ignore:
     - 'site/**'
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [master]
+    branches: [main]
     paths-ignore:
     - 'site/**'
   schedule:

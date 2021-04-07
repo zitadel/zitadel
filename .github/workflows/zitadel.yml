@@ -256,17 +256,17 @@ jobs:
           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
           docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
           docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
       - name: Docker Push Version
         run: |
           docker push $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
           docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
           docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
       - name: Dev-Release
         id: create_release
         uses: ncipollo/release-action@v1.8.1
-        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
         with:
           artifacts: "${{ env.ARTIFACTS_FOLDER }}/zitadelctl-darwin-amd64/zitadelctl-darwin-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-linux-amd64/zitadelctl-linux-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe"
           body: |

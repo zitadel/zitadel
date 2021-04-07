@@ -30,7 +30,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     public memberRoleOptions: string[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'memberType', 'displayName', 'creationDate', 'changeDate', 'roles'];
+    public displayedColumns: string[] = ['select', 'memberType', 'displayName', 'creationDate', 'changeDate', 'roles', 'actions'];
 
     public loading: boolean = false;
     public memberships!: Membership.AsObject[];
@@ -200,6 +200,27 @@ export class MembershipDetailComponent implements AfterViewInit {
                         this.toast.showError(error);
                     });
             });
+        }
+    }
+
+    public removeMembership(membership: Membership.AsObject): void {
+        let prom;
+
+        if (membership.projectId && membership.projectGrantId && membership.userId) {
+            prom = this.mgmtService.removeProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId);
+        } else if (membership.projectId && membership.userId) {
+            prom = this.mgmtService.removeProjectMember(membership.projectId, membership.userId);
+        } else if (membership.orgId && membership.userId) {
+            prom = this.mgmtService.removeOrgMember(membership.userId);
+        } else if (membership.userId) {
+            prom = this.adminService.removeIAMMember(membership.userId);
+        }
+
+        if (prom) {
+            prom.then(() => {
+                this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
+                this.refreshPage();
+            }).catch(error => this.toast.showError(error));
         }
     }
 

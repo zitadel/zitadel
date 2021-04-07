@@ -29,12 +29,12 @@
 
             <ng-container matColumnDef="externalUserDisplayName">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.EXTERNALIDP.USERDISPLAYNAME' | translate }} </th>
-                <td mat-cell *matCellDef="let idp"> {{idp?.externalUserDisplayName}} </td>
+                <td mat-cell *matCellDef="let idp"> {{idp?.providedUserName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="externalUserId">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.EXTERNALIDP.EXTERNALUSERID' | translate }} </th>
-                <td mat-cell *matCellDef="let idp"> {{idp?.externalUserId}} </td>
+                <td mat-cell *matCellDef="let idp"> {{idp?.providedUserId}} </td>
             </ng-container>
 
             <ng-container matColumnDef="actions" stickyEnd>
