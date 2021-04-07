@@ -17,7 +17,7 @@
                 item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
                 }}</span>
             <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
-            <span class="description" *ngIf="item.resourceOwnerName">{{item.resourceOwnerName}}</span>
+            <span class="description" *ngIf="item.projectOwnerName">{{item.projectOwnerName}}</span>
             <span *ngIf="item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
                 }}</span>
@@ -25,8 +25,6 @@
         </div>
 
         <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
-
-
     </div>
 
 </div>
@@ -42,7 +40,7 @@
                 item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
                 }}</span>
             <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
-            <span class="description" *ngIf="item.resourceOwnerName">{{item.resourceOwnerName}}</span>
+            <span class="description" *ngIf="item.projectOwnerName">{{item.projectOwnerName}}</span>
             <span *ngIf="item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <span class="fill-space"></span>
