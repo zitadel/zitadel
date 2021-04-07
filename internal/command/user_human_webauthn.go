@@ -2,11 +2,13 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -41,11 +43,16 @@ func (c *Commands) getHumanU2FLogin(ctx context.Context, userID, authReqID, reso
 	if err != nil {
 		return nil, err
 	}
-	if tokenReadModel.State == domain.UserStateDeleted {
+	if tokenReadModel.State == domain.UserStateUnspecified || tokenReadModel.State == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5m88U", "Errors.User.NotFound")
 	}
 	return &domain.WebAuthNLogin{
-		Challenge: tokenReadModel.Challenge,
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: tokenReadModel.AggregateID,
+		},
+		Challenge:            tokenReadModel.Challenge,
+		AllowedCredentialIDs: tokenReadModel.AllowedCredentialIDs,
+		UserVerification:     tokenReadModel.UserVerification,
 	}, nil
 }
 
@@ -55,11 +62,16 @@ func (c *Commands) getHumanPasswordlessLogin(ctx context.Context, userID, authRe
 	if err != nil {
 		return nil, err
 	}
-	if tokenReadModel.State == domain.UserStateDeleted {
+	if tokenReadModel.State == domain.UserStateUnspecified || tokenReadModel.State == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fm84R", "Errors.User.NotFound")
 	}
 	return &domain.WebAuthNLogin{
-		Challenge: tokenReadModel.Challenge,
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: tokenReadModel.AggregateID,
+		},
+		Challenge:            tokenReadModel.Challenge,
+		AllowedCredentialIDs: tokenReadModel.AllowedCredentialIDs,
+		UserVerification:     tokenReadModel.UserVerification,
 	}, nil
 }
 
@@ -259,6 +271,8 @@ func (c *Commands) HumanBeginU2FLogin(ctx context.Context, userID, resourceOwner
 			ctx,
 			userAgg,
 			webAuthNLogin.Challenge,
+			webAuthNLogin.AllowedCredentialIDs,
+			webAuthNLogin.UserVerification,
 			authRequestDomainToAuthRequestInfo(authRequest),
 		),
 	)
@@ -281,6 +295,8 @@ func (c *Commands) HumanBeginPasswordlessLogin(ctx context.Context, userID, reso
 			ctx,
 			userAgg,
 			webAuthNLogin.Challenge,
+			webAuthNLogin.AllowedCredentialIDs,
+			webAuthNLogin.UserVerification,
 			authRequestDomainToAuthRequestInfo(authRequest),
 		),
 	)
