@@ -63,7 +63,10 @@ ARG PROJECT_PATH
 
 COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
-RUN ./build/zitadel/generate-grpc-clients.sh ${PROJECT_PATH}
+# generate all pb files and copy them to a new directory
+RUN ./build/zitadel/generate-grpc-clients.sh ${PROJECT_PATH} \
+    && mkdir /zitadel-api \
+    && find ./pkg/grpc -iname '*.pb.go' -exec cp --parents \{\} /zitadel-api \;
 
 
 #######################
@@ -71,4 +74,4 @@ RUN ./build/zitadel/generate-grpc-clients.sh ${PROJECT_PATH}
 #######################
 FROM scratch as zitadel-copy
 ARG PROJECT_PATH
-COPY --from=zitadel-client /go/src/github.com/caos/zitadel/pkg/grpc /zitadel
+COPY --from=zitadel-client /zitadel-api/pkg/grpc /zitadel
