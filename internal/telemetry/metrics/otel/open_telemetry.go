@@ -2,13 +2,15 @@ package otel
 
 import (
 	"context"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"go.opentelemetry.io/otel/api/metric"
-	"go.opentelemetry.io/otel/exporters/metric/prometheus"
-	"go.opentelemetry.io/otel/label"
 	"net/http"
 	"sync"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"go.opentelemetry.io/otel/exporters/metric/prometheus"
+
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 )
 
 type Metrics struct {
@@ -80,13 +82,13 @@ func (m *Metrics) RegisterValueObserver(name, description string, callbackFunc m
 	return nil
 }
 
-func MapToKeyValue(labels map[string]interface{}) []label.KeyValue {
+func MapToKeyValue(labels map[string]interface{}) []attribute.KeyValue {
 	if labels == nil {
 		return nil
 	}
-	keyValues := make([]label.KeyValue, 0, len(labels))
+	keyValues := make([]attribute.KeyValue, 0, len(labels))
 	for key, value := range labels {
-		keyValues = append(keyValues, label.Any(key, value))
+		keyValues = append(keyValues, attribute.Any(key, value))
 	}
 	return keyValues
 }

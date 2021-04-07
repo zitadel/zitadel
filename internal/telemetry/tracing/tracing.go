@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	api_trace "go.opentelemetry.io/otel/api/trace"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Tracer interface {
@@ -81,5 +81,5 @@ func NewSpanHTTP(r *http.Request) (*http.Request, *Span) {
 }
 
 func TraceIDFromCtx(ctx context.Context) string {
-	return api_trace.SpanFromContext(ctx).SpanContext().TraceID.String()
+	return trace.SpanFromContext(ctx).SpanContext().TraceID.String()
 }
