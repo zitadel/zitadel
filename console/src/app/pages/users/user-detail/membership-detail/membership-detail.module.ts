@@ -12,6 +12,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
@@ -43,6 +44,7 @@ const routes: Routes = [
         HasRoleModule,
         MatIconModule,
         MatButtonModule,
+        HasRolePipeModule,
         RefreshTableModule,
         MatTooltipModule,
     ],

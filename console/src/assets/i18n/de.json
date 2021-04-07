@@ -173,6 +173,7 @@
             "DEACTIVATE":"Deaktivieren",
             "ACTIVATE":"Aktivieren",
             "FILTER": {
+                "0":"Nach displayName filtern",
                 "1":"Nach Username filtern",
                 "2":"Nach Vornamen filtern",
                 "3":"Nach Nachnamen filtern",
@@ -588,7 +589,8 @@
             "2":"Annuliert",
             "3":"Besitzstandswahrend"
         },
-        "NOTAVAILABLE":"Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!"
+        "NOTAVAILABLE":"Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!",
+        "RETENTIONHOURS":"Stunden"
     },
     "POLICY": {
         "TITLE":"Richtlinen entdecken",

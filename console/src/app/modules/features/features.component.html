@@ -1,5 +1,5 @@
 <app-detail-layout [backRouterLink]="[ serviceType === FeatureServiceType.ADMIN ? '/iam/policies' : '/org']"
-    [title]="'FEATURES.TITLE' | translate" [description]="'FEATURES.DESCRIPTION' | translate">
+    [title]="'ZITADEL ' +features?.tier.name + ' ' + ('FEATURES.TITLE' | translate)" [description]="'FEATURES.DESCRIPTION' | translate">
     <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
 
     <ng-template appHasRole [appHasRole]="['iam.features.delete']">
@@ -14,7 +14,7 @@
         <div class="row">
             <span class="left-desc">{{'FEATURES.DATA.AUDITLOGRETENTION' | translate}}</span>
             <span class="fill-space"></span>
-            <span>{{features.auditLogRetention | json }}</span>
+            <span>{{features.auditLogRetention | timestampToRetention }} {{'FEATURES.RETENTIONHOURS' | translate}}</span>
         </div>
         <div class="row">
             <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYUSERNAMELOGIN' | translate}}</span>

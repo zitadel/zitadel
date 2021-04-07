@@ -129,14 +129,15 @@
                 display: flex;
                 justify-content: center;
             }
+        }
 
-            .end-container {
-                font-size: 12px;
-                color: var(--grey);
-                font-size: 14px;
-                margin: 1rem 0;
-                color: var(--grey);
-            }
+        .end-container {
+            font-size: 12px;
+            color: var(--grey);
+            font-size: 14px;
+            margin: 1rem 0 1rem 0;
+            display: block;
+            color: var(--grey);
         }
     }
 }
