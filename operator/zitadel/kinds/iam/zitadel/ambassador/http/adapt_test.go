@@ -233,6 +233,29 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).MinTimes(1).MaxTimes(1)
 
+	openAPIName := labels.MustForName(componentLabels, OpenAPIName)
+	openAPI := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": group + "/" + version,
+			"kind":       kind,
+			"metadata": map[string]interface{}{
+				"labels":    labels.MustK8sMap(openAPIName),
+				"name":      openAPIName.Name(),
+				"namespace": namespace,
+			},
+			"spec": map[string]interface{}{
+				"connect_timeout_ms": 30000,
+				"host":               ".",
+				"prefix":             "/openapi/v2/swagger",
+				"rewrite":            "",
+				"service":            url,
+				"timeout_ms":         30000,
+			},
+		},
+	}
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, OpenAPIName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OpenAPIName, openAPI).MinTimes(1).MaxTimes(1)
+
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}
@@ -441,6 +464,29 @@ func TestHttp_Adapt2(t *testing.T) {
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, AuthRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, AuthRName, authR).MinTimes(1).MaxTimes(1)
+
+	openAPIName := labels.MustForName(componentLabels, OpenAPIName)
+	openAPI := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": group + "/" + version,
+			"kind":       kind,
+			"metadata": map[string]interface{}{
+				"labels":    labels.MustK8sMap(openAPIName),
+				"name":      openAPIName.Name(),
+				"namespace": namespace,
+			},
+			"spec": map[string]interface{}{
+				"connect_timeout_ms": 30000,
+				"host":               "api.domain",
+				"prefix":             "/openapi/v2/swagger",
+				"rewrite":            "",
+				"service":            url,
+				"timeout_ms":         30000,
+			},
+		},
+	}
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, OpenAPIName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OpenAPIName, openAPI).MinTimes(1).MaxTimes(1)
 
 	query, _, err := AdaptFunc(monitor, componentLabels, namespace, url, dns)
 	assert.NoError(t, err)

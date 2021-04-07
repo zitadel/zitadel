@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.v1;
 
@@ -12,7 +13,11 @@ message ObjectDetails {
     // on read: the sequence of the last event reduced by the projection
     //
     // on manipulation: the timestamp of the event(s) added by the manipulation
-    uint64 sequence = 1;
+    uint64 sequence = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2\"";
+        }
+    ];
     //creation_date is the timestamp where the first operation on the object was made
     //
     // on read: the timestamp of the first event of the object
@@ -26,19 +31,48 @@ message ObjectDetails {
     // on manipulation: the
     google.protobuf.Timestamp change_date = 3;
     //resource_owner is the organisation an object belongs to
-    string resource_owner = 4;
+    string resource_owner = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
 }
 
 message ListQuery {
-    uint64 offset = 1;
-    uint32 limit = 2;
-    bool asc = 3;
+    uint64 offset = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"10\"";
+        }
+    ];
+    uint32 limit = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "20";
+            description: "Maximum amount of events returned. Default is set to 1000 in https://github.com/caos/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If limit exeeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
+        }
+    ];
+    bool asc = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "default is descending"
+        }
+    ];
 }
 
 message ListDetails {
-    uint64 total_result = 1;
-    uint64 processed_sequence = 2;
-    google.protobuf.Timestamp view_timestamp = 3;
+    uint64 total_result = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2\"";
+        }
+    ];
+    uint64 processed_sequence = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"267831\"";
+        }
+    ];
+    google.protobuf.Timestamp view_timestamp = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the last time the view got updated"
+        }
+    ];
 }
 
 enum TextQueryMethod {

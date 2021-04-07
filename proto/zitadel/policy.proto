@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.policy.v1;
 
@@ -8,26 +9,74 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/policy";
 
 message OrgIAMPolicy {
     zitadel.v1.ObjectDetails details = 1;
-    bool user_login_must_be_domain = 2;
-    bool is_default = 3;
+    bool user_login_must_be_domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the username has to end with the domain of it's organisation"
+        }
+    ];
+    bool is_default = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the organisation's admin changed the policy"
+        }
+    ];
 }
 
 message LabelPolicy {
     zitadel.v1.ObjectDetails details = 1;
-    string primary_color = 2;
-    string secondary_color = 3;
-    bool is_default = 4;
-    bool hide_login_name_suffix = 5;
+    string primary_color = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for primary color"
+        }
+    ];
+    string secondary_color = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for secondary color"
+        }
+    ];
+    bool is_default = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the organisation's admin changed the policy"
+        }
+    ];
+    bool hide_login_name_suffix = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/architecture#Reserved_Scopes";
+        }
+    ];
 }
 
 message LoginPolicy {
     zitadel.v1.ObjectDetails details = 1;
-    bool allow_username_password = 2;
-    bool allow_register = 3;
-    bool allow_external_idp = 4;
-    bool force_mfa = 5;
-    PasswordlessType passwordless_type = 6;
-    bool is_default = 7;
+    bool allow_username_password = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if a user is allowed to login with his username and password"
+        }
+    ];
+    bool allow_register = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if a person is allowed to register a user on this organisation"
+        }
+    ];
+    bool allow_external_idp = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if a user is allowed to add a defined identity provider. E.g. Google auth"
+        }
+    ];
+    bool force_mfa = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if a user MUST use a multi factor to log in"
+        }
+    ];
+    PasswordlessType passwordless_type = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if passwordless is allowed for users"
+        }
+    ];
+    bool is_default = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the organisation's admin changed the policy"
+        }
+    ];
 }
 
 enum SecondFactorType {
@@ -49,24 +98,75 @@ enum PasswordlessType {
 
 message PasswordComplexityPolicy {
     zitadel.v1.ObjectDetails details = 1;
-    uint64 min_length = 2;
-    bool has_uppercase = 3;
-    bool has_lowercase = 4;
-    bool has_number = 5;
-    bool has_symbol = 6;
-    bool is_default = 7;
+    uint64 min_length = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"8\""
+        }
+    ];
+    bool has_uppercase = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the password MUST contain an upper case letter"
+        }
+    ];
+    bool has_lowercase = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the password MUST contain a lower case letter"
+        }
+    ];
+    bool has_number = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the password MUST contain a number"
+        }
+    ];
+    bool has_symbol = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the password MUST contain a symbol. E.g. \"$\""
+        }
+    ];
+    bool is_default = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the organisation's admin changed the policy"
+        }
+    ];
 }
 
 message PasswordAgePolicy {
     zitadel.v1.ObjectDetails details = 1;
-    uint64 max_age_days = 2;
-    uint64 expire_warn_days = 3;
-    bool is_default = 4;
+    uint64 max_age_days = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum days since last password change"
+            example: "\"365\""
+        }
+    ];
+    uint64 expire_warn_days = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Days before the password expiry the user gets notified to change the password"
+            example: "\"10\""
+        }
+    ];
+    bool is_default = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the organisation's admin changed the policy"
+        }
+    ];
 }
 
 message PasswordLockoutPolicy {
     zitadel.v1.ObjectDetails details = 1;
-    uint64 max_attempts = 2;
-    bool show_lockout_failure = 3;
-    bool is_default = 4;
+    uint64 max_attempts = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
+            example: "\"10\""
+        }
+    ];
+    bool show_lockout_failure = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Enables if the failure should be shown to de user, sometimes for security issues the user should not get to much information"
+        }
+    ];
+    bool is_default = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the organisation's admin changed the policy"
+        }
+    ];
 }

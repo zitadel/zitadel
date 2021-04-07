@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
+	"github.com/caos/zitadel/openapi"
 
 	"github.com/caos/logging"
 
@@ -177,6 +178,11 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, *localDevMode)
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
+
+	openAPIHandler, err := openapi.Start()
+	logging.Log("ZITAD-8pRk1").OnError(err).Fatal("Unable to start openapi handler")
+	apis.RegisterHandler("/openapi/v2/swagger", openAPIHandler)
+
 	apis.Start(ctx)
 }
 
