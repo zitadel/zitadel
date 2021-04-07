@@ -38,7 +38,7 @@
     "libphonenumber-js": "^1.9.13",
     "moment": "^2.29.1",
     "ngx-quicklink": "^0.2.6",
-    "rxjs": "~6.6.3",
+    "rxjs": "~6.6.7",
     "ts-protoc-gen": "^0.14.0",
     "tslib": "^2.2.0",
     "uuid": "^8.3.2",
