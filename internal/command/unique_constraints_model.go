@@ -83,6 +83,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 		case *project.ProjectRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, project.UniqueProjectnameType)
 			rm.listRemoveUniqueConstraint(e.Aggregate().ID, project.UniqueAppNameType)
+			rm.listRemoveUniqueConstraint(e.Aggregate().ID, member.UniqueMember)
 			rm.listRemoveUniqueConstraint(e.Aggregate().ID, project.UniqueRoleType)
 			rm.listRemoveUniqueConstraint(e.Aggregate().ID, project.UniqueGrantType)
 			rm.listRemoveUniqueConstraint(e.Aggregate().ID, project.UniqueProjectGrantMemberType)
