@@ -301,9 +301,12 @@ func (wm *HumanPasswordlessTokensReadModel) WebAuthNTokenByID(id string) (idx in
 type HumanU2FLoginReadModel struct {
 	eventstore.WriteModel
 
-	AuthReqID string
-	Challenge string
-	State     domain.UserState
+	AuthReqID            string
+	Challenge            string
+	AllowedCredentialIDs [][]byte
+	UserVerification     domain.UserVerificationRequirement
+	User
+	State domain.UserState
 }
 
 func NewHumanU2FLoginReadModel(userID, authReqID, resourceOwner string) *HumanU2FLoginReadModel {
@@ -335,6 +338,8 @@ func (wm *HumanU2FLoginReadModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanU2FBeginLoginEvent:
 			wm.Challenge = e.Challenge
+			wm.AllowedCredentialIDs = e.AllowedCredentialIDs
+			wm.UserVerification = e.UserVerification
 			wm.State = domain.UserStateActive
 		case *user.UserRemovedEvent:
 			wm.State = domain.UserStateDeleted

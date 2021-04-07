@@ -180,7 +180,9 @@ func HumanWebAuthNRemovedEventMapper(event *repository.Event) (eventstore.EventR
 type HumanWebAuthNBeginLoginEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Challenge string `json:"challenge"`
+	Challenge            string                             `json:"challenge"`
+	AllowedCredentialIDs [][]byte                           `json:"allowedCredentialIDs"`
+	UserVerification     domain.UserVerificationRequirement `json:"userVerification"`
 	*AuthRequestInfo
 }
 
@@ -192,15 +194,13 @@ func (e *HumanWebAuthNBeginLoginEvent) UniqueConstraints() []*eventstore.EventUn
 	return nil
 }
 
-func NewHumanWebAuthNBeginLoginEvent(
-	base *eventstore.BaseEvent,
-	challenge string,
-	info *AuthRequestInfo,
-) *HumanWebAuthNBeginLoginEvent {
+func NewHumanWebAuthNBeginLoginEvent(base *eventstore.BaseEvent, challenge string, allowedCredentialIDs [][]byte, userVerification domain.UserVerificationRequirement, info *AuthRequestInfo) *HumanWebAuthNBeginLoginEvent {
 	return &HumanWebAuthNBeginLoginEvent{
-		BaseEvent:       *base,
-		Challenge:       challenge,
-		AuthRequestInfo: info,
+		BaseEvent:            *base,
+		Challenge:            challenge,
+		AllowedCredentialIDs: allowedCredentialIDs,
+		UserVerification:     userVerification,
+		AuthRequestInfo:      info,
 	}
 }
 
