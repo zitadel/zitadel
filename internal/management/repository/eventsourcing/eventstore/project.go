@@ -442,6 +442,37 @@ func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, 
 	return model.ProjectGrantMemberToModel(member), nil
 }
 
+func (repo *ProjectRepo) SearchProjectGrantRoles(ctx context.Context, projectID, grantID string, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
+	projectGrant, err := repo.ProjectGrantByID(ctx, grantID)
+	if err != nil {
+		return nil, err
+	}
+	err = request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
+	request.AppendProjectQuery(projectID)
+	request.AppendRoleKeysQuery(projectGrant.GrantedRoleKeys)
+	sequence, sequenceErr := repo.View.GetLatestProjectRoleSequence()
+	logging.Log("EVENT-3M9fs").OnError(sequenceErr).Warn("could not read latest project role sequence")
+	roles, count, err := repo.View.SearchProjectRoles(request)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &proj_model.ProjectRoleSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      model.ProjectRolesToModel(roles),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
+}
+
 func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request *proj_model.ProjectGrantMemberSearchRequest) (*proj_model.ProjectGrantMemberSearchResponse, error) {
 	err := request.EnsureLimit(repo.SearchLimit)
 	if err != nil {
