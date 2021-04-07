@@ -52,3 +52,4 @@ console/src/app/proto/generated/
 **.pb.*.go
 **.gen.go 
 openapi/**/*.json
+examples/client/zitadel/*
