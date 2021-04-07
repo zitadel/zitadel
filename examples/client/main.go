@@ -8,13 +8,12 @@ import (
 
 	// the generated zitadel files for management api
 	pb "github.com/caos/zitadel/examples/client/zitadel/management"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 //zitadelAPI is the default zitadel api
-const zitadelAPI = "api.zitadel.ch:443"
+const zitadelAPI = "api.zitadel.io:443"
 
 func main() {
 	conn, err := grpc.Dial(zitadelAPI, grpc.WithTransportCredentials(cert()))
@@ -27,7 +26,7 @@ func main() {
 
 	//call ZITADEL. the response has no payload so we ignore the res
 	// the call was successful if no error responded
-	_, err = client.Healthz(context.TODO(), &empty.Empty{})
+	_, err = client.Healthz(context.TODO(), &pb.HealthzRequest{})
 	if err != nil {
 		log.Fatalln("call failed: ", err)
 	}
