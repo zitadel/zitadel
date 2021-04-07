@@ -37,7 +37,7 @@ export class UserGrantCreateComponent implements OnDestroy {
 
     public UserGrantContext: any = UserGrantContext;
 
-    public grantRolesKeyList: string[] = [];
+    public grantedRoleKeysList: string[] = [];
 
     public user!: User.AsObject;
     public UserTarget: any = UserTarget;
@@ -66,7 +66,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                 this.context = UserGrantContext.GRANTED_PROJECT;
                 this.mgmtService.getGrantedProjectByID(this.projectId, this.grantId).then(resp => {
                     if (resp.grantedProject?.grantedRoleKeysList) {
-                        this.grantRolesKeyList = resp.grantedProject?.grantedRoleKeysList;
+                        this.grantedRoleKeysList = resp.grantedProject?.grantedRoleKeysList;
                     }
                 }).catch((error: any) => {
                     this.toast.showError(error);
@@ -139,10 +139,11 @@ export class UserGrantCreateComponent implements OnDestroy {
                 });
                 break;
             case UserGrantContext.NONE:
+                console.log('none');
                 let tempGrantId;
 
-                if ((this.project as GrantedProject.AsObject)?.projectId) {
-                    tempGrantId = (this.project as GrantedProject.AsObject).projectId;
+                if ((this.project as GrantedProject.AsObject)?.grantId) {
+                    tempGrantId = (this.project as GrantedProject.AsObject).grantId;
                 }
 
                 this.userService.addUserGrant(
@@ -158,13 +159,13 @@ export class UserGrantCreateComponent implements OnDestroy {
                 });
                 break;
         }
-
     }
 
     public selectProject(project: Project.AsObject | GrantedProject.AsObject | any): void {
         this.project = project;
         this.projectId = project.id || project.projectId;
-        this.grantRolesKeyList = project.roleKeysList ?? [];
+
+        this.grantedRoleKeysList = project.grantedRoleKeysList ?? [];
     }
 
     public selectUser(user: User.AsObject): void {
