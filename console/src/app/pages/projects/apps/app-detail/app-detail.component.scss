@@ -11,7 +11,6 @@
   .title-col {
     margin-left: 2rem;
     margin-right: 1rem;
-    min-width: 200px;
 
     h1 {
         font-size: 1.2rem;
@@ -23,6 +22,10 @@
         font-size: 12px;
         color: var(--grey);
     }
+  }
+
+  .fill-space {
+    flex: 1;
   }
 
   .desc {
@@ -39,7 +42,7 @@
   }
 
   .state-button {
-      margin: 0 .5rem;
+      margin-left: .5rem;
   }
 }
 

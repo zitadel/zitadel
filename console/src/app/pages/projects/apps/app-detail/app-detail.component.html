@@ -22,6 +22,15 @@
                         <i class="las la-save"></i>
                     </button>
 
+                    <ng-template appHasRole [appHasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
+                        <button matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" mat-icon-button
+                            (click)="deleteApp()" aria-label="delete app">
+                            <i class="las la-trash"></i>
+                        </button>
+                    </ng-template>
+
+                    <span class="fill-space"></span>
+
                     <button class="state-button" mat-stroked-button color="warn"
                         *ngIf="app.state !== undefined && app?.state !== AppState.APP_STATE_INACTIVE"
                         (click)="changeState(AppState.APP_STATE_INACTIVE)">
@@ -32,13 +41,6 @@
                         (click)="changeState(AppState.APP_STATE_ACTIVE)">
                         {{'ACTIONS.REACTIVATE' | translate}}
                    </button>
-                </ng-template>
-
-                <ng-template appHasRole [appHasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
-                    <button matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" mat-icon-button
-                        (click)="deleteApp()" aria-label="delete app">
-                        <i class="las la-trash"></i>
-                    </button>
                 </ng-template>
             </ng-container>
 
@@ -112,7 +114,7 @@
             </cnsl-info-section>
 
             <cnsl-info-section class="step-description"
-                *ngIf="OIDCAppType?.value == OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value == OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
+                *ngIf="appType?.value == OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value == OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}
             </cnsl-info-section>
 
