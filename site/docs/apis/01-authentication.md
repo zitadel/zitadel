@@ -15,4 +15,4 @@ The authentication API (aka Auth API) is used for all operations on the currentl
 > At a later date we might expose functions to build your own login GUI
 > You can build your own user Register GUI already by utilizing the [Management API](#management)
 
-[Latest API Version](https://github.com/caos/zitadel/blob/master/pkg/grpc/auth/proto/auth.proto)
+[Latest API Version](https://github.com/caos/zitadel/blob/main/pkg/grpc/auth/proto/auth.proto)
