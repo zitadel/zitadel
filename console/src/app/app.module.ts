@@ -38,6 +38,7 @@ import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasFeaturePipeModule } from './pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
+import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
@@ -175,6 +176,7 @@ const authConfig: AuthConfig = {
         SeoService,
         RefreshService,
         GrpcService,
+        AuthenticationService,
         GrpcAuthService,
         { provide: 'windowObject', useValue: window },
     ],

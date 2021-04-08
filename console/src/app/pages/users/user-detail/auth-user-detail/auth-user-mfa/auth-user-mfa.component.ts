@@ -26,7 +26,7 @@ export interface WebAuthNOptions {
     styleUrls: ['./auth-user-mfa.component.scss'],
 })
 export class AuthUserMfaComponent implements OnInit, OnDestroy {
-    public displayedColumns: string[] = ['type', 'attr', 'state', 'actions'];
+    public displayedColumns: string[] = ['type', 'name', 'state', 'actions'];
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
