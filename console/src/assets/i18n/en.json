@@ -1,5 +1,10 @@
 {
     "APP_NAME": "ZITADEL",
+    "PAGINATOR": {
+        "PREVIOUS":"Previous",
+        "NEXT":"Next",
+        "COUNT":"Total Results"
+    },
     "ONBOARDING": {
         "HEADER":"First Steps",
         "TITLE":"Learn how to use ZITADEL",
@@ -687,7 +692,8 @@
             "SELECTION": "Selected Elements",
             "DEACTIVATE": "Deactivate User",
             "ACTIVATE": "Activate User",
-            "DELETE": "Delete User"
+            "DELETE": "Delete User",
+            "CLEAR":"Clear selection"
         }
     },
     "PROJECT": {

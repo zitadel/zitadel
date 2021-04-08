@@ -1,7 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatInput } from '@angular/material/input';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
@@ -19,6 +18,7 @@ import {
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
 
 export enum UserGrantListSearchKey {
@@ -45,7 +45,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     public dataSource!: UserGrantsDataSource;
     public selection: SelectionModel<UserGrant.AsObject> = new SelectionModel<UserGrant.AsObject>(true, []);
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     @ViewChild(MatTable) public table!: MatTable<UserGrant.AsObject>;
 
     @Input() disableWrite: boolean = false;

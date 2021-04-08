@@ -1,5 +1,10 @@
 {
     "APP_NAME": "ZITADEL",
+    "PAGINATOR": {
+        "PREVIOUS":"Zurück",
+        "NEXT":"Weiter",
+        "COUNT":"Anzahl Ergebnisse"
+    },
     "ONBOARDING": {
         "HEADER":"Erste Schritte",
         "TITLE":"Lernen Sie unsere ZITADEL Console kennen.",
@@ -686,10 +691,11 @@
         },
         "TABLE": {
             "TOTAL": "Einträge gesamt",
-            "SELECTION": "Ausgewählte Elemente",
+            "SELECTION": "ausgewählt",
             "DEACTIVATE": "Benutzer deaktivieren",
             "ACTIVATE": "Benutzer aktivieren",
-            "DELETE": "Benutzer löschen"
+            "DELETE": "Benutzer löschen",
+            "CLEAR":"Auswahl aufheben"
         }
     },
     "PROJECT": {
@@ -834,7 +840,7 @@
         },
         "TABLE": {
             "TOTAL": "Einträge gesamt:",
-            "SELECTION": "Ausgewählte Elemente",
+            "SELECTION": "ausgewählt",
             "DEACTIVATE": "Projekt deaktivieren",
             "ACTIVATE": "Projekt aktivieren",
             "DELETE": "Projekt löschen",

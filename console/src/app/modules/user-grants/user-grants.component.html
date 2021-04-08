@@ -153,9 +153,9 @@
             <i class="las la-exclamation"></i>
             <span>{{'GRANTS.EMPTY' | translate}}</span>
         </div>
-        <mat-paginator class="paginator" #paginator [length]="dataSource.totalResult" [pageSize]="INITIAL_PAGE_SIZE"
+        <cnsl-paginator class="paginator" #paginator [length]="dataSource.totalResult" [pageSize]="INITIAL_PAGE_SIZE"
             [length]="dataSource.totalResult" [pageSizeOptions]="[2, 3, 25, 50, 100, 250]" (page)="changePage($event)">
-        </mat-paginator>
+        </cnsl-paginator>
     </div>
 </app-refresh-table>
 
