@@ -131,7 +131,8 @@ func (k *KeyRepository) refreshSigningKey(ctx context.Context, key *model.KeyVie
 	}
 	signingKey, err := model.SigningKeyFromKeyView(key, k.KeyAlgorithm)
 	if err != nil {
-		return false, err
+		logging.Log("EVENT-HJd92").WithError(err).Error("signing key cannot be decrypted -> immediate refresh")
+		return k.refreshSigningKey(ctx, nil, keyCh, algorithm)
 	}
 	k.currentKeyID = signingKey.ID
 	k.currentKeyExpiration = key.Expiry

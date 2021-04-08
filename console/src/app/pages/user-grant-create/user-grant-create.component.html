@@ -37,7 +37,7 @@
     <ng-container *ngIf="currentCreateStep === STEPS">
         <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
         <ng-container
-            *ngIf="(projectId && (context === UserGrantContext.OWNED_PROJECT || ((context === UserGrantContext.USER || context === UserGrantContext.NONE) && $any(project)?.id == undefined)))">
+            *ngIf="$any(project)?.id && (context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE)">
             <app-card>
                 <app-project-roles (changedSelection)="selectRoles($event)" [projectId]="projectId">
                 </app-project-roles>
@@ -45,11 +45,11 @@
         </ng-container>
 
         <ng-container
-            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || ((context === UserGrantContext.USER || context === UserGrantContext.NONE) && $any(project)?.id)) && grantRolesKeyList">
+            *ngIf="$any(project)?.projectId && (context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantedRoleKeysList">
             <cnsl-form-field class="form-field" appearance="outline">
                 <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
                 <mat-select multiple (selectionChange)="rolesList = $event.value">
-                    <mat-option *ngFor="let role of grantRolesKeyList" [value]="role">
+                    <mat-option *ngFor="let role of grantedRoleKeysList" [value]="role">
                         {{role}}
                     </mat-option>
                 </mat-select>

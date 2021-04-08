@@ -2,8 +2,9 @@ package user
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
@@ -170,18 +171,20 @@ func NewHumanPasswordlessBeginLoginEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	challenge string,
+	allowedCredentialIDs [][]byte,
+	userVerification domain.UserVerificationRequirement,
 	info *AuthRequestInfo,
 ) *HumanPasswordlessBeginLoginEvent {
 	return &HumanPasswordlessBeginLoginEvent{
-		HumanWebAuthNBeginLoginEvent: *NewHumanWebAuthNBeginLoginEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				HumanPasswordlessTokenVerifiedType,
-			),
-			challenge,
-			info,
+		HumanWebAuthNBeginLoginEvent: *NewHumanWebAuthNBeginLoginEvent(eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanPasswordlessTokenBeginLoginType,
 		),
+			challenge,
+			allowedCredentialIDs,
+			userVerification,
+			info),
 	}
 }
 

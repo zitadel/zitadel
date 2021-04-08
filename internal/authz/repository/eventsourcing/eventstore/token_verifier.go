@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"encoding/base64"
 	"strings"
 	"time"
 
@@ -26,7 +27,7 @@ import (
 )
 
 type TokenVerifierRepo struct {
-	TokenVerificationKey [32]byte
+	TokenVerificationKey crypto.EncryptionAlgorithm
 	IAMID                string
 	Eventstore           v1.Eventstore
 	View                 *view.View
@@ -68,8 +69,11 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, clientID string) (userID string, agentID string, prefLang, resourceOwner string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	//TODO: use real key
-	tokenIDSubject, err := crypto.DecryptAESString(tokenString, string(repo.TokenVerificationKey[:32]))
+	tokenData, err := base64.URLEncoding.DecodeString(tokenString)
+	if err != nil {
+		return "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
+	}
+	tokenIDSubject, err := repo.TokenVerificationKey.DecryptString(tokenData, repo.TokenVerificationKey.EncryptionKeyID())
 	if err != nil {
 		return "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
 	}

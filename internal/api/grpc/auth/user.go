@@ -23,12 +23,12 @@ func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*a
 }
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+	sequence, limit, asc := change.ChangeQueryToModel(req.Query)
 	features, err := s.repo.GetOrgFeatures(ctx, authz.GetCtxData(ctx).ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	changes, err := s.repo.MyUserChanges(ctx, offset, limit, asc, features.AuditLogRetention)
+	changes, err := s.repo.MyUserChanges(ctx, sequence, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,11 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 }
 
 func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProjectOrgsRequest) (*auth_pb.ListMyProjectOrgsResponse, error) {
-	res, err := s.repo.SearchMyProjectOrgs(ctx, ListMyProjectOrgsRequestToModel(req))
+	r, err := ListMyProjectOrgsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.repo.SearchMyProjectOrgs(ctx, r)
 	if err != nil {
 		return nil, err
 	}
@@ -93,12 +97,16 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 	}, nil
 }
 
-func ListMyProjectOrgsRequestToModel(req *auth_pb.ListMyProjectOrgsRequest) *grant_model.UserGrantSearchRequest {
+func ListMyProjectOrgsRequestToModel(req *auth_pb.ListMyProjectOrgsRequest) (*grant_model.UserGrantSearchRequest, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &grant_model.UserGrantSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		// Queries: queries,//TODO:user grant queries missing in proto
+	queries, err := org.OrgQueriesToUserGrantModel(req.Queries)
+	if err != nil {
+		return nil, err
 	}
+	return &grant_model.UserGrantSearchRequest{
+		Offset:  offset,
+		Limit:   limit,
+		Asc:     asc,
+		Queries: queries,
+	}, nil
 }

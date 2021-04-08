@@ -21,6 +21,8 @@ func FeaturesFromModel(features *features_model.FeaturesView) *features_pb.Featu
 		LoginPolicyPasswordless:  features.LoginPolicyPasswordless,
 		LoginPolicyRegistration:  features.LoginPolicyRegistration,
 		LoginPolicyUsernameLogin: features.LoginPolicyUsernameLogin,
+		PasswordComplexityPolicy: features.PasswordComplexityPolicy,
+		LabelPolicy:              features.LabelPolicy,
 	}
 }
 

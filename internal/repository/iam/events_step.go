@@ -3,6 +3,7 @@ package iam
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -12,6 +13,8 @@ import (
 )
 
 const (
+	UniqueStepStarted                          = "stepstarted"
+	UniqueStepDone                             = "stepdone"
 	SetupDoneEventType    eventstore.EventType = "iam.setup.done"
 	SetupStartedEventType eventstore.EventType = "iam.setup.started"
 )
@@ -23,12 +26,30 @@ type SetupStepEvent struct {
 	Done bool        `json:"-"`
 }
 
+func NewAddSetupStepStartedUniqueConstraint(step domain.Step) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		UniqueStepStarted,
+		strconv.Itoa(int(step)),
+		"Errors.Step.Started.AlreadyExists")
+}
+
+func NewAddSetupStepDoneUniqueConstraint(step domain.Step) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		UniqueStepDone,
+		strconv.Itoa(int(step)),
+		"Errors.Step.Done.AlreadyExists")
+}
+
 func (e *SetupStepEvent) Data() interface{} {
 	return e
 }
 
 func (e *SetupStepEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	if e.Done {
+		return []*eventstore.EventUniqueConstraint{NewAddSetupStepDoneUniqueConstraint(e.Step)}
+	} else {
+		return []*eventstore.EventUniqueConstraint{NewAddSetupStepStartedUniqueConstraint(e.Step)}
+	}
 }
 
 func SetupStepMapper(event *repository.Event) (eventstore.EventReader, error) {
@@ -61,6 +82,7 @@ func NewSetupStepDoneEvent(
 			SetupDoneEventType,
 		),
 		Step: step,
+		Done: true,
 	}
 }
 

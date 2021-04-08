@@ -13,7 +13,7 @@
 
                     <i matTooltip="verified" *ngIf="domain.isVerified" class="verified las la-check-circle"></i>
                     <i matTooltip="primary" *ngIf="domain.isPrimary" class="primary las la-star"></i>
-                    <a *ngIf="!domain.isPrimary && (canwrite$ | async)" class="primaryset"
+                    <a *ngIf="domain.isVerified && !domain.isPrimary && (canwrite$ | async)" class="primaryset"
                         (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
 
                     <span class="fill-space"></span>

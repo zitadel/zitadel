@@ -2,16 +2,30 @@ syntax = "proto3";
 
 import "zitadel/object.proto";
 import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.authn.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/authn";
 
 message Key {
-    string id = 1;
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
-    KeyType type = 3;
-    google.protobuf.Timestamp expiration_date = 4;
+    KeyType type = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the file type of the key";
+        }
+    ];
+    google.protobuf.Timestamp expiration_date = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the date a key will expire";
+            example: "\"3019-04-01T08:45:00.000000Z\"";
+        }
+    ];
 }
 
 enum KeyType {

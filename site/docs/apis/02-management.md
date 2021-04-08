@@ -12,4 +12,4 @@ The management API is as the name states the interface where systems can mutate 
 | REST    | [https://api.zitadel.ch/management/v1/](https://api.zitadel.ch/management/v1/)                                                                      |
 | GRPC    | [https://api.zitadel.ch/caos.zitadel.management.api.v1.ManagementService/](https://api.zitadel.ch/caos.zitadel.management.api.v1.ManagementService) |
 
-[Latest API Version](https://github.com/caos/zitadel/blob/master/pkg/grpc/management/proto/management.proto)
+[Latest API Version](https://github.com/caos/zitadel/blob/main/pkg/grpc/management/proto/management.proto)

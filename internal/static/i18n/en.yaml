@@ -4,6 +4,8 @@ Errors:
   OriginNotAllowed: This "Origin" is not allowed
   IDMissing: ID missing
   ResourceOwnerMissing: Resource Owner Organisation missing
+  Limit:
+    ExceedsDefault: Limit exceeds default limit
   User:
     NotFound: User could not be found
     AlreadyExists: User already exists
@@ -310,6 +312,11 @@ Errors:
     LoginPolicy:
       MFA:
         ForceAndNotConfigured: Multifactor is configured as required, but no possible providers are configured. Please contact your system administrator.
+  Step:
+    Started:
+      AlreadyExists: Step started already exists
+    Done:
+      AlreadyExists: Step done already exists
 EventTypes:
   user:
     added: User added

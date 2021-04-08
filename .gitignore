@@ -47,10 +47,8 @@ tmp/
 console/src/app/proto/generated/
 
 #generated filed
-pkg/grpc/*/*.pb*.*
-pkg/grpc/*/*.swagger.json
-pkg/grpc/*/mock/*.mock.go
 **.pb.go
 **.proto.mock.go
 **.pb.*.go
-**.gen.go
+**.gen.go 
+openapi/**/*.json

@@ -71,13 +71,33 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	}, nil
 }
 
+func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListGrantedProjectRolesRequest) (*mgmt_pb.ListGrantedProjectRolesResponse, error) {
+	queries, err := ListGrantedProjectRolesRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	queries.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
+	roles, err := s.project.SearchProjectGrantRoles(ctx, req.ProjectId, req.GrantId, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListGrantedProjectRolesResponse{
+		Result: project_grpc.RolesToPb(roles.Result),
+		Details: object_grpc.ToListDetails(
+			roles.TotalResult,
+			roles.Sequence,
+			roles.Timestamp,
+		),
+	}, nil
+}
+
 func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjectChangesRequest) (*mgmt_pb.ListProjectChangesResponse, error) {
-	offset, limit, asc := object_grpc.ListQueryToModel(req.Query)
+	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
 	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.project.ProjectChanges(ctx, req.ProjectId, offset, limit, asc, features.AuditLogRetention)
+	res, err := s.project.ProjectChanges(ctx, req.ProjectId, sequence, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}

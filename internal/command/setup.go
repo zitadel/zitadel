@@ -56,6 +56,7 @@ func setSetUpContextData(ctx context.Context) context.Context {
 }
 
 func (c *Commands) StartSetup(ctx context.Context, step domain.Step) (*domain.IAM, error) {
+	logging.Log("COMMA-3M9fs").Infof("start setup step %v", step)
 	iamWriteModel, err := c.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
@@ -92,6 +93,9 @@ func (c *Commands) setup(ctx context.Context, step Step, iamAggregateProvider fu
 	events = append(events, iam_repo.NewSetupStepDoneEvent(ctx, iamAgg, step.Step()))
 
 	_, err = c.eventstore.PushEvents(ctx, events...)
+	if caos_errs.IsErrorAlreadyExists(err) {
+		logging.LogWithFields("SETUP-4M9gsf", "step", step.Step()).WithError(err).Info("setup step already done")
+	}
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailedf(nil, "EVENT-dbG31", "Setup %v failed", step.Step())
 	}

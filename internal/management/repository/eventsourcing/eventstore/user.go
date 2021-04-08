@@ -60,7 +60,10 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 }
 
 func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest) (*usr_model.UserSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, sequenceErr := repo.View.GetLatestUserSequence()
 	logging.Log("EVENT-Lcn7d").OnError(sequenceErr).Warn("could not read latest user sequence")
 	users, count, err := repo.View.SearchUsers(request)
@@ -157,7 +160,10 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 }
 
 func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model.ExternalIDPSearchRequest) (*usr_model.ExternalIDPSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
 	logging.Log("EVENT-Qs7uf").OnError(seqErr).Warn("could not read latest external idp sequence")
 	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
@@ -202,7 +208,10 @@ func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (
 }
 
 func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, seqErr := repo.View.GetLatestAuthNKeySequence()
 	logging.Log("EVENT-Sk8fs").OnError(seqErr).Warn("could not read latest authn key sequence")
 	keys, count, err := repo.View.SearchAuthNKeys(request)
@@ -256,7 +265,10 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 }
 
 func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_model.UserMembershipSearchRequest) (*usr_model.UserMembershipSearchResponse, error) {
-	request.EnsureLimit(repo.SearchLimit)
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
 	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
 	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
 

@@ -23,14 +23,14 @@ var (
 
 func NewAddProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		UniqueRoleType,
+		UniqueGrantType,
 		fmt.Sprintf("%s:%s", grantedOrgID, projectID),
 		"Errors.Project.Grant.AlreadyExists")
 }
 
 func NewRemoveProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		UniqueRoleType,
+		UniqueGrantType,
 		fmt.Sprintf("%s:%s", grantedOrgID, projectID))
 }
 

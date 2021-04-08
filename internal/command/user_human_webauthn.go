@@ -2,11 +2,13 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -41,11 +43,16 @@ func (c *Commands) getHumanU2FLogin(ctx context.Context, userID, authReqID, reso
 	if err != nil {
 		return nil, err
 	}
-	if tokenReadModel.State == domain.UserStateDeleted {
+	if tokenReadModel.State == domain.UserStateUnspecified || tokenReadModel.State == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5m88U", "Errors.User.NotFound")
 	}
 	return &domain.WebAuthNLogin{
-		Challenge: tokenReadModel.Challenge,
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: tokenReadModel.AggregateID,
+		},
+		Challenge:            tokenReadModel.Challenge,
+		AllowedCredentialIDs: tokenReadModel.AllowedCredentialIDs,
+		UserVerification:     tokenReadModel.UserVerification,
 	}, nil
 }
 
@@ -55,11 +62,16 @@ func (c *Commands) getHumanPasswordlessLogin(ctx context.Context, userID, authRe
 	if err != nil {
 		return nil, err
 	}
-	if tokenReadModel.State == domain.UserStateDeleted {
+	if tokenReadModel.State == domain.UserStateUnspecified || tokenReadModel.State == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fm84R", "Errors.User.NotFound")
 	}
 	return &domain.WebAuthNLogin{
-		Challenge: tokenReadModel.Challenge,
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: tokenReadModel.AggregateID,
+		},
+		Challenge:            tokenReadModel.Challenge,
+		AllowedCredentialIDs: tokenReadModel.AllowedCredentialIDs,
+		UserVerification:     tokenReadModel.UserVerification,
 	}, nil
 }
 
@@ -259,6 +271,8 @@ func (c *Commands) HumanBeginU2FLogin(ctx context.Context, userID, resourceOwner
 			ctx,
 			userAgg,
 			webAuthNLogin.Challenge,
+			webAuthNLogin.AllowedCredentialIDs,
+			webAuthNLogin.UserVerification,
 			authRequestDomainToAuthRequestInfo(authRequest),
 		),
 	)
@@ -281,6 +295,8 @@ func (c *Commands) HumanBeginPasswordlessLogin(ctx context.Context, userID, reso
 			ctx,
 			userAgg,
 			webAuthNLogin.Challenge,
+			webAuthNLogin.AllowedCredentialIDs,
+			webAuthNLogin.UserVerification,
 			authRequestDomainToAuthRequestInfo(authRequest),
 		),
 	)
@@ -322,6 +338,10 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 
 	userAgg, token, signCount, err := c.finishWebAuthNLogin(ctx, userID, resourceOwner, credentialData, webAuthNLogin, u2fTokens, isLoginUI)
 	if err != nil {
+		if userAgg == nil {
+			logging.LogWithFields("EVENT-Addqd", "userID", userID, "resourceOwner", resourceOwner).WithError(err).Warn("missing userAggregate for pushing failed u2f check event")
+			return err
+		}
 		_, pushErr := c.eventstore.PushEvents(ctx,
 			usr_repo.NewHumanU2FCheckFailedEvent(
 				ctx,
@@ -329,7 +349,7 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 				authRequestDomainToAuthRequestInfo(authRequest),
 			),
 		)
-		logging.Log("EVENT-33M9f").OnError(pushErr).WithField("userID", userID).Warn("could not push failed passwordless check event")
+		logging.LogWithFields("EVENT-Bdgd2", "userID", userID, "resourceOwner", resourceOwner).OnError(pushErr).Warn("could not push failed u2f check event")
 		return err
 	}
 
@@ -363,6 +383,10 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 
 	userAgg, token, signCount, err := c.finishWebAuthNLogin(ctx, userID, resourceOwner, credentialData, webAuthNLogin, passwordlessTokens, isLoginUI)
 	if err != nil {
+		if userAgg == nil {
+			logging.LogWithFields("EVENT-Dbbbw", "userID", userID, "resourceOwner", resourceOwner).WithError(err).Warn("missing userAggregate for pushing failed passwordless check event")
+			return err
+		}
 		_, pushErr := c.eventstore.PushEvents(ctx,
 			usr_repo.NewHumanPasswordlessCheckFailedEvent(
 				ctx,
@@ -370,12 +394,12 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 				authRequestDomainToAuthRequestInfo(authRequest),
 			),
 		)
-		logging.Log("EVENT-33M9f").OnError(pushErr).WithField("userID", userID).Warn("could not push failed passwordless check event")
+		logging.LogWithFields("EVENT-33M9f", "userID", userID, "resourceOwner", resourceOwner).OnError(pushErr).Warn("could not push failed passwordless check event")
 		return err
 	}
 
 	_, err = c.eventstore.PushEvents(ctx,
-		usr_repo.NewHumanU2FCheckSucceededEvent(
+		usr_repo.NewHumanPasswordlessCheckSucceededEvent(
 			ctx,
 			userAgg,
 			authRequestDomainToAuthRequestInfo(authRequest),

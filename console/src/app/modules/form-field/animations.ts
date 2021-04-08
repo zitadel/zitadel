@@ -8,7 +8,6 @@ export const cnslFormFieldAnimations: {
 } = {
     /** Animation that transitions the form field's error and hint messages. */
     transitionMessages: trigger('transitionMessages', [
-        // TODO(mmalerba): Use angular animations for label animation as well.
         state('enter', style({ opacity: 1, transform: 'translateY(0%)' })),
         transition('void => enter', [
             style({ opacity: 0, transform: 'translateY(-100%)' }),

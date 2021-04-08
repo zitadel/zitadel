@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/zitadel/internal/query"
@@ -49,6 +50,11 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, qu
 
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
 
+	keyAlgorithm, err := crypto.NewAESCrypto(systemDefaults.KeyConfig.EncryptionConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	return &EsRepository{
 		spool,
 		eventstore.UserGrantRepo{
@@ -62,10 +68,10 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, qu
 			IAMV2Query: queries,
 		},
 		eventstore.TokenVerifierRepo{
-			//TODO: Add Token Verification Key
-			Eventstore: es,
-			IAMID:      systemDefaults.IamID,
-			View:       view,
+			TokenVerificationKey: keyAlgorithm,
+			Eventstore:           es,
+			IAMID:                systemDefaults.IamID,
+			View:                 view,
 		},
 	}, nil
 }

@@ -1,10 +1,12 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"time"
 
+	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -63,10 +65,14 @@ type KeySearchResponse struct {
 	Result      []*KeyView
 }
 
-func (r *KeySearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *KeySearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return errors.ThrowInvalidArgument(nil, "SEARCH-Mf9sd", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }
 
 func SigningKeyFromKeyView(key *KeyView, alg crypto.EncryptionAlgorithm) (*SigningKey, error) {
@@ -90,15 +96,16 @@ func SigningKeyFromKeyView(key *KeyView, alg crypto.EncryptionAlgorithm) (*Signi
 }
 
 func PublicKeysFromKeyView(keys []*KeyView, alg crypto.EncryptionAlgorithm) ([]*PublicKey, error) {
-	converted := make([]*PublicKey, len(keys))
-	var err error
-	for i, key := range keys {
-		converted[i], err = PublicKeyFromKeyView(key, alg)
+	convertedKeys := make([]*PublicKey, 0, len(keys))
+	for _, key := range keys {
+		converted, err := PublicKeyFromKeyView(key, alg)
 		if err != nil {
-			return nil, err
+			logging.Log("MODEL-adB3f").WithError(err).Debug("cannot convert to public key") //TODO: change log level to warning when keys can be revoked
+			continue
 		}
+		convertedKeys = append(convertedKeys, converted)
 	}
-	return converted, nil
+	return convertedKeys, nil
 
 }
 func PublicKeyFromKeyView(key *KeyView, alg crypto.EncryptionAlgorithm) (*PublicKey, error) {

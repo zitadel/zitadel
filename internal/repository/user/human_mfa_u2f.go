@@ -2,8 +2,9 @@ package user
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
@@ -166,20 +167,17 @@ type HumanU2FBeginLoginEvent struct {
 	HumanWebAuthNBeginLoginEvent
 }
 
-func NewHumanU2FBeginLoginEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	challenge string,
-	info *AuthRequestInfo,
-) *HumanU2FBeginLoginEvent {
+func NewHumanU2FBeginLoginEvent(ctx context.Context, aggregate *eventstore.Aggregate, challenge string, allowedCredentialIDs [][]byte, userVerification domain.UserVerificationRequirement, info *AuthRequestInfo) *HumanU2FBeginLoginEvent {
 	return &HumanU2FBeginLoginEvent{
 		HumanWebAuthNBeginLoginEvent: *NewHumanWebAuthNBeginLoginEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				HumanU2FTokenVerifiedType,
+				HumanU2FTokenBeginLoginType,
 			),
 			challenge,
+			allowedCredentialIDs,
+			userVerification,
 			info,
 		),
 	}

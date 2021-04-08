@@ -1,9 +1,10 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
@@ -35,6 +36,7 @@ const (
 	OrgSearchKeyOrgDomain
 	OrgSearchKeyState
 	OrgSearchKeyResourceOwner
+	OrgSearchKeyOrgNameIgnoreCase //used for lowercase search
 )
 
 type OrgSearchQuery struct {
@@ -52,10 +54,14 @@ type OrgSearchResult struct {
 	Timestamp   time.Time
 }
 
-func (r *OrgSearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *OrgSearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-200ds", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }
 
 func OrgViewToOrg(o *OrgView) *Org {

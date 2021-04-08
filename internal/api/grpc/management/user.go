@@ -52,12 +52,12 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 }
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
 	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.user.UserChanges(ctx, req.UserId, offset, limit, asc, features.AuditLogRetention)
+	res, err := s.user.UserChanges(ctx, req.UserId, sequence, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}

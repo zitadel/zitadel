@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
 )
 
 type OrgMemberView struct {
@@ -56,8 +57,12 @@ type OrgMemberSearchResponse struct {
 	Timestamp   time.Time
 }
 
-func (r *OrgMemberSearchRequest) EnsureLimit(limit uint64) {
-	if r.Limit == 0 || r.Limit > limit {
+func (r *OrgMemberSearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-77fu3", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
 		r.Limit = limit
 	}
+	return nil
 }

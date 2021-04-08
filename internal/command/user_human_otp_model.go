@@ -46,7 +46,10 @@ func (wm *HumanOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(user.HumanMFAOTPAddedType,
 			user.HumanMFAOTPVerifiedType,
 			user.HumanMFAOTPRemovedType,
-			user.UserRemovedType)
+			user.UserRemovedType,
+			user.UserV1MFAOTPAddedType,
+			user.UserV1MFAOTPVerifiedType,
+			user.UserV1MFAOTPRemovedType)
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}

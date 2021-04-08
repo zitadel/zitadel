@@ -83,13 +83,14 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error
 func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	var userAgentID, applicationID string
+	var userAgentID, applicationID, userOrgID string
 	authReq, ok := req.(*AuthRequest)
 	if ok {
 		userAgentID = authReq.AgentID
 		applicationID = authReq.ApplicationID
+		userOrgID = authReq.UserOrgID
 	}
-	resp, err := o.command.AddUserToken(ctx, authReq.UserOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.command.AddUserToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}

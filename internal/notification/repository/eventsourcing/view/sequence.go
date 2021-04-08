@@ -29,7 +29,6 @@ func (v *View) updateSpoolerRunSequence(viewName string) error {
 	}
 	currentSequence.LastSuccessfulSpoolerRun = time.Now()
 	//update all aggregate types
-	//TODO: not sure if all scenarios work as expected
 	currentSequence.AggregateType = ""
 	return repository.UpdateCurrentSequence(v.Db, sequencesTable, currentSequence)
 }

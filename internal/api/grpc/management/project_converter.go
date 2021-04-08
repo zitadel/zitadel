@@ -111,7 +111,23 @@ func ListGrantedProjectsRequestToModel(req *mgmt_pb.ListGrantedProjectsRequest) 
 		Queries: queries,
 	}, nil
 }
+
 func ListProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*proj_model.ProjectRoleSearchRequest, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := proj_grpc.RoleQueriesToModel(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ProjectRoleSearchRequest{
+		Offset: offset,
+		Limit:  limit,
+		Asc:    asc,
+		//SortingColumn: //TODO: sorting
+		Queries: queries,
+	}, nil
+}
+
+func ListGrantedProjectRolesRequestToModel(req *mgmt_pb.ListGrantedProjectRolesRequest) (*proj_model.ProjectRoleSearchRequest, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := proj_grpc.RoleQueriesToModel(req.Queries)
 	if err != nil {

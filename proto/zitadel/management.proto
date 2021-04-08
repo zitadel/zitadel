@@ -38,7 +38,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         }
         license: {
             name: "Apache License 2.0",
-            url: "https://github.com/caos/zitadel/blob/master/LICENSE"
+            url: "https://github.com/caos/zitadel/blob/main/LICENSE"
         };
     };
 
@@ -135,6 +135,7 @@ service ManagementService {
     rpc ListUserChanges(ListUserChangesRequest) returns (ListUserChangesResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/changes/_search"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -536,6 +537,7 @@ service ManagementService {
     rpc ListOrgChanges(ListOrgChangesRequest) returns (ListOrgChangesResponse) {
         option (google.api.http) = {
             post: "/orgs/me/changes/_search"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -736,6 +738,18 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.read"
+        };
+    }
+
+    // returns all roles of a project grant
+    rpc ListGrantedProjectRoles(ListGrantedProjectRolesRequest) returns (ListGrantedProjectRolesResponse) {
+        option (google.api.http) = {
+            get: "/granted_projects/{project_id}/grants/{grant_id}/roles/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.role.read"
+            check_field_name: "GrantId"
         };
     }
 
@@ -1855,8 +1869,11 @@ message GetUserByLoginNameGlobalResponse {
 }
 
 message ListUsersRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    // the field the result is sorted
     zitadel.user.v1.UserFieldName sorting_column = 2;
+    //criterias the client is looking for
     repeated zitadel.user.v1.SearchQuery queries = 3;
 }
 
@@ -1867,7 +1884,8 @@ message ListUsersResponse {
 }
 
 message ListUserChangesRequest {
-    zitadel.v1.ListQuery query = 1;
+    //list limitations and ordering
+    zitadel.change.v1.ChangeQuery query = 1;
     string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -2194,6 +2212,7 @@ message GetMachineKeyByIDsResponse {
 
 message ListMachineKeysRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
 }
 
@@ -2205,7 +2224,12 @@ message ListMachineKeysResponse {
 message AddMachineKeyRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
     zitadel.authn.v1.KeyType type = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
-    google.protobuf.Timestamp expiration_date = 3;
+    google.protobuf.Timestamp expiration_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the key will expire and no logins will be possible";
+        }
+    ];
 }
 
 message AddMachineKeyResponse {
@@ -2225,6 +2249,7 @@ message RemoveMachineKeyResponse {
 
 message ListHumanLinkedIDPsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
 }
 
@@ -2244,8 +2269,11 @@ message RemoveHumanLinkedIDPResponse {
 }
 
 message ListUserMembershipsRequest {
+    //list limitations and ordering
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //the field the result is sorted
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.user.v1.MembershipQuery queries = 3;
 }
 
@@ -2265,7 +2293,8 @@ message GetOrgByDomainGlobalRequest {
 }
 
 message ListOrgChangesRequest {
-    zitadel.v1.ListQuery query = 1;
+    //list limitations and ordering
+    zitadel.change.v1.ChangeQuery query = 1;
 }
 
 message ListOrgChangesResponse {
@@ -2299,7 +2328,9 @@ message ReactivateOrgResponse {
 }
 
 message ListOrgDomainsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.org.v1.DomainSearchQuery queries = 2;
 }
 
@@ -2357,12 +2388,16 @@ message ListOrgMemberRolesResponse {
 }
 
 message ListOrgMembersRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 2;
 }
 
 message ListOrgMembersResponse {
+    //list limitations and ordering
     zitadel.v1.ListDetails details = 1;
+    //criterias the client is looking for
     repeated zitadel.member.v1.Member result = 2;
 }
 
@@ -2409,7 +2444,9 @@ message GetGrantedProjectByIDResponse {
 }
 
 message ListProjectsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
@@ -2419,7 +2456,9 @@ message ListProjectsResponse {
 }
 
 message ListGrantedProjectsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
@@ -2429,7 +2468,8 @@ message ListGrantedProjectsResponse {
 }
 
 message ListProjectChangesRequest {
-    zitadel.v1.ListQuery query = 1;
+    //list limitations and ordering
+    zitadel.change.v1.ChangeQuery query = 1;
     string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -2539,7 +2579,9 @@ message RemoveProjectRoleResponse {
 
 message ListProjectRolesRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.project.v1.RoleQuery queries = 3;
 }
 
@@ -2548,9 +2590,25 @@ message ListProjectRolesResponse {
     repeated zitadel.project.v1.Role result = 2;
 }
 
+message ListGrantedProjectRolesRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 3;
+    //criterias the client is looking for
+    repeated zitadel.project.v1.RoleQuery queries = 4;
+}
+
+message ListGrantedProjectRolesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.project.v1.Role result = 2;
+}
+
 message ListProjectMembersRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 3;
 }
 
@@ -2599,7 +2657,9 @@ message GetAppByIDResponse {
 
 message ListAppsRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.app.v1.AppQuery queries = 3;
 }
 
@@ -2609,7 +2669,8 @@ message ListAppsResponse {
 }
 
 message ListAppChangesRequest {
-    zitadel.v1.ListQuery query = 1;
+    //list limitations and ordering
+    zitadel.change.v1.ChangeQuery query = 1;
     string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -2640,8 +2701,18 @@ message AddOIDCAppRequest {
 message AddOIDCAppResponse {
     string app_id = 1;
     zitadel.v1.ObjectDetails details = 2;
-    string client_id = 3;
-    string client_secret = 4;
+    string client_id = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gjöq34589uasgh\"";
+            description: "generated secret for this config";
+        }
+    ];
+    string client_secret = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gjöq34589uasgh\"";
+            description: "generated secret for this config";
+        }
+    ];
     bool none_compliant = 5;
     repeated zitadel.v1.LocalizedMessage compliance_problems = 6;
 }
@@ -2655,8 +2726,18 @@ message AddAPIAppRequest {
 message AddAPIAppResponse {
     string app_id = 1;
     zitadel.v1.ObjectDetails details = 2;
-    string client_id = 3;
-    string client_secret = 4;
+    string client_id = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gjöq34589uasgh\"";
+            description: "generated secret for this config";
+        }
+    ];
+    string client_secret = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gjöq34589uasgh\"";
+            description: "generated secret for this config";
+        }
+    ];
 }
 
 message UpdateAppRequest {
@@ -2734,7 +2815,12 @@ message RegenerateOIDCClientSecretRequest {
 }
 
 message RegenerateOIDCClientSecretResponse {
-    string client_secret = 1;
+    string client_secret = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gjöq34589uasgh\"";
+            description: "generated secret for the client";
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
 }
 
@@ -2759,6 +2845,7 @@ message GetAppKeyResponse {
 }
 
 message ListAppKeysRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string project_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -2772,7 +2859,12 @@ message AddAppKeyRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.authn.v1.KeyType type = 3 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
-    google.protobuf.Timestamp expiration_date = 4;
+    google.protobuf.Timestamp expiration_date = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the key will expire and no logins will be possible";
+        }
+    ];
 }
 
 message AddAppKeyResponse {
@@ -2802,7 +2894,9 @@ message GetProjectGrantByIDResponse {
 
 message ListProjectGrantsRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
+    //criterias the client is looking for
     repeated zitadel.project.v1.ProjectGrantQuery queries = 3;
 }
 
@@ -2870,7 +2964,9 @@ message ListProjectGrantMemberRolesResponse {
 message ListProjectGrantMembersRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 3;
+    //criterias the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 4;
 }
 
@@ -2921,7 +3017,9 @@ message GetUserGrantByIDResponse {
 }
 
 message ListUserGrantRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
     repeated zitadel.user.v1.UserGrantQuery queries = 2;
 }
 
@@ -3244,7 +3342,11 @@ message GetDefaultLabelPolicyResponse {
 message AddCustomLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {min_len: 1, max_len: 50}];
     string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
-    bool hide_login_name_suffix = 3;
+    bool hide_login_name_suffix = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/architecture#Reserved_Scopes";
+        }
+    ];
 }
 
 message AddCustomLabelPolicyResponse {
@@ -3254,7 +3356,11 @@ message AddCustomLabelPolicyResponse {
 message UpdateCustomLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {min_len: 1, max_len: 50}];
     string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
-    bool hide_login_name_suffix = 3;
+    bool hide_login_name_suffix = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/architecture#Reserved_Scopes";
+        }
+    ];
 }
 
 message UpdateCustomLabelPolicyResponse {
@@ -3276,8 +3382,11 @@ message GetOrgIDPByIDResponse {
 }
 
 message ListOrgIDPsRequest {
+    //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //the field the result is sorted
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
+    //criterias the client is looking for
     repeated IDPQuery queries = 3;
 }
 
@@ -3298,15 +3407,56 @@ message ListOrgIDPsResponse {
 }
 
 message AddOrgOIDCIDPRequest {
-    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.IDPStylingType styling_type = 2 [(validate.rules).enum = {defined_only: true}];
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+        }
+    ];
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "some identity providers specify the styling of the button to their login";
+        }
+    ];
 
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string issuer = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 6;
-    zitadel.idp.v1.OIDCMappingField display_name_mapping = 7 [(validate.rules).enum = {defined_only: true}];
-    zitadel.idp.v1.OIDCMappingField username_mapping = 8 [(validate.rules).enum = {defined_only: true}];
+    string client_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "client id generated by the identity provider";
+        }
+    ];
+    string client_secret = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "client secret generated by the identity provider";
+        }
+    ];
+    string issuer = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the oidc issuer of the identity provider";
+        }
+    ];
+    repeated string scopes = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "the scopes requested by ZITADEL during the request on the identity provider";
+        }
+    ];
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 7 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "definition which field is mapped to the display name of the user";
+        }
+    ];
+    zitadel.idp.v1.OIDCMappingField username_mapping = 8 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "definition which field is mapped to the email of the user";
+        }
+    ];
 }
 
 message AddOrgOIDCIDPResponse {
@@ -3338,8 +3488,18 @@ message RemoveOrgIDPResponse {}
 
 message UpdateOrgIDPRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.IDPStylingType styling_type = 3 [(validate.rules).enum = {defined_only: true}];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+        }
+    ];
+    zitadel.idp.v1.IDPStylingType styling_type = 3 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "some identity providers specify the styling of the button to their login";
+        }
+    ];
 }
 
 message UpdateOrgIDPResponse {
@@ -3347,14 +3507,50 @@ message UpdateOrgIDPResponse {
 }
 
 message UpdateOrgIDPOIDCConfigRequest {
-    string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
 
-    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {max_len: 200}];
-    string issuer = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 5;
-    zitadel.idp.v1.OIDCMappingField display_name_mapping = 6 [(validate.rules).enum = {defined_only: true}];
-    zitadel.idp.v1.OIDCMappingField username_mapping = 7 [(validate.rules).enum = {defined_only: true}];
+    string client_id = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "client id generated by the identity provider";
+        }
+    ];
+    string client_secret = 3 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "client secret generated by the identity provider. If empty the secret is not overwritten";
+        }
+    ];
+    string issuer = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the oidc issuer of the identity provider";
+        }
+    ];
+    repeated string scopes = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "the scopes requested by ZITADEL during the request on the identity provider";
+        }
+    ];
+    zitadel.idp.v1.OIDCMappingField display_name_mapping = 6 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "definition which field is mapped to the display name of the user";
+        }
+    ];
+    zitadel.idp.v1.OIDCMappingField username_mapping = 7 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "definition which field is mapped to the email of the user";
+        }
+    ];
 }
 
 message UpdateOrgIDPOIDCConfigResponse {

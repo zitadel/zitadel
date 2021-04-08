@@ -107,7 +107,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IAMID:                      systemDefaults.IamID,
 		},
 		eventstore.TokenRepo{
-			View: view,
+			View:       view,
+			Eventstore: es,
 		},
 		eventstore.KeyRepository{
 			View:                     view,
