@@ -89,7 +89,8 @@
         "SHOWORGS":"Show All Organisations",
         "GRANTSECTION":"Authorization Section",
         "GRANTS":"Authorizations",
-        "TOC":"Privacy Policy and TOC",
+        "PRIVACY":"Privacy",
+        "TOS":"Terms of Service",
         "TOOLTIP": {
             "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
             "IAMPOLICIES":"Manage ZITADELs global Access policies und elect ZITADEL Managers",
