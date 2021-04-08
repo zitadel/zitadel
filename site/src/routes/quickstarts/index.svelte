@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-	<title>Quickstarts ZITADEL</title>
+	<title>ZITADEL Quickstarts</title>
 
 	<meta name="twitter:title" content="Quickstarts ZITADEL">
 	<meta name="twitter:description" content={description}>
@@ -140,7 +140,19 @@
     .quickstart:last-child {
         margin-bottom: 100px;
     }
+
 	@media (max-width: 768px) {
+        .quickstart {
+            flex-direction: column-reverse;
+            margin-bottom: 50px;
+        }
+
+        .quickstart img {
+            max-height: 180px;
+            max-width: 180px;
+            padding-bottom: 10px;
+        }
+
 		.quickstarts :global(.anchor) {
 			transform: scale(0.6);
 			opacity: 1;

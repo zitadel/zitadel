@@ -600,3 +600,6 @@ input[type="checkbox"]:checked::after {
     width: 150px;
     border-radius: 4px;
 }
+
+img {
+	max-width: var(--linemax);}
