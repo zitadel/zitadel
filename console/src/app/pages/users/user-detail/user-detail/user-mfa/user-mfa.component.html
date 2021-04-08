@@ -9,10 +9,11 @@
                 </td>
             </ng-container>
 
-            <ng-container matColumnDef="attr">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.ATTRIBUTE' | translate }} </th>
-                <td mat-cell *matCellDef="let mfa"><span *ngIf="mfa?.attribute" class="centered">
-                        {{ mfa.attribute }}
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.NAME' | translate }} </th>
+                <td mat-cell *matCellDef="let mfa">
+                    <span *ngIf="mfa?.u2f?.name" class="centered">
+                        {{ mfa.u2f.name }}
                     </span>
                 </td>
             </ng-container>
