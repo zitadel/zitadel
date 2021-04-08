@@ -74,15 +74,11 @@ func (c *Commands) RemoveLabelPolicy(ctx context.Context, orgID string) (*domain
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgLabelPolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	removeEvent, err := c.removeLabelPolicy(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
-	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LabelPolicy.NotFound")
-	}
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyRemovedEvent(ctx, orgAgg))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -91,4 +87,36 @@ func (c *Commands) RemoveLabelPolicy(ctx context.Context, orgID string) (*domain
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) removeLabelPolicy(ctx context.Context, existingPolicy *OrgLabelPolicyWriteModel) (*org.LabelPolicyRemovedEvent, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LabelPolicy.NotFound")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
+	return org.NewLabelPolicyRemovedEvent(ctx, orgAgg), nil
+}
+
+func (c *Commands) removeLabelPolicyIfExists(ctx context.Context, orgID string) (*org.LabelPolicyRemovedEvent, error) {
+	policy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if policy.State != domain.PolicyStateActive {
+		return nil, nil
+	}
+	return c.removeLabelPolicy(ctx, policy)
+}
+
+func (c *Commands) orgLabelPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgLabelPolicyWriteModel, error) {
+	policy := NewOrgLabelPolicyWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	return policy, nil
 }
