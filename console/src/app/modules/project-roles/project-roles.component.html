@@ -72,8 +72,8 @@
             <span>{{'PROJECT.ROLE.EMPTY' | translate}}</span>
         </div>
 
-        <mat-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50"
+        <cnsl-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50" (page)="changePage()"
             [pageSizeOptions]="[25, 50, 100, 250]">
-        </mat-paginator>
+        </cnsl-paginator>
     </div>
 </app-refresh-table>

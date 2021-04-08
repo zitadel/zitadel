@@ -3,7 +3,7 @@
     "PAGINATOR": {
         "PREVIOUS":"Zurück",
         "NEXT":"Weiter",
-        "COUNT":"Anzahl Ergebnisse"
+        "COUNT":"Ergebnisse"
     },
     "ONBOARDING": {
         "HEADER":"Erste Schritte",

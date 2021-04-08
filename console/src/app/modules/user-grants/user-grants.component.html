@@ -2,7 +2,7 @@
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
     [dataSize]="dataSource?.totalResult" [selection]="selection">
     <cnsl-form-field @appearfade *ngIf="userGrantListSearchKey != undefined" actions class="filtername">
-        <input cnslInput (keyup)="applyFilter($event)"
+        <input class="filterinput" cnslInput (keyup)="applyFilter($event)"
             [placeholder]="('USER.TABLE.FILTER.' + userGrantListSearchKey.toString()) | translate" #input>
     </cnsl-form-field>
 

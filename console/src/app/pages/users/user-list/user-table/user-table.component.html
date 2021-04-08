@@ -1,7 +1,7 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="totalResult"
     [timestamp]="viewTimestamp" [selection]="selection" [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
     <cnsl-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
-        <input cnslInput (keyup)="applyFilter($event)"
+        <input class="filterinput" cnslInput (keyup)="applyFilter($event)"
             [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
     </cnsl-form-field>
 

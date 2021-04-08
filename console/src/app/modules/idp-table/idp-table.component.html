@@ -100,6 +100,6 @@
             </tr>
         </table>
     </div>
-    <mat-paginator #paginator class="paginator" [length]="idpResult?.details?.totalResult || 0" [pageSize]="10"
-        [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
+    <cnsl-paginator #paginator class="paginator" [length]="idpResult?.details?.totalResult || 0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
 </app-refresh-table>
