@@ -8,7 +8,7 @@ spec:
   version: v0
   spec:
     verbose: false
-    version: 0.118.2
+    version: 1.0.0
     selfReconciling: true
   iam:
     kind: zitadel.caos.ch/ZITADEL
