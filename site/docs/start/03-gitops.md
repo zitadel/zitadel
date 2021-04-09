@@ -19,7 +19,7 @@ MY_GIT_REPO="git@github.com:me/my-orb.git"
 zitadelctl --gitops configure --repourl ${MY_GIT_REPO} --masterkey "$(openssl rand -base64 21)"
 
 # Write the minimal Secrets
-wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/start/templates/example_keys && zitadelctl --gitops writesecret zitadel.keys.existing --file ./example_keys
+wget https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/example_keys && zitadelctl --gitops writesecret zitadel.keys.existing --file ./example_keys
 
 # Deploy the operators to the current-context of your ~/.kube/config file
 zitadelctl --gitops takeoff

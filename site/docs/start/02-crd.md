@@ -14,15 +14,15 @@ sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 zitadelctl takeoff
 
 # Download the configuration templates
-wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/start/templates/crd/database.yml
-wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/start/templates/crd/zitadel.yml
+wget https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/crd/database.yml
+wget https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/crd/zitadel.yml
 
 # Before applying, adjust the values in ./database.yml and zitadel.yml using your favorite text editor to match your environment.
 # Especially the values for the domain, cluster DNS and storage class are important
 kubectl apply --filename ./database.yml,./zitadel.yml
 
 # Write the minimal Secrets
-wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/start/templates/example_keys && zitadelctl writesecret zitadel.keys.existing --file ./example_keys
+wget https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/example_keys && zitadelctl writesecret zitadel.keys.existing --file ./example_keys
 
 # Enjoy watching the zitadel pods becoming ready
 watch "kubectl --namespace caos-zitadel get pods"
@@ -40,7 +40,7 @@ sudo chown $(id -u):$(id -g) /usr/local/bin/orbctl
 orbctl takeoff
 
 # Download the configuration template
-wget https://raw.githubusercontent.com/caos/zitadel/crd-mode-docs/site/docs/start/templates/boom.yml
+wget https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/boom.yml
 
 # Before applying, adjust the values in ./boom.yml using your favorite text editor to match your environment.
 # Especially the value for proxyProtocol is of special interest
