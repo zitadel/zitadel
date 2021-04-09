@@ -34,7 +34,7 @@ func StartOperator(getRv GetRootValues) *cobra.Command {
 		version := rv.Version
 
 		if rv.Gitops {
-			k8sClient, err := cli.Client(monitor, orbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops, true)
+			k8sClient, err := cli.Client(monitor, orbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops)
 			if err != nil {
 				return err
 			}
@@ -79,7 +79,7 @@ func StartDatabase(getRv GetRootValues) *cobra.Command {
 		version := rv.Version
 
 		if rv.Gitops {
-			k8sClient, err := cli.Client(monitor, orbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops, true)
+			k8sClient, err := cli.Client(monitor, orbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops)
 			if err != nil {
 				return err
 			}
