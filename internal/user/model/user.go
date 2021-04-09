@@ -2,7 +2,6 @@ package model
 
 import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"strings"
 
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
