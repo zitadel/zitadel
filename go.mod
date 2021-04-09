@@ -2,9 +2,6 @@ module github.com/caos/zitadel
 
 go 1.15
 
-replace github.com/caos/orbos => /home/elio/Code/src/github.com/caos/orbos
-replace github.com/caos/oidc => /home/elio/Code/src/github.com/caos/oidc
-
 require (
 	cloud.google.com/go v0.71.0 // indirect
 	cloud.google.com/go/storage v1.10.0
@@ -20,7 +17,7 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.14.4
-	github.com/caos/orbos v1.5.14-0.20210323181340-093f4c8a30f9
+	github.com/caos/orbos v1.5.14-0.20210409065121-3d3b9cc72937
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
