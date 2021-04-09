@@ -42,7 +42,7 @@ func Start(monitor mntr.Monitor, version, metricsAddr string, features ...string
 		return errors.Wrap(err, "unable to start manager")
 	}
 
-	k8sClient, err := kubernetes.NewK8sClientWithConfig(monitor, cfg, true)
+	k8sClient, err := kubernetes.NewK8sClientWithConfig(monitor, cfg)
 	if err != nil {
 		return err
 	}
