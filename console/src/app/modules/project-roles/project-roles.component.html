@@ -72,7 +72,7 @@
             <span>{{'PROJECT.ROLE.EMPTY' | translate}}</span>
         </div>
 
-        <cnsl-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50" (page)="changePage()"
+        <cnsl-paginator #paginator [timestamp]="dataSource?.viewTimestamp" [length]="dataSource.totalResult" [pageSize]="50" (page)="changePage()"
             [pageSizeOptions]="[25, 50, 100, 250]">
         </cnsl-paginator>
     </div>

@@ -83,7 +83,7 @@
                 <i class="las la-exclamation"></i>
                 <span>{{'PROJECT.TABLE.EMPTY' | translate}}</span>
             </div>
-            <cnsl-paginator class="paginator" [length]="totalResult" [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"
+            <cnsl-paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult" [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"
                 (page)="changePage($event)"></cnsl-paginator>
         </div>
     </app-refresh-table>

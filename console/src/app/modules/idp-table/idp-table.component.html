@@ -100,6 +100,6 @@
             </tr>
         </table>
     </div>
-    <cnsl-paginator #paginator class="paginator" [length]="idpResult?.details?.totalResult || 0" [pageSize]="10"
+    <cnsl-paginator #paginator class="paginator" [timestamp]="idpResult?.details?.viewTimestamp" [length]="idpResult?.details?.totalResult || 0" [pageSize]="10"
         [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
 </app-refresh-table>

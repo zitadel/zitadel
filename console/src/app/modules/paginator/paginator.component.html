@@ -13,7 +13,8 @@
                 </mat-option>
             </mat-select>
         </cnsl-form-field>
-        <button (click)="previous()" [disabled]="!previousPossible" mat-raised-button>{{'PAGINATOR.PREVIOUS' | translate}}</button>
-        <button (click)="next()" [disabled]="!nextPossible" mat-raised-button>{{'PAGINATOR.NEXT' | translate}}</button>
+        <button (click)="previous()" [disabled]="!previousPossible" mat-button>{{'PAGINATOR.PREVIOUS' |
+            translate}}</button>
+        <button (click)="next()" [disabled]="!nextPossible" mat-button>{{'PAGINATOR.NEXT' | translate}}</button>
     </div>
 </div>

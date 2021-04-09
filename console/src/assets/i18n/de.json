@@ -179,13 +179,12 @@
             "DEACTIVATE":"Deaktivieren",
             "ACTIVATE":"Aktivieren",
             "FILTER": {
-                "0":"Nach displayName filtern",
+                "0":"Nach Anzeigename filtern",
                 "1":"Nach Username filtern",
-                "2":"Nach Vornamen filtern",
-                "3":"Nach Nachnamen filtern",
-                "4":"Nach rollenschlüssel filtern",
+                "2":"Nach Displayname filtern",
+                "3":"Nach Benutzernamen filtern",
+                "4":"Nach Email filtern",
                 "5":"Nach Display Namen filtern",
-                "6":"Nach Email filtern",
                 "10":"Nach Organisationsname filtern",
                 "12":"Project Name"
             },
@@ -381,6 +380,12 @@
             "CREATE": {
                 "TITLE": "Benutzerberechtigung erstellen",
                 "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
+            },
+            "FILTER": {
+                "0":"Nach User Anzeigename filtern",
+                "1":"Nach Domain filtern",
+                "2":"Nach Projectnamen filtern",
+                "3":"Nach Rolle filtern"
             }
         },
         "VALIDATION": {

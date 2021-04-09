@@ -65,7 +65,7 @@
             </tr>
 
         </table>
-        <cnsl-paginator #paginator class="paginator" [length]="keyResult?.details?.totalResult || 0" [pageSize]="10"
+        <cnsl-paginator #paginator class="paginator" [timestamp]="keyResult?.details?.viewTimestamp" [length]="keyResult?.details?.totalResult || 0" [pageSize]="10"
             [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
     </div>
 </app-refresh-table>

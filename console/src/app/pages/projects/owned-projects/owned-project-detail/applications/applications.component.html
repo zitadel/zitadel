@@ -45,7 +45,7 @@
             <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
 
-        <cnsl-paginator class="paginator" #paginator [length]="dataSource.totalResult" [pageSize]="25"
+        <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [length]="dataSource.totalResult" [pageSize]="25"
             [pageSizeOptions]="[25, 50, 100, 250]">
         </cnsl-paginator>
     </div>

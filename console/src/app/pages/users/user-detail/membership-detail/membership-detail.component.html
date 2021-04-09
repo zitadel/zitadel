@@ -78,7 +78,7 @@
                 </tr>
             </table>
 
-            <cnsl-paginator class="paginator" #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
+            <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
             </cnsl-paginator>
         </div>
     </app-refresh-table>

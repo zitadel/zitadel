@@ -3,7 +3,7 @@
     [dataSize]="dataSource?.totalResult" [selection]="selection">
     <cnsl-form-field @appearfade *ngIf="userGrantListSearchKey != undefined" actions class="filtername">
         <input class="filterinput" cnslInput (keyup)="applyFilter($event)"
-            [placeholder]="('USER.TABLE.FILTER.' + userGrantListSearchKey.toString()) | translate" #input>
+            [placeholder]="('USER.GRANTS.FILTER.' + userGrantListSearchKey.toString()) | translate" #input>
     </cnsl-form-field>
 
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button actions
@@ -78,6 +78,20 @@
                 </td>
             </ng-container>
 
+            <ng-container matColumnDef="creationDate">
+                <th mat-header-cell *matHeaderCellDef> {{'PROJECT.GRANT.CREATIONDATE' | translate}} </th>
+                <td mat-cell *matCellDef="let grant">
+                    <span>{{grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="changeDate">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
+                <td mat-cell *matCellDef="let grant">
+                    <span>{{grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+                </td>
+            </ng-container>
+
             <ng-container matColumnDef="roleNamesList">
                 <th mat-header-cell *matHeaderCellDef class="role-data">
                     {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
@@ -106,7 +120,6 @@
                         <ng-container
                             *ngIf="(context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantToEdit == grant.id && loadedProjectId && loadedProjectId === grant.projectId">
                             <cnsl-form-field class="form-field" appearance="outline">
-                                <!-- <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label> -->
                                 <mat-select [(ngModel)]="grant.roleKeysList" multiple
                                     [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.id] : []) | hasRole | async))"
                                     (selectionChange)="updateRoles(grant, $event)">
@@ -125,7 +138,6 @@
                         <ng-container
                             *ngIf="(context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && loadedId && loadedId === grant.id && grantToEdit == grant.id">
                             <cnsl-form-field class="form-field" appearance="outline">
-                                <!-- <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label> -->
                                 <mat-select [(ngModel)]="grant.roleKeysList" multiple
                                     [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.id] : []) | hasRole | async))"
                                     (selectionChange)="updateRoles(grant, $event)">
@@ -153,7 +165,7 @@
             <i class="las la-exclamation"></i>
             <span>{{'GRANTS.EMPTY' | translate}}</span>
         </div>
-        <cnsl-paginator class="paginator" #paginator [length]="dataSource.totalResult" [pageSize]="INITIAL_PAGE_SIZE"
+        <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [length]="dataSource.totalResult" [pageSize]="INITIAL_PAGE_SIZE"
             [length]="dataSource.totalResult" [pageSizeOptions]="[2, 3, 25, 50, 100, 250]" (page)="changePage($event)">
         </cnsl-paginator>
     </div>
