@@ -21,7 +21,7 @@ export ZITADEL_EVENTSTORE_HOST=localhost
 export ZITADEL_EVENTSTORE_PORT=26257
 
 # Keys
-gopass zitadel-secrets/zitadel/developer/default/keys.yaml > "$BASEDIR/local_keys.yaml"
+# gopass zitadel-secrets/zitadel/developer/default/keys.yaml > "$BASEDIR/local_keys.yaml"
 export ZITADEL_KEY_PATH="$BASEDIR/local_keys.yaml"
 
 export ZITADEL_USER_VERIFICATION_KEY=UserVerificationKey_1
